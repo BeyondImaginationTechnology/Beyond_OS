@@ -127,3 +127,126 @@ const menuBtn=document.querySelector(".menu-btn"),mobileNav=document.querySelect
 // Beyond TV Beta Build 2.1.1 theme flavors: Dark → Light → Sunset
 (function(){document.querySelectorAll('.footer,.classic-footer').forEach(function(footer){footer.childNodes.forEach(function(node){if(node.nodeType===3)node.nodeValue=node.nodeValue.replace(/Beyond TV 2\.2/g,'Beyond TV · Beta Build 2.1.1')})})})();
 (function(){const root=document.documentElement,themes=['dark','light','sunset'],icons={dark:'🌙',light:'☀️',sunset:'🌅'},labels={dark:'Dark',light:'Light',sunset:'Sunset'};let saved='sunset';try{saved=localStorage.getItem('beyond-tv-theme')||'sunset'}catch(e){}if(!themes.includes(saved))saved='sunset';function apply(t){root.dataset.tvTheme=t;document.querySelectorAll('[data-tv-theme-toggle]').forEach(btn=>{btn.innerHTML=icons[t]+'<span class="sr-only"> '+labels[t]+'</span>';const next=themes[(themes.indexOf(t)+1)%themes.length];btn.setAttribute('aria-label','Current theme '+labels[t]+'. Switch to '+labels[next]);btn.title='Theme: '+labels[t]+' · Next: '+labels[next]})}apply(saved);document.addEventListener('click',e=>{const btn=e.target.closest('[data-tv-theme-toggle]');if(!btn)return;const current=themes.includes(root.dataset.tvTheme)?root.dataset.tvTheme:'dark',next=themes[(themes.indexOf(current)+1)%themes.length];try{localStorage.setItem('beyond-tv-theme',next)}catch(e){}apply(next)})})();
+
+// Homepage Beyond TV iframe sync: 30 minutes for episodes, 2 hours for long-form content.
+(function initHomeBeyondTvSync(){
+  const frame=document.getElementById('homeBeyondTvPlayer');
+  const stage=document.querySelector('.home-live-stage');
+  if(!frame||!stage)return;
+
+  const buttons=[...stage.querySelectorAll('[data-home-channel]')];
+  if(!buttons.length)return;
+
+  const EPISODE_SYNC_MS=30*60*1000;
+  const LONG_FORM_SYNC_MS=2*60*60*1000;
+  const longFormChannels=new Set(['space','ancient','cinema','health','comedy','family']);
+  let syncTimer=0;
+  let nextSyncAt=0;
+
+  const name=document.getElementById('homeLiveChannelName');
+  const now=document.getElementById('homeLiveNow');
+  const open=document.getElementById('homeLiveOpen');
+  const kicker=document.getElementById('homeLiveKicker');
+  const heading=document.getElementById('homeLiveHeading');
+  const description=document.getElementById('homeLiveDescription');
+  const clock=document.querySelector('.home-live-clock');
+  const clean=value=>String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));
+
+  buttons.forEach(button=>{
+    const endpoint=button.dataset.endpoint||'';
+    if(endpoint)button.dataset.syncEndpoint=endpoint;
+    delete button.dataset.endpoint;
+  });
+
+  function syncInterval(button){
+    const explicit=Number(button?.dataset.syncMs||0);
+    if(Number.isFinite(explicit)&&explicit>=60000)return explicit;
+    return longFormChannels.has(button?.dataset.homeChannel||'')?LONG_FORM_SYNC_MS:EPISODE_SYNC_MS;
+  }
+
+  function syncLabel(button){
+    return syncInterval(button)===LONG_FORM_SYNC_MS?'Long-form sync · every 2 hours':'Episode sync · every 30 minutes';
+  }
+
+  function normalizedEmbed(embed){
+    if(!embed)return '';
+    const withApi=embed.includes('enablejsapi=1')?embed:(embed+(embed.includes('?')?'&':'?')+'enablejsapi=1');
+    try{return new URL(withApi,window.location.href).href}catch(_){return withApi}
+  }
+
+  function setFrame(embed,forceReload=false){
+    const nextSrc=normalizedEmbed(embed);
+    if(!nextSrc)return;
+    if(forceReload||frame.src!==nextSrc)frame.src=nextSrc;
+  }
+
+  function updateMeta(button,state={}){
+    const channelName=button.dataset.channelName||'Beyond TV';
+    const channelNumber=button.dataset.channelNumber||'';
+    const current=state.current||state.playing||{};
+    const next=state.next||{};
+    const block=current.title||state.episode_title||button.dataset.now||state.programme||'Live now';
+    const lineup=current.lineup||button.dataset.now||state.episode_title||'';
+    const upNext=next.title||button.dataset.next||'';
+    const icon=current.icon||button.dataset.icon||button.textContent.trim().split(' ')[0]||'📺';
+    stage.dataset.channelTheme=button.dataset.homeChannel||'cartoons';
+    if(name)name.textContent=channelName;
+    if(now)now.textContent=block;
+    if(kicker)kicker.innerHTML='<i></i> Beyond TV · Channel '+clean(channelNumber)+' live';
+    if(heading)heading.textContent=channelName+' is playing now.';
+    if(description)description.innerHTML='<strong>'+clean(icon)+' '+clean(block)+'</strong>'+(lineup&&lineup!==block?' · '+clean(lineup):'')+(upNext?' · Up next: '+clean(upNext):'')+' · Vancouver time';
+    if(open)open.href=button.dataset.open||'/beyond-tv/';
+    if(clock)clock.textContent=syncLabel(button)+' · America/Vancouver';
+  }
+
+  async function sync(button){
+    if(!button||!button.classList.contains('active'))return;
+    const endpoint=button.dataset.syncEndpoint||'';
+    try{
+      if(endpoint){
+        const response=await fetch(endpoint,{cache:'no-store'});
+        if(!response.ok)throw new Error('HTTP '+response.status);
+        const data=await response.json();
+        const state=data.state||data;
+        const embed=state.embed_url||state.embed_fallback||button.dataset.embed||'';
+        setFrame(embed,true);
+        updateMeta(button,state);
+      }else{
+        setFrame(button.dataset.embed||frame.src,true);
+        updateMeta(button);
+      }
+    }catch(error){
+      console.warn('Beyond TV scheduled iframe sync unavailable',error);
+    }finally{
+      schedule(button);
+    }
+  }
+
+  function schedule(button){
+    if(syncTimer)clearTimeout(syncTimer);
+    if(!button)return;
+    const delay=syncInterval(button);
+    nextSyncAt=Date.now()+delay;
+    syncTimer=window.setTimeout(()=>sync(button),delay);
+    if(clock)clock.textContent=syncLabel(button)+' · America/Vancouver';
+  }
+
+  buttons.forEach(button=>{
+    button.addEventListener('click',()=>{
+      const endpoint=button.dataset.syncEndpoint||'';
+      if(endpoint)button.dataset.endpoint=endpoint;
+    },true);
+    button.addEventListener('click',()=>{
+      window.setTimeout(()=>{delete button.dataset.endpoint},0);
+      schedule(button);
+    });
+  });
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden)return;
+    const active=stage.querySelector('[data-home-channel].active');
+    if(active&&nextSyncAt&&Date.now()>=nextSyncAt)sync(active);
+  });
+
+  schedule(stage.querySelector('[data-home-channel].active'));
+})();

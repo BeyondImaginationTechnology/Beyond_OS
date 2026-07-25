@@ -232,9 +232,9 @@
     "name": "Beyond Movies",
     "short_name": "Beyond Movies",
     "icon": "🎬",
-    "now": "Jeepers Creepers — Today’s Special",
-    "up_next": "Sunday: six-movie marathon",
-    "description": "Features, double bills, and weekend marathons.",
+    "now": "General-audience live feature",
+    "up_next": "Next family-safe classic",
+    "description": "Animation, comedy, adventure, and family classics in a continuous live rotation.",
     "gradient": "linear-gradient(135deg,#241b08,#6f4a16 60%,#e6b94b)",
     "progress": 27,
     "access": "guest",
@@ -243,7 +243,7 @@
     "thumbnail": "/beyond-tv/assets/img/beyond-tv-promo.webp",
     "release_status": "released",
     "source_type": "scheduled_movies",
-    "source_label": "Beyond Movies weekly schedule",
+    "source_label": "Wikimedia Commons public-domain rotation",
     "number": 6,
     "featured": true
   },
@@ -475,7 +475,7 @@
     "category": "Movies",
     "live": true,
     "source_type": "scheduled_movies",
-    "source_label": "Beyond Movies weekly schedule",
+    "source_label": "Wikimedia Commons public-domain rotation",
     "featured": false
   },
   {

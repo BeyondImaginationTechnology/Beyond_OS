@@ -165,7 +165,9 @@ const menuBtn=document.querySelector(".menu-btn"),mobileNav=document.querySelect
   }
 
   function syncLabel(button){
-    return syncInterval(button)===LONG_FORM_SYNC_MS?'Long-form sync · every 2 hours':'Episode sync · every 30 minutes';
+    const interval=syncInterval(button);
+    if(interval===5*60*1000)return 'Live movie sync · every 5 minutes';
+    return interval===LONG_FORM_SYNC_MS?'Long-form sync · every 2 hours':'Episode sync · every 30 minutes';
   }
 
   function normalizedEmbed(embed){

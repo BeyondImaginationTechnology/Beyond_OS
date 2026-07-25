@@ -1,24 +1,106 @@
 <?php
 declare(strict_types=1);
-function beyond_movies_schedule_state(?DateTimeImmutable $now=null): array {
-    $tz=new DateTimeZone('America/Vancouver'); $now=$now?->setTimezone($tz)??new DateTimeImmutable('now',$tz);
-    $movies=[
-      1=>['title'=>'Cats','id'=>'QrnXZgFYMbk','genre'=>'Family · Adventure','runtime'=>'1 hr 30 min'],
-      2=>['title'=>'Mud (2012)','id'=>'qbhV8m2wrZM','genre'=>'Drama','runtime'=>'2 hr 10 min'],
-      3=>['title'=>'Never Back Down','id'=>'y886zL1bwQU','genre'=>'Action · Martial Arts','runtime'=>'Full movie'],
-      4=>['title'=>'Big Stan','id'=>'sx8pViXxZQg','genre'=>'Comedy','runtime'=>'Full movie'],
-      5=>['title'=>'In the Mix','id'=>'zhue70cwb7Y','genre'=>'Romantic Comedy','runtime'=>'Full movie'],
-      6=>['title'=>"Don't Look Away",'id'=>'eDrk1ifu0g8','genre'=>'Horror','runtime'=>'Full movie'],
-      7=>['title'=>'Zatch Bell! Movie 1: 101st Devil','type'=>'archive','url'=>'https://archive.org/download/zatch-bell-collection/Zatch%20Bell/Movies/Zatch%20Bell%20Movie%2001%20-%20%20Unlisted%20Demon%20101%20%28101st%20Devil%29.mp4','genre'=>'Anime · Adventure','runtime'=>'Feature film'],
-      8=>['title'=>'Zatch Bell! Movie 2: Attack of the Mechavulcan','type'=>'archive','url'=>'https://archive.org/download/zatch-bell-collection/Zatch%20Bell/Movies/Zatch%20Bell%20Movie%2002%20-%20Attack%20of%20The%20Mechavulcan.mp4','genre'=>'Anime · Action','runtime'=>'Feature film'],
+
+function beyond_movies_catalog(): array {
+    return [
+        [
+            'title' => "Gulliver's Travels",
+            'year' => '1939',
+            'genre' => 'Animation · Fantasy · Family',
+            'runtime' => '1 hr 16 min',
+            'duration' => 4581,
+            'rating' => 'General audiences',
+            'url' => 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Gullivers%20Travels%20%281939%29.webm',
+            'rights_url' => 'https://commons.wikimedia.org/wiki/File:Gullivers_Travels_(1939).webm',
+        ],
+        [
+            'title' => 'The Kid',
+            'year' => '1921',
+            'genre' => 'Comedy · Family · Drama',
+            'runtime' => '1 hr 8 min',
+            'duration' => 4100,
+            'rating' => 'General audiences',
+            'url' => 'https://commons.wikimedia.org/wiki/Special:Redirect/file/The%20Kid%20%281921%29%20by%20Charlie%20Chaplin.webm',
+            'rights_url' => 'https://commons.wikimedia.org/wiki/File:The_Kid_(1921)_by_Charlie_Chaplin.webm',
+        ],
+        [
+            'title' => 'Sherlock Jr.',
+            'year' => '1924',
+            'genre' => 'Comedy · Mystery · Family',
+            'runtime' => '44 min',
+            'duration' => 2646,
+            'rating' => 'General audiences',
+            'url' => 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Sherlock%20Jr.%20%281924%29.webm',
+            'rights_url' => 'https://commons.wikimedia.org/wiki/File:Sherlock_Jr._(1924).webm',
+        ],
+        [
+            'title' => 'The General',
+            'year' => '1926',
+            'genre' => 'Comedy · Adventure · Family',
+            'runtime' => '1 hr 16 min',
+            'duration' => 4552,
+            'rating' => 'General audiences',
+            'url' => 'https://commons.wikimedia.org/wiki/Special:Redirect/file/The%20General%20%281926%29.webm',
+            'rights_url' => 'https://commons.wikimedia.org/wiki/File:The_General_(1926).webm',
+        ],
+        [
+            'title' => 'The Little Princess',
+            'year' => '1939',
+            'genre' => 'Family · Musical · Drama',
+            'runtime' => '1 hr 33 min',
+            'duration' => 5569,
+            'rating' => 'General audiences',
+            'url' => 'https://commons.wikimedia.org/wiki/Special:Redirect/file/The%20Little%20Princess%20%281939%29.webm',
+            'rights_url' => 'https://commons.wikimedia.org/wiki/File:The_Little_Princess_(1939).webm',
+        ],
+        [
+            'title' => 'His Girl Friday',
+            'year' => '1940',
+            'genre' => 'Comedy · Romance',
+            'runtime' => '1 hr 32 min',
+            'duration' => 5518,
+            'rating' => 'General audiences',
+            'url' => 'https://commons.wikimedia.org/wiki/Special:Redirect/file/His%20Girl%20Friday%20%281940%29.webm',
+            'rights_url' => 'https://commons.wikimedia.org/wiki/File:His_Girl_Friday_(1940).webm',
+        ],
     ];
-    $specials=['2026-07-17'=>['title'=>'Jeepers Creepers','id'=>'ROY1YDlYUNc','genre'=>'Horror · Special Presentation','runtime'=>'Full movie']];
-    $day=(int)$now->format('N'); $date=$now->format('Y-m-d');
-    if(isset($specials[$date])){$current=$specials[$date];$label="TODAY'S SPECIAL";$next=$movies[6];}
-    elseif($day===7){
-      $movieCount=count($movies); $slot=(int)floor(((int)$now->format('G')*60+(int)$now->format('i'))/(24*60/$movieCount));
-      $slot=max(0,min($movieCount-1,$slot)); $current=$movies[$slot+1]; $label='SUNDAY MARATHON'; $next=$movies[(($slot+1)%$movieCount)+1];
-    } else {$current=$movies[$day];$label='FEATURE OF THE DAY';$next=$day===6?$movies[1]:$movies[$day+1];}
-    $embed=($current['type']??'youtube')==='archive' ? (string)$current['url'] : 'https://www.youtube-nocookie.com/embed/'.$current['id'].'?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1';
-    return ['current'=>$current,'next'=>$next,'label'=>$label,'embed_url'=>$embed,'movies'=>$movies,'is_marathon'=>$day===7,'date'=>$date];
+}
+
+function beyond_movies_schedule_state(?DateTimeImmutable $now = null): array {
+    $timezone = new DateTimeZone('America/Vancouver');
+    $now = $now?->setTimezone($timezone) ?? new DateTimeImmutable('now', $timezone);
+    $movies = beyond_movies_catalog();
+    $total = array_sum(array_column($movies, 'duration'));
+    $position = $total > 0 ? $now->getTimestamp() % $total : 0;
+    $currentIndex = 0;
+    $startOffset = 0;
+
+    foreach ($movies as $index => $movie) {
+        if ($position < (int)$movie['duration']) {
+            $currentIndex = (int)$index;
+            $startOffset = $position;
+            break;
+        }
+        $position -= (int)$movie['duration'];
+    }
+
+    $ordered = array_merge(array_slice($movies, $currentIndex), array_slice($movies, 0, $currentIndex));
+    $current = $movies[$currentIndex] ?? [];
+    $next = $movies[($currentIndex + 1) % max(1, count($movies))] ?? [];
+    $sourceKey = $current ? sha1((string)$current['url'] . '|' . $currentIndex) : '';
+
+    return [
+        'current' => $current,
+        'next' => $next,
+        'label' => 'GENERAL AUDIENCE · LIVE ROTATION',
+        'embed_url' => (string)($current['url'] ?? ''),
+        'player_url' => '/beyond-tv/movie-player.php',
+        'source_key' => $sourceKey,
+        'start_offset' => $startOffset,
+        'playlist_duration' => $total,
+        'movies' => $movies,
+        'sources' => $ordered,
+        'timezone' => 'America/Vancouver',
+        'server_time' => $now->format(DATE_ATOM),
+    ];
 }

@@ -247,6 +247,19 @@ function resolve_archives(array $ids): array {
     return $resolved;
 }
 $config=$channels[$slug];
+if ($slug === 'classic-cinema') {
+    require_once dirname(__DIR__) . '/includes/movies-schedule.php';
+    $movieState = beyond_movies_schedule_state();
+    $config['items'] = array_map(static fn(array $movie): array => [
+        'url' => (string)$movie['url'],
+        'title' => (string)$movie['title'],
+        'duration' => (int)$movie['duration'],
+        'creator' => '',
+        'license' => 'Public-domain source edition',
+        'rights_url' => (string)$movie['rights_url'],
+    ], $movieState['movies']);
+    $config['embed'] = (string)$movieState['player_url'];
+}
 if (!empty($config['episode_map'])) {
     $episodeRows = json_decode((string)@file_get_contents((string)$config['episode_map']), true);
     $preferred = [];

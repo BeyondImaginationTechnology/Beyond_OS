@@ -21,6 +21,15 @@ $timezone = new DateTimeZone('America/Vancouver');
 $now = new DateTimeImmutable('now', $timezone);
 $hour = (int)$now->format('G');
 $schedule = is_array($schedules[$slug] ?? null) ? $schedules[$slug] : [];
+if (in_array($slug, ['beyond-after-dark', 'beyond-comedy', 'beyond-family'], true)) {
+    require_once dirname(__DIR__) . '/includes/eight-channel-guide.php';
+    if ($slug === 'beyond-after-dark') {
+        $schedule = beyond_tv_after_dark_hourly_rows();
+    } else {
+        $dynamicSchedule = beyond_tv_catalog_hourly_rows($slug);
+        if ($dynamicSchedule) $schedule = $dynamicSchedule;
+    }
+}
 $currentIndex = 0;
 foreach ($schedule as $index => $block) {
     $start = (int)($block['start'] ?? 0);

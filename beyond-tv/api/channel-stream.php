@@ -184,13 +184,67 @@ function fetch_json(string $url): ?array {
     $decoded=$body!==null?json_decode($body,true):null; return is_array($decoded)?$decoded:null;
 }
 function archive_url(string $id,string $file): string { return 'https://archive.org/download/'.rawurlencode($id).'/'.implode('/',array_map('rawurlencode',explode('/',$file))); }
-function resolve_archive(string $id): ?string {
-    $metadata=fetch_json('https://archive.org/metadata/'.rawurlencode($id));
+function archive_cache_file(string $id): string {
+    $cacheDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'beyond-tv-archive-cache';
+    return $cacheDir . DIRECTORY_SEPARATOR . sha1($id) . '.json';
+}
+function archive_cache_get(string $id): ?string {
+    $cacheFile = archive_cache_file($id);
+    if (is_file($cacheFile) && (time() - (int)@filemtime($cacheFile)) < 604800) {
+        $cached = json_decode((string)@file_get_contents($cacheFile), true);
+        if (is_array($cached) && filter_var($cached['url'] ?? '', FILTER_VALIDATE_URL)) return (string)$cached['url'];
+    }
+    return null;
+}
+function archive_cache_set(string $id, string $url): void {
+    $cacheFile = archive_cache_file($id);
+    $cacheDir = dirname($cacheFile);
+    if (!is_dir($cacheDir)) @mkdir($cacheDir, 0775, true);
+    if (is_dir($cacheDir)) @file_put_contents($cacheFile, json_encode(['url'=>$url], JSON_UNESCAPED_SLASHES), LOCK_EX);
+}
+function archive_url_from_metadata(string $id, ?array $metadata): ?string {
     if(!$metadata||!is_array($metadata['files']??null))return null;
     $c=[]; foreach($metadata['files'] as $f){ if(!is_array($f))continue; $n=(string)($f['name']??''); $fmt=strtolower((string)($f['format']??''));
         if(!preg_match('/\.(mp4|m4v|webm)$/i',$n)||str_contains($fmt,'thumbnail')||str_contains(strtolower($n),'thumb'))continue;
         $score=(int)($f['size']??0); if(preg_match('/\.mp4$/i',$n))$score+=2000000000; $c[]=['n'=>$n,'s'=>$score]; }
-    usort($c,fn($a,$b)=>$b['s']<=>$a['s']); return $c?archive_url($id,$c[0]['n']):null;
+    usort($c,fn($a,$b)=>$b['s']<=>$a['s']);
+    return $c ? archive_url($id, $c[0]['n']) : null;
+}
+function resolve_archive(string $id): ?string {
+    $cached = archive_cache_get($id);
+    if ($cached) return $cached;
+    $metadata=fetch_json('https://archive.org/metadata/'.rawurlencode($id));
+    $url=archive_url_from_metadata($id,$metadata);
+    if($url)archive_cache_set($id,$url);
+    return $url;
+}
+function resolve_archives(array $ids): array {
+    $resolved=[];$missing=[];
+    foreach(array_values(array_unique(array_filter(array_map('strval',$ids)))) as $id){
+        $cached=archive_cache_get($id);
+        if($cached)$resolved[$id]=$cached;else $missing[]=$id;
+    }
+    if(!$missing)return $resolved;
+    if(!function_exists('curl_multi_init')){
+        foreach($missing as $id){$url=resolve_archive($id);if($url)$resolved[$id]=$url;}
+        return $resolved;
+    }
+    $multi=curl_multi_init();$handles=[];
+    foreach($missing as $id){
+        $handle=curl_init('https://archive.org/metadata/'.rawurlencode($id));
+        curl_setopt_array($handle,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_FOLLOWLOCATION=>true,CURLOPT_CONNECTTIMEOUT=>3,CURLOPT_TIMEOUT=>8,CURLOPT_USERAGENT=>'BeyondTV/2.1']);
+        curl_multi_add_handle($multi,$handle);$handles[spl_object_id($handle)]=['id'=>$id,'handle'=>$handle];
+    }
+    do{$status=curl_multi_exec($multi,$active);if($active&&$status===CURLM_OK&&curl_multi_select($multi,1.0)===-1)usleep(10000);}while($active&&$status===CURLM_OK);
+    foreach($handles as $entry){
+        $handle=$entry['handle'];$id=$entry['id'];$body=curl_multi_getcontent($handle);$http=(int)curl_getinfo($handle,CURLINFO_RESPONSE_CODE);
+        $metadata=is_string($body)&&$http>=200&&$http<300?json_decode($body,true):null;
+        $url=archive_url_from_metadata($id,is_array($metadata)?$metadata:null);
+        if($url){archive_cache_set($id,$url);$resolved[$id]=$url;}
+        curl_multi_remove_handle($multi,$handle);curl_close($handle);
+    }
+    curl_multi_close($multi);
+    return $resolved;
 }
 $config=$channels[$slug];
 if (!empty($config['episode_map'])) {
@@ -227,10 +281,32 @@ if ($slug === 'beyond-after-dark') {
         ];
     }
 }
+$archiveIds=[];foreach($config['items'] as $item){if(empty($item['url'])&&!empty($item['archive']))$archiveIds[]=(string)$item['archive'];}
+$archiveUrls=resolve_archives($archiveIds);
 $resolved=[];
-foreach($config['items'] as $item){ $url=$item['url']??null; if(!$url&&!empty($item['archive']))$url=resolve_archive($item['archive']); if(!$url)continue;
-    $resolved[]=['provider'=>!empty($item['archive'])?'Internet Archive':'Wikimedia Commons','title'=>$item['title'],'url'=>$url,'duration'=>(int)$item['duration'],'type'=>str_contains($url,'.webm')?'video/webm':'video/mp4','creator'=>(string)($item['creator']??''),'license'=>(string)($item['license']??''),'rights_url'=>(string)($item['rights_url']??'')]; }
+foreach($config['items'] as $item){ $url=$item['url']??null; if(!$url&&!empty($item['archive']))$url=$archiveUrls[(string)$item['archive']]??null; if(!$url)continue;
+    $provider = !empty($item['archive']) || str_contains((string)$url, 'archive.org/') ? 'Internet Archive' : 'Wikimedia Commons';
+    $resolved[]=['provider'=>$provider,'title'=>$item['title'],'url'=>$url,'duration'=>(int)$item['duration'],'type'=>str_contains($url,'.webm')?'video/webm':'video/mp4','creator'=>(string)($item['creator']??''),'license'=>(string)($item['license']??''),'rights_url'=>(string)($item['rights_url']??'')]; }
 $total=array_sum(array_column($resolved,'duration')); $position=$total>0?time()%$total:0; $current=0; $offset=0;
 foreach($resolved as $i=>$item){ if($position<$item['duration']){$current=$i;$offset=$position;break;} $position-=$item['duration']; }
 $ordered=$resolved; if($resolved){$ordered=array_merge(array_slice($resolved,$current),array_slice($resolved,0,$current));}
-echo json_encode(['ok'=>true,'channel'=>['slug'=>$slug,'name'=>$config['name'],'mode'=>'pseudo-live','programme'=>$resolved[$current]['title']??'Unavailable'],'sources'=>$ordered,'start_offset'=>$offset,'playlist_duration'=>$total,'server_time'=>time(),'embed_fallback'=>$config['embed']],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
+$currentItem = $resolved[$current] ?? [];
+$nextItem = $resolved ? $resolved[($current + 1) % count($resolved)] : [];
+$sourceKey = $currentItem ? sha1((string)($currentItem['url'] ?? '') . '|' . $current) : '';
+$playerUrl = '/beyond-tv/embed-player.php?slug=' . rawurlencode($slug);
+echo json_encode([
+    'ok'=>true,
+    'channel'=>['slug'=>$slug,'name'=>$config['name'],'mode'=>'pseudo-live','programme'=>$currentItem['title']??'Unavailable'],
+    'state'=>[
+        'current'=>['title'=>$currentItem['title']??'Unavailable','provider'=>$currentItem['provider']??'','source_key'=>$sourceKey],
+        'next'=>['title'=>$nextItem['title']??'Next scheduled program'],
+        'player_url'=>$playerUrl,
+        'source_key'=>$sourceKey,
+    ],
+    'sources'=>$ordered,
+    'start_offset'=>$offset,
+    'playlist_duration'=>$total,
+    'server_time'=>time(),
+    'player_url'=>$playerUrl,
+    'embed_fallback'=>$config['embed'],
+],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);

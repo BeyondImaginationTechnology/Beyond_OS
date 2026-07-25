@@ -76,11 +76,6 @@ function beyond_tv_after_dark_hourly_rows(): array {
     $day = new DateTimeImmutable('today', new DateTimeZone('America/Vancouver'));
     $rows = [];
     for ($hour = 0; $hour < 24; $hour++) {
-        if ($hour >= 22 || in_array($hour, [4, 10, 16], true)) {
-            $episode = (($hour + (int)$day->format('z')) % 13) + 1;
-            $rows[] = ['start'=>$hour,'end'=>$hour+1,'icon'=>'🐶','title'=>'Courage the Cowardly Dog','lineup'=>'Season 1 · Episode '.$episode];
-            continue;
-        }
         $position = $day->setTime($hour, 0)->getTimestamp() % $total; $index = 0;
         foreach ($durations as $candidate => $duration) { if ($position < $duration) { $index = $candidate; break; } $position -= $duration; }
         $episode = $playlist[$index];

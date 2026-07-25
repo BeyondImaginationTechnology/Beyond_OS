@@ -205,7 +205,7 @@ $cartoonNext = $cartoonSchedule['next'];
       <div>
         <span class="home-live-kicker" id="homeLiveKicker"><i></i> Beyond TV · Channel 1 live</span>
         <h2 id="homeLiveHeading">Beyond After Dark is playing now.</h2>
-        <p id="homeLiveDescription"><strong>🌙 Beyond After Dark demo</strong> · Supernatural channel preview · Vancouver time</p>
+        <p id="homeLiveDescription"><strong>🌙 Connecting to the live program…</strong> · Synchronized premium channel preview · Vancouver time</p>
       </div>
       <div class="home-live-actions">
         <a class="home-live-button secondary" href="/beyond-tv/#guide">TV Guide</a>
@@ -218,12 +218,12 @@ $cartoonNext = $cartoonSchedule['next'];
     </div>
 
     <div class="home-live-meta">
-      <div><span class="live-dot"></span><b id="homeLiveChannelName">Beyond After Dark</b><span id="homeLiveNow">Beyond After Dark demo</span></div>
+      <div><span class="live-dot"></span><b id="homeLiveChannelName">Beyond After Dark</b><span id="homeLiveNow">Loading live schedule…</span></div>
       <span class="home-live-clock">Live schedule · America/Vancouver</span>
     </div>
 
     <div class="home-live-switch" role="group" aria-label="Choose a Beyond TV channel">
-      <button type="button" class="active" data-home-channel="after-dark" data-channel-number="1" data-channel-name="Beyond After Dark" data-endpoint="/beyond-tv/api/schedule-live.php?slug=beyond-after-dark" data-embed="/beyond-tv/embed-player.php?slug=beyond-after-dark" data-now="R. L. Stine’s The Haunting Hour" data-next="Next supernatural story" data-icon="🌙" data-open="/beyond-tv/channel.php?slug=beyond-after-dark">🌙 <span>After Dark</span></button>
+      <button type="button" class="active" data-home-channel="after-dark" data-channel-number="1" data-channel-name="Beyond After Dark" data-endpoint="/beyond-tv/api/channel-stream.php?slug=beyond-after-dark" data-embed="/beyond-tv/embed-player.php?slug=beyond-after-dark" data-now="Loading the live program…" data-next="Live schedule connecting" data-icon="🌙" data-open="/beyond-tv/channel.php?slug=beyond-after-dark">🌙 <span>After Dark</span></button>
       <button type="button" data-home-channel="cartoons" data-channel-number="2" data-channel-name="Beyond Kartoons" data-endpoint="/beyond-tv/api/beyond-cartoons-live.php" data-open="/beyond-tv/channel.php?slug=beyond-cartoons">📺 <span>Kartoons</span></button>
       <button type="button" data-home-channel="anime" data-channel-number="3" data-channel-name="Beyond Anime" data-endpoint="/beyond-tv/api/yugioh-live.php" data-now="Beyond Anime demo" data-next="Next anime episode" data-icon="⚡" data-open="/beyond-tv/channel.php?slug=yugioh-tv">⚡ <span>Anime</span></button>
       <button type="button" data-home-channel="cinema" data-channel-number="4" data-channel-name="Beyond Movies" data-endpoint="/beyond-tv/api/schedule-live.php?slug=classic-cinema" data-embed="https://www.youtube-nocookie.com/embed/QrnXZgFYMbk?autoplay=1&amp;mute=1&amp;playsinline=1&amp;rel=0&amp;modestbranding=1&amp;enablejsapi=1" data-now="Cats" data-next="More family movie features" data-icon="🎬" data-open="/beyond-tv/channel.php?slug=classic-cinema">🎬 <span>Movies</span></button>
@@ -232,8 +232,8 @@ $cartoonNext = $cartoonSchedule['next'];
       <button type="button" data-home-channel="preschool-fr" data-channel-number="7" data-channel-name="Préscolaire Français" data-endpoint="/beyond-tv/api/channel-stream.php?slug=preschool-francais" data-embed="/beyond-tv/embed-player.php?slug=preschool-francais" data-now="Caillou en français" data-next="Histoires éducatives en français" data-icon="🇫🇷" data-open="/beyond-tv/channel.php?slug=preschool-francais">🇫🇷 <span>Préscolaire FR</span></button>
       <button type="button" data-home-channel="space" data-channel-number="8" data-channel-name="Beyond Space" data-endpoint="/beyond-tv/api/space-live.php" data-now="The Sun &amp; The Milky Way" data-next="Weekly space rotation" data-icon="🛰️" data-open="/beyond-tv/channel.php?slug=space-tv">🛰️ <span>Space</span></button>
       <button type="button" data-home-channel="ancient" data-channel-number="9" data-channel-name="Beyond Ancient" data-endpoint="/beyond-tv/api/schedule-live.php?slug=beyond-ancient" data-embed="https://www.youtube-nocookie.com/embed/BR2ZMj3o5EU?autoplay=1&amp;mute=1&amp;playsinline=1&amp;rel=0&amp;enablejsapi=1" data-now="Ancient Egypt Documentary" data-next="Pyramids, pharaohs and archaeology" data-icon="𓂀" data-open="/beyond-tv/channel.php?slug=beyond-ancient">𓂀 <span>Ancient</span></button>
-      <button type="button" data-home-channel="comedy" data-channel-number="10" data-channel-name="Beyond Comedy" data-endpoint="/beyond-tv/api/schedule-live.php?slug=beyond-comedy" data-embed="/beyond-tv/embed-player.php?slug=beyond-comedy" data-now="Comedy live library" data-next="Next comedy feature" data-icon="😂" data-open="/beyond-tv/channel.php?slug=beyond-comedy">😂 <span>Comedy</span></button>
-      <button type="button" data-home-channel="family" data-channel-number="11" data-channel-name="Beyond Family" data-endpoint="/beyond-tv/api/schedule-live.php?slug=beyond-family" data-embed="/beyond-tv/embed-player.php?slug=beyond-family" data-now="Family live library" data-next="Next family feature" data-icon="✨" data-open="/beyond-tv/channel.php?slug=beyond-family">✨ <span>Family</span></button>
+      <button type="button" data-home-channel="comedy" data-channel-number="10" data-channel-name="Beyond Comedy" data-endpoint="/beyond-tv/api/channel-stream.php?slug=beyond-comedy" data-embed="/beyond-tv/embed-player.php?slug=beyond-comedy" data-now="Loading the live program…" data-next="Live schedule connecting" data-icon="😂" data-open="/beyond-tv/channel.php?slug=beyond-comedy">😂 <span>Comedy</span></button>
+      <button type="button" data-home-channel="family" data-channel-number="11" data-channel-name="Beyond Family" data-endpoint="/beyond-tv/api/channel-stream.php?slug=beyond-family" data-embed="/beyond-tv/embed-player.php?slug=beyond-family" data-now="Loading the live program…" data-next="Live schedule connecting" data-icon="✨" data-open="/beyond-tv/channel.php?slug=beyond-family">✨ <span>Family</span></button>
     </div>
   </div>
 </section>
@@ -331,9 +331,9 @@ $cartoonNext = $cartoonSchedule['next'];
 
 <style>
 .home-live-stage{position:relative;isolation:isolate;width:min(1600px,calc(100vw - 24px));margin:4px auto 42px;overflow:hidden;border:1px solid rgba(151,112,255,.48);border-radius:32px;background:#080a18;box-shadow:0 30px 90px rgba(0,0,0,.48)}
-.home-live-stage__background{position:absolute;inset:-28px;z-index:-2;background-image:url('/beyond-tv/assets/img/channel-backgrounds-sprite.png');background-repeat:no-repeat;background-size:400% 200%;background-position:var(--channel-bg,33.333% 0);filter:blur(16px) saturate(1.25);transform:scale(1.06);opacity:.94;transition:background-position .35s ease}
-.home-live-stage:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(3,5,13,.34),rgba(3,5,13,.78) 82%,#050712);pointer-events:none}
-.home-live-stage[data-channel-theme="classic"]{--channel-bg:0 0}.home-live-stage[data-channel-theme="cartoons"]{--channel-bg:33.333% 0}.home-live-stage[data-channel-theme="preschool"]{--channel-bg:66.666% 0}.home-live-stage[data-channel-theme="space"]{--channel-bg:100% 0}.home-live-stage[data-channel-theme="ancient"]{--channel-bg:0 100%}.home-live-stage[data-channel-theme="cinema"]{--channel-bg:33.333% 100%}.home-live-stage[data-channel-theme="french"]{--channel-bg:66.666% 100%}.home-live-stage[data-channel-theme="health"]{--channel-bg:100% 100%}
+.home-live-stage__background{position:absolute;inset:-18px;z-index:-2;background-image:url('/beyond-tv/assets/img/channel-backgrounds-sprite.png');background-repeat:no-repeat;background-size:400% 200%;background-position:var(--channel-bg,33.333% 0);filter:blur(9px) saturate(1.34) contrast(1.08) hue-rotate(var(--channel-hue,0deg));transform:scale(1.035);opacity:1;transition:background-position .35s ease,filter .35s ease}
+.home-live-stage:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(3,5,13,.12),rgba(3,5,13,.48) 82%,rgba(5,7,18,.72));pointer-events:none}
+.home-live-stage[data-channel-theme="after-dark"]{--channel-bg:0 0;--channel-hue:-18deg}.home-live-stage[data-channel-theme="cartoons"]{--channel-bg:33.333% 0;--channel-hue:0deg}.home-live-stage[data-channel-theme="anime"]{--channel-bg:100% 0;--channel-hue:22deg}.home-live-stage[data-channel-theme="classic"]{--channel-bg:0 0}.home-live-stage[data-channel-theme="preschool"]{--channel-bg:66.666% 0}.home-live-stage[data-channel-theme="preschool-fr"]{--channel-bg:66.666% 100%}.home-live-stage[data-channel-theme="space"]{--channel-bg:100% 0}.home-live-stage[data-channel-theme="ancient"]{--channel-bg:0 100%}.home-live-stage[data-channel-theme="cinema"]{--channel-bg:33.333% 100%}.home-live-stage[data-channel-theme="french"]{--channel-bg:66.666% 100%}.home-live-stage[data-channel-theme="health"]{--channel-bg:100% 100%}.home-live-stage[data-channel-theme="comedy"]{--channel-bg:33.333% 100%}.home-live-stage[data-channel-theme="family"]{--channel-bg:66.666% 0}
 .home-live-stage__inner{padding:clamp(18px,3vw,42px)}.home-live-stage__top{display:flex;align-items:end;justify-content:space-between;gap:28px;margin-bottom:20px}.home-live-stage h2{margin:5px 0 0;font-size:clamp(34px,5vw,68px);line-height:.96;letter-spacing:-.055em}.home-live-stage__top p{max-width:850px;margin:12px 0 0;color:#d0d4e2;line-height:1.55}.home-live-kicker{display:inline-flex;align-items:center;gap:9px;color:#c6baff;font-size:11px;font-weight:950;letter-spacing:.14em;text-transform:uppercase}.home-live-kicker i,.live-dot{width:9px;height:9px;border-radius:50%;background:#ff365f;box-shadow:0 0 0 5px rgba(255,54,95,.16)}.home-live-actions{display:flex;gap:10px;flex:0 0 auto}.home-live-button{display:inline-flex;min-height:46px;align-items:center;justify-content:center;padding:0 17px;border-radius:12px;text-decoration:none;font-size:12px;font-weight:900;background:linear-gradient(100deg,#6857ff,#e946a0);box-shadow:0 12px 30px rgba(95,73,255,.28)}.home-live-button.secondary{border:1px solid rgba(255,255,255,.24);background:rgba(6,8,18,.48);box-shadow:none}.home-live-player{width:100%;aspect-ratio:16/8.4;min-height:540px;overflow:hidden;border:1px solid rgba(255,255,255,.18);border-radius:25px;background:#000;box-shadow:0 25px 70px rgba(0,0,0,.58)}.home-live-player iframe{display:block;width:100%;height:100%;border:0}.home-live-meta{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 3px 13px}.home-live-meta>div{display:flex;align-items:center;gap:11px;flex-wrap:wrap}.home-live-meta span{color:#c3c8d8}.home-live-clock{font-size:11px}.home-live-switch{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}.home-live-switch button{min-width:0;padding:12px 8px;border:1px solid rgba(255,255,255,.18);border-radius:12px;color:#fff;background:rgba(5,7,17,.62);font:800 11px/1.2 inherit;cursor:pointer}.home-live-switch button span{display:block;margin-top:5px;overflow:hidden;text-overflow:ellipsis}.home-live-switch button:hover{background:rgba(255,255,255,.12)}.home-live-switch button.active{border-color:#a994ff;background:#765cff;box-shadow:0 9px 24px rgba(118,92,255,.3)}
 .live-apps{margin-bottom:24px}.live-apps-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:16px}.live-apps-heading span{color:#a99cff;font-size:10px;font-weight:950;letter-spacing:.15em}.live-apps-heading h2{margin:5px 0 0;font-size:clamp(30px,4vw,50px);letter-spacing:-.05em}.live-apps-heading>a{font-size:13px;font-weight:900;text-decoration:none}.live-app-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.live-app-card{position:relative;isolation:isolate;min-height:400px;overflow:hidden;padding:clamp(24px,4vw,44px);display:flex;flex-direction:column;justify-content:flex-end;border:1px solid rgba(255,255,255,.16);border-radius:28px;box-shadow:0 22px 60px rgba(0,0,0,.34)}.live-app-card:before{content:"";position:absolute;inset:0;z-index:-2}.live-app-card:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(3,6,14,.04),rgba(3,6,14,.9) 78%)}.verse-card:before{background:radial-gradient(circle at 75% 20%,rgba(243,218,143,.32),transparent 23%),linear-gradient(135deg,#071d14,#175137 58%,#596720)}.french-card:before{background:radial-gradient(circle at 77% 17%,rgba(255,255,255,.24),transparent 22%),linear-gradient(135deg,#061d4e,#173c9e 55%,#d92549)}.live-app-card__art{position:absolute;right:7%;top:12%;font-size:clamp(80px,13vw,175px);opacity:.2}.live-app-label{color:#d7d2ff;font-size:10px;font-weight:950;letter-spacing:.15em}.verse-card .live-app-label{color:#9be9b2}.live-app-card blockquote,.live-app-card h3{max-width:760px;margin:15px 0 10px;font-size:clamp(34px,5vw,64px);line-height:1;letter-spacing:-.045em;font-weight:900}.live-app-card blockquote{font-family:Georgia,serif;font-weight:500}.live-app-card p{margin:0;color:#d0d5e2;font-size:16px}.live-app-card .translation{font-size:22px;font-weight:800;color:#fff}.live-app-card .pronunciation{margin-top:7px;font-size:14px}.live-app-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.live-app-actions a,.live-app-actions button{display:inline-flex;min-height:44px;align-items:center;justify-content:center;padding:0 16px;border:1px solid rgba(255,255,255,.27);border-radius:999px;color:#fff;background:rgba(255,255,255,.09);font:900 12px/1 inherit;text-decoration:none;cursor:pointer}.live-app-actions a:first-child{background:rgba(255,255,255,.15)}
 .home-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:45px}.home-shortcuts a{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center;padding:18px;border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(10,14,29,.72);text-decoration:none}.home-shortcuts span{grid-row:1/3;font-size:29px}.home-shortcuts strong{font-size:15px}.home-shortcuts small{margin-top:3px;color:#aeb5c9}
@@ -367,14 +367,17 @@ html[data-theme="light"] .home-live-stage,html[data-theme="light"] .live-app-car
    const current=state.current||state.playing||{};
    const next=state.next||{};
    const block=current.title||state.episode_title||button.dataset.now||state.programme||'Live now';
-   const lineup=current.lineup||button.dataset.now||state.episode_title||'';
+   const lineup=current.lineup||(!current.title?button.dataset.now:'')||state.episode_title||'';
    const upNext=next.title||button.dataset.next||'';
    const icon=current.icon||button.dataset.icon||button.textContent.trim().split(' ')[0]||'📺';
-   const embed=state.embed_url||state.embed_fallback||button.dataset.embed||'';
+   const embed=state.player_url||state.embed_url||button.dataset.embed||'';
    if(embed){
-     const nextSrc=embed.includes('enablejsapi=1')?embed:(embed+(embed.includes('?')?'&':'?')+'enablejsapi=1');
+     const withApi=/youtube(?:-nocookie)?\.com/.test(embed)&&!embed.includes('enablejsapi=1')?embed+(embed.includes('?')?'&':'?')+'enablejsapi=1':embed;
+     const nextSrc=new URL(withApi,window.location.href).href;
      if(frame.src!==nextSrc)frame.src=nextSrc;
    }
+   const sourceKey=String(state.source_key||current.source_key||'');
+   if(sourceKey)button.dataset.streamKey=sourceKey;
    name.textContent=channelName;
    now.textContent=block;
    kicker.innerHTML='<i></i> Beyond TV · Channel '+clean(channelNumber)+' live';
@@ -386,11 +389,12 @@ html[data-theme="light"] .home-live-stage,html[data-theme="light"] .live-app-car
    buttons.forEach(item=>item.classList.toggle('active',item===button));
    render(button);
    if(!button.dataset.endpoint)return;
+   const requestedEndpoint=button.dataset.endpoint;
    try{
-     const response=await fetch(button.dataset.endpoint,{cache:'no-store'});
+     const response=await fetch(requestedEndpoint,{cache:'default'});
      if(!response.ok)throw new Error('HTTP '+response.status);
      const data=await response.json();
-     render(button,data.state||data);
+     if(button.classList.contains('active'))render(button,data.state||data);
    }catch(error){console.warn('Beyond TV channel refresh unavailable',error);}
  }
  buttons.forEach(button=>button.addEventListener('click',()=>tune(button)));

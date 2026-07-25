@@ -170,7 +170,8 @@ const menuBtn=document.querySelector(".menu-btn"),mobileNav=document.querySelect
 
   function normalizedEmbed(embed){
     if(!embed)return '';
-    const withApi=embed.includes('enablejsapi=1')?embed:(embed+(embed.includes('?')?'&':'?')+'enablejsapi=1');
+    const isYoutube=/youtube(?:-nocookie)?\.com/.test(embed);
+    const withApi=!isYoutube||embed.includes('enablejsapi=1')?embed:(embed+(embed.includes('?')?'&':'?')+'enablejsapi=1');
     try{return new URL(withApi,window.location.href).href}catch(_){return withApi}
   }
 
@@ -186,7 +187,7 @@ const menuBtn=document.querySelector(".menu-btn"),mobileNav=document.querySelect
     const current=state.current||state.playing||{};
     const next=state.next||{};
     const block=current.title||state.episode_title||button.dataset.now||state.programme||'Live now';
-    const lineup=current.lineup||button.dataset.now||state.episode_title||'';
+    const lineup=current.lineup||(!current.title?button.dataset.now:'')||state.episode_title||'';
     const upNext=next.title||button.dataset.next||'';
     const icon=current.icon||button.dataset.icon||button.textContent.trim().split(' ')[0]||'📺';
     stage.dataset.channelTheme=button.dataset.homeChannel||'cartoons';
@@ -208,8 +209,11 @@ const menuBtn=document.querySelector(".menu-btn"),mobileNav=document.querySelect
         if(!response.ok)throw new Error('HTTP '+response.status);
         const data=await response.json();
         const state=data.state||data;
-        const embed=state.embed_url||state.embed_fallback||button.dataset.embed||'';
-        setFrame(embed,true);
+        const embed=state.player_url||state.embed_url||button.dataset.embed||'';
+        const sourceKey=String(state.source_key||state.current?.source_key||'');
+        const sourceChanged=Boolean(sourceKey&&button.dataset.streamKey&&sourceKey!==button.dataset.streamKey);
+        setFrame(embed,sourceChanged);
+        if(sourceKey)button.dataset.streamKey=sourceKey;
         updateMeta(button,state);
       }else{
         setFrame(button.dataset.embed||frame.src,true);

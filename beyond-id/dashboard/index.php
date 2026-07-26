@@ -77,6 +77,26 @@ body{background:radial-gradient(circle at 90% 0,#e9e3ff,transparent 30%),#f7f8fc
         </aside>
     </section>
 
+    <?php
+    $academyBadges = [];
+    try {
+        require_once __DIR__ . '/../../includes/academy-certificates.php';
+        $academyBadges = academy_badges($uid);
+    } catch (Throwable $exception) {
+        $academyBadges = [];
+    }
+    ?>
+    <section class="section">
+        <div class="section-head"><div><span class="muted">LEARNING & CREDENTIALS</span><h2>Beyond Academy</h2></div><a class="btn primary" href="/academy/dashboard.php">Learner dashboard</a></div>
+        <div class="grid">
+            <?php if ($academyBadges): foreach ($academyBadges as $badge): ?>
+                <a class="app" href="/academy/certificate.php?id=<?= urlencode((string)$badge['credential_id']) ?>"><span class="mark">🏅</span><strong><?= e((string)$badge['title']) ?></strong><small>Beyond-issued · Verify credential</small></a>
+            <?php endforeach; else: ?>
+                <a class="app" href="/academy/dashboard.php"><span class="mark">🎓</span><strong>Earn your first badge</strong><small>Choose one of three certificate pathways.</small></a>
+            <?php endif; ?>
+        </div>
+    </section>
+
 </main>
 <script src="/assets/js/visitor-analytics.js" defer></script></body>
 </html>

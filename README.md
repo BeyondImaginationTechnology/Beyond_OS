@@ -1,6 +1,6 @@
-# Beyond OS 2.2.1 beta hardening build
+# Beyond OS 2.3 Academy & Certificates
 
-This is a merge-deployment package for the existing Beyond OS installation. It is not a database or `var/` replacement.
+This is a merge-deployment package for the existing Beyond OS installation. Release 2.3 adds a shared learner dashboard, three certificate pathways, assessments, verifiable Beyond-issued certificates, and Beyond ID achievement badges. It is not a database or `var/` replacement.
 
 ## Deploy
 

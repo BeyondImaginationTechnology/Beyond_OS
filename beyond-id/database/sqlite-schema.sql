@@ -159,6 +159,52 @@ CREATE TABLE IF NOT EXISTS bible_academy_progress (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS academy_course_progress (
+    user_id INTEGER NOT NULL,
+    course_slug TEXT NOT NULL,
+    lesson_number INTEGER NOT NULL,
+    completed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, course_slug, lesson_number),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS academy_assessment_attempts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    course_slug TEXT NOT NULL,
+    score INTEGER NOT NULL,
+    question_count INTEGER NOT NULL,
+    passed INTEGER NOT NULL DEFAULT 0,
+    attempted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_academy_attempt_user ON academy_assessment_attempts(user_id, course_slug, passed);
+
+CREATE TABLE IF NOT EXISTS academy_credentials (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    credential_id TEXT NOT NULL UNIQUE,
+    user_id INTEGER NOT NULL,
+    course_slug TEXT NOT NULL,
+    learner_name TEXT NOT NULL,
+    score INTEGER NOT NULL,
+    issued_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    revoked_at TEXT,
+    UNIQUE (user_id, course_slug),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS academy_badges (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    badge_slug TEXT NOT NULL,
+    title TEXT NOT NULL,
+    credential_id TEXT,
+    awarded_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (user_id, badge_slug),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS clients (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,

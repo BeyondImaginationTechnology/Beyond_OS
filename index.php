@@ -58,7 +58,7 @@ if (is_file($frenchLessonsPath)) {
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset'].includes(t)?t:'sunset';}catch(e){document.documentElement.dataset.theme='sunset';}})();</script>
 <meta name="theme-color" content="#050817">
-<title>Beyond OS 2.2.1 | Live. Learn. Earn. Explore.</title>
+<title>Beyond OS 2.3 | Live. Learn. Earn. Explore.</title>
 <meta name="description" content="Health, education, wallet and entertainment connected through one secure Beyond ID and one shared bit$ balance.">
 <style>
 :root{--bg:#030611;--panel:#09101f;--line:rgba(255,255,255,.13);--text:#f7f8ff;--muted:#b8bed2;--pink:#f2469d;--violet:#7057ff;--green:#51db78;--gold:#ffbf32;--blue:#448cff}

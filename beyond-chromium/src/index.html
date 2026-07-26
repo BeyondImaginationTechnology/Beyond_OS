@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Beyond Chromium</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="toolbar">
+      <div class="brand">
+        <span class="brand-atom" aria-hidden="true"><i></i><i></i><i></i><b></b></span>
+        <span class="brand-copy"><strong>BEYOND <em>CHROMIUM</em></strong><small>POWERED BY BEYOND OS</small></span>
+      </div>
+      <button id="back" title="Back" aria-label="Back">←</button>
+      <button id="forward" title="Forward" aria-label="Forward">→</button>
+      <button id="reload" title="Reload" aria-label="Reload">↻</button>
+      <form id="address-form">
+        <input id="address" aria-label="Address or search" autocomplete="off" />
+      </form>
+      <button id="keyboard-button" title="On-screen keyboard" aria-label="Open on-screen keyboard">⌨</button>
+      <div id="controller-status" class="status"><span></span>Controller: waiting</div>
+    </header>
+
+    <section id="keyboard" class="keyboard hidden" aria-label="On-screen keyboard">
+      <div id="keys"></div>
+      <div class="keyboard-help"><b>LEFT STICK</b> selects <i>·</i> <b>A / CROSS</b> types <i>·</i> <b>B / CIRCLE</b> closes</div>
+    </section>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>

@@ -177,7 +177,7 @@ function beyond_nav_bootstrap(string $appName, ?array $wallet = null): array {
                 $html = preg_replace('/<\/head>/i', $tag . '</head>', $html, 1) ?? $html;
             }
             if (!str_contains($html, 'beyond-theme-default.js')) {
-                $themeAssets = '<script src="' . e(beyond_url('assets/js/beyond-theme-default.js?v=20260719-2')) . '"></script>'
+                $themeAssets = '<script src="' . e(beyond_url('assets/js/beyond-theme-default.js?v=20260727-3')) . '"></script>'
                     . '<script src="' . e(beyond_url('assets/js/beyond-locales.js?v=20260719-2')) . '" defer></script>'
                     . '<link rel="stylesheet" href="' . e(beyond_url('assets/css/beyond-dark-default.css')) . '">';
                 $html = preg_replace('/<\/head>/i', $themeAssets . '</head>', $html, 1) ?? $html;
@@ -202,7 +202,7 @@ function beyond_shell_markup(string $appName, array $wallet): string {
     $app = e($appName);
     $home = e(beyond_url());
     // Version the navbar asset so browsers receive logo updates immediately.
-    $homeIcon = '<span class="bos-logo-mark" aria-hidden="true"><img src="' . e(beyond_url('assets/images/bos-logo-mark.svg?v=20260720-2')) . '" alt=""></span>';
+    $homeIcon = '<span class="bos-logo-mark" aria-hidden="true"><img src="' . e(beyond_url('assets/images/bos-logo-mark.svg?v=20260727-3')) . '" alt=""></span>';
     $currentIconPath = beyond_app_icon($appName);
     $currentIcon = $currentIconPath ? '<img class="bos-current-icon" src="' . e($currentIconPath) . '" alt="">' : '';
     $appIdentity = strcasecmp(trim($appName), 'Beyond OS') === 0
@@ -210,42 +210,66 @@ function beyond_shell_markup(string $appName, array $wallet): string {
         : '<span class="bos-app-label">/</span>' . $currentIcon . '<strong class="bos-app">' . $app . '</strong>';
 
     if ($signedIn) {
-        $email = e($_SESSION['email'] ?? 'Member');
-        $avatar = e(strtoupper(substr($_SESSION['name'] ?? $_SESSION['email'] ?? 'B', 0, 1)));
+        $emailRaw = (string)($_SESSION['email'] ?? 'Member');
+        $nameRaw = trim((string)($_SESSION['name'] ?? '')) ?: strtok($emailRaw, '@');
+        $email = e($emailRaw);
+        $displayName = e($nameRaw ?: 'Member');
+        $avatar = e(strtoupper(substr($nameRaw ?: $emailRaw ?: 'B', 0, 1)));
+        $avatarUrl = '';
+        try {
+            $avatarStmt = beyond_db()->prepare('SELECT avatar FROM profiles WHERE user_id = ? LIMIT 1');
+            $avatarStmt->execute([(int)$_SESSION['user_id']]);
+            $avatarCandidate = trim((string)($avatarStmt->fetchColumn() ?: ''));
+            if ($avatarCandidate !== '' && preg_match('#^(?:https?://|/)#i', $avatarCandidate)) {
+                $avatarUrl = e($avatarCandidate);
+            }
+        } catch (Throwable $exception) {
+            $avatarUrl = '';
+        }
+        $avatarMarkup = $avatarUrl !== ''
+            ? '<span class="bos-avatar"><img src="' . $avatarUrl . '" alt=""></span>'
+            : '<span class="bos-avatar bos-avatar-default"><img src="' . e(beyond_url('assets/images/default-astronaut-avatar.webp?v=20260727-1')) . '" alt=""></span>';
         $balance = number_format((float)($wallet['balance'] ?? 0), 0);
         $unread = beyond_notification_count();
-        $accountActions = '<a class="bos-action" href="' . e(beyond_url('beyond-id/dashboard/notifications.php')) . '" aria-label="Notifications">🔔' . ($unread ? '<span class="bos-badge">' . $unread . '</span>' : '') . '</a>'
-            . '<a class="bos-action bos-bits" href="' . e(beyond_url('beyond-id/dashboard/wallet.php')) . '">' . $balance . ' bit$</a>'
-            . '<a class="bos-avatar" href="' . e(beyond_url('beyond-id/dashboard/')) . '" aria-label="Beyond ID for ' . $email . '">' . $avatar . '</a>'
-            . '<a class="bos-action bos-email" href="' . e(beyond_url('beyond-id/auth/logout.php')) . '">Sign out</a>';
+        $accountActions = '<span class="bos-account-cluster"><a class="bos-icon-action bos-notifications" href="' . e(beyond_url('beyond-id/dashboard/notifications.php')) . '" aria-label="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/></svg>' . ($unread ? '<span class="bos-badge">' . $unread . '</span>' : '') . '</a>'
+            . '<a class="bos-action bos-bits" href="' . e(beyond_url('beyond-id/dashboard/wallet.php')) . '"><i aria-hidden="true">b</i><span>' . $balance . ' bit$</span></a>'
+            . '<details class="bos-account"><summary aria-label="Open Beyond ID account menu">' . $avatarMarkup . '<span class="bos-account-name">' . $displayName . '</span><svg class="bos-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></summary><div class="bos-account-menu"><div class="bos-account-identity">' . $avatarMarkup . '<span><strong>' . $displayName . '</strong><small>' . $email . '</small></span></div><a href="' . e(beyond_url('beyond-id/dashboard/')) . '">Beyond ID dashboard <span>→</span></a><a href="' . e(beyond_url('beyond-id/dashboard/wallet.php')) . '">Wallet <span>' . $balance . ' bit$</span></a><a class="bos-signout" href="' . e(beyond_url('beyond-id/auth/logout.php')) . '">Sign out</a></div></details></span>';
     } else {
         $accountActions = '<a class="bos-action bos-create" href="' . e(beyond_url('beyond-id/auth/login.php')) . '">Beyond ID</a>';
     }
 
-    $navTools = '<label class="bos-locale" title="Choose language"><span aria-hidden="true">🌐</span><span class="bos-sr-only">Language</span><select id="localePicker" aria-label="Choose language"><option value="en">English</option><option value="fr">Français</option><option value="ht">Kreyòl</option><option value="es">Español</option></select></label>'
-        . '<button class="theme-toggle bos-theme-toggle" type="button" aria-label="Switch theme" title="Switch theme">☀</button>';
-    $appStoreAction = '<a class="bos-action bos-app-store" href="' . e(beyond_url('app-store/')) . '"><span aria-hidden="true">🛍</span><span class="bos-app-store-label bos-app-store-label-full">App Store</span><span class="bos-app-store-label bos-app-store-label-mobile">Apps</span></a>';
+    $navTools = '<span class="bos-tool-cluster"><label class="bos-locale" title="Choose language"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg><span class="bos-sr-only">Language</span><select id="localePicker" aria-label="Choose language"><option value="en">English</option><option value="fr">Français</option><option value="ht">Kreyòl</option><option value="es">Español</option></select></label>'
+        . '<button class="theme-toggle bos-theme-toggle" type="button" aria-label="Switch theme" title="Switch theme">☀</button></span>';
+    $appStoreAction = '<a class="bos-action bos-app-store" href="' . e(beyond_url('app-store/')) . '"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span class="bos-app-store-label bos-app-store-label-full">App Store</span><span class="bos-app-store-label bos-app-store-label-mobile">Apps</span><b aria-hidden="true">→</b></a>';
 
     return '<style>
-#beyond-os-shell{position:relative;top:auto;z-index:100;min-height:58px;padding:max(8px,env(safe-area-inset-top)) 16px 8px;background:rgba(10,10,18,.94);color:#fff;border-bottom:1px solid rgba(255,255,255,.14);backdrop-filter:blur(18px);font:600 13px/1.3 system-ui,sans-serif}
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap");
+#beyond-os-shell{position:relative;top:auto;z-index:100;min-height:64px;padding:max(9px,env(safe-area-inset-top)) 16px 9px;background:rgba(7,8,16,.9);color:#fff;border-bottom:1px solid rgba(255,255,255,.12);backdrop-filter:blur(24px) saturate(1.3);font:600 13px/1.3 "Space Grotesk",Inter,system-ui,sans-serif;box-shadow:0 10px 35px rgba(0,0,0,.18)}
 #beyond-os-shell *{box-sizing:border-box}#beyond-os-shell a{color:inherit;text-decoration:none}
 #beyond-os-shell .bos-row{width:100%;max-width:1320px;min-width:0;margin:auto;display:flex;align-items:center;gap:12px}
 #beyond-os-shell .bos-home{color:#a5b4fc;font-weight:900;letter-spacing:.04em;display:flex;align-items:center;gap:8px;flex:0 0 auto;white-space:nowrap}
-#beyond-os-shell .bos-home-label{display:inline-flex;font-size:14px;line-height:1;font-weight:1000;letter-spacing:-.02em;background:linear-gradient(100deg,#fff 0 56%,#f05ab8 76%,#9b82ff);background-clip:text;-webkit-background-clip:text;color:transparent}
+#beyond-os-shell .bos-home-label{display:inline-flex;font-size:15px;line-height:1;font-weight:700;letter-spacing:-.045em;background:linear-gradient(100deg,#fff 0 52%,#f05ab8 76%,#9b82ff);background-clip:text;-webkit-background-clip:text;color:transparent}
 #beyond-os-shell .bos-home img,#beyond-os-shell .bos-current-icon{width:30px;height:30px;border-radius:9px;object-fit:cover;border:1px solid rgba(255,255,255,.18)}
 #beyond-os-shell .bos-logo-mark{position:relative;display:grid;place-items:center;width:38px;height:38px;flex:0 0 38px;min-width:38px;overflow:hidden;isolation:isolate;border:1px solid rgba(181,137,255,.44);border-radius:12px;background:radial-gradient(circle at 35% 30%,#31245d,#0b0b1d 68%);box-shadow:0 7px 22px rgba(112,74,255,.34),inset 0 0 14px rgba(118,88,255,.15)}
 #beyond-os-shell .bos-logo-mark img{display:block;width:34px;height:34px;border:0;border-radius:0;object-fit:contain}
 #beyond-os-shell .bos-app{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#beyond-os-shell .bos-actions{min-width:0;margin-left:auto;display:flex;align-items:center;gap:8px}
-#beyond-os-shell .bos-action{min-height:38px;display:flex;align-items:center;gap:6px;padding:8px 11px;border:1px solid rgba(255,255,255,.13);border-radius:999px;background:rgba(255,255,255,.06);color:#fff;font:inherit}
-#beyond-os-shell .bos-app-store{background:linear-gradient(100deg,#586cff,#8b5cf6);border-color:transparent;font-weight:900;box-shadow:0 8px 24px rgba(88,108,255,.24)}#beyond-os-shell .bos-app-store>span[aria-hidden="true"],#beyond-os-shell .bos-app-store-label-mobile{display:none}
-#beyond-os-shell .bos-create{background:linear-gradient(100deg,#586cff,#ef4897);border:0}#beyond-os-shell .bos-bits{color:#ffe17a}
+#beyond-os-shell .bos-actions{min-width:0;margin-left:auto;display:flex;align-items:center;gap:9px}
+#beyond-os-shell .bos-action{min-height:40px;display:flex;align-items:center;gap:7px;padding:8px 12px;border:1px solid rgba(255,255,255,.13);border-radius:999px;background:rgba(255,255,255,.055);color:#fff;font:700 12px/1 "Space Grotesk",Inter,system-ui,sans-serif;letter-spacing:-.015em;transition:transform .2s ease,border-color .2s ease,background .2s ease}
+#beyond-os-shell .bos-action:hover,#beyond-os-shell .bos-action:focus-visible{transform:translateY(-1px);border-color:rgba(190,170,255,.48);background:rgba(255,255,255,.1)}
+#beyond-os-shell .bos-app-store{position:relative;isolation:isolate;min-height:42px;padding:0 16px;background:linear-gradient(105deg,#526dff 0%,#8658f6 48%,#e950aa 100%);border-color:rgba(255,255,255,.2);font-weight:700;box-shadow:0 10px 28px rgba(94,72,255,.32),inset 0 1px rgba(255,255,255,.25);overflow:hidden}#beyond-os-shell .bos-app-store:before{content:"";position:absolute;z-index:-1;inset:-80% 45% -80% -20%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.24),transparent);transform:skewX(-18deg)}#beyond-os-shell .bos-app-store:hover:before{animation:bos-app-shine .8s ease forwards}@keyframes bos-app-shine{to{transform:translateX(220%) skewX(-18deg)}}#beyond-os-shell .bos-app-store svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7}#beyond-os-shell .bos-app-store b{font-size:14px}#beyond-os-shell .bos-app-store-label-mobile{display:none}
+#beyond-os-shell .bos-create{background:linear-gradient(100deg,#586cff,#ef4897);border-color:rgba(255,255,255,.15)}#beyond-os-shell .bos-bits{color:#ffe17a;background:rgba(255,198,54,.07);border-color:rgba(255,216,122,.18)}#beyond-os-shell .bos-bits i{display:grid;width:20px;height:20px;place-items:center;border-radius:50%;background:linear-gradient(145deg,#ffe68a,#c98913);color:#352100;font:800 11px/1 Georgia,serif;box-shadow:0 0 14px rgba(255,197,58,.22)}
 html[data-theme="sunset"] #beyond-os-shell{background:rgba(57,20,47,.95);border-color:rgba(255,204,176,.2)}html[data-theme="sunset"] #beyond-os-shell .bos-action,html[data-theme="sunset"] #beyond-os-shell .bos-locale,html[data-theme="sunset"] #beyond-os-shell .bos-theme-toggle{background:rgba(112,43,76,.46);border-color:rgba(255,208,180,.25)}html[data-theme="sunset"] #beyond-os-shell .bos-app-store{background:linear-gradient(110deg,#ff8a62,#a83e81);box-shadow:0 8px 24px rgba(255,108,92,.25)}
-#beyond-os-shell .bos-avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#5b8cff,#e9449f);font-weight:900;flex:0 0 34px}.bos-badge{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;margin-left:4px;border-radius:999px;background:#ef476f;font-size:10px}
-#beyond-os-shell .bos-locale,#beyond-os-shell .bos-theme-toggle{position:relative;z-index:2;width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;padding:0;border:1px solid rgba(255,255,255,.13);border-radius:50%;background:rgba(255,255,255,.06);color:#fff;cursor:pointer;touch-action:manipulation;pointer-events:auto}
+#beyond-os-shell .bos-tool-cluster,#beyond-os-shell .bos-account-cluster{display:flex;align-items:center;gap:4px;padding:3px;border:1px solid rgba(255,255,255,.1);border-radius:999px;background:rgba(255,255,255,.035);box-shadow:inset 0 1px rgba(255,255,255,.04)}
+#beyond-os-shell .bos-icon-action{position:relative;display:grid;width:38px;height:38px;place-items:center;border-radius:50%;color:#e9ebf5;transition:background .2s ease,color .2s ease}#beyond-os-shell .bos-icon-action:hover,#beyond-os-shell .bos-icon-action:focus-visible{background:rgba(255,255,255,.1);color:#fff}#beyond-os-shell .bos-icon-action svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#beyond-os-shell .bos-avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,#5b8cff,#e9449f);font-weight:900;flex:0 0 36px;border:1px solid rgba(210,197,255,.65);box-shadow:0 0 0 3px rgba(123,91,255,.12),0 7px 18px rgba(0,0,0,.24)}#beyond-os-shell .bos-avatar img{display:block;width:100%;height:100%;object-fit:cover;border:0;border-radius:50%}.bos-badge{position:absolute;right:-1px;top:-2px;display:inline-grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border:2px solid #0b0c15;border-radius:999px;background:#ff4676;color:#fff;font-size:9px;font-weight:800}
+#beyond-os-shell .bos-locale,#beyond-os-shell .bos-theme-toggle{position:relative;z-index:2;width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center;padding:0;border:0;border-radius:50%;background:transparent;color:#e9ebf5;cursor:pointer;touch-action:manipulation;pointer-events:auto;font:600 15px/1 system-ui,sans-serif}#beyond-os-shell .bos-locale:hover,#beyond-os-shell .bos-theme-toggle:hover{background:rgba(255,255,255,.09);color:#fff}#beyond-os-shell .bos-locale>svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round}
 #beyond-os-shell .bos-locale select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}#beyond-os-shell .bos-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
-@media(max-width:760px){#beyond-os-shell{width:100%;max-width:100vw;padding-left:7px;padding-right:7px}#beyond-os-shell .bos-row{gap:5px}#beyond-os-shell .bos-home-label,#beyond-os-shell .bos-email,#beyond-os-shell .bos-app-label,#beyond-os-shell .bos-app,#beyond-os-shell .bos-app-store-label{display:none}#beyond-os-shell .bos-current-icon{display:block;flex:0 0 30px}#beyond-os-shell .bos-action{min-height:40px;padding:6px 8px}#beyond-os-shell .bos-actions{gap:5px}#beyond-os-shell .bos-app-store{width:40px;justify-content:center;padding:0}#beyond-os-shell .bos-app-store>span[aria-hidden="true"]{display:inline}}
-@media(max-width:430px){#beyond-os-shell .bos-row{gap:4px}#beyond-os-shell .bos-current-icon{display:none}#beyond-os-shell .bos-home img{width:28px;height:28px}#beyond-os-shell .bos-locale,#beyond-os-shell .bos-theme-toggle{display:grid;width:36px;height:36px;flex-basis:36px}#beyond-os-shell .bos-app-store{width:auto;min-width:58px;min-height:36px;padding:6px 8px;justify-content:center}#beyond-os-shell .bos-app-store-label-full{display:none}#beyond-os-shell .bos-app-store-label-mobile{display:inline;font-size:11px}#beyond-os-shell .bos-bits{display:none}#beyond-os-shell .bos-avatar{width:32px;height:32px;flex-basis:32px}}
+#beyond-os-shell .bos-account{position:relative}#beyond-os-shell .bos-account summary{display:flex;align-items:center;gap:8px;min-height:40px;padding:2px 8px 2px 2px;border-radius:999px;cursor:pointer;list-style:none}#beyond-os-shell .bos-account summary::-webkit-details-marker{display:none}#beyond-os-shell .bos-account summary:hover{background:rgba(255,255,255,.07)}#beyond-os-shell .bos-account-name{max-width:94px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:700}#beyond-os-shell .bos-chevron{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;transition:transform .2s ease}#beyond-os-shell .bos-account[open] .bos-chevron{transform:rotate(180deg)}
+#beyond-os-shell .bos-account-menu{position:absolute;right:0;top:48px;z-index:1000;width:250px;padding:9px;border:1px solid rgba(255,255,255,.14);border-radius:20px;background:rgba(12,13,25,.97);backdrop-filter:blur(24px);box-shadow:0 24px 70px rgba(0,0,0,.52)}#beyond-os-shell .bos-account-identity{display:flex;align-items:center;gap:11px;padding:9px 9px 13px;margin-bottom:5px;border-bottom:1px solid rgba(255,255,255,.09)}#beyond-os-shell .bos-account-identity span:last-child{min-width:0}#beyond-os-shell .bos-account-identity strong,#beyond-os-shell .bos-account-identity small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#beyond-os-shell .bos-account-identity small{margin-top:3px;color:#969eb4;font-size:10px}#beyond-os-shell .bos-account-menu>a{display:flex;align-items:center;justify-content:space-between;padding:10px 11px;border-radius:11px;font-size:11px}#beyond-os-shell .bos-account-menu>a:hover{background:rgba(255,255,255,.07)}#beyond-os-shell .bos-account-menu .bos-signout{margin-top:5px;color:#ff9bb3;border-top:1px solid rgba(255,255,255,.08);border-radius:0 0 11px 11px}
+@media(max-width:920px){#beyond-os-shell .bos-account-name,#beyond-os-shell .bos-app-store b{display:none}}
+@media(max-width:760px){#beyond-os-shell{width:100%;max-width:100vw;padding-left:7px;padding-right:7px}#beyond-os-shell .bos-row{gap:5px}#beyond-os-shell .bos-home-label,#beyond-os-shell .bos-app-label,#beyond-os-shell .bos-app,#beyond-os-shell .bos-app-store-label{display:none}#beyond-os-shell .bos-current-icon{display:block;flex:0 0 30px}#beyond-os-shell .bos-action{min-height:38px;padding:6px 8px}#beyond-os-shell .bos-actions{gap:5px}#beyond-os-shell .bos-app-store{width:40px;justify-content:center;padding:0}#beyond-os-shell .bos-account summary{padding-right:2px}}
+@media(max-width:520px){#beyond-os-shell .bos-bits{display:none}#beyond-os-shell .bos-tool-cluster,#beyond-os-shell .bos-account-cluster{gap:2px;padding:2px}}
+@media(max-width:430px){#beyond-os-shell .bos-row{gap:4px}#beyond-os-shell .bos-current-icon{display:none}#beyond-os-shell .bos-home img{width:28px;height:28px}#beyond-os-shell .bos-locale,#beyond-os-shell .bos-theme-toggle{display:grid;width:34px;height:34px;flex-basis:34px}#beyond-os-shell .bos-app-store{width:auto;min-width:58px;min-height:36px;padding:6px 9px;justify-content:center}#beyond-os-shell .bos-app-store-label-full{display:none}#beyond-os-shell .bos-app-store-label-mobile{display:inline;font-size:11px}#beyond-os-shell .bos-avatar{width:32px;height:32px;flex-basis:32px}}
 </style><nav id="beyond-os-shell" aria-label="Beyond OS navigation"><div class="bos-row"><a class="bos-home" href="' . $home . '" aria-label="Beyond OS 2.3" title="Beyond OS 2.3">' . $homeIcon . '<span class="bos-home-label">BEYOND OS 2.3</span></a>' . $appIdentity . '<div class="bos-actions">' . $appStoreAction . $navTools . $accountActions . '</div></div></nav>';
 }
 

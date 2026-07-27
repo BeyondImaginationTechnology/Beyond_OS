@@ -5,10 +5,10 @@
   var icons = { dark: '\uD83C\uDF19', light: '\u2600\uFE0F', sunset: '\uD83C\uDF05' };
   var labels = { dark: 'Dark', light: 'Light', sunset: 'Sunset' };
   function validTheme(theme) { return themes.indexOf(theme) !== -1; }
-  function savedTheme() { try { var saved = localStorage.getItem('beyond-theme'); return validTheme(saved) ? saved : 'sunset'; } catch (error) { return 'sunset'; } }
+  function savedTheme() { try { var saved = localStorage.getItem('beyond-theme'); return validTheme(saved) ? saved : 'dark'; } catch (error) { return 'dark'; } }
   function each(selector, callback) { var nodes = document.querySelectorAll(selector); for (var index = 0; index < nodes.length; index += 1) callback(nodes[index]); }
   function applyTheme(theme) {
-    if (!validTheme(theme)) theme = 'sunset';
+    if (!validTheme(theme)) theme = 'dark';
     root.setAttribute('data-theme', theme);
     var next = themes[(themes.indexOf(theme) + 1) % themes.length];
     each('.theme-toggle', function (button) {
@@ -40,7 +40,7 @@
     var button = closestByClass(event.target, 'bos-theme-toggle');
     if (!button) return false;
     event.preventDefault();
-    var current = validTheme(root.getAttribute('data-theme')) ? root.getAttribute('data-theme') : 'sunset';
+    var current = validTheme(root.getAttribute('data-theme')) ? root.getAttribute('data-theme') : 'dark';
     var next = themes[(themes.indexOf(current) + 1) % themes.length];
     try { localStorage.setItem('beyond-theme', next); } catch (error) {}
     applyTheme(next);

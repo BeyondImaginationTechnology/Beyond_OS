@@ -56,7 +56,7 @@ if (is_file($frenchLessonsPath)) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset'].includes(t)?t:'sunset';}catch(e){document.documentElement.dataset.theme='sunset';}})();</script>
+<script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset'].includes(t)?t:'dark';}catch(e){document.documentElement.dataset.theme='dark';}try{const c=localStorage.getItem('beyond-currency');document.documentElement.dataset.currency=['USD','CAD','BITS'].includes(c)?c:'CAD';}catch(e){document.documentElement.dataset.currency='CAD';}})();</script>
 <meta name="theme-color" content="#050817">
 <title>Beyond OS 2.3 | Live. Learn. Earn. Explore.</title>
 <meta name="description" content="Health, education, wallet and entertainment connected through one secure Beyond ID and one shared bit$ balance.">
@@ -99,18 +99,21 @@ html[data-theme="light"]{background:#f4f6fc}html[data-theme="light"] body{color:
 html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff,#e2ecff 58%,#f2e9ff)}
 #beyond-os-shell .locale-picker,#beyond-os-shell .theme-toggle{width:38px;height:38px;flex:0 0 38px}
 @media(max-width:650px){#beyond-os-shell .bos-actions{gap:6px}}
-.brand-atom{position:relative;display:inline-block;width:34px;height:34px;border:1px solid rgba(255,255,255,.18);border-radius:10px;vertical-align:middle;margin-right:9px;background:#0b0b1d;box-shadow:0 6px 18px rgba(88,108,255,.3)}
-.brand-atom i{position:absolute;left:6px;top:13px;width:20px;height:7px;border:1.7px solid #8d70ff;border-radius:50%}.brand-atom i:nth-child(2){transform:rotate(60deg)}.brand-atom i:nth-child(3){transform:rotate(120deg)}
-.brand-atom u{position:absolute;left:14px;top:15px;width:5px;height:5px;border-radius:50%;background:#f05ab8;box-shadow:0 0 7px #f05ab8;text-decoration:none}
-.nav>a:nth-child(1){border-color:#f2469d}.nav>a:nth-child(2){border-color:#4ee097}.nav>a:nth-child(3){border-color:#ffbf32}.nav>a:nth-child(4){border-color:#448cff}
-.nav>a:nth-child(1):hover,.nav>a:nth-child(1):focus-visible{color:#ff73ba}.nav>a:nth-child(2):hover,.nav>a:nth-child(2):focus-visible{color:#70e9a0}.nav>a:nth-child(3):hover,.nav>a:nth-child(3):focus-visible{color:#ffd16b}.nav>a:nth-child(4):hover,.nav>a:nth-child(4):focus-visible{color:#70a7ff}
+.brand-atom{display:inline-grid;width:38px;height:38px;place-items:center;vertical-align:middle;margin-right:9px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:radial-gradient(circle at 35% 25%,rgba(117,91,255,.2),rgba(8,9,20,.94) 68%);box-shadow:0 8px 24px rgba(88,108,255,.28),inset 0 1px rgba(255,255,255,.08)}
+.brand-atom img{display:block;width:34px;height:34px;filter:drop-shadow(0 0 8px rgba(143,100,255,.32))}
+.nav>a[href="/academy/"]{border-color:var(--gold)}.nav>a[href="/beyond-tv/"],.nav>a[href="/beyond-media/"]{border-color:var(--pink)}.nav>a[href="/beyond-id/dashboard/wallet.php"]{border-color:var(--blue)}
+.nav>a[href="/academy/"]:hover,.nav>a[href="/academy/"]:focus-visible{color:#ffd16b}.nav>a[href="/beyond-tv/"]:hover,.nav>a[href="/beyond-tv/"]:focus-visible,.nav>a[href="/beyond-media/"]:hover,.nav>a[href="/beyond-media/"]:focus-visible{color:#ff73ba}.nav>a[href="/beyond-id/dashboard/wallet.php"]:hover,.nav>a[href="/beyond-id/dashboard/wallet.php"]:focus-visible{color:#70a7ff}
+.currency-picker{position:relative;display:flex;align-items:center;min-width:84px;height:43px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.055);overflow:hidden}.currency-picker:focus-within{outline:2px solid #a99cff;outline-offset:2px}.currency-picker>span{position:absolute;left:11px;z-index:1;color:#c9bcff;font-size:12px;font-weight:950;pointer-events:none}.currency-picker select{position:relative;width:100%;height:100%;padding:0 25px 0 29px;border:0;outline:0;color:#fff;background:transparent;font:900 11px/1 inherit;cursor:pointer;appearance:none}.currency-picker:after{content:"⌄";position:absolute;right:10px;top:11px;color:#aeb4ca;font-size:12px;pointer-events:none}.currency-picker option{color:#111;background:#fff}html[data-theme="light"] .currency-picker{border-color:rgba(23,26,46,.2);background:rgba(255,255,255,.62)}html[data-theme="light"] .currency-picker select{color:#171a2e}@media(max-width:560px){.currency-picker{min-width:72px;height:40px}.currency-picker select{padding-left:25px;padding-right:20px;font-size:10px}.currency-picker>span{left:9px}.currency-picker:after{right:7px}}
+.brand,.nav,.primary,.ghost,.home-live-button,.live-app-actions a,.live-app-actions button{font-family:"Space Grotesk",Inter,system-ui,sans-serif}.brand{font-weight:700;letter-spacing:-.055em}.nav>a:not(.primary){font-weight:600;letter-spacing:-.015em}.primary{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.16);background:linear-gradient(105deg,#526dff 0%,#8658f6 50%,#e950aa 100%);font-weight:700;letter-spacing:-.02em;box-shadow:0 14px 36px rgba(101,72,255,.34),inset 0 1px rgba(255,255,255,.22)}.primary:hover,.primary:focus-visible{transform:translateY(-1px);box-shadow:0 18px 42px rgba(101,72,255,.42),inset 0 1px rgba(255,255,255,.28)}
 </style>
 </head>
 <body>
 <header class="top wrap">
-    <a class="brand" href="./"><b class="brand-atom" aria-hidden="true"><i></i><i></i><i></i><u></u></b>BEYOND <span>OS</span><small>THE CONNECTED IMAGINATION ECOSYSTEM</small></a>
+    <a class="brand" href="./"><b class="brand-atom" aria-hidden="true"><img src="/assets/images/bos-logo-mark.svg?v=20260727-3" alt=""></b>BEYOND <span>OS</span><small>THE CONNECTED IMAGINATION ECOSYSTEM</small></a>
     <nav class="nav" aria-label="Primary navigation">
-          <a href="/app-store/">App Store</a><a href="/beyond-id/dashboard/wallet.php">Wallet</a><a href="/academy/">Learn</a><a href="/beyond-tv/">TV</a>
+          <a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-media/">Media</a><a href="/beyond-id/dashboard/wallet.php">Wallet</a>
+          <label class="currency-picker"><span aria-hidden="true">$</span><span class="visually-hidden">Display currency</span><select id="homeCurrency" aria-label="Display currency"><option value="USD">USD</option><option value="CAD">CAD</option><option value="BITS">bit$</option></select></label>
+          <a class="primary" href="/app-store/">App Store</a>
     </nav>
 </header>
 <main>
@@ -197,7 +200,42 @@ $classicNext = $classicSchedule['next'];
 $cartoonSchedule = beyond_cartoons_schedule_state();
 $cartoonCurrent = $cartoonSchedule['current'];
 $cartoonNext = $cartoonSchedule['next'];
+$featuredTitles = json_decode((string)@file_get_contents(__DIR__ . '/beyond-tv/data/catalog.json'), true) ?: [];
 ?>
+<section class="featured-library wrap" aria-labelledby="featuredLibraryTitle">
+  <header class="featured-library__heading">
+    <div><span>NOW STREAMING ON BEYOND TV</span><h2 id="featuredLibraryTitle">60 titles. Pick your next watch.</h2></div>
+    <div class="featured-library__actions">
+      <a href="/beyond-tv/browse.php">Browse everything →</a>
+      <div class="featured-library__controls" aria-label="Featured title carousel controls">
+        <button type="button" data-featured-title-prev aria-label="Previous featured title">←</button>
+        <button type="button" data-featured-title-next aria-label="Next featured title">→</button>
+      </div>
+    </div>
+  </header>
+  <div class="featured-title-carousel" data-featured-title-carousel tabindex="0" role="region" aria-roledescription="carousel" aria-label="All 60 currently available Beyond TV titles">
+    <?php foreach ($featuredTitles as $featuredIndex => $featuredTitle):
+      $featuredThumbnail = trim((string)($featuredTitle['thumbnail'] ?? ''));
+      if ($featuredThumbnail === '' && !empty($featuredTitle['archive_id'])) {
+          $featuredThumbnail = 'https://archive.org/services/img/' . rawurlencode((string)$featuredTitle['archive_id']);
+      }
+    ?>
+    <a class="featured-title-card" href="/beyond-tv/title.php?slug=<?=urlencode((string)($featuredTitle['slug'] ?? ''))?>" style="--title-gradient:<?=htmlspecialchars((string)($featuredTitle['gradient'] ?? 'linear-gradient(135deg,#151a34,#623d85)'))?>" aria-label="<?=htmlspecialchars((string)($featuredTitle['title'] ?? 'Beyond TV title'))?>">
+      <span class="featured-title-card__cover">
+        <?php if ($featuredThumbnail !== ''): ?><img src="<?=htmlspecialchars($featuredThumbnail)?>" alt="" width="420" height="630" loading="<?=$featuredIndex < 6 ? 'eager' : 'lazy'?>" decoding="async"><?php else: ?><span class="featured-title-card__fallback" aria-hidden="true"><?=htmlspecialchars((string)($featuredTitle['icon'] ?? '▶'))?></span><?php endif; ?>
+        <span class="featured-title-card__type"><?=($featuredTitle['type'] ?? '') === 'movie' ? 'MOVIE' : 'SERIES'?></span>
+        <span class="featured-title-card__play" aria-hidden="true">▶</span>
+      </span>
+      <span class="featured-title-card__copy">
+        <strong><?=htmlspecialchars((string)($featuredTitle['title'] ?? 'Untitled'))?></strong>
+        <small><?=htmlspecialchars((string)($featuredTitle['year'] ?? ''))?><?php if (!empty($featuredTitle['rating'])): ?> · <?=htmlspecialchars((string)$featuredTitle['rating'])?><?php endif; ?></small>
+        <span><?=htmlspecialchars((string)($featuredTitle['genre'] ?? 'Beyond TV'))?></span>
+      </span>
+    </a>
+    <?php endforeach; ?>
+  </div>
+  <div class="featured-title-progress"><span data-featured-title-position>1</span> / <?=count($featuredTitles)?></div>
+</section>
 <section class="home-live-stage" data-channel-theme="after-dark" aria-labelledby="homeLiveHeading">
   <div class="home-live-stage__background" aria-hidden="true"></div>
   <div class="home-live-stage__inner">
@@ -241,9 +279,15 @@ $cartoonNext = $cartoonSchedule['next'];
 <section class="live-apps wrap" aria-labelledby="liveAppsTitle">
   <header class="live-apps-heading">
     <div><span>LIVE APP EXPERIENCES</span><h2 id="liveAppsTitle">Today inside Beyond OS</h2></div>
-    <a href="/app-store/">Browse the App Store →</a>
+    <div class="live-apps-heading__actions">
+      <a href="/app-store/">Browse the App Store →</a>
+      <div class="live-app-controls" aria-label="App experience carousel controls">
+        <button type="button" data-live-app-prev aria-label="Previous app experience">←</button>
+        <button type="button" data-live-app-next aria-label="Next app experience">→</button>
+      </div>
+    </div>
   </header>
-  <div class="live-app-grid">
+  <div class="live-app-grid" data-live-app-carousel tabindex="0" role="region" aria-roledescription="carousel" aria-label="Live app experiences">
     <article class="live-app-card verse-card">
       <div class="live-app-card__art" aria-hidden="true">✦</div>
       <span class="live-app-label">DAILY BREATH · VERSE OF THE DAY</span>
@@ -321,6 +365,7 @@ $cartoonNext = $cartoonSchedule['next'];
       <div class="live-app-actions"><a href="/beyond-games/zaks-kitchen-rush.php">Play Kitchen Rush</a><a href="/beyond-games/bit-runner.php">Play Bit Runner</a><a href="/beyond-games/">All games</a></div>
     </article>
   </div>
+  <div class="live-app-progress" data-live-app-progress aria-label="Carousel position"></div>
 </section>
 
 <nav class="home-shortcuts wrap" aria-label="Beyond OS quick destinations">
@@ -330,24 +375,82 @@ $cartoonNext = $cartoonSchedule['next'];
 </nav>
 
 <style>
+.featured-library{margin-top:8px;margin-bottom:34px}.featured-library__heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:18px}.featured-library__heading>div:first-child>span{color:#ff7fc0;font-size:10px;font-weight:950;letter-spacing:.16em}.featured-library__heading h2{margin:5px 0 0;font-size:clamp(31px,4vw,52px);line-height:1;letter-spacing:-.052em}.featured-library__actions{display:flex;align-items:center;gap:14px;flex:0 0 auto}.featured-library__actions>a{font-size:13px;font-weight:900;text-decoration:none}.featured-library__controls{display:flex;gap:8px}.featured-library__controls button{display:grid;width:44px;height:44px;place-items:center;border:1px solid rgba(255,255,255,.19);border-radius:50%;background:rgba(12,15,31,.86);color:#fff;font:900 18px/1 inherit;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.22);transition:transform .2s ease,border-color .2s ease,background .2s ease}.featured-library__controls button:hover,.featured-library__controls button:focus-visible{transform:translateY(-2px);border-color:#ff8bc8;background:#b82f76}.featured-library__controls button:disabled{cursor:default;opacity:.35;transform:none}.featured-title-carousel{display:flex;gap:15px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scroll-padding-inline:2px;scrollbar-width:none;padding:4px 2px 20px}.featured-title-carousel::-webkit-scrollbar{display:none}.featured-title-carousel:focus-visible{outline:2px solid #ff7fc0;outline-offset:6px;border-radius:20px}.featured-title-card{flex:0 0 clamp(215px,22vw,272px);scroll-snap-align:start;scroll-snap-stop:always;color:#fff;text-decoration:none;transition:transform .28s ease,opacity .28s ease}.featured-title-card:not(.is-current){opacity:.82}.featured-title-card:hover,.featured-title-card:focus-visible,.featured-title-card.is-current{opacity:1;transform:translateY(-5px)}.featured-title-card:focus-visible{outline:2px solid #fff;outline-offset:4px;border-radius:20px}.featured-title-card__cover{position:relative;display:block;aspect-ratio:2/3;overflow:hidden;border:1px solid rgba(255,255,255,.16);border-radius:20px;background:var(--title-gradient);box-shadow:0 20px 48px rgba(0,0,0,.42)}.featured-title-card__cover:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,5,13,0) 52%,rgba(3,5,13,.86));pointer-events:none}.featured-title-card__cover img{width:100%;height:100%;object-fit:cover;transition:transform .55s cubic-bezier(.2,.8,.2,1),filter .3s ease}.featured-title-card:hover img,.featured-title-card:focus-visible img{transform:scale(1.045);filter:saturate(1.08)}.featured-title-card__fallback{display:grid;width:100%;height:100%;place-items:center;font-size:72px;background:var(--title-gradient)}.featured-title-card__type{position:absolute;left:12px;top:12px;z-index:2;padding:6px 8px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(5,7,18,.74);backdrop-filter:blur(10px);font-size:8px;font-weight:950;letter-spacing:.13em}.featured-title-card__play{position:absolute;right:13px;bottom:13px;z-index:2;display:grid;width:40px;height:40px;place-items:center;border-radius:50%;background:#fff;color:#101224;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.35)}.featured-title-card__copy{display:block;padding:13px 3px 0}.featured-title-card__copy strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px;letter-spacing:-.02em}.featured-title-card__copy small{display:block;margin-top:6px;color:#d1d5e2;font-size:11px}.featured-title-card__copy>span{display:block;overflow:hidden;margin-top:5px;color:#9da5ba;font-size:10px;text-overflow:ellipsis;white-space:nowrap}.featured-title-progress{display:flex;justify-content:flex-end;margin-top:-2px;color:#aeb4c8;font-size:11px;font-weight:900;font-variant-numeric:tabular-nums}.featured-title-progress span{color:#fff}
 .home-live-stage{position:relative;isolation:isolate;width:min(1600px,calc(100vw - 24px));margin:4px auto 42px;overflow:hidden;border:1px solid rgba(151,112,255,.48);border-radius:32px;background:#080a18;box-shadow:0 30px 90px rgba(0,0,0,.48)}
 .home-live-stage__background{position:absolute;inset:-18px;z-index:-2;background-image:url('/beyond-tv/assets/img/channel-backgrounds-sprite.png');background-repeat:no-repeat;background-size:400% 200%;background-position:var(--channel-bg,33.333% 0);filter:blur(9px) saturate(1.34) contrast(1.08) hue-rotate(var(--channel-hue,0deg));transform:scale(1.035);opacity:1;transition:background-position .35s ease,filter .35s ease}
 .home-live-stage:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(3,5,13,.12),rgba(3,5,13,.48) 82%,rgba(5,7,18,.72));pointer-events:none}
 .home-live-stage[data-channel-theme="after-dark"]{--channel-bg:0 0;--channel-hue:-18deg}.home-live-stage[data-channel-theme="cartoons"]{--channel-bg:33.333% 0;--channel-hue:0deg}.home-live-stage[data-channel-theme="anime"]{--channel-bg:100% 0;--channel-hue:22deg}.home-live-stage[data-channel-theme="classic"]{--channel-bg:0 0}.home-live-stage[data-channel-theme="preschool"]{--channel-bg:66.666% 0}.home-live-stage[data-channel-theme="preschool-fr"]{--channel-bg:66.666% 100%}.home-live-stage[data-channel-theme="space"]{--channel-bg:100% 0}.home-live-stage[data-channel-theme="ancient"]{--channel-bg:0 100%}.home-live-stage[data-channel-theme="cinema"]{--channel-bg:33.333% 100%}.home-live-stage[data-channel-theme="french"]{--channel-bg:66.666% 100%}.home-live-stage[data-channel-theme="health"]{--channel-bg:100% 100%}.home-live-stage[data-channel-theme="comedy"]{--channel-bg:33.333% 100%}.home-live-stage[data-channel-theme="family"]{--channel-bg:66.666% 0}
 .home-live-stage__inner{padding:clamp(18px,3vw,42px)}.home-live-stage__top{display:flex;align-items:end;justify-content:space-between;gap:28px;margin-bottom:20px}.home-live-stage h2{margin:5px 0 0;font-size:clamp(34px,5vw,68px);line-height:.96;letter-spacing:-.055em}.home-live-stage__top p{max-width:850px;margin:12px 0 0;color:#d0d4e2;line-height:1.55}.home-live-kicker{display:inline-flex;align-items:center;gap:9px;color:#c6baff;font-size:11px;font-weight:950;letter-spacing:.14em;text-transform:uppercase}.home-live-kicker i,.live-dot{width:9px;height:9px;border-radius:50%;background:#ff365f;box-shadow:0 0 0 5px rgba(255,54,95,.16)}.home-live-actions{display:flex;gap:10px;flex:0 0 auto}.home-live-button{display:inline-flex;min-height:46px;align-items:center;justify-content:center;padding:0 17px;border-radius:12px;text-decoration:none;font-size:12px;font-weight:900;background:linear-gradient(100deg,#6857ff,#e946a0);box-shadow:0 12px 30px rgba(95,73,255,.28)}.home-live-button.secondary{border:1px solid rgba(255,255,255,.24);background:rgba(6,8,18,.48);box-shadow:none}.home-live-player{width:100%;aspect-ratio:16/8.4;min-height:540px;overflow:hidden;border:1px solid rgba(255,255,255,.18);border-radius:25px;background:#000;box-shadow:0 25px 70px rgba(0,0,0,.58)}.home-live-player iframe{display:block;width:100%;height:100%;border:0}.home-live-meta{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 3px 13px}.home-live-meta>div{display:flex;align-items:center;gap:11px;flex-wrap:wrap}.home-live-meta span{color:#c3c8d8}.home-live-clock{font-size:11px}.home-live-switch{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}.home-live-switch button{min-width:0;padding:12px 8px;border:1px solid rgba(255,255,255,.18);border-radius:12px;color:#fff;background:rgba(5,7,17,.62);font:800 11px/1.2 inherit;cursor:pointer}.home-live-switch button span{display:block;margin-top:5px;overflow:hidden;text-overflow:ellipsis}.home-live-switch button:hover{background:rgba(255,255,255,.12)}.home-live-switch button.active{border-color:#a994ff;background:#765cff;box-shadow:0 9px 24px rgba(118,92,255,.3)}
 .live-apps{margin-bottom:24px}.live-apps-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:16px}.live-apps-heading span{color:#a99cff;font-size:10px;font-weight:950;letter-spacing:.15em}.live-apps-heading h2{margin:5px 0 0;font-size:clamp(30px,4vw,50px);letter-spacing:-.05em}.live-apps-heading>a{font-size:13px;font-weight:900;text-decoration:none}.live-app-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.live-app-card{position:relative;isolation:isolate;min-height:400px;overflow:hidden;padding:clamp(24px,4vw,44px);display:flex;flex-direction:column;justify-content:flex-end;border:1px solid rgba(255,255,255,.16);border-radius:28px;box-shadow:0 22px 60px rgba(0,0,0,.34)}.live-app-card:before{content:"";position:absolute;inset:0;z-index:-2}.live-app-card:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(3,6,14,.04),rgba(3,6,14,.9) 78%)}.verse-card:before{background:radial-gradient(circle at 75% 20%,rgba(243,218,143,.32),transparent 23%),linear-gradient(135deg,#071d14,#175137 58%,#596720)}.french-card:before{background:radial-gradient(circle at 77% 17%,rgba(255,255,255,.24),transparent 22%),linear-gradient(135deg,#061d4e,#173c9e 55%,#d92549)}.live-app-card__art{position:absolute;right:7%;top:12%;font-size:clamp(80px,13vw,175px);opacity:.2}.live-app-label{color:#d7d2ff;font-size:10px;font-weight:950;letter-spacing:.15em}.verse-card .live-app-label{color:#9be9b2}.live-app-card blockquote,.live-app-card h3{max-width:760px;margin:15px 0 10px;font-size:clamp(34px,5vw,64px);line-height:1;letter-spacing:-.045em;font-weight:900}.live-app-card blockquote{font-family:Georgia,serif;font-weight:500}.live-app-card p{margin:0;color:#d0d5e2;font-size:16px}.live-app-card .translation{font-size:22px;font-weight:800;color:#fff}.live-app-card .pronunciation{margin-top:7px;font-size:14px}.live-app-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.live-app-actions a,.live-app-actions button{display:inline-flex;min-height:44px;align-items:center;justify-content:center;padding:0 16px;border:1px solid rgba(255,255,255,.27);border-radius:999px;color:#fff;background:rgba(255,255,255,.09);font:900 12px/1 inherit;text-decoration:none;cursor:pointer}.live-app-actions a:first-child{background:rgba(255,255,255,.15)}
+.live-apps-heading__actions{display:flex;align-items:center;gap:14px}.live-apps-heading__actions>a{font-size:13px;font-weight:900;text-decoration:none}.live-app-controls{display:flex;gap:8px}.live-app-controls button{display:grid;place-items:center;width:44px;height:44px;border:1px solid rgba(255,255,255,.19);border-radius:50%;background:rgba(12,15,31,.86);color:#fff;font:900 18px/1 inherit;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.22);transition:transform .2s ease,border-color .2s ease,background .2s ease}.live-app-controls button:hover,.live-app-controls button:focus-visible{transform:translateY(-2px);border-color:#b7a8ff;background:#6c55ef}.live-app-controls button:disabled{cursor:default;opacity:.35;transform:none}.live-app-grid{display:flex;gap:18px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scrollbar-width:none;padding:4px max(0px,calc((100% - 1180px)/2)) 28px}.live-app-grid::-webkit-scrollbar{display:none}.live-app-grid:focus-visible{outline:2px solid #a99cff;outline-offset:7px;border-radius:22px}.live-app-card{flex:0 0 clamp(310px,67vw,760px);scroll-snap-align:start;scroll-snap-stop:always;min-height:470px;transform:translateZ(0);transition:transform .35s ease,border-color .35s ease,box-shadow .35s ease}.live-app-card.is-current{border-color:rgba(194,181,255,.62);box-shadow:0 30px 80px rgba(0,0,0,.46),0 0 0 1px rgba(169,156,255,.17)}.live-app-card:not(.is-current){transform:scale(.975)}.live-app-progress{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:-7px}.live-app-progress button{width:7px;height:7px;padding:0;border:0;border-radius:999px;background:rgba(255,255,255,.26);cursor:pointer;transition:width .25s ease,background .25s ease}.live-app-progress button.active{width:28px;background:linear-gradient(90deg,#a996ff,#ef5da8)}.live-app-progress button:focus-visible{outline:2px solid #fff;outline-offset:3px}
 .home-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:45px}.home-shortcuts a{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center;padding:18px;border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(10,14,29,.72);text-decoration:none}.home-shortcuts span{grid-row:1/3;font-size:29px}.home-shortcuts strong{font-size:15px}.home-shortcuts small{margin-top:3px;color:#aeb5c9}
 @media(max-width:1100px){.home-live-player{min-height:0;aspect-ratio:16/9}.home-live-switch{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:800px){.home-live-stage{width:calc(100vw - 12px);border-radius:23px;margin-bottom:32px}.home-live-stage__inner{padding:14px}.home-live-stage__top{align-items:flex-start;flex-direction:column;margin-bottom:14px}.home-live-actions{width:100%}.home-live-button{flex:1}.home-live-player{aspect-ratio:16/9;border-radius:16px}.home-live-meta{align-items:flex-start;flex-direction:column}.home-live-switch{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px}.home-live-switch button{min-width:93px;scroll-snap-align:start}.live-apps-heading{align-items:flex-start;flex-direction:column}.live-app-grid{grid-template-columns:1fr}.live-app-card{min-height:340px}.home-shortcuts{grid-template-columns:1fr}}
+@media(max-width:800px){.home-live-stage{width:calc(100vw - 12px);border-radius:23px;margin-bottom:32px}.home-live-stage__inner{padding:14px}.home-live-stage__top{align-items:flex-start;flex-direction:column;margin-bottom:14px}.home-live-actions{width:100%}.home-live-button{flex:1}.home-live-player{aspect-ratio:16/9;border-radius:16px}.home-live-meta{align-items:flex-start;flex-direction:column}.home-live-switch{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px}.home-live-switch button{min-width:93px;scroll-snap-align:start}.live-apps-heading{align-items:flex-start;flex-direction:column}.live-apps-heading__actions{width:100%;justify-content:space-between}.live-app-grid{width:calc(100vw - 16px);margin-left:calc((100% - 100vw)/2 + 8px);padding-inline:4px}.live-app-card{flex-basis:min(88vw,560px);min-height:390px}.home-shortcuts{grid-template-columns:1fr}}
+@media(max-width:800px){.featured-library__heading{align-items:flex-start;flex-direction:column}.featured-library__actions{width:100%;justify-content:space-between}.featured-title-carousel{width:calc(100vw - 8px);margin-left:calc((100% - 100vw)/2 + 4px);padding-inline:8px}.featured-title-card{flex-basis:min(58vw,250px)}}
 .games-card:before{background:radial-gradient(circle at 77% 17%,rgba(255,203,103,.34),transparent 24%),linear-gradient(135deg,#24120b,#7c2f20 55%,#e88a25)}.games-card .live-app-label{color:#ffd17f}.games-card .live-app-card__art{filter:drop-shadow(0 18px 32px rgba(0,0,0,.28))}
 .casino-card:before{background:radial-gradient(circle at 77% 17%,rgba(255,216,109,.3),transparent 23%),linear-gradient(135deg,#160b25,#54205c 55%,#a42e65)}.casino-card .live-app-label{color:#ffd86d}.casino-card h3{font-size:clamp(34px,5vw,64px)}
 .math-card:before{background:radial-gradient(circle at 78% 18%,rgba(91,219,69,.3),transparent 24%),linear-gradient(135deg,#06172d,#0a4c82 58%,#178b73)}.math-card .live-app-label{color:#8ff0b3}.coding-card:before{background:radial-gradient(circle at 78% 18%,rgba(53,214,255,.28),transparent 24%),linear-gradient(135deg,#16092c,#51269a 56%,#087f9b)}.coding-card .live-app-label{color:#95eaff}.coding-card .live-app-card__art{font-size:clamp(60px,9vw,124px);font-weight:950;letter-spacing:-.12em}
-@media(min-width:1051px){.live-app-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(min-width:1051px){.live-app-card{flex-basis:min(62vw,760px)}}
 @media(max-width:480px){.home-live-stage h2{font-size:34px}.home-live-stage__top p{font-size:13px}.home-live-actions{display:grid;grid-template-columns:1fr 1fr}.home-live-button{padding:0 10px}.home-live-player{aspect-ratio:16/10}.home-live-clock{display:none}.live-app-card{min-height:315px;padding:23px}.live-app-card blockquote,.live-app-card h3{font-size:36px}}
+@media(max-width:480px){.featured-library__heading h2{font-size:34px}.featured-title-card{flex-basis:64vw}.featured-library__actions>a{font-size:12px}}
 html[data-theme="light"] .home-live-stage,html[data-theme="light"] .live-app-card{color:#fff}html[data-theme="light"] .home-shortcuts a{background:rgba(255,255,255,.82);border-color:rgba(26,31,54,.14)}html[data-theme="light"] .home-shortcuts small{color:#5e667a}
 </style>
 
 <script>
+(function(){
+ const carousel=document.querySelector('[data-featured-title-carousel]');
+ const previous=document.querySelector('[data-featured-title-prev]');
+ const next=document.querySelector('[data-featured-title-next]');
+ const position=document.querySelector('[data-featured-title-position]');
+ if(!carousel||!previous||!next||!position)return;
+ const cards=[...carousel.querySelectorAll('.featured-title-card')];
+ let current=0;
+
+ cards.forEach((card,index)=>{
+   card.setAttribute('role','group');
+   card.setAttribute('aria-roledescription','slide');
+   card.setAttribute('aria-label',`${card.getAttribute('aria-label')||'Title'}, ${index+1} of ${cards.length}`);
+ });
+
+ function update(){
+   cards.forEach((card,index)=>card.classList.toggle('is-current',index===current));
+   position.textContent=String(current+1);
+   previous.disabled=current===0;
+   next.disabled=current===cards.length-1;
+ }
+
+ function goTo(index){
+   current=Math.max(0,Math.min(cards.length-1,index));
+   cards[current].scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'});
+   update();
+ }
+
+ previous.addEventListener('click',()=>goTo(current-1));
+ next.addEventListener('click',()=>goTo(current+1));
+ carousel.addEventListener('keydown',event=>{
+   if(event.key==='ArrowLeft'){event.preventDefault();goTo(current-1);}
+   if(event.key==='ArrowRight'){event.preventDefault();goTo(current+1);}
+   if(event.key==='Home'){event.preventDefault();goTo(0);}
+   if(event.key==='End'){event.preventDefault();goTo(cards.length-1);}
+ });
+
+ let frame=0;
+ carousel.addEventListener('scroll',()=>{
+   if(frame)return;
+   frame=requestAnimationFrame(()=>{
+     frame=0;
+     const left=carousel.getBoundingClientRect().left;
+     current=cards.reduce((best,card,index)=>{
+       const distance=Math.abs(card.getBoundingClientRect().left-left);
+       const bestDistance=Math.abs(cards[best].getBoundingClientRect().left-left);
+       return distance<bestDistance?index:best;
+     },current);
+     update();
+   });
+ },{passive:true});
+
+ update();
+})();
 (function(){
  const frame=document.getElementById('homeBeyondTvPlayer');
  const stage=document.querySelector('.home-live-stage');
@@ -412,6 +515,90 @@ html[data-theme="light"] .home-live-stage,html[data-theme="light"] .live-app-car
    utterance.lang='fr-FR'; utterance.rate=.88;
    window.speechSynthesis.speak(utterance);
  });
+})();
+(function(){
+ const carousel=document.querySelector('[data-live-app-carousel]');
+ const progress=document.querySelector('[data-live-app-progress]');
+ const previous=document.querySelector('[data-live-app-prev]');
+ const next=document.querySelector('[data-live-app-next]');
+ if(!carousel||!progress||!previous||!next)return;
+ const cards=[...carousel.querySelectorAll('.live-app-card')];
+ let current=0;
+
+ const dots=cards.map((card,index)=>{
+   card.setAttribute('role','group');
+   card.setAttribute('aria-roledescription','slide');
+   card.setAttribute('aria-label',`${index+1} of ${cards.length}`);
+   const dot=document.createElement('button');
+   dot.type='button';
+   dot.setAttribute('aria-label',`Show app experience ${index+1}`);
+   dot.addEventListener('click',()=>goTo(index));
+   progress.appendChild(dot);
+   return dot;
+ });
+
+ function goTo(index,behavior='smooth'){
+   current=Math.max(0,Math.min(cards.length-1,index));
+   cards[current].scrollIntoView({behavior,block:'nearest',inline:'start'});
+   update();
+ }
+
+ function update(){
+   cards.forEach((card,index)=>card.classList.toggle('is-current',index===current));
+   dots.forEach((dot,index)=>{
+     dot.classList.toggle('active',index===current);
+     dot.setAttribute('aria-current',index===current?'true':'false');
+   });
+   previous.disabled=current===0;
+   next.disabled=current===cards.length-1;
+ }
+
+ previous.addEventListener('click',()=>goTo(current-1));
+ next.addEventListener('click',()=>goTo(current+1));
+ carousel.addEventListener('keydown',event=>{
+   if(event.key==='ArrowLeft'){event.preventDefault();goTo(current-1);}
+   if(event.key==='ArrowRight'){event.preventDefault();goTo(current+1);}
+ });
+
+ let frame=0;
+ carousel.addEventListener('scroll',()=>{
+   if(frame)return;
+   frame=requestAnimationFrame(()=>{
+     frame=0;
+     const left=carousel.getBoundingClientRect().left;
+     current=cards.reduce((best,card,index)=>{
+       const distance=Math.abs(card.getBoundingClientRect().left-left);
+       const bestDistance=Math.abs(cards[best].getBoundingClientRect().left-left);
+       return distance<bestDistance?index:best;
+     },current);
+     update();
+   });
+ },{passive:true});
+
+ update();
+})();
+(function(){
+ const picker=document.getElementById('homeCurrency');
+ if(!picker)return;
+ const supported=['USD','CAD','BITS'];
+ const root=document.documentElement;
+
+ function applyCurrency(value,announce=false){
+   const currency=supported.includes(value)?value:'CAD';
+   root.dataset.currency=currency;
+   picker.value=currency;
+   try{localStorage.setItem('beyond-currency',currency);}catch(error){}
+   document.cookie=`beyond_currency=${encodeURIComponent(currency)}; path=/; max-age=31536000; SameSite=Lax`;
+   window.BeyondCurrency={
+     code:currency,
+     label:currency==='BITS'?'bit$':currency,
+     symbol:currency==='USD'?'US$':currency==='CAD'?'CA$':'bit$'
+   };
+   if(announce)window.dispatchEvent(new CustomEvent('beyond:currencychange',{detail:window.BeyondCurrency}));
+ }
+
+ applyCurrency(root.dataset.currency||'CAD');
+ picker.addEventListener('change',()=>applyCurrency(picker.value,true));
 })();
 </script>
 <script src="/beyond-tv/assets/js/app.js?v=2.2.1"></script>

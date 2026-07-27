@@ -13,5 +13,6 @@ $bodyClass = $bodyClass ?? '';
   <meta name="theme-color" content="#09070f">
   <title><?= e($pageTitle) ?></title>
   <link rel="stylesheet" href="/beyond-tattoo/assets/css/app.css?v=<?= rawurlencode((string) (@filemtime(__DIR__ . '/../assets/css/app.css') ?: '20260716')) ?>">
+  <link rel="stylesheet" href="/beyond-tattoo/assets/css/studio-upgrades.css?v=<?= rawurlencode((string) (@filemtime(__DIR__ . '/../assets/css/studio-upgrades.css') ?: '20260727')) ?>">
 </head>
 <body class="<?= e($bodyClass) ?>">

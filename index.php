@@ -51,6 +51,50 @@ if (is_file($frenchLessonsPath)) {
         }
     }
 }
+
+$homeMarketListing = [
+    'id' => 0,
+    'title' => 'Custom Coffee Mugs',
+    'item_type' => 'physical',
+    'listing_type' => 'buy_now',
+    'price_cash' => 16,
+    'price_bits' => null,
+    'currency' => 'CAD',
+];
+$homeMarketListings = [];
+try {
+    $homeMarketListings = beyond_db()->query(
+        "SELECT id,title,item_type,listing_type,price_cash,price_bits,currency
+         FROM listings
+         WHERE status='active'
+         ORDER BY created_at DESC
+         LIMIT 8"
+    )->fetchAll();
+    if (is_array($homeMarketListings[0] ?? null)) {
+        $homeMarketListing = array_merge($homeMarketListing, $homeMarketListings[0]);
+    }
+} catch (Throwable $exception) {
+    $homeMarketListings = [];
+    // The Canvas product fallback keeps this live-demo card useful before the first seller listing.
+}
+$homeMarketPrice = '';
+if ($homeMarketListing['price_bits'] !== null) {
+    $homeMarketPrice = number_format((int)$homeMarketListing['price_bits']) . ' bit$';
+}
+if ((float)$homeMarketListing['price_cash'] > 0) {
+    $cashPrice = '$' . number_format((float)$homeMarketListing['price_cash'], 2) . ' ' . (string)$homeMarketListing['currency'];
+    $homeMarketPrice .= $homeMarketPrice !== '' ? ' or ' . $cashPrice : $cashPrice;
+}
+$homeMarketUrl = (int)$homeMarketListing['id'] > 0
+    ? '/beyond-sell/listing.php?id=' . (int)$homeMarketListing['id']
+    : '/beyond-market/#shop';
+$homeMarketFeedLive = $homeMarketListings !== [];
+$homeMarketFeed = $homeMarketFeedLive ? $homeMarketListings : [
+    ['id'=>0,'title'=>'Custom Coffee Mugs','item_type'=>'physical','listing_type'=>'canvas_ready','price_cash'=>16,'price_bits'=>null,'currency'=>'CAD','market_url'=>'/beyond-market/#shop'],
+    ['id'=>0,'title'=>'Posters & Art Prints','item_type'=>'physical','listing_type'=>'canvas_ready','price_cash'=>12,'price_bits'=>null,'currency'=>'CAD','market_url'=>'/beyond-market/#shop'],
+    ['id'=>0,'title'=>'SVG & Digital Packs','item_type'=>'digital','listing_type'=>'instant_download','price_cash'=>5,'price_bits'=>null,'currency'=>'CAD','market_url'=>'/beyond-market/#shop'],
+    ['id'=>0,'title'=>'Tattoo Stencil Prints','item_type'=>'digital','listing_type'=>'creator_tools','price_cash'=>8,'price_bits'=>null,'currency'=>'CAD','market_url'=>'/beyond-market/#shop'],
+];
 ?>
 <!doctype html>
 <html lang="en">
@@ -78,6 +122,53 @@ if (is_file($frenchLessonsPath)) {
 
 
 html[data-theme="sunset"]{background:#1a0d24}html[data-theme="sunset"] body{color:#fff7f2;background:radial-gradient(circle at 76% 8%,rgba(255,111,97,.30),transparent 30%),radial-gradient(circle at 20% 34%,rgba(255,179,71,.18),transparent 35%),linear-gradient(180deg,#32113d 0%,#1d102b 46%,#0d1021 100%)}html[data-theme="sunset"] .brand small,html[data-theme="sunset"] .intro,html[data-theme="sunset"] .world p,html[data-theme="sunset"] .identity p{color:#f2c9c1}html[data-theme="sunset"] .login-btn,html[data-theme="sunset"] .ghost,html[data-theme="sunset"] .theme-toggle{border-color:rgba(255,220,190,.28);background:rgba(83,34,66,.48)}html[data-theme="sunset"] .core{background:radial-gradient(circle at 40% 35%,#fff0c6,#ff8a72 58%,#8f3b73);box-shadow:0 0 0 12px rgba(255,151,98,.09),0 0 52px rgba(255,96,108,.55),inset 0 0 35px rgba(255,222,170,.55)}html[data-theme="sunset"] .planet{background:rgba(70,25,60,.92);border-color:rgba(255,190,160,.30)}html[data-theme="sunset"] .world:before{background:linear-gradient(90deg,rgba(39,12,35,.95),rgba(54,17,46,.72) 42%,rgba(255,126,84,.12) 78%,rgba(36,14,44,.68))}html[data-theme="sunset"] .app{background:rgba(45,18,47,.78);border-color:rgba(255,207,176,.18)}html[data-theme="sunset"] .footer{border-color:rgba(255,210,183,.14);color:#d5aeb0}html[data-theme="sunset"] .footer h4{color:#ffe6dc}
+
+/* Live Marketplace landing */
+.home-market{position:relative;margin-top:28px;padding:42px 0 24px;isolation:isolate;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:30px;background:linear-gradient(145deg,rgba(17,20,42,.96),rgba(5,8,20,.98) 56%,rgba(23,8,34,.96));box-shadow:0 30px 90px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.05)}
+.home-market:before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(115deg,rgba(255,190,50,.6),transparent 26%,transparent 69%,rgba(242,70,157,.55));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.home-market__glow{position:absolute;z-index:-1;width:480px;height:480px;right:-180px;top:-250px;border-radius:50%;background:radial-gradient(circle,rgba(242,70,157,.24),rgba(112,87,255,.11) 38%,transparent 70%);filter:blur(8px)}
+.home-market__heading{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;padding:0 34px 28px}
+.home-market__heading h2{margin:8px 0 7px;font-family:"Space Grotesk",Inter,sans-serif;font-size:clamp(34px,5vw,58px);line-height:.96;letter-spacing:-.055em}
+.home-market__heading p{max-width:600px;margin:0;color:#aeb6cc;font-size:14px;line-height:1.55}
+.home-market__kicker{display:inline-flex;align-items:center;gap:9px;color:#ffd66e;font-size:10px;font-weight:900;letter-spacing:.17em}
+.home-market__kicker i{width:8px;height:8px;border-radius:50%;background:#55e58b;box-shadow:0 0 0 5px rgba(85,229,139,.1),0 0 18px rgba(85,229,139,.75);animation:market-live 2s ease-in-out infinite}
+@keyframes market-live{50%{opacity:.48;transform:scale(.82)}}
+.home-market__heading-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.home-market__sell,.home-market__browse{min-height:43px;display:inline-flex;align-items:center;justify-content:center;padding:0 17px;border-radius:12px;text-decoration:none;font-family:"Space Grotesk",Inter,sans-serif;font-size:12px;font-weight:780;white-space:nowrap;transition:.2s ease}
+.home-market__sell{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06)}
+.home-market__browse{border:1px solid rgba(255,200,73,.45);color:#171005;background:linear-gradient(135deg,#ffe083,#ffb932);box-shadow:0 10px 26px rgba(255,185,50,.17)}
+.home-market__sell:hover,.home-market__browse:hover{transform:translateY(-2px)}
+.home-market__controls{display:flex;gap:7px}
+.home-market__controls button{width:43px;height:43px;border:1px solid rgba(255,255,255,.16);border-radius:50%;color:#fff;background:rgba(255,255,255,.07);font:700 18px/1 inherit;cursor:pointer;transition:.2s ease}
+.home-market__controls button:hover,.home-market__controls button:focus-visible{border-color:#ffd16b;background:rgba(255,209,107,.12);transform:translateY(-2px)}
+.home-market__controls button:disabled{opacity:.3;cursor:default;transform:none}
+.home-market__feed{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(248px,292px);gap:15px;padding:7px 34px 20px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scrollbar-width:none;outline:none}
+.home-market__feed::-webkit-scrollbar{display:none}
+.home-market-card{position:relative;min-width:0;scroll-snap-align:start;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:20px;background:rgba(10,14,30,.86);box-shadow:0 18px 38px rgba(0,0,0,.25);transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.home-market-card:hover{transform:translateY(-5px);border-color:rgba(255,210,107,.42);box-shadow:0 24px 50px rgba(0,0,0,.36)}
+.home-market-card__visual{position:relative;height:184px;display:flex;align-items:center;justify-content:center;overflow:hidden;text-decoration:none;background:radial-gradient(circle at 68% 20%,hsla(var(--market-card-hue),88%,68%,.35),transparent 34%),radial-gradient(circle at 12% 92%,rgba(255,196,66,.18),transparent 35%),linear-gradient(145deg,hsl(var(--market-card-hue) 45% 17%),#080b19 70%)}
+.home-market-card__visual:before,.home-market-card__visual:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.12);border-radius:50%;transform:rotate(-24deg)}
+.home-market-card__visual:before{width:188px;height:78px}.home-market-card__visual:after{width:118px;height:188px}
+.home-market-card__icon{position:relative;z-index:1;width:72px;height:72px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.24);border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.2),rgba(255,255,255,.04));font:600 34px/1 "Space Grotesk",sans-serif;box-shadow:0 16px 34px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.25);backdrop-filter:blur(9px)}
+.home-market-card__badge{position:absolute;left:12px;top:12px;z-index:2;padding:6px 8px;border:1px solid rgba(255,255,255,.18);border-radius:9px;background:rgba(3,6,17,.64);font-size:8px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;backdrop-filter:blur(10px)}
+.home-market-card__preview{position:absolute;right:12px;bottom:11px;color:rgba(255,255,255,.55);font-size:8px;font-weight:900;letter-spacing:.15em}
+.home-market-card__copy{padding:17px 17px 16px}
+.home-market-card__copy small{color:#8f99b3;font-size:10px;font-weight:760;text-transform:uppercase;letter-spacing:.08em}
+.home-market-card__copy h3{min-height:43px;margin:7px 0 13px;font-family:"Space Grotesk",Inter,sans-serif;font-size:17px;line-height:1.2;letter-spacing:-.02em}
+.home-market-card__copy h3 a{text-decoration:none}
+.home-market-card__copy>div{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.home-market-card__copy strong{color:#ffe083;font-size:13px}
+.home-market-card__copy button{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.13);border-radius:50%;color:#fff;background:rgba(255,255,255,.05);font-size:19px;cursor:pointer;transition:.2s}
+.home-market-card__copy button:hover,.home-market-card__copy button[aria-pressed="true"]{border-color:#f2469d;color:#ff79bd;background:rgba(242,70,157,.12);transform:scale(1.06)}
+.home-market-card--create{min-height:304px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:#d9dcee;text-align:center;text-decoration:none;border-style:dashed;background:linear-gradient(145deg,rgba(112,87,255,.11),rgba(255,255,255,.025))}
+.home-market-card--create span{width:58px;height:58px;display:grid;place-items:center;border:1px solid rgba(166,147,255,.38);border-radius:18px;color:#cabfff;background:rgba(112,87,255,.14);font-size:30px}
+.home-market-card--create strong{font-family:"Space Grotesk",Inter,sans-serif;font-size:17px}.home-market-card--create small{color:#8993ae}
+.home-market__footer{display:flex;align-items:center;justify-content:space-between;padding:2px 34px 0;color:#7f89a2;font-size:11px}
+.home-market__footer b{color:#fff}.home-market__footer a{color:#bfc6d9;text-decoration:none;font-weight:760}.home-market__footer a:hover{color:#ffe083}
+html[data-theme="light"] .home-market{color:#f9faff;background:linear-gradient(145deg,#171b37,#070b19 62%,#210d31)}
+@media(max-width:850px){.home-market__heading{align-items:flex-start;flex-direction:column}.home-market__heading-actions{justify-content:flex-start}.home-market__feed{grid-auto-columns:minmax(240px,44vw)}}
+@media(max-width:560px){.home-market{width:calc(100% - 14px);margin-top:18px;padding:30px 0 20px;border-radius:24px}.home-market__heading{padding:0 18px 22px;gap:18px}.home-market__heading h2{font-size:38px}.home-market__heading-actions{width:100%}.home-market__sell,.home-market__browse{flex:1;padding-inline:10px}.home-market__controls{display:none}.home-market__feed{grid-auto-columns:80vw;padding:4px 18px 17px}.home-market__footer{padding-inline:18px}.home-market__footer a{max-width:190px;text-align:right}}
+@media(prefers-reduced-motion:reduce){.home-market__kicker i{animation:none}}
 </style>
 <style>
 .login-btn{display:inline-flex!important;align-items:center;justify-content:center;min-height:47px;padding:0 21px!important;border:1px solid rgba(255,255,255,.28)!important;border-radius:9px;text-decoration:none!important;font-weight:850!important;font-size:13px!important;background:rgba(255,255,255,.04);transition:.2s}
@@ -102,8 +193,8 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
 @media(max-width:650px){#beyond-os-shell .bos-actions{gap:6px}}
 .brand-atom{display:inline-grid;width:38px;height:38px;place-items:center;vertical-align:middle;margin-right:9px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:radial-gradient(circle at 35% 25%,rgba(117,91,255,.2),rgba(8,9,20,.94) 68%);box-shadow:0 8px 24px rgba(88,108,255,.28),inset 0 1px rgba(255,255,255,.08)}
 .brand-atom img{display:block;width:34px;height:34px;filter:drop-shadow(0 0 8px rgba(143,100,255,.32))}
-.nav>a[href="/academy/"]{border-color:var(--gold)}.nav>a[href="/beyond-tv/"],.nav>a[href="/beyond-media/"]{border-color:var(--pink)}.nav>a[href="/beyond-id/dashboard/wallet.php"]{border-color:var(--blue)}
-.nav>a[href="/academy/"]:hover,.nav>a[href="/academy/"]:focus-visible{color:#ffd16b}.nav>a[href="/beyond-tv/"]:hover,.nav>a[href="/beyond-tv/"]:focus-visible,.nav>a[href="/beyond-media/"]:hover,.nav>a[href="/beyond-media/"]:focus-visible{color:#ff73ba}.nav>a[href="/beyond-id/dashboard/wallet.php"]:hover,.nav>a[href="/beyond-id/dashboard/wallet.php"]:focus-visible{color:#70a7ff}
+.nav>a[href="/academy/"]{border-color:var(--gold)}.nav>a[href="/beyond-tv/"]{border-color:var(--pink)}.nav>a[href="/beyond-games/"]{border-color:#a855f7}.nav>a[href="/beyond-market/"]{border-color:var(--blue)}
+.nav>a[href="/academy/"]:hover,.nav>a[href="/academy/"]:focus-visible{color:#ffd16b}.nav>a[href="/beyond-tv/"]:hover,.nav>a[href="/beyond-tv/"]:focus-visible{color:#ff73ba}.nav>a[href="/beyond-games/"]:hover,.nav>a[href="/beyond-games/"]:focus-visible{color:#c69cff}.nav>a[href="/beyond-market/"]:hover,.nav>a[href="/beyond-market/"]:focus-visible{color:#70a7ff}
 .currency-picker{position:relative;display:flex;align-items:center;min-width:84px;height:43px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.055);overflow:hidden}.currency-picker:focus-within{outline:2px solid #a99cff;outline-offset:2px}.currency-picker>span{position:absolute;left:11px;z-index:1;color:#c9bcff;font-size:12px;font-weight:950;pointer-events:none}.currency-picker select{position:relative;width:100%;height:100%;padding:0 25px 0 29px;border:0;outline:0;color:#fff;background:transparent;font:900 11px/1 inherit;cursor:pointer;appearance:none}.currency-picker:after{content:"⌄";position:absolute;right:10px;top:11px;color:#aeb4ca;font-size:12px;pointer-events:none}.currency-picker option{color:#111;background:#fff}html[data-theme="light"] .currency-picker{border-color:rgba(23,26,46,.2);background:rgba(255,255,255,.62)}html[data-theme="light"] .currency-picker select{color:#171a2e}@media(max-width:560px){.currency-picker{min-width:72px;height:40px}.currency-picker select{padding-left:25px;padding-right:20px;font-size:10px}.currency-picker>span{left:9px}.currency-picker:after{right:7px}}
 .brand,.nav,.primary,.ghost,.home-live-button,.live-app-actions a,.live-app-actions button{font-family:"Space Grotesk",Inter,system-ui,sans-serif}.brand{font-weight:700;letter-spacing:-.055em}.nav>a:not(.primary){font-weight:600;letter-spacing:-.015em}.primary{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.16);background:linear-gradient(105deg,#526dff 0%,#8658f6 50%,#e950aa 100%);font-weight:700;letter-spacing:-.02em;box-shadow:0 14px 36px rgba(101,72,255,.34),inset 0 1px rgba(255,255,255,.22)}.primary:hover,.primary:focus-visible{transform:translateY(-1px);box-shadow:0 18px 42px rgba(101,72,255,.42),inset 0 1px rgba(255,255,255,.28)}
 </style>
@@ -112,7 +203,7 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
 <header class="top wrap">
     <a class="brand" href="./"><b class="brand-atom" aria-hidden="true"><img src="/assets/images/bos-logo-mark.svg?v=20260727-3" alt=""></b>BEYOND <span>OS</span><small>THE CONNECTED IMAGINATION ECOSYSTEM</small></a>
     <nav class="nav" aria-label="Primary navigation">
-          <a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-media/">Media</a><a href="/beyond-id/dashboard/wallet.php">Wallet</a>
+          <a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="/beyond-market/">Marketplace</a>
           <label class="currency-picker"><span aria-hidden="true">$</span><span class="visually-hidden">Display currency</span><select id="homeCurrency" aria-label="Display currency"><option value="USD">USD</option><option value="CAD">CAD</option><option value="BITS">bit$</option></select></label>
           <a class="primary" href="/app-store/">App Store</a>
     </nav>
@@ -283,6 +374,56 @@ $tmdbPosterProvider = $posterProviderConfig['tmdb_read_token'] !== '' || $poster
       <button type="button" data-home-channel="family" data-channel-number="11" data-channel-name="Beyond Family" data-endpoint="/beyond-tv/api/channel-stream.php?slug=beyond-family" data-embed="/beyond-tv/embed-player.php?slug=beyond-family" data-now="Loading the live program…" data-next="Live schedule connecting" data-icon="✨" data-open="/beyond-tv/channel.php?slug=beyond-family">✨ <span>Family</span></button>
     </div>
   </div>
+</section>
+
+<section class="home-market wrap" aria-labelledby="homeMarketTitle">
+  <div class="home-market__glow" aria-hidden="true"></div>
+  <header class="home-market__heading">
+    <div>
+      <span class="home-market__kicker"><i></i> <?=$homeMarketFeedLive ? 'LIVE SELLER FEED' : 'MARKETPLACE PREVIEW'?></span>
+      <h2 id="homeMarketTitle">Fresh from Beyond Market.</h2>
+      <p><?=$homeMarketFeedLive ? 'New active listings flow here automatically from Beyond Sell.' : 'Explore Canvas-ready products while the first community listings arrive.'?></p>
+    </div>
+    <div class="home-market__heading-actions">
+      <a class="home-market__sell" href="/beyond-sell/">Start selling</a>
+      <a class="home-market__browse" href="/beyond-market/">Open Marketplace →</a>
+      <div class="home-market__controls" aria-label="Marketplace listing controls">
+        <button type="button" data-home-market-prev aria-label="Previous Marketplace listing">←</button>
+        <button type="button" data-home-market-next aria-label="Next Marketplace listing">→</button>
+      </div>
+    </div>
+  </header>
+  <div class="home-market__feed" data-home-market-carousel tabindex="0" role="region" aria-roledescription="carousel" aria-label="Latest Beyond Market listings">
+    <?php foreach ($homeMarketFeed as $marketIndex => $marketItem):
+      $marketPriceParts = [];
+      if (($marketItem['price_bits'] ?? null) !== null) {
+          $marketPriceParts[] = number_format((int)$marketItem['price_bits']) . ' bit$';
+      }
+      if ((float)($marketItem['price_cash'] ?? 0) > 0) {
+          $marketPriceParts[] = '$' . number_format((float)$marketItem['price_cash'], 2) . ' ' . (string)($marketItem['currency'] ?? 'CAD');
+      }
+      $marketPriceLabel = $marketPriceParts ? implode(' or ', $marketPriceParts) : 'Free';
+      $marketItemUrl = (string)($marketItem['market_url'] ?? ('/beyond-sell/listing.php?id=' . (int)($marketItem['id'] ?? 0)));
+      $marketItemType = (string)($marketItem['item_type'] ?? 'digital');
+    ?>
+    <article class="home-market-card" data-market-slide>
+      <a class="home-market-card__visual" href="<?=e($marketItemUrl)?>" style="--market-card-hue:<?=($marketIndex * 47) % 360?>deg">
+        <span class="home-market-card__icon" aria-hidden="true"><?=$marketItemType === 'physical' ? '□' : ($marketItemType === 'digital' ? '↓' : '✦')?></span>
+        <span class="home-market-card__badge"><?=e(ucwords(str_replace('_', ' ', (string)($marketItem['listing_type'] ?? 'listing'))))?></span>
+        <span class="home-market-card__preview">BEYOND MARKET</span>
+      </a>
+      <div class="home-market-card__copy">
+        <small><?=e(ucfirst($marketItemType))?> · <?=$homeMarketFeedLive ? 'Live listing' : 'Canvas ready'?></small>
+        <h3><a href="<?=e($marketItemUrl)?>"><?=e((string)($marketItem['title'] ?? 'Marketplace listing'))?></a></h3>
+        <div><strong><?=e($marketPriceLabel)?></strong><button type="button" data-market-save aria-label="Save <?=e((string)($marketItem['title'] ?? 'listing'))?>" aria-pressed="false">♡</button></div>
+      </div>
+    </article>
+    <?php endforeach; ?>
+    <a class="home-market-card home-market-card--create" href="/beyond-sell/create.php">
+      <span>＋</span><strong>List something new.</strong><small>Publish through Beyond Sell</small>
+    </a>
+  </div>
+  <footer class="home-market__footer"><span><b data-home-market-position>1</b> / <?=count($homeMarketFeed)+1?></span><a href="/beyond-market/#live-listings">See the full seller floor →</a></footer>
 </section>
 
 <section class="live-apps wrap" aria-labelledby="liveAppsTitle">
@@ -519,6 +660,66 @@ html[data-theme="light"] .home-live-stage,html[data-theme="light"] .live-app-car
  const initial=stage.querySelector('[data-home-channel].active');
  if(initial)tune(initial);
  setInterval(()=>{const active=stage.querySelector('[data-home-channel].active');if(active&&active.dataset.endpoint)tune(active);},60000);
+})();
+(function(){
+ const carousel=document.querySelector('[data-home-market-carousel]');
+ const previous=document.querySelector('[data-home-market-prev]');
+ const next=document.querySelector('[data-home-market-next]');
+ const position=document.querySelector('[data-home-market-position]');
+ if(!carousel||!previous||!next||!position)return;
+ const cards=[...carousel.querySelectorAll('.home-market-card')];
+ let current=0;
+ let frame=0;
+
+ cards.forEach((card,index)=>{
+   card.setAttribute('role','group');
+   card.setAttribute('aria-roledescription','slide');
+   card.setAttribute('aria-label',`${index+1} of ${cards.length}`);
+ });
+
+ function update(){
+   cards.forEach((card,index)=>card.classList.toggle('is-current',index===current));
+   position.textContent=String(current+1);
+   previous.disabled=current===0;
+   next.disabled=current===cards.length-1;
+ }
+
+ function goTo(index){
+   current=Math.max(0,Math.min(cards.length-1,index));
+   cards[current].scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'});
+   update();
+ }
+
+ previous.addEventListener('click',()=>goTo(current-1));
+ next.addEventListener('click',()=>goTo(current+1));
+ carousel.addEventListener('keydown',event=>{
+   if(event.key==='ArrowLeft'){event.preventDefault();goTo(current-1);}
+   if(event.key==='ArrowRight'){event.preventDefault();goTo(current+1);}
+   if(event.key==='Home'){event.preventDefault();goTo(0);}
+   if(event.key==='End'){event.preventDefault();goTo(cards.length-1);}
+ });
+ carousel.addEventListener('scroll',()=>{
+   if(frame)return;
+   frame=requestAnimationFrame(()=>{
+     frame=0;
+     const left=carousel.getBoundingClientRect().left;
+     current=cards.reduce((best,card,index)=>{
+       const distance=Math.abs(card.getBoundingClientRect().left-left);
+       const bestDistance=Math.abs(cards[best].getBoundingClientRect().left-left);
+       return distance<bestDistance?index:best;
+     },current);
+     update();
+   });
+ },{passive:true});
+
+ carousel.querySelectorAll('[data-market-save]').forEach(button=>{
+   button.addEventListener('click',()=>{
+     const saved=button.getAttribute('aria-pressed')!=='true';
+     button.setAttribute('aria-pressed',saved?'true':'false');
+     button.textContent=saved?'♥':'♡';
+   });
+ });
+ update();
 })();
 (function(){
  const listen=document.getElementById('homeFrenchListen');

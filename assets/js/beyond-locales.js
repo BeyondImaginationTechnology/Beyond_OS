@@ -60,29 +60,88 @@
     es: {'Home':'Inicio','App Store':'Tienda de apps','Apps':'Aplicaciones','Sign in':'Iniciar sesión','Sign out':'Cerrar sesión','Create account':'Crear cuenta','Dashboard':'Panel','Profile':'Perfil','Settings':'Configuración','Notifications':'Notificaciones','Wallet':'Billetera','Search':'Buscar','Learn more':'Más información','Back':'Volver','Save':'Guardar','Cancel':'Cancelar','Continue':'Continuar','Email':'Correo electrónico','Password':'Contraseña','Forgot password?':'¿Olvidaste tu contraseña?','Remember me':'Recordarme','Open':'Abrir','Launch':'Iniciar','Language':'Idioma','Theme':'Tema'}
   };
 
+  Object.assign(commonTranslations.fr, {
+    'Academy':'Académie','TV':'Télé','Games':'Jeux','Marketplace':'Marché','Beyond Academy':'Académie Beyond',
+    'Open learner dashboard':'Ouvrir le tableau de bord','Verify a certificate':'Vérifier un certificat','Browse academies':'Parcourir les académies',
+    'Learn it.':'Apprenez.','Prove it.':'Démontrez-le.','Build real skills, complete guided lessons, pass assessments and earn verifiable Beyond-issued certificates.':'Développez de vraies compétences, suivez des leçons guidées, réussissez les évaluations et obtenez des certificats Beyond vérifiables.',
+    'Beyond Certificates':'Certificats Beyond','Three pathways. Real evidence of learning.':'Trois parcours. Des preuves concrètes d’apprentissage.',
+    'Start pathway':'Commencer le parcours','Live learning':'Apprentissage en direct','Choose your academy':'Choisissez votre académie','Open Academy':'Ouvrir l’académie','Open School':'Ouvrir l’école','Open app':'Ouvrir l’app',
+    'Beyond Market':'Marché Beyond','Shop & discover.':'Magasinez et découvrez.','Explore the market':'Explorer le marché','Create with Canvas':'Créer avec Canvas','Start selling':'Commencer à vendre',
+    'Search Beyond Market':'Rechercher sur Beyond Market','All categories':'Toutes les catégories','Canvas studio':'Studio Canvas','Live listings':'Annonces en direct','Sell':'Vendre','Original artwork':'Œuvres originales',
+    'Find your next favorite thing.':'Trouvez votre prochain coup de cœur.','Browse seller listings':'Voir les annonces','Original Beyond collection':'Collection originale Beyond','Start with artwork you can see.':'Commencez avec des œuvres à découvrir.','Open Canvas':'Ouvrir Canvas',
+    'Featured creator experiences':'Expériences créatives en vedette','Artwork, releases and services':'Œuvres, nouveautés et services','Buy now & auction':'Achat immédiat et enchères','Live seller listings':'Annonces vendeurs en direct','View all listings':'Voir toutes les annonces',
+    'Create & earn':'Créer et gagner','Seller tools':'Outils vendeurs','Fresh from Beyond Market.':'Nouveautés du Marché Beyond.','Open Marketplace →':'Ouvrir le marché →','See the full seller floor →':'Voir tout l’espace vendeur →',
+    'PLAYABLE NOW · BEYOND GAMES':'JOUABLE MAINTENANT · BEYOND GAMES','Live demo games.':'Démos de jeux en direct.','Explore Beyond Games →':'Explorer Beyond Games →','Play demo →':'Jouer à la démo →','Game details':'Détails du jeu',
+    'Physical':'Physique','Digital':'Numérique','Live listing':'Annonce en direct','Buy Now':'Acheter','Preview in Canvas →':'Aperçu dans Canvas →','Customize in Canvas':'Personnaliser dans Canvas','Quick view':'Aperçu rapide','Save to watchlist':'Enregistrer',
+    'Every Beyond app.':'Toutes les apps Beyond.','One store.':'Une seule boutique.','List something new.':'Publiez une nouveauté.','Publish through Beyond Sell':'Publier avec Beyond Sell'
+  });
+  Object.assign(commonTranslations.ht, {
+    'Academy':'Akademi','TV':'Televizyon','Games':'Jwèt','Marketplace':'Mache','Beyond Academy':'Akademi Beyond',
+    'Open learner dashboard':'Louvri tablo elèv la','Verify a certificate':'Verifye yon sètifika','Browse academies':'Gade akademi yo',
+    'Learn it.':'Aprann li.','Prove it.':'Pwouve li.','Build real skills, complete guided lessons, pass assessments and earn verifiable Beyond-issued certificates.':'Devlope bonjan ladrès, fini leson gide yo, pase evalyasyon epi resevwa sètifika Beyond ki ka verifye.',
+    'Beyond Certificates':'Sètifika Beyond','Three pathways. Real evidence of learning.':'Twa chemen. Prèv reyèl ou aprann.',
+    'Start pathway':'Kòmanse chemen an','Live learning':'Aprantisaj an dirèk','Choose your academy':'Chwazi akademi ou','Open Academy':'Louvri akademi','Open School':'Louvri lekòl','Open app':'Louvri aplikasyon',
+    'Beyond Market':'Mache Beyond','Shop & discover.':'Achte epi dekouvri.','Explore the market':'Eksplore mache a','Create with Canvas':'Kreye ak Canvas','Start selling':'Kòmanse vann',
+    'Search Beyond Market':'Chèche nan Mache Beyond','All categories':'Tout kategori','Canvas studio':'Estidyo Canvas','Live listings':'Anons an dirèk','Sell':'Vann','Original artwork':'Zèv orijinal',
+    'Find your next favorite thing.':'Jwenn pwochen bagay ou renmen an.','Browse seller listings':'Gade anons vandè yo','Original Beyond collection':'Koleksyon orijinal Beyond','Start with artwork you can see.':'Kòmanse ak zèv ou ka wè.','Open Canvas':'Louvri Canvas',
+    'Featured creator experiences':'Eksperyans kreyatè vedèt','Artwork, releases and services':'Zèv, nouvo sòti ak sèvis','Buy now & auction':'Achte kounye a ak vann piblik','Live seller listings':'Anons vandè an dirèk','View all listings':'Gade tout anons yo',
+    'Create & earn':'Kreye epi touche','Seller tools':'Zouti vandè','Fresh from Beyond Market.':'Nouvo nan Mache Beyond.','Open Marketplace →':'Louvri mache a →','See the full seller floor →':'Gade tout espas vandè a →',
+    'PLAYABLE NOW · BEYOND GAMES':'JWE KOUNYE A · BEYOND GAMES','Live demo games.':'Demo jwèt an dirèk.','Explore Beyond Games →':'Eksplore Beyond Games →','Play demo →':'Jwe demo a →','Game details':'Detay jwèt la',
+    'Physical':'Fizik','Digital':'Dijital','Live listing':'Anons an dirèk','Buy Now':'Achte kounye a','Preview in Canvas →':'Gade nan Canvas →','Customize in Canvas':'Pèsonalize nan Canvas','Quick view':'Gade rapid','Save to watchlist':'Sove',
+    'Every Beyond app.':'Tout aplikasyon Beyond.','One store.':'Yon sèl magazen.','List something new.':'Mete yon nouvo bagay.','Publish through Beyond Sell':'Pibliye ak Beyond Sell'
+  });
+  Object.assign(commonTranslations.es, {
+    'Academy':'Academia','TV':'TV','Games':'Juegos','Marketplace':'Mercado','Beyond Academy':'Academia Beyond',
+    'Open learner dashboard':'Abrir panel del estudiante','Verify a certificate':'Verificar un certificado','Browse academies':'Explorar academias',
+    'Learn it.':'Apréndelo.','Prove it.':'Demuéstralo.','Build real skills, complete guided lessons, pass assessments and earn verifiable Beyond-issued certificates.':'Desarrolla habilidades reales, completa lecciones guiadas, aprueba evaluaciones y obtén certificados Beyond verificables.',
+    'Beyond Certificates':'Certificados Beyond','Three pathways. Real evidence of learning.':'Tres rutas. Evidencia real de aprendizaje.',
+    'Start pathway':'Comenzar ruta','Live learning':'Aprendizaje en vivo','Choose your academy':'Elige tu academia','Open Academy':'Abrir academia','Open School':'Abrir escuela','Open app':'Abrir app',
+    'Beyond Market':'Mercado Beyond','Shop & discover.':'Compra y descubre.','Explore the market':'Explorar el mercado','Create with Canvas':'Crear con Canvas','Start selling':'Empezar a vender',
+    'Search Beyond Market':'Buscar en Beyond Market','All categories':'Todas las categorías','Canvas studio':'Estudio Canvas','Live listings':'Anuncios en vivo','Sell':'Vender','Original artwork':'Arte original',
+    'Find your next favorite thing.':'Encuentra tu próximo favorito.','Browse seller listings':'Ver anuncios','Original Beyond collection':'Colección original Beyond','Start with artwork you can see.':'Empieza con arte que puedes ver.','Open Canvas':'Abrir Canvas',
+    'Featured creator experiences':'Experiencias destacadas','Artwork, releases and services':'Arte, novedades y servicios','Buy now & auction':'Compra directa y subasta','Live seller listings':'Anuncios de vendedores en vivo','View all listings':'Ver todos los anuncios',
+    'Create & earn':'Crea y gana','Seller tools':'Herramientas para vendedores','Fresh from Beyond Market.':'Lo nuevo de Beyond Market.','Open Marketplace →':'Abrir mercado →','See the full seller floor →':'Ver todo el espacio de vendedores →',
+    'PLAYABLE NOW · BEYOND GAMES':'JUEGA AHORA · BEYOND GAMES','Live demo games.':'Demos de juegos en vivo.','Explore Beyond Games →':'Explorar Beyond Games →','Play demo →':'Jugar demo →','Game details':'Detalles del juego',
+    'Physical':'Físico','Digital':'Digital','Live listing':'Anuncio en vivo','Buy Now':'Comprar ahora','Preview in Canvas →':'Vista previa en Canvas →','Customize in Canvas':'Personalizar en Canvas','Quick view':'Vista rápida','Save to watchlist':'Guardar',
+    'Every Beyond app.':'Todas las apps Beyond.','One store.':'Una sola tienda.','List something new.':'Publica algo nuevo.','Publish through Beyond Sell':'Publicar con Beyond Sell'
+  });
+
+  var textSources = typeof WeakMap === 'function' ? new WeakMap() : null;
+
   function translateCommon(locale) {
-    var translations = commonTranslations[locale];
-    if (!translations) {
-      document.querySelectorAll('[data-i18n-source]').forEach(function (node) { node.textContent = node.getAttribute('data-i18n-source'); });
-      document.querySelectorAll('[data-i18n-placeholder]').forEach(function (field) { field.setAttribute('placeholder', field.getAttribute('data-i18n-placeholder')); });
-      return;
-    }
-    var nodes = document.querySelectorAll('a,button,label,h1,h2,h3,h4,p,span,strong,small,option');
-    for (var index = 0; index < nodes.length; index += 1) {
-      var node = nodes[index];
-      if (node.children.length !== 0 || (node.closest && node.closest('[data-no-translate]'))) continue;
-      var original = node.getAttribute('data-i18n-source') || node.textContent.trim();
-      if (!translations[original]) continue;
-      if (!node.hasAttribute('data-i18n-source')) node.setAttribute('data-i18n-source', original);
-      node.textContent = translations[original];
+    var translations = commonTranslations[locale] || {};
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    var textNodes = [];
+    var current;
+    while ((current = walker.nextNode())) textNodes.push(current);
+    for (var index = 0; index < textNodes.length; index += 1) {
+      var textNode = textNodes[index];
+      var parent = textNode.parentElement;
+      if (!parent || parent.closest('script,style,code,pre,[data-no-translate],[contenteditable="true"]')) continue;
+      var sourceText = textSources && textSources.has(textNode) ? textSources.get(textNode) : textNode.nodeValue;
+      if (textSources && !textSources.has(textNode)) textSources.set(textNode, sourceText);
+      var sourceTrimmed = (sourceText || '').trim();
+      if (!sourceTrimmed) continue;
+      var translated = locale === 'en' ? sourceTrimmed : (translations[sourceTrimmed] || sourceTrimmed);
+      textNode.nodeValue = sourceText.replace(sourceTrimmed, translated);
     }
     var placeholders = document.querySelectorAll('input[placeholder],textarea[placeholder]');
     for (var item = 0; item < placeholders.length; item += 1) {
       var field = placeholders[item];
       var source = field.getAttribute('data-i18n-placeholder') || field.getAttribute('placeholder');
-      if (!translations[source]) continue;
       if (!field.hasAttribute('data-i18n-placeholder')) field.setAttribute('data-i18n-placeholder', source);
-      field.setAttribute('placeholder', translations[source]);
+      field.setAttribute('placeholder', locale === 'en' ? source : (translations[source] || source));
+    }
+    var attributed = document.querySelectorAll('[aria-label],[title]');
+    for (var attributeIndex = 0; attributeIndex < attributed.length; attributeIndex += 1) {
+      var element = attributed[attributeIndex];
+      ['aria-label', 'title'].forEach(function (attribute) {
+        if (!element.hasAttribute(attribute)) return;
+        var sourceAttribute = 'data-i18n-' + attribute;
+        var original = element.getAttribute(sourceAttribute) || element.getAttribute(attribute);
+        if (!element.hasAttribute(sourceAttribute)) element.setAttribute(sourceAttribute, original);
+        element.setAttribute(attribute, locale === 'en' ? original : (translations[original] || original));
+      });
     }
   }
 
@@ -93,18 +152,19 @@
     document.documentElement.lang = locale;
     document.documentElement.dataset.locale = locale;
     bindings.forEach(function (binding) {
-      document.querySelectorAll(binding[0]).forEach(function (node) { node.textContent = dictionary[binding[1]]; });
+      document.querySelectorAll(binding[0]).forEach(function (node) { var value = dictionary[binding[1]]; if (node.textContent !== value) node.textContent = value; });
     });
-    document.querySelectorAll('.bos-apps-toggle').forEach(function (button) { button.textContent = dictionary.apps + ' ▾'; });
+    document.querySelectorAll('.bos-apps-toggle').forEach(function (button) { var value = dictionary.apps + ' ▾'; if (button.textContent !== value) button.textContent = value; });
     document.querySelectorAll('.bos-locale').forEach(function (label) { label.title = dictionary.language; });
     document.querySelectorAll('#localePicker').forEach(function (picker) { picker.setAttribute('aria-label', dictionary.language); });
-    document.querySelectorAll('.bos-app-store-label-full').forEach(function (label) { label.textContent = appStoreLabels[locale] || appStoreLabels.en; });
-    document.querySelectorAll('.hero-actions .ghost').forEach(function (link) { link.textContent = appStoreCtas[locale] || appStoreCtas.en; });
-    document.querySelectorAll('#beyond-os-shell .bos-home-label').forEach(function (label) { label.textContent = 'BEYOND OS 2.3'; });
+    document.querySelectorAll('.bos-app-store-label-full').forEach(function (label) { var value = appStoreLabels[locale] || appStoreLabels.en; if (label.textContent !== value) label.textContent = value; });
+    document.querySelectorAll('.hero-actions .ghost').forEach(function (link) { var value = appStoreCtas[locale] || appStoreCtas.en; if (link.textContent !== value) link.textContent = value; });
+    document.querySelectorAll('#beyond-os-shell .bos-home-label').forEach(function (label) { if (label.textContent !== 'BEYOND OS 2.3.1') label.textContent = 'BEYOND OS 2.3.1'; });
     document.querySelectorAll('.bos-kicker,.bos-hero h1,.os,.logo').forEach(function (label) {
-      label.textContent = label.textContent
+      var nextText = label.textContent
         .replace(/Beyond OS 2\.1 Beta/gi, 'Beyond OS · Beta Build 2.1.1')
         .replace(/(Beyond (?:Wallet|Investing|TV|Sell|Finance|Careers)) (?:2\.1|2\.2) Beta/gi, '$1 · Beta Build 2.1.1');
+      if (label.textContent !== nextText) label.textContent = nextText;
     });
     translateCommon(locale);
   }
@@ -116,4 +176,11 @@
   document.addEventListener('beyond:locale-change', function (event) { apply(event.detail && event.detail.locale || 'en'); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { apply(selectedLocale()); });
   else apply(selectedLocale());
+  if (typeof MutationObserver === 'function') {
+    var localeRefresh = 0;
+    new MutationObserver(function () {
+      clearTimeout(localeRefresh);
+      localeRefresh = setTimeout(function () { apply(selectedLocale()); }, 50);
+    }).observe(document.documentElement, { childList: true, subtree: true });
+  }
 })();

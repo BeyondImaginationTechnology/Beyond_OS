@@ -2,11 +2,11 @@
 declare(strict_types=1);
 
 return [
-    'slug' => 'eye-of-horus-anubis-july-21-2026',
+    'slug' => 'eye-of-horus-anubis-july-27-2026',
     'title' => 'Eye of Horus Anubis',
     'collection' => 'Beyond Ancient Collection',
-    'display_date' => 'Tuesday, July 21, 2026',
-    'iso_date' => '2026-07-21',
+    'display_date' => 'Monday, July 27, 2026',
+    'iso_date' => '2026-07-27',
     'description' => 'Premium Egyptian-inspired realism with clean, transfer-ready line work.',
     'preview_url' => 'assets/stencils/eye-of-horus-anubis-preview.webp',
     'package_url' => 'api/stencil-download.php?type=package',
@@ -16,8 +16,9 @@ return [
     'transfer_pdf_url' => 'assets/stencils/eye-of-horus-anubis-transfer.pdf',
     'placement_guide_url' => 'assets/stencils/eye-of-horus-anubis-studio-placement-guide.pdf',
     'placement' => 'Outer forearm · 6.5–8.5 inches tall',
-    'public_url' => 'https://beyondimagination.co.technology/beyond-tattoo/stencilday',
+    'public_url' => 'https://beyondimagination.co.technology/beyond-tattoo/stencil-of-day.php',
     'reward_bits' => 25,
+    'updated_at' => '2026-07-27T21:00:00Z',
     'package_files' => [
         'assets/stencils/eye-of-horus-anubis-preview.webp' => 'eye-of-horus-anubis/preview.webp',
         'assets/stencils/eye-of-horus-anubis-editable.svg' => 'eye-of-horus-anubis/editable-master.svg',
@@ -28,4 +29,3 @@ return [
         'assets/stencils/eye-of-horus-anubis-metadata.json' => 'eye-of-horus-anubis/metadata.json',
     ],
 ];
-

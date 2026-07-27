@@ -1,0 +1,422 @@
+/* Beyond Market premium gallery theme */
+.market-page {
+  --market-bg: #080c11;
+  --market-panel: #111820;
+  --market-panel-strong: #18212b;
+  --market-input: #0b1118;
+  --market-line: rgba(213, 222, 230, .15);
+  --market-text: #f7f5ef;
+  --market-muted: #aab4bd;
+  --market-accent: #e8b75a;
+  background: radial-gradient(circle at 82% 0, rgba(232, 183, 90, .12), transparent 27%), var(--market-bg);
+  color: var(--market-text);
+}
+
+.market-page .market-hero {
+  border: 1px solid var(--market-line);
+  background:
+    radial-gradient(circle at 84% 12%, rgba(232, 183, 90, .2), transparent 28%),
+    radial-gradient(circle at 10% 92%, rgba(102, 199, 182, .1), transparent 34%),
+    linear-gradient(135deg, #0c1219, #15202a 58%, #20251f);
+}
+
+.market-page .market-hero h1 em {
+  background: linear-gradient(90deg, #f3c86c, #ef946d 58%, #75d0bd);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.market-page .market-showcase {
+  border-color: rgba(232, 183, 90, .4);
+  background: radial-gradient(circle, rgba(102, 199, 182, .14), rgba(18, 28, 36, .4) 50%, transparent 70%);
+  box-shadow: inset 0 0 70px rgba(232, 183, 90, .09), 0 0 80px rgba(0, 0, 0, .2);
+}
+
+.market-page .market-bag {
+  border-color: rgba(255, 255, 255, .2);
+  background: linear-gradient(145deg, #273643, #101820);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, .42);
+}
+
+.market-page .market-bag span,
+.market-page .market-orbit.three { color: #f0c66d; }
+.market-page .market-orbit.one { color: #79d5c2; }
+.market-page .market-orbit.two { color: #ef9b78; }
+.market-page .market-orbit { background: #10171e; }
+
+.market-page .market-search {
+  border-color: var(--market-line);
+  background: color-mix(in srgb, var(--market-input) 94%, transparent);
+}
+
+.market-page .market-search input,
+.market-page .market-search select { color: var(--market-text); }
+.market-page .market-search select { color: var(--market-muted); }
+
+.market-page .market-search button,
+.market-page .bos-btn {
+  border: 1px solid #f0cb7a;
+  background: linear-gradient(135deg, #f0ca72, #c99137);
+  color: #17130c;
+  box-shadow: 0 10px 25px rgba(201, 145, 55, .18);
+}
+
+.market-page .bos-btn.secondary {
+  border-color: var(--market-line);
+  background: rgba(255, 255, 255, .045);
+  color: var(--market-text);
+  box-shadow: none;
+}
+
+.market-page .market-jump {
+  border-color: var(--market-line);
+  background: color-mix(in srgb, var(--market-input) 88%, transparent);
+}
+
+.market-page .market-jump a { color: var(--market-muted); }
+.market-page .market-jump a:first-child {
+  background: linear-gradient(135deg, #eac16a, #bd8630);
+  color: #17130c;
+}
+
+.market-page .canvas-studio,
+.market-page .product-market,
+.market-page .live-listings,
+.market-page .starter-art {
+  border-color: var(--market-line);
+  background: var(--market-panel);
+}
+
+.market-page .canvas-preview {
+  border-color: var(--market-line);
+  background: radial-gradient(circle at 50% 20%, rgba(232, 183, 90, .14), transparent 50%), #090e14;
+}
+
+.market-page .canvas-mark { color: #d39839; }
+.market-page .canvas-features span,
+.market-page .canvas-tools span {
+  border-color: var(--market-line);
+  background: rgba(255, 255, 255, .035);
+  color: var(--market-muted);
+}
+
+.market-page .market-heading > a,
+.market-page .listing-card small { color: var(--market-accent); }
+.market-page .category-strip button {
+  border-color: var(--market-line);
+  color: var(--market-muted);
+}
+
+.market-page .category-strip button.active {
+  border-color: #e7bb62;
+  background: linear-gradient(135deg, #e9c36e, #b87f2a);
+  color: #17130c;
+}
+
+.market-page .product-meta,
+.market-page .product-copy p { color: var(--market-muted); }
+.market-page .product-meta select {
+  border-color: var(--market-line);
+  background: var(--market-input);
+  color: var(--market-text);
+}
+
+.market-page .product-card {
+  border-color: var(--market-line);
+  background: var(--market-input);
+}
+
+.market-page .product-card:hover {
+  border-color: var(--market-accent);
+  box-shadow: 0 20px 42px rgba(0, 0, 0, .28);
+}
+
+.market-page .product-copy > span { color: var(--market-accent); }
+.market-page .product-actions a {
+  border-color: rgba(232, 183, 90, .38);
+  background: rgba(232, 183, 90, .13);
+  color: var(--market-text);
+}
+
+.market-page .product-actions button {
+  border-color: var(--market-line);
+  background: rgba(255, 255, 255, .035);
+}
+
+.market-page .product-visual {
+  background-color: #e9e0d6;
+  background-image: url("../images/beyond-product-categories.png");
+  background-repeat: no-repeat;
+  background-size: 400% 200%;
+}
+
+.market-page .product-visual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(7, 11, 15, .22), transparent 42%);
+  pointer-events: none;
+}
+
+.market-page .product-visual > b { z-index: 2; }
+.market-page .product-mugs .product-visual { background-position: 33.333% 0; }
+.market-page .product-posters .product-visual,
+.market-page .product-wall-canvas .product-visual { background-position: 66.667% 0; }
+.market-page .product-stickers .product-visual { background-position: 66.667% 100%; }
+.market-page .product-t-shirts .product-visual,
+.market-page .product-hoodies .product-visual { background-position: 0 0; }
+.market-page .product-phone-cases .product-visual { background-position: 0 100%; }
+.market-page .product-tote-bags .product-visual { background-position: 100% 0; }
+
+.market-page .product-wallpapers .product-visual,
+.market-page .product-digital-svg .product-visual,
+.market-page .product-tattoo-prints .product-visual {
+  background-image: url("../images/beyond-original-artworks.png");
+}
+
+.market-page .product-wallpapers .product-visual { background-position: 0 0; }
+.market-page .product-digital-svg .product-visual { background-position: 66.667% 100%; }
+.market-page .product-tattoo-prints .product-visual { background-position: 66.667% 0; }
+
+.market-page .starter-art {
+  margin: 18px 0;
+  padding: clamp(24px, 4vw, 42px);
+  border: 1px solid var(--market-line);
+  border-radius: 28px;
+  scroll-margin-top: 145px;
+}
+
+.market-page .artwork-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 25px;
+}
+
+.market-page .artwork-card {
+  overflow: hidden;
+  border: 1px solid var(--market-line);
+  border-radius: 18px;
+  background: var(--market-input);
+  color: var(--market-text);
+  text-decoration: none;
+  transition: transform .2s ease, border-color .2s ease;
+}
+
+.market-page .artwork-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--market-accent);
+}
+
+.market-page .artwork-image {
+  display: block;
+  aspect-ratio: 1;
+  background-image: url("../images/beyond-original-artworks.png");
+  background-repeat: no-repeat;
+  background-size: 400% 200%;
+}
+
+.market-page .artwork-astronaut-garden .artwork-image { background-position: 0 0; }
+.market-page .artwork-caribbean-sunrise .artwork-image { background-position: 33.333% 0; }
+.market-page .artwork-celestial-moth .artwork-image { background-position: 66.667% 0; }
+.market-page .artwork-rooftop-hoop .artwork-image { background-position: 100% 0; }
+.market-page .artwork-tropical-botanicals .artwork-image { background-position: 0 100%; }
+.market-page .artwork-cosmic-cassette .artwork-image { background-position: 33.333% 100%; }
+.market-page .artwork-atom-gateway .artwork-image { background-position: 66.667% 100%; }
+.market-page .artwork-haitian-kitchen .artwork-image { background-position: 100% 100%; }
+
+.market-page .artwork-copy {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+}
+
+.market-page .artwork-copy small {
+  color: var(--market-accent);
+  font-size: .66rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.market-page .artwork-copy strong { font-size: 1rem; }
+.market-page .artwork-copy b {
+  color: var(--market-muted);
+  font-size: .72rem;
+}
+
+.market-page .creator-discovery .bos-card-icon,
+.market-page #seller-tools .bos-card-icon { display: none; }
+
+.market-page .creator-discovery .bos-card,
+.market-page #seller-tools .bos-card {
+  grid-template-columns: minmax(0, 1fr) auto;
+  border-color: var(--market-line);
+  background: var(--market-panel);
+  box-shadow: none;
+}
+
+.market-page .creator-discovery .bos-card:hover,
+.market-page #seller-tools .bos-card:hover {
+  border-color: var(--market-accent);
+  background: var(--market-panel-strong);
+}
+
+.market-page .bos-card-status {
+  padding: 7px 10px;
+  border: 1px solid rgba(232, 183, 90, .36);
+  border-radius: 999px;
+  color: var(--market-accent);
+  white-space: nowrap;
+}
+
+.market-page .listing-card {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  border-color: var(--market-line);
+  background: var(--market-input);
+}
+
+.market-page .listing-card:hover { border-color: var(--market-accent); }
+.market-page .listing-visual {
+  display: block;
+  width: 78px;
+  height: 78px;
+  border: 1px solid var(--market-line);
+  border-radius: 14px;
+  background-color: #e9e0d6;
+  background-image: url("../images/beyond-product-categories.png");
+  background-repeat: no-repeat;
+  background-size: 400% 200%;
+}
+
+.market-page .listing-hoodie .listing-visual { background-position: 0 0; }
+.market-page .listing-art-print .listing-visual { background-position: 66.667% 0; }
+.market-page .listing-sticker .listing-visual { background-position: 66.667% 100%; }
+.market-page .listing-journal .listing-visual { background-position: 100% 100%; }
+.market-page .listing-default .listing-visual { background-position: 33.333% 0; }
+.market-page .product-dialog {
+  border-color: var(--market-line);
+  background: var(--market-panel-strong);
+  color: var(--market-text);
+}
+
+.market-page a:focus-visible,
+.market-page button:focus-visible,
+.market-page input:focus-visible,
+.market-page select:focus-visible { outline-color: #e8b75a; }
+
+html[data-theme="light"] .market-page {
+  --market-bg: #f3f0e9;
+  --market-panel: #fffdf8;
+  --market-panel-strong: #f0eadf;
+  --market-input: #fff;
+  --market-line: rgba(30, 42, 51, .15);
+  --market-text: #17212a;
+  --market-muted: #5e6a73;
+  background: radial-gradient(circle at 82% 0, rgba(205, 151, 52, .13), transparent 28%), var(--market-bg);
+  color: var(--market-text);
+}
+
+html[data-theme="light"] .market-page .market-hero {
+  color: #fff;
+  background: radial-gradient(circle at 84% 12%, rgba(232, 183, 90, .2), transparent 28%), linear-gradient(135deg, #101820, #22303a 62%, #34362d);
+}
+
+html[data-theme="light"] .market-page .market-search,
+html[data-theme="light"] .market-page .market-jump { box-shadow: 0 18px 45px rgba(36, 45, 50, .12); }
+html[data-theme="light"] .market-page .market-search input,
+html[data-theme="light"] .market-page .market-search select { color: var(--market-text); }
+html[data-theme="light"] .market-page .market-search input::placeholder { color: #71808a; }
+html[data-theme="light"] .market-page .product-actions button,
+html[data-theme="light"] .market-page .bos-btn.secondary {
+  color: var(--market-text);
+  background: #fff;
+}
+
+html[data-theme="light"] .market-page .product-dialog p,
+html[data-theme="light"] .market-page .dialog-notice { color: var(--market-muted); }
+
+html[data-theme="sunset"] .market-page {
+  --market-bg: #17120e;
+  --market-panel: #241b15;
+  --market-panel-strong: #302219;
+  --market-input: #1b1511;
+  --market-line: rgba(241, 187, 118, .18);
+  --market-text: #fff7ed;
+  --market-muted: #c8b6a7;
+  --market-accent: #f0aa5f;
+  background: radial-gradient(circle at 82% 0, rgba(240, 170, 95, .14), transparent 28%), var(--market-bg);
+}
+
+html[data-theme="sunset"] .market-page .market-hero {
+  background: radial-gradient(circle at 84% 12%, rgba(240, 170, 95, .2), transparent 28%), linear-gradient(135deg, #17120e, #2c2119 60%, #303028);
+}
+
+html[data-theme="ocean"] .market-page {
+  --market-bg: #071E2E;
+  --market-panel: #0D3044;
+  --market-panel-strong: #123c51;
+  --market-input: #082637;
+  --market-line: #1D4B61;
+  --market-text: #F1FBFF;
+  --market-muted: #8EB5C5;
+  --market-accent: #60E1C2;
+  background: radial-gradient(circle at 82% 0, rgba(35,181,211,.18), transparent 28%), var(--market-bg);
+}
+
+html[data-theme="ocean"] .market-page .market-hero {
+  background: radial-gradient(circle at 84% 12%, rgba(96,225,194,.18), transparent 28%), linear-gradient(135deg, #071E2E, #0D3044 62%, #10394d);
+}
+
+html[data-theme="ocean"] .market-page .market-search button,
+html[data-theme="ocean"] .market-page .bos-btn,
+html[data-theme="ocean"] .market-page .category-strip button.active,
+html[data-theme="ocean"] .market-page .market-jump a:first-child {
+  border-color: #60E1C2;
+  background: linear-gradient(135deg, #60E1C2, #23B5D3);
+  color: #03171e;
+}
+
+html[data-theme="forest"] .market-page {
+  --market-bg: #101C16;
+  --market-panel: #1A2B21;
+  --market-panel-strong: #22372a;
+  --market-input: #13231a;
+  --market-line: #32483A;
+  --market-text: #F3F7ED;
+  --market-muted: #9CAF9F;
+  --market-accent: #E3B764;
+  background: radial-gradient(circle at 82% 0, rgba(114,198,140,.16), transparent 28%), var(--market-bg);
+}
+
+html[data-theme="forest"] .market-page .market-hero {
+  background: radial-gradient(circle at 84% 12%, rgba(227,183,100,.16), transparent 28%), linear-gradient(135deg, #101C16, #1A2B21 62%, #293728);
+}
+
+html[data-theme="forest"] .market-page .market-search button,
+html[data-theme="forest"] .market-page .bos-btn,
+html[data-theme="forest"] .market-page .category-strip button.active,
+html[data-theme="forest"] .market-page .market-jump a:first-child {
+  border-color: #E3B764;
+  background: linear-gradient(135deg, #E3B764, #72C68C);
+  color: #07120b;
+}
+
+@media (max-width: 1050px) {
+  .market-page .artwork-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 900px) {
+  .market-page .artwork-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .market-page .artwork-grid { grid-template-columns: 1fr; }
+  .market-page .creator-discovery .bos-card,
+  .market-page #seller-tools .bos-card { grid-template-columns: 1fr; }
+  .market-page .bos-card-status { justify-self: start; }
+  .market-page .listing-card { grid-template-columns: 72px minmax(0, 1fr); }
+  .market-page .listing-card > b { grid-column: 2; }
+  .market-page .listing-visual { width: 72px; height: 72px; }
+}

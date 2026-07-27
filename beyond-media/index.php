@@ -16,7 +16,7 @@ foreach ($videoCatalog as &$mediaTitle) {
 unset($mediaTitle);
 ?>
 <!doctype html><html lang="en"><head>
-<script>(function(){try{var t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset'].includes(t)?t:'dark';}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
+<script>(function(){try{var t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset','ocean','forest'].includes(t)?t:'dark';}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#130d2d">
 <title>Beyond Media | Watch, Listen & Create</title><meta name="description" content="Beyond TV and Beyond Audio in one media hub, with official YouTube previews and authorized open-media downloads.">
 <link rel="manifest" href="<?=e(beyond_url('manifest.webmanifest'))?>"><link rel="stylesheet" href="<?=e(beyond_url('assets/css/bos-21.css'))?>">

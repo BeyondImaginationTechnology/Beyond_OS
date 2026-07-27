@@ -120,16 +120,17 @@
     "play_url": "/beyond-games/zaks-kitchen-rush.php"
   },
   {
-    "slug": "beyond-hoops",
-    "title": "Beyond Hoops",
+    "slug": "beyond-hoop",
+    "title": "Beyond Hoop",
     "category": "Sports & Competition",
     "icon": "🏀",
     "tagline": "Mobile-first street basketball.",
     "gameplay": "Swipe to shoot, land trick shots, win tournaments and customize your character.",
-    "status": "Concept",
-    "phase": "Future release",
-    "launch": false,
-    "playable": false,
+    "status": "Playable prototype",
+    "phase": "Playable proof",
+    "launch": true,
+    "playable": true,
+    "play_url": "/beyond-games/beyond-hoop.php",
     "color": "#ff7a32",
     "features": [
       "Swipe shooting",

@@ -88,22 +88,36 @@ if ((float)$homeMarketListing['price_cash'] > 0) {
 $homeMarketUrl = (int)$homeMarketListing['id'] > 0
     ? '/beyond-sell/listing.php?id=' . (int)$homeMarketListing['id']
     : '/beyond-market/#shop';
-$homeMarketFeedLive = $homeMarketListings !== [];
-$homeMarketFeed = $homeMarketFeedLive ? $homeMarketListings : [
-    ['id'=>0,'title'=>'Custom Coffee Mugs','item_type'=>'physical','listing_type'=>'canvas_ready','price_cash'=>16,'price_bits'=>null,'currency'=>'CAD','market_url'=>'/beyond-market/#shop'],
-    ['id'=>0,'title'=>'Posters & Art Prints','item_type'=>'physical','listing_type'=>'canvas_ready','price_cash'=>12,'price_bits'=>null,'currency'=>'CAD','market_url'=>'/beyond-market/#shop'],
-    ['id'=>0,'title'=>'SVG & Digital Packs','item_type'=>'digital','listing_type'=>'instant_download','price_cash'=>5,'price_bits'=>null,'currency'=>'CAD','market_url'=>'/beyond-market/#shop'],
-    ['id'=>0,'title'=>'Tattoo Stencil Prints','item_type'=>'digital','listing_type'=>'creator_tools','price_cash'=>8,'price_bits'=>null,'currency'=>'CAD','market_url'=>'/beyond-market/#shop'],
+$homeMarketFeedIsPublished = $homeMarketListings !== [];
+$homeMarketFeed = $homeMarketFeedIsPublished ? $homeMarketListings : [
+    ['id'=>0,'title'=>'Midnight Horizon Premium Hoodie','item_type'=>'physical','listing_type'=>'buy_now','price_cash'=>63.59,'price_bits'=>null,'currency'=>'USD','seller'=>'Beyond Studio','visual'=>'hoodie','market_url'=>'/beyond-tattoo/stencil-editor.php?source=market&product=hoodies&art=atom-gateway'],
+    ['id'=>0,'title'=>'Caribbean Sunrise Art Print','item_type'=>'physical','listing_type'=>'buy_now','price_cash'=>27.87,'price_bits'=>null,'currency'=>'USD','seller'=>'Beyond Studio','visual'=>'art-print','market_url'=>'/beyond-tattoo/stencil-editor.php?source=market&product=posters&art=caribbean-sunrise'],
+    ['id'=>0,'title'=>'Celestial Moth Holographic Sticker','item_type'=>'physical','listing_type'=>'buy_now','price_cash'=>7.57,'price_bits'=>null,'currency'=>'USD','seller'=>'Beyond Studio','visual'=>'sticker','market_url'=>'/beyond-tattoo/stencil-editor.php?source=market&product=stickers&art=celestial-moth'],
+    ['id'=>0,'title'=>'Atom Gateway Hardcover Journal','item_type'=>'physical','listing_type'=>'buy_now','price_cash'=>25.90,'price_bits'=>null,'currency'=>'USD','seller'=>'Beyond Studio','visual'=>'journal','market_url'=>'/beyond-tattoo/stencil-editor.php?source=market&product=stationery&art=atom-gateway'],
 ];
+$homeGameDemos = [];
+try {
+    $homeGamesJson = file_get_contents(__DIR__ . '/beyond-games/data/games.json');
+    $homeGamesCatalog = json_decode((string)$homeGamesJson, true, 512, JSON_THROW_ON_ERROR);
+    foreach ($homeGamesCatalog as $homeGame) {
+        if (!is_array($homeGame) || empty($homeGame['playable']) || empty($homeGame['play_url'])) continue;
+        $playUrl = (string)$homeGame['play_url'];
+        if (!str_starts_with($playUrl, '/')) $playUrl = '/beyond-games/' . ltrim($playUrl, '/');
+        $homeGame['play_url'] = $playUrl;
+        $homeGameDemos[] = $homeGame;
+    }
+} catch (Throwable $exception) {
+    $homeGameDemos = [];
+}
 ?>
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset'].includes(t)?t:'dark';}catch(e){document.documentElement.dataset.theme='dark';}try{const c=localStorage.getItem('beyond-currency');document.documentElement.dataset.currency=['USD','CAD','BITS'].includes(c)?c:'CAD';}catch(e){document.documentElement.dataset.currency='CAD';}})();</script>
+<script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset','ocean','forest'].includes(t)?t:'dark';}catch(e){document.documentElement.dataset.theme='dark';}try{const c=localStorage.getItem('beyond-currency');document.documentElement.dataset.currency=['USD','CAD','BITS'].includes(c)?c:'CAD';}catch(e){document.documentElement.dataset.currency='CAD';}})();</script>
 <meta name="theme-color" content="#050817">
-<title>Beyond OS 2.3 | Live. Learn. Earn. Explore.</title>
+<title>Beyond OS 2.3.1 | Live. Learn. Earn. Explore.</title>
 <meta name="description" content="Health, education, wallet and entertainment connected through one secure Beyond ID and one shared bit$ balance.">
 <style>
 :root{--bg:#030611;--panel:#09101f;--line:rgba(255,255,255,.13);--text:#f7f8ff;--muted:#b8bed2;--pink:#f2469d;--violet:#7057ff;--green:#51db78;--gold:#ffbf32;--blue:#448cff}
@@ -152,6 +166,12 @@ html[data-theme="sunset"]{background:#1a0d24}html[data-theme="sunset"] body{colo
 .home-market-card__icon{position:relative;z-index:1;width:72px;height:72px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.24);border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.2),rgba(255,255,255,.04));font:600 34px/1 "Space Grotesk",sans-serif;box-shadow:0 16px 34px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.25);backdrop-filter:blur(9px)}
 .home-market-card__badge{position:absolute;left:12px;top:12px;z-index:2;padding:6px 8px;border:1px solid rgba(255,255,255,.18);border-radius:9px;background:rgba(3,6,17,.64);font-size:8px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;backdrop-filter:blur(10px)}
 .home-market-card__preview{position:absolute;right:12px;bottom:11px;color:rgba(255,255,255,.55);font-size:8px;font-weight:900;letter-spacing:.15em}
+.home-market-card__visual{background-color:#eee5dc;background-image:url("/beyond-market/assets/images/beyond-product-categories.png");background-repeat:no-repeat;background-size:400% 200%}
+.home-market-card__visual:before,.home-market-card__visual:after{content:none}
+.home-market-card__visual--hoodie{background-position:0 0}
+.home-market-card__visual--art-print{background-position:66.667% 0}
+.home-market-card__visual--sticker{background-position:66.667% 100%}
+.home-market-card__visual--journal{background-position:100% 100%}
 .home-market-card__copy{padding:17px 17px 16px}
 .home-market-card__copy small{color:#8f99b3;font-size:10px;font-weight:760;text-transform:uppercase;letter-spacing:.08em}
 .home-market-card__copy h3{min-height:43px;margin:7px 0 13px;font-family:"Space Grotesk",Inter,sans-serif;font-size:17px;line-height:1.2;letter-spacing:-.02em}
@@ -199,7 +219,7 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
 .brand,.nav,.primary,.ghost,.home-live-button,.live-app-actions a,.live-app-actions button{font-family:"Space Grotesk",Inter,system-ui,sans-serif}.brand{font-weight:700;letter-spacing:-.055em}.nav>a:not(.primary){font-weight:600;letter-spacing:-.015em}.primary{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.16);background:linear-gradient(105deg,#526dff 0%,#8658f6 50%,#e950aa 100%);font-weight:700;letter-spacing:-.02em;box-shadow:0 14px 36px rgba(101,72,255,.34),inset 0 1px rgba(255,255,255,.22)}.primary:hover,.primary:focus-visible{transform:translateY(-1px);box-shadow:0 18px 42px rgba(101,72,255,.42),inset 0 1px rgba(255,255,255,.28)}
 </style>
 </head>
-<body>
+<body class="home-page">
 <header class="top wrap">
     <a class="brand" href="./"><b class="brand-atom" aria-hidden="true"><img src="/assets/images/bos-logo-mark.svg?v=20260727-3" alt=""></b>BEYOND <span>OS</span><small>THE CONNECTED IMAGINATION ECOSYSTEM</small></a>
     <nav class="nav" aria-label="Primary navigation">
@@ -273,8 +293,9 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
                     <ellipse rx="72" ry="31" transform="rotate(120)"/>
                 </g>
                 <g class="svg-nucleus">
-                    <path d="M0-25A17 17 0 0 0-9.5 6L-17 32H17L9.5 6A17 17 0 0 0 0-25Z" fill="#090b18" stroke="#f2eaff" stroke-width="5" stroke-linejoin="round" style="filter:drop-shadow(0 0 10px rgba(168,85,247,.85))"/>
-                    <path d="M0-17A9 9 0 0 0-4.5-.2L-9 24H9L4.5-.2A9 9 0 0 0 0-17Z" fill="url(#keyholeFill)"/>
+                    <path d="M0-25A17 17 0 0 0-9.5 6L-17 32H17L9.5 6A17 17 0 0 0 0-25ZM0-17A9 9 0 0 0-4.5-.2L-9 24H9L4.5-.2A9 9 0 0 0 0-17Z" fill="#090b18" fill-rule="evenodd" clip-rule="evenodd"/>
+                    <path d="M0-25A17 17 0 0 0-9.5 6L-17 32H17L9.5 6A17 17 0 0 0 0-25Z" fill="none" stroke="#f2eaff" stroke-width="4.5" stroke-linejoin="round" style="filter:drop-shadow(0 0 10px rgba(168,85,247,.85))"/>
+                    <path d="M0-17A9 9 0 0 0-4.5-.2L-9 24H9L4.5-.2A9 9 0 0 0 0-17Z" fill="none" stroke="url(#keyholeFill)" stroke-width="3" stroke-linejoin="round"/>
                 </g>
                 <circle class="svg-sheen" cx="-22" cy="-36" r="10" fill="#fff" opacity=".18"/>
             </g>
@@ -380,9 +401,9 @@ $tmdbPosterProvider = $posterProviderConfig['tmdb_read_token'] !== '' || $poster
   <div class="home-market__glow" aria-hidden="true"></div>
   <header class="home-market__heading">
     <div>
-      <span class="home-market__kicker"><i></i> <?=$homeMarketFeedLive ? 'LIVE SELLER FEED' : 'MARKETPLACE PREVIEW'?></span>
+      <span class="home-market__kicker"><i></i> LIVE MARKETPLACE</span>
       <h2 id="homeMarketTitle">Fresh from Beyond Market.</h2>
-      <p><?=$homeMarketFeedLive ? 'New active listings flow here automatically from Beyond Sell.' : 'Explore Canvas-ready products while the first community listings arrive.'?></p>
+      <p><?=$homeMarketFeedIsPublished ? 'New active listings flow here automatically from Beyond Sell.' : 'The Beyond Studio launch collection is live. Community listings join this carousel automatically.'?></p>
     </div>
     <div class="home-market__heading-actions">
       <a class="home-market__sell" href="/beyond-sell/">Start selling</a>
@@ -405,15 +426,17 @@ $tmdbPosterProvider = $posterProviderConfig['tmdb_read_token'] !== '' || $poster
       $marketPriceLabel = $marketPriceParts ? implode(' or ', $marketPriceParts) : 'Free';
       $marketItemUrl = (string)($marketItem['market_url'] ?? ('/beyond-sell/listing.php?id=' . (int)($marketItem['id'] ?? 0)));
       $marketItemType = (string)($marketItem['item_type'] ?? 'digital');
+      $marketVisualOptions = ['hoodie','art-print','sticker','journal'];
+      $marketVisual = (string)($marketItem['visual'] ?? $marketVisualOptions[$marketIndex % count($marketVisualOptions)]);
+      $marketSeller = (string)($marketItem['seller'] ?? 'Live listing');
     ?>
     <article class="home-market-card" data-market-slide>
-      <a class="home-market-card__visual" href="<?=e($marketItemUrl)?>" style="--market-card-hue:<?=($marketIndex * 47) % 360?>deg">
-        <span class="home-market-card__icon" aria-hidden="true"><?=$marketItemType === 'physical' ? '□' : ($marketItemType === 'digital' ? '↓' : '✦')?></span>
+      <a class="home-market-card__visual home-market-card__visual--<?=e($marketVisual)?>" href="<?=e($marketItemUrl)?>">
         <span class="home-market-card__badge"><?=e(ucwords(str_replace('_', ' ', (string)($marketItem['listing_type'] ?? 'listing'))))?></span>
         <span class="home-market-card__preview">BEYOND MARKET</span>
       </a>
       <div class="home-market-card__copy">
-        <small><?=e(ucfirst($marketItemType))?> · <?=$homeMarketFeedLive ? 'Live listing' : 'Canvas ready'?></small>
+        <small><?=e(ucfirst($marketItemType))?> · <?=e($marketSeller)?></small>
         <h3><a href="<?=e($marketItemUrl)?>"><?=e((string)($marketItem['title'] ?? 'Marketplace listing'))?></a></h3>
         <div><strong><?=e($marketPriceLabel)?></strong><button type="button" data-market-save aria-label="Save <?=e((string)($marketItem['title'] ?? 'listing'))?>" aria-pressed="false">♡</button></div>
       </div>
@@ -426,97 +449,36 @@ $tmdbPosterProvider = $posterProviderConfig['tmdb_read_token'] !== '' || $poster
   <footer class="home-market__footer"><span><b data-home-market-position>1</b> / <?=count($homeMarketFeed)+1?></span><a href="/beyond-market/#live-listings">See the full seller floor →</a></footer>
 </section>
 
-<section class="live-apps wrap" aria-labelledby="liveAppsTitle">
+<?php if ($homeGameDemos): ?>
+<section class="live-apps live-game-demos wrap" aria-labelledby="liveAppsTitle">
   <header class="live-apps-heading">
-    <div><span>LIVE APP EXPERIENCES</span><h2 id="liveAppsTitle">Today inside Beyond OS</h2></div>
+    <div><span>PLAYABLE NOW · BEYOND GAMES</span><h2 id="liveAppsTitle">Live demo games.</h2></div>
     <div class="live-apps-heading__actions">
-      <a href="/app-store/">Browse the App Store →</a>
-      <div class="live-app-controls" aria-label="App experience carousel controls">
-        <button type="button" data-live-app-prev aria-label="Previous app experience">←</button>
-        <button type="button" data-live-app-next aria-label="Next app experience">→</button>
+      <a href="/beyond-games/">Explore Beyond Games →</a>
+      <div class="live-app-controls" aria-label="Game demo carousel controls">
+        <button type="button" data-live-app-prev aria-label="Previous playable game">←</button>
+        <button type="button" data-live-app-next aria-label="Next playable game">→</button>
       </div>
     </div>
   </header>
-  <div class="live-app-grid" data-live-app-carousel tabindex="0" role="region" aria-roledescription="carousel" aria-label="Live app experiences">
-    <article class="live-app-card verse-card">
-      <div class="live-app-card__art" aria-hidden="true">✦</div>
-      <span class="live-app-label">DAILY BREATH · VERSE OF THE DAY</span>
-      <blockquote>“<?= e((string)$homeVerse['text']) ?>”</blockquote>
-      <p><?= e((string)$homeVerse['reference']) ?></p>
+  <div class="live-app-grid" data-live-app-carousel tabindex="0" role="region" aria-roledescription="carousel" aria-label="Playable Beyond Games demos">
+    <?php foreach ($homeGameDemos as $homeGame): ?>
+    <article class="live-app-card game-demo-card game-demo-<?=e((string)$homeGame['slug'])?>" style="--game-color:<?=e((string)($homeGame['color'] ?? '#ffb33d'))?>">
+      <div class="live-app-card__art" aria-hidden="true"><?=e((string)($homeGame['icon'] ?? '▶'))?></div>
+      <span class="live-app-label"><?=e(strtoupper((string)($homeGame['category'] ?? 'Beyond Games')))?> · <?=e(strtoupper((string)($homeGame['status'] ?? 'PLAYABLE DEMO')))?></span>
+      <h3><?=e((string)$homeGame['title'])?></h3>
+      <p class="translation"><?=e((string)($homeGame['tagline'] ?? 'Play the latest Beyond Games demo.'))?></p>
+      <p class="pronunciation"><?=e((string)($homeGame['gameplay'] ?? 'Jump in and play directly in your browser.'))?></p>
       <div class="live-app-actions">
-        <a href="<?= e($homeBibleUrl) ?>">Read &amp; listen</a>
-        <a href="/dailybreath/academy.php">Bible lessons</a>
+        <a href="<?=e((string)$homeGame['play_url'])?>">Play demo →</a>
+        <a href="/beyond-games/">Game details</a>
       </div>
     </article>
-
-    <article class="live-app-card french-card">
-      <div class="live-app-card__art" aria-hidden="true">🇫🇷</div>
-      <span class="live-app-label">BEYOND FRENCH · TODAY’S LESSON</span>
-      <h3><?= e((string)$homeFrench['french']) ?></h3>
-      <p class="translation"><?= e((string)$homeFrench['english']) ?></p>
-      <p class="pronunciation"><?= e((string)($homeFrench['french_pronunciation'] ?? '')) ?></p>
-      <div class="live-app-actions">
-        <button type="button" id="homeFrenchListen" data-speak="<?= e((string)$homeFrench['french']) ?>">🔊 Listen</button>
-        <a href="/beyond-french/challenge.php?id=<?= max(1, (int)($homeFrench['id'] ?? 1)) ?>">Practice lesson</a>
-      </div>
-    </article>
-
-    <article class="live-app-card casino-card">
-      <div class="live-app-card__art" aria-hidden="true">&#9824;</div>
-      <span class="live-app-label">BEYOND CASINO &middot; SOCIAL PLAY</span>
-      <h3>Play for fun.</h3>
-      <p class="translation">1,000 demo bit$ to explore the social casino.</p>
-      <p class="pronunciation">Entertainment only &middot; No purchase necessary &middot; No cash value</p>
-      <div class="live-app-actions"><a href="/beyond-casino/">Open casino demo</a></div>
-    </article>
-
-    <article class="live-app-card math-card">
-      <div class="live-app-card__art" aria-hidden="true">∑</div>
-      <span class="live-app-label">BEYOND MATH ACADEMY &middot; INTERACTIVE LEARNING</span>
-      <h3>Build math skills.</h3>
-      <p class="translation">5 modules &middot; 10 lessons each &middot; interactive lessons</p>
-      <p class="pronunciation">Guided practice, lesson tests and module exams for every learning path.</p>
-      <div class="live-app-actions"><a href="/beyond-math/academy.php">Try a math lesson</a><a href="/beyond-math/tools.php">Open math tools</a></div>
-    </article>
-
-    <article class="live-app-card coding-card">
-      <div class="live-app-card__art" aria-hidden="true">&lt;/&gt;</div>
-      <span class="live-app-label">BEYOND CODING SCHOOL &middot; CAREER PATHWAYS</span>
-      <h3>Learn by building.</h3>
-      <p class="translation">Web, iOS, Android, SVG, games and full-stack development</p>
-      <p class="pronunciation">Six pathways with guided lessons, tests, module exams and saved progress.</p>
-      <div class="live-app-actions"><a href="/coding-school/">Explore coding pathways</a></div>
-    </article>
-
-    <article class="live-app-card jobs-card">
-      <div class="live-app-card__art" aria-hidden="true">↗</div>
-      <span class="live-app-label">BEYOND JOBS &middot; CAREER BUILDER</span>
-      <h3>Turn learning into work.</h3>
-      <p class="translation">Career-path job matching, résumé and cover-letter drafts</p>
-      <p class="pronunciation">Free training plans, project guidance and a practical certificate checklist.</p>
-      <div class="live-app-actions"><a href="/beyond-jobs/">Open Beyond Jobs</a><a href="/coding-school/">Start free training</a></div>
-    </article>
-
-    <article class="live-app-card media-card">
-      <div class="live-app-card__art" aria-hidden="true">▶♫</div>
-      <span class="live-app-label">BEYOND MEDIA &middot; VIDEO + AUDIO</span>
-      <h3>Watch, listen and discover.</h3>
-      <p class="translation">Beyond TV and Beyond Audio in one connected media hub</p>
-      <p class="pronunciation">Official YouTube previews, private local playback and licensed open-media downloads.</p>
-      <div class="live-app-actions"><a href="/beyond-media/">Open Beyond Media</a></div>
-    </article>
-
-    <article class="live-app-card games-card">
-      <div class="live-app-card__art" aria-hidden="true">🍲</div>
-      <span class="live-app-label">BEYOND GAMES &middot; TWO ORIGINAL GAMES ONLINE</span>
-      <h3>Zak’s Kitchen is open.</h3>
-      <p class="translation">Cook Haitian favourites, serve orders and upgrade a lively kitchen</p>
-      <p class="pronunciation">Playable now on mobile and PC alongside Bit Runner, with local progression and fair demo rewards.</p>
-      <div class="live-app-actions"><a href="/beyond-games/zaks-kitchen-rush.php">Play Kitchen Rush</a><a href="/beyond-games/bit-runner.php">Play Bit Runner</a><a href="/beyond-games/">All games</a></div>
-    </article>
+    <?php endforeach; ?>
   </div>
-  <div class="live-app-progress" data-live-app-progress aria-label="Carousel position"></div>
+  <div class="live-app-progress" data-live-app-progress aria-label="Game carousel position"></div>
 </section>
+<?php endif; ?>
 
 <nav class="home-shortcuts wrap" aria-label="Beyond OS quick destinations">
   <a href="/app-store/"><span>🛍</span><strong>App Store</strong><small>Discover every Beyond app</small></a>
@@ -538,6 +500,10 @@ $tmdbPosterProvider = $posterProviderConfig['tmdb_read_token'] !== '' || $poster
 @media(max-width:800px){.home-live-stage{width:calc(100vw - 12px);border-radius:23px;margin-bottom:32px}.home-live-stage__inner{padding:14px}.home-live-stage__top{align-items:flex-start;flex-direction:column;margin-bottom:14px}.home-live-actions{width:100%}.home-live-button{flex:1}.home-live-player{aspect-ratio:16/9;border-radius:16px}.home-live-meta{align-items:flex-start;flex-direction:column}.home-live-switch{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:4px}.home-live-switch button{min-width:93px;scroll-snap-align:start}.live-apps-heading{align-items:flex-start;flex-direction:column}.live-apps-heading__actions{width:100%;justify-content:space-between}.live-app-grid{width:calc(100vw - 16px);margin-left:calc((100% - 100vw)/2 + 8px);padding-inline:4px}.live-app-card{flex-basis:min(88vw,560px);min-height:390px}.home-shortcuts{grid-template-columns:1fr}}
 @media(max-width:800px){.featured-library__heading{align-items:flex-start;flex-direction:column}.featured-library__actions{width:100%;justify-content:space-between}.featured-title-carousel{width:calc(100vw - 8px);margin-left:calc((100% - 100vw)/2 + 4px);padding-inline:8px}.featured-title-card{flex-basis:min(58vw,250px)}}
 .games-card:before{background:radial-gradient(circle at 77% 17%,rgba(255,203,103,.34),transparent 24%),linear-gradient(135deg,#24120b,#7c2f20 55%,#e88a25)}.games-card .live-app-label{color:#ffd17f}.games-card .live-app-card__art{filter:drop-shadow(0 18px 32px rgba(0,0,0,.28))}
+.game-demo-card:before{background:radial-gradient(circle at 78% 18%,color-mix(in srgb,var(--game-color) 38%,transparent),transparent 25%),linear-gradient(135deg,#07101a,color-mix(in srgb,var(--game-color) 42%,#111827) 58%,#111820)}
+.game-demo-card .live-app-label{color:color-mix(in srgb,var(--game-color) 48%,#fff)}
+.game-demo-card .live-app-card__art{opacity:.42;filter:drop-shadow(0 20px 38px color-mix(in srgb,var(--game-color) 36%,transparent))}
+.game-demo-card .live-app-actions a:first-child{border-color:color-mix(in srgb,var(--game-color) 62%,#fff);background:color-mix(in srgb,var(--game-color) 32%,rgba(255,255,255,.12))}
 .casino-card:before{background:radial-gradient(circle at 77% 17%,rgba(255,216,109,.3),transparent 23%),linear-gradient(135deg,#160b25,#54205c 55%,#a42e65)}.casino-card .live-app-label{color:#ffd86d}.casino-card h3{font-size:clamp(34px,5vw,64px)}
 .math-card:before{background:radial-gradient(circle at 78% 18%,rgba(91,219,69,.3),transparent 24%),linear-gradient(135deg,#06172d,#0a4c82 58%,#178b73)}.math-card .live-app-label{color:#8ff0b3}.coding-card:before{background:radial-gradient(circle at 78% 18%,rgba(53,214,255,.28),transparent 24%),linear-gradient(135deg,#16092c,#51269a 56%,#087f9b)}.coding-card .live-app-label{color:#95eaff}.coding-card .live-app-card__art{font-size:clamp(60px,9vw,124px);font-weight:950;letter-spacing:-.12em}
 @media(min-width:1051px){.live-app-card{flex-basis:min(62vw,760px)}}

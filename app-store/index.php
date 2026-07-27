@@ -3,10 +3,10 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/app-layout.php';
 $wallet = beyond_nav_bootstrap('Beyond App Store');
 ?>
-<!doctype html><html lang="en"><head><script>(function(){try{var t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset'].includes(t)?t:'dark';}catch(e){document.documentElement.dataset.theme='dark';}})();</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#32113d"><title>Beyond App Store | Beyond OS 2.3</title><meta name="description" content="Find and try every app in the Beyond ecosystem."><link rel="manifest" href="<?=e(beyond_url('manifest.webmanifest'))?>"><link rel="stylesheet" href="<?=e(beyond_url('assets/css/bos-21.css'))?>"></head><body class="bos-page">
+<!doctype html><html lang="en"><head><script>(function(){try{var t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset','ocean','forest'].includes(t)?t:'dark';}catch(e){document.documentElement.dataset.theme='dark';}})();</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#32113d"><title>Beyond App Store | Beyond OS 2.3.1</title><meta name="description" content="Find and try every app in the Beyond ecosystem."><link rel="manifest" href="<?=e(beyond_url('manifest.webmanifest'))?>"><link rel="stylesheet" href="<?=e(beyond_url('assets/css/bos-21.css'))?>"></head><body class="bos-page">
 <main class="bos-main app-store-main">
   <section class="bos-hero app-store-hero">
-    <span class="bos-kicker">Release 2.3</span>
+    <span class="bos-kicker">Release 2.3.1</span>
     <h1>Every Beyond app.<br>One store.</h1>
     <p>Browse the connected tools for living, learning, earning and exploring. Apps open directly—there is nothing extra to install.</p>
     <div class="bos-actions"><a class="bos-btn" href="<?=e(beyond_url('beyond-id/dashboard/wallet.php'))?>">Open Wallet</a><a class="bos-btn secondary" href="<?=e(beyond_url('beyond-market/'))?>">Explore Marketplace</a><a class="bos-btn secondary" href="#featured">Browse all apps</a></div>

@@ -1,0 +1,17 @@
+.hoop-spotlight{
+  border-color:rgba(255,113,51,.34);
+  background:radial-gradient(circle at 92% 20%,rgba(255,110,42,.16),transparent 34%),rgba(25,13,36,.84);
+}
+.hoop-art{background:radial-gradient(circle,#74315e 0,#28153d 47%,#090815 73%)}
+.hoop-art:before{
+  background:repeating-linear-gradient(90deg,transparent 0 49px,#ff7437 50px),repeating-linear-gradient(0deg,transparent 0 29px,#8a55ff 30px);
+}
+.hoop-mark{
+  border-color:#fff;
+  background:linear-gradient(145deg,rgba(111,53,232,.38),rgba(228,87,55,.38));
+  font-size:7rem;
+  box-shadow:0 0 46px #a44bde,inset 0 0 35px rgba(255,113,57,.28);
+}
+.hoop-mark span{filter:drop-shadow(0 0 14px #ff8d49)}
+.hoop-spotlight .art-label span{color:#ff9a5e}
+.hoop-play{background:linear-gradient(135deg,#ff9a45,#e64f37)!important}

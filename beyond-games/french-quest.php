@@ -6,7 +6,7 @@ $wallet = beyond_nav_bootstrap('Beyond Games');
 <!doctype html>
 <html lang="en">
 <head>
-  <script>(function(){try{var t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset'].includes(t)?t:'dark';}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
+<script>(function(){try{var t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset','ocean','forest'].includes(t)?t:'dark';}catch(e){document.documentElement.dataset.theme='dark';}})();</script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#07172e">

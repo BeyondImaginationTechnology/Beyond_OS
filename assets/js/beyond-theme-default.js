@@ -1,9 +1,9 @@
 (function () {
   'use strict';
   var root = document.documentElement;
-  var themes = ['dark', 'light', 'sunset'];
-  var icons = { dark: '\uD83C\uDF19', light: '\u2600\uFE0F', sunset: '\uD83C\uDF05' };
-  var labels = { dark: 'Dark', light: 'Light', sunset: 'Sunset' };
+  var themes = ['dark', 'light', 'sunset', 'ocean', 'forest'];
+  var icons = { dark: '\uD83C\uDF19', light: '\u2600\uFE0F', sunset: '\uD83C\uDF05', ocean: '\uD83C\uDF0A', forest: '\uD83C\uDF32' };
+  var labels = { dark: 'Dark', light: 'Light', sunset: 'Sunset', ocean: 'Ocean', forest: 'Forest' };
   function validTheme(theme) { return themes.indexOf(theme) !== -1; }
   function savedTheme() { try { var saved = localStorage.getItem('beyond-theme'); return validTheme(saved) ? saved : 'dark'; } catch (error) { return 'dark'; } }
   function each(selector, callback) { var nodes = document.querySelectorAll(selector); for (var index = 0; index < nodes.length; index += 1) callback(nodes[index]); }
@@ -17,7 +17,7 @@
       button.setAttribute('aria-label', 'Current theme ' + labels[theme] + '. Switch to ' + labels[next] + ' theme');
     });
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', theme === 'light' ? '#f4f6fc' : theme === 'sunset' ? '#32113d' : '#050817');
+    if (meta) meta.setAttribute('content', theme === 'light' ? '#f4f6fc' : theme === 'sunset' ? '#32113d' : theme === 'ocean' ? '#071E2E' : theme === 'forest' ? '#101C16' : '#050817');
   }
   function closestByClass(node, className) { while (node && node !== document) { if (node.classList && node.classList.contains(className)) return node; node = node.parentNode; } return null; }
   function emitLocale(locale) {

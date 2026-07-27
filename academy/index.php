@@ -20,5 +20,5 @@ $wallet = beyond_nav_bootstrap('Beyond Academy');
     <?=bos_app_card('Beyond Space','Explore astronomy, planets and the observable universe.','beyond-space/','BS','Open app','assets/icons/app-store/beyond-space.jpg')?>
   </div></section>
 </main>
-<style>.academy-main{width:min(1240px,calc(100% - 28px))}.academy-hero{background:radial-gradient(circle at 85% 12%,rgba(53,214,255,.24),transparent 28%),linear-gradient(135deg,#10163b,#291c57 58%,#173e66)}.academy-main .bos-card-icon{width:62px;height:62px}</style>
+<style>.academy-main{width:min(1240px,calc(100% - 28px))}.academy-hero{background:radial-gradient(circle at 85% 12%,color-mix(in srgb,var(--accent) 24%,transparent),transparent 28%),linear-gradient(135deg,var(--surface-deep),var(--surface-strong) 58%,color-mix(in srgb,var(--primary) 32%,var(--surface-deep)))}.academy-main .bos-card-icon{width:62px;height:62px}</style>
 <?php bos_page_end(); ?>

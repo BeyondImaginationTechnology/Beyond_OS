@@ -17,8 +17,7 @@ const menuBtn=document.querySelector(".menu-btn"),mobileNav=document.querySelect
   try{channels=JSON.parse(dataNode.textContent||'[]')}catch(_){return}
   if(!Array.isArray(channels)||!channels.length)return;
 
-  const preferred='yugioh-tv';
-  let current=Math.max(0,channels.findIndex(channel=>channel.slug===preferred));
+  let current=0;
   let timer=0;
   const dots=document.querySelector('[data-rotation-dots]');
 

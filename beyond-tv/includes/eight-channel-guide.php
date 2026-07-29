@@ -46,7 +46,7 @@ function beyond_tv_cartoon_hourly_rows(): array {
 
 function beyond_tv_movie_hourly_rows(): array {
     $day=new DateTimeImmutable('today',new DateTimeZone('America/Vancouver'));$rows=[];
-    for($hour=0;$hour<24;$hour++){$state=beyond_movies_schedule_state($day->setTime($hour,0));$movie=$state['current'];$rows[]=['start'=>$hour,'end'=>$hour+1,'icon'=>'🎬','title'=>(string)$movie['title'],'lineup'=>(string)($movie['genre']??$state['label'])];}
+    for($hour=0;$hour<24;$hour+=2){$state=beyond_movies_schedule_state($day->setTime($hour,0));$movie=$state['current'];$rows[]=['start'=>$hour,'end'=>$hour+2,'icon'=>'🎬','title'=>(string)$movie['title'],'lineup'=>(string)($movie['year']??'').' · '.(string)($movie['genre']??$state['label'])];}
     return $rows;
 }
 

@@ -8,12 +8,12 @@ require_once dirname(__DIR__) . '/includes/movies-schedule.php';
 
 $state = beyond_movies_schedule_state();
 $sources = array_map(static fn(array $movie): array => [
-    'provider' => 'Wikimedia Commons',
+    'provider' => 'Internet Archive',
     'title' => (string)$movie['title'],
     'url' => (string)$movie['url'],
     'duration' => (int)$movie['duration'],
-    'type' => 'video/webm',
-    'license' => 'Public-domain source edition',
+    'type' => 'video/mp4',
+    'license' => 'Archive-hosted source',
     'rights_url' => (string)$movie['rights_url'],
 ], $state['sources']);
 
@@ -31,6 +31,10 @@ echo json_encode([
         'label' => $state['label'],
         'player_url' => $state['player_url'],
         'source_key' => $state['source_key'],
+        'slot_start' => $state['slot_start'],
+        'slot_end' => $state['slot_end'],
+        'weekday' => $state['weekday'],
+        'slot_hours' => $state['slot_hours'],
     ],
     'sources' => $sources,
     'start_offset' => $state['start_offset'],

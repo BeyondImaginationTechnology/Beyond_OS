@@ -36,7 +36,7 @@
       <div class="styles">
         <label class="style-card"><input type="radio" name="style" value="advanced" checked><strong>Living Sanctuary</strong><small>Premium layered editorial artwork</small></label>
         <label class="style-card"><input type="radio" name="style" value="forest"><strong>Modern Aurora</strong><small>Layered glass and forest light</small></label>
-        <label class="style-card"><input type="radio" name="style" value="botanical"><strong>Heritage Parchment</strong><small>Dimensional botanical editorial</small></label>
+        <label class="style-card"><input type="radio" name="style" value="botanical"><strong>Heritage Botanical</strong><small>Museum-grade engraved cannabis study</small></label>
       </div>
     </section>
 
@@ -113,8 +113,9 @@
   const ctx = canvas.getContext('2d', {alpha:false});
   ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
   const csrf = document.querySelector('meta[name="csrf-token"]').content;
-  const forest = new Image(); forest.src = '/assets/dailybreath-login-background.webp';
-  const botanical = new Image(); botanical.src = '/assets/img/verse-botanical-sketch-bg.webp';
+  const livingSanctuary = new Image(); livingSanctuary.src = '/assets/img/verse-cannabis-living-sanctuary-v1.png';
+  const modernAurora = new Image(); modernAurora.src = '/assets/img/verse-cannabis-modern-aurora-v1.png';
+  const heritageBotanical = new Image(); heritageBotanical.src = '/assets/img/verse-cannabis-heritage-botanical-v1.png';
   let activeAudio = null;
   let verseCatalog = [];
   const controls = [...document.querySelectorAll('input,textarea,select')];
@@ -157,7 +158,7 @@
   function coverImage(img){if(!img.complete||!img.naturalWidth)return false;const s=Math.max(1080/img.naturalWidth,1350/img.naturalHeight);const w=img.naturalWidth*s,h=img.naturalHeight*s;ctx.drawImage(img,(1080-w)/2,(1350-h)/2,w,h);return true}
   function drawNarrationBadge(light=false,pulse=0){if(!$('showBadge').checked)return;const alpha=.92+.06*pulse;ctx.save();ctx.globalAlpha=alpha;roundedRect(748,45,287,92,22,light?'rgba(248,246,235,.96)':'rgba(4,17,36,.92)',light?'#76824b':'#4d8d72',3);ctx.fillStyle=light?'#1f251c':'#fff';ctx.font='800 21px Inter, Arial, sans-serif';ctx.textAlign='left';ctx.fillText('🔊',775,100);ctx.letterSpacing='2px';ctx.fillText('NARRATION',832,80);ctx.fillStyle=light?'#64743f':'#82d6a5';ctx.font='900 25px Inter, Arial, sans-serif';ctx.letterSpacing='1px';ctx.fillText('PLAYING NOW',832,113);ctx.letterSpacing='0px';ctx.restore()}
   function drawForest(pulse){
-    ctx.clearRect(0,0,1080,1350);if(!coverImage(forest)){const bg=ctx.createLinearGradient(0,0,1080,1350);bg.addColorStop(0,'#061a2b');bg.addColorStop(.38,'#164c55');bg.addColorStop(.72,'#27705b');bg.addColorStop(1,'#d2a45d');ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1350);const sun=ctx.createRadialGradient(790,190,15,790,190,480);sun.addColorStop(0,'rgba(255,236,174,.9)');sun.addColorStop(.28,'rgba(255,203,121,.28)');sun.addColorStop(1,'rgba(255,203,121,0)');ctx.fillStyle=sun;ctx.fillRect(250,0,830,730);ctx.fillStyle='#153f39';ctx.beginPath();ctx.moveTo(0,830);ctx.bezierCurveTo(190,620,350,790,520,610);ctx.bezierCurveTo(710,430,850,690,1080,510);ctx.lineTo(1080,1350);ctx.lineTo(0,1350);ctx.closePath();ctx.fill();ctx.fillStyle='#092d2d';ctx.beginPath();ctx.moveTo(0,950);ctx.bezierCurveTo(210,750,410,920,630,720);ctx.bezierCurveTo(830,545,930,780,1080,690);ctx.lineTo(1080,1350);ctx.lineTo(0,1350);ctx.closePath();ctx.fill();ctx.save();ctx.globalAlpha=.18;ctx.strokeStyle='#e8f4d9';for(let i=0;i<14;i++){ctx.beginPath();ctx.moveTo(720+i*28,-20);ctx.lineTo(250+i*48,760);ctx.stroke()}ctx.restore()}
+    ctx.clearRect(0,0,1080,1350);if(!coverImage(modernAurora)){const bg=ctx.createLinearGradient(0,0,1080,1350);bg.addColorStop(0,'#061a2b');bg.addColorStop(.38,'#164c55');bg.addColorStop(.72,'#27705b');bg.addColorStop(1,'#d2a45d');ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1350);const sun=ctx.createRadialGradient(790,190,15,790,190,480);sun.addColorStop(0,'rgba(255,236,174,.9)');sun.addColorStop(.28,'rgba(255,203,121,.28)');sun.addColorStop(1,'rgba(255,203,121,0)');ctx.fillStyle=sun;ctx.fillRect(250,0,830,730);ctx.fillStyle='#153f39';ctx.beginPath();ctx.moveTo(0,830);ctx.bezierCurveTo(190,620,350,790,520,610);ctx.bezierCurveTo(710,430,850,690,1080,510);ctx.lineTo(1080,1350);ctx.lineTo(0,1350);ctx.closePath();ctx.fill();ctx.fillStyle='#092d2d';ctx.beginPath();ctx.moveTo(0,950);ctx.bezierCurveTo(210,750,410,920,630,720);ctx.bezierCurveTo(830,545,930,780,1080,690);ctx.lineTo(1080,1350);ctx.lineTo(0,1350);ctx.closePath();ctx.fill();ctx.save();ctx.globalAlpha=.18;ctx.strokeStyle='#e8f4d9';for(let i=0;i<14;i++){ctx.beginPath();ctx.moveTo(720+i*28,-20);ctx.lineTo(250+i*48,760);ctx.stroke()}ctx.restore()}
     ctx.save();ctx.globalAlpha=.22;for(let i=0;i<70;i++){ctx.fillStyle=i%4?'#e7f2d6':'#f4d78e';ctx.beginPath();ctx.arc((i*167)%1080,(i*89)%1280,1+(i%3),0,Math.PI*2);ctx.fill()}ctx.restore();
     const grad=ctx.createLinearGradient(0,0,0,1350);grad.addColorStop(0,'rgba(1,14,9,.22)');grad.addColorStop(.5,'rgba(1,17,10,.38)');grad.addColorStop(1,'rgba(1,12,8,.74)');ctx.fillStyle=grad;ctx.fillRect(0,0,1080,1350);
     drawNarrationBadge(false,pulse);
@@ -169,7 +170,7 @@
     if($('showFooter').checked){const d=dateInfo();roundedRect(105,1100,870,150,26,'rgba(7,29,20,.84)','rgba(255,255,255,.18)',2);drawCalendarIcon(145,1142,62,'#e5c86e');ctx.fillStyle='#e5c86e';ctx.font='800 20px Inter, Arial, sans-serif';ctx.letterSpacing='2px';ctx.textAlign='left';ctx.fillText(`${d.weekday}  ·  ${d.month} ${d.day}`,235,1158);ctx.fillStyle='#f7f4e8';ctx.font='700 25px Georgia, serif';ctx.letterSpacing='.5px';wrapText(value('footer'),235,1203,690,31,2,'left');ctx.letterSpacing='0px'}
   }
   function drawBotanical(pulse){
-    ctx.clearRect(0,0,1080,1350);if(!coverImage(botanical)){const paper=ctx.createLinearGradient(0,0,1080,1350);paper.addColorStop(0,'#f3ead5');paper.addColorStop(.48,'#e7dcc0');paper.addColorStop(1,'#cdbd96');ctx.fillStyle=paper;ctx.fillRect(0,0,1080,1350);const light=ctx.createRadialGradient(430,340,80,430,340,760);light.addColorStop(0,'rgba(255,255,245,.84)');light.addColorStop(1,'rgba(255,255,245,0)');ctx.fillStyle=light;ctx.fillRect(0,0,1080,1350);ctx.save();ctx.strokeStyle='rgba(73,93,55,.34)';ctx.fillStyle='rgba(105,126,70,.13)';ctx.lineWidth=3;for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(side<0?75:1005,1260);ctx.bezierCurveTo(side<0?180:900,1040,side<0?65:1015,720,side<0?185:895,420);ctx.stroke();for(let i=0;i<7;i++){const y=1120-i*105,x=(side<0?115:965)+(i%2?(side<0?35:-35):0);ctx.save();ctx.translate(x,y);ctx.rotate(side*(i%2?.55:-.45));ctx.beginPath();ctx.ellipse(0,0,38,15,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore()}}ctx.restore();ctx.save();ctx.globalAlpha=.16;for(let i=0;i<110;i++){ctx.fillStyle=i%2?'#765f3d':'#fff';ctx.fillRect((i*137)%1080,(i*73)%1350,1+(i%2),1+(i%2))}ctx.restore()}
+    ctx.clearRect(0,0,1080,1350);if(!coverImage(heritageBotanical)){const paper=ctx.createLinearGradient(0,0,1080,1350);paper.addColorStop(0,'#f3ead5');paper.addColorStop(.48,'#e7dcc0');paper.addColorStop(1,'#cdbd96');ctx.fillStyle=paper;ctx.fillRect(0,0,1080,1350);const light=ctx.createRadialGradient(430,340,80,430,340,760);light.addColorStop(0,'rgba(255,255,245,.84)');light.addColorStop(1,'rgba(255,255,245,0)');ctx.fillStyle=light;ctx.fillRect(0,0,1080,1350);ctx.save();ctx.strokeStyle='rgba(73,93,55,.34)';ctx.fillStyle='rgba(105,126,70,.13)';ctx.lineWidth=3;for(const side of [-1,1]){ctx.beginPath();ctx.moveTo(side<0?75:1005,1260);ctx.bezierCurveTo(side<0?180:900,1040,side<0?65:1015,720,side<0?185:895,420);ctx.stroke();for(let i=0;i<7;i++){const y=1120-i*105,x=(side<0?115:965)+(i%2?(side<0?35:-35):0);ctx.save();ctx.translate(x,y);ctx.rotate(side*(i%2?.55:-.45));ctx.beginPath();ctx.ellipse(0,0,38,15,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore()}}ctx.restore();ctx.save();ctx.globalAlpha=.16;for(let i=0;i<110;i++){ctx.fillStyle=i%2?'#765f3d':'#fff';ctx.fillRect((i*137)%1080,(i*73)%1350,1+(i%2),1+(i%2))}ctx.restore()}
     const edge=ctx.createLinearGradient(0,0,1080,0);edge.addColorStop(0,'rgba(79,58,31,.2)');edge.addColorStop(.12,'rgba(79,58,31,0)');edge.addColorStop(.88,'rgba(79,58,31,0)');edge.addColorStop(1,'rgba(79,58,31,.2)');ctx.fillStyle=edge;ctx.fillRect(0,0,1080,1350);ctx.fillStyle='rgba(248,244,232,.12)';ctx.fillRect(0,0,1080,1350);drawNarrationBadge(true,pulse);
     ctx.textAlign='center';ctx.fillStyle='#31352b';ctx.font='700 35px Georgia';ctx.fillText('DAILY',540,142);ctx.fillStyle='#738047';ctx.fillText('BREATH',660,142);ctx.font='700 15px Arial';ctx.letterSpacing='4px';ctx.fillText('FAITH. GROWTH. PEACE. PURPOSE.',540,174);ctx.letterSpacing='0px';
     ctx.strokeStyle='#8d9464';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(405,203);ctx.lineTo(675,203);ctx.stroke();
@@ -181,11 +182,13 @@
   }
   function drawAdvanced(pulse){
     ctx.clearRect(0,0,1080,1350);
+    if(!coverImage(livingSanctuary)){
     const sky=ctx.createLinearGradient(0,0,1080,1350);sky.addColorStop(0,'#071f2c');sky.addColorStop(.42,'#174f4a');sky.addColorStop(.72,'#567454');sky.addColorStop(1,'#d0a765');ctx.fillStyle=sky;ctx.fillRect(0,0,1080,1350);
     const glow=ctx.createRadialGradient(820,170,20,820,170,540);glow.addColorStop(0,'rgba(255,229,153,.72)');glow.addColorStop(.35,'rgba(242,190,103,.2)');glow.addColorStop(1,'rgba(242,190,103,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,1080,800);
     ctx.save();ctx.globalAlpha=.14;ctx.strokeStyle='#fff4cf';ctx.lineWidth=2;for(let i=0;i<18;i++){ctx.beginPath();ctx.moveTo(760+i*19,-30);ctx.lineTo(300+i*42,720);ctx.stroke()}ctx.restore();
     ctx.fillStyle='#173c35';ctx.beginPath();ctx.moveTo(0,810);ctx.bezierCurveTo(180,650,315,760,470,650);ctx.bezierCurveTo(620,540,760,690,1080,535);ctx.lineTo(1080,1350);ctx.lineTo(0,1350);ctx.closePath();ctx.fill();
     ctx.fillStyle='#0b2927';ctx.beginPath();ctx.moveTo(0,920);ctx.bezierCurveTo(230,760,390,900,610,730);ctx.bezierCurveTo(810,590,925,760,1080,690);ctx.lineTo(1080,1350);ctx.lineTo(0,1350);ctx.closePath();ctx.fill();
+    }
     ctx.save();ctx.globalAlpha=.34;for(let i=0;i<95;i++){const x=(i*173)%1080,y=(i*97)%1350,r=1+(i%4);ctx.fillStyle=i%3?'#f6e6b5':'#a7d0a8';ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}ctx.restore();
     const vignette=ctx.createRadialGradient(540,590,260,540,650,820);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(1,'rgba(0,10,12,.68)');ctx.fillStyle=vignette;ctx.fillRect(0,0,1080,1350);
     drawNarrationBadge(false,pulse);
@@ -330,7 +333,7 @@
 
   controls.forEach(control=>{control.addEventListener(control.type==='file'?'change':'input',draw);control.addEventListener('change',draw)});
   $('downloadPng').addEventListener('click',downloadPng);$('saveDraft').addEventListener('click',saveDraft);$('previewAudio').addEventListener('click',previewNarration);$('stopAudio').addEventListener('click',()=>{stopNarration();status('Narration stopped.')});$('exportVideo').addEventListener('click',exportVideo);$('exportAllVideo').addEventListener('click',exportAllLanguagesVideo);$('exportMp3').addEventListener('click',exportMp3);$('generateTodayVerse').addEventListener('click',generateTodayVerse);
-  forest.onload=draw;botanical.onload=draw;syncHeading();loadVerseCatalog();loadManagedVerse();draw();
+  livingSanctuary.onload=draw;modernAurora.onload=draw;heritageBotanical.onload=draw;syncHeading();loadVerseCatalog();loadManagedVerse();draw();
 })();
 </script>
 </body>

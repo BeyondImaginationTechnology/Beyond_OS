@@ -265,8 +265,8 @@ export const BeyondFrenchVideo: React.FC<BeyondFrenchVideoProps> = ({
                 gap: 70,
               }}
             >
-              <Headline kicker={`Today's ${category} phrase`}>
-                {`${english}\nFour ways to say it.`}
+              <Headline kicker={`Today's ${category} lesson`}>
+                {'One phrase.\nFour languages.'}
               </Headline>
               <div
                 style={{
@@ -305,7 +305,7 @@ export const BeyondFrenchVideo: React.FC<BeyondFrenchVideoProps> = ({
                   marginBottom: 14,
                 }}
               >
-                Say “hello” your way.
+                One phrase. Four languages.
               </div>
               <LanguagePill
                 index={0}
@@ -386,7 +386,38 @@ export const BeyondFrenchVideo: React.FC<BeyondFrenchVideoProps> = ({
                   fontWeight: 800,
                 }}
               >
-                Download on the App Store
+                Download on Beyond Store
+              </div>
+              <div
+                style={{
+                  ...enter(frame, 32, 28),
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 8,
+                  color: C.muted,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 38,
+                    fontWeight: 800,
+                    letterSpacing: 1,
+                  }}
+                >
+                  Google Play + App Store
+                </div>
+                <div
+                  style={{
+                    color: C.gold,
+                    fontSize: 30,
+                    fontWeight: 850,
+                    letterSpacing: 3,
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  Coming Fall 2026
+                </div>
               </div>
             </div>
           </Scene>

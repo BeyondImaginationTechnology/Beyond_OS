@@ -15,6 +15,7 @@ require __DIR__ . '/includes/header.php';
 
 $stencilDay = bt_stencil_content();
 $downloadFile = $stencilDay['package_url'];
+$packImage = trim((string)($stencilDay['pack_image_url'] ?? '')) ?: $stencilDay['preview_url'];
 
 $featuredDateBadge = strtoupper($stencilDay['display_date'] ?? '');
 if (!empty($stencilDay['iso_date'])) {
@@ -89,7 +90,10 @@ if (!empty($stencilDay['iso_date'])) {
 
       <a class="bt-package-stage" href="<?= e($downloadFile) ?>" download aria-label="Download today's free stencil package">
         <span class="bt-package-glow" aria-hidden="true"></span>
-        <img src="assets/img/storefront/hero-package.webp" alt="Divine Realism Biblical Realism stencil package">
+        <img
+          src="<?= e($packImage) ?>?v=<?= e((string)($stencilDay['updated_at'] ?: '1')) ?>"
+          alt="<?= e($stencilDay['title']) ?> generated stencil package"
+        >
         <span class="bt-package-cta">Download free stencil</span>
       </a>
     </div>

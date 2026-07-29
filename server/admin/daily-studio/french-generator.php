@@ -3,6 +3,9 @@ declare(strict_types=1);
 require __DIR__ . '/bootstrap.php';
 require_once dirname(__DIR__, 3) . '/config/bootstrap.php';
 
+header('Cache-Control: private, no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+
 if (empty($_SESSION['verse_generator_csrf'])) {
     $_SESSION['verse_generator_csrf'] = bin2hex(random_bytes(32));
 }
@@ -13,6 +16,9 @@ if ($view === false) {
     exit('Français du Jour generator view is unavailable.');
 }
 $view = str_replace('</head>', '<link rel="stylesheet" href="/server/admin/daily-studio/studio-sunset.css"></head>', $view);
+$rendererPath = __DIR__ . '/assets/beyond-french-remotion-renderer.js';
+$rendererVersion = is_file($rendererPath) ? (string)filemtime($rendererPath) : 'missing';
+$view = str_replace('__FRENCH_RENDERER_VERSION__', rawurlencode($rendererVersion), $view);
 
 $providerLabels = [
     'openai' => 'OpenAI Speech · gpt-4o-mini-tts',

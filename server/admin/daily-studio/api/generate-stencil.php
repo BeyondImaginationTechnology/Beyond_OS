@@ -41,6 +41,40 @@ try {
     $composition = mb_substr(trim((string)($input['composition'] ?? 'Centered vertical emblem')), 0, 100);
     $lineWeight = mb_substr(trim((string)($input['line_weight'] ?? 'Balanced transfer-ready hierarchy')), 0, 100);
     $detail = mb_substr(trim((string)($input['detail'] ?? 'High detail with controlled open skin breaks')), 0, 120);
+    $uploadedImage = trim((string)($input['stencil_image'] ?? ''));
+    if ($uploadedImage !== '') {
+        if (!preg_match('#^data:(image/(?:png|jpeg|webp));base64,(.+)$#s', $uploadedImage, $uploadMatch)) {
+            stencilJson(['ok'=>false,'error'=>'Upload a PNG, JPG or WebP stencil image.'], 422);
+        }
+        $uploadedBytes = base64_decode($uploadMatch[2], true);
+        $uploadInfo = is_string($uploadedBytes) ? @getimagesizefromstring($uploadedBytes) : false;
+        if (!is_string($uploadedBytes) || strlen($uploadedBytes) > 15 * 1024 * 1024 || $uploadInfo === false) {
+            stencilJson(['ok'=>false,'error'=>'The uploaded stencil image is invalid or too large.'], 422);
+        }
+        $uploadMime = (string)($uploadInfo['mime'] ?? '');
+        if ($uploadMime !== 'image/png') {
+            if (!function_exists('imagecreatefromstring')) {
+                stencilJson(['ok'=>false,'error'=>'PHP GD is required to convert uploaded JPG or WebP artwork to PNG.'], 503);
+            }
+            $uploadCanvas = @imagecreatefromstring($uploadedBytes);
+            if ($uploadCanvas === false) stencilJson(['ok'=>false,'error'=>'The uploaded stencil image could not be decoded.'], 422);
+            ob_start();
+            imagepng($uploadCanvas, null, 9);
+            $converted = ob_get_clean();
+            imagedestroy($uploadCanvas);
+            if (!is_string($converted) || $converted === '') stencilJson(['ok'=>false,'error'=>'The uploaded stencil could not be converted to PNG.'], 500);
+            $uploadedBytes = $converted;
+        }
+        stencilJson([
+            'ok'=>true,
+            'image'=>'data:image/png;base64,'.base64_encode($uploadedBytes),
+            'render_token'=>stencilRenderToken($uploadedBytes),
+            'model'=>'Approved artist upload',
+            'provider'=>'upload',
+            'quality'=>'source',
+            'size'=>(string)$uploadInfo[0].'×'.(string)$uploadInfo[1],
+        ]);
+    }
     if (mb_strlen($idea) < 8) stencilJson(['ok'=>false,'error'=>'Describe the stencil concept in a little more detail.'], 422);
     if (!function_exists('curl_init')) stencilJson(['ok'=>false,'error'=>'The server cURL extension is required.'], 503);
     $prompt = <<<PROMPT

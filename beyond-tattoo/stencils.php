@@ -78,9 +78,13 @@ function bt_stencil_category_slugs(string $title, string $collection): array
     return array_values(array_unique($categories));
 }
 
+$availableCount = 0;
 $visibleCount = 0;
 foreach ($collections as $collection) {
     foreach ($collection['stencils'] as $item) {
+        $releaseDate = new DateTimeImmutable($item[1], new DateTimeZone('America/Vancouver'));
+        if ($releaseDate > $today) continue;
+        $availableCount++;
         if ($activeCategory === '' || in_array($activeCategory, bt_stencil_category_slugs($item[0], $collection['name']), true)) {
             $visibleCount++;
         }
@@ -95,24 +99,25 @@ foreach ($collections as $collection) {
     <div class="bt-header-actions"><a class="bt-header-download" href="<?= e($downloadFile) ?>" download>↓ Free pack</a><a class="bt-login-link" href="login.php">Studio login</a><details class="bt-mobile-menu"><summary>☰</summary><div><a href="stencils.php">Stencils</a><a href="collections.php">Collections</a><a href="studios.php">Studios</a><a href="about.php">About</a><a href="login.php">Studio login</a></div></details></div>
   </div></header>
 
-<section class="bt-page-hero"><div class="bt-wrap"><p class="bt-gold-kicker">✦ SEASON ONE LIBRARY</p><h1>55 HAND-DESIGNED<br><strong>STENCIL DROPS</strong></h1><p>Browse the complete release schedule. Finished drops include clean linework, a printable PDF, watermarked preview, placement guidance and matching video assets.</p><div class="bt-main-actions"><a class="bt-glow-button" href="<?= e($downloadFile) ?>" download>↓ Download today’s stencil</a><a class="bt-outline-button" href="collections.php">Browse collections</a></div></div></section>
+<section class="bt-page-hero"><div class="bt-wrap"><p class="bt-gold-kicker">✦ SEASON ONE LIBRARY</p><h1><?= e((string)$availableCount) ?> AVAILABLE<br><strong>STENCIL DROPS</strong></h1><p>Browse every design released through <?= e($today->format('F j, Y')) ?>. New Season One stencils unlock daily through September 9 with clean linework, printable files, placement guidance and matching media.</p><div class="bt-main-actions"><a class="bt-glow-button" href="<?= e($downloadFile) ?>" download>↓ Download today’s stencil</a><a class="bt-outline-button" href="collections.php">Browse collections</a></div></div></section>
 <section class="bt-page-section"><div class="bt-wrap">
   <?php if (($stencilDay['updated_at'] ?? '') !== ''): ?>
   <section class="bt-library-group" id="studio-release"><div class="bt-library-heading"><div><p>BEYOND STUDIO RELEASE</p><h2>Latest published stencil</h2></div><span>Live now</span></div><div class="bt-stencil-schedule-grid"><article class="bt-schedule-card is-current is-unlocked" role="button" tabindex="0" aria-haspopup="dialog" aria-label="View <?= e($stencilDay['title']) ?> stencil" data-stencil-preview="<?= e($stencilDay['preview_url']) ?>" data-stencil-title="<?= e($stencilDay['title']) ?>" data-stencil-collection="<?= e($stencilDay['collection']) ?>" data-stencil-date="<?= e($stencilDay['display_date']) ?>" data-stencil-download="<?= e($stencilDay['transfer_png_url']) ?>"><div class="bt-schedule-number">AI</div><div><time datetime="<?= e($stencilDay['iso_date']) ?>"><?= e($stencilDay['display_date']) ?></time><h3><?= e($stencilDay['title']) ?></h3><p><?= e($stencilDay['description']) ?></p></div><span>View stencil</span></article></div></section>
   <?php endif; ?>
   <div class="bt-category-browser" aria-label="Browse stencils by category">
-    <a class="<?= $activeCategory === '' ? 'is-active' : '' ?>" href="stencils.php"><b>▦</b><span>All</span><small>55</small></a>
+    <a class="<?= $activeCategory === '' ? 'is-active' : '' ?>" href="stencils.php"><b>▦</b><span>All</span><small><?= e((string)$availableCount) ?></small></a>
     <?php foreach ($categoryOptions as $slug => $option): ?>
       <a class="<?= $activeCategory === $slug ? 'is-active' : '' ?>" href="stencils.php?category=<?= e($slug) ?>"><b><?= e($option['icon']) ?></b><span><?= e($option['label']) ?></span></a>
     <?php endforeach; ?>
   </div>
-  <div class="bt-category-results"><strong><?= e((string)$visibleCount) ?> stencil<?= $visibleCount === 1 ? '' : 's' ?></strong><?php if ($activeCategory !== ''): ?><span>in <?= e($categoryOptions[$activeCategory]['label']) ?></span><a href="stencils.php">Clear filter ×</a><?php else: ?><span>across four hand-designed collections</span><?php endif; ?></div>
+  <div class="bt-category-results"><strong><?= e((string)$visibleCount) ?> available stencil<?= $visibleCount === 1 ? '' : 's' ?></strong><?php if ($activeCategory !== ''): ?><span>in <?= e($categoryOptions[$activeCategory]['label']) ?></span><a href="stencils.php">Clear filter ×</a><?php else: ?><span>released through <?= e($today->format('M j')) ?></span><?php endif; ?></div>
 
   <?php $number=1; foreach($collections as $slug=>$collection):
     $matchingItems = [];
     foreach ($collection['stencils'] as $index => $item) {
       $itemNumber = $number++;
-      if ($activeCategory === '' || in_array($activeCategory, bt_stencil_category_slugs($item[0], $collection['name']), true)) {
+      $scheduledDate = new DateTimeImmutable($item[1], new DateTimeZone('America/Vancouver'));
+      if ($scheduledDate <= $today && ($activeCategory === '' || in_array($activeCategory, bt_stencil_category_slugs($item[0], $collection['name']), true))) {
         $matchingItems[] = [$item, $itemNumber, $index];
       }
     }
@@ -147,7 +152,7 @@ foreach ($collections as $collection) {
   >
     <div class="bt-schedule-number"><?= str_pad((string)$itemNumber,2,'0',STR_PAD_LEFT) ?></div>
     <div><time datetime="<?= e($item[1]) ?>"><?= e(bt_pretty_date($item[1])) ?></time><h3><?= e($item[0]) ?></h3><p><?= e($collection['name']) ?> · <?= e(implode(' · ', array_map(static fn($cat) => $categoryOptions[$cat]['label'] ?? $cat, $itemCategories))) ?></p></div>
-    <span><?= $isUnlocked?'View stencil':'Scheduled' ?></span>
+    <span><?= $isUnlocked?'View stencil':'Available' ?></span>
   </article><?php endforeach; ?>
   </div></section><?php endforeach; ?>
 </div></section>

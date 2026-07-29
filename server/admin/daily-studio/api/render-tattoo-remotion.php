@@ -35,6 +35,7 @@ $fieldLimits = [
     'suggestedPlacement'=>140,
     'caption'=>500,
     'style'=>100,
+    'date'=>50,
 ];
 $props = [];
 foreach ($fieldLimits as $field=>$limit) {
@@ -103,7 +104,6 @@ try {
     if (!copy($privateImage, $runtimeImage)) throw new RuntimeException('The stencil artwork could not be staged for Remotion.');
     $props['mainArtwork'] = 'runtime/' . basename($runtimeImage);
     $props['studioTransfer'] = $props['mainArtwork'];
-    $props['date'] = date('l, F j, Y');
     $props['downloadUrl'] = 'https://beyondimagination.co.technology/beyond-tattoo/stencil-of-day.php';
     $props['showQrCode'] = true;
     $props['audioFile'] = '';

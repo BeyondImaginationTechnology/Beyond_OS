@@ -54,6 +54,32 @@ if (!is_array($imageInfo) || ($imageInfo['mime'] ?? '') !== 'image/png') {
 }
 
 $includeNarration = !array_key_exists('includeNarration', $input) || (bool)$input['includeNarration'];
+$audioOnly = !empty($input['audio_only']);
+
+if ($audioOnly) {
+    if (!$includeNarration) tattooRemotionError(422, 'Narration was not requested.');
+    try {
+        $script = sprintf(
+            "Today's Beyond Tattoo stencil: %s. %s, designed for %s. Download the transfer-ready pack.",
+            $props['stencilTitle'],
+            $props['style'],
+            $props['suggestedPlacement']
+        );
+        $narration = studio_narration_generate($script, 'en-US');
+        $audio = (string)($narration['audio_content'] ?? '');
+        if (strlen($audio) < 128) throw new RuntimeException('The narration service returned empty audio.');
+        header('Content-Type: audio/mpeg');
+        header('Content-Length: ' . strlen($audio));
+        header('Cache-Control: private, no-store');
+        header('X-Tattoo-Narration: OpenAI');
+        echo $audio;
+        exit;
+    } catch (Throwable $error) {
+        error_log('Beyond Tattoo narration export: ' . $error->getMessage());
+        tattooRemotionError(503, $error->getMessage());
+    }
+}
+
 $root = dirname(__DIR__, 4);
 $project = $root . '/tools/daily-stencil-video';
 $remotion = $project . '/node_modules/.bin/remotion';

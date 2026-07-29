@@ -7,19 +7,22 @@
     "render": "mkdir -p out && remotion render src/index.ts DailyStencilPack out/daily-stencil-pack.mp4 --props=public/daily-stencil.json",
     "still": "mkdir -p out && remotion still src/index.ts DailyStencilPack out/preview.png --frame=210 --props=public/daily-stencil.json",
     "prepare": "node scripts/prepare-remote-config.mjs",
+    "build:browser": "node scripts/build-browser-renderer.mjs",
     "render:queued": "mkdir -p out && remotion render src/index.ts DailyStencilPack out/daily-stencil-pack.mp4 --props=public/daily-stencil.render.json"
   },
   "dependencies": {
-    "@remotion/cli": "^4.0.0",
-    "@remotion/media": "^4.0.0",
+    "@remotion/cli": "4.0.501",
+    "@remotion/media": "4.0.501",
+    "@remotion/web-renderer": "4.0.501",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "remotion": "^4.0.0"
+    "remotion": "4.0.501"
   },
   "devDependencies": {
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19.0.0",
+    "esbuild": "0.28.1",
     "typescript": "^5.7.0"
   }
 }

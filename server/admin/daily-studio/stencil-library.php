@@ -68,6 +68,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   </section>
 </main>
 
+<script src="/server/admin/daily-studio/assets/beyond-tattoo-remotion-renderer.js?v=20260729-1"></script>
 <script>
 (() => {
   'use strict';
@@ -89,6 +90,16 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     step.classList.toggle('complete', index < active);
   });
   const title = () => $('title').value.trim() || $('idea').value.trim().split(/[,.]/)[0].slice(0, 70) || 'Generated Stencil';
+  const videoCaption = () => `${$('style').value} · ${$('idea').value.trim()}`.slice(0, 480);
+  const videoPayload = (includeNarration = $('includeNarration').checked) => ({
+    render_token: renderToken,
+    stencilTitle: title(),
+    collectionName: $('collection').value,
+    suggestedPlacement: $('placement').value,
+    caption: videoCaption(),
+    style: $('style').value,
+    includeNarration,
+  });
   const generationPayload = () => ({
     idea: $('idea').value.trim(),
     style: $('style').value,
@@ -191,6 +202,74 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     }
   };
 
+  const browserTattooVideo = async () => {
+    const renderer = window.BeyondTattooRemotion;
+    if (!renderer?.render) throw new Error('The Beyond Tattoo browser renderer did not load.');
+    let audioUrl = '';
+    try {
+      if ($('includeNarration').checked) {
+        message('Generating OpenAI narration for the tattoo reel…');
+        const response = await fetch('api/render-tattoo-remotion.php', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf},
+          body: JSON.stringify({...videoPayload(true), audio_only: true}),
+        });
+        if (!response.ok) {
+          let text = 'Tattoo narration could not be generated.';
+          try { text = (await response.json()).error || text; } catch {}
+          throw new Error(text);
+        }
+        audioUrl = URL.createObjectURL(await response.blob());
+      }
+      const support = await renderer.canRender(!!audioUrl);
+      if (!support.supported) throw new Error(support.message);
+      const date = new Date().toLocaleDateString('en-US', {
+        weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+      });
+      const blob = await renderer.render({
+        props: {
+          mainArtwork: image,
+          studioTransfer: image,
+          collectionName: $('collection').value,
+          stencilTitle: title(),
+          date,
+          suggestedPlacement: $('placement').value,
+          downloadUrl: 'https://beyondimagination.co.technology/beyond-tattoo/stencil-of-day.php',
+          caption: videoCaption(),
+          style: $('style').value,
+          audioFile: '',
+          showQrCode: true,
+        },
+        artworkUrl: image,
+        audioUrl,
+        onProgress: (progress) => message(`Rendering animated Beyond Tattoo MP4… ${Math.round(progress * 100)}%`),
+      });
+      if (blob.size < 1024) throw new Error('The Remotion browser renderer returned an empty video.');
+      download(blob, `beyond-tattoo-${title().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-remotion.mp4`);
+      setStep(2);
+      message('Animated Remotion MP4 exported in your browser.');
+    } finally {
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+    }
+  };
+
+  const serverTattooVideo = async () => {
+    const response = await fetch('api/render-tattoo-remotion.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf},
+      body: JSON.stringify(videoPayload()),
+    });
+    if (!response.ok) {
+      let text = 'The Remotion video could not be rendered.';
+      try { text = (await response.json()).error || text; } catch {}
+      throw new Error(text);
+    }
+    if (response.headers.get('X-Video-Renderer') !== 'Remotion') throw new Error('The server did not return a Remotion video.');
+    download(await response.blob(), `beyond-tattoo-${title().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-remotion.mp4`);
+    setStep(2);
+    message('Animated Remotion MP4 exported by the server.');
+  };
+
   $('renderVideo').onclick = async () => {
     if (!renderToken) return;
     if (location.protocol === 'file:') {
@@ -198,30 +277,10 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       return;
     }
     $('renderVideo').disabled = true;
-    message('Rendering the animated Beyond Tattoo reel… This may take 20–40 seconds.');
+    message('Starting the animated Beyond Tattoo render…');
     try {
-      const response = await fetch('api/render-tattoo-remotion.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf},
-        body: JSON.stringify({
-          render_token: renderToken,
-          stencilTitle: title(),
-          collectionName: $('collection').value,
-          suggestedPlacement: $('placement').value,
-          caption: `${$('style').value} · ${$('idea').value.trim()}`,
-          style: $('style').value,
-          includeNarration: $('includeNarration').checked,
-        }),
-      });
-      if (!response.ok) {
-        let text = 'The Remotion video could not be rendered.';
-        try { text = (await response.json()).error || text; } catch {}
-        throw new Error(text);
-      }
-      if (response.headers.get('X-Video-Renderer') !== 'Remotion') throw new Error('The server did not return a Remotion video.');
-      download(await response.blob(), `beyond-tattoo-${title().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-remotion.mp4`);
-      setStep(2);
-      message('Animated Remotion MP4 exported.');
+      if (window.BeyondTattooRemotion?.render) await browserTattooVideo();
+      else await serverTattooVideo();
     } catch (error) {
       message(error.message || 'The Remotion video could not be rendered.', true);
     } finally {

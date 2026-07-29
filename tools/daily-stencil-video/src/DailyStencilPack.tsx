@@ -22,6 +22,7 @@ export type DailyStencilProps = {
   caption?: string;
   style?: string;
   audioFile?: string;
+  brandLogo?: string;
   showQrCode?: boolean;
   qrDataUrl?: string;
 };
@@ -39,9 +40,13 @@ export const defaultDailyStencilProps: DailyStencilProps = {
     'Premium Egyptian-inspired realism with clean, transfer-ready line work.',
   style: 'Engraving realism',
   audioFile: '',
+  brandLogo: 'brand/beyond-tattoo-logo.webp',
   showQrCode: true,
   qrDataUrl: '',
 };
+
+const mediaSource = (source: string) =>
+  /^(blob:|data:|https?:\/\/|\/)/i.test(source) ? source : staticFile(source);
 
 const C = {
   ink: '#08090B',
@@ -82,7 +87,7 @@ const Grain: React.FC = () => (
   />
 );
 
-const Brand: React.FC = () => {
+const Brand: React.FC<{logo: string}> = ({logo}) => {
   const frame = useCurrentFrame();
   return (
     <div
@@ -98,7 +103,7 @@ const Brand: React.FC = () => {
       }}
     >
       <Img
-        src={staticFile('brand/beyond-tattoo-logo.webp')}
+        src={mediaSource(logo)}
         style={{width: 62, height: 62, borderRadius: 18, objectFit: 'cover'}}
       />
       <div>
@@ -157,7 +162,7 @@ const ArtworkFrame: React.FC<{
       }}
     >
       <Img
-        src={staticFile(src)}
+        src={mediaSource(src)}
         style={{
           width: '100%',
           height: '100%',
@@ -360,7 +365,7 @@ const EndScene: React.FC<DailyStencilProps> = ({
         }}
       >
         <Img
-          src={staticFile(mainArtwork)}
+          src={mediaSource(mainArtwork)}
           style={{width: '100%', height: '100%', objectFit: 'contain'}}
         />
       </div>
@@ -457,6 +462,7 @@ const EndScene: React.FC<DailyStencilProps> = ({
 export const DailyStencilPack: React.FC<DailyStencilProps> = (props) => {
   const frame = useCurrentFrame();
   const {durationInFrames} = useVideoConfig();
+  const closingDuration = Math.max(160, durationInFrames - 440);
   return (
     <AbsoluteFill
       style={{
@@ -469,7 +475,7 @@ export const DailyStencilPack: React.FC<DailyStencilProps> = (props) => {
     >
       <Grain />
       <div style={{position: 'absolute', left: 70, top: 76, zIndex: 20}}>
-        <Brand />
+        <Brand logo={props.brandLogo || defaultDailyStencilProps.brandLogo || ''} />
       </div>
       <Sequence from={0} durationInFrames={250}>
         <Intro {...props} />
@@ -477,7 +483,7 @@ export const DailyStencilPack: React.FC<DailyStencilProps> = (props) => {
       <Sequence from={220} durationInFrames={250}>
         <TransferScene {...props} />
       </Sequence>
-      <Sequence from={440} durationInFrames={160}>
+      <Sequence from={440} durationInFrames={closingDuration}>
         <EndScene {...props} />
       </Sequence>
       <div
@@ -504,7 +510,7 @@ export const DailyStencilPack: React.FC<DailyStencilProps> = (props) => {
         />
       </div>
       {props.audioFile ? (
-        <Audio src={staticFile(props.audioFile)} volume={0.95} />
+        <Audio src={mediaSource(props.audioFile)} volume={0.95} />
       ) : null}
     </AbsoluteFill>
   );

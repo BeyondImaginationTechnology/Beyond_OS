@@ -21,4 +21,15 @@ npm run studio
 npm run still
 npm run render
 ```
+
+The hosted Daily Studio renders MP4s in the browser, so its PHP server does
+not need Node, Chromium, or FFmpeg. Rebuild the committed browser bundle after
+changing this composition:
+
+```bash
+npm run build:browser
+```
+
+The bundle is written to
+`server/admin/daily-studio/assets/beyond-tattoo-remotion-renderer.js`.
 Output: `out/daily-stencil-pack.mp4`

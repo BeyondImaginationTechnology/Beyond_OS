@@ -9,17 +9,24 @@ $subscribers = $pdo->query('SELECT name,email,preferred_language,created_at FROM
 $audioRows = $pdo->query("SELECT id,lesson_id,provider,voice,language,audio_path,generation_status,created_at FROM french_lesson_audio ORDER BY id DESC LIMIT 20")->fetchAll();
 $csrfToken = french_csrf_token();
 $lessonPayload = array_map(static function (array $lesson): array {
+    $english = trim((string)($lesson['english'] ?? ''));
+    $french = trim((string)($lesson['french'] ?? ''));
+    $kreyol = trim((string)($lesson['kreyol'] ?? ''));
+    $spanish = trim((string)($lesson['spanish'] ?? ''));
+    $patois = trim((string)($lesson['patois'] ?? ''));
     return [
         'id' => (int)($lesson['id'] ?? 0),
         'label' => (string)($lesson['date'] ?? '') . ' - ' . (string)($lesson['english'] ?? 'Lesson'),
         'text' => (string)($lesson['french'] ?? ''),
         'texts' => [
+            'en-US' => $english,
             'fr-CA' => (string)($lesson['french'] ?? ''),
             'fr-FR' => (string)($lesson['french'] ?? ''),
             'ht-HT' => (string)($lesson['kreyol'] ?? ''),
             'en-JM' => (string)($lesson['patois'] ?? ''),
             'es-ES' => (string)($lesson['spanish'] ?? ''),
         ],
+        'video_script' => "Today's phrase is: {$english} In French: {$french} In Haitian Creole: {$kreyol} In Spanish: {$spanish} In Jamaican Patois: {$patois} Practice it today, and go beyond French.",
         'language' => 'fr-CA',
     ];
 }, $lessons);
@@ -76,9 +83,16 @@ $lessonPayload = array_map(static function (array $lesson): array {
                     <option value="azure">Azure Speech</option>
                 </select>
             </label>
+            <label>Narration type
+                <select name="narration_type" required>
+                    <option value="phrase">Lesson phrase audio</option>
+                    <option value="video">Daily video voiceover</option>
+                </select>
+            </label>
             <label>Language
                 <select name="language" required>
-                    <option value="fr-CA">French - Canada</option>
+                    <option value="en-US">English - Video narrator</option>
+                    <option value="fr-CA" selected>French - Canada</option>
                     <option value="fr-FR">French - France</option>
                     <option value="ht-HT">Haitian Kreyol</option>
                     <option value="en-JM">Jamaican Patois</option>
@@ -132,6 +146,6 @@ $lessonPayload = array_map(static function (array $lesson): array {
         </tbody></table></div>
     </section>
 </div>
-<script src="../assets/js/admin-narration.js?v=2.2.0" defer></script>
+<script src="../assets/js/admin-narration.js?v=2.3.0" defer></script>
 </body>
 </html>

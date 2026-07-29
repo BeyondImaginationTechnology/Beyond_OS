@@ -5,11 +5,13 @@
     "studio": "remotion studio src/index.ts",
     "render": "remotion render src/index.ts HelloWorldPreview out/hello-world-app-preview.mp4",
     "still": "remotion still src/index.ts HelloWorldPreview out/preview.png --frame=105",
-    "render:beyond-french": "remotion render src/index.ts BeyondFrenchPreview out/beyond-french-app-preview.mp4",
-    "still:beyond-french": "remotion still src/index.ts BeyondFrenchPreview out/beyond-french-preview.png --frame=145"
+    "prepare:beyond-french": "node scripts/prepare-beyond-french.mjs",
+    "render:beyond-french": "remotion render src/index.ts BeyondFrenchPreview out/beyond-french-app-preview.mp4 --props=public/beyond-french.render.json",
+    "still:beyond-french": "remotion still src/index.ts BeyondFrenchPreview out/beyond-french-preview.png --frame=145 --props=public/beyond-french.render.json"
   },
   "dependencies": {
     "@remotion/cli": "latest",
+    "@remotion/media": "latest",
     "react": "latest",
     "react-dom": "latest",
     "remotion": "latest"

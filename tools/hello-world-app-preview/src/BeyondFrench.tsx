@@ -1,4 +1,5 @@
 import React from 'react';
+import {Audio} from '@remotion/media';
 import {
   AbsoluteFill,
   Easing,
@@ -16,6 +17,26 @@ const C = {
   red: '#FF3B4E',
   gold: '#FFD84D',
   green: '#38D978',
+};
+
+export type BeyondFrenchVideoProps = {
+  english: string;
+  french: string;
+  kreyol: string;
+  spanish: string;
+  patois: string;
+  category: string;
+  audioFile?: string;
+};
+
+export const defaultBeyondFrenchVideoProps: BeyondFrenchVideoProps = {
+  english: 'Keep going.',
+  french: 'Continue.',
+  kreyol: 'Kontinye.',
+  spanish: 'Sigue adelante.',
+  patois: 'Keep on gwaan.',
+  category: 'Encouragement',
+  audioFile: '',
 };
 
 const enter = (frame: number, start: number, distance = 70) => ({
@@ -201,7 +222,15 @@ const LanguagePill: React.FC<{
   );
 };
 
-export const BeyondFrenchVideo: React.FC = () => {
+export const BeyondFrenchVideo: React.FC<BeyondFrenchVideoProps> = ({
+  english,
+  french,
+  kreyol,
+  spanish,
+  patois,
+  category,
+  audioFile,
+}) => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill
@@ -227,8 +256,8 @@ export const BeyondFrenchVideo: React.FC = () => {
                 gap: 70,
               }}
             >
-              <Headline kicker="Learn beyond translation">
-                {'One phrase.\nFour languages.'}
+              <Headline kicker={`Today's ${category} phrase`}>
+                {`${english}\nFour ways to say it.`}
               </Headline>
               <div
                 style={{
@@ -274,28 +303,28 @@ export const BeyondFrenchVideo: React.FC = () => {
                 color={C.blue}
                 flag="🇫🇷"
                 label="French"
-                phrase="Bonjour"
+                phrase={french}
               />
               <LanguagePill
                 index={1}
                 color={C.red}
                 flag="🇭🇹"
                 label="Haitian Creole"
-                phrase="Bonjou"
+                phrase={kreyol}
               />
               <LanguagePill
                 index={2}
                 color={C.gold}
                 flag="🇪🇸"
                 label="Spanish"
-                phrase="Hola"
+                phrase={spanish}
               />
               <LanguagePill
                 index={3}
                 color={C.green}
                 flag="🇯🇲"
                 label="Jamaican Patois"
-                phrase="Wah Gwaan"
+                phrase={patois}
               />
             </div>
           </Scene>
@@ -354,6 +383,7 @@ export const BeyondFrenchVideo: React.FC = () => {
           </Scene>
         </Sequence>
       </AbsoluteFill>
+      {audioFile ? <Audio src={staticFile(audioFile)} volume={0.96} /> : null}
     </AbsoluteFill>
   );
 };

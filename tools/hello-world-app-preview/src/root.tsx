@@ -7,7 +7,10 @@ import {
   Sequence,
   useCurrentFrame,
 } from 'remotion';
-import {BeyondFrenchVideo} from './BeyondFrench';
+import {
+  BeyondFrenchVideo,
+  defaultBeyondFrenchVideoProps,
+} from './BeyondFrench';
 
 const colors = {
   ink: '#F8FAFF',
@@ -295,7 +298,7 @@ export const RemotionRoot: React.FC = () => (
       fps={30}
       width={1080}
       height={1920}
-      defaultProps={{}}
+      defaultProps={defaultBeyondFrenchVideoProps}
     />
   </>
 );

@@ -3,12 +3,12 @@ declare(strict_types=1);
 require_once __DIR__ . '/anime-schedule.php';
 require_once __DIR__ . '/beyond-cartoons-schedule.php';
 require_once __DIR__ . '/movies-schedule.php';
+require_once __DIR__ . '/catalog-rotation.php';
 
 function beyond_tv_catalog_hourly_rows(string $slug): array {
     $catalog = json_decode((string)@file_get_contents(__DIR__ . '/../data/catalog.json'), true) ?: [];
     $items = [];
-    foreach ($catalog as $entry) {
-        if (!is_array($entry) || ($entry['channel_slug'] ?? '') !== $slug) continue;
+    foreach (beyond_tv_catalog_entries_for_channel($catalog, $slug) as $entry) {
         $map = trim((string)($entry['archive_episode_map'] ?? ''));
         if ($map !== '') {
             $episodes = json_decode((string)@file_get_contents(__DIR__ . '/../data/' . basename($map)), true) ?: [];

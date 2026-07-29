@@ -2,6 +2,7 @@
 declare(strict_types=1);
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: public, max-age=300, stale-while-revalidate=3600');
+require_once dirname(__DIR__) . '/includes/catalog-rotation.php';
 
 $slug = preg_replace('/[^a-z0-9-]/', '', strtolower((string)($_GET['slug'] ?? '')));
 $channels = [
@@ -141,12 +142,17 @@ $channels = [
 // duplicating its approved sources in this endpoint.
 if (!isset($channels[$slug])) {
     $catalog = json_decode((string)@file_get_contents(dirname(__DIR__) . '/data/catalog.json'), true);
-    $catalogItems = array_values(array_filter(is_array($catalog) ? $catalog : [], static fn($item): bool => is_array($item) && ($item['channel_slug'] ?? '') === $slug));
+    $catalogItems = beyond_tv_catalog_entries_for_channel(is_array($catalog) ? $catalog : [], $slug);
     if ($catalogItems) {
-        $items = []; $episodeMap = '';
+        $items = []; $episodeMaps = [];
         foreach ($catalogItems as $item) {
             if (($item['source_type'] ?? '') === 'archive_episode_map' && !empty($item['archive_episode_map'])) {
-                $episodeMap = dirname(__DIR__) . '/data/' . basename((string)$item['archive_episode_map']);
+                $episodeMaps[] = [
+                    'path' => dirname(__DIR__) . '/data/' . basename((string)$item['archive_episode_map']),
+                    'title' => (string)($item['title'] ?? 'Series'),
+                    'creator' => (string)($item['title'] ?? 'Beyond TV library'),
+                    'rights_url' => (string)($item['official_url'] ?? $item['rights_url'] ?? ''),
+                ];
                 continue;
             }
             $videoUrl = trim((string)($item['video_url'] ?? ''));
@@ -162,7 +168,7 @@ if (!isset($channels[$slug])) {
         $channels[$slug] = [
             'name' => (string)($catalogItems[0]['channel_name'] ?? ucwords(str_replace('-', ' ', $slug))),
             'items' => $items,
-            'episode_map' => $episodeMap,
+            'episode_maps' => $episodeMaps,
             'embed' => !empty($catalogItems[0]['archive_id']) ? 'https://archive.org/embed/' . rawurlencode((string)$catalogItems[0]['archive_id']) : '',
         ];
     }
@@ -261,7 +267,15 @@ if ($slug === 'classic-cinema') {
     $config['embed'] = (string)$movieState['player_url'];
 }
 if (!empty($config['episode_map'])) {
-    $episodeRows = json_decode((string)@file_get_contents((string)$config['episode_map']), true);
+    $config['episode_maps'][] = [
+        'path' => (string)$config['episode_map'],
+        'title' => (string)($config['name'] ?? 'Series'),
+        'creator' => (string)($config['name'] ?? 'Beyond TV library'),
+        'rights_url' => '',
+    ];
+}
+foreach ((array)($config['episode_maps'] ?? []) as $episodeMap) {
+    $episodeRows = json_decode((string)@file_get_contents((string)($episodeMap['path'] ?? '')), true);
     $preferred = [];
     foreach (is_array($episodeRows) ? $episodeRows : [] as $episode) {
         if (!is_array($episode) || empty($episode['video_url'])) continue;
@@ -270,13 +284,16 @@ if (!empty($config['episode_map'])) {
         if (!isset($preferred[$number]) || $extension === 'mp4') $preferred[$number] = $episode;
     }
     ksort($preferred);
+    $seriesTitle = (string)($episodeMap['title'] ?? $config['name'] ?? 'Series');
+    $seriesCreator = (string)($episodeMap['creator'] ?? $seriesTitle);
+    $seriesRightsUrl = (string)($episodeMap['rights_url'] ?? '');
     $mappedItems = array_map(static fn(array $episode): array => [
         'url' => (string)$episode['video_url'],
-        'title' => 'The Haunting Hour · S1 E' . (int)($episode['episode'] ?? 0) . ' · ' . (string)($episode['title'] ?? 'Haunting Hour'),
+        'title' => $seriesTitle . ' · S' . (int)($episode['season'] ?? 1) . ' E' . (int)($episode['episode'] ?? 0) . ' · ' . (string)($episode['title'] ?? 'Episode'),
         'duration' => max(60, (int)($episode['runtime_seconds'] ?? 1380)),
-        'creator' => 'R. L. Stine’s The Haunting Hour',
+        'creator' => $seriesCreator,
         'license' => 'Owner-verified archive source',
-        'rights_url' => 'https://archive.org/details/rl-stines-the-haunting-hour-full-series',
+        'rights_url' => $seriesRightsUrl,
     ], array_values($preferred));
     $config['items'] = array_merge((array)($config['items'] ?? []), $mappedItems);
 }
@@ -319,6 +336,8 @@ echo json_encode([
     'sources'=>$ordered,
     'start_offset'=>$offset,
     'playlist_duration'=>$total,
+    'library_count'=>count($resolved),
+    'library_hours'=>round($total / 3600, 1),
     'server_time'=>time(),
     'player_url'=>$playerUrl,
     'embed_fallback'=>$config['embed'],

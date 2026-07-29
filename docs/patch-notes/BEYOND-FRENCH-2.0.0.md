@@ -7,3 +7,4 @@
 - Connects the Studio generator to the public daily phrase: saving a dated generator session creates or updates that day’s shared Web/iOS lesson.
 - Defines guest access as the free Lesson of the Day, free dictionary, and Greetings Module Lesson 1; a Beyond ID unlocks tests, remaining lessons, progress, and rewards.
 - Adds a standalone native SwiftUI iOS beta with Today, Dictionary, Academy, Practice, and Progress tabs.
+- Adds an email-only iOS beta request form that saves the subscriber and sends an SMTP notification to the administrator.

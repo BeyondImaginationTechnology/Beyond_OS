@@ -70,6 +70,7 @@
   <section class="preview"><div class="canvas-wrap"><canvas id="art" width="1080" height="1350" aria-label="Français du Jour preview"></canvas></div></section>
 </main>
 
+<script src="/server/admin/daily-studio/assets/beyond-french-remotion-renderer.js?v=20260729-1"></script>
 <script>
 (() => {
   'use strict';
@@ -235,14 +236,43 @@
     }finally{button.disabled=false}
   }
   function remotionPayload(){return{publish_date:v('publishDate'),english:v('phrase'),french:v('french'),kreyol:v('kreyol'),spanish:v('spanish'),patois:v('patois'),category:'Daily Phrase',include_narration:$('includeNarration').checked}}
+  async function browserRemotionVideo(){
+    const renderer=window.BeyondFrenchRemotion;
+    if(!renderer?.render)throw new Error('The Remotion browser renderer did not load.');
+    let audioUrl='';
+    try{
+      if($('includeNarration').checked){
+        setStatus('Generating narration for the Remotion video…');
+        const audio=await narrationBlob();
+        audioUrl=URL.createObjectURL(audio);
+      }
+      const support=await renderer.canRender(!!audioUrl);
+      if(!support.supported)throw new Error(support.message);
+      const blob=await renderer.render({
+        props:{english:v('phrase'),french:v('french'),kreyol:v('kreyol'),spanish:v('spanish'),patois:v('patois'),category:'Daily Phrase',audioFile:''},
+        audioUrl,
+        onProgress:progress=>setStatus(`Rendering animated Remotion MP4 in this browser… ${Math.round(progress*100)}%`)
+      });
+      if(blob.size<1024)throw new Error('The Remotion browser renderer returned an empty video.');
+      download(blob,`beyond-french-${v('publishDate')||'daily'}-remotion.mp4`);
+      setStatus('Animated Remotion MP4 exported in your browser.');
+    }finally{
+      if(audioUrl)URL.revokeObjectURL(audioUrl);
+    }
+  }
+  async function serverRemotionVideo(){
+    const response=await fetch('/server/admin/daily-studio/api/render-french-remotion.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(remotionPayload())});
+    if(!response.ok){let message='The Remotion export failed.';try{const data=await response.json();message=data.error||message}catch{}throw new Error(message)}
+    if(response.headers.get('X-Video-Renderer')!=='Remotion')throw new Error('The server did not return a Remotion video.');
+    const blob=await response.blob();download(blob,`beyond-french-${v('publishDate')||'daily'}-remotion.mp4`);
+    setStatus('Animated Remotion MP4 exported by the server.');
+  }
   async function remotionVideo(){
     if(location.protocol==='file:'){setStatus('Remotion rendering requires the served generator URL, not the raw file:// template. Open /server/admin/daily-studio/french-generator.php.',true);return}
-    const button=$('exportRemotionVideo');button.disabled=true;setStatus('Generating narration and rendering the animated Remotion video… This may take 15–30 seconds.');
+    const button=$('exportRemotionVideo');button.disabled=true;setStatus('Starting the animated Remotion render…');
     try{
-      const response=await fetch('/server/admin/daily-studio/api/render-french-remotion.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(remotionPayload())});
-      if(!response.ok){let message='The Remotion export failed.';try{const data=await response.json();message=data.error||message}catch{}throw new Error(message)}
-      if(response.headers.get('X-Video-Renderer')!=='Remotion')throw new Error('The server did not return a Remotion video.');
-      const blob=await response.blob();download(blob,`beyond-french-${v('publishDate')||'daily'}-remotion.mp4`);setStatus('Animated Remotion MP4 exported.');
+      if(window.BeyondFrenchRemotion?.render)await browserRemotionVideo();
+      else await serverRemotionVideo();
     }catch(error){setStatus(error.message||'The Remotion export failed. The static template remains unchanged.',true)}finally{button.disabled=false}
   }
   function restore(){try{const data=JSON.parse(localStorage.getItem('beyondFrenchGenerator')||'null');if(!data)return;ids.forEach(id=>{if(!(id in data))return;if($(id).type==='checkbox')$(id).checked=!!data[id];else $(id).value=data[id]})}catch{}}

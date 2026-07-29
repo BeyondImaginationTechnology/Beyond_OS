@@ -12,6 +12,24 @@ function stencilJson(array $payload, int $status = 200): never {
     exit;
 }
 
+function stencilRenderToken(string $png): string {
+    $directory = beyond_private_root() . '/tmp/stencil-generations';
+    if (!is_dir($directory) && !mkdir($directory, 0700, true) && !is_dir($directory)) {
+        throw new RuntimeException('The private stencil preview folder could not be created.');
+    }
+    foreach (glob($directory . '/*.png') ?: [] as $oldFile) {
+        if (is_file($oldFile) && filemtime($oldFile) < time() - 7200) @unlink($oldFile);
+    }
+    $token = bin2hex(random_bytes(18));
+    $file = $directory . '/' . $token . '.png';
+    if (file_put_contents($file, $png, LOCK_EX) === false) {
+        throw new RuntimeException('The stencil preview could not be prepared for Remotion.');
+    }
+    @chmod($file, 0600);
+    $_SESSION['stencil_render_tokens'][$token] = time();
+    return $token;
+}
+
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') stencilJson(['ok'=>false,'error'=>'POST required.'], 405);
     if (!Auth::check()) stencilJson(['ok'=>false,'error'=>'Administrator access required.'], 403);
@@ -20,9 +38,28 @@ try {
     $idea = mb_substr(trim((string)($input['idea'] ?? '')), 0, 700);
     $style = mb_substr(trim((string)($input['style'] ?? 'Fine-line blackwork')), 0, 80);
     $placement = mb_substr(trim((string)($input['placement'] ?? 'Outer forearm')), 0, 80);
+    $composition = mb_substr(trim((string)($input['composition'] ?? 'Centered vertical emblem')), 0, 100);
+    $lineWeight = mb_substr(trim((string)($input['line_weight'] ?? 'Balanced transfer-ready hierarchy')), 0, 100);
+    $detail = mb_substr(trim((string)($input['detail'] ?? 'High detail with controlled open skin breaks')), 0, 120);
     if (mb_strlen($idea) < 8) stencilJson(['ok'=>false,'error'=>'Describe the stencil concept in a little more detail.'], 422);
     if (!function_exists('curl_init')) stencilJson(['ok'=>false,'error'=>'The server cURL extension is required.'], 503);
-    $prompt = "Create a premium, professional tattoo stencil design sheet. Concept: {$idea}. Style: {$style}. Intended placement: {$placement}. Render only isolated artwork on pure white: crisp black transfer-ready linework, intentional line-weight hierarchy, generous negative space, anatomy-aware flow, symmetrical where appropriate, no skin, person, mockup, color, gray wash, shadows, text, logo, watermark, or border. Centered vertical composition with exceptionally clean edges, practical for an artist to print and refine.";
+    $prompt = <<<PROMPT
+Create one original, premium tattoo stencil master suitable for a professional artist.
+
+DESIGN BRIEF
+- Concept: {$idea}
+- Tattoo style: {$style}
+- Intended body placement: {$placement}
+- Composition: {$composition}
+- Line-weight plan: {$lineWeight}
+- Detail density: {$detail}
+
+ART DIRECTION
+Build a strong readable silhouette first, then intentional internal detail. Follow the natural anatomy and visual flow of the stated placement. Use confident black transfer lines with a deliberate hierarchy: bold structural contours, medium secondary forms, and restrained fine detail. Preserve generous, purposeful negative space and open skin breaks so the design remains readable after transfer and aging. Keep the focal point unmistakable. Make every ornamental element structurally connected and tattooable. Use clean symmetry only when the concept calls for it; otherwise use balanced organic flow.
+
+OUTPUT REQUIREMENTS
+Return a single isolated vertical stencil on a pure white background. Crisp black linework only. No skin, body, person, studio scene, paper texture, mockup, frame, border, crop marks, typography, letters, numbers, signature, logo, watermark, color, gray wash, soft shading, drop shadow, glow, or photographic rendering. Keep the entire design inside the canvas with comfortable white margins. The result must look like a high-end transfer-ready master an experienced tattoo artist can print, size, and refine.
+PROMPT;
     $openAiKey = trim((string)beyond_ai_config('api_key', ''));
     $googleKey = trim((string)beyond_ai_config('google_image_key', ''));
     $errors = [];
@@ -33,7 +70,19 @@ try {
         $raw = curl_exec($curl); $curlError = curl_error($curl); $status = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE); curl_close($curl);
         $response = is_string($raw) ? json_decode($raw, true) : null;
         $image = is_array($response) ? (string)($response['data'][0]['b64_json'] ?? '') : '';
-        if ($status >= 200 && $status < 300 && $image !== '' && base64_decode($image, true) !== false) stencilJson(['ok'=>true,'image'=>'data:image/png;base64,'.$image,'model'=>'gpt-image-2','provider'=>'openai']);
+        $decodedImage = $image !== '' ? base64_decode($image, true) : false;
+        if ($status >= 200 && $status < 300 && is_string($decodedImage)) {
+            stencilJson([
+                'ok'=>true,
+                'image'=>'data:image/png;base64,'.$image,
+                'render_token'=>stencilRenderToken($decodedImage),
+                'model'=>'gpt-image-2',
+                'provider'=>'openai',
+                'quality'=>'high',
+                'size'=>'1024x1536',
+                'usage'=>$response['usage']??null,
+            ]);
+        }
         $errors[] = is_array($response) ? (string)($response['error']['message'] ?? 'OpenAI image generation failed.') : ($curlError ?: 'OpenAI image generation failed.');
     }
     if ($googleKey !== '' && !str_contains($googleKey, 'YOUR_')) {
@@ -53,7 +102,7 @@ try {
                 if ($canvas !== false) { ob_start(); imagepng($canvas, null, 9); $png=ob_get_clean(); imagedestroy($canvas); if (is_string($png) && $png!=='') { $image=base64_encode($png); $mime='image/png'; } }
             }
             if ($mime !== 'image/png') throw new RuntimeException('Google returned an image, but PHP GD is required to convert it to PNG for publishing.');
-            stencilJson(['ok'=>true,'image'=>'data:image/png;base64,'.$image,'model'=>$model,'provider'=>'google']);
+            stencilJson(['ok'=>true,'image'=>'data:image/png;base64,'.$image,'render_token'=>stencilRenderToken((string)base64_decode($image, true)),'model'=>$model,'provider'=>'google']);
         }
         $errors[] = is_array($response) ? (string)($response['error']['message'] ?? 'Google Imagen generation failed.') : ($curlError ?: 'Google Imagen generation failed.');
     }

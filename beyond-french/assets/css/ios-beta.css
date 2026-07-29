@@ -4,6 +4,14 @@
 .ios-beta-copy h1 span{background:linear-gradient(90deg,#1768ff,#ef3340,#ff9f0a);-webkit-background-clip:text;color:transparent}
 .ios-beta-copy>p{max-width:620px;color:var(--muted);font-size:1.16rem;line-height:1.7}
 .ios-beta-actions{display:flex;gap:12px;flex-wrap:wrap;margin:28px 0}
+.ios-beta-form{margin-top:28px;padding:18px;border:1px solid #d8e3f2;border-radius:20px;background:#fff;box-shadow:0 16px 44px rgba(7,21,47,.09)}
+.ios-beta-form>label{display:block;margin-bottom:8px;font-size:.82rem;font-weight:900}
+.ios-beta-form>div{display:grid;grid-template-columns:1fr auto;gap:10px}
+.ios-beta-form input[type=email]{width:100%;min-width:0;padding:14px 16px;border:1px solid #cbd7e8;border-radius:14px;background:#f8faff;font:inherit}
+.ios-beta-form input[type=email]:focus{border-color:#1768ff;outline:3px solid rgba(23,104,255,.14)}
+.ios-beta-form small{display:block;margin-top:9px;color:var(--muted)}
+.ios-beta-form .ios-beta-error{color:#c5273d;font-weight:800}
+.ios-beta-honeypot{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;opacity:0!important}
 .ios-beta-copy ul{display:grid;gap:10px;padding:0;list-style:none;color:#34425c;font-weight:750}
 .ios-beta-copy li::before{content:"✓";display:inline-grid;place-items:center;width:23px;height:23px;margin-right:10px;border-radius:50%;background:#e4f7e9;color:#07813c}
 .ios-beta-shot{margin:0;text-align:center}
@@ -12,4 +20,4 @@
 .ios-beta-details{padding-top:18px;text-align:center}
 .ios-beta-details p{max-width:650px;margin:0 auto 24px;color:var(--muted);font-size:1.08rem;line-height:1.7}
 @media(max-width:850px){.ios-beta-hero{grid-template-columns:1fr;gap:38px;padding-top:34px}.ios-beta-shot{order:-1}.ios-beta-shot img{max-width:430px}}
-@media(max-width:560px){.ios-beta-hero{padding:24px 18px 54px}.ios-beta-copy h1{font-size:3.25rem}.ios-beta-actions{display:grid}.ios-beta-shot img{border-radius:22px}}
+@media(max-width:560px){.ios-beta-hero{padding:24px 18px 54px}.ios-beta-copy h1{font-size:3.25rem}.ios-beta-actions,.ios-beta-form>div{display:grid;grid-template-columns:1fr}.ios-beta-shot img{border-radius:22px}}

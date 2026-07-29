@@ -8,6 +8,7 @@ import {
   Sequence,
   staticFile,
   useCurrentFrame,
+  useVideoConfig,
 } from 'remotion';
 
 const C = {
@@ -27,7 +28,11 @@ export type BeyondFrenchVideoProps = {
   patois: string;
   category: string;
   audioFile?: string;
+  brandIcon?: string;
 };
+
+const mediaSource = (source: string) =>
+  /^(blob:|data:|https?:\/\/|\/)/i.test(source) ? source : staticFile(source);
 
 export const defaultBeyondFrenchVideoProps: BeyondFrenchVideoProps = {
   english: 'Keep going.',
@@ -37,6 +42,7 @@ export const defaultBeyondFrenchVideoProps: BeyondFrenchVideoProps = {
   patois: 'Keep on gwaan.',
   category: 'Encouragement',
   audioFile: '',
+  brandIcon: 'beyond-french/app-icon.png',
 };
 
 const enter = (frame: number, start: number, distance = 70) => ({
@@ -116,7 +122,7 @@ const Background: React.FC = () => {
   );
 };
 
-const Brand: React.FC = () => (
+const Brand: React.FC<{icon: string}> = ({icon}) => (
   <div
     style={{
       display: 'flex',
@@ -130,7 +136,7 @@ const Brand: React.FC = () => (
     }}
   >
     <Img
-      src={staticFile('beyond-french/app-icon.png')}
+      src={mediaSource(icon)}
       style={{width: 56, height: 56, borderRadius: 15}}
     />
     Beyond French
@@ -230,8 +236,11 @@ export const BeyondFrenchVideo: React.FC<BeyondFrenchVideoProps> = ({
   patois,
   category,
   audioFile,
+  brandIcon = defaultBeyondFrenchVideoProps.brandIcon,
 }) => {
   const frame = useCurrentFrame();
+  const {durationInFrames} = useVideoConfig();
+  const closingDuration = Math.max(102, durationInFrames - 198);
   return (
     <AbsoluteFill
       style={{
@@ -242,7 +251,7 @@ export const BeyondFrenchVideo: React.FC<BeyondFrenchVideoProps> = ({
       <Background />
       <AbsoluteFill style={{padding: '92px 84px 110px'}}>
         <div style={enter(frame, 0, 20)}>
-          <Brand />
+          <Brand icon={brandIcon} />
         </div>
 
         <Sequence from={0} durationInFrames={92} layout="none">
@@ -330,8 +339,8 @@ export const BeyondFrenchVideo: React.FC<BeyondFrenchVideoProps> = ({
           </Scene>
         </Sequence>
 
-        <Sequence from={198} durationInFrames={102} layout="none">
-          <Scene from={198} duration={102}>
+        <Sequence from={198} durationInFrames={closingDuration} layout="none">
+          <Scene from={198} duration={closingDuration}>
             <div
               style={{
                 height: '100%',
@@ -344,7 +353,7 @@ export const BeyondFrenchVideo: React.FC<BeyondFrenchVideoProps> = ({
               }}
             >
               <Img
-                src={staticFile('beyond-french/app-icon.png')}
+                src={mediaSource(brandIcon)}
                 style={{
                   ...enter(frame, 8, 45),
                   width: 260,
@@ -383,7 +392,7 @@ export const BeyondFrenchVideo: React.FC<BeyondFrenchVideoProps> = ({
           </Scene>
         </Sequence>
       </AbsoluteFill>
-      {audioFile ? <Audio src={staticFile(audioFile)} volume={0.96} /> : null}
+      {audioFile ? <Audio src={mediaSource(audioFile)} volume={0.96} /> : null}
     </AbsoluteFill>
   );
 };

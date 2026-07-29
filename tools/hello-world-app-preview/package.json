@@ -6,17 +6,20 @@
     "render": "remotion render src/index.ts HelloWorldPreview out/hello-world-app-preview.mp4",
     "still": "remotion still src/index.ts HelloWorldPreview out/preview.png --frame=105",
     "prepare:beyond-french": "node scripts/prepare-beyond-french.mjs",
+    "build:beyond-french-browser": "node scripts/build-browser-renderer.mjs",
     "render:beyond-french": "remotion render src/index.ts BeyondFrenchPreview out/beyond-french-app-preview.mp4 --props=public/beyond-french.render.json",
     "still:beyond-french": "remotion still src/index.ts BeyondFrenchPreview out/beyond-french-preview.png --frame=145 --props=public/beyond-french.render.json"
   },
   "dependencies": {
-    "@remotion/cli": "latest",
-    "@remotion/media": "latest",
+    "@remotion/cli": "4.0.501",
+    "@remotion/media": "4.0.501",
+    "@remotion/web-renderer": "4.0.501",
     "react": "latest",
     "react-dom": "latest",
-    "remotion": "latest"
+    "remotion": "4.0.501"
   },
   "devDependencies": {
+    "esbuild": "0.28.1",
     "typescript": "5.9.3"
   }
 }

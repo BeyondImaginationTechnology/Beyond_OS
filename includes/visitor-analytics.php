@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 /**
  * Privacy-conscious first-party visitor traffic helpers.
- * Raw IP addresses, full user-agent strings, URL queries, and referrer queries
- * are never stored.
+ * IP addresses are retained briefly for the private admin view. Full
+ * user-agent strings, URL queries, and referrer queries are never stored.
  */
 
 function beyond_analytics_private_root(): string
@@ -52,9 +52,34 @@ function beyond_analytics_limit(string $value, int $length): string
     return function_exists('mb_substr') ? mb_substr($value, 0, $length, 'UTF-8') : substr($value, 0, $length);
 }
 
+function beyond_analytics_client_ip(): ?string
+{
+    // These headers are set by the supported edge proxies. Generic
+    // X-Forwarded-For is intentionally ignored because clients can spoof it.
+    $candidates = [
+        $_SERVER['HTTP_CF_CONNECTING_IP'] ?? null,
+        $_SERVER['HTTP_X_REAL_IP'] ?? null,
+        $_SERVER['REMOTE_ADDR'] ?? null,
+    ];
+    foreach ($candidates as $candidate) {
+        $candidate = trim((string)$candidate);
+        if ($candidate === '' || filter_var($candidate, FILTER_VALIDATE_IP) === false) continue;
+        $packed = @inet_pton($candidate);
+        return $packed === false ? $candidate : (inet_ntop($packed) ?: $candidate);
+    }
+    return null;
+}
+
 function beyond_analytics_hash(string $value): string
 {
     return hash_hmac('sha256', $value, beyond_analytics_hash_key());
+}
+
+function beyond_analytics_current_visitor_hash(): ?string
+{
+    $visitorId = (string)($_COOKIE['beyond_visitor_id'] ?? '');
+    if (!preg_match('/^[a-f0-9]{32,64}$/', $visitorId)) return null;
+    return beyond_analytics_hash('visitor|' . $visitorId);
 }
 
 function beyond_analytics_cookie(string $name, int $ttl): string
@@ -174,7 +199,13 @@ function beyond_analytics_summary(PDO $pdo, int $days): array
     [$rangeStart, $rangeEnd] = beyond_analytics_vancouver_bounds($days);
     $views = beyond_analytics_count($pdo, 'COUNT(*)', $rangeStart, $rangeEnd);
     $sessions = beyond_analytics_count($pdo, 'COUNT(DISTINCT session_hash)', $rangeStart, $rangeEnd);
+    $activeStmt = $pdo->prepare(
+        'SELECT COUNT(DISTINCT session_hash) FROM visitor_traffic
+         WHERE COALESCE(last_seen_at, occurred_at)>=?'
+    );
+    $activeStmt->execute([gmdate('Y-m-d H:i:s', time() - 5 * 60)]);
     return [
+        'active_now' => (int)$activeStmt->fetchColumn(),
         'today_views' => beyond_analytics_count($pdo, 'COUNT(*)', $todayStart, $todayEnd),
         'today_visitors' => beyond_analytics_count($pdo, 'COUNT(DISTINCT visitor_hash)', $todayStart, $todayEnd),
         'range_views' => $views,

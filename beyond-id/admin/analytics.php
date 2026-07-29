@@ -13,11 +13,12 @@ if (!in_array($rangeDays, $allowedRanges, true)) $rangeDays = 30;
 $analyticsReady = true;
 $analyticsError = '';
 $summary = [
-    'today_views' => 0, 'today_visitors' => 0, 'range_views' => 0, 'range_visitors' => 0,
+    'active_now' => 0, 'today_views' => 0, 'today_visitors' => 0, 'range_views' => 0, 'range_visitors' => 0,
     'range_sessions' => 0, 'signed_in_views' => 0, 'pages_per_session' => 0.0,
     'start_utc' => '', 'end_utc' => '',
 ];
-$trend = $topPages = $topApps = $referrers = $devices = $browsers = $recent = [];
+$trend = $topPages = $topApps = $referrers = $devices = $browsers = $recent = $liveVisitors = [];
+$currentVisitorHash = beyond_analytics_current_visitor_hash();
 
 try {
     $summary = beyond_analytics_summary($pdo, $rangeDays);
@@ -27,8 +28,26 @@ try {
     $referrers = beyond_analytics_grouped($pdo, 'referrer_host', $summary['start_utc'], $summary['end_utc'], 8, "AND referrer_host IS NOT NULL AND referrer_host <> 'internal'");
     $devices = beyond_analytics_grouped($pdo, 'device_type', $summary['start_utc'], $summary['end_utc'], 5);
     $browsers = beyond_analytics_grouped($pdo, 'browser', $summary['start_utc'], $summary['end_utc'], 6);
-    $recentStmt = $pdo->query('SELECT path,app_slug,device_type,browser,referrer_host,occurred_at,user_id FROM visitor_traffic ORDER BY occurred_at DESC LIMIT 25');
-    $recent = $recentStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $recentStmt = $pdo->query(
+        'SELECT path,page_title,app_slug,visitor_hash,session_hash,device_type,browser,operating_system,
+                referrer_host,referrer_path,country_code,ip_address,viewport_width,client_language,
+                client_timezone,occurred_at,last_seen_at,user_id
+         FROM visitor_traffic
+         ORDER BY COALESCE(last_seen_at,occurred_at) DESC
+         LIMIT 75'
+    );
+    $allRecent = $recentStmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $recent = array_slice($allRecent, 0, 30);
+    $activeCutoff = time() - 5 * 60;
+    $seenSessions = [];
+    foreach ($allRecent as $row) {
+        $lastSeenValue = (string)($row['last_seen_at'] ?? $row['occurred_at'] ?? '');
+        $lastSeen = $lastSeenValue !== '' ? (strtotime($lastSeenValue . ' UTC') ?: 0) : 0;
+        $sessionHash = (string)($row['session_hash'] ?? '');
+        if ($lastSeen < $activeCutoff || $sessionHash === '' || isset($seenSessions[$sessionHash])) continue;
+        $seenSessions[$sessionHash] = true;
+        $liveVisitors[] = $row;
+    }
 } catch (Throwable $exception) {
     $analyticsReady = false;
     $analyticsError = $exception->getMessage();
@@ -47,10 +66,28 @@ $localTime = static function (?string $utc): string {
     if (!$utc) return '—';
     try {
         return (new DateTimeImmutable($utc, new DateTimeZone('UTC')))
-            ->setTimezone(new DateTimeZone('America/Vancouver'))->format('M j, g:i A');
+            ->setTimezone(new DateTimeZone('America/Vancouver'))->format('M j, g:i:s A');
     } catch (Throwable $exception) {
         return (string)$utc;
     }
+};
+$timeAgo = static function (?string $utc): string {
+    $timestamp = $utc ? strtotime($utc . ' UTC') : false;
+    if ($timestamp === false) return 'unknown';
+    $seconds = max(0, time() - $timestamp);
+    if ($seconds < 10) return 'just now';
+    if ($seconds < 60) return $seconds . 's ago';
+    if ($seconds < 3600) return intdiv($seconds, 60) . 'm ago';
+    return intdiv($seconds, 3600) . 'h ago';
+};
+$visitorLabel = static function (?string $hash): string {
+    $hash = strtoupper(substr((string)$hash, 0, 8));
+    return $hash === '' ? 'Unknown visitor' : 'Visitor ' . $hash;
+};
+$visibleIp = static function (array $row): string {
+    $occurred = strtotime((string)($row['occurred_at'] ?? '') . ' UTC') ?: 0;
+    if ($occurred < time() - 30 * 86400) return 'Expired';
+    return (string)($row['ip_address'] ?: 'IP unavailable');
 };
 
 require __DIR__ . '/../includes/admin-header.php';
@@ -61,7 +98,7 @@ require __DIR__ . '/../includes/admin-sidebar.php';
     <div>
       <p class="eyebrow">First-party traffic</p>
       <h1>Visitor analytics</h1>
-      <p class="muted">See which Beyond apps and pages people use, without storing raw IP addresses or full browser fingerprints.</p>
+      <p class="muted">See who is on the site now, recognize your own browser, and inspect recent traffic from this private admin view.</p>
     </div>
     <form class="analytics-range" method="get">
       <label for="analytics-range">Reporting window</label>
@@ -80,6 +117,7 @@ require __DIR__ . '/../includes/admin-sidebar.php';
     </article>
   <?php else: ?>
     <div class="metrics-grid analytics-metrics" aria-label="Visitor traffic summary">
+      <article class="tile analytics-live-metric"><div class="tile-head"><span class="stat-icon">●</span><span class="metric-trend">Last 5 min</span></div><div class="metric-value"><?= number_format((int)$summary['active_now']) ?></div><p>Active visitors</p></article>
       <article class="tile"><div class="tile-head"><span class="stat-icon">👤</span><span class="metric-trend">Today</span></div><div class="metric-value"><?= number_format((int)$summary['today_visitors']) ?></div><p>Unique visitors</p></article>
       <article class="tile"><div class="tile-head"><span class="stat-icon">↗</span><span class="metric-trend">Today</span></div><div class="metric-value"><?= number_format((int)$summary['today_views']) ?></div><p>Page views</p></article>
       <article class="tile"><div class="tile-head"><span class="stat-icon">◎</span><span class="metric-trend"><?= $rangeDays ?> days</span></div><div class="metric-value"><?= number_format((int)$summary['range_visitors']) ?></div><p>Unique visitors</p></article>
@@ -87,6 +125,33 @@ require __DIR__ . '/../includes/admin-sidebar.php';
       <article class="tile"><div class="tile-head"><span class="stat-icon">⌁</span><span class="metric-trend">Engagement</span></div><div class="metric-value"><?= number_format((float)$summary['pages_per_session'], 1) ?></div><p>Pages per session</p></article>
       <article class="tile"><div class="tile-head"><span class="stat-icon">ID</span><span class="metric-trend">Beyond ID</span></div><div class="metric-value"><?= number_format((int)$summary['signed_in_views']) ?></div><p>Signed-in page views</p></article>
     </div>
+
+    <article class="card analytics-live-card">
+      <div class="card-heading analytics-card-heading">
+        <div><h2>On the site now</h2><p>Presence updates about once per minute while a public page remains visible.</p></div>
+        <span class="badge ok">● Live · auto-refresh</span>
+      </div>
+      <?php if ($liveVisitors === []): ?>
+        <div class="analytics-zero analytics-live-empty"><strong>No active visitors right now</strong><span>Open a public page in another tab to verify your visit.</span></div>
+      <?php else: ?>
+        <div class="analytics-live-grid">
+          <?php foreach ($liveVisitors as $row):
+              $isYou = $currentVisitorHash !== null && hash_equals($currentVisitorHash, (string)$row['visitor_hash']);
+          ?>
+            <section class="analytics-live-visitor<?= $isYou ? ' is-you' : '' ?>">
+              <div class="live-visitor-head">
+                <div><strong><?= e($visitorLabel((string)$row['visitor_hash'])) ?></strong><small><?= e($timeAgo((string)($row['last_seen_at'] ?? $row['occurred_at']))) ?></small></div>
+                <?= $isYou ? '<span class="badge ok">You</span>' : ($row['user_id'] !== null ? '<span class="badge ok">Signed in</span>' : '<span class="badge">Guest</span>') ?>
+              </div>
+              <code class="analytics-ip"><?= e($visibleIp($row)) ?></code>
+              <a href="<?= e((string)$row['path']) ?>" target="_blank" rel="noopener"><?= e((string)$row['path']) ?> ↗</a>
+              <p><?= e(ucfirst((string)$row['device_type'])) ?> · <?= e((string)$row['operating_system']) ?> · <?= e((string)$row['browser']) ?><?php if ((int)$row['viewport_width'] > 0): ?> · <?= number_format((int)$row['viewport_width']) ?>px<?php endif; ?></p>
+              <p><?= e((string)($row['country_code'] ?: 'Unknown country')) ?> · <?= e((string)($row['client_language'] ?: 'Unknown language')) ?> · <?= e((string)($row['client_timezone'] ?: 'Unknown timezone')) ?></p>
+            </section>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
+    </article>
 
     <article class="card traffic-chart-card">
       <div class="card-heading analytics-card-heading">
@@ -143,20 +208,26 @@ require __DIR__ . '/../includes/admin-sidebar.php';
     </div>
 
     <article class="card analytics-recent-card">
-      <div class="card-heading"><div><h2>Recent visits</h2><p>Latest page views, shown in Vancouver time.</p></div><span class="badge ok">Live</span></div>
+      <div class="card-heading"><div><h2>Recent visits</h2><p>Latest page views and last activity, shown in Vancouver time.</p></div><span class="badge">30 visits</span></div>
       <div class="analytics-table-wrap">
         <table class="analytics-table">
-          <thead><tr><th>Time</th><th>Page</th><th>App</th><th>Device</th><th>Source</th><th>Identity</th></tr></thead>
+          <thead><tr><th>Last seen</th><th>Visitor</th><th>IP address</th><th>Page</th><th>Device</th><th>Source</th><th>Identity</th></tr></thead>
           <tbody>
-          <?php if ($recent === []): ?><tr><td colspan="6">No visits recorded yet.</td></tr><?php endif; ?>
-          <?php foreach ($recent as $row): ?>
+          <?php if ($recent === []): ?><tr><td colspan="7">No visits recorded yet.</td></tr><?php endif; ?>
+          <?php foreach ($recent as $row):
+              $isYou = $currentVisitorHash !== null && hash_equals($currentVisitorHash, (string)$row['visitor_hash']);
+              $source = ($row['referrer_host'] ?? '') === 'internal'
+                  ? 'Internal' . (!empty($row['referrer_path']) ? ' · ' . $row['referrer_path'] : '')
+                  : (($row['referrer_host'] ?? '') ?: 'Direct');
+          ?>
             <tr>
-              <td><?= e($localTime((string)$row['occurred_at'])) ?></td>
-              <td><code><?= e((string)$row['path']) ?></code></td>
-              <td><?= e($formatApp((string)$row['app_slug'])) ?></td>
-              <td><?= e(ucfirst((string)$row['device_type'])) ?> · <?= e((string)$row['browser']) ?></td>
-              <td><?= e(($row['referrer_host'] ?? '') === 'internal' ? 'Internal' : (($row['referrer_host'] ?? '') ?: 'Direct')) ?></td>
-              <td><?= $row['user_id'] !== null ? '<span class="badge ok">Signed in</span>' : '<span class="badge">Guest</span>' ?></td>
+              <td><strong><?= e($timeAgo((string)($row['last_seen_at'] ?? $row['occurred_at']))) ?></strong><small class="analytics-cell-detail"><?= e($localTime((string)($row['last_seen_at'] ?? $row['occurred_at']))) ?></small></td>
+              <td><strong><?= e($visitorLabel((string)$row['visitor_hash'])) ?></strong><small class="analytics-cell-detail"><?= e($formatApp((string)$row['app_slug'])) ?></small></td>
+              <td><code class="analytics-ip"><?= e($visibleIp($row)) ?></code><small class="analytics-cell-detail"><?= e((string)($row['country_code'] ?: '—')) ?></small></td>
+              <td><a href="<?= e((string)$row['path']) ?>" target="_blank" rel="noopener"><code><?= e((string)$row['path']) ?></code></a><small class="analytics-cell-detail"><?= e((string)($row['page_title'] ?: 'Untitled page')) ?></small></td>
+              <td><?= e(ucfirst((string)$row['device_type'])) ?> · <?= e((string)$row['browser']) ?><small class="analytics-cell-detail"><?= e((string)$row['operating_system']) ?><?php if ((int)$row['viewport_width'] > 0): ?> · <?= number_format((int)$row['viewport_width']) ?>px<?php endif; ?></small></td>
+              <td><?= e($source) ?><small class="analytics-cell-detail"><?= e((string)($row['client_timezone'] ?: 'Unknown timezone')) ?></small></td>
+              <td><?= $isYou ? '<span class="badge ok">You</span>' : ($row['user_id'] !== null ? '<span class="badge ok">Signed in</span>' : '<span class="badge">Guest</span>') ?></td>
             </tr>
           <?php endforeach; ?>
           </tbody>
@@ -165,9 +236,23 @@ require __DIR__ . '/../includes/admin-sidebar.php';
     </article>
 
     <article class="analytics-privacy-note">
-      <strong>Privacy by design</strong>
-      <span>Visitor and session IDs are one-way hashed with a key generated inside the protected <code>var/analytics/</code> directory. Raw IP addresses, complete user-agent strings, and URL query parameters are not stored. Do Not Track is respected.</span>
+      <strong>Private operational data</strong>
+      <span>IP addresses are visible only in this administrator view and are automatically cleared after 30 days. Visitor and session IDs remain one-way hashed. Complete user-agent strings and URL query parameters are not stored, and Do Not Track is respected.</span>
     </article>
   <?php endif; ?>
 </section>
+<script>
+try {
+  const savedScroll = Number(sessionStorage.getItem('analytics-scroll') || 0);
+  if (savedScroll > 0) {
+    window.requestAnimationFrame(() => window.scrollTo({top: savedScroll, behavior: 'auto'}));
+    sessionStorage.removeItem('analytics-scroll');
+  }
+} catch (_) {}
+window.setTimeout(() => {
+  if (document.visibilityState !== 'visible') return;
+  try { sessionStorage.setItem('analytics-scroll', String(window.scrollY)); } catch (_) {}
+  window.location.reload();
+}, 60_000);
+</script>
 <?php require __DIR__ . '/../includes/admin-footer.php'; ?>

@@ -57,8 +57,9 @@
         <button id="saveDailyPhrase" class="btn primary wide" type="button">Save daily phrase to Web + iOS</button>
         <button id="downloadPng" class="btn primary" type="button">Download static PNG</button>
         <button id="saveLocal" class="btn secondary" type="button">Save browser draft</button>
-        <button id="saveAndExportVideo" class="btn voice-primary wide" type="button">Save + export narrated MP4</button>
-        <button id="exportVideo" class="btn secondary wide" type="button">Export narrated MP4 only</button>
+        <button id="saveAndExportVideo" class="btn voice-primary wide" type="button">Save + export animated Remotion MP4</button>
+        <button id="exportRemotionVideo" class="btn secondary wide" type="button">Export animated Remotion MP4 only</button>
+        <button id="exportVideo" class="btn secondary wide" type="button">Export static canvas MP4 fallback</button>
         <button id="exportAllVideo" class="btn secondary wide" type="button">Export all languages as one narrated MP4</button>
         <button id="exportMp3" class="btn secondary wide" type="button">Export MP3 narration</button>
       </div>
@@ -229,9 +230,20 @@
     try{
       const saved=await saveDailyPhrase();
       if(!saved)return;
-      setStatus('Daily phrase saved. Preparing narrated video…');
-      await video();
+      setStatus('Daily phrase saved. Rendering the animated Remotion video…');
+      await remotionVideo();
     }finally{button.disabled=false}
+  }
+  function remotionPayload(){return{publish_date:v('publishDate'),english:v('phrase'),french:v('french'),kreyol:v('kreyol'),spanish:v('spanish'),patois:v('patois'),category:'Daily Phrase',include_narration:$('includeNarration').checked}}
+  async function remotionVideo(){
+    if(location.protocol==='file:'){setStatus('Remotion rendering requires the served generator URL, not the raw file:// template. Open /server/admin/daily-studio/french-generator.php.',true);return}
+    const button=$('exportRemotionVideo');button.disabled=true;setStatus('Generating narration and rendering the animated Remotion video… This may take 15–30 seconds.');
+    try{
+      const response=await fetch('/server/admin/daily-studio/api/render-french-remotion.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(remotionPayload())});
+      if(!response.ok){let message='The Remotion export failed.';try{const data=await response.json();message=data.error||message}catch{}throw new Error(message)}
+      if(response.headers.get('X-Video-Renderer')!=='Remotion')throw new Error('The server did not return a Remotion video.');
+      const blob=await response.blob();download(blob,`beyond-french-${v('publishDate')||'daily'}-remotion.mp4`);setStatus('Animated Remotion MP4 exported.');
+    }catch(error){setStatus(error.message||'The Remotion export failed. The static template remains unchanged.',true)}finally{button.disabled=false}
   }
   function restore(){try{const data=JSON.parse(localStorage.getItem('beyondFrenchGenerator')||'null');if(!data)return;ids.forEach(id=>{if(!(id in data))return;if($(id).type==='checkbox')$(id).checked=!!data[id];else $(id).value=data[id]})}catch{}}
   function updateAudioUi(){const output=exportSettings();if(v('narratorLocale')!==output.locale)$('narratorLocale').value=output.locale;$('previewAudio').textContent=`Preview ${output.label} audio`;$('exportVideo').textContent=$('includeNarration').checked?`Export ${output.label} narrated MP4`:`Export ${output.label} visual MP4`;$('exportMp3').textContent=`Export ${output.label} MP3 Narration`;}
@@ -264,7 +276,7 @@
       setStatus(savedUrl?'MP3 saved to the French audio library and downloaded.':'MP3 generated and downloaded.');
     }catch(error){setStatus(error.message||'MP3 export failed.',true)}finally{button.disabled=false}
   }
-  restore();updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{draw();updateAudioUi()});el.addEventListener('change',()=>{draw();updateAudioUi()})});$('saveDailyPhrase').onclick=saveDailyPhrase;$('saveAndExportVideo').onclick=saveAndExportVideo;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;var todayPhraseButton=$('generateTodayPhrase');if(todayPhraseButton)todayPhraseButton.addEventListener('click',generateTodayPhrase);draw();
+  restore();updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{draw();updateAudioUi()});el.addEventListener('change',()=>{draw();updateAudioUi()})});$('saveDailyPhrase').onclick=saveDailyPhrase;$('saveAndExportVideo').onclick=saveAndExportVideo;$('exportRemotionVideo').onclick=remotionVideo;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;var todayPhraseButton=$('generateTodayPhrase');if(todayPhraseButton)todayPhraseButton.addEventListener('click',generateTodayPhrase);draw();
 })();
 </script>
 </body>

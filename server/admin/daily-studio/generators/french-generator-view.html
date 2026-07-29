@@ -8,7 +8,7 @@
   <style>
     :root{color-scheme:light;--navy:#15325c;--panel:#fff;--blue:#1558ce;--gold:#d89a00;--line:rgba(28,65,116,.16);--muted:#65758d}
     *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% 0,#f8fbff 0,#edf4fc 50%,#e7eef8 100%);color:#17243a;font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}
-    .shell{min-height:100vh;display:grid;grid-template-columns:minmax(330px,450px) minmax(0,1fr)}.controls{padding:26px;overflow:auto;background:rgba(255,255,255,.97);border-right:1px solid var(--line);box-shadow:8px 0 30px rgba(28,65,116,.06)}.preview{display:grid;place-items:center;padding:28px;min-width:0}.back{display:inline-block;margin-bottom:15px;color:#315d98;text-decoration:none}h1{margin:0;font-size:28px}.lede,.hint{color:var(--muted)}.lede{margin:5px 0 23px}.group{padding:18px 0;border-top:1px solid var(--line)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field{margin-bottom:13px}label{display:block;font-weight:750;margin-bottom:6px}input[type=text],input[type=date],input[type=file],textarea,select{width:100%;padding:10px 11px;border-radius:10px;border:1px solid var(--line);background:#fff;color:#17243a;outline:none}textarea{min-height:85px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:#3880ef;box-shadow:0 0 0 3px rgba(56,128,239,.15)}.check{display:flex;align-items:center;gap:8px;margin:0}.check input{width:17px;height:17px;accent-color:#e0a20b}.audio-row,.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{border:0;border-radius:11px;padding:12px 13px;font-weight:800;cursor:pointer;background:#edf2f9;color:#17345d}.btn.primary{background:linear-gradient(135deg,#ffd65a,#ffae2e);color:#142744}.btn.secondary{color:#173d70;background:#e7f0fc;border:1px solid var(--line)}.btn.wide{grid-column:1/-1}.btn:disabled{opacity:.55;cursor:wait}.status{min-height:23px;margin-top:10px;color:#327247}.status.error{color:#b92828}.canvas-wrap{width:min(72vh,680px);max-width:100%;filter:drop-shadow(0 22px 36px rgba(28,65,116,.2))}canvas{display:block;width:100%;height:auto;border-radius:18px;background:#041733}
+    .shell{min-height:100vh;display:grid;grid-template-columns:minmax(330px,450px) minmax(0,1fr)}.controls{padding:26px;overflow:auto;background:rgba(255,255,255,.97);border-right:1px solid var(--line);box-shadow:8px 0 30px rgba(28,65,116,.06)}.preview{display:grid;place-items:center;padding:28px;min-width:0}.back{display:inline-block;margin-bottom:15px;color:#315d98;text-decoration:none}h1{margin:0;font-size:28px}.lede,.hint{color:var(--muted)}.lede{margin:5px 0 23px}.group{padding:18px 0;border-top:1px solid var(--line)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field{margin-bottom:13px}label{display:block;font-weight:750;margin-bottom:6px}input[type=text],input[type=date],input[type=file],textarea,select{width:100%;padding:10px 11px;border-radius:10px;border:1px solid var(--line);background:#fff;color:#17243a;outline:none}textarea{min-height:85px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:#3880ef;box-shadow:0 0 0 3px rgba(56,128,239,.15)}.check{display:flex;align-items:center;gap:8px;margin:0}.check input{width:17px;height:17px;accent-color:#e0a20b}.audio-row,.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{border:0;border-radius:11px;padding:12px 13px;font-weight:800;cursor:pointer;background:#edf2f9;color:#17345d}.btn.primary{background:linear-gradient(135deg,#ffd65a,#ffae2e);color:#142744}.btn.secondary{color:#173d70;background:#e7f0fc;border:1px solid var(--line)}.btn.voice-primary{background:linear-gradient(135deg,#1558ce,#7047eb);color:#fff;box-shadow:0 10px 24px rgba(21,88,206,.22)}.btn.wide{grid-column:1/-1}.btn:disabled{opacity:.55;cursor:wait}.voice-integration{margin:0 0 14px;padding:13px 14px;border:1px solid #cbdcf5;border-radius:13px;background:#f3f7ff}.voice-integration strong,.voice-integration span{display:block}.voice-integration strong{color:#173d70}.voice-integration span{margin-top:3px;color:var(--muted);font-size:12px}.voice-integration a{display:inline-block;margin-top:8px;color:#1558ce;font-size:12px;font-weight:800}.voice-state{float:right;padding:4px 7px;border-radius:999px;font-size:10px;text-transform:uppercase}.voice-state.ready{background:#dcf7e5;color:#24723c}.voice-state.needs-config{background:#fff0d5;color:#865700}.static-note{margin:0 0 12px;padding:10px 12px;border-radius:11px;background:#eef8f1;color:#2a6b3d;font-size:12px;font-weight:700}.status{min-height:23px;margin-top:10px;color:#327247}.status.error{color:#b92828}.canvas-wrap{width:min(72vh,680px);max-width:100%;filter:drop-shadow(0 22px 36px rgba(28,65,116,.2))}canvas{display:block;width:100%;height:auto;border-radius:18px;background:#041733}
     @media(max-width:940px){.shell{display:block}.controls{border-right:0;border-bottom:1px solid var(--line)}.preview{padding:18px}.canvas-wrap{width:min(100%,580px)}}@media(max-width:520px){.controls{padding:20px}.grid,.actions,.audio-row{grid-template-columns:1fr}.btn.wide{grid-column:auto}}
   </style>
 </head>
@@ -38,6 +38,12 @@
 
     <section class="group">
       <label>Narration</label>
+      <div class="voice-integration">
+        <span class="voice-state __VOICE_STATUS_CLASS__">__VOICE_STATUS__</span>
+        <strong>__VOICE_PROVIDER__</strong>
+        <span>API usage begins only when you preview or export narration.</span>
+        <a href="/server/admin/daily-studio/voice-settings.php">Configure premium voices</a>
+      </div>
       <div class="grid"><label class="check"><input id="includeNarration" type="checkbox" checked> Include audio</label><label class="check"><input id="showBadge" type="checkbox" checked> Show playing badge</label></div>
       <div class="field" style="margin-top:13px"><label for="exportLanguage">Export version</label><select id="exportLanguage"><option value="en">English text + English audio</option><option value="fr">French text + French audio</option><option value="es">Spanish text + Spanish audio</option><option value="jm">Patois text + Patois audio</option><option value="ht">Kreyòl text + Kreyòl audio</option></select></div>
       <div class="field" style="margin-top:13px"><label for="narratorLocale">Narrator voice</label><select id="narratorLocale"><option value="fr-FR">French</option><option value="es-ES">Spanish</option><option value="en-US">English (overview)</option><option value="en-JM">Jamaican Patois</option><option value="ht-HT">Haitian Kreyòl</option></select></div>
@@ -46,7 +52,16 @@
     </section>
 
     <section class="group">
-      <div class="actions"><button id="saveDailyPhrase" class="btn primary wide" type="button">Save daily phrase to Web + iOS</button><button id="downloadPng" class="btn primary" type="button">Download PNG</button><button id="saveLocal" class="btn secondary" type="button">Save browser draft</button><button id="exportVideo" class="btn primary wide" type="button">Export narrated MP4</button><button id="exportAllVideo" class="btn secondary wide" type="button">Export all languages as one narrated MP4</button><button id="exportMp3" class="btn secondary wide" type="button">Export MP3 Narration</button></div>
+      <div class="static-note">Static template protected: Web, iOS, PNG, and browser drafts do not call the narration API.</div>
+      <div class="actions">
+        <button id="saveDailyPhrase" class="btn primary wide" type="button">Save daily phrase to Web + iOS</button>
+        <button id="downloadPng" class="btn primary" type="button">Download static PNG</button>
+        <button id="saveLocal" class="btn secondary" type="button">Save browser draft</button>
+        <button id="saveAndExportVideo" class="btn voice-primary wide" type="button">Save + export narrated MP4</button>
+        <button id="exportVideo" class="btn secondary wide" type="button">Export narrated MP4 only</button>
+        <button id="exportAllVideo" class="btn secondary wide" type="button">Export all languages as one narrated MP4</button>
+        <button id="exportMp3" class="btn secondary wide" type="button">Export MP3 narration</button>
+      </div>
       <div id="status" class="status" role="status" aria-live="polite"></div>
       <div class="hint">MP4 is used when supported; WebM is the fallback. When no API voice or uploaded file is available, the visual exports without audio instead of failing.</div>
     </section>
@@ -206,8 +221,17 @@
     try{
       const response=await fetch('/server/admin/daily-studio/api/save-french-phrase.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(payload)});
       const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'The daily phrase could not be saved.');
-      save();setStatus(`${data.message} Web and iOS will use lesson #${data.id}.`);
-    }catch(error){setStatus(error.message||'The daily phrase could not be saved.',true)}finally{button.disabled=false}
+      save();setStatus(`${data.message} Web and iOS will use lesson #${data.id}.`);return true;
+    }catch(error){setStatus(error.message||'The daily phrase could not be saved.',true);return false}finally{button.disabled=false}
+  }
+  async function saveAndExportVideo(){
+    const button=$('saveAndExportVideo');button.disabled=true;
+    try{
+      const saved=await saveDailyPhrase();
+      if(!saved)return;
+      setStatus('Daily phrase saved. Preparing narrated video…');
+      await video();
+    }finally{button.disabled=false}
   }
   function restore(){try{const data=JSON.parse(localStorage.getItem('beyondFrenchGenerator')||'null');if(!data)return;ids.forEach(id=>{if(!(id in data))return;if($(id).type==='checkbox')$(id).checked=!!data[id];else $(id).value=data[id]})}catch{}}
   function updateAudioUi(){const output=exportSettings();if(v('narratorLocale')!==output.locale)$('narratorLocale').value=output.locale;$('previewAudio').textContent=`Preview ${output.label} audio`;$('exportVideo').textContent=$('includeNarration').checked?`Export ${output.label} narrated MP4`:`Export ${output.label} visual MP4`;$('exportMp3').textContent=`Export ${output.label} MP3 Narration`;}
@@ -240,7 +264,7 @@
       setStatus(savedUrl?'MP3 saved to the French audio library and downloaded.':'MP3 generated and downloaded.');
     }catch(error){setStatus(error.message||'MP3 export failed.',true)}finally{button.disabled=false}
   }
-  restore();updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{draw();updateAudioUi()});el.addEventListener('change',()=>{draw();updateAudioUi()})});$('saveDailyPhrase').onclick=saveDailyPhrase;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;var todayPhraseButton=$('generateTodayPhrase');if(todayPhraseButton)todayPhraseButton.addEventListener('click',generateTodayPhrase);draw();
+  restore();updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{draw();updateAudioUi()});el.addEventListener('change',()=>{draw();updateAudioUi()})});$('saveDailyPhrase').onclick=saveDailyPhrase;$('saveAndExportVideo').onclick=saveAndExportVideo;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;var todayPhraseButton=$('generateTodayPhrase');if(todayPhraseButton)todayPhraseButton.addEventListener('click',generateTodayPhrase);draw();
 })();
 </script>
 </body>

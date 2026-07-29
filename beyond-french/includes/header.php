@@ -26,10 +26,11 @@ $academyCssVersion = (string)(@filemtime(__DIR__ . '/../assets/css/academy.css')
     <button class="menu-toggle" type="button" aria-label="Open menu">☰</button>
     <nav class="nav">
         <a href="<?= h($frenchBase) ?>">Today</a>
-        <a href="<?= h($frenchBase) ?>dictionary.php">Dictionary + Bible</a>
+        <a href="<?= h($frenchBase) ?>dictionary.php">Dictionary</a>
         <a href="<?= h($frenchBase) ?>academy.php">Academy</a>
         <a href="<?= h($frenchBase) ?>archive.php">Daily Lessons</a>
         <a href="<?= h($frenchBase) ?>challenge.php">Challenge</a>
+        <a href="<?= h($frenchBase) ?>ios-beta.php">iOS Beta</a>
         <a href="<?= h($frenchBase) ?>academy.php">Continue</a>
         <a class="nav-cta" href="<?= h($frenchBase) ?>challenge.php">Practice</a>
     </nav>

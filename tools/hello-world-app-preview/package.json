@@ -1,0 +1,20 @@
+{
+  "name": "hello-world-app-preview",
+  "private": true,
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts HelloWorldPreview out/hello-world-app-preview.mp4",
+    "still": "remotion still src/index.ts HelloWorldPreview out/preview.png --frame=105",
+    "render:beyond-french": "remotion render src/index.ts BeyondFrenchPreview out/beyond-french-app-preview.mp4",
+    "still:beyond-french": "remotion still src/index.ts BeyondFrenchPreview out/beyond-french-preview.png --frame=145"
+  },
+  "dependencies": {
+    "@remotion/cli": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "remotion": "latest"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

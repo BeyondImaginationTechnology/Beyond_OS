@@ -6,6 +6,14 @@ if (!$lesson) {
     http_response_code(404);
     exit('Lesson not found.');
 }
+if (!french_guest_daily_lesson_allowed($lesson)) {
+    http_response_code(403);
+    $pageTitle='Beyond ID required | Beyond French';
+    require __DIR__.'/includes/header.php';
+    echo '<section class="section center"><span class="big-icon">🔒</span><h1>Today’s lesson is free.</h1><p>Create a free Beyond ID to open the full lesson archive and save your progress.</p><a class="button primary" href="../beyond-id/auth/register.php?app=beyond-french">Create Beyond ID</a></section>';
+    require __DIR__.'/includes/footer.php';
+    exit;
+}
 $userId=(int)($_SESSION['user_id']??0);french_mark_started($userId,$id);$position=lesson_position($id);
 $pageTitle = $lesson['english'] . ' | Beyond French';
 require __DIR__ . '/includes/header.php';

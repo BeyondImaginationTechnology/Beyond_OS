@@ -223,6 +223,14 @@ function french_learner_key(): string {
 function french_academy_has_full_access(): bool {
     return is_admin()||!empty($_SESSION['user_id'])||!empty($_SESSION['french_academy_entitled']);
 }
+function french_is_guest(): bool {
+    return empty($_SESSION['user_id']) && !is_admin();
+}
+function french_guest_daily_lesson_allowed(?array $lesson): bool {
+    if (!french_is_guest()) return true;
+    $today = todays_lesson();
+    return $lesson !== null && $today !== null && (int)($lesson['id'] ?? 0) === (int)($today['id'] ?? 0);
+}
 function french_academy_module_accessible(string $module): bool {
     $course=french_academy_modules()[french_valid_module($module)]??[];
     return !empty($course['free'])||french_academy_has_full_access();
@@ -240,6 +248,7 @@ function french_academy_exam_passed(string $age,string $module): bool {
 function french_academy_lesson_unlocked(string $age,string $module,int $lesson): bool {
     $age=french_valid_age_group($age);$module=french_valid_module($module);
     if(is_admin())return true;
+    if(french_is_guest())return $module==='greetings'&&$lesson===1;
     if(!french_academy_module_accessible($module)||$lesson<1||$lesson>10)return false;
     if($lesson>1)return french_academy_lesson_passed($age,$module,$lesson-1);
     $keys=array_keys(french_academy_modules());$index=array_search($module,$keys,true);

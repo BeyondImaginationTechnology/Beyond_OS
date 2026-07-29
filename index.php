@@ -314,13 +314,17 @@ $cartoonSchedule = beyond_cartoons_schedule_state();
 $cartoonCurrent = $cartoonSchedule['current'];
 $cartoonNext = $cartoonSchedule['next'];
 $featuredTitles = json_decode((string)@file_get_contents(__DIR__ . '/beyond-tv/data/catalog.json'), true) ?: [];
+usort($featuredTitles, static function (array $left, array $right): int {
+    return strnatcasecmp((string)($left['title'] ?? ''), (string)($right['title'] ?? ''));
+});
+$featuredTitleCount = count($featuredTitles);
 $posterProviderConfig = beyond_tv_poster_config();
 $premiumPosterProvider = beyond_tv_poster_provider_configured();
 $tmdbPosterProvider = $posterProviderConfig['tmdb_read_token'] !== '' || $posterProviderConfig['tmdb_api_key'] !== '';
 ?>
 <section class="featured-library wrap" aria-labelledby="featuredLibraryTitle">
   <header class="featured-library__heading">
-    <div><span>NOW STREAMING ON BEYOND TV</span><h2 id="featuredLibraryTitle">60 titles. Pick your next watch.</h2></div>
+    <div><span>NOW STREAMING ON BEYOND TV</span><h2 id="featuredLibraryTitle"><?=number_format($featuredTitleCount)?> titles. Pick your next watch.</h2></div>
     <div class="featured-library__actions">
       <a href="/beyond-tv/browse.php">Browse everything →</a>
       <div class="featured-library__controls" aria-label="Featured title carousel controls">
@@ -329,7 +333,7 @@ $tmdbPosterProvider = $posterProviderConfig['tmdb_read_token'] !== '' || $poster
       </div>
     </div>
   </header>
-  <div class="featured-title-carousel" data-featured-title-carousel tabindex="0" role="region" aria-roledescription="carousel" aria-label="All 60 currently available Beyond TV titles">
+  <div class="featured-title-carousel" data-featured-title-carousel tabindex="0" role="region" aria-roledescription="carousel" aria-label="All <?=number_format($featuredTitleCount)?> currently available Beyond TV titles">
     <?php foreach ($featuredTitles as $featuredIndex => $featuredTitle):
       $featuredSlug = (string)($featuredTitle['slug'] ?? '');
       $featuredThumbnail = $premiumPosterProvider
@@ -354,7 +358,7 @@ $tmdbPosterProvider = $posterProviderConfig['tmdb_read_token'] !== '' || $poster
     </a>
     <?php endforeach; ?>
   </div>
-  <div class="featured-title-progress"><span data-featured-title-position>1</span> / <?=count($featuredTitles)?></div>
+  <div class="featured-title-progress"><span data-featured-title-position>1</span> / <?=number_format($featuredTitleCount)?></div>
   <?php if ($tmdbPosterProvider): ?><p class="featured-library__credit"><a href="https://www.themoviedb.org/" target="_blank" rel="noopener"><img src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_long_2-9665a76b1ae401a510ec1e0ca40ddcb3b0cfe45f1d51b77a308fea0845885648.svg" alt="TMDB"></a><span>This product uses the TMDB API but is not endorsed or certified by TMDB.</span></p><?php elseif ($premiumPosterProvider): ?><p class="featured-library__credit">Poster data provided by <a href="https://www.omdbapi.com/" target="_blank" rel="noopener">OMDb</a>.</p><?php endif; ?>
 </section>
 <section class="home-live-stage" data-channel-theme="after-dark" aria-labelledby="homeLiveHeading">
@@ -384,7 +388,7 @@ $tmdbPosterProvider = $posterProviderConfig['tmdb_read_token'] !== '' || $poster
     <div class="home-live-switch" role="group" aria-label="Choose a Beyond TV channel">
       <button type="button" class="active" data-home-channel="after-dark" data-channel-number="1" data-channel-name="Beyond After Dark" data-endpoint="/beyond-tv/api/channel-stream.php?slug=beyond-after-dark" data-embed="/beyond-tv/embed-player.php?slug=beyond-after-dark" data-now="Loading the live program…" data-next="Live schedule connecting" data-icon="🌙" data-open="/beyond-tv/channel.php?slug=beyond-after-dark">🌙 <span>After Dark</span></button>
       <button type="button" data-home-channel="cartoons" data-channel-number="2" data-channel-name="Beyond Kartoons" data-endpoint="/beyond-tv/api/beyond-cartoons-live.php" data-open="/beyond-tv/channel.php?slug=beyond-cartoons">📺 <span>Kartoons</span></button>
-      <button type="button" data-home-channel="anime" data-channel-number="3" data-channel-name="Beyond Anime" data-endpoint="/beyond-tv/api/yugioh-live.php" data-now="Beyond Anime demo" data-next="Next anime episode" data-icon="⚡" data-open="/beyond-tv/channel.php?slug=yugioh-tv">⚡ <span>Anime</span></button>
+      <button type="button" data-home-channel="anime" data-channel-number="3" data-channel-name="Beyond Anime" data-endpoint="/beyond-tv/api/anime-live.php" data-open="/beyond-tv/channel.php?slug=yugioh-tv">⚡ <span>Anime</span></button>
       <button type="button" data-home-channel="cinema" data-channel-number="4" data-channel-name="Beyond Movies" data-endpoint="/beyond-tv/api/movies-live.php" data-embed="/beyond-tv/movie-player.php" data-sync-ms="300000" data-now="Loading the live feature…" data-next="Next movie loading" data-icon="🎬" data-open="/beyond-tv/channel.php?slug=classic-cinema">🎬 <span>Movies</span></button>
       <button type="button" data-home-channel="classic" data-channel-number="5" data-channel-name="Classic Cartoon Theater" data-endpoint="/beyond-tv/api/classic-live.php" data-open="/beyond-tv/channel.php?slug=classic-cartoon-theater">🎞️ <span>Classic</span></button>
       <button type="button" data-home-channel="preschool" data-channel-number="6" data-channel-name="Preschool English" data-endpoint="/beyond-tv/api/bluey-live.php" data-embed="https://www.youtube-nocookie.com/embed/61fSXCbzF1M?autoplay=1&amp;mute=1&amp;playsinline=1&amp;rel=0&amp;enablejsapi=1" data-now="English preschool demo" data-next="Bluey, Blue's Clues and more" data-icon="🐾" data-open="/beyond-tv/channel.php?slug=bubble-guppies">🐾 <span>Preschool EN</span></button>

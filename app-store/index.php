@@ -25,7 +25,7 @@ $wallet = beyond_nav_bootstrap('Beyond App Store');
   <section class="bos-section" id="learn">
     <span class="bos-kicker">Learn</span><h2>Education & discovery</h2><p>Languages, numbers, history and the universe.</p>
     <div class="bos-grid">
-      <?=bos_app_card('Beyond French','French phrase of the day and language practice.','beyond-french/','BF','Live demo','assets/icons/app-store/beyond-french.jpg')?>
+      <?=bos_app_card('Beyond French 2.0','Daily French, four-language practice, and a new iOS beta.','beyond-french/ios-beta.php','BF','Join iOS beta','assets/icons/app-store/beyond-french.jpg')?>
       <?=bos_app_card('Beyond Math Academy','5 modules · 10 lessons each · interactive lessons.','beyond-math/academy.php','BM','Open Academy','beyond-math/assets/img/beyond-math-logo.webp')?>
       <?=bos_app_card('Beyond Ancient','Explore ancient worlds and civilizations.','beyond-tv/channel.php?slug=beyond-ancient','BA','Watch & learn','assets/icons/app-store/beyond-ancient.jpg')?>
       <?=bos_app_card('Beyond Space','Launch into astronomy and space discovery.','beyond-space/','BS','Open app','assets/icons/app-store/beyond-space.jpg')?>

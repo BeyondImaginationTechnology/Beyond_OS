@@ -2,6 +2,10 @@
 $pageTitle = 'Lesson Archive | Beyond French';
 require __DIR__ . '/includes/header.php';
 $lessons = all_lessons();
+if (french_is_guest()) {
+    $todayLesson = todays_lesson();
+    $lessons = $todayLesson ? [$todayLesson] : [];
+}
 $module = strtolower(trim((string)($_GET['module'] ?? '')));
 if ($module !== '' && isset(french_modules()[$module])) $lessons=array_values(array_filter($lessons,fn(array $lesson): bool => lesson_module($lesson)===$module));
 $query = trim($_GET['q'] ?? '');

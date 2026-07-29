@@ -3,6 +3,10 @@ require __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/../includes/ecosystem.php';
 $id = (int)($_GET['id'] ?? 0);
 $lesson = $id ? lesson_by_id($id) : todays_lesson();
+if ($lesson && !french_guest_daily_lesson_allowed($lesson)) {
+    http_response_code(403);
+    exit('Create a Beyond ID to practice archived lessons.');
+}
 if (!$lesson) {
     exit('No challenge found.');
 }

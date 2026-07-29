@@ -16,8 +16,8 @@
 <main class="shell">
   <aside class="controls">
     <a class="back" href="/server/admin/daily-studio/">&larr; Admin dashboard</a>
-    <h1>Français du Jour Generator</h1>
-    <p class="lede">Build the daily four-language lesson and export it as an image or narrated short.</p>
+    <h1>Français du Jour Generator <small style="font-size:12px;color:#1558ce;vertical-align:middle">2.0.0</small></h1>
+    <p class="lede">Build a logo-branded daily four-language lesson and export it as an image or narrated short.</p>
     <button id="generateTodayPhrase" class="btn primary wide" type="button" style="width:100%;margin:0 0 18px">✨ Generate Today’s Phrase</button>
 
     <section class="group">
@@ -46,7 +46,7 @@
     </section>
 
     <section class="group">
-      <div class="actions"><button id="downloadPng" class="btn primary" type="button">Download PNG</button><button id="saveLocal" class="btn secondary" type="button">Save settings</button><button id="exportVideo" class="btn primary wide" type="button">Export narrated MP4</button><button id="exportAllVideo" class="btn secondary wide" type="button">Export all languages as one narrated MP4</button><button id="exportMp3" class="btn secondary wide" type="button">Export MP3 Narration</button></div>
+      <div class="actions"><button id="saveDailyPhrase" class="btn primary wide" type="button">Save daily phrase to Web + iOS</button><button id="downloadPng" class="btn primary" type="button">Download PNG</button><button id="saveLocal" class="btn secondary" type="button">Save browser draft</button><button id="exportVideo" class="btn primary wide" type="button">Export narrated MP4</button><button id="exportAllVideo" class="btn secondary wide" type="button">Export all languages as one narrated MP4</button><button id="exportMp3" class="btn secondary wide" type="button">Export MP3 Narration</button></div>
       <div id="status" class="status" role="status" aria-live="polite"></div>
       <div class="hint">MP4 is used when supported; WebM is the fallback. When no API voice or uploaded file is available, the visual exports without audio instead of failing.</div>
     </section>
@@ -60,7 +60,7 @@
   const $=id=>document.getElementById(id),canvas=$('art'),ctx=canvas.getContext('2d',{alpha:false}),csrf=document.querySelector('meta[name="csrf-token"]').content;
   const ids=['phrase','meaning','weekday','publishDate','french','frenchPron','patois','patoisPron','kreyol','kreyolPron','spanish','spanishPron','culture','exportLanguage','narratorLocale','includeNarration','showBadge'];
   ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-  let activeAudio=null;const v=id=>$(id).value.trim();const setStatus=(m,e=false)=>{$('status').textContent=m;$('status').classList.toggle('error',e)};
+  let activeAudio=null,brandReady=false;const brandLogo=new Image();brandLogo.decoding='async';brandLogo.src='/beyond-french/assets/images/beyond-french-logo.webp';brandLogo.onload=()=>{brandReady=true;draw()};brandLogo.onerror=()=>setStatus('Beyond French logo could not be loaded. Exports will use a text fallback.',true);const v=id=>$(id).value.trim();const setStatus=(m,e=false)=>{$('status').textContent=m;$('status').classList.toggle('error',e)};
   const exportSettings=()=>({
     en:{locale:'en-US',label:'English',banner:'Today’s English Phrase',phrase:v('phrase'),pronunciation:'',meaningLabel:'What it means'},
     fr:{locale:'fr-FR',label:'French',banner:'Phrase Française du Jour',phrase:v('french'),pronunciation:v('frenchPron'),meaningLabel:'Meaning in English'},
@@ -72,19 +72,59 @@
   function wrap(text,x,y,width,height,max=4,align='center'){const words=text.replace(/\s+/g,' ').trim().split(' '),lines=[];let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>width&&line){lines.push(line);line=word}else line=test}if(line)lines.push(line);ctx.textAlign=align;lines.slice(0,max).forEach((l,i)=>ctx.fillText(l,x,y+i*height));return lines.length}
   function sizeFor(text,width,start,min=18,weight=800){let s=start;for(;s>min;s-=2){ctx.font=`${weight} ${s}px Arial`;if(ctx.measureText(text).width<=width)break}return s}
   function dateData(){const raw=v('publishDate')||new Date().toISOString().slice(0,10),d=new Date(raw+'T12:00:00');return{raw,month:d.toLocaleDateString('en-US',{month:'long'}).toUpperCase(),day:String(d.getDate())}}
-  function drawbit$(){ctx.save();ctx.translate(72,69);ctx.strokeStyle='#1680ff';ctx.lineWidth=5;ctx.beginPath();ctx.arc(0,0,53,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#fff';ctx.font='900 43px Arial';ctx.textAlign='center';ctx.fillText('B=',0,4);ctx.font='800 17px Arial';ctx.fillText('BITS',0,29);ctx.restore()}
-  function drawBadge(pulse){if(!$('showBadge').checked)return;ctx.save();ctx.globalAlpha=.93+.06*pulse;round(747,30,290,91,18,'rgba(3,20,49,.94)','#1763e8',3);ctx.fillStyle='#fff';ctx.font='700 45px Arial';ctx.textAlign='left';ctx.fillText('🔊',767,92);ctx.font='700 26px Arial';ctx.fillText('NARRATION',842,69);ctx.fillStyle='#62c34a';ctx.font='800 27px Arial';ctx.fillText('PLAYING',842,101);ctx.restore()}
-  function drawCard(x,label,flag,text,pron,color){round(x,755,238,330,22,'rgba(255,255,255,.97)','rgba(255,255,255,.75)',2);ctx.textAlign='center';ctx.font='43px Arial';ctx.fillText(flag,x+119,820);ctx.fillStyle=color;ctx.font='800 23px Arial';ctx.fillText(label,x+119,867);ctx.fillStyle='#071630';const s=sizeFor(text,205,37,25);ctx.font=`800 ${s}px Arial`;wrap(text,x+119,922,205,s*1.16,3);ctx.fillStyle='#344564';ctx.font='700 17px Arial';wrap(`(${pron})`,x+119,1010,200,22,2);ctx.fillStyle=color;ctx.beginPath();ctx.arc(x+119,1050,31,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.font='700 28px Arial';ctx.fillText('🔊',x+119,1061)}
+  function drawBrand(){
+    ctx.save();ctx.beginPath();ctx.arc(78,78,58,0,Math.PI*2);ctx.clip();
+    if(brandReady)ctx.drawImage(brandLogo,20,20,116,116);
+    else{ctx.fillStyle='#071630';ctx.fillRect(20,20,116,116);ctx.fillStyle='#fff';ctx.font='900 34px Arial';ctx.textAlign='center';ctx.fillText('BF',78,90)}
+    ctx.restore();ctx.beginPath();ctx.arc(78,78,59,0,Math.PI*2);ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke()
+  }
+  function drawBadge(pulse){
+    if(!$('showBadge').checked)return;
+    ctx.save();
+    ctx.shadowColor='rgba(0,0,0,.28)';ctx.shadowBlur=22;ctx.shadowOffsetY=8;
+    round(740,28,300,100,24,'rgba(4,20,48,.94)','rgba(84,148,255,.58)',2);
+    ctx.shadowColor='transparent';
+    const glow=ctx.createRadialGradient(786,78,3,786,78,48);glow.addColorStop(0,'rgba(35,117,255,.34)');glow.addColorStop(1,'rgba(35,117,255,0)');ctx.fillStyle=glow;ctx.fillRect(742,30,88,96);
+    ctx.fillStyle='#1768ff';ctx.beginPath();ctx.arc(786,78,29,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(774,72);ctx.lineTo(782,72);ctx.lineTo(793,63);ctx.lineTo(793,93);ctx.lineTo(782,84);ctx.lineTo(774,84);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.lineCap='round';for(let i=0;i<2;i++){ctx.beginPath();ctx.arc(792,78,10+i*8,-.82,.82);ctx.stroke()}
+    ctx.textAlign='left';ctx.fillStyle='#9ebfff';ctx.font='800 15px Arial';ctx.letterSpacing='2px';ctx.fillText('NARRATION',830,61);ctx.letterSpacing='0px';
+    ctx.fillStyle='#fff';ctx.font='900 24px Arial';ctx.fillText('Now playing',830,88);
+    const levels=[.35,.7,1,.58,.82];levels.forEach((level,i)=>{const animated=10+(level*18)+(pulse*(i%2?8:3));round(831+i*12,100-animated/2,6,animated,3,i===2?'#ffbf00':'#41e28a',null)});
+    ctx.fillStyle='#41e28a';ctx.font='800 13px Arial';ctx.fillText('VOICE ON',902,106);
+    ctx.restore()
+  }
+  function drawCalendar(){
+    const d=dateData(),x=856,y=148,w=158,h=154;
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.30)';ctx.shadowBlur=24;ctx.shadowOffsetY=10;round(x,y,w,h,24,'#fff',null);ctx.shadowColor='transparent';
+    round(x,y,w,52,24,'#e82f3f',null);ctx.fillStyle='#e82f3f';ctx.fillRect(x,y+26,w,26);
+    ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(x+12,y+11,w-24,1);
+    [x+38,x+w-38].forEach(ringX=>{ctx.fillStyle='#061731';ctx.beginPath();ctx.arc(ringX,y+8,8,0,Math.PI*2);ctx.fill();round(ringX-4,y-13,8,25,4,'#dce4f1',null)});
+    ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='900 18px Arial';ctx.letterSpacing='2px';ctx.fillText(v('weekday').slice(0,3),x+w/2,y+34);ctx.letterSpacing='0px';
+    ctx.fillStyle='#6d7890';ctx.font='900 18px Arial';ctx.fillText(d.month.slice(0,3),x+w/2,y+82);
+    ctx.fillStyle='#071630';ctx.font='900 55px Arial Black, Arial';ctx.fillText(d.day,x+w/2,y+137);
+    ctx.fillStyle='#1768ff';round(x+48,y+143,62,4,2,'#1768ff',null);
+    ctx.restore()
+  }
+  function drawCard(x,label,flag,text,pron,color){
+    ctx.save();ctx.shadowColor='rgba(0,7,24,.22)';ctx.shadowBlur=20;ctx.shadowOffsetY=9;round(x,755,238,330,24,'rgba(255,255,255,.98)',null);ctx.shadowColor='transparent';
+    round(x,755,238,10,5,color,null);round(x+18,776,202,44,14,'#f0f4fa',null);
+    ctx.textAlign='left';ctx.font='31px Arial';ctx.fillText(flag,x+31,808);ctx.fillStyle=color;ctx.font='900 16px Arial';ctx.letterSpacing='1.5px';ctx.fillText(label,x+78,804);ctx.letterSpacing='0px';
+    ctx.textAlign='center';ctx.fillStyle='#071630';const s=sizeFor(text,202,36,24);ctx.font=`900 ${s}px Arial`;wrap(text,x+119,878,202,s*1.14,3);
+    ctx.fillStyle='#66738b';ctx.font='italic 700 16px Arial';wrap(pron?`/${pron}/`:'Written guide',x+119,982,194,21,2);
+    round(x+68,1026,102,38,19,color,null);ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(x+93,1038);ctx.lineTo(x+101,1038);ctx.lineTo(x+111,1030);ctx.lineTo(x+111,1060);ctx.lineTo(x+101,1052);ctx.lineTo(x+93,1052);ctx.closePath();ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.arc(x+110,1045,9,-.8,.8);ctx.stroke();ctx.font='900 12px Arial';ctx.textAlign='left';ctx.fillText('LISTEN',x+123,1050);ctx.restore()
+  }
   function draw(pulse=0){
-    const g=ctx.createLinearGradient(0,0,1080,1350);g.addColorStop(0,'#03162f');g.addColorStop(.55,'#05285a');g.addColorStop(1,'#031631');ctx.fillStyle=g;ctx.fillRect(0,0,1080,1350);
-    ctx.save();ctx.globalAlpha=.08;ctx.strokeStyle='#2f78ff';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(90,730);ctx.lineTo(145,300);ctx.lineTo(205,730);ctx.moveTo(115,560);ctx.lineTo(185,560);ctx.moveTo(104,640);ctx.lineTo(195,640);ctx.stroke();ctx.restore();
-    const output=exportSettings();drawbit$();drawBadge(pulse);ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='900 87px Arial Black, Impact, Arial';ctx.fillText('FRANÇAIS',485,166);ctx.fillStyle='#ffc018';ctx.font='900 70px Arial Black, Impact, Arial';ctx.fillText('DU JOUR',485,242);round(250,272,475,50,25,'#1557c9',null);ctx.fillStyle='#fff';ctx.font='800 23px Arial, Helvetica, sans-serif';ctx.fillText(output.banner,487,306);
-    const d=dateData();round(859,151,151,142,18,'#f8f8f8','#fff',3);ctx.fillStyle='#d31318';ctx.fillRect(859,151,151,39);ctx.fillStyle='#fff';ctx.font='800 21px Arial';ctx.fillText(v('weekday'),934,179);ctx.fillStyle='#071630';ctx.font='800 26px Arial';ctx.fillText(d.month,934,222);ctx.font='900 50px Arial';ctx.fillText(d.day,934,274);
-    round(175,350,730,188,25,'rgba(255,255,255,.97)',null);ctx.fillStyle='#1557c9';ctx.font='900 16px Arial';ctx.letterSpacing='3px';ctx.fillText(output.label.toUpperCase(),540,394);ctx.letterSpacing='0px';ctx.fillStyle='#071630';const psize=sizeFor(output.phrase,650,54,28);ctx.font=`900 ${psize}px Arial Black, Arial`;ctx.fillText(output.phrase,540,463);if(output.pronunciation){ctx.fillStyle='#52627b';ctx.font='italic 700 20px Arial';ctx.fillText(`(${output.pronunciation})`,540,507)}
-    round(105,574,870,126,20,'rgba(255,255,255,.96)',null);ctx.textAlign='left';ctx.fillStyle='#071630';ctx.font='800 25px Arial, Helvetica, sans-serif';ctx.fillText(output.meaningLabel,135,617);ctx.fillStyle='#314360';ctx.font='500 23px Arial';wrap(v('meaning'),135,658,760,29,2,'left');
+    const g=ctx.createLinearGradient(0,0,1080,1350);g.addColorStop(0,'#020d20');g.addColorStop(.48,'#05295e');g.addColorStop(1,'#020d22');ctx.fillStyle=g;ctx.fillRect(0,0,1080,1350);
+    const halo=ctx.createRadialGradient(540,270,20,540,270,650);halo.addColorStop(0,'rgba(31,111,255,.24)');halo.addColorStop(.62,'rgba(8,47,104,.08)');halo.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=halo;ctx.fillRect(0,0,1080,850);
+    ctx.save();ctx.globalAlpha=.08;ctx.strokeStyle='#60a5ff';ctx.lineWidth=2;for(let r=170;r<=520;r+=70){ctx.beginPath();ctx.arc(540,330,r,Math.PI*.12,Math.PI*.88);ctx.stroke()}for(let i=0;i<32;i++){ctx.fillStyle=i%4===0?'#ffbf00':'#65a4ff';ctx.beginPath();ctx.arc(40+(i*83)%1020,340+(i*71)%340,2+(i%3),0,Math.PI*2);ctx.fill()}ctx.restore();
+    const output=exportSettings();drawBrand();drawBadge(pulse);ctx.textAlign='left';ctx.fillStyle='#9ebfff';ctx.font='900 15px Arial';ctx.letterSpacing='4px';ctx.fillText('BEYOND FRENCH · DAILY ACADEMY',164,91);ctx.letterSpacing='0px';ctx.fillStyle='#fff';ctx.font='900 77px Arial Black, Impact, Arial';ctx.fillText('FRANÇAIS',164,172);ctx.fillStyle='#ffc018';ctx.font='900 62px Arial Black, Impact, Arial';ctx.fillText('DU JOUR',164,234);round(164,266,520,48,24,'rgba(23,104,255,.92)','rgba(114,170,255,.52)',2);ctx.fillStyle='#fff';ctx.font='800 21px Arial, Helvetica, sans-serif';ctx.textAlign='center';ctx.fillText(output.banner,424,298);
+    drawCalendar();
+    ctx.save();ctx.shadowColor='rgba(0,6,25,.28)';ctx.shadowBlur=28;ctx.shadowOffsetY=12;round(150,350,780,190,28,'rgba(255,255,255,.985)',null);ctx.shadowColor='transparent';round(185,374,160,34,17,'#eaf1ff',null);ctx.fillStyle='#1557c9';ctx.font='900 14px Arial';ctx.letterSpacing='2px';ctx.textAlign='center';ctx.fillText(output.label.toUpperCase(),265,397);ctx.letterSpacing='0px';ctx.fillStyle='#071630';const psize=sizeFor(output.phrase,690,57,29);ctx.font=`900 ${psize}px Arial Black, Arial`;ctx.fillText(output.phrase,540,474);if(output.pronunciation){ctx.fillStyle='#52627b';ctx.font='italic 700 20px Arial';ctx.fillText(`/${output.pronunciation}/`,540,512)}ctx.restore();
+    round(105,574,870,126,22,'rgba(5,25,57,.88)','rgba(112,162,236,.38)',2);ctx.textAlign='left';ctx.fillStyle='#ffca36';ctx.font='900 16px Arial';ctx.letterSpacing='2px';ctx.fillText(output.meaningLabel.toUpperCase(),135,614);ctx.letterSpacing='0px';ctx.fillStyle='#eef5ff';ctx.font='600 22px Arial';wrap(v('meaning'),135,657,800,29,2,'left');
     drawCard(52,'FRANÇAIS','🇫🇷',v('french'),v('frenchPron'),'#0a3d97');drawCard(300,'PATOIS','🇯🇲',v('patois'),v('patoisPron'),'#249c3a');drawCard(548,'KREYÒL','🇭🇹',v('kreyol'),v('kreyolPron'),'#c3161b');drawCard(796,'ESPAÑOL','🇪🇸',v('spanish'),v('spanishPron'),'#ed8b00');
-    round(105,1110,870,116,20,'rgba(5,38,87,.94)','#1451b3',2);ctx.textAlign='left';ctx.fillStyle='#ffc21c';ctx.font='800 24px Arial';ctx.fillText('💡  CULTURE NOTE:',135,1150);ctx.fillStyle='#fff';ctx.font='500 20px Arial';wrap(v('culture'),165,1186,735,25,2,'left');
-    ctx.fillStyle='#ffc21c';ctx.fillRect(0,1270,1080,80);ctx.fillStyle='#05152f';ctx.textAlign='center';ctx.font='800 17px Arial';ctx.fillText('🌐  ONE PHRASE.   •   FOUR LANGUAGES.   •   EVERY DAY.   •   BEYONDIMAGINATION.CO.TECHNOLOGY/BEYOND-FRENCH',540,1320)
+    round(105,1110,870,116,22,'rgba(8,35,78,.96)','rgba(63,132,242,.48)',2);round(126,1129,46,46,14,'#ffbf00',null);ctx.fillStyle='#071630';ctx.font='900 25px Arial';ctx.textAlign='center';ctx.fillText('i',149,1161);ctx.textAlign='left';ctx.fillStyle='#ffc21c';ctx.font='900 17px Arial';ctx.letterSpacing='1.5px';ctx.fillText('CULTURE NOTE',190,1149);ctx.letterSpacing='0px';ctx.fillStyle='#fff';ctx.font='600 19px Arial';wrap(v('culture'),190,1182,745,24,2,'left');
+    const footer=ctx.createLinearGradient(0,1270,1080,1350);footer.addColorStop(0,'#ffbf00');footer.addColorStop(.5,'#ffd65a');footer.addColorStop(1,'#ffae22');ctx.fillStyle=footer;ctx.fillRect(0,1270,1080,80);ctx.fillStyle='#05152f';ctx.textAlign='center';ctx.font='900 17px Arial';ctx.letterSpacing='1px';ctx.fillText('ONE PHRASE  ·  FOUR LANGUAGES  ·  EVERY DAY',540,1306);ctx.font='800 14px Arial';ctx.letterSpacing='.5px';ctx.fillText('BEYONDIMAGINATION.CO.TECHNOLOGY/BEYOND-FRENCH',540,1332);ctx.letterSpacing='0px'
   }
   function localDateParts(){const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000),iso=local.toISOString().slice(0,10);return{date:iso,weekday:now.toLocaleDateString('en-US',{weekday:'long'}).toUpperCase()}}
   function setFieldValue(id,value){const field=$(id);if(!field)return false;field.value=value==null?'':String(value);field.dispatchEvent(new Event('input',{bubbles:true}));field.dispatchEvent(new Event('change',{bubbles:true}));return true}
@@ -118,10 +158,11 @@
   async function preview(){stop();setStatus('Preparing narration…');try{const blob=await narrationBlob(),url=URL.createObjectURL(blob);activeAudio=new Audio(url);activeAudio.onended=()=>{URL.revokeObjectURL(url);activeAudio=null;setStatus('Narration finished.')};await activeAudio.play();setStatus('Narration playing.')}catch(error){if('speechSynthesis'in window){const utterance=new SpeechSynthesisUtterance(narrationText());utterance.lang=v('narratorLocale');utterance.onend=()=>setStatus('Browser voice preview finished.');speechSynthesis.speak(utterance);setStatus(`Using this device’s ${exportSettings().label} voice for preview.`)}else setStatus('No audio voice is configured. Upload a narration file or export the visual without audio.',false)}}
   function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
   const baseName=()=>`francais-du-jour-${v('exportLanguage')}-${v('publishDate')||'post'}`;
-  function png(){draw();canvas.toBlob(blob=>blob&&download(blob,baseName()+'.png'),'image/png')}
+  async function ensureBrand(){if(brandReady)return;try{await brandLogo.decode();brandReady=true}catch{}}
+  async function png(){await ensureBrand();draw();canvas.toBlob(blob=>blob&&download(blob,baseName()+'.png'),'image/png')}
   function mimeType(){return['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus'].find(t=>MediaRecorder.isTypeSupported(t))||''}
   async function video(){
-    if(!window.MediaRecorder||!canvas.captureStream){setStatus('Video export is not supported by this browser.',true);return}
+    if(!window.MediaRecorder||!canvas.captureStream){setStatus('Video export is not supported by this browser.',true);return}await ensureBrand();
     const button=$('exportVideo');button.disabled=true;stop();setStatus(`Generating ${exportSettings().label} narration…`);
     let url='',ac=null,audioNotice='';
     try{
@@ -146,7 +187,7 @@
     }catch(error){setStatus(error.message||'Video export failed.',true)}finally{if(url)URL.revokeObjectURL(url);if(ac)ac.close();button.disabled=false}
   }
   async function exportAllLanguagesVideo(){
-    if(!window.MediaRecorder||!canvas.captureStream){setStatus('Batch video export is not supported by this browser.',true);return}
+    if(!window.MediaRecorder||!canvas.captureStream){setStatus('Batch video export is not supported by this browser.',true);return}await ensureBrand();
     const button=$('exportAllVideo'),originalLanguage=v('exportLanguage'),originalLocale=v('narratorLocale'),languages=[['en','en-US','English'],['fr','fr-FR','French'],['es','es-ES','Spanish'],['jm','en-JM','Patois'],['ht','ht-HT','Kreyòl']];button.disabled=true;stop();let audioContext=null,running=true,recorder=null;
     try{
       setStatus('Preparing the five-language narrated video…');const stream=canvas.captureStream(30);audioContext=new (window.AudioContext||window.webkitAudioContext)();await audioContext.resume();const destination=audioContext.createMediaStreamDestination();destination.stream.getAudioTracks().forEach(track=>stream.addTrack(track));
@@ -159,6 +200,15 @@
     }catch(error){running=false;if(recorder&&recorder.state!=='inactive')recorder.stop();setStatus(error.message||'Batch video export failed.',true)}finally{$('exportLanguage').value=originalLanguage;$('narratorLocale').value=originalLocale;if(audioContext)await audioContext.close().catch(()=>{});draw();updateAudioUi();button.disabled=false}
   }
   function save(){const data={};ids.forEach(id=>data[id]=$(id).type==='checkbox'?$(id).checked:$(id).value);localStorage.setItem('beyondFrenchGenerator',JSON.stringify(data));setStatus('Generator settings saved in this browser.')}
+  async function saveDailyPhrase(){
+    const button=$('saveDailyPhrase');button.disabled=true;setStatus('Saving the daily phrase to Beyond French…');
+    const payload={publish_date:v('publishDate'),english:v('phrase'),meaning:v('meaning'),french:v('french'),french_pronunciation:v('frenchPron'),patois:v('patois'),patois_pronunciation:v('patoisPron'),kreyol:v('kreyol'),kreyol_pronunciation:v('kreyolPron'),spanish:v('spanish'),spanish_pronunciation:v('spanishPron'),culture_note:v('culture'),export_language:v('exportLanguage'),narrator_locale:v('narratorLocale')};
+    try{
+      const response=await fetch('/server/admin/daily-studio/api/save-french-phrase.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(payload)});
+      const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'The daily phrase could not be saved.');
+      save();setStatus(`${data.message} Web and iOS will use lesson #${data.id}.`);
+    }catch(error){setStatus(error.message||'The daily phrase could not be saved.',true)}finally{button.disabled=false}
+  }
   function restore(){try{const data=JSON.parse(localStorage.getItem('beyondFrenchGenerator')||'null');if(!data)return;ids.forEach(id=>{if(!(id in data))return;if($(id).type==='checkbox')$(id).checked=!!data[id];else $(id).value=data[id]})}catch{}}
   function updateAudioUi(){const output=exportSettings();if(v('narratorLocale')!==output.locale)$('narratorLocale').value=output.locale;$('previewAudio').textContent=`Preview ${output.label} audio`;$('exportVideo').textContent=$('includeNarration').checked?`Export ${output.label} narrated MP4`:`Export ${output.label} visual MP4`;$('exportMp3').textContent=`Export ${output.label} MP3 Narration`;}
   async function exportMp3(){
@@ -190,7 +240,7 @@
       setStatus(savedUrl?'MP3 saved to the French audio library and downloaded.':'MP3 generated and downloaded.');
     }catch(error){setStatus(error.message||'MP3 export failed.',true)}finally{button.disabled=false}
   }
-  restore();updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{draw();updateAudioUi()});el.addEventListener('change',()=>{draw();updateAudioUi()})});$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;var todayPhraseButton=$('generateTodayPhrase');if(todayPhraseButton)todayPhraseButton.addEventListener('click',generateTodayPhrase);draw();
+  restore();updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{draw();updateAudioUi()});el.addEventListener('change',()=>{draw();updateAudioUi()})});$('saveDailyPhrase').onclick=saveDailyPhrase;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;var todayPhraseButton=$('generateTodayPhrase');if(todayPhraseButton)todayPhraseButton.addEventListener('click',generateTodayPhrase);draw();
 })();
 </script>
 </body>

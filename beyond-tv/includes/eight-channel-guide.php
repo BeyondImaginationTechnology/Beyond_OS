@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . '/yugioh-live.php';
+require_once __DIR__ . '/anime-schedule.php';
 require_once __DIR__ . '/beyond-cartoons-schedule.php';
 require_once __DIR__ . '/movies-schedule.php';
 
@@ -85,37 +85,8 @@ function beyond_tv_after_dark_hourly_rows(): array {
     return $rows;
 }
 
-function beyond_tv_yugioh_hourly_rows(): array {
-    $day = new DateTimeImmutable('today', new DateTimeZone('America/Vancouver')); $rows = [];
-    $digimon = json_decode((string)@file_get_contents(__DIR__ . '/../data/digimon-library.json'), true) ?: [];
-    $pokemon = json_decode((string)@file_get_contents(__DIR__ . '/../data/pokemon-library.json'), true) ?: [];
-    $dragonBall = json_decode((string)@file_get_contents(__DIR__ . '/../data/dragon-ball-library.json'), true) ?: [];
-    $dragonBallZ = json_decode((string)@file_get_contents(__DIR__ . '/../data/dbz-westwood-sd-library.json'), true) ?: [];
-    for ($hour = 0; $hour < 24; $hour++) {
-        $state = beyond_yugioh_live_state($day->setTime($hour, 0)->getTimestamp());
-        if ($hour >= 0 && $hour < 3 && $dragonBall) {
-            $episode = $dragonBall[(($hour * 2) + (int)$day->format('z')) % count($dragonBall)];
-            $rows[] = ['start'=>$hour,'end'=>$hour+1,'icon'=>'🐉','title'=>'Dragon Ball','lineup'=>'S1 E'.(int)$episode['episode'].' · '.$episode['title']];
-        } elseif ($hour >= 3 && $hour < 6) {
-            $episode = (($hour * 2 + (int)$day->format('z')) % 167) + 1;
-            $rows[] = ['start'=>$hour,'end'=>$hour+1,'icon'=>'🐲','title'=>'Dragon Ball Kai','lineup'=>'Episode '.$episode];
-        } elseif ((($hour >= 6 && $hour < 9) || $hour >= 21) && $dragonBallZ) {
-            $episode = $dragonBallZ[(($hour * 2) + (int)$day->format('z')) % count($dragonBallZ)];
-            $rows[] = ['start'=>$hour,'end'=>$hour+1,'icon'=>'🔥','title'=>'Dragon Ball Z','lineup'=>'SD · Episode '.(int)$episode['episode'].' · '.$episode['title']];
-        } elseif ($hour >= 12 && $hour < 15) {
-            $episode = (($hour * 2 + (int)$day->format('z')) % 50) + 1;
-            $rows[] = ['start'=>$hour,'end'=>$hour+1,'icon'=>'⚡','title'=>'Zatch Bell!','lineup'=>'Season 1 · Episodes '.$episode.'–'.min(50,$episode+1)];
-        } elseif ($hour >= 15 && $hour < 18 && $digimon) {
-            $episode = $digimon[(($hour - 15) * 2 + (int)$day->format('z')) % count($digimon)];
-            $rows[] = ['start'=>$hour,'end'=>$hour+1,'icon'=>'🔷','title'=>'Digimon: Digital Monsters','lineup'=>'S'.(int)$episode['season'].' E'.(int)$episode['episode'].' · '.$episode['title']];
-        } elseif ($hour >= 18 && $hour < 21 && $pokemon) {
-            $episode = $pokemon[(($hour - 18) * 2 + (int)$day->format('z')) % count($pokemon)];
-            $rows[] = ['start'=>$hour,'end'=>$hour+1,'icon'=>'⚡','title'=>'Pokémon: Indigo League','lineup'=>'S1 E'.(int)$episode['episode'].' · '.$episode['title']];
-        } else {
-            $rows[] = ['start'=>$hour,'end'=>$hour+1,'icon'=>'🃏','title'=>'Yu-Gi-Oh! Duel Monsters','lineup'=>'Season 1 · Episode '.(int)$state['episode_number']];
-        }
-    }
-    return $rows;
+function beyond_tv_anime_rows(): array {
+    return beyond_anime_guide_rows();
 }
 
 /** Kept under the original function name for backwards compatibility. */
@@ -129,7 +100,7 @@ function beyond_tv_eight_channel_guide(array $classicState, array $cartoonState)
         if ($slug === 'classic-cartoon-theater' && !empty($classicState['blocks'])) { $rows = $classicState['blocks']; }
         if ($slug === 'beyond-cartoons' && !empty($cartoonState['blocks'])) { $rows = $cartoonState['blocks']; }
         if ($slug === 'beyond-after-dark') { $rows = beyond_tv_after_dark_hourly_rows(); }
-        if ($slug === 'yugioh-tv') { $rows = beyond_tv_yugioh_hourly_rows(); }
+        if ($slug === 'yugioh-tv') { $rows = beyond_tv_anime_rows(); }
         if ($slug === 'beyond-cartoons') { $rows = beyond_tv_cartoon_hourly_rows(); }
         if ($slug === 'classic-cinema') { $rows = beyond_tv_movie_hourly_rows(); }
         if (in_array($slug, ['bubble-guppies','preschool-francais','beyond-comedy','beyond-family'], true)) { $catalogRows=beyond_tv_catalog_hourly_rows($slug); if($catalogRows)$rows=$catalogRows; }

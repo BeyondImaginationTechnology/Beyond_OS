@@ -41,6 +41,22 @@ $fallbackCurrent = ['icon'=>$channel['icon'] ?? '▶', 'title'=>$channel['now'] 
 $fallbackNext = ['title'=>$channel['up_next'] ?? 'Next scheduled program'];
 $current = $schedule[$currentIndex] ?? $fallbackCurrent;
 $next = $schedule ? ($schedule[($currentIndex + 1) % count($schedule)] ?? $fallbackNext) : $fallbackNext;
+$embedUrl = null;
+if (($channel['source_type'] ?? '') === 'youtube_embed' && !empty($channel['youtube_id'])) {
+    $youtubeId = (string)$channel['youtube_id'];
+    $playlistId = trim((string)($channel['youtube_playlist_id'] ?? ''));
+    $query = [
+        'autoplay'=>!empty($channel['youtube_autoplay']) ? 1 : 0,
+        'mute'=>!empty($channel['youtube_muted']) ? 1 : 0,
+        'controls'=>1,
+        'rel'=>0,
+        'playsinline'=>1,
+        'enablejsapi'=>1,
+    ];
+    if ($playlistId !== '') $query['list'] = $playlistId;
+    $embedUrl = 'https://www.youtube-nocookie.com/embed/' . rawurlencode($youtubeId)
+        . '?' . http_build_query($query);
+}
 
 echo json_encode([
     'ok'=>true,
@@ -48,5 +64,9 @@ echo json_encode([
     'timezone'=>'America/Vancouver',
     'server_time'=>$now->format(DATE_ATOM),
     'channel'=>['slug'=>$slug, 'name'=>$channel['name'] ?? $slug],
-    'state'=>['current'=>$current, 'next'=>$next],
+    'state'=>array_filter([
+        'current'=>$current,
+        'next'=>$next,
+        'embed_url'=>$embedUrl,
+    ], static fn($value): bool => $value !== null),
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

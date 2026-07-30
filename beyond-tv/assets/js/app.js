@@ -123,8 +123,7 @@ const menuBtn=document.querySelector(".menu-btn"),mobileNav=document.querySelect
 })();
 
 
-// Beyond TV Beta Build 2.1.1 theme flavors: Dark → Light → Sunset
-(function(){document.querySelectorAll('.footer,.classic-footer').forEach(function(footer){footer.childNodes.forEach(function(node){if(node.nodeType===3)node.nodeValue=node.nodeValue.replace(/Beyond TV 2\.2/g,'Beyond TV · Beta Build 2.1.1')})})})();
+// Beyond TV 3.0 theme flavors: Sunset → Dark → Light
 (function(){const root=document.documentElement,themes=['sunset','dark','light'],icons={dark:'🌙',light:'☀️',sunset:'🌅'},labels={dark:'Dark',light:'Light',sunset:'Sunset'};let saved='sunset';try{saved=localStorage.getItem('beyond-tv-theme')||'sunset'}catch(e){}if(!themes.includes(saved))saved='sunset';function apply(t){root.dataset.tvTheme=t;document.querySelector('meta[name="theme-color"]')?.setAttribute('content',t==='light'?'#f6f1f4':t==='dark'?'#080812':'#401532');document.querySelectorAll('[data-tv-theme-toggle]').forEach(btn=>{btn.innerHTML=icons[t]+'<span class="sr-only"> '+labels[t]+'</span>';const next=themes[(themes.indexOf(t)+1)%themes.length];btn.setAttribute('aria-label','Current theme '+labels[t]+'. Switch to '+labels[next]);btn.title='Theme: '+labels[t]+' · Next: '+labels[next]})}apply(saved);document.addEventListener('click',e=>{const btn=e.target.closest('[data-tv-theme-toggle]');if(!btn)return;const current=themes.includes(root.dataset.tvTheme)?root.dataset.tvTheme:'sunset',next=themes[(themes.indexOf(current)+1)%themes.length];try{localStorage.setItem('beyond-tv-theme',next)}catch(e){}apply(next)})})();
 
 // Homepage Beyond TV iframe sync: 30 minutes for episodes, 2 hours for long-form content.

@@ -136,6 +136,17 @@ function sqlite_db(): PDO {
         passed INTEGER NOT NULL DEFAULT 0 CHECK(passed IN (0,1)),
         attempted_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS french_academy_practice (
+        learner_key TEXT NOT NULL,
+        age_group TEXT NOT NULL,
+        module_slug TEXT NOT NULL,
+        lesson_number INTEGER NOT NULL,
+        round_number INTEGER NOT NULL,
+        response TEXT NOT NULL,
+        completed_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY(learner_key,age_group,module_slug,lesson_number,round_number)
+    )");
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_french_academy_test_learner ON french_academy_test_attempts(learner_key,age_group,module_slug,lesson_number)');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_french_academy_exam_learner ON french_academy_exam_attempts(learner_key,age_group,module_slug)');
     $pdo->exec("CREATE TABLE IF NOT EXISTS french_narration_rate_limits (
@@ -259,6 +270,17 @@ function french_academy_module_progress(string $age,string $module): array {
     $s=sqlite_db()->prepare('SELECT COUNT(*) lessons_passed,COALESCE(MAX(best_score),0) best_score FROM french_academy_progress WHERE learner_key=? AND age_group=? AND module_slug=? AND passed=1');
     $s->execute([french_learner_key(),french_valid_age_group($age),french_valid_module($module)]);$row=$s->fetch()?:[];
     return ['lessons_passed'=>(int)($row['lessons_passed']??0),'best_score'=>(int)($row['best_score']??0),'exam_passed'=>french_academy_exam_passed($age,$module)];
+}
+function french_academy_practice_responses(string $age,string $module,int $lesson): array {
+    $s=sqlite_db()->prepare('SELECT round_number,response FROM french_academy_practice WHERE learner_key=? AND age_group=? AND module_slug=? AND lesson_number=? ORDER BY round_number');
+    $s->execute([french_learner_key(),french_valid_age_group($age),french_valid_module($module),$lesson]);
+    $responses=[];foreach($s->fetchAll() as $row)$responses[(int)$row['round_number']]=(string)$row['response'];
+    return $responses;
+}
+function french_record_academy_practice(string $age,string $module,int $lesson,int $round,string $response): bool {
+    $response=trim($response);if($round<1||$round>3||mb_strlen($response)<3)return false;
+    sqlite_db()->prepare("INSERT INTO french_academy_practice(learner_key,age_group,module_slug,lesson_number,round_number,response) VALUES(?,?,?,?,?,?) ON CONFLICT(learner_key,age_group,module_slug,lesson_number,round_number) DO UPDATE SET response=excluded.response,updated_at=CURRENT_TIMESTAMP")->execute([french_learner_key(),french_valid_age_group($age),french_valid_module($module),$lesson,$round,$response]);
+    return true;
 }
 function french_record_lesson_test(string $age,string $module,int $lesson,int $score,int $questionCount=10): bool {
     $age=french_valid_age_group($age);$module=french_valid_module($module);$passed=$score>=8;

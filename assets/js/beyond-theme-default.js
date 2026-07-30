@@ -5,10 +5,11 @@
   var icons = { dark: '\uD83C\uDF19', light: '\u2600\uFE0F', sunset: '\uD83C\uDF05', ocean: '\uD83C\uDF0A', forest: '\uD83C\uDF32' };
   var labels = { dark: 'Dark', light: 'Light', sunset: 'Sunset', ocean: 'Ocean', forest: 'Forest' };
   function validTheme(theme) { return themes.indexOf(theme) !== -1; }
-  function savedTheme() { try { var saved = localStorage.getItem('beyond-theme'); return validTheme(saved) ? saved : 'dark'; } catch (error) { return 'dark'; } }
+  function defaultTheme() { var preferred = root.getAttribute('data-default-theme'); return validTheme(preferred) ? preferred : 'dark'; }
+  function savedTheme() { try { var saved = localStorage.getItem('beyond-theme'); return validTheme(saved) ? saved : defaultTheme(); } catch (error) { return defaultTheme(); } }
   function each(selector, callback) { var nodes = document.querySelectorAll(selector); for (var index = 0; index < nodes.length; index += 1) callback(nodes[index]); }
   function applyTheme(theme) {
-    if (!validTheme(theme)) theme = 'dark';
+    if (!validTheme(theme)) theme = defaultTheme();
     root.setAttribute('data-theme', theme);
     var next = themes[(themes.indexOf(theme) + 1) % themes.length];
     each('.theme-toggle', function (button) {
@@ -40,7 +41,7 @@
     var button = closestByClass(event.target, 'bos-theme-toggle');
     if (!button) return false;
     event.preventDefault();
-    var current = validTheme(root.getAttribute('data-theme')) ? root.getAttribute('data-theme') : 'dark';
+    var current = validTheme(root.getAttribute('data-theme')) ? root.getAttribute('data-theme') : defaultTheme();
     var next = themes[(themes.indexOf(current) + 1) % themes.length];
     try { localStorage.setItem('beyond-theme', next); } catch (error) {}
     applyTheme(next);

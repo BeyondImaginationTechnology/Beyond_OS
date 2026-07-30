@@ -111,12 +111,12 @@ try {
 }
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="en" data-default-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset','ocean','forest'].includes(t)?t:'dark';}catch(e){document.documentElement.dataset.theme='dark';}try{const c=localStorage.getItem('beyond-currency');document.documentElement.dataset.currency=['USD','CAD','BITS'].includes(c)?c:'CAD';}catch(e){document.documentElement.dataset.currency='CAD';}})();</script>
-<meta name="theme-color" content="#050817">
+<script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset','ocean','forest'].includes(t)?t:'light';}catch(e){document.documentElement.dataset.theme='light';}try{const c=localStorage.getItem('beyond-currency');document.documentElement.dataset.currency=['USD','CAD','BITS'].includes(c)?c:'CAD';}catch(e){document.documentElement.dataset.currency='CAD';}})();</script>
+<meta name="theme-color" content="#f4f6fc">
 <title>Beyond OS 2.3.3 | Live. Learn. Earn. Explore.</title>
 <meta name="description" content="Health, education, wallet and entertainment connected through one secure Beyond ID and one shared bit$ balance.">
 <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
@@ -315,9 +315,8 @@ $cartoonSchedule = beyond_cartoons_schedule_state();
 $cartoonCurrent = $cartoonSchedule['current'];
 $cartoonNext = $cartoonSchedule['next'];
 $featuredTitles = json_decode((string)@file_get_contents(__DIR__ . '/beyond-tv/data/catalog.json'), true) ?: [];
-usort($featuredTitles, static function (array $left, array $right): int {
-    return strnatcasecmp((string)($left['title'] ?? ''), (string)($right['title'] ?? ''));
-});
+// Catalogue additions are appended, so newest titles lead the discovery carousel.
+$featuredTitles = array_reverse($featuredTitles);
 $featuredTitleCount = count($featuredTitles);
 $posterProviderConfig = beyond_tv_poster_config();
 $premiumPosterProvider = beyond_tv_poster_provider_configured();
@@ -325,7 +324,7 @@ $tmdbPosterProvider = $posterProviderConfig['tmdb_read_token'] !== '' || $poster
 ?>
 <section class="featured-library wrap" aria-labelledby="featuredLibraryTitle">
   <header class="featured-library__heading">
-    <div><span>NOW STREAMING ON BEYOND TV</span><h2 id="featuredLibraryTitle"><?=number_format($featuredTitleCount)?> titles. Pick your next watch.</h2></div>
+    <div><span>NEW ADDITIONS TO BEYOND TV</span><h2 id="featuredLibraryTitle"><?=number_format($featuredTitleCount)?> titles. Pick your next watch.</h2></div>
     <div class="featured-library__actions">
       <a href="/beyond-tv/browse.php">Browse everything →</a>
       <div class="featured-library__controls" aria-label="Featured title carousel controls">
@@ -343,12 +342,13 @@ $tmdbPosterProvider = $posterProviderConfig['tmdb_read_token'] !== '' || $poster
       if (!$premiumPosterProvider && $featuredThumbnail === '' && $featuredSlug === 'malcolm-in-the-middle') {
           $featuredThumbnail = trim((string)($featuredTitle['thumbnail'] ?? ''));
       }
+      $featuredIsNew = !empty($featuredTitle['new_addition']) || $featuredIndex < 12;
     ?>
     <a class="featured-title-card" href="/beyond-tv/title.php?slug=<?=urlencode((string)($featuredTitle['slug'] ?? ''))?>" style="--title-gradient:<?=htmlspecialchars((string)($featuredTitle['gradient'] ?? 'linear-gradient(135deg,#151a34,#623d85)'))?>" aria-label="<?=htmlspecialchars((string)($featuredTitle['title'] ?? 'Beyond TV title'))?>">
       <span class="featured-title-card__cover">
         <span class="featured-title-card__fallback" aria-hidden="true"><span class="featured-title-card__orbit"></span><span class="featured-title-card__icon"><?=htmlspecialchars((string)($featuredTitle['icon'] ?? '▶'))?></span><strong><?=htmlspecialchars((string)($featuredTitle['title'] ?? 'Beyond TV'))?></strong><small><?=($featuredTitle['type'] ?? '') === 'movie' ? 'A BEYOND MOVIE' : 'A BEYOND SERIES'?></small></span>
         <?php if ($featuredThumbnail !== ''): ?><img class="featured-title-card__poster" src="<?=htmlspecialchars($featuredThumbnail)?>" alt="" width="420" height="630" loading="<?=$featuredIndex < 6 ? 'eager' : 'lazy'?>" decoding="async"><?php endif; ?>
-        <span class="featured-title-card__type"><?=($featuredTitle['type'] ?? '') === 'movie' ? 'MOVIE' : 'SERIES'?></span>
+        <span class="featured-title-card__type"><?=$featuredIsNew ? 'NEW · ' : ''?><?=($featuredTitle['type'] ?? '') === 'movie' ? 'MOVIE' : 'SERIES'?></span>
         <span class="featured-title-card__play" aria-hidden="true">▶</span>
       </span>
       <span class="featured-title-card__copy">
@@ -796,7 +796,7 @@ window.addEventListener('DOMContentLoaded',()=>{
  picker.addEventListener('change',()=>applyCurrency(picker.value,true));
 })();
 </script>
-<script src="/beyond-tv/assets/js/app.js?v=2.2.1"></script>
+<script src="/beyond-tv/assets/js/app.js?v=3.0.1"></script>
 </main>
 <footer class="footer wrap">
     <div><a class="brand" href="./">BEYOND <span>OS</span></a><p>The connected imagination ecosystem.</p><p class="copyright">© 2026 Beyond Imagination Corp.</p></div>

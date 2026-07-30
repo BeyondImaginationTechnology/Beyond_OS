@@ -360,7 +360,10 @@ function beyond_tv_build_episode_library(array $title, array $catalogEpisodes, s
         }
     }
 
-    $needsArchiveDiscovery = $archiveId !== '' && in_array($sourceType, ['archive_embed', 'archive_episode_map', 'archive_collection'], true)
+    $archiveDiscoveryEnabled = !array_key_exists('archive_discovery', $title) || !empty($title['archive_discovery']);
+    $needsArchiveDiscovery = $archiveDiscoveryEnabled
+        && $archiveId !== ''
+        && in_array($sourceType, ['archive_embed', 'archive_episode_map', 'archive_collection'], true)
         && ($template === '' || count($mapped) < max(1, $archiveCount));
     if ($needsArchiveDiscovery) {
         $discovered = beyond_tv_discover_archive_episodes($archiveId, $forcedSeason);

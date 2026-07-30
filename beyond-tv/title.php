@@ -46,7 +46,7 @@ $currentSeason = (int) ($currentEpisode['season'] ?? $requestedSeason);
 $currentEpisodeNumber = (int) ($currentEpisode['episode'] ?? $requestedEpisode);
 $currentEpisodeTitle = (string) ($currentEpisode['title'] ?? '');
 $currentEpisodeIsPlayable = !empty($currentEpisode['playable']);
-$currentVideoUrl = trim((string) ($currentEpisode['video_url'] ?? ''));
+$currentVideoUrl = trim((string) ($currentEpisode['video_url'] ?? $title['video_url'] ?? ''));
 $currentYoutubeId = preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($currentEpisode['youtube_id'] ?? ''));
 $currentPlaylistIndex = max(0, (int) ($currentEpisode['playlist_index'] ?? ($currentEpisodeNumber - 1)));
 
@@ -93,7 +93,7 @@ function beyond_tv_episode_code(array $episode): string
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#401532">
 <title><?= htmlspecialchars((string) $title['title']) ?><?= $currentEpisodeIsPlayable && $currentEpisodeTitle !== '' ? ' · ' . htmlspecialchars(beyond_tv_episode_code($currentEpisode ?? []) . ' ' . $currentEpisodeTitle) : '' ?> | Beyond TV</title>
-<link rel="stylesheet" href="/beyond-tv/assets/css/app.css?v=3.0.0">
+<link rel="stylesheet" href="/beyond-tv/assets/css/app.css?v=3.0.1">
 </head>
 <body class="tv-app">
 <?php include __DIR__ . '/partials/header.php'; ?>
@@ -114,9 +114,10 @@ function beyond_tv_episode_code(array $episode): string
 <div class="youtube-player-wrap"><iframe class="youtube-player" src="https://archive.org/embed/<?= htmlspecialchars($archiveId) ?>" title="<?= htmlspecialchars((string) $title['title']) ?>" allow="autoplay; fullscreen" allowfullscreen></iframe></div>
 <?php elseif ($sourceType === 'watchlist'): ?>
 <?php $isHdPending = (string) ($title['episode_catalog'] ?? '') === 'pending_hd'; ?>
-<div class="external-player" style="background:<?= htmlspecialchars((string) ($title['gradient'] ?? 'linear-gradient(135deg,#111,#444)')) ?>"><span class="external-icon"><?= htmlspecialchars((string) ($title['icon'] ?? '📺')) ?></span><span class="source-pill"><?= htmlspecialchars(strtoupper((string) ($title['source_label'] ?? 'OWNER WATCHLIST'))) ?></span><h2><?= $isHdPending ? 'HD source required' : 'Interested' ?></h2><p><?= $isHdPending ? 'The supplied Archive item currently exposes only SD files. Playback remains disabled until a verified HD collection is available.' : 'This title is saved for curation. Playback stays disabled until a rights-authorized source is approved.' ?></p><?php if (!empty($title['candidate_url'])): ?><a class="btn btn-secondary" href="<?= htmlspecialchars((string) $title['candidate_url']) ?>" target="_blank" rel="noopener">Review candidate metadata ↗</a><?php endif; ?></div>
+<?php $isApprovedCandidate = !empty($title['source_approved']); ?>
+<div class="external-player" style="background:<?= htmlspecialchars((string) ($title['gradient'] ?? 'linear-gradient(135deg,#111,#444)')) ?>"><span class="external-icon"><?= htmlspecialchars((string) ($title['icon'] ?? '📺')) ?></span><span class="source-pill"><?= htmlspecialchars(strtoupper((string) ($title['source_label'] ?? 'OWNER WATCHLIST'))) ?></span><h2><?= $isHdPending ? 'HD source required' : ($isApprovedCandidate ? 'Source search approved' : 'Interested') ?></h2><p><?= $isHdPending ? 'The supplied Archive item currently exposes only SD files. Playback remains disabled until a verified HD collection is available.' : ($isApprovedCandidate ? 'Owner approval is recorded. Connect a specific playable media file or Archive item ID to enable playback.' : 'This title is saved for curation. Playback stays disabled until a source is approved.') ?></p><?php if (!empty($title['candidate_url'])): ?><a class="btn btn-secondary" href="<?= htmlspecialchars((string) $title['candidate_url']) ?>" target="_blank" rel="noopener"><?= $isApprovedCandidate ? 'Open approved source search' : 'Review candidate metadata' ?> ↗</a><?php endif; ?></div>
 <?php else: ?>
-<div class="external-player" style="background:<?= htmlspecialchars((string) ($title['gradient'] ?? 'linear-gradient(135deg,#111,#444)')) ?>"><span class="external-icon"><?= htmlspecialchars((string) ($title['icon'] ?? '📺')) ?></span><h2>Catalogue available</h2><p>No approved full-show source has been added. Browse the complete episode guide below.</p></div>
+<div class="external-player" style="background:<?= htmlspecialchars((string) ($title['gradient'] ?? 'linear-gradient(135deg,#111,#444)')) ?>"><span class="external-icon"><?= htmlspecialchars((string) ($title['icon'] ?? '📺')) ?></span><h2>Media source required</h2><p>This catalogue entry does not yet include a playable video URL or collection item. Browse the episode guide below while the media source is connected.</p></div>
 <?php endif; ?>
 
 <?php if (($title['type'] ?? '') === 'show' && $currentEpisode && $currentEpisodeIsPlayable): ?>
@@ -201,6 +202,7 @@ function beyond_tv_episode_code(array $episode): string
   } catch (error) {}
 })();
 </script>
+<script src="/beyond-tv/assets/js/app.js?v=3.0.1"></script>
 <script src="/assets/js/visitor-analytics.js" defer></script>
 </body>
 </html>

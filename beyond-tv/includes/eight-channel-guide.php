@@ -112,7 +112,7 @@ function beyond_tv_eight_channel_guide(array $classicState, array $cartoonState)
         if ($slug === 'yugioh-tv') { $rows = beyond_tv_anime_rows(); }
         if ($slug === 'beyond-cartoons') { $rows = beyond_tv_cartoon_hourly_rows(); }
         if ($slug === 'classic-cinema') { $rows = beyond_tv_movie_hourly_rows(); }
-        if (in_array($slug, ['bubble-guppies','preschool-francais','beyond-comedy','beyond-family'], true)) { $catalogRows=beyond_tv_catalog_hourly_rows($slug); if($catalogRows)$rows=$catalogRows; }
+        if (in_array($slug, ['bubble-guppies','preschool-francais','beyond-comedy','beyond-family','beyond-mystery'], true)) { $catalogRows=beyond_tv_catalog_hourly_rows($slug); if($catalogRows)$rows=$catalogRows; }
         if (in_array($slug, ['space-tv','beyond-ancient','beyond-french','beyond-health'], true)) { $rows=beyond_tv_confirmed_presentation_rows($slug,$rows); }
         if (!$rows) { continue; }
         $guide[] = [

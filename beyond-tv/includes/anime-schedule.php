@@ -94,17 +94,17 @@ function beyond_anime_program_for_block(
 ): array {
     $baseLineup = [
         'dragon-ball',
+        'kirby',
         'dragon-ball-kai',
+        'death-note',
         'dragon-ball-z',
         'yugioh',
         'zatch-bell',
         'digimon',
         'pokemon',
+        'kirby',
+        'death-note',
         'dragon-ball-z',
-        'dragon-ball',
-        'zatch-bell',
-        'digimon',
-        'pokemon',
     ];
     $weekdayOffset = ((int)$blockStart->format('N') - 1) % count($baseLineup);
     $lineup = array_merge(
@@ -113,7 +113,7 @@ function beyond_anime_program_for_block(
     );
     $key = $lineup[$blockIndex % count($lineup)];
     $duration = in_array($key, ['zatch-bell', 'digimon', 'pokemon'], true) ? 1320 : 1440;
-    if ($key === 'dragon-ball') $duration = 1380;
+    if (in_array($key, ['dragon-ball', 'kirby', 'death-note'], true)) $duration = 1380;
 
     $dayIndex = (int)$blockStart->format('z');
     $episodeAdvance = intdiv(max(0, $elapsed), $duration);
@@ -132,6 +132,42 @@ function beyond_anime_program_for_block(
 
 function beyond_anime_episode(string $key, int $seed, int $duration, int $startOffset): array
 {
+    if ($key === 'kirby') {
+        $library = beyond_anime_library('kirby-library.json');
+        $episode = $library[$seed % max(1, count($library))] ?? [];
+        $number = (int)($episode['episode'] ?? 1);
+        $title = (string)($episode['title'] ?? ('Episode ' . $number));
+        $file = (string)($episode['archive_file'] ?? $episode['file'] ?? '');
+        return [
+            'series' => 'Kirby: Right Back at Ya!',
+            'icon' => '⭐',
+            'episode_number' => $number,
+            'episode_title' => $title,
+            'lineup' => 'S1 E' . $number . ' · ' . $title,
+            'source_type' => 'archive',
+            'url' => 'https://archive.org/download/kirby-right-back-at-ya-high-quality-original-format-uncensored/'
+                . rawurlencode($file),
+        ];
+    }
+
+    if ($key === 'death-note') {
+        $library = beyond_anime_library('death-note-library.json');
+        $episode = $library[$seed % max(1, count($library))] ?? [];
+        $number = (int)($episode['episode'] ?? 1);
+        $title = (string)($episode['title'] ?? ('Episode ' . $number));
+        $file = (string)($episode['archive_file'] ?? $episode['file'] ?? '');
+        return [
+            'series' => 'Death Note',
+            'icon' => '📓',
+            'episode_number' => $number,
+            'episode_title' => $title,
+            'lineup' => 'S1 E' . $number . ' · ' . $title,
+            'source_type' => 'archive',
+            'url' => 'https://archive.org/download/death-note-complete-2006-2007/'
+                . rawurlencode($file),
+        ];
+    }
+
     if ($key === 'dragon-ball') {
         $library = beyond_anime_library('dragon-ball-library.json');
         $episode = $library[$seed % max(1, count($library))] ?? [];

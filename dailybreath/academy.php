@@ -51,7 +51,7 @@ foreach($courses as $course){
     <div><span class="ba-kicker"><?=$subscribed?'MEMBERSHIP ACTIVE':'START FREE'?></span><h2><?=$subscribed?'Every module is unlocked.':'Begin Module 1 at no cost.'?></h2><p><?=$subscribed?'Continue any teen or adult pathway and keep your saved progress.':'The first module in each path is free. Sign in and subscribe only when you are ready for Modules 2–5.'?></p></div>
     <?php if($subscribed):?><form method="post" action="academy-manage.php"><input type="hidden" name="csrf" value="<?=e(csrf_token())?>"><button class="ba-button secondary" type="submit">Manage membership</button></form><?php else:?><a class="ba-button secondary" href="academy-subscribe.php">View membership</a><?php endif;?>
   </section>
-  <section class="ba-section-head"><div><span class="ba-kicker"><?=e(strtoupper($selectedName))?> PATHWAY</span><h2>Build understanding one module at a time.</h2></div><p>Every module includes 10 guided lessons, 10 lesson checks, and one cumulative exam.</p></section>
+  <section class="ba-section-head"><div><span class="ba-kicker"><?=e(strtoupper($selectedName))?> PATHWAY</span><h2>Build understanding one module at a time.</h2></div><p>Every lesson includes three reflection and application practices before its check. Each module closes with one cumulative exam.</p></section>
   <section class="ba-modules">
     <?php foreach($courses as $index=>$course):$number=$index+1;$locked=!(bool)$course['is_free']&&!$subscribed;$progress=$courseProgress[(int)$course['id']]??['lessons'=>0,'exam'=>false];$percent=$progress['lessons']*10;?>
       <article class="ba-module">

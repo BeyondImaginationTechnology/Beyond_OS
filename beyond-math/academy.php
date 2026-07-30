@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 $academyConfig=[
- 'slug'=>'beyond-math','title'=>'Beyond Math Academy','icon'=>'🧮','accent'=>'#1768ff','base'=>'/beyond-math/academy.php','css'=>'/beyond-math/academy.css','headline'=>'Math that grows with every learner.','description'=>'Five modules with ten interactive lessons each, guided practice, lesson tests, and module exams. Module 1 is free for everyone.',
+ 'slug'=>'beyond-math','title'=>'Beyond Math Academy','icon'=>'🧮','logo'=>'/beyond-math/assets/img/beyond-math-logo.webp','tagline'=>'Learning campus','accent'=>'#1768ff','base'=>'/beyond-math/academy.php','css'=>'/beyond-math/academy.css','headline'=>'Math that grows with every learner.','description'=>'Five modules with ten interactive lessons each, guided practice, lesson tests, and module exams. Module 1 is free for everyone.',
  'tracks'=>[
   'preschool'=>['Numbers & Counting','Shapes & Space','Adding & Taking Away','Measurement & Time','Patterns & Money'],
   'kids'=>['Number Sense','Operations','Fractions & Decimals','Geometry & Measurement','Data & Problem Solving'],

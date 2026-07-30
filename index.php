@@ -117,7 +117,7 @@ try {
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset','ocean','forest'].includes(t)?t:'dark';}catch(e){document.documentElement.dataset.theme='dark';}try{const c=localStorage.getItem('beyond-currency');document.documentElement.dataset.currency=['USD','CAD','BITS'].includes(c)?c:'CAD';}catch(e){document.documentElement.dataset.currency='CAD';}})();</script>
 <meta name="theme-color" content="#050817">
-<title>Beyond OS 2.3.1 | Live. Learn. Earn. Explore.</title>
+<title>Beyond OS 2.3.3 | Live. Learn. Earn. Explore.</title>
 <meta name="description" content="Health, education, wallet and entertainment connected through one secure Beyond ID and one shared bit$ balance.">
 <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
 <style>

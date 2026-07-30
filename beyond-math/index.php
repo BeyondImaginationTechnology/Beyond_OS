@@ -10,8 +10,13 @@ $userName = $_SESSION['user_name'] ?? $_SESSION['name'] ?? 'Learner';
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#07111f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Beyond Math">
   <meta name="description" content="Beyond Math — step-by-step math lessons, adaptive practice, calculators and an AI learning coach inside Beyond Academy.">
   <title>Beyond Math — Math that meets you where you are</title>
+  <link rel="manifest" href="/beyond-math/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/beyond-math/assets/img/beyond-math-logo.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -58,6 +63,7 @@ $userName = $_SESSION['user_name'] ?? $_SESSION['name'] ?? 'Learner';
       <div class="login-divider"><span>or start free</span></div>
       <a class="btn secondary wide" href="/beyond-math/academy.php">Try a free lesson</a>
       <a class="btn ghost wide" href="/beyond-math/tools.php">Open calculator tools</a>
+      <button class="btn ghost wide" id="installBeyondMath" type="button" hidden>Install Beyond Math</button>
       <p class="privacy-note">Guest access does not require an account. Beyond ID unlocks cloud-synced progress and personalized learning.</p>
     </aside>
   </section>
@@ -84,5 +90,5 @@ $userName = $_SESSION['user_name'] ?? $_SESSION['name'] ?? 'Learner';
   </section>
 </main>
 <footer class="footer"><span>© <?= date('Y') ?> Beyond Imagination Technology</span><a href="/academy/">Beyond Academy</a></footer>
-<script src="/assets/js/visitor-analytics.js" defer></script></body>
+<script src="/beyond-math/assets/js/app.js?v=2.3.3" defer></script><script src="/assets/js/visitor-analytics.js" defer></script></body>
 </html>

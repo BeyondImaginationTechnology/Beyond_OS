@@ -29,7 +29,9 @@ function bos_log(string $event, array $details=[]): void {
     try { $s=beyond_db()->prepare('INSERT INTO platform_events(user_id,event_name,details_json,created_at) VALUES(?,?,?,NOW())'); $s->execute([bos_current_user_id() ?: null,$event,json_encode($details)]); } catch(Throwable $e) {}
 }
 function bos_app_card(string $title,string $copy,string $href,string $icon='✦',string $status='Open',?string $brandIcon=null): string {
-    if ($brandIcon === '@atom') {
+    if ($brandIcon === '@blank') {
+        $iconMarkup = '<span class="bos-card-icon bos-card-icon-blank" aria-hidden="true"></span>';
+    } elseif ($brandIcon === '@atom') {
         $iconMarkup = '<span class="bos-card-icon bos-card-brand-tile"><img src="'.e(beyond_url('assets/icons/app-store/beyond-imagination.jpg')).'" alt=""><small>'.e($icon).'</small></span>';
     } elseif (is_string($brandIcon) && $brandIcon !== '') {
         $iconMarkup = '<span class="bos-card-icon bos-card-brand-icon"><img src="'.e(beyond_url($brandIcon)).'" alt="'.e($title).' icon"></span>';

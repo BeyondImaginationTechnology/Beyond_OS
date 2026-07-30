@@ -118,6 +118,7 @@
   const heritageBotanical = new Image(); heritageBotanical.src = '/assets/img/verse-cannabis-heritage-botanical-v1.png';
   let activeAudio = null;
   let verseCatalog = [];
+  let currentVerseId = '';
   const controls = [...document.querySelectorAll('input,textarea,select')];
 
   const value = id => $(id).value.trim();
@@ -205,6 +206,7 @@
   function draw(pulse=0){const selected=style();selected==='advanced'?drawAdvanced(pulse):(selected==='botanical'?drawBotanical(pulse):drawForest(pulse))}
 
   function applyVerseItem(item,preserveDate=false){
+    currentVerseId=item.id||'';
     $('heading').value=localizedHeading();$('verse').value=item.verse;$('reference').value=item.reference;$('translation').value=item.translation||'KJV';$('footer').value=item.footer||'WALK IN FAITH TODAY.';
     if(!preserveDate){const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000);$('publishDate').value=local.toISOString().slice(0,10)}draw();
   }
@@ -216,9 +218,10 @@
       const response=await fetch(`/server/admin/daily-studio/api/random-content.php?${params}`,{cache:'no-store'});
       const data=await response.json();
       if(!response.ok)throw new Error(data.error||'Managed verse could not be loaded.');
-      if(data.item){applyVerseItem(data.item,true);if(showMessage)status(`${data.item.status==='published'?'Published':'Draft'} Content Manager verse loaded for ${date}.`)}
+      if(data.item){applyVerseItem(data.item,true);if(showMessage)status(`${data.item.status==='published'?'Published':'Draft'} Content Manager verse loaded for ${date}.`);return true}
       else if(showMessage)status(`No managed verse for ${date}; the generator placeholder is ready.`);
     }catch(error){if(showMessage)status(error.message,true)}
+    return false;
   }
   function populateBooks(){
     const books=[...new Set(verseCatalog.map(item=>item.book))];$('verseBook').innerHTML=books.map(book=>`<option value="${book}">${book}</option>`).join('');populateChapters();
@@ -233,6 +236,15 @@
     $('loadSelectedVerse').disabled=true;
     try{const response=await fetch(`/server/admin/daily-studio/api/random-content.php?type=bible&catalog=1&language=${encodeURIComponent(verseLanguage())}`,{cache:'no-store'});const data=await response.json();if(!response.ok||!Array.isArray(data.items))throw new Error(data.error||'Verse list could not be loaded.');verseCatalog=data.items;populateBooks();}
     catch(error){verseCatalog=[];$('verseBook').innerHTML=$('verseChapter').innerHTML=$('verseNumber').innerHTML='';status(error.message,true)}finally{$('loadSelectedVerse').disabled=false}
+  }
+  async function loadVerseTranslation(id){
+    if(!id)return false;
+    const params=new URLSearchParams({type:'bible',language:verseLanguage(),id});
+    const response=await fetch(`/server/admin/daily-studio/api/random-content.php?${params}`,{cache:'no-store'});
+    const data=await response.json();
+    if(!response.ok||!data.item)return false;
+    applyVerseItem(data.item,true);
+    return true;
   }
   async function loadSelectedVerse(){
     const button=$('loadSelectedVerse');button.disabled=true;status('Loading selected verse…');
@@ -327,7 +339,7 @@
   }
   if('speechSynthesis' in window){window.speechSynthesis.onvoiceschanged=populateVoices;populateVoices()}
   document.querySelectorAll('input[name="narrationLanguage"]').forEach(input=>input.addEventListener('change',()=>{populateVoices();status(`${input.nextElementSibling.textContent.trim()} narrator selected.`);draw()}));
-  document.querySelectorAll('input[name="verseLanguage"]').forEach(input=>input.addEventListener('change',()=>{const settings=languageSettings[input.value];const narration=document.querySelector(`input[name="narrationLanguage"][value="${settings.narration}"]`);if(narration)narration.checked=true;$('locale').value=settings.locale;syncHeading();populateVoices();loadVerseCatalog();loadManagedVerse();status(`${input.nextElementSibling.textContent.trim()} selected for verse text and audio.`);draw()}));
+  document.querySelectorAll('input[name="verseLanguage"]').forEach(input=>input.addEventListener('change',async()=>{const settings=languageSettings[input.value],verseId=currentVerseId;const narration=document.querySelector(`input[name="narrationLanguage"][value="${settings.narration}"]`);if(narration)narration.checked=true;$('locale').value=settings.locale;syncHeading();populateVoices();status(`Loading ${input.nextElementSibling.textContent.trim()} scripture…`);await loadVerseCatalog();const managedLoaded=await loadManagedVerse();const translated=managedLoaded||await loadVerseTranslation(verseId);if(!translated)await generateTodayVerse();status(`${input.nextElementSibling.textContent.trim()} selected for scripture text and audio.`);draw()}));
   $('daypart').addEventListener('change',()=>{syncHeading();status(`${$('daypart').selectedOptions[0].textContent} edition selected.`);draw()});
   $('verseBook').addEventListener('change',populateChapters);$('verseChapter').addEventListener('change',populateVerseNumbers);$('loadSelectedVerse').addEventListener('click',loadSelectedVerse);$('publishDate').addEventListener('change',()=>loadManagedVerse(true));
 

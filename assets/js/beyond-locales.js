@@ -159,7 +159,7 @@
     document.querySelectorAll('#localePicker').forEach(function (picker) { picker.setAttribute('aria-label', dictionary.language); });
     document.querySelectorAll('.bos-app-store-label-full').forEach(function (label) { var value = appStoreLabels[locale] || appStoreLabels.en; if (label.textContent !== value) label.textContent = value; });
     document.querySelectorAll('.hero-actions .ghost').forEach(function (link) { var value = appStoreCtas[locale] || appStoreCtas.en; if (link.textContent !== value) link.textContent = value; });
-    document.querySelectorAll('#beyond-os-shell .bos-home-label').forEach(function (label) { if (label.textContent !== 'BEYOND OS 2.3.1') label.textContent = 'BEYOND OS 2.3.1'; });
+    document.querySelectorAll('#beyond-os-shell .bos-home-label').forEach(function (label) { if (label.textContent !== 'BEYOND OS 2.3.3') label.textContent = 'BEYOND OS 2.3.3'; });
     document.querySelectorAll('.bos-kicker,.bos-hero h1,.os,.logo').forEach(function (label) {
       var nextText = label.textContent
         .replace(/Beyond OS 2\.1 Beta/gi, 'Beyond OS · Beta Build 2.1.1')

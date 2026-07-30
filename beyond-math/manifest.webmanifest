@@ -1,0 +1,18 @@
+{
+  "id": "/beyond-math/",
+  "name": "Beyond Math",
+  "short_name": "Math",
+  "description": "Lessons, practice, progress, and everyday math tools from Beyond Academy.",
+  "start_url": "/beyond-math/",
+  "scope": "/beyond-math/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#07111f",
+  "theme_color": "#07111f",
+  "categories": ["education", "productivity"],
+  "icons": [{"src": "/beyond-math/assets/img/beyond-math-logo.webp", "sizes": "512x512", "type": "image/webp", "purpose": "any"}],
+  "shortcuts": [
+    {"name": "Continue learning", "url": "/beyond-math/academy.php"},
+    {"name": "Math tools", "url": "/beyond-math/tools.php"}
+  ]
+}

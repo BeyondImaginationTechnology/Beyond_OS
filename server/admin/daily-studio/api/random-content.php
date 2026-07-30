@@ -48,9 +48,9 @@ try {
                 jsonOut(['ok'=>false, 'error'=>'A valid managed-content date is required.'], 422);
             }
             require $root . '/beyond-id/includes/db.php';
-            $managedLocale = $language === 'jm' ? 'en' : $language;
-            $statement = $pdo->prepare("SELECT publish_date,locale,translation_code,heading,verse_text,scripture_reference,footer_message,status FROM verse_day_posts WHERE publish_date=? AND locale IN (?, 'en') ORDER BY CASE WHEN locale=? THEN 0 ELSE 1 END, CASE WHEN status='published' THEN 0 ELSE 1 END, id DESC LIMIT 1");
-            $statement->execute([$managedDate, $managedLocale, $managedLocale]);
+            $managedLocale = $language;
+            $statement = $pdo->prepare("SELECT publish_date,locale,translation_code,heading,verse_text,scripture_reference,footer_message,status FROM verse_day_posts WHERE publish_date=? AND locale=? ORDER BY CASE WHEN status='published' THEN 0 ELSE 1 END, id DESC LIMIT 1");
+            $statement->execute([$managedDate, $managedLocale]);
             $managed = $statement->fetch(PDO::FETCH_ASSOC);
             if (!$managed || trim((string)($managed['verse_text'] ?? '')) === '') {
                 jsonOut(['ok'=>true, 'item'=>null, 'source'=>'generator_placeholder']);
@@ -158,15 +158,20 @@ try {
         ];
         $footers = $footerBanks[$language];
         if (isset($_GET['catalog']) && $_GET['catalog'] === '1') {
-            $catalog = array_map(fn($i) => ['book'=>$i['book'],'chapter'=>$i['chapter'],'verse_number'=>$i['verse_number'],'reference'=>$i['reference']], $items);
+            $catalog = array_map(fn($i) => ['id'=>$i['id'],'book'=>$i['book'],'chapter'=>$i['chapter'],'verse_number'=>$i['verse_number'],'reference'=>$i['reference']], $items);
             jsonOut(['ok'=>true,'language'=>$language,'translation'=>$translation,'items'=>$catalog]);
         }
+        $selectedId = strtoupper(trim((string)($_GET['id'] ?? '')));
         $selectedBook = strtoupper(trim((string)($_GET['book'] ?? '')));
         $selectedChapter = (int)($_GET['chapter'] ?? 0);
         $selectedVerse = (int)($_GET['verse'] ?? 0);
         $cycled = false;
         $remaining = count($items);
-        if ($selectedBook !== '' && $selectedChapter > 0 && $selectedVerse > 0) {
+        if ($selectedId !== '') {
+            $matches = array_values(array_filter($items, fn($i) => strtoupper($i['id']) === $selectedId));
+            if (!$matches) jsonOut(['error'=>'The selected verse is not available in this language bank.'], 404);
+            $item = $matches[0];
+        } elseif ($selectedBook !== '' && $selectedChapter > 0 && $selectedVerse > 0) {
             $matches = array_values(array_filter($items, fn($i) => strtoupper($i['book']) === $selectedBook && $i['chapter'] === $selectedChapter && $i['verse_number'] === $selectedVerse));
             if (!$matches) jsonOut(['error'=>'The selected verse is not available in this language bank.'], 404);
             $item = $matches[0];

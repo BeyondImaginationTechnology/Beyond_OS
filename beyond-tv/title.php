@@ -88,11 +88,12 @@ function beyond_tv_episode_code(array $episode): string
 <!doctype html>
 <html lang="en">
 <head>
-<script>(function(){try{const t=localStorage.getItem("beyond-tv-theme");document.documentElement.dataset.tvTheme=["dark","light","sunset"].includes(t)?t:"dark"}catch(e){document.documentElement.dataset.tvTheme="dark"}})();</script>
+<script>(function(){try{const t=localStorage.getItem("beyond-tv-theme");document.documentElement.dataset.tvTheme=["dark","light","sunset"].includes(t)?t:"sunset"}catch(e){document.documentElement.dataset.tvTheme="sunset"}})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#401532">
 <title><?= htmlspecialchars((string) $title['title']) ?><?= $currentEpisodeIsPlayable && $currentEpisodeTitle !== '' ? ' · ' . htmlspecialchars(beyond_tv_episode_code($currentEpisode ?? []) . ' ' . $currentEpisodeTitle) : '' ?> | Beyond TV</title>
-<link rel="stylesheet" href="/beyond-tv/assets/css/app.css?v=2.2.2">
+<link rel="stylesheet" href="/beyond-tv/assets/css/app.css?v=3.0.0">
 </head>
 <body class="tv-app">
 <?php include __DIR__ . '/partials/header.php'; ?>

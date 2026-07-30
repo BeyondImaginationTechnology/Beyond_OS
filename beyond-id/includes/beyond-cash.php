@@ -4,7 +4,7 @@ declare(strict_types=1);
 /**
  * Returns the user's provider-backed cash accounts. These records are display
  * mirrors only: balances may be changed only by verified provider webhooks and
- * reconciliation jobs once DCBank is connected.
+ * reconciliation jobs once a regulated cash provider is connected.
  */
 function beyond_cash_accounts(PDO $pdo, int $userId): array
 {

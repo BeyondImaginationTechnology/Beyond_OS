@@ -15,7 +15,7 @@ $wallet = beyond_nav_bootstrap('Beyond App Store');
   <section class="bos-section" id="featured">
     <span class="bos-kicker">Live</span><h2>Health & daily life</h2><p>Daily guidance, wellness and creative self-expression.</p>
     <div class="bos-grid">
-      <?=bos_app_card('Daily Breath','Daily verse, reflection and breathing practice.','dailybreath/bible.php?preview=1','DB','Live demo','@blank')?>
+      <?=bos_app_card('Daily Breath','Daily verse, reflection and breathing practice.','dailybreath/bible.php?preview=1','DB','Live demo','assets/icons/app-store/daily-breath.jpg')?>
       <?=bos_app_card('Beyond Health','Health tools for mind, body and everyday care.','dailybreath/practices.php','BH','Open practices','assets/icons/app-store/beyond-health.jpg')?>
       <?=bos_app_card('Beyond Tattoo','AI-assisted tattoo ideas and daily stencils.','beyond-tattoo/','BT','Open app','assets/icons/app-store/beyond-tattoo.jpg')?>
       <?=bos_app_card('Baby Names','Explore names, origins and meanings.','beyond-baby-names/','BN','Open app','assets/icons/app-store/baby-names.jpg')?>
@@ -27,9 +27,8 @@ $wallet = beyond_nav_bootstrap('Beyond App Store');
     <div class="bos-grid">
       <?=bos_app_card('Beyond French 2.0','Daily French, four-language practice, and a new iOS beta.','beyond-french/ios-beta.php','BF','Join iOS beta','assets/icons/app-store/beyond-french.jpg')?>
       <?=bos_app_card('Beyond Math Academy','5 modules · 10 lessons each · interactive lessons.','beyond-math/academy.php','BM','Open Academy','beyond-math/assets/img/beyond-math-logo.webp')?>
-      <?=bos_app_card('Beyond Ancient','Explore ancient worlds and civilizations.','beyond-tv/channel.php?slug=beyond-ancient','BA','Watch & learn','assets/icons/app-store/beyond-ancient.jpg')?>
-      <?=bos_app_card('Beyond Space','Launch into astronomy and space discovery.','beyond-space/','BS','Open app','assets/icons/app-store/beyond-space.jpg')?>
-      <?=bos_app_card('Beyond Preschool','Early learning activities for young minds.','beyond-preschool/','BP','Open app','@blank')?>
+      <?=bos_app_card('Beyond Ancient Academy','50 narrated world-history lessons, artifact labs, source analysis, and exams.','beyond-ancient/academy.php','BA','Open Academy','assets/icons/app-store/beyond-ancient.jpg')?>
+      <?=bos_app_card('Beyond Space','Space Academy, Solar System explorer, astronomy missions, and entertainment horoscopes.','beyond-space/','BS','Explore','assets/icons/app-store/beyond-space.jpg')?>
       <?=bos_app_card('Beyond Coding School','Web, iOS, Android, SVG, game and full-stack pathways.','coding-school/','CODE','Open School','@blank')?>
     </div>
   </section>

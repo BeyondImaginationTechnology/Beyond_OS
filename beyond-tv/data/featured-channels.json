@@ -1,15 +1,17 @@
 [
-  {"number":1,"slug":"beyond-after-dark","name":"Beyond After Dark","icon":"🌙","description":"Goosebumps, Courage the Cowardly Dog, Haunting Hour, and supernatural anthologies.","category":"Horror"},
+  {"number":1,"slug":"beyond-after-dark","name":"Beyond After Dark","icon":"🌙","description":"Ghost Stories, Goosebumps, Courage, Haunting Hour, and supernatural animation.","category":"Horror"},
   {"number":2,"slug":"beyond-cartoons","name":"Beyond Kartoons","icon":"📺","description":"Action cartoons, animated comedy, and weekend favorites.","category":"Cartoons"},
   {"number":3,"slug":"yugioh-tv","name":"Beyond Anime","icon":"🎴","description":"Dragon Ball, Dragon Ball Z SD, Dragon Ball Kai, Pokémon, Digimon, Yu-Gi-Oh!, and Zatch Bell!","category":"Anime"},
   {"number":4,"slug":"classic-cinema","name":"Beyond Movies","icon":"🎬","description":"Features, double bills, and weekend marathons.","category":"Movies"},
   {"number":5,"slug":"beyond-comedy","name":"Beyond Comedy","icon":"😂","description":"Sitcoms, teen comedy, and feel-good movies.","category":"Comedy"},
   {"number":6,"slug":"beyond-family","name":"Beyond Family","icon":"✨","description":"Fantasy, storybook classics, and family adventures.","category":"Family"},
-  {"number":7,"slug":"classic-cartoon-theater","name":"Classic Cartoon Theater","icon":"🎞️","description":"Vintage animation and weekend cartoon blocks.","category":"Cartoons"},
+  {"number":7,"slug":"classic-cartoon-theater","name":"Beyond Animated Classics","icon":"⚡","description":"X-Men, Spider-Man, Fantastic Four, Hulk, and Batman animation blocks.","category":"Superheroes"},
   {"number":8,"slug":"bubble-guppies","name":"Preschool English","icon":"🐾","description":"Bluey, Bubble Guppies, Blue's Clues, and English preschool favorites.","category":"Preschool"},
   {"number":9,"slug":"preschool-francais","name":"Préscolaire Français","icon":"🇫🇷","description":"Caillou et des histoires éducatives dans un canal préscolaire entièrement en français.","category":"Preschool"},
   {"number":10,"slug":"space-tv","name":"Beyond Space","icon":"🛰️","description":"Space science, NASA, and cosmic ambience.","category":"Science"},
   {"number":11,"slug":"beyond-ancient","name":"Beyond Ancient","icon":"🏺","description":"Archaeology, civilizations, and ancient history.","category":"History"},
   {"number":12,"slug":"beyond-french","name":"Beyond French","icon":"🇫🇷","description":"Lessons, conversation, and French culture.","category":"Education"},
-  {"number":13,"slug":"beyond-health","name":"Beyond Health","icon":"💚","description":"Fitness, nutrition, meditation, and wellness.","category":"Wellness"}
+  {"number":13,"slug":"beyond-health","name":"Beyond Health","icon":"💚","description":"Fitness, nutrition, meditation, and wellness.","category":"Wellness"},
+  {"number":14,"slug":"beyond-trailers","name":"Beyond Trailers","icon":"🍿","description":"Official trailers, teasers, first looks, and coming-soon previews.","category":"Entertainment"},
+  {"number":15,"slug":"beyond-sports","name":"Beyond Sports","icon":"🏆","description":"Official highlights, full replays, athlete stories, and iconic moments.","category":"Sports"}
 ]

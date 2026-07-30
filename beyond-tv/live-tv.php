@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . '/require-member.php';
+require_once __DIR__ . '/../includes/ecosystem.php';
+if (!empty($_SESSION['user_id'])) {
+    beyond_track_app('Beyond TV');
+}
  $channelsBySlug=[]; foreach((json_decode(file_get_contents(__DIR__ . '/data/channels.json'),true)?:[]) as $channel){$channelsBySlug[(string)($channel['slug']??'')]=$channel;}
  $channels=[]; foreach((json_decode(file_get_contents(__DIR__ . '/data/featured-channels.json'),true)?:[]) as $featured){$slug=(string)($featured['slug']??'');if(isset($channelsBySlug[$slug]))$channels[]=array_merge($channelsBySlug[$slug],$featured);} ?>
 <!doctype html><html lang="en"><head><script>(function(){try{const t=localStorage.getItem("beyond-tv-theme");document.documentElement.dataset.tvTheme=["dark","light","sunset"].includes(t)?t:"dark"}catch(e){document.documentElement.dataset.tvTheme="dark"}})();</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=count($channels)?> Live Channels | Beyond TV</title><link rel="stylesheet" href="/beyond-tv/assets/css/app.css"></head><body><?php include 'partials/header.php'; ?><main class="page shell"><span class="kicker">LIVE GUIDE</span><h1><?=count($channels)?> Live Channels</h1><p class="lead">Cartoons, English and French preschool, movies, comedy, mystery, family, learning, wellness, and After Dark—organized into focused live-library channels.</p><div class="guide"><?php foreach($channels as $i=>$c): ?><a href="channel.php?slug=<?= urlencode($c['slug']) ?>"><time>CH <?=str_pad((string)($i+1),2,'0',STR_PAD_LEFT)?></time><strong><?= htmlspecialchars($c['name']) ?></strong><span><?= htmlspecialchars($c['now']) ?><?php if (!empty($c['weekend'])): ?> · <?= htmlspecialchars((string)($c['weekend_label'] ?? 'This weekend')) ?><?php endif; ?></span><b>LIVE</b></a><?php endforeach; ?></div></main><?php include 'partials/footer.php'; ?><script src="/beyond-tv/assets/js/app.js"></script><script src="/assets/js/visitor-analytics.js" defer></script></body></html>

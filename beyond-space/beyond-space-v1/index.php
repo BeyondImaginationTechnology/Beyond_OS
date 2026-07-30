@@ -8,18 +8,18 @@ $featured = [
   ['title'=>'Life Beyond Earth','eyebrow'=>'Astrobiology','icon'=>'👽','copy'=>'Investigate habitable worlds, biosignatures, ocean moons, and the search for life.'],
 ];
 $signs = [
-  ['name'=>'Aries','symbol'=>'♈','dates'=>'Mar 21 – Apr 19','message'=>'Lead with curiosity today. A bold question may open a surprising path.'],
-  ['name'=>'Taurus','symbol'=>'♉','dates'=>'Apr 20 – May 20','message'=>'Slow down and notice the details. Steady progress beats a rushed launch.'],
-  ['name'=>'Gemini','symbol'=>'♊','dates'=>'May 21 – Jun 20','message'=>'Share an idea, ask a question, and let conversation spark discovery.'],
-  ['name'=>'Cancer','symbol'=>'♋','dates'=>'Jun 21 – Jul 22','message'=>'Protect your energy while staying open to one meaningful connection.'],
-  ['name'=>'Leo','symbol'=>'♌','dates'=>'Jul 23 – Aug 22','message'=>'Let your creativity take the spotlight. Build something unmistakably yours.'],
-  ['name'=>'Virgo','symbol'=>'♍','dates'=>'Aug 23 – Sep 22','message'=>'A small adjustment can improve the whole system. Refine before expanding.'],
-  ['name'=>'Libra','symbol'=>'♎','dates'=>'Sep 23 – Oct 22','message'=>'Balance imagination with evidence. The strongest choice may combine both.'],
-  ['name'=>'Scorpio','symbol'=>'♏','dates'=>'Oct 23 – Nov 21','message'=>'Look beneath the surface. A hidden pattern is ready to be understood.'],
-  ['name'=>'Sagittarius','symbol'=>'♐','dates'=>'Nov 22 – Dec 21','message'=>'Explore beyond the familiar. A new subject may become your next obsession.'],
-  ['name'=>'Capricorn','symbol'=>'♑','dates'=>'Dec 22 – Jan 19','message'=>'Choose one ambitious target and give it structure. Momentum follows clarity.'],
-  ['name'=>'Aquarius','symbol'=>'♒','dates'=>'Jan 20 – Feb 18','message'=>'Your unusual perspective is useful today. Test the idea instead of shrinking it.'],
-  ['name'=>'Pisces','symbol'=>'♓','dates'=>'Feb 19 – Mar 20','message'=>'Make room for wonder, then ground it with one practical next step.'],
+  ['name'=>'Aries','symbol'=>'♈','dates'=>'Mar 21 – Apr 19','element'=>'Fire','message'=>'Lead with curiosity today. A bold question may open a surprising path.'],
+  ['name'=>'Taurus','symbol'=>'♉','dates'=>'Apr 20 – May 20','element'=>'Earth','message'=>'Slow down and notice the details. Steady progress beats a rushed launch.'],
+  ['name'=>'Gemini','symbol'=>'♊','dates'=>'May 21 – Jun 20','element'=>'Air','message'=>'Share an idea, ask a question, and let conversation spark discovery.'],
+  ['name'=>'Cancer','symbol'=>'♋','dates'=>'Jun 21 – Jul 22','element'=>'Water','message'=>'Protect your energy while staying open to one meaningful connection.'],
+  ['name'=>'Leo','symbol'=>'♌','dates'=>'Jul 23 – Aug 22','element'=>'Fire','message'=>'Let your creativity take the spotlight. Build something unmistakably yours.'],
+  ['name'=>'Virgo','symbol'=>'♍','dates'=>'Aug 23 – Sep 22','element'=>'Earth','message'=>'A small adjustment can improve the whole system. Refine before expanding.'],
+  ['name'=>'Libra','symbol'=>'♎','dates'=>'Sep 23 – Oct 22','element'=>'Air','message'=>'Balance imagination with evidence. The strongest choice may combine both.'],
+  ['name'=>'Scorpio','symbol'=>'♏','dates'=>'Oct 23 – Nov 21','element'=>'Water','message'=>'Look beneath the surface. A hidden pattern is ready to be understood.'],
+  ['name'=>'Sagittarius','symbol'=>'♐','dates'=>'Nov 22 – Dec 21','element'=>'Fire','message'=>'Explore beyond the familiar. A new subject may become your next obsession.'],
+  ['name'=>'Capricorn','symbol'=>'♑','dates'=>'Dec 22 – Jan 19','element'=>'Earth','message'=>'Choose one ambitious target and give it structure. Momentum follows clarity.'],
+  ['name'=>'Aquarius','symbol'=>'♒','dates'=>'Jan 20 – Feb 18','element'=>'Air','message'=>'Your unusual perspective is useful today. Test the idea instead of shrinking it.'],
+  ['name'=>'Pisces','symbol'=>'♓','dates'=>'Feb 19 – Mar 20','element'=>'Water','message'=>'Make room for wonder, then ground it with one practical next step.'],
 ];
 ?><!doctype html>
 <html lang="en">
@@ -27,21 +27,22 @@ $signs = [
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#030612">
-  <title>Beyond Space — Version 2.0</title>
-  <meta name="description" content="An interactive AI-powered journey through space, astronomy, technology, and astrology.">
+  <title>Beyond Space — Academy, Astronomy & Horoscopes</title>
+  <meta name="description" content="Explore a complete astronomy academy, interactive space science, daily entertainment horoscopes, and zodiac reflections.">
   <link rel="icon" href="/beyond-space/beyond-space-v1/assets/img/beyond-space-logo.webp">
   <link rel="stylesheet" href="/beyond-space/beyond-space-v1/assets/css/app.css?v=1.0.0">
+  <link rel="stylesheet" href="/beyond-space/beyond-space-v1/assets/css/enhancements.css?v=2.3.3">
 </head>
 <body>
 <div class="space-dust" aria-hidden="true"></div>
 <header class="topbar">
   <a class="brand" href="#top" aria-label="Beyond Space home">
     <img src="/beyond-space/beyond-space-v1/assets/img/beyond-space-logo.webp" alt="Beyond Space logo">
-    <span><b>Beyond Space</b><small>AI Explorer • Version 2.0</small></span>
+    <span><b>Beyond Space</b><small>Explorer + Academy • 2.3.3</small></span>
   </a>
   <button class="menu" id="menuBtn" aria-label="Open menu">☰</button>
   <nav id="nav">
-    <a href="#explore">Explore</a><a href="#system">Solar System</a><a href="#horoscope">Horoscope</a><a href="#quiz">Quiz</a>
+    <a href="#explore">Explore</a><a href="/beyond-space/academy.php">Academy</a><a href="#system">Solar System</a><a href="#horoscope">Horoscope</a><a href="#quiz">Quiz</a>
   </nav>
 </header>
 
@@ -53,8 +54,8 @@ $signs = [
     <span class="kicker">🚀 Launch into the unknown</span>
     <h1>The universe is<br><em>yours to explore.</em></h1>
     <p>Discover planets, galaxies, astronomy, space technology, possible life beyond Earth, and a daily astrology experience—all inside one animated learning world.</p>
-    <div class="actions"><a class="btn primary" href="#explore">Start exploring</a><button class="btn ghost" id="watchIntro">▶ Watch launch</button></div>
-    <div class="stats"><span><b>8</b> planets</span><span><b>12</b> zodiac signs</span><span><b>1</b> living universe</span></div>
+    <div class="actions"><a class="btn primary" href="/beyond-space/academy.php">Enter Space Academy</a><a class="btn ghost" href="#explore">Explore universe</a><button class="btn ghost" id="watchIntro">▶ Watch launch</button></div>
+    <div class="stats"><span><b>50</b> academy lessons</span><span><b>8</b> planets</span><span><b>12</b> zodiac signs</span></div>
   </div>
   <button class="scroll-cue" aria-label="Scroll to explore" onclick="document.querySelector('#explore').scrollIntoView({behavior:'smooth'})">⌄</button>
 </section>
@@ -100,13 +101,21 @@ $signs = [
 
 <section class="section horoscope" id="horoscope">
   <div class="section-head reveal"><span>Astrology • For entertainment</span><h2>Your Daily Cosmic Reading</h2><p>Choose a zodiac sign for a playful daily message. Astronomy and astrology remain clearly separated throughout the app.</p></div>
+  <div class="astro-profile reveal">
+    <div><span class="kicker">Sun sign finder</span><h3>Build your astrology profile</h3><p>Enter a birth date to find the traditional Western sun sign. Your choice can be remembered on this device.</p></div>
+    <label>Birth date<input id="birthDate" type="date"></label><button class="btn primary" id="findSign" type="button">Find my sign</button><output id="signResult" aria-live="polite">No birth date saved.</output>
+  </div>
   <div class="horoscope-layout">
     <div class="zodiac-grid reveal" id="zodiacGrid">
       <?php foreach($signs as $i=>$sign): ?>
       <button data-sign="<?= $i ?>"><b><?= $sign['symbol'] ?></b><span><?= htmlspecialchars($sign['name']) ?></span></button>
       <?php endforeach; ?>
     </div>
-    <article class="reading reveal" id="reading"><span class="reading-symbol">♈</span><small>Daily reading</small><h3>Aries</h3><em>Mar 21 – Apr 19</em><p>Lead with curiosity today. A bold question may open a surprising path.</p><small class="disclaimer">Astrology content is provided for reflection and entertainment, not as scientific or professional advice.</small></article>
+    <article class="reading reveal" id="reading"><span class="reading-symbol">♈</span><small>Daily reading · <span id="readingDate"><?=htmlspecialchars(date('M j'))?></span></small><h3>Aries</h3><em>Mar 21 – Apr 19</em><div class="reading-meta"><span id="readingElement">Fire</span><span id="readingEnergy">Energy: initiate</span></div><p>Lead with curiosity today. A bold question may open a surprising path.</p><small class="disclaimer">Astrology content is provided for reflection and entertainment, not as scientific, medical, legal, financial, or professional advice.</small></article>
+  </div>
+  <div class="compatibility reveal">
+    <div><span class="kicker">Compatibility explorer</span><h3>Compare two signs</h3><p>A playful reflection on traditional element pairings—not a prediction about any relationship.</p></div>
+    <label>First sign<select id="compatOne"><?php foreach($signs as $sign):?><option><?=htmlspecialchars($sign['name'])?></option><?php endforeach;?></select></label><label>Second sign<select id="compatTwo"><?php foreach($signs as $sign):?><option><?=htmlspecialchars($sign['name'])?></option><?php endforeach;?></select></label><button class="btn ghost" id="compareSigns" type="button">Compare</button><output id="compatResult" aria-live="polite">Choose two signs to explore.</output>
   </div>
 </section>
 
@@ -130,14 +139,14 @@ $signs = [
 </section>
 
 <section class="section beta" id="about">
-  <div class="reveal"><span class="kicker">Built for Beyond Learn</span><h2>An interactive universe, ready to expand.</h2><p>Version 2.0 delivers an animated landing experience, responsive navigation, destination cards, Solar System selector, horoscope module, mission timeline, quiz engine, and shared-hosting-ready PHP foundation.</p></div>
-  <div class="beta-list reveal"><span>✓ Mobile-first responsive UI</span><span>✓ Beyond ID secured</span><span>✓ PHP shared-hosting ready</span><span>✓ Horoscope included in v2.0</span><span>✓ Motion-reduction support</span></div>
+  <div class="reveal"><span class="kicker">Built for Beyond Learn</span><h2>A complete cosmic learning world.</h2><p>Study five astronomy modules, complete 50 narrated lessons, run mission labs, save progress, pass assessments, explore the Solar System, and enjoy a clearly separated astrology experience.</p><div class="actions"><a class="btn primary" href="/beyond-space/academy.php">Start the free module</a></div></div>
+  <div class="beta-list reveal"><span>✓ Five complete science modules</span><span>✓ 50 narrated lessons and labs</span><span>✓ Saved progress and assessments</span><span>✓ Daily horoscope and sign profile</span><span>✓ Mobile and motion-reduction support</span></div>
 </section>
 </main>
 
-<footer><img src="/beyond-space/beyond-space-v1/assets/img/beyond-space-logo.webp" alt=""><p>Beyond Space • Part of Beyond Learn</p><small>Version 2.0 — interactive educational experience</small></footer>
+<footer><img src="/beyond-space/beyond-space-v1/assets/img/beyond-space-logo.webp" alt=""><p>Beyond Space • Part of Beyond Learn</p><small>Version 2.3.3 — astronomy education with a separate entertainment astrology experience</small></footer>
 
-<div class="modal" id="modal" aria-hidden="true"><div class="modal-card"><button class="close" aria-label="Close">×</button><span id="modalIcon">🪐</span><small id="modalEyebrow"></small><h2 id="modalTitle"></h2><p id="modalCopy"></p><div class="progress"><i></i></div><p class="coming">Interactive chapter preview • Full experience coming in the next beta.</p></div></div>
+<div class="modal" id="modal" aria-hidden="true"><div class="modal-card"><button class="close" aria-label="Close">×</button><span id="modalIcon">🪐</span><small id="modalEyebrow"></small><h2 id="modalTitle"></h2><p id="modalCopy"></p><a class="btn primary" href="/beyond-space/academy.php">Study this in Space Academy</a></div></div>
 <div class="modal" id="videoModal" aria-hidden="true"><div class="modal-card video-card"><button class="close" aria-label="Close">×</button><div class="cinema"><div class="cinema-earth"></div><div class="cinema-moon"></div><div class="cinema-rocket">🚀</div></div><h2>Welcome to Beyond Space</h2><p>A lightweight animated launch sequence ready to be replaced by an MP4 or WebM cinematic.</p></div></div>
 <script>window.BS_STORIES = <?= json_encode($featured, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) ?>; window.BS_SIGNS = <?= json_encode($signs, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) ?>;</script>
 <script src="/beyond-space/beyond-space-v1/assets/js/app.js?v=1.0.0"></script>

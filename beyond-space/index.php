@@ -1,2 +1,3 @@
-<?php require_once __DIR__.'/../includes/app-layout.php'; $wallet=bos_page_start('Beyond Space','Beyond Space','Explore the universe.'); ?>
-<main class="bos-main"><section class="bos-hero"><span class="bos-kicker">Beyond OS 2.1 Beta</span><h1>Beyond Space</h1><p>Explore the universe.</p><div class="bos-actions"><a class="bos-btn" href="#features">Explore</a><a class="bos-btn secondary" href="<?=e(beyond_url('dashboard/'))?>">Back to Beyond OS</a></div></section><section class="bos-section" id="features"><h2>Core experience</h2><div class="bos-grid"><?=bos_app_card('Universe Explorer','Travel from Earth to the observable universe.','beyond-space/','🚀','Beta')?><?=bos_app_card('Solar System','Interactive planets, moons and missions.','beyond-space/','🚀','Beta')?><?=bos_app_card('Space TV','Documentaries, launches and live space feeds.','beyond-space/','🚀','Beta')?><?=bos_app_card('Daily Mission','Quiz, learn and earn bit$.','beyond-space/','🚀','Beta')?></div></section></main><?php bos_page_end(); ?>
+<?php
+declare(strict_types=1);
+require __DIR__ . '/beyond-space-v1/index.php';

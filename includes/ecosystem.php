@@ -45,7 +45,7 @@ function beyond_base_path(): string {
     }
 
     // Fallback for hosts that do not expose a usable DOCUMENT_ROOT.
-    $known = ['/app-store/','/academy/','/coding-school/','/beyond-id/','/beyond-math/','/beyond-french/','/dailybreath/','/beyond-health/','/beyond-tv/','/beyond-media/','/beyond-games/','/beyond-jobs/','/beyond-radio/','/beyond-casino/','/beyond-skate/','/beyond-catering/','/beyond-baby-names/','/beyond-tattoo/','/beyond-space/','/beyond-ancient/','/beyond-preschool/','/beyond-careers/','/beyond-sell/','/beyond-market/','/beyond-finance/','/beyond-investing/','/dashboard/','/admin/','/api-hub/'];
+    $known = ['/app-store/','/academy/','/coding-school/','/beyond-id/','/beyond-math/','/beyond-french/','/dailybreath/','/beyond-health/','/beyond-tv/','/beyond-media/','/beyond-games/','/beyond-jobs/','/beyond-radio/','/beyond-casino/','/beyond-skate/','/beyond-catering/','/beyond-baby-names/','/beyond-tattoo/','/beyond-space/','/beyond-ancient/','/beyond-careers/','/beyond-sell/','/beyond-market/','/beyond-finance/','/beyond-investing/','/dashboard/','/admin/','/api-hub/'];
     foreach ($known as $marker) {
         $position = strpos($script, $marker);
         if ($position !== false) return substr($script, 0, $position);
@@ -77,6 +77,7 @@ function beyond_app_icon(string $appName): string {
         return is_file(__DIR__ . '/../' . $fallback) ? beyond_url($fallback) : '';
     }
     $versioned = [
+        'daily-breath' => 'daily-breath-192.jpg?v=20260730-1',
         'beyond-baby-names' => 'beyond-baby-names-v2-192.webp?v=20260717-3',
         'beyond-tattoo' => 'beyond-tattoo-v2-192.webp?v=20260717-3',
     ];
@@ -173,7 +174,9 @@ function beyond_nav_bootstrap(string $appName, ?array $wallet = null): array {
             $wallet = $GLOBALS['beyond_wallet_override'] ?? $wallet;
             $icon = beyond_app_icon($appName) ?: beyond_app_icon('Beyond OS');
             if ($icon && stripos($html, 'rel="icon"') === false) {
-                $tag = '<link rel="icon" type="image/webp" href="' . e($icon) . '">';
+                $iconType = preg_match('/\.jpe?g(?:\?|$)/i', $icon) ? 'image/jpeg' : 'image/webp';
+                $tag = '<link rel="icon" type="' . $iconType . '" href="' . e($icon) . '">'
+                    . '<link rel="apple-touch-icon" href="' . e($icon) . '">';
                 $html = preg_replace('/<\/head>/i', $tag . '</head>', $html, 1) ?? $html;
             }
             if (!str_contains($html, 'beyond-theme-default.js')) {

@@ -1,1 +1,29 @@
-@import url('/assets/css/learning-academy.css');
+@import url('/beyond-math/academy.css?v=2.3.3');
+
+:root{
+  --math-navy:#211344;
+  --math-blue:#6d4aff;
+  --math-sky:#f2edff;
+  --math-cyan:#8b5cf6;
+  --math-green:#12b981;
+  --math-yellow:#f6b93b;
+  --math-coral:#ec4899;
+  --math-ink:#2d2050;
+  --math-muted:#716789;
+  --math-line:#dfd8ee;
+  --math-bg:#f7f4fb;
+  --math-shadow:0 16px 45px rgba(67,42,105,.12)
+}
+html{background:var(--math-bg)}
+body{background:radial-gradient(circle at 8% 3%,rgba(109,74,255,.12),transparent 25rem),radial-gradient(circle at 92% 18%,rgba(236,72,153,.11),transparent 22rem),linear-gradient(180deg,#fcfbff 0,#f7f4fb 45%,#f1eef8 100%)}
+.la-brand>span:first-child:not(.la-brand-copy){background:linear-gradient(145deg,#6d4aff,#9b51e0);color:#fff;font-size:24px;box-shadow:0 8px 22px rgba(109,74,255,.24)}
+.la-hero,.la-title,.la-lock{border-color:#ded3f2;background:linear-gradient(130deg,#fff 0%,#f8f4ff 54%,#efe6ff 100%)}
+.la-hero:before,.la-title:before{background:linear-gradient(90deg,#6d4aff,#9b51e0,#12b981,#f6b93b,#ec4899)}
+.la-hero:after{border-color:rgba(109,74,255,.08)}
+.la-kicker{color:#6843d4}.la-kicker:before{background:#ec4899;box-shadow:0 0 0 5px rgba(236,72,153,.12)}
+.la-ages a.active,.la-button{background:linear-gradient(135deg,#6d4aff,#9456df);box-shadow:0 8px 20px rgba(109,74,255,.2)}
+.la-card:nth-child(1){--module-color:#6d4aff}.la-card:nth-child(2){--module-color:#1479d1}.la-card:nth-child(3){--module-color:#12a978}.la-card:nth-child(4){--module-color:#dc8b16}.la-card:nth-child(5){--module-color:#db3f8d}
+.la-interactive{border-color:#d9c9f5!important;background:linear-gradient(145deg,#f5f0ff,#f0fbf7)!important}
+.math-lab__work button{background:linear-gradient(90deg,#6d4aff,#9b51e0)}
+.coding-studio{display:grid;gap:14px;margin-top:18px}.coding-studio__steps{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.coding-studio__steps label{display:flex;gap:9px;align-items:flex-start;padding:14px;border:1px solid #d9cee9;border-radius:13px;background:#fff;color:#504466;font-weight:750}.coding-studio__steps input{margin-top:4px;accent-color:#6d4aff}.coding-studio__note{display:grid;gap:7px;color:#564b6b;font-weight:850}.coding-studio textarea{width:100%;resize:vertical;padding:14px;border:1px solid #d4c9e5;border-radius:14px;background:#fff;color:#2d2050;font:14px/1.6 ui-monospace,monospace}.coding-studio__actions{display:flex;align-items:center;gap:12px}.coding-studio__actions button{padding:12px 16px;border:0;border-radius:12px;background:linear-gradient(135deg,#6d4aff,#9456df);color:#fff;font-weight:900;cursor:pointer}.coding-studio__actions span{color:#187c58;font-weight:800}
+@media(max-width:700px){.coding-studio__steps{grid-template-columns:1fr}}

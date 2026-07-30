@@ -6,22 +6,17 @@ require_once dirname(__DIR__) . '/includes/catalog-rotation.php';
 
 $slug = preg_replace('/[^a-z0-9-]/', '', strtolower((string)($_GET['slug'] ?? '')));
 $channels = [
-    'vintage-cartoon-theater' => [
-        'name' => 'Classic Cartoon Theater',
+    'classic-cartoon-theater' => [
+        'name' => 'Beyond Animated Classics',
         'items' => [
-            ['archive' => 'SnowWhiteWithBettyBoop1933', 'title' => 'Snow White (1933)', 'duration' => 397],
-            ['url' => "https://commons.wikimedia.org/wiki/Special:Redirect/file/Betty_Boop%27s_Rise_to_Fame_%281934%29.webm", 'title' => "Betty Boop's Rise to Fame (1934)", 'duration' => 530],
-            ['url' => 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Betty_Boop_-_Poor_Cinderella_%281934%29_-_HD.webm', 'title' => 'Poor Cinderella (1934)', 'duration' => 620],
+            ['archive' => 'x-men-the-animated-series-1080p-ai-upscale_202204', 'title' => 'X-Men: The Animated Series · Remastered', 'duration' => 1380, 'license' => 'Internet Archive remastered collection', 'rights_url' => 'https://archive.org/details/x-men-the-animated-series-1080p-ai-upscale_202204'],
+            ['archive' => 'spider-mantheanimatedseries', 'title' => 'Spider-Man: The Animated Series · Remastered', 'duration' => 1380, 'license' => 'Internet Archive remastered collection', 'rights_url' => 'https://archive.org/details/spider-mantheanimatedseries'],
+            ['archive' => 'fantastic-four-1996-complete-series', 'title' => 'Fantastic Four (1996)', 'duration' => 1380, 'license' => 'Internet Archive collection', 'rights_url' => 'https://archive.org/details/fantastic-four-1996-complete-series'],
+            ['archive' => 'the-incredble-hulk-1966-complete-series-english', 'title' => 'The Incredible Hulk (1966)', 'duration' => 1200, 'license' => 'Internet Archive collection', 'rights_url' => 'https://archive.org/details/the-incredble-hulk-1966-complete-series-english'],
+            ['archive' => 'BatmanTASFull', 'title' => 'Batman: The Animated Series', 'duration' => 1380, 'license' => 'Internet Archive collection', 'rights_url' => 'https://archive.org/details/BatmanTASFull'],
+            ['archive' => 'the-batman-03x-01', 'title' => 'The Batman', 'duration' => 1380, 'license' => 'Internet Archive collection', 'rights_url' => 'https://archive.org/details/the-batman-03x-01'],
         ],
-        'embed' => 'https://archive.org/embed/SnowWhiteWithBettyBoop1933',
-    ],
-    'saturday-morning-cartoons' => [
-        'name' => 'Saturday Morning Cartoons',
-        'items' => [
-            ['url' => 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Betty_Boop_-_Poor_Cinderella_%281934%29_-_HD.webm', 'title' => 'Poor Cinderella (1934)', 'duration' => 620],
-            ['url' => "https://commons.wikimedia.org/wiki/Special:Redirect/file/Betty_Boop%27s_Rise_to_Fame_%281934%29.webm", 'title' => "Betty Boop's Rise to Fame (1934)", 'duration' => 530],
-        ],
-        'embed' => 'https://archive.org/embed/SnowWhiteWithBettyBoop1933',
+        'embed' => 'https://archive.org/embed/x-men-the-animated-series-1080p-ai-upscale_202204',
     ],
     'classic-cinema' => [
         'name' => 'Beyond Movies',
@@ -308,6 +303,21 @@ if ($slug === 'beyond-after-dark') {
             'creator' => 'Goosebumps',
             'license' => 'Owner-verified archive source',
             'rights_url' => 'https://archive.org/details/goosebumps-s01',
+        ];
+    }
+    $ghostStoriesId = '17.-ghost-stories-2000-dual-audio-dvdrip-960x-720-10bit-hevc';
+    for ($episodeNumber = 1; $episodeNumber <= 20; $episodeNumber++) {
+        $episodeFile = sprintf(
+            '%02d. Ghost Stories (2000) (Dual Audio DVDRip 960x720 10bit HEVC).mp4',
+            $episodeNumber
+        );
+        $config['items'][] = [
+            'url' => archive_url($ghostStoriesId, $episodeFile),
+            'title' => 'Ghost Stories (2000) · Episode ' . $episodeNumber,
+            'duration' => 1380,
+            'creator' => 'Studio Pierrot / SPE Visual Works / Fuji Television',
+            'license' => 'Internet Archive community upload',
+            'rights_url' => 'https://archive.org/details/' . $ghostStoriesId,
         ];
     }
 }

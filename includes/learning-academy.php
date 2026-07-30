@@ -30,7 +30,7 @@ function la_phases(): array{return [
 ];}
 function la_modules(array $config,string $age): array{
  $titles=(array)($config['tracks'][$age]??$config['tracks']['kids']??[]);$modules=[];
- foreach(array_values($titles) as $index=>$item){$title=is_array($item)?(string)($item['title']??'Module'):strval($item);$description=is_array($item)?(string)($item['description']??''):'Build practical, age-appropriate skills in '.$title.' through examples, practice, and a final project.';$lessons=[];$moduleSlug=la_slug($title);$custom=(array)($config['rich_lessons'][$age][$moduleSlug]??[]);
+ foreach(array_values($titles) as $index=>$item){$title=is_array($item)?(string)($item['title']??'Module'):strval($item);$description=is_array($item)?(string)($item['description']??''):'Build practical, age-appropriate skills in '.$title.' through examples, practice, and a final project.';$lessons=[];$moduleSlug=la_slug($title);$custom=(array)($config['rich_lessons'][$age][$moduleSlug]??$config['rich_lessons']['*'][$moduleSlug]??[]);
   if($custom){foreach(array_values($custom) as $lessonIndex=>$lesson)$lessons[]=['number'=>$lessonIndex+1,'title'=>(string)$lesson['title'],'focus'=>(string)$lesson['focus'],'teaching'=>(string)$lesson['teaching'],'practice'=>(string)$lesson['practice'],'concept'=>(string)($lesson['concept']??''),'example'=>(string)($lesson['example']??''),'activity'=>(string)($lesson['activity']??'number-line')];}
   else foreach(la_phases() as $lessonIndex=>$phase)$lessons[]=['number'=>$lessonIndex+1,'title'=>$phase[0].': '.$title,'focus'=>$phase[0],'teaching'=>$phase[1].' '.$description,'practice'=>$phase[2]];
   $modules[]=['number'=>$index+1,'slug'=>$moduleSlug,'title'=>$title,'description'=>$description,'free'=>$index===0,'lessons'=>$lessons];

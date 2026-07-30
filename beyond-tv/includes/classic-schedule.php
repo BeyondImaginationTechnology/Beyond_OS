@@ -9,41 +9,46 @@ declare(strict_types=1);
 function beyond_classic_libraries(): array
 {
     return [
-        'popeye' => [
-            'name' => 'Popeye', 'icon' => '💪', 'episode_count' => 1,
+        'x-men' => [
+            'name' => 'X-Men: The Animated Series', 'icon' => '❌', 'episode_count' => 1,
+            'lineup_label' => 'Complete remastered collection',
             'sources' => [
-                ['type'=>'video','id'=>'nSdz5ln2rME','label'=>'Popeye classics','start'=>0],
+                ['type'=>'archive','id'=>'x-men-the-animated-series-1080p-ai-upscale_202204','label'=>'Internet Archive · remastered 1080p collection'],
             ],
         ],
-        'lucky-luke' => [
-            'name' => 'Lucky Luke', 'icon' => '🤠', 'episode_count' => 10,
+        'fantastic-four' => [
+            'name' => 'Fantastic Four (1996)', 'icon' => '4️⃣', 'episode_count' => 1,
+            'lineup_label' => 'Complete series collection',
             'sources' => [
-                ['type'=>'playlist','id'=>'PLQGZSV9PRCFmc11X9ec_FaoKdC3u23Cua','label'=>'Lucky Luke playlist'],
+                ['type'=>'archive','id'=>'fantastic-four-1996-complete-series','label'=>'Internet Archive · complete series upload'],
             ],
         ],
         'spider-man' => [
-            'name' => 'Spider-Man', 'icon' => '🕷️', 'episode_count' => 10,
+            'name' => 'Spider-Man: The Animated Series', 'icon' => '🕷️', 'episode_count' => 1,
+            'lineup_label' => 'Complete remastered collection',
             'sources' => [
-                ['type'=>'playlist','id'=>'PL_S5Mwou0NdrXq3z7PBxgPR4Q25YnKL9r','label'=>'Spider-Man playlist'],
+                ['type'=>'archive','id'=>'spider-mantheanimatedseries','label'=>'Internet Archive · remastered 1080p collection'],
             ],
         ],
-        'batman' => [
-            'name' => 'Batman', 'icon' => '🦇', 'episode_count' => 10,
+        'hulk' => [
+            'name' => 'The Incredible Hulk (1966)', 'icon' => '💚', 'episode_count' => 1,
+            'lineup_label' => 'Complete 1966 series collection',
             'sources' => [
-                ['type'=>'playlist','id'=>'PLBJAZVFKjDq2vW8BovPYNyYNQTaJFhHn1','label'=>'Batman playlist'],
+                ['type'=>'archive','id'=>'the-incredble-hulk-1966-complete-series-english','label'=>'Internet Archive · complete English collection'],
             ],
         ],
-        'superman' => [
-            'name' => 'Superman', 'icon' => '🦸', 'episode_count' => 10,
+        'batman-tas' => [
+            'name' => 'Batman: The Animated Series', 'icon' => '🦇', 'episode_count' => 1,
+            'lineup_label' => 'Animated series collection',
             'sources' => [
-                ['type'=>'playlist','id'=>'PLhGipfv0juZWw5lM_NyhY1n32UXVSn37Q','label'=>'Superman playlist'],
-                ['type'=>'video','id'=>'u92t2pNOoqM','label'=>'Superman feature / special','start'=>0],
+                ['type'=>'archive','id'=>'BatmanTASFull','label'=>'Internet Archive · animated series collection'],
             ],
         ],
-        'mario' => [
-            'name' => 'Channel 1 Classics', 'icon' => '🎞️', 'episode_count' => 1,
+        'the-batman' => [
+            'name' => 'The Batman', 'icon' => '🦇', 'episode_count' => 1,
+            'lineup_label' => 'Complete five-season collection',
             'sources' => [
-                ['type'=>'video','id'=>'nSdz5ln2rME','label'=>'Channel 1 classic fallback','start'=>0],
+                ['type'=>'archive','id'=>'the-batman-03x-01','label'=>'Internet Archive · complete series upload'],
             ],
         ],
     ];
@@ -52,14 +57,14 @@ function beyond_classic_libraries(): array
 function beyond_classic_blocks(): array
 {
     return [
-        ['start'=>0,  'end'=>3,  'library'=>'batman',      'title'=>'Batman After Dark'],
-        ['start'=>3,  'end'=>6,  'library'=>'popeye',      'title'=>'Popeye Classics'],
-        ['start'=>6,  'end'=>9,  'library'=>'popeye',      'title'=>'Morning Cartoon Classics'],
-        ['start'=>9,  'end'=>12, 'library'=>'spider-man',  'title'=>'Spider-Man Classics'],
-        ['start'=>12, 'end'=>15, 'library'=>'lucky-luke',  'title'=>'Lucky Luke'],
-        ['start'=>15, 'end'=>18, 'library'=>'mario',       'title'=>'Channel 1 Classics'],
-        ['start'=>18, 'end'=>21, 'library'=>'superman',    'title'=>'Superman Prime Time'],
-        ['start'=>21, 'end'=>24, 'library'=>'mario',       'title'=>'Channel 1 Classics'],
+        ['start'=>0,  'end'=>3,  'library'=>'batman-tas',    'title'=>'Batman After Dark'],
+        ['start'=>3,  'end'=>6,  'library'=>'x-men',         'title'=>'X-Men Overnight'],
+        ['start'=>6,  'end'=>9,  'library'=>'spider-man',    'title'=>'Spider-Man Classics'],
+        ['start'=>9,  'end'=>12, 'library'=>'fantastic-four','title'=>'Fantastic Four'],
+        ['start'=>12, 'end'=>15, 'library'=>'hulk',          'title'=>'The Incredible Hulk'],
+        ['start'=>15, 'end'=>18, 'library'=>'the-batman',    'title'=>'The Batman'],
+        ['start'=>18, 'end'=>21, 'library'=>'x-men',         'title'=>'X-Men Prime Time'],
+        ['start'=>21, 'end'=>24, 'library'=>'spider-man',    'title'=>'Spider-Man After Hours'],
     ];
 }
 
@@ -92,6 +97,10 @@ function beyond_classic_save_progress(array $state): void
 
 function beyond_classic_embed(array $source, int $episodeIndex): string
 {
+    if (($source['type'] ?? '') === 'archive') {
+        $id = preg_replace('/[^A-Za-z0-9_.-]/', '', (string)($source['id'] ?? ''));
+        return 'https://archive.org/embed/' . rawurlencode($id) . '?autoplay=1&playlist=1';
+    }
     $base = 'https://www.youtube-nocookie.com/embed/';
     $params = ['autoplay'=>1,'mute'=>1,'controls'=>1,'rel'=>0,'playsinline'=>1,'modestbranding'=>1,'enablejsapi'=>1];
     if (($source['type'] ?? '') === 'playlist') {
@@ -146,7 +155,7 @@ function beyond_classic_schedule_state(?DateTimeImmutable $now = null): array
     $active = $fallbacks[$sourceIndex] ?? $fallbacks[0];
 
     $current['icon']=$library['icon'];
-    $current['lineup']=$library['name'].' · Episode '.((int)$entry['episode']+1);
+    $current['lineup']=$library['name'].' · '.(string)($library['lineup_label'] ?? ('Episode '.((int)$entry['episode']+1)));
     $current['library_name']=$library['name'];
     $current['episode_number']=(int)$entry['episode']+1;
     $nextLib=$libraries[$next['library']];
@@ -160,6 +169,6 @@ function beyond_classic_schedule_state(?DateTimeImmutable $now = null): array
         'seconds_remaining'=>max(0,$end->getTimestamp()-$now->getTimestamp()),
         'library_key'=>$libraryKey,'episode_index'=>(int)$entry['episode'],'episode_number'=>(int)$entry['episode']+1,
         'source_index'=>$sourceIndex,'source_label'=>$active['label'],'embed_url'=>$active['embed_url'],
-        'fallbacks'=>$fallbacks,'blocks'=>array_map(static function(array $block) use ($libraries): array { $lib=$libraries[$block['library']]; $block['icon']=$lib['icon']; $block['lineup']=$lib['name'].' · library rotation'; return $block; }, $blocks),
+        'fallbacks'=>$fallbacks,'blocks'=>array_map(static function(array $block) use ($libraries): array { $lib=$libraries[$block['library']]; $block['icon']=$lib['icon']; $block['lineup']=$lib['name'].' · '.(string)($lib['lineup_label'] ?? 'library rotation'); return $block; }, $blocks),
     ];
 }

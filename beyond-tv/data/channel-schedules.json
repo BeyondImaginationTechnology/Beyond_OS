@@ -3,58 +3,58 @@
     {
       "start": 0,
       "end": 3,
-      "icon": "▶",
-      "title": "Midnight Toons",
-      "lineup": "Midnight Toons"
+      "icon": "🦇",
+      "title": "Batman After Dark",
+      "lineup": "Batman: The Animated Series"
     },
     {
       "start": 3,
       "end": 6,
-      "icon": "▶",
-      "title": "Golden-Age Cartoons",
-      "lineup": "Golden-Age Cartoons"
+      "icon": "❌",
+      "title": "X-Men Overnight",
+      "lineup": "X-Men: The Animated Series"
     },
     {
       "start": 6,
       "end": 9,
-      "icon": "▶",
-      "title": "Breakfast Cartoons",
-      "lineup": "Breakfast Cartoons"
+      "icon": "🕷️",
+      "title": "Spider-Man Classics",
+      "lineup": "Spider-Man: The Animated Series"
     },
     {
       "start": 9,
       "end": 12,
-      "icon": "▶",
-      "title": "Hero Hour",
-      "lineup": "Hero Hour"
+      "icon": "4️⃣",
+      "title": "Fantastic Four",
+      "lineup": "Fantastic Four (1996)"
     },
     {
       "start": 12,
       "end": 15,
-      "icon": "▶",
-      "title": "Comedy Cartoons",
-      "lineup": "Comedy Cartoons"
+      "icon": "💚",
+      "title": "The Incredible Hulk",
+      "lineup": "The Incredible Hulk (1966)"
     },
     {
       "start": 15,
       "end": 18,
-      "icon": "▶",
-      "title": "Afternoon Adventures",
-      "lineup": "Afternoon Adventures"
+      "icon": "🦇",
+      "title": "The Batman",
+      "lineup": "The Batman complete series"
     },
     {
       "start": 18,
       "end": 21,
-      "icon": "▶",
-      "title": "Prime-Time Classics",
-      "lineup": "Prime-Time Classics"
+      "icon": "❌",
+      "title": "X-Men Prime Time",
+      "lineup": "X-Men: The Animated Series"
     },
     {
       "start": 21,
       "end": 24,
-      "icon": "▶",
-      "title": "Late-Night Animation",
-      "lineup": "Late-Night Animation"
+      "icon": "🕷️",
+      "title": "Spider-Man After Hours",
+      "lineup": "Spider-Man: The Animated Series"
     }
   ],
   "beyond-cartoons": [
@@ -694,5 +694,25 @@
       "title": "Bedtime Classics",
       "lineup": "Bedtime Classics"
     }
+  ],
+  "beyond-trailers": [
+    {"start":0,"end":3,"icon":"🌙","title":"Midnight Premieres","lineup":"Official trailers and late-night first looks"},
+    {"start":3,"end":6,"icon":"🎞️","title":"Coming Soon","lineup":"Teasers, announcements, and release previews"},
+    {"start":6,"end":9,"icon":"☀️","title":"Morning First Look","lineup":"New official trailers to start the day"},
+    {"start":9,"end":12,"icon":"🍿","title":"Trailer Showcase","lineup":"Big-screen premieres and studio previews"},
+    {"start":12,"end":15,"icon":"🚀","title":"Action & Adventure","lineup":"Official action, adventure, and sci-fi previews"},
+    {"start":15,"end":18,"icon":"✨","title":"Family Preview","lineup":"Animation, fantasy, and family first looks"},
+    {"start":18,"end":21,"icon":"🎬","title":"Prime-Time Trailers","lineup":"The latest official studio premieres"},
+    {"start":21,"end":24,"icon":"👀","title":"After-Hours Preview","lineup":"Thrillers, mysteries, and coming attractions"}
+  ],
+  "beyond-sports": [
+    {"start":0,"end":3,"icon":"🏆","title":"Classic Finals","lineup":"Iconic championship moments and full replays"},
+    {"start":3,"end":6,"icon":"🌍","title":"World Stage","lineup":"International competition highlights"},
+    {"start":6,"end":9,"icon":"🏃","title":"Morning Motion","lineup":"Athletics, training, and athlete stories"},
+    {"start":9,"end":12,"icon":"🏀","title":"Court Classics","lineup":"Basketball highlights and memorable matchups"},
+    {"start":12,"end":15,"icon":"⚽","title":"Global Football","lineup":"Goals, finals, and tournament stories"},
+    {"start":15,"end":18,"icon":"🏊","title":"Olympic Spotlight","lineup":"Summer and winter sport highlights"},
+    {"start":18,"end":21,"icon":"🥇","title":"Gold-Medal Replays","lineup":"Full official replays and winning performances"},
+    {"start":21,"end":24,"icon":"🔥","title":"Best of Sport","lineup":"Unforgettable moments from the official archive"}
   ]
 }

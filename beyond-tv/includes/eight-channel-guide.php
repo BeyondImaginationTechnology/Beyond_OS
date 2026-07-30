@@ -70,6 +70,15 @@ function beyond_tv_after_dark_hourly_rows(): array {
     ksort($preferred); $playlist = array_values($preferred);
     $goosebumps = json_decode((string)@file_get_contents(__DIR__ . '/../data/goosebumps-library.json'), true) ?: [];
     foreach ($goosebumps as $episode) { if (is_array($episode) && !empty($episode['video_url'])) $playlist[] = $episode; }
+    for ($episode = 1; $episode <= 20; $episode++) {
+        $playlist[] = [
+            'series' => 'Ghost Stories',
+            'episode' => $episode,
+            'title' => 'Ghost Stories (2000) · Episode ' . $episode,
+            'runtime_seconds' => 1380,
+            'video_url' => 'https://archive.org/details/17.-ghost-stories-2000-dual-audio-dvdrip-960x-720-10bit-hevc',
+        ];
+    }
     $durations = array_map(static fn(array $episode): int => max(60, (int)($episode['runtime_seconds'] ?? 1380)), $playlist);
     $total = array_sum($durations);
     if (!$playlist || $total < 1) return [];
@@ -80,7 +89,7 @@ function beyond_tv_after_dark_hourly_rows(): array {
         foreach ($durations as $candidate => $duration) { if ($position < $duration) { $index = $candidate; break; } $position -= $duration; }
         $episode = $playlist[$index];
         $series = (string)($episode['series'] ?? 'The Haunting Hour');
-        $rows[] = ['start'=>$hour,'end'=>$hour+1,'icon'=>$series === 'Goosebumps' ? '👻' : '🌙','title'=>$series,'lineup'=>'S1 E'.(int)($episode['episode'] ?? ($index+1)).' · '.(string)($episode['title'] ?? 'Episode')];
+        $rows[] = ['start'=>$hour,'end'=>$hour+1,'icon'=>in_array($series, ['Goosebumps','Ghost Stories'], true) ? '👻' : '🌙','title'=>$series,'lineup'=>'S1 E'.(int)($episode['episode'] ?? ($index+1)).' · '.(string)($episode['title'] ?? 'Episode')];
     }
     return $rows;
 }

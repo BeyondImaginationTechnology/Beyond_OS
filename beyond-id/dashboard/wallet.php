@@ -1,16 +1,32 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/../../includes/platform.php';
-require_once __DIR__.'/../includes/crypto-watch.php';
-require_once __DIR__.'/../includes/beyond-cash.php';
-require_once __DIR__.'/../includes/marqeta.php';
+$cryptoInclude=__DIR__.'/../includes/crypto-watch.php';
+$cryptoIntegrationAvailable=is_file($cryptoInclude);
+if($cryptoIntegrationAvailable)require_once $cryptoInclude;
+$cashInclude=__DIR__.'/../includes/beyond-cash.php';
+$cashIntegrationAvailable=is_file($cashInclude);
+if($cashIntegrationAvailable)require_once $cashInclude;
+$marqetaInclude=__DIR__.'/../includes/marqeta.php';
+$cardIntegrationAvailable=is_file($marqetaInclude);
+if($cardIntegrationAvailable)require_once $marqetaInclude;
 $wallet=beyond_app_bootstrap('Beyond Wallet');
 global $pdo;
 $userId=(int)$_SESSION['user_id'];
-$cashAccounts=beyond_cash_accounts($pdo,$userId);
-$cardMessage='';$cardError='';
+$cashAccounts=[];$cashError='';
+if(!$cashIntegrationAvailable||!function_exists('beyond_cash_accounts')){
+    $cashError='Cash balances are temporarily unavailable while wallet setup completes.';
+}else{
+    try{$cashAccounts=beyond_cash_accounts($pdo,$userId);}
+    catch(Throwable $exception){
+        $cashError='Cash balances are temporarily unavailable while wallet setup completes.';
+        error_log('Beyond Wallet cash accounts: '.$exception->getMessage());
+    }
+}
+$cardMessage='';$cardError=$cardIntegrationAvailable?'':'Card services are temporarily unavailable while setup completes.';
 if($_SERVER['REQUEST_METHOD']==='POST'&&isset($_POST['card_action'])){
-    if(!bos_verify_csrf($_POST['csrf']??null))$cardError='Your session expired. Refresh and try again.';
+    if(!$cardIntegrationAvailable)$cardError='Card services are temporarily unavailable while setup completes.';
+    elseif(!bos_verify_csrf($_POST['csrf']??null))$cardError='Your session expired. Refresh and try again.';
     else{
         try{
             $cardAction=(string)$_POST['card_action'];
@@ -30,10 +46,19 @@ if($_SERVER['REQUEST_METHOD']==='POST'&&isset($_POST['card_action'])){
         }catch(Throwable $exception){$cardError=$exception->getMessage();}
     }
 }
-$cardProgram=beyond_card_program_state($pdo,$userId);
-$cryptoMessage='';$cryptoError='';$cryptoAccounts=[];$cryptoNetworks=beyond_crypto_networks();
+$cardProgram=['config'=>['environment'=>'off','configured'=>false],'customer'=>null,'cards'=>[]];
+if($cardIntegrationAvailable&&function_exists('beyond_card_program_state')){
+    try{$cardProgram=beyond_card_program_state($pdo,$userId);}
+    catch(Throwable $exception){
+        $cardError=$cardError?:'Card services are temporarily unavailable while setup completes.';
+        error_log('Beyond Wallet card program: '.$exception->getMessage());
+    }
+}
+$cryptoMessage='';$cryptoError=$cryptoIntegrationAvailable?'':'Crypto watch is temporarily unavailable while wallet setup completes.';$cryptoAccounts=[];
+$cryptoNetworks=$cryptoIntegrationAvailable&&function_exists('beyond_crypto_networks')?beyond_crypto_networks():[];
 if($_SERVER['REQUEST_METHOD']==='POST'&&isset($_POST['crypto_action'])){
-    if(!bos_verify_csrf($_POST['csrf']??null))$cryptoError='Your session expired. Refresh and try again.';
+    if(!$cryptoIntegrationAvailable)$cryptoError='Crypto watch is temporarily unavailable while wallet setup completes.';
+    elseif(!bos_verify_csrf($_POST['csrf']??null))$cryptoError='Your session expired. Refresh and try again.';
     else{
         try{
             $action=(string)$_POST['crypto_action'];
@@ -53,8 +78,15 @@ if($_SERVER['REQUEST_METHOD']==='POST'&&isset($_POST['crypto_action'])){
         }catch(Throwable $exception){$cryptoError=$exception instanceof PDOException?'That public address is already connected.':$exception->getMessage();}
     }
 }
-$cryptoStatement=$pdo->prepare('SELECT id,network,label,public_address,created_at FROM crypto_watch_accounts WHERE user_id=? ORDER BY created_at DESC');
-$cryptoStatement->execute([(int)$_SESSION['user_id']]);$cryptoAccounts=$cryptoStatement->fetchAll(PDO::FETCH_ASSOC);
+if($cryptoIntegrationAvailable){
+    try{
+        $cryptoStatement=$pdo->prepare('SELECT id,network,label,public_address,created_at FROM crypto_watch_accounts WHERE user_id=? ORDER BY created_at DESC');
+        $cryptoStatement->execute([$userId]);$cryptoAccounts=$cryptoStatement->fetchAll(PDO::FETCH_ASSOC);
+    }catch(Throwable $exception){
+        $cryptoError=$cryptoError?:'Crypto watch is temporarily unavailable while wallet setup completes.';
+        error_log('Beyond Wallet crypto accounts: '.$exception->getMessage());
+    }
+}
 $transactions=[];
 try{$stmt=$pdo->prepare('SELECT t.* FROM beyond_wallet_transactions t JOIN beyond_wallets w ON w.id=t.wallet_id WHERE w.user_id=? ORDER BY t.created_at DESC LIMIT 50');$stmt->execute([(int)$_SESSION['user_id']]);$transactions=$stmt->fetchAll(PDO::FETCH_ASSOC);}catch(Throwable $e){}
 $earned=0.0;$spent=0.0;
@@ -73,7 +105,7 @@ $usdEstimate=$balance/$bitsPerUsd;
 <section class="card wallet-hero"><div class="wallet-balance"><span class="badge">BEYOND BITS</span><h1><?=number_format($balance,0)?> <?=e((string)($wallet['currency']??'BITS'))?></h1><p>Your reward balance follows your Beyond ID across every connected app. Earn 10 bit$ for each completed lesson and 50 bit$ for each completed module.</p></div><div class="balance-mark">bit$</div></section>
 <section class="metric-grid" aria-label="Wallet summary"><article class="metric"><small>Available</small><strong><?=number_format($balance,0)?> bit$</strong></article><article class="metric"><small>Lifetime earned</small><strong><?=number_format($earned,0)?> bit$</strong></article><article class="metric"><small>Lifetime spent</small><strong><?=number_format($spent,0)?> bit$</strong></article><article class="metric"><small>Transactions</small><strong><?=count($transactions)?></strong></article></section>
 <section class="card value-card"><div class="value-heading"><div><span class="badge">VALUE COMPARISON</span><h2>Your bit$ in USD and CAD</h2><p>See the estimated purchasing value of your Beyond balance in both currencies.</p></div><span class="rate-pill">100 bit$ = US$1.00</span></div><div class="value-grid" aria-label="bit$ value comparison"><article class="value-tile"><span>Beyond balance</span><strong><?=number_format($balance,0)?> bit$</strong><small>Your available rewards</small></article><article class="value-tile"><span>USD estimate</span><strong><?=number_format($usdEstimate,2)?> USD</strong><small>At the Beyond reference rate</small></article><article class="value-tile"><span>CAD estimate</span><strong id="balanceCad">Loading…</strong><small id="cadRate">Checking today’s USD/CAD rate</small></article></div><div class="conversion-tool"><label for="bitsToCompare">Compare another bit$ amount<input id="bitsToCompare" type="number" min="0" step="1" inputmode="numeric" value="<?=e((string)(int)$balance)?>"></label><span class="conversion-arrow" aria-hidden="true">→</span><div class="conversion-result" aria-live="polite"><div><span>USD</span><strong id="compareUsd">—</strong></div><div><span>CAD</span><strong id="compareCad">—</strong></div></div></div><p class="disclaimer">This is a reference comparison for purchases inside Beyond OS. bit$ are closed-loop ecosystem rewards—not cryptocurrency, legal tender, or a cash balance—and have no guaranteed cash-out value.</p></section>
-<section class="card cash-card"><div class="value-heading"><div><span class="badge">BEYOND CASH</span><h2>Provider-backed money</h2><p>CAD and USD funds will live here after a regulated wallet provider is activated. This balance is entirely separate from bit$ Rewards.</p></div><span class="rate-pill">Provider onboarding pending</span></div><div class="cash-grid"><?php foreach(['CAD','USD'] as $currency):$account=$cashAccounts[$currency]??[];?><article class="cash-account"><header><span><?=e($currency)?> balance</span><small><?=($account['status']??'pending_provider')==='active'?'Available':'Not activated'?></small></header><strong><?=number_format((float)($account['available_balance']??0),2)?> <?=e($currency)?></strong><p><?=number_format((float)($account['pending_balance']??0),2)?> pending</p></article><?php endforeach;?></div><div class="ledger-note"><b>Two-ledger protection</b><span>Only reconciled provider funds may enter Beyond Cash. Learning rewards remain in bit$ and can never increase a cash balance.</span></div></section>
+<section class="card cash-card"><div class="value-heading"><div><span class="badge">BEYOND CASH</span><h2>Provider-backed money</h2><p>CAD and USD funds will live here after a regulated wallet provider is activated. This balance is entirely separate from bit$ Rewards.</p></div><span class="rate-pill">Provider onboarding pending</span></div><?php if($cashError):?><p class="message error"><?=e($cashError)?></p><?php endif;?><div class="cash-grid"><?php foreach(['CAD','USD'] as $currency):$account=$cashAccounts[$currency]??[];?><article class="cash-account"><header><span><?=e($currency)?> balance</span><small><?=($account['status']??'pending_provider')==='active'?'Available':'Not activated'?></small></header><strong><?=number_format((float)($account['available_balance']??0),2)?> <?=e($currency)?></strong><p><?=number_format((float)($account['pending_balance']??0),2)?> pending</p></article><?php endforeach;?></div><div class="ledger-note"><b>Two-ledger protection</b><span>Only reconciled provider funds may enter Beyond Cash. Learning rewards remain in bit$ and can never increase a cash balance.</span></div></section>
 <?php $mq=$cardProgram['config'];$cardCustomer=$cardProgram['customer'];$issuedCards=$cardProgram['cards'];$displayCard=$issuedCards[0]??null;?>
 <section class="card card-program"><div class="value-heading"><div><span class="badge">BEYOND CARD</span><h2>Peoples-ready card program</h2><p>Marqeta powers the card API. Peoples Trust is the planned Canadian issuer and BIN sponsor, subject to separate approval and production onboarding.</p></div><span class="rate-pill"><?=e($mq['environment']==='sandbox'?'Marqeta sandbox':($mq['environment']==='production'?'Production':'Setup required'))?></span></div>
 <?php if($cardMessage):?><p class="message"><?=e($cardMessage)?></p><?php endif;?><?php if($cardError):?><p class="message error"><?=e($cardError)?></p><?php endif;?>

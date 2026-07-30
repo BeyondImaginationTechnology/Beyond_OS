@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . '/require-member.php';
+require_once __DIR__ . '/../includes/ecosystem.php';
+if (!empty($_SESSION['user_id'])) {
+    beyond_track_app('Beyond TV');
+}
 
 $catalog = json_decode((string) file_get_contents(__DIR__ . '/data/catalog.json'), true) ?: [];
 $view = strtolower((string)($_GET['view'] ?? 'all'));
@@ -20,7 +23,7 @@ $heading = $view === 'shows' ? 'TV Shows' : ($view === 'movies' ? 'Free Movies' 
 ?>
 <!doctype html><html lang="en"><head><script>(function(){try{const t=localStorage.getItem("beyond-tv-theme");document.documentElement.dataset.tvTheme=["dark","light","sunset"].includes(t)?t:"dark"}catch(e){document.documentElement.dataset.tvTheme="dark"}})();</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=htmlspecialchars($heading)?> | Beyond TV</title><link rel="stylesheet" href="/beyond-tv/assets/css/app.css?v=2.2.0"></head><body class="tv-app"><?php include __DIR__.'/partials/header.php'; ?>
 <main class="page shell catalog-page">
-<span class="kicker">BEYOND TV LIBRARY</span><h1><?=htmlspecialchars($heading)?></h1><p class="lead">Browse every Season 1 collection and select episodes directly from a clean on-page episode list.</p>
+<span class="kicker">BEYOND TV LIBRARY</span><h1><?=htmlspecialchars($heading)?></h1><p class="lead">Browse the complete library and watch available movies and episodes without an account.</p>
 <div class="library-search"><label for="library-filter">Search library</label><input id="library-filter" type="search" placeholder="Search Yu-Gi-Oh!, Mr. Bean, Courage…" autocomplete="off"></div><nav class="catalog-tabs" aria-label="Browse library"><a class="<?=$view==='all'?'is-active':''?>" href="/beyond-tv/browse.php">All</a><a class="<?=$view==='shows'?'is-active':''?>" href="/beyond-tv/browse.php?view=shows">TV Shows</a><a class="<?=$view==='movies'?'is-active':''?>" href="/beyond-tv/browse.php?view=movies">Free Movies</a><a href="/beyond-tv/live-tv.php">Live Guide</a></nav>
 <section class="genre-filter" aria-labelledby="genre-filter-title"><div class="genre-filter-heading"><div><span class="kicker">FILTER CATALOGUE</span><h2 id="genre-filter-title">Browse by genre</h2></div><button type="button" class="genre-clear" data-genre-clear hidden>Clear filter ×</button></div><div class="genre-chips" role="group" aria-label="Filter titles by genre"><button type="button" class="is-active" data-genre="all" aria-pressed="true">All genres <span><?=count($filtered)?></span></button><?php foreach($genreCounts as $genreName=>$genreCount): ?><button type="button" data-genre="<?=htmlspecialchars(strtolower($genreName))?>" aria-pressed="false"><?=htmlspecialchars($genreName)?> <span><?=$genreCount?></span></button><?php endforeach; ?></div></section>
 <div class="catalog-grid"><?php foreach($filtered as $item): ?>

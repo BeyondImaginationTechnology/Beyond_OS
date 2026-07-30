@@ -1,24 +1,68 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__.'/../includes/ecosystem.php';$wallet=beyond_app_bootstrap('DailyBreath');$pdo=beyond_db();$userId=(int)$_SESSION['user_id'];
+require_once __DIR__.'/../includes/ecosystem.php';
+$wallet=beyond_app_bootstrap('DailyBreath');
+$pdo=beyond_db();
+$userId=(int)$_SESSION['user_id'];
 $catalog=[
- 'preschool'=>['Preschool','🧸',['God Made Me and Loves Me','Bible Heroes','Jesus Loves Children','Prayer and Kindness','Worship and Thankfulness']],
- 'kids'=>['Kids','🌱',['The Ten Commandments','Bible Foundations','The Life of Jesus','Prayer and Faith','Living with Courage']],
- 'preteen'=>['Preteen','📖',['Ten Commandments in Real Life','Identity and Purpose','Wisdom and Choices','The Life and Teaching of Jesus','Faith in Action']],
- 'teen'=>['Teen','✨',['Identity in Christ','Relationships and Integrity','Questions, Doubt, and Faith','Purpose and Leadership','Faith in Culture']],
- 'adult'=>['Adult','🕊️',['Bible Foundations','Spiritual Disciplines','Relationships and Calling','Biblical Wisdom for Life','Faithful Leadership']],
+ 'teen'=>['Teen','13–17','✨',['Identity in Christ','Relationships and Integrity','Questions, Doubt, and Faith','Purpose and Leadership','Faith in Culture']],
+ 'adult'=>['Adult','18+','🕊️',['Bible Foundations','Spiritual Disciplines','Relationships and Calling','Biblical Wisdom for Life','Faithful Leadership']],
 ];
-// Portable catalog bootstrap keeps MySQL and SQLite installations aligned.
-try{foreach($catalog as $ageSlug=>[$ageName,$icon,$modules]){
-  $a=$pdo->prepare('SELECT id FROM academy_age_groups WHERE slug=?');$a->execute([$ageSlug]);$ageId=(int)$a->fetchColumn();if(!$ageId)continue;
-  foreach($modules as $offset=>$title){$number=$offset+1;$slug=$ageSlug.'-module-'.$number;$q=$pdo->prepare('SELECT id FROM academy_courses WHERE slug=?');$q->execute([$slug]);$courseId=(int)$q->fetchColumn();
-    if(!$courseId){$pdo->prepare('INSERT INTO academy_courses(slug,title,summary,is_free,is_published,sort_order) VALUES(?,?,?,?,1,?)')->execute([$slug,$title,"Ten guided lessons for the $ageName learning path.",$number===1?1:0,($ageId*10)+$number]);$courseId=(int)$pdo->lastInsertId();}
-    $m=$pdo->prepare('SELECT 1 FROM academy_course_age_groups WHERE course_id=? AND age_group_id=?');$m->execute([$courseId,$ageId]);if(!$m->fetchColumn())$pdo->prepare('INSERT INTO academy_course_age_groups(course_id,age_group_id) VALUES(?,?)')->execute([$courseId,$ageId]);
-    for($lesson=1;$lesson<=10;$lesson++){$l=$pdo->prepare('SELECT 1 FROM academy_lessons WHERE course_id=? AND lesson_number=?');$l->execute([$courseId,$lesson]);if(!$l->fetchColumn())$pdo->prepare('INSERT INTO academy_lessons(course_id,lesson_number,title,lesson_type,is_preview,is_published) VALUES(?,?,?,\'reading\',?,1)')->execute([$courseId,$lesson,$title.' · Lesson '.$lesson,$number===1?1:0]);}
+// Bible Academy intentionally publishes only teen and adult learning paths.
+try{
+  foreach($catalog as $ageSlug=>[$ageName,$ages,$icon,$modules]){
+    $a=$pdo->prepare('SELECT id FROM academy_age_groups WHERE slug=?');$a->execute([$ageSlug]);$ageId=(int)$a->fetchColumn();if(!$ageId)continue;
+    foreach($modules as $offset=>$title){
+      $number=$offset+1;$slug=$ageSlug.'-module-'.$number;$q=$pdo->prepare('SELECT id FROM academy_courses WHERE slug=?');$q->execute([$slug]);$courseId=(int)$q->fetchColumn();
+      if(!$courseId){$pdo->prepare('INSERT INTO academy_courses(slug,title,summary,is_free,is_published,sort_order) VALUES(?,?,?,?,1,?)')->execute([$slug,$title,"Ten guided lessons for the $ageName learning path.",$number===1?1:0,($ageId*10)+$number]);$courseId=(int)$pdo->lastInsertId();}
+      $m=$pdo->prepare('SELECT 1 FROM academy_course_age_groups WHERE course_id=? AND age_group_id=?');$m->execute([$courseId,$ageId]);if(!$m->fetchColumn())$pdo->prepare('INSERT INTO academy_course_age_groups(course_id,age_group_id) VALUES(?,?)')->execute([$courseId,$ageId]);
+      for($lesson=1;$lesson<=10;$lesson++){
+        $l=$pdo->prepare('SELECT 1 FROM academy_lessons WHERE course_id=? AND lesson_number=?');$l->execute([$courseId,$lesson]);
+        if(!$l->fetchColumn())$pdo->prepare('INSERT INTO academy_lessons(course_id,lesson_number,title,lesson_type,is_preview,is_published) VALUES(?,?,?,\'reading\',?,1)')->execute([$courseId,$lesson,$title.' · Lesson '.$lesson,$number===1?1:0]);
+      }
+    }
   }
-}}catch(Throwable $e){error_log('Academy catalog bootstrap: '.$e->getMessage());}
-$subscribed=false;try{$s=$pdo->prepare("SELECT 1 FROM academy_subscriptions WHERE user_id=? AND status IN ('active','trialing') AND (current_period_end IS NULL OR current_period_end>=CURRENT_TIMESTAMP) LIMIT 1");$s->execute([$userId]);$subscribed=(bool)$s->fetchColumn();}catch(Throwable $e){}
-$selected=$_GET['age']??'preteen';if(!isset($catalog[$selected]))$selected='preteen';
-$s=$pdo->prepare('SELECT c.* FROM academy_courses c JOIN academy_course_age_groups m ON m.course_id=c.id JOIN academy_age_groups a ON a.id=m.age_group_id WHERE a.slug=? AND c.is_published=1 ORDER BY c.sort_order,c.id');$s->execute([$selected]);$courses=$s->fetchAll(PDO::FETCH_ASSOC);
+}catch(Throwable $exception){error_log('Bible Academy catalog bootstrap: '.$exception->getMessage());}
+$subscribed=false;
+try{$statement=$pdo->prepare("SELECT 1 FROM academy_subscriptions WHERE user_id=? AND status IN ('active','trialing') AND (current_period_end IS NULL OR current_period_end>=CURRENT_TIMESTAMP) LIMIT 1");$statement->execute([$userId]);$subscribed=(bool)$statement->fetchColumn();}catch(Throwable $exception){}
+$selected=(string)($_GET['age']??'teen');if(!isset($catalog[$selected]))$selected='teen';
+$statement=$pdo->prepare('SELECT c.* FROM academy_courses c JOIN academy_course_age_groups m ON m.course_id=c.id JOIN academy_age_groups a ON a.id=m.age_group_id WHERE a.slug=? AND c.is_published=1 ORDER BY c.sort_order,c.id');$statement->execute([$selected]);$courses=$statement->fetchAll(PDO::FETCH_ASSOC);
+$courseProgress=[];
+foreach($courses as $course){
+  $query=$pdo->prepare('SELECT COUNT(DISTINCT lesson_id) FROM academy_quiz_attempts WHERE user_id=? AND passed=1 AND lesson_id IN(SELECT id FROM academy_lessons WHERE course_id=?)');$query->execute([$userId,$course['id']]);$passedLessons=(int)$query->fetchColumn();
+  $query=$pdo->prepare('SELECT 1 FROM academy_module_exam_attempts WHERE user_id=? AND course_id=? AND passed=1 LIMIT 1');$query->execute([$userId,$course['id']]);$courseProgress[(int)$course['id']]=['lessons'=>$passedLessons,'exam'=>(bool)$query->fetchColumn()];
+}
+[$selectedName,$selectedAges,$selectedIcon]=$catalog[$selected];
 ?>
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Bible Academy | DailyBreath</title><style>*{box-sizing:border-box}body{margin:0;padding-bottom:100px;color:#eef5ed;font-family:Inter,system-ui;background:linear-gradient(#00180c55,#00180cb5),url('../assets/dailybreath-login-background.webp') center top/cover fixed}.shell{max-width:1050px;margin:auto;padding:48px 22px 80px}.top{display:flex;justify-content:space-between}.top a{color:#f0cf7e}.hero{padding:50px 0 25px}.eyebrow{color:#f0cf7e;font-weight:900;letter-spacing:.12em;font-size:12px}.hero h1{font:500 clamp(46px,8vw,76px)/1 Georgia,serif;margin:12px 0}.hero p{max-width:720px;color:#dce6dc;font-size:18px;line-height:1.6}.ages{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:18px 0 26px}.ages a{padding:15px 8px;border:1px solid #ffffff44;border-radius:15px;color:#173f2c;background:#fffdf3e8;text-align:center;text-decoration:none}.ages a.active{background:#f0cf7e}.ages span,.ages strong{display:block}.modules{display:grid;gap:14px}.module{display:grid;grid-template-columns:65px 1fr auto;gap:17px;align-items:center;padding:23px;border:1px solid #ffffff66;border-radius:22px;color:#263228;background:#fffdf7f2;box-shadow:0 20px 60px #00170b55}.num{display:grid;place-items:center;width:56px;height:56px;border-radius:17px;color:#fff;background:#173f2c;font-size:23px;font-weight:900}.module h2{margin:0 0 6px}.module p{margin:0;color:#68736c}.meta{margin-top:9px;color:#6f842e;font-size:12px;font-weight:900}.btn{display:inline-flex;padding:12px 16px;border-radius:12px;color:#173f2c;background:#f0cf7e;text-decoration:none;font-weight:900}.locked{color:#fff;background:#173f2c}.pricing{margin:24px 0;padding:21px;border-radius:20px;background:#0b3927dd;border:1px solid #ffffff44}.pricing strong{color:#f0cf7e}@media(max-width:760px){body{background-attachment:scroll}.ages{grid-template-columns:repeat(2,1fr)}.module{grid-template-columns:50px 1fr}.module .btn{grid-column:1/-1;justify-content:center}}</style></head><body><main class="shell"><header class="top"><strong>DailyBreath · Bible Academy</strong><a href="index.php">← Home</a></header><section class="hero"><span class="eyebrow">5 AGE PATHS · 5 MODULES EACH</span><h1>Grow deeper at every age.</h1><p>Each module includes ten lessons, a ten-question test after every lesson, and a cumulative module exam. Module 1 is free for every age group.</p></section><nav class="ages" aria-label="Choose an age group"><?php foreach($catalog as $slug=>[$name,$icon]):?><a class="<?=$slug===$selected?'active':''?>" href="?age=<?=e($slug)?>"><span><?=$icon?></span><strong><?=e($name)?></strong></a><?php endforeach;?></nav><section class="pricing"><strong><?= $subscribed?'All modules unlocked':'Module 1 is free' ?></strong><p><?= $subscribed?'Your Academy subscription is active.':'Continue to Modules 2–5 with the $4.99/month Academy subscription.' ?></p><?php if($subscribed):?><form method="post" action="academy-manage.php"><input type="hidden" name="csrf" value="<?=e(csrf_token())?>"><button class="btn" type="submit">Manage subscription</button></form><?php endif;?></section><section class="modules"><?php foreach($courses as $index=>$course):$number=$index+1;$locked=!(bool)$course['is_free']&&!$subscribed;$q=$pdo->prepare('SELECT COUNT(DISTINCT lesson_id) FROM academy_quiz_attempts WHERE user_id=? AND passed=1 AND lesson_id IN(SELECT id FROM academy_lessons WHERE course_id=?)');$q->execute([$userId,$course['id']]);$passedLessons=(int)$q->fetchColumn();$q=$pdo->prepare('SELECT 1 FROM academy_module_exam_attempts WHERE user_id=? AND course_id=? AND passed=1 LIMIT 1');$q->execute([$userId,$course['id']]);$examPassed=(bool)$q->fetchColumn();?><article class="module"><span class="num"><?=$number?></span><div><h2><?=e($course['title'])?></h2><p><?=e($course['summary'])?></p><div class="meta">10 LESSONS · 10 TESTS · 1 MODULE EXAM · <?=$passedLessons?>/10 LESSON TESTS PASSED<?=$examPassed?' · EXAM PASSED':''?><?=!empty($course['is_free'])?' · FREE':''?></div></div><a class="btn <?=$locked?'locked':''?>" href="<?=$locked?'academy-subscribe.php':'course.php?course='.rawurlencode($course['slug']).'&lesson=1'?>"><?=$locked?'Unlock module':($passedLessons?'Keep learning':'Begin module')?></a></article><?php endforeach;?></section></main><script src="/assets/js/visitor-analytics.js" defer></script></body></html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7faf6"><title>Bible Academy | DailyBreath</title><meta name="description" content="Professional Bible learning pathways for teens and adults."><link rel="stylesheet" href="/dailybreath/academy.css?v=20260730-1"></head><body>
+<header class="ba-nav">
+  <a class="ba-brand" href="/dailybreath/"><span class="ba-mark">DB</span><span><strong>DailyBreath</strong><small>Bible Academy</small></span></a>
+  <nav aria-label="Bible Academy navigation"><a class="active" href="/dailybreath/academy.php">Academy</a><a href="/dailybreath/bible.php">Bible Library</a><a href="/dailybreath/">DailyBreath home</a></nav>
+</header>
+<main class="ba-main">
+  <section class="ba-hero">
+    <div><span class="ba-kicker">SCRIPTURE · WISDOM · PRACTICE</span><h1>Grow deeper.<br>Live with purpose.</h1><p>Guided Bible learning built for teens and adults, with narrated lessons, knowledge checks, saved progress, and cumulative module exams.</p></div>
+    <div class="ba-hero-card"><span>YOUR PATH</span><strong><?=$selectedIcon?> <?=e($selectedName)?></strong><small>Ages <?=e($selectedAges)?> · 5 modules · 50 lessons</small></div>
+  </section>
+  <section class="ba-stats" aria-label="Academy overview"><div><b>2</b><span>learning paths</span></div><div><b>10</b><span>guided modules</span></div><div><b>100</b><span>lessons</span></div><div><b>80%</b><span>passing standard</span></div></section>
+  <nav class="ba-paths" aria-label="Choose a Bible learning path"><?php foreach($catalog as $slug=>[$name,$ages,$icon]):?><a class="<?=$slug===$selected?'active':''?>" href="?age=<?=e($slug)?>"><span><?=$icon?></span><div><strong><?=e($name)?></strong><small>Ages <?=e($ages)?></small></div></a><?php endforeach;?></nav>
+  <p class="ba-audience-note"><strong>Audience:</strong> Bible Academy is intentionally designed for Teens and Adults. Adult wellness content remains separately age-gated and is not part of Academy lessons.</p>
+  <section class="ba-membership">
+    <div><span class="ba-kicker"><?=$subscribed?'MEMBERSHIP ACTIVE':'START FREE'?></span><h2><?=$subscribed?'Every module is unlocked.':'Begin Module 1 at no cost.'?></h2><p><?=$subscribed?'Continue any teen or adult pathway and keep your saved progress.':'The first module in each path is free. Sign in and subscribe only when you are ready for Modules 2–5.'?></p></div>
+    <?php if($subscribed):?><form method="post" action="academy-manage.php"><input type="hidden" name="csrf" value="<?=e(csrf_token())?>"><button class="ba-button secondary" type="submit">Manage membership</button></form><?php else:?><a class="ba-button secondary" href="academy-subscribe.php">View membership</a><?php endif;?>
+  </section>
+  <section class="ba-section-head"><div><span class="ba-kicker"><?=e(strtoupper($selectedName))?> PATHWAY</span><h2>Build understanding one module at a time.</h2></div><p>Every module includes 10 guided lessons, 10 lesson checks, and one cumulative exam.</p></section>
+  <section class="ba-modules">
+    <?php foreach($courses as $index=>$course):$number=$index+1;$locked=!(bool)$course['is_free']&&!$subscribed;$progress=$courseProgress[(int)$course['id']]??['lessons'=>0,'exam'=>false];$percent=$progress['lessons']*10;?>
+      <article class="ba-module">
+        <div class="ba-module-top"><span class="ba-number"><?=str_pad((string)$number,2,'0',STR_PAD_LEFT)?></span><span class="ba-badge <?=$locked?'locked':(!empty($course['is_free'])?'free':'')?>"><?=$locked?'Member':(!empty($course['is_free'])?'Free':'Unlocked')?></span></div>
+        <h3><?=e($course['title'])?></h3><p><?=e($course['summary'])?></p>
+        <div class="ba-progress" aria-label="<?=$percent?>% complete"><span style="width:<?=$percent?>%"></span></div>
+        <small><?=$progress['lessons']?>/10 checks passed<?=$progress['exam']?' · Exam passed':' · Exam pending'?></small>
+        <a class="ba-button <?=$locked?'disabled':''?>" href="<?=$locked?'academy-subscribe.php':'course.php?course='.rawurlencode($course['slug']).'&lesson=1'?>"><?=$locked?'Unlock module':($progress['lessons']?'Continue learning':'Begin module')?> →</a>
+      </article>
+    <?php endforeach;?>
+  </section>
+</main>
+<footer class="ba-footer"><strong>DailyBreath Bible Academy</strong><span>Teen and Adult learning · Educational faith content</span></footer>
+<script src="/assets/js/visitor-analytics.js" defer></script></body></html>

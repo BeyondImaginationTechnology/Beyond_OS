@@ -7,7 +7,7 @@ $state = beyond_classic_schedule_state();
 echo json_encode([
     'ok'=>true,
     'mode'=>'youtube-library',
-    'channel'=>['slug'=>'classic-cartoon-theater','name'=>'Classic Cartoon Theater','access'=>'public','live'=>true],
+    'channel'=>['slug'=>'classic-cartoon-theater','name'=>'Beyond Animated Classics','access'=>'public','live'=>true],
     'state'=>$state,
     'sources'=>[],
     'start_offset'=>0,

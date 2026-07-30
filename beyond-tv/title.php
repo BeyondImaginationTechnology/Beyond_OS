@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . '/require-member.php';
+require_once __DIR__ . '/../includes/ecosystem.php';
+if (!empty($_SESSION['user_id'])) {
+    beyond_track_app('Beyond TV');
+}
 require_once __DIR__ . '/includes/episode-library.php';
 
 $catalog = json_decode((string) file_get_contents(__DIR__ . '/data/catalog.json'), true) ?: [];

@@ -24,10 +24,16 @@ bos_page_start('Beyond Academy', $course['title'], $course['description']);
   <section class="lesson-list" aria-label="Course lessons">
     <?php foreach ($course['lessons'] as $index => $lesson): $number = $index + 1; $complete = in_array($number, $progress['completed_lessons'], true); $unlocked = academy_lesson_unlocked($userId, $slug, $number); ?>
     <a class="lesson-row" <?=$unlocked ? '' : 'aria-disabled="true"'?> href="<?=$unlocked ? e(beyond_url('academy/lesson.php?course=' . rawurlencode($slug) . '&lesson=' . $number)) : '#'?>">
-      <span><?=$complete ? '✓' : $number?></span><div><h2><?=e($lesson[0])?></h2><p><?=e($lesson[1])?></p></div><b><?=$complete ? 'Completed' : ($unlocked ? 'Start →' : 'Locked')?></b>
+      <span><?=$complete ? '✓' : $number?></span><div><h2><?=e(academy_lesson_title($lesson))?></h2><p><?=e(academy_lesson_summary($lesson))?></p><?php if(!empty($lesson['duration'])):?><small><?=e((string)$lesson['duration'])?> · narrated lesson · interactive practice</small><?php endif;?></div><b><?=$complete ? 'Completed' : ($unlocked ? 'Start →' : 'Locked')?></b>
     </a>
     <?php endforeach; ?>
   </section>
+  <?php if(!empty($course['project'])):$project=$course['project'];?>
+  <section class="academy-project">
+    <div><span class="academy-kicker">Capstone project</span><h2><?=e((string)$project['title'])?></h2><p><?=e((string)$project['brief'])?></p></div>
+    <ul><?php foreach((array)$project['deliverables'] as $deliverable):?><li><?=e((string)$deliverable)?></li><?php endforeach;?></ul>
+  </section>
+  <?php endif;?>
   <section class="assessment-card">
     <span class="academy-kicker">Final assessment</span><h2>Pass with 80% or higher.</h2>
     <p><?=$progress['completed']?> of <?=$progress['total']?> lessons completed. Your best assessment score is <?=$progress['best_score']?>/<?=count($course['questions'])?>.</p>

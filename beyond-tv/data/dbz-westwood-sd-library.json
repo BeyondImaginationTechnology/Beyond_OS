@@ -263,6 +263,8 @@
     "episode": 145,
     "broadcast_episode": 160,
     "title": "Cell Is Complete",
+    "playable": false,
+    "status": "unavailable",
     "video_url": "https://archive.org/download/dbz-westwood-remaster/DBZWW-SD/Dragon%20Ball%20Z%20-%20145%20%28160%29%20Cell%20Is%20Complete%20%5BV2%5D%20%5BManifestx%5D-8.mp4"
   },
   {

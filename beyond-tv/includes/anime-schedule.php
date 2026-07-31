@@ -143,7 +143,7 @@ function beyond_anime_program_for_block(
 function beyond_anime_episode(string $key, int $seed, int $duration, int $startOffset): array
 {
     if ($key === 'kirby') {
-        $library = beyond_anime_library('kirby-library.json');
+        $library = beyond_anime_playable_library('kirby-library.json');
         $episode = $library[$seed % max(1, count($library))] ?? [];
         $number = (int)($episode['episode'] ?? 1);
         $title = (string)($episode['title'] ?? ('Episode ' . $number));
@@ -161,7 +161,7 @@ function beyond_anime_episode(string $key, int $seed, int $duration, int $startO
     }
 
     if ($key === 'death-note') {
-        $library = beyond_anime_library('death-note-library.json');
+        $library = beyond_anime_playable_library('death-note-library.json');
         $episode = $library[$seed % max(1, count($library))] ?? [];
         $number = (int)($episode['episode'] ?? 1);
         $title = (string)($episode['title'] ?? ('Episode ' . $number));
@@ -179,7 +179,7 @@ function beyond_anime_episode(string $key, int $seed, int $duration, int $startO
     }
 
     if ($key === 'dragon-ball') {
-        $library = beyond_anime_library('dragon-ball-library.json');
+        $library = beyond_anime_playable_library('dragon-ball-library.json');
         $episode = $library[$seed % max(1, count($library))] ?? [];
         $number = (int)($episode['episode'] ?? 1);
         $title = (string)($episode['title'] ?? ('Episode ' . $number));
@@ -209,7 +209,7 @@ function beyond_anime_episode(string $key, int $seed, int $duration, int $startO
     }
 
     if ($key === 'dragon-ball-z') {
-        $library = beyond_anime_library('dbz-westwood-sd-library.json');
+        $library = beyond_anime_playable_library('dbz-westwood-sd-library.json');
         $episode = $library[$seed % max(1, count($library))] ?? [];
         $number = (int)($episode['episode'] ?? 1);
         $title = (string)($episode['title'] ?? ('Episode ' . $number));
@@ -263,7 +263,7 @@ function beyond_anime_episode(string $key, int $seed, int $duration, int $startO
     }
 
     if ($key === 'digimon') {
-        $library = beyond_anime_library('digimon-library.json');
+        $library = beyond_anime_playable_library('digimon-library.json');
         $episode = $library[$seed % max(1, count($library))] ?? [];
         $number = (int)($episode['episode'] ?? 1);
         $title = (string)($episode['title'] ?? ('Episode ' . $number));
@@ -279,7 +279,7 @@ function beyond_anime_episode(string $key, int $seed, int $duration, int $startO
         ];
     }
 
-    $library = beyond_anime_library('pokemon-library.json');
+    $library = beyond_anime_playable_library('pokemon-library.json');
     $episode = $library[$seed % max(1, count($library))] ?? [];
     $number = (int)($episode['episode'] ?? 1);
     $title = (string)($episode['title'] ?? ('Episode ' . $number));
@@ -303,4 +303,13 @@ function beyond_anime_library(string $filename): array
         $libraries[$filename] = json_decode((string)@file_get_contents($path), true) ?: [];
     }
     return $libraries[$filename];
+}
+
+function beyond_anime_playable_library(string $filename): array
+{
+    return array_values(array_filter(
+        beyond_anime_library($filename),
+        static fn(array $episode): bool => ($episode['playable'] ?? true) !== false
+            && ($episode['status'] ?? 'available') !== 'unavailable'
+    ));
 }

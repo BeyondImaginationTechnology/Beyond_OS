@@ -77,7 +77,7 @@
   const $=id=>document.getElementById(id),canvas=$('art'),ctx=canvas.getContext('2d',{alpha:false}),csrf=document.querySelector('meta[name="csrf-token"]').content;
   const ids=['phrase','meaning','weekday','publishDate','french','frenchPron','patois','patoisPron','kreyol','kreyolPron','spanish','spanishPron','culture','exportLanguage','narratorLocale','includeNarration','showBadge'];
   ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-  let activeAudio=null,brandReady=false;const brandLogo=new Image();brandLogo.decoding='async';brandLogo.src='/beyond-french/assets/images/beyond-french-logo.webp';brandLogo.onload=()=>{brandReady=true;draw()};brandLogo.onerror=()=>setStatus('Beyond French logo could not be loaded. Exports will use a text fallback.',true);const v=id=>$(id).value.trim();const setStatus=(m,e=false)=>{$('status').textContent=m;$('status').classList.toggle('error',e)};
+  let activeAudio=null,brandReady=false,narrationPlaying=false,previewAnimation=null;const brandLogo=new Image();brandLogo.decoding='async';brandLogo.src='/beyond-french/assets/images/beyond-french-logo.webp';brandLogo.onload=()=>{brandReady=true;draw()};brandLogo.onerror=()=>setStatus('Beyond French logo could not be loaded. Exports will use a text fallback.',true);const v=id=>$(id).value.trim();const setStatus=(m,e=false)=>{$('status').textContent=m;$('status').classList.toggle('error',e)};
   const exportSettings=()=>({
     en:{locale:'en-US',label:'English',banner:'Today’s English Phrase',phrase:v('phrase'),pronunciation:'',meaningLabel:'What it means'},
     fr:{locale:'fr-FR',label:'French',banner:'Phrase Française du Jour',phrase:v('french'),pronunciation:v('frenchPron'),meaningLabel:'Meaning in English'},
@@ -106,7 +106,7 @@
     ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(774,72);ctx.lineTo(782,72);ctx.lineTo(793,63);ctx.lineTo(793,93);ctx.lineTo(782,84);ctx.lineTo(774,84);ctx.closePath();ctx.fill();
     ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.lineCap='round';for(let i=0;i<2;i++){ctx.beginPath();ctx.arc(792,78,10+i*8,-.82,.82);ctx.stroke()}
     ctx.textAlign='left';ctx.fillStyle='#9ebfff';ctx.font='800 15px Arial';ctx.letterSpacing='2px';ctx.fillText('NARRATION',830,61);ctx.letterSpacing='0px';
-    ctx.fillStyle='#fff';ctx.font='900 24px Arial';ctx.fillText('Now playing',830,88);
+    ctx.fillStyle='#fff';ctx.font='900 26px Arial';ctx.fillText('Voice on',830,88);
     const levels=[.35,.7,1,.58,.82];levels.forEach((level,i)=>{const animated=10+(level*18)+(pulse*(i%2?8:3));round(831+i*12,100-animated/2,6,animated,3,i===2?'#ffbf00':'#41e28a',null)});
     ctx.fillStyle='#41e28a';ctx.font='800 13px Arial';ctx.fillText('VOICE ON',902,106);
     ctx.restore()
@@ -123,13 +123,15 @@
     ctx.fillStyle='#1768ff';round(x+48,y+143,62,4,2,'#1768ff',null);
     ctx.restore()
   }
-  function drawCard(x,label,flag,text,pron,color){
-    ctx.save();ctx.shadowColor='rgba(0,7,24,.22)';ctx.shadowBlur=20;ctx.shadowOffsetY=9;round(x,755,238,330,24,'rgba(255,255,255,.98)',null);ctx.shadowColor='transparent';
-    round(x,755,238,10,5,color,null);round(x+18,776,202,44,14,'#f0f4fa',null);
+  function drawCard(x,language,label,flag,text,pron,color,pulse=0){
+    const active=$('includeNarration').checked&&$('showBadge').checked&&v('exportLanguage')===language;
+    ctx.save();ctx.shadowColor=active?'rgba(255,191,0,.45)':'rgba(0,7,24,.22)';ctx.shadowBlur=active?34:20;ctx.shadowOffsetY=active?14:9;round(x,755,238,330,24,active?'#fffbea':'rgba(255,255,255,.98)',active?'rgba(255,191,0,.86)':null,active?4:2);ctx.shadowColor='transparent';
+    round(x,755,238,10,5,color,null);round(x+18,776,202,44,14,active?'#fff3bd':'#f0f4fa',null);
     ctx.textAlign='left';ctx.font='31px Arial';ctx.fillText(flag,x+31,808);ctx.fillStyle=color;ctx.font='900 16px Arial';ctx.letterSpacing='1.5px';ctx.fillText(label,x+78,804);ctx.letterSpacing='0px';
     ctx.textAlign='center';ctx.fillStyle='#071630';const s=sizeFor(text,202,36,24);ctx.font=`900 ${s}px Arial`;wrap(text,x+119,878,202,s*1.14,3);
     ctx.fillStyle='#66738b';ctx.font='italic 700 16px Arial';wrap(pron?`/${pron}/`:'Written guide',x+119,982,194,21,2);
-    round(x+68,1026,102,38,19,color,null);ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(x+93,1038);ctx.lineTo(x+101,1038);ctx.lineTo(x+111,1030);ctx.lineTo(x+111,1060);ctx.lineTo(x+101,1052);ctx.lineTo(x+93,1052);ctx.closePath();ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.arc(x+110,1045,9,-.8,.8);ctx.stroke();ctx.font='900 12px Arial';ctx.textAlign='left';ctx.fillText('LISTEN',x+123,1050);ctx.restore()
+    const pulseScale=active?1+pulse*.12:1,iconX=x+119,iconY=1045;
+    round(x+68,1026,102,38,19,active?'#05a84f':color,null);ctx.save();ctx.translate(iconX,iconY);ctx.scale(pulseScale,pulseScale);ctx.translate(-iconX,-iconY);ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(x+93,1038);ctx.lineTo(x+101,1038);ctx.lineTo(x+111,1030);ctx.lineTo(x+111,1060);ctx.lineTo(x+101,1052);ctx.lineTo(x+93,1052);ctx.closePath();ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.arc(x+110,1045,9,-.8,.8);ctx.stroke();if(active){ctx.beginPath();ctx.arc(x+110,1045,18+pulse*12,-.8,.8);ctx.globalAlpha=.72;ctx.stroke()}ctx.restore();ctx.fillStyle='#fff';ctx.font='900 12px Arial';ctx.textAlign='left';ctx.fillText(active?'VOICE ON':'LISTEN',x+123,1050);ctx.restore()
   }
   function draw(pulse=0){
     const g=ctx.createLinearGradient(0,0,1080,1350);g.addColorStop(0,'#020d20');g.addColorStop(.48,'#05295e');g.addColorStop(1,'#020d22');ctx.fillStyle=g;ctx.fillRect(0,0,1080,1350);
@@ -139,7 +141,8 @@
     drawCalendar();
     ctx.save();ctx.shadowColor='rgba(0,6,25,.28)';ctx.shadowBlur=28;ctx.shadowOffsetY=12;round(150,350,780,190,28,'rgba(255,255,255,.985)',null);ctx.shadowColor='transparent';round(185,374,160,34,17,'#eaf1ff',null);ctx.fillStyle='#1557c9';ctx.font='900 14px Arial';ctx.letterSpacing='2px';ctx.textAlign='center';ctx.fillText(output.label.toUpperCase(),265,397);ctx.letterSpacing='0px';ctx.fillStyle='#071630';const psize=sizeFor(output.phrase,690,57,29);ctx.font=`900 ${psize}px Arial Black, Arial`;ctx.fillText(output.phrase,540,474);if(output.pronunciation){ctx.fillStyle='#52627b';ctx.font='italic 700 20px Arial';ctx.fillText(`/${output.pronunciation}/`,540,512)}ctx.restore();
     round(105,574,870,126,22,'rgba(5,25,57,.88)','rgba(112,162,236,.38)',2);ctx.textAlign='left';ctx.fillStyle='#ffca36';ctx.font='900 16px Arial';ctx.letterSpacing='2px';ctx.fillText(output.meaningLabel.toUpperCase(),135,614);ctx.letterSpacing='0px';ctx.fillStyle='#eef5ff';ctx.font='600 22px Arial';wrap(v('meaning'),135,657,800,29,2,'left');
-    drawCard(52,'FRANÇAIS','🇫🇷',v('french'),v('frenchPron'),'#0a3d97');drawCard(300,'PATOIS','🇯🇲',v('patois'),v('patoisPron'),'#249c3a');drawCard(548,'KREYÒL','🇭🇹',v('kreyol'),v('kreyolPron'),'#c3161b');drawCard(796,'ESPAÑOL','🇪🇸',v('spanish'),v('spanishPron'),'#ed8b00');
+    const activePulse=narrationPlaying||($('includeNarration').checked&&$('showBadge').checked)?pulse:0;
+    drawCard(52,'fr','FRANÇAIS','🇫🇷',v('french'),v('frenchPron'),'#0a3d97',activePulse);drawCard(300,'jm','PATOIS','🇯🇲',v('patois'),v('patoisPron'),'#249c3a',activePulse);drawCard(548,'ht','KREYÒL','🇭🇹',v('kreyol'),v('kreyolPron'),'#c3161b',activePulse);drawCard(796,'es','ESPAÑOL','🇪🇸',v('spanish'),v('spanishPron'),'#ed8b00',activePulse);
     round(105,1110,870,116,22,'rgba(8,35,78,.96)','rgba(63,132,242,.48)',2);round(126,1129,46,46,14,'#ffbf00',null);ctx.fillStyle='#071630';ctx.font='900 25px Arial';ctx.textAlign='center';ctx.fillText('i',149,1161);ctx.textAlign='left';ctx.fillStyle='#ffc21c';ctx.font='900 17px Arial';ctx.letterSpacing='1.5px';ctx.fillText('CULTURE NOTE',190,1149);ctx.letterSpacing='0px';ctx.fillStyle='#fff';ctx.font='600 19px Arial';wrap(v('culture'),190,1182,745,24,2,'left');
     const footer=ctx.createLinearGradient(0,1270,1080,1350);footer.addColorStop(0,'#ffbf00');footer.addColorStop(.5,'#ffd65a');footer.addColorStop(1,'#ffae22');ctx.fillStyle=footer;ctx.fillRect(0,1270,1080,80);ctx.fillStyle='#05152f';ctx.textAlign='center';ctx.font='900 17px Arial';ctx.letterSpacing='1px';ctx.fillText('ONE PHRASE  ·  FOUR LANGUAGES  ·  EVERY DAY',540,1306);ctx.font='800 14px Arial';ctx.letterSpacing='.5px';ctx.fillText('BEYONDIMAGINATION.CO.TECHNOLOGY/BEYOND-FRENCH',540,1332);ctx.letterSpacing='0px'
   }
@@ -171,8 +174,10 @@
       const blob=await response.blob();if(blob.size<128)throw new Error('The narration service returned empty audio.');return blob;
     }catch(error){if(error.name==='AbortError')throw new Error('French narration timed out after 70 seconds. Check the configured French voice or upload an MP3.');throw error}finally{clearTimeout(timer)}
   }
-  function stop(){if(activeAudio){activeAudio.pause();URL.revokeObjectURL(activeAudio.src);activeAudio=null}window.speechSynthesis?.cancel()}
-  async function preview(){stop();setStatus('Preparing narration…');try{const blob=await narrationBlob(),url=URL.createObjectURL(blob);activeAudio=new Audio(url);activeAudio.onended=()=>{URL.revokeObjectURL(url);activeAudio=null;setStatus('Narration finished.')};await activeAudio.play();setStatus('Narration playing.')}catch(error){if('speechSynthesis'in window){const utterance=new SpeechSynthesisUtterance(narrationText());utterance.lang=v('narratorLocale');utterance.onend=()=>setStatus('Browser voice preview finished.');speechSynthesis.speak(utterance);setStatus(`Using this device’s ${exportSettings().label} voice for preview.`)}else setStatus('No audio voice is configured. Upload a narration file or export the visual without audio.',false)}}
+  function startNarrationPulse(){narrationPlaying=true;if(previewAnimation)cancelAnimationFrame(previewAnimation);const started=performance.now(),tick=now=>{if(!narrationPlaying)return;draw((Math.sin((now-started)/420)+1)/2);previewAnimation=requestAnimationFrame(tick)};previewAnimation=requestAnimationFrame(tick)}
+  function stopNarrationPulse(){narrationPlaying=false;if(previewAnimation)cancelAnimationFrame(previewAnimation);previewAnimation=null;draw()}
+  function stop(){if(activeAudio){activeAudio.pause();URL.revokeObjectURL(activeAudio.src);activeAudio=null}window.speechSynthesis?.cancel();stopNarrationPulse()}
+  async function preview(){stop();setStatus('Preparing narration…');try{const blob=await narrationBlob(),url=URL.createObjectURL(blob);activeAudio=new Audio(url);activeAudio.onended=()=>{URL.revokeObjectURL(url);activeAudio=null;stopNarrationPulse();setStatus('Narration finished.')};startNarrationPulse();await activeAudio.play();setStatus('Narration playing.')}catch(error){stopNarrationPulse();if('speechSynthesis'in window){const utterance=new SpeechSynthesisUtterance(narrationText());utterance.lang=v('narratorLocale');utterance.onstart=startNarrationPulse;utterance.onend=()=>{stopNarrationPulse();setStatus('Browser voice preview finished.')};speechSynthesis.speak(utterance);setStatus(`Using this device’s ${exportSettings().label} voice for preview.`)}else setStatus('No audio voice is configured. Upload a narration file or export the visual without audio.',false)}}
   function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
   const baseName=()=>`francais-du-jour-${v('exportLanguage')}-${v('publishDate')||'post'}`;
   async function ensureBrand(){if(brandReady)return;try{await brandLogo.decode();brandReady=true}catch{}}

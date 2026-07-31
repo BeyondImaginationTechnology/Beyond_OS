@@ -87,10 +87,10 @@ DROP METADATA
 - Package format: {$packStyle}
 
 ART DIRECTION
-Luxury black retail packaging with dimensional foil, embossed borders, subtle material folds and museum-grade ornamental detailing. Use antique gold as the primary accent and a restrained collection accent color. Present the stencil in a large clean white or warm-ivory window so it remains recognizably transfer-ready. Include elegant blank header, date, sequence, collection and footer label panels for exact typography to be overlaid later. Include five small premium feature-icon positions along the lower area. Keep the layout symmetrical, front-facing, commercially believable and suitable for a high-end tattoo supply launch.
+Luxury black retail packaging with dimensional foil, embossed borders, subtle material folds and museum-grade ornamental detailing. Use antique gold as the primary accent and a restrained collection accent color. Present the stencil in a large clean white or warm-ivory window so it remains recognizably transfer-ready. Make the resealable pouch or premium retail pack itself clearly visible, with zipper track, hang tab, label zones, foil trim and realistic package seams. Keep all label areas visually integrated into the package design itself, not as floating banners or stickers. Keep the layout symmetrical, front-facing, commercially believable and suitable for a high-end tattoo supply launch.
 
 CONSTRAINTS
-No people, hands, skin, tattooed bodies, store shelf, extra products or environmental scene. Do not invent readable words, letters, dates, numbers, logos or watermarks; keep all label panels blank. Do not crop the package. Return one finished vertical package design filling the frame with safe margins.
+No people, hands, skin, tattooed bodies, store shelf, extra products or environmental scene. Do not invent readable words, dates, numbers, logos or watermarks. Do not add floating overlays, text boxes or post-production captions. Do not crop the package. Return one finished vertical package design filling the frame with safe margins.
 PROMPT;
     $prompts['reference'] = <<<PROMPT
 Create a museum-quality, high-detail 2:3 vertical reference artwork for the Beyond Tattoo daily stencil "{$title}".

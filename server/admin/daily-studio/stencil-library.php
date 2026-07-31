@@ -93,6 +93,7 @@ foreach ($dropSchedule as $index => $drop) {
 button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;padding:34px}.hero{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:25px}.eyebrow{color:var(--gold);font-size:11px;font-weight:950;letter-spacing:.18em}.hero h1{margin:7px 0;font:700 clamp(38px,6vw,68px)/.96 Georgia,serif}.hero p{max-width:720px;margin:0;color:#b5b1aa}.badges{display:flex;gap:8px;flex-wrap:wrap}.badge{padding:9px 12px;border:1px solid #55462e;border-radius:999px;background:#171511;color:#e4c98d;font-size:12px;font-weight:850}.layout{display:grid;grid-template-columns:minmax(350px,.82fr) minmax(470px,1.18fr);gap:22px}.panel{padding:24px;border:1px solid var(--line);border-radius:25px;background:rgba(18,18,20,.94);box-shadow:0 30px 80px #0008}.section-title{margin:0 0 18px;font-size:20px}.field{margin-bottom:15px}.field label{display:block;margin-bottom:6px;font-weight:850}.field small{display:block;margin-top:5px;color:#898985}.field input,.field textarea,.field select{width:100%;padding:12px 13px;border:1px solid #38383c;border-radius:12px;background:#0d0e10;color:#fff;outline:0}.field textarea{min-height:134px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px #d8ab5222}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.check{display:flex;align-items:center;gap:9px;margin:4px 0 15px;color:#d6d2ca;font-weight:800}.check input{width:18px;height:18px;accent-color:var(--gold)}.actions{display:flex;gap:9px;flex-wrap:wrap}.btn{border:0;border-radius:13px;padding:13px 16px;background:linear-gradient(135deg,#d8ab52,#b78027);color:#090a0b;font-weight:950;cursor:pointer}.btn.secondary{border:1px solid #414145;background:#222327;color:#fff}.btn.remotion{width:100%;margin-top:9px;background:linear-gradient(135deg,#8f2f2a,#d05b43);color:#fff}.btn:disabled{opacity:.45;cursor:wait}.status{min-height:25px;margin:13px 0;color:#d7bd86;font-weight:750}.status.error{color:#ff9ba0}.workflow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 18px}.workflow span{padding:9px;border:1px solid #343438;border-radius:11px;color:#777;text-align:center;font-size:11px;font-weight:900}.workflow span.active{border-color:#8e733e;background:#292214;color:#f2cf84}.workflow span.complete{border-color:#2f6e45;color:#88dba4}.preview{position:relative;min-height:760px;display:grid;place-items:center;overflow:hidden;border:1px solid #343438;border-radius:20px;background:radial-gradient(circle,#302b25,#111214 66%)}.preview:before{content:"";position:absolute;inset:0;opacity:.14;background-image:radial-gradient(#fff .65px,transparent .65px);background-size:11px 11px}.preview img{position:relative;display:block;max-width:92%;max-height:760px;object-fit:contain;border-radius:12px;box-shadow:0 28px 70px #000b}.empty{position:relative;max-width:360px;text-align:center;color:#8e8c88}.empty b{display:block;color:var(--gold);font-size:58px}.meta-bar{display:flex;justify-content:space-between;gap:15px;margin-top:14px;color:#8d8b86;font-size:12px}.output{margin-top:19px;padding-top:18px;border-top:1px solid #303034}.output p{color:#9d9a94}.safe-note{padding:11px 13px;border:1px solid #3c493f;border-radius:12px;background:#172019;color:#99d2a9;font-size:12px}
 .schedule-card{margin-bottom:22px;padding:17px;border:1px solid #594725;border-radius:17px;background:linear-gradient(135deg,#241d12,#111214)}.schedule-card label{display:block;margin-bottom:8px;color:#f1cf87;font-weight:950}.schedule-card select{width:100%;padding:13px;border:1px solid #6d562c;border-radius:12px;background:#090a0b;color:#fff;font-weight:800}.drop-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}.drop-meta span{padding:6px 9px;border-radius:999px;background:#342a19;color:#e6c57f;font-size:11px;font-weight:900}.preview-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.preview-tab{border:1px solid #39393d;border-radius:12px;padding:10px;background:#17181b;color:#92918e;font-weight:900;cursor:pointer}.preview-tab.active{border-color:#a07d3c;background:#302617;color:#f2ce83}.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.tool-grid .wide{grid-column:1/-1}.lore-box{min-height:118px!important}.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0}.review-grid .check{margin:0;padding:10px;border:1px solid #333438;border-radius:11px;background:#111214;font-size:12px}
 @media(max-width:960px){.wrap{padding:20px}.hero{display:block}.badges{margin-top:15px}.layout{grid-template-columns:1fr}.preview{min-height:520px}.row{grid-template-columns:1fr}.preview-tabs{grid-template-columns:repeat(2,1fr)}}
+.asset-intel{margin-bottom:14px;padding:15px;border:1px solid #342f25;border-radius:16px;background:linear-gradient(135deg,#17130d,#111214)}.asset-intel-kicker{margin:0 0 4px;color:#d8ab52;font-size:11px;font-weight:950;letter-spacing:.16em;text-transform:uppercase}.asset-intel h3{margin:0 0 7px;font-size:20px}.asset-intel p{margin:0;color:#b8b0a3}.asset-intel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.asset-intel-grid span{padding:8px 10px;border:1px solid #3a352d;border-radius:10px;background:#0d0e10;color:#d8c79d;font-size:12px;font-weight:850}@media(max-width:620px){.asset-intel-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -103,7 +104,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       <h1>Daily stencil generator</h1>
       <p>Generate a transfer-ready tattoo master with GPT Image 2, review the actual artwork, publish its artist pack, and export a polished animated Remotion reel.</p>
     </div>
-    <div class="badges"><span class="badge">GPT Image 2</span><span class="badge">High quality · 1024×1536</span><span class="badge">Remotion · 1080×1920</span></div>
+    <div class="badges"><span class="badge">GPT Image 2</span><span class="badge">High quality · 1024×1536</span><span class="badge">IG post video · 1080×1080</span></div>
   </header>
 
   <section class="layout">
@@ -168,7 +169,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
           <label class="check"><input class="preflight" type="checkbox"> Clean line hierarchy</label>
           <label class="check"><input class="preflight" type="checkbox"> Open negative space</label>
           <label class="check"><input class="preflight" type="checkbox"> Full design in frame</label>
-          <label class="check"><input class="preflight" type="checkbox"> No text or watermark</label>
+          <label class="check"><input class="preflight" type="checkbox"> No stray text artifacts</label>
         </div>
         <div class="actions"><button class="btn" id="publishBtn" disabled type="button">Publish artist pack</button></div>
         <button class="btn remotion" id="renderVideo" disabled type="button">Export animated Remotion MP4</button>
@@ -184,6 +185,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
         <button class="preview-tab" data-preview="lore" type="button">5 · Lore card</button>
         <button class="preview-tab" data-preview="style" type="button">6 · Style card</button>
       </div>
+      <div class="asset-intel" id="assetIntel" aria-live="polite"></div>
       <div class="preview" id="preview"><div class="empty"><b>✦</b><h2>Generated stencil preview</h2><p>Your GPT Image 2 artwork will appear here at the same 2:3 aspect ratio used by the final stencil and video.</p></div></div>
       <div class="meta-bar"><span id="providerMeta">Awaiting generation</span><span id="qualityMeta">High quality · PNG</span></div>
     </article>
@@ -199,6 +201,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   const $ = (id) => document.getElementById(id);
   const status = $('status');
   const preview = $('preview');
+  const assetIntel = $('assetIntel');
   const workflow = [...document.querySelectorAll('.workflow span')];
   let image = '';
   let referenceImage = '';
@@ -216,6 +219,14 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     pack: 'premium packaging',
     lore: 'information and lore card',
     style: 'design and style card',
+  };
+  const assetIntelCopy = {
+    reference: 'High-detail visual reference for mood, materials, lighting, and artist consultation.',
+    stencil: 'Printer-ready transfer master with subtle bit-atom provenance marks baked into the stencil canvas.',
+    placement: 'Anatomy and scale mockup to confirm flow before final studio sizing.',
+    pack: 'Instagram-square premium package post with the resealable pack kept visible and text kept off the package body.',
+    lore: 'Story card for symbolism, collection context, and collector-facing release notes.',
+    style: 'Technical card for design language, placement, release metadata, and studio handoff.',
   };
 
   const message = (text, error = false) => {
@@ -259,6 +270,8 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   const emptyPreview = (mode = 'stencil') => `<div class="empty"><b>${mode === 'stencil' ? '✦' : '◇'}</b><h2>${previewLabels[mode] || 'Daily drop'} preview</h2><p>${mode === 'stencil' ? 'Generate or upload the approved stencil to unlock the complete six-piece kit.' : `Create the ${previewLabels[mode]} from the approved scheduled stencil.`}</p></div>`;
   const renderPreview = () => {
     const source = assetSource(previewMode);
+    const drop = activeDrop();
+    assetIntel.innerHTML = `<p class="asset-intel-kicker">${previewLabels[previewMode] || 'Daily asset'}</p><h3>${drop.title}</h3><p>${assetIntelCopy[previewMode] || drop.lore}</p><div class="asset-intel-grid"><span>${drop.collection}</span><span>Drop ${drop.sequence} / 55</span><span>${$('placement').value}</span></div>`;
     preview.innerHTML = '';
     if (!source) {
       preview.innerHTML = emptyPreview(previewMode);
@@ -351,6 +364,43 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     img.onerror = () => reject(new Error('The generated image could not be prepared.'));
     img.src = source;
   });
+  const drawBitAtom = (ctx, x, y, size, alpha = .16) => {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = '#111';
+    ctx.fillStyle = '#111';
+    ctx.lineWidth = Math.max(1, size * .035);
+    ctx.translate(x, y);
+    for (const rotation of [0, Math.PI / 3, -Math.PI / 3]) {
+      ctx.save();
+      ctx.rotate(rotation);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, size * .5, size * .16, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.beginPath();
+    ctx.arc(0, 0, size * .08, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.font = `900 ${Math.max(11, size * .16)}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.fillText('bit$', 0, size * .68);
+    ctx.restore();
+  };
+  const watermarkStencilDataUrl = async (source) => {
+    const stencil = await loadImage(source);
+    const canvas = document.createElement('canvas');
+    canvas.width = stencil.naturalWidth || stencil.width || 1024;
+    canvas.height = stencil.naturalHeight || stencil.height || 1536;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(stencil, 0, 0, canvas.width, canvas.height);
+    const size = Math.min(canvas.width, canvas.height) * .16;
+    drawBitAtom(ctx, canvas.width - size * .7, size * .62, size, .13);
+    drawBitAtom(ctx, size * .7, canvas.height - size * .64, size, .1);
+    return canvas.toDataURL('image/png');
+  };
   const fitCanvasText = (ctx, text, maxWidth, start, min = 22) => {
     let size = start;
     while (size > min) {
@@ -419,70 +469,76 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     const drop = activeDrop();
     const base = await loadImage(source);
     const canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 1536;
+    canvas.width = 1080;
+    canvas.height = 1080;
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(base, 0, 0, 1024, 1536);
-    const top = ctx.createLinearGradient(0, 0, 0, 310);
-    top.addColorStop(0, 'rgba(3,3,4,.98)');
-    top.addColorStop(1, 'rgba(3,3,4,.72)');
-    ctx.fillStyle = top;
-    ctx.fillRect(24, 24, 976, 292);
-    const bottom = ctx.createLinearGradient(0, 1130, 0, 1536);
-    bottom.addColorStop(0, 'rgba(3,3,4,.68)');
-    bottom.addColorStop(1, 'rgba(3,3,4,.98)');
-    ctx.fillStyle = bottom;
-    ctx.fillRect(24, 1120, 976, 392);
+    const background = ctx.createRadialGradient(540, 390, 120, 540, 540, 760);
+    background.addColorStop(0, '#312419');
+    background.addColorStop(.56, '#09090b');
+    background.addColorStop(1, '#020203');
+    ctx.fillStyle = background;
+    ctx.fillRect(0, 0, 1080, 1080);
+    const maxW = 650;
+    const maxH = 900;
+    const scale = Math.min(maxW / base.width, maxH / base.height);
+    const drawW = base.width * scale;
+    const drawH = base.height * scale;
+    const drawX = 64 + (maxW - drawW) / 2;
+    const drawY = 72 + (maxH - drawH) / 2;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,.62)';
+    ctx.shadowBlur = 34;
+    ctx.shadowOffsetY = 18;
+    ctx.drawImage(base, drawX, drawY, drawW, drawH);
+    ctx.restore();
     ctx.strokeStyle = '#d8ab52';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(34, 34, 956, 1468);
+    ctx.lineWidth = 5;
+    ctx.strokeRect(28, 28, 1024, 1024);
     ctx.strokeStyle = 'rgba(216,171,82,.52)';
     ctx.lineWidth = 1;
-    ctx.strokeRect(48, 48, 928, 1440);
-    ctx.textAlign = 'center';
+    ctx.strokeRect(44, 44, 992, 992);
+    ctx.textAlign = 'left';
     ctx.fillStyle = '#e8c77b';
-    ctx.font = '800 27px Arial';
+    ctx.font = '800 22px Arial';
     ctx.letterSpacing = '8px';
-    ctx.fillText('BEYOND TATTOO', 512, 92);
+    ctx.fillText('BEYOND TATTOO', 750, 118);
     ctx.letterSpacing = '0px';
-    ctx.font = '900 67px Georgia, serif';
-    ctx.fillText('DAILY STENCIL PACK', 512, 174);
-    ctx.fillStyle = '#caa34f';
-    ctx.font = '800 25px Arial';
-    ctx.fillText(drop.collection.toUpperCase(), 512, 224);
-    ctx.fillStyle = 'rgba(3,3,4,.9)';
-    ctx.fillRect(70, 246, 235, 80);
-    ctx.fillRect(719, 246, 235, 80);
-    ctx.strokeStyle = '#d8ab52';
-    ctx.strokeRect(70, 246, 235, 80);
-    ctx.strokeRect(719, 246, 235, 80);
-    ctx.fillStyle = '#f1d28a';
-    ctx.font = '900 24px Arial';
-    ctx.fillText(drop.release_date, 187, 294);
-    ctx.fillText(`${drop.sequence} / 55`, 836, 294);
     ctx.fillStyle = '#f3d58d';
-    const titleSize = fitCanvasText(ctx, drop.title.toUpperCase(), 850, 66, 30);
+    const titleSize = fitCanvasText(ctx, drop.title.toUpperCase(), 286, 40, 25);
     ctx.font = `900 ${titleSize}px Georgia, serif`;
-    ctx.fillText(drop.title.toUpperCase(), 512, 1205);
-    ctx.font = '800 20px Arial';
-    const features = ['PRINTER READY', 'CLEAN LINES', 'EASY TRANSFER', 'STUDIO APPROVED', 'PREMIUM QUALITY'];
+    wrapCanvasText(ctx, drop.title.toUpperCase(), 750, 188, 270, titleSize * 1.08, 3);
+    ctx.fillStyle = '#caa34f';
+    ctx.font = '800 19px Arial';
+    wrapCanvasText(ctx, drop.collection.toUpperCase(), 750, 330, 270, 26, 3, 'left');
+    ctx.strokeStyle = 'rgba(216,171,82,.5)';
+    ctx.beginPath();
+    ctx.moveTo(750, 414);
+    ctx.lineTo(1010, 414);
+    ctx.stroke();
+    ctx.fillStyle = '#f1d28a';
+    ctx.font = '900 23px Arial';
+    ctx.fillText(drop.release_date, 750, 468);
+    ctx.fillText(`DROP ${drop.sequence} / 55`, 750, 505);
+    ctx.fillStyle = '#d0c2aa';
+    ctx.font = '700 19px Arial';
+    wrapCanvasText($('placement').value.toUpperCase(), 750, 566, 260, 27, 3, 'left');
+    const features = ['PRINTER READY', 'CLEAN LINES', 'EASY TRANSFER', 'STUDIO APPROVED'];
     features.forEach((feature, index) => {
-      const x = 112 + index * 200;
+      const x = 100 + index * 236;
       ctx.strokeStyle = '#d8ab52';
       ctx.beginPath();
-      ctx.arc(x, 1305, 34, 0, Math.PI * 2);
+      ctx.arc(x, 996, 28, 0, Math.PI * 2);
       ctx.stroke();
       ctx.fillStyle = '#e8c77b';
-      ctx.fillText(['▣', '✦', '◇', '✓', '◆'][index], x, 1314);
+      ctx.textAlign = 'center';
+      ctx.font = '800 18px Arial';
+      ctx.fillText(['▣', '✦', '◇', '✓'][index], x, 1003);
       ctx.font = '800 15px Arial';
-      ctx.fillText(feature, x, 1363);
-      ctx.font = '800 20px Arial';
+      ctx.fillText(feature, x, 1042);
     });
-    ctx.fillStyle = '#d8ab52';
-    ctx.font = '900 25px Arial';
-    ctx.fillText('55 DAYS  ·  55 MASTERPIECES', 512, 1448);
+    drawBitAtom(ctx, 984, 842, 76, .22);
     return canvas.toDataURL('image/png');
   };
   const composeLoreCard = async () => {
@@ -568,8 +624,8 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     styleCard = await composeStyleCard();
     selectPreview('lore');
   };
-  const show = (data) => {
-    image = data.image;
+  const show = async (data) => {
+    image = await watermarkStencilDataUrl(data.image);
     referenceImage = '';
     placementImage = '';
     packImage = '';
@@ -614,7 +670,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       });
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || 'Image generation failed.');
-      show(data);
+      await show(data);
       message('Stencil generated. Review the linework, then publish or export its Remotion reel.');
     } catch (error) {
       message(error.message || 'Image generation failed.', true);
@@ -646,7 +702,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       });
       const data = await response.json();
       if (!response.ok || !data.ok) throw new Error(data.error || 'The uploaded stencil could not be staged.');
-      show(data);
+      await show(data);
       message(`${activeDrop().title} uploaded. Schedule metadata is ready for pack generation, publishing and Remotion.`);
     } catch (error) {
       message(error.message || 'The uploaded stencil could not be staged.', true);
@@ -677,7 +733,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     if (assetType === 'placement') placementImage = result;
     if (assetType === 'pack') packImage = result;
     $('providerMeta').textContent = `${data.provider === 'openai' ? 'OpenAI' : data.provider} · ${data.model} · ${previewLabels[assetType]}`;
-    $('qualityMeta').textContent = `${data.quality || 'high'} quality · ${assetType === 'pack' ? 'exact schedule overlay · ' : ''}PNG`;
+    $('qualityMeta').textContent = `${data.quality || 'high'} quality · ${assetType === 'pack' ? 'IG-square package post · ' : ''}PNG`;
     selectPreview(assetType);
     return result;
   };
@@ -854,6 +910,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
         props: {
           mainArtwork: image,
           studioTransfer: image,
+          packImage: packImage || '',
           collectionName: $('collection').value,
           stencilTitle: title(),
           date,

@@ -55,9 +55,18 @@ try {
             if (!$managed || trim((string)($managed['verse_text'] ?? '')) === '') {
                 jsonOut(['ok'=>true, 'item'=>null, 'source'=>'generator_placeholder']);
             }
+            $managedReference = (string)$managed['scripture_reference'];
+            $managedId = '';
+            foreach (['GEN'=>'GENESIS','PSA'=>'PSALM','PRO'=>'PROVERBS','ISA'=>'ISAIAH','MAT'=>'MATTHEW','MRK'=>'MARK','JHN'=>'JOHN','ROM'=>'ROMANS','1CO'=>'1 CORINTHIANS','2CO'=>'2 CORINTHIANS','PHP'=>'PHILIPPIANS','1TH'=>'1 THESSALONIANS','HEB'=>'HEBREWS'] as $code => $bookName) {
+                if (preg_match('/^' . preg_quote($bookName, '/') . '\s+(\d+):(\d+)/i', $managedReference, $parts)) {
+                    $managedId = $code . ' ' . $parts[1] . ':' . $parts[2];
+                    break;
+                }
+            }
             jsonOut(['ok'=>true, 'source'=>'content_manager', 'item'=>[
+                'id'=>$managedId,
                 'verse'=>(string)$managed['verse_text'],
-                'reference'=>(string)$managed['scripture_reference'],
+                'reference'=>$managedReference,
                 'translation'=>(string)($managed['translation_code'] ?: 'KJV'),
                 'heading'=>(string)($managed['heading'] ?: 'VERSE OF THE DAY'),
                 'footer'=>(string)($managed['footer_message'] ?: 'WALK IN FAITH TODAY.'),

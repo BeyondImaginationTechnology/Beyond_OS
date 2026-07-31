@@ -7,9 +7,9 @@ const calculateMetadata: CalculateMetadataFunction<DailyStencilProps> = async ({
   const qrDataUrl = props.showQrCode && props.downloadUrl
     ? await QRCode.toDataURL(props.downloadUrl, {margin: 1, width: 320})
     : '';
-  return {durationInFrames: 600, fps: 60, width: 1080, height: 1920, props: {...props, qrDataUrl}};
+  return {durationInFrames: 600, fps: 60, width: 1080, height: 1080, props: {...props, qrDataUrl}};
 };
 
 export const RemotionRoot: React.FC = () => (
-  <Composition id="DailyStencilPack" component={DailyStencilPack} durationInFrames={600} fps={60} width={1080} height={1920} defaultProps={defaultDailyStencilProps} calculateMetadata={calculateMetadata}/>
+  <Composition id="DailyStencilPack" component={DailyStencilPack} durationInFrames={600} fps={60} width={1080} height={1080} defaultProps={defaultDailyStencilProps} calculateMetadata={calculateMetadata}/>
 );

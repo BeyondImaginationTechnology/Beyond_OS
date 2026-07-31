@@ -14,6 +14,7 @@ import {
 export type DailyStencilProps = {
   mainArtwork: string;
   studioTransfer: string;
+  packImage?: string;
   collectionName: string;
   stencilTitle: string;
   date: string;
@@ -30,6 +31,7 @@ export type DailyStencilProps = {
 export const defaultDailyStencilProps: DailyStencilProps = {
   mainArtwork: 'stencils/main-stencil.webp',
   studioTransfer: 'stencils/studio-transfer.png',
+  packImage: '',
   collectionName: 'Beyond Ancient Collection',
   stencilTitle: 'Eye of Horus Anubis',
   date: 'Tuesday, July 21, 2026',
@@ -53,6 +55,7 @@ const C = {
   paper: '#F3EFE7',
   gold: '#D8AB52',
   warm: '#8F2F2A',
+  purple: '#7A4BE8',
   smoke: '#A8A29A',
   white: '#FFFDF7',
 };
@@ -87,6 +90,68 @@ const Grain: React.FC = () => (
   />
 );
 
+const BitAtomWatermark: React.FC<{
+  right?: number;
+  bottom?: number;
+  size?: number;
+  dark?: boolean;
+}> = ({right = 30, bottom = 28, size = 86, dark = true}) => {
+  const color = dark ? C.ink : C.gold;
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        right,
+        bottom,
+        width: size,
+        height: size,
+        opacity: 0.18,
+        color,
+      }}
+    >
+      {[0, 60, -60].map((rotation) => (
+        <div
+          key={rotation}
+          style={{
+            position: 'absolute',
+            left: size * 0.12,
+            top: size * 0.38,
+            width: size * 0.76,
+            height: size * 0.24,
+            border: `3px solid ${color}`,
+            borderRadius: '50%',
+            rotate: `${rotation}deg`,
+          }}
+        />
+      ))}
+      <div
+        style={{
+          position: 'absolute',
+          left: size * 0.45,
+          top: size * 0.45,
+          width: size * 0.1,
+          height: size * 0.1,
+          borderRadius: '50%',
+          background: color,
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: -6,
+          textAlign: 'center',
+          fontSize: size * 0.16,
+          fontWeight: 950,
+        }}
+      >
+        bit$
+      </div>
+    </div>
+  );
+};
+
 const Brand: React.FC<{logo: string}> = ({logo}) => {
   const frame = useCurrentFrame();
   return (
@@ -109,7 +174,7 @@ const Brand: React.FC<{logo: string}> = ({logo}) => {
       <div>
         <div
           style={{
-            fontSize: 27,
+          fontSize: 24,
             fontWeight: 900,
             letterSpacing: 5,
             textTransform: 'uppercase',
@@ -121,7 +186,7 @@ const Brand: React.FC<{logo: string}> = ({logo}) => {
           style={{
             marginTop: 4,
             color: C.gold,
-            fontSize: 15,
+          fontSize: 13,
             fontWeight: 850,
             letterSpacing: 4,
             textTransform: 'uppercase',
@@ -137,21 +202,20 @@ const Brand: React.FC<{logo: string}> = ({logo}) => {
 const ArtworkFrame: React.FC<{
   src: string;
   mirrored?: boolean;
-  label: string;
   start: number;
   end: number;
-}> = ({src, mirrored = false, label, start, end}) => {
+}> = ({src, mirrored = false, start, end}) => {
   const frame = useCurrentFrame();
   return (
     <div
       style={{
         position: 'absolute',
-        left: 70,
-        right: 70,
-        top: 250,
-        bottom: 250,
+        left: 118,
+        right: 118,
+        top: 132,
+        bottom: 260,
         overflow: 'hidden',
-        borderRadius: 46,
+        borderRadius: 30,
         background: C.paper,
         border: '1px solid rgba(216,171,82,.52)',
         boxShadow:
@@ -167,36 +231,12 @@ const ArtworkFrame: React.FC<{
           width: '100%',
           height: '100%',
           objectFit: 'contain',
-          padding: 42,
+          padding: 34,
           filter: 'contrast(1.08)',
           scale: mirrored ? '-1 1' : '1',
         }}
       />
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          boxShadow: 'inset 0 -180px 160px rgba(8,9,11,.12)',
-          pointerEvents: 'none',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          left: 26,
-          bottom: 26,
-          padding: '15px 23px',
-          borderRadius: 999,
-          color: C.white,
-          background: 'rgba(8,9,11,.9)',
-          fontSize: 18,
-          fontWeight: 850,
-          letterSpacing: 3,
-          textTransform: 'uppercase',
-        }}
-      >
-        {label}
-      </div>
+      <BitAtomWatermark />
     </div>
   );
 };
@@ -212,7 +252,6 @@ const Intro: React.FC<DailyStencilProps> = ({
     <AbsoluteFill>
       <ArtworkFrame
         src={mainArtwork}
-        label="Original stencil master"
         start={25}
         end={245}
       />
@@ -270,7 +309,6 @@ const TransferScene: React.FC<DailyStencilProps> = ({
       <ArtworkFrame
         src={studioTransfer}
         mirrored
-        label="Mirrored transfer view"
         start={0}
         end={240}
       />
@@ -334,12 +372,13 @@ const EndScene: React.FC<DailyStencilProps> = ({
   downloadUrl,
   qrDataUrl,
   mainArtwork,
+  packImage,
 }) => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill
       style={{
-        padding: '210px 76px 100px',
+        padding: '124px 76px 70px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -350,8 +389,8 @@ const EndScene: React.FC<DailyStencilProps> = ({
     >
       <div
         style={{
-          width: 350,
-          height: 500,
+          width: 310,
+          height: 385,
           padding: 18,
           overflow: 'hidden',
           borderRadius: 34,
@@ -365,15 +404,15 @@ const EndScene: React.FC<DailyStencilProps> = ({
         }}
       >
         <Img
-          src={mediaSource(mainArtwork)}
+          src={mediaSource(packImage || mainArtwork)}
           style={{width: '100%', height: '100%', objectFit: 'contain'}}
         />
       </div>
       <div
         style={{
-          marginTop: 38,
+          marginTop: 24,
           color: C.gold,
-          fontSize: 19,
+          fontSize: 17,
           fontWeight: 900,
           letterSpacing: 5,
           textTransform: 'uppercase',
@@ -383,10 +422,10 @@ const EndScene: React.FC<DailyStencilProps> = ({
       </div>
       <div
         style={{
-          marginTop: 13,
+          marginTop: 9,
           color: C.white,
           fontFamily: 'Georgia, Times New Roman, serif',
-          fontSize: 68,
+          fontSize: 50,
           fontWeight: 700,
           lineHeight: 1,
         }}
@@ -396,11 +435,11 @@ const EndScene: React.FC<DailyStencilProps> = ({
       {caption ? (
         <div
           style={{
-            maxWidth: 810,
-            marginTop: 20,
+            maxWidth: 820,
+            marginTop: 14,
             color: C.smoke,
-            fontSize: 23,
-            lineHeight: 1.35,
+            fontSize: 19,
+            lineHeight: 1.28,
           }}
         >
           {caption}
@@ -412,15 +451,15 @@ const EndScene: React.FC<DailyStencilProps> = ({
           alignItems: 'center',
           justifyContent: 'center',
           gap: 24,
-          marginTop: 34,
+          marginTop: 22,
         }}
       >
         {qrDataUrl ? (
           <Img
             src={qrDataUrl}
             style={{
-              width: 152,
-              height: 152,
+              width: 120,
+              height: 120,
               padding: 9,
               borderRadius: 18,
               background: C.white,
@@ -431,11 +470,11 @@ const EndScene: React.FC<DailyStencilProps> = ({
           <div
             style={{
               display: 'inline-block',
-              padding: '20px 27px',
+              padding: '15px 22px',
               borderRadius: 16,
               background: C.gold,
               color: C.ink,
-              fontSize: 25,
+              fontSize: 21,
               fontWeight: 950,
               letterSpacing: 1,
             }}
@@ -447,7 +486,7 @@ const EndScene: React.FC<DailyStencilProps> = ({
               maxWidth: 510,
               marginTop: 13,
               color: C.smoke,
-              fontSize: 16,
+              fontSize: 14,
               overflowWrap: 'anywhere',
             }}
           >

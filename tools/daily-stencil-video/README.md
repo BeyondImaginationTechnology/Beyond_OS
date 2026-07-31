@@ -1,6 +1,6 @@
 # Beyond Tattoo Daily Stencil Pack Video
 
-Reusable Remotion Reel: 10 seconds, 1080×1920, 60fps.
+Reusable Remotion Reel: 10 seconds, 1080×1080, 60fps, sized for Instagram feed posts.
 
 Change only `public/daily-stencil.json` and the two referenced images each day:
 - Main stencil artwork

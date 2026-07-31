@@ -17,7 +17,7 @@ const VIDEO = {
   durationInFrames: 600,
   fps: 60,
   width: 1080,
-  height: 1920,
+  height: 1080,
   calculateMetadata: null,
   defaultProps: defaultDailyStencilProps,
 };

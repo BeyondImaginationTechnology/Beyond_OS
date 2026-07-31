@@ -57,6 +57,24 @@ function beyond_tv_confirmed_presentation_rows(string $slug, array $fallbackRows
     $rows=[];foreach($fallbackRows as $row){$rows[]=['start'=>(int)$row['start'],'end'=>(int)$row['end'],'icon'=>(string)($row['icon']??'▶'),'title'=>$title,'lineup'=>(string)($row['title']??$channel['up_next']??'Featured presentation')];}return $rows;
 }
 
+function beyond_tv_channel_fallback_rows(array $channel): array {
+    $title = trim((string)($channel['now'] ?? $channel['name'] ?? 'Beyond TV'));
+    $lineup = trim((string)($channel['up_next'] ?? $channel['description'] ?? 'Curated live library'));
+    if ($title === '') $title = 'Beyond TV';
+    if ($lineup === '') $lineup = 'Curated live library';
+    $rows = [];
+    for ($hour = 0; $hour < 24; $hour += 2) {
+        $rows[] = [
+            'start' => $hour,
+            'end' => $hour + 2,
+            'icon' => (string)($channel['icon'] ?? '▶'),
+            'title' => $title,
+            'lineup' => $lineup,
+        ];
+    }
+    return $rows;
+}
+
 function beyond_tv_after_dark_hourly_rows(): array {
     $hauntingEpisodes = json_decode((string)@file_get_contents(__DIR__ . '/../data/haunting-hour-library.json'), true) ?: [];
     $preferred = [];
@@ -101,10 +119,17 @@ function beyond_tv_anime_rows(): array {
 /** Kept under the original function name for backwards compatibility. */
 function beyond_tv_eight_channel_guide(array $classicState, array $cartoonState): array {
     $featured = json_decode((string) @file_get_contents(__DIR__ . '/../data/featured-channels.json'), true) ?: [];
+    $catalogue = json_decode((string) @file_get_contents(__DIR__ . '/../data/channels.json'), true) ?: [];
     $schedules = json_decode((string) @file_get_contents(__DIR__ . '/../data/channel-schedules.json'), true) ?: [];
+    $catalogueBySlug = [];
+    foreach ($catalogue as $catalogueChannel) {
+        $catalogueSlug = (string)($catalogueChannel['slug'] ?? '');
+        if ($catalogueSlug !== '') $catalogueBySlug[$catalogueSlug] = $catalogueChannel;
+    }
     $guide = [];
     foreach ($featured as $channel) {
         $slug = (string)($channel['slug'] ?? '');
+        $channelMeta = array_merge($catalogueBySlug[$slug] ?? [], $channel);
         $rows = $schedules[$slug] ?? [];
         if ($slug === 'classic-cartoon-theater' && !empty($classicState['blocks'])) { $rows = $classicState['blocks']; }
         if ($slug === 'beyond-cartoons' && !empty($cartoonState['blocks'])) { $rows = $cartoonState['blocks']; }
@@ -114,11 +139,11 @@ function beyond_tv_eight_channel_guide(array $classicState, array $cartoonState)
         if ($slug === 'classic-cinema') { $rows = beyond_tv_movie_hourly_rows(); }
         if (in_array($slug, ['bubble-guppies','preschool-francais','beyond-comedy','beyond-family','beyond-mystery'], true)) { $catalogRows=beyond_tv_catalog_hourly_rows($slug); if($catalogRows)$rows=$catalogRows; }
         if (in_array($slug, ['space-tv','beyond-ancient','beyond-french','beyond-health'], true)) { $rows=beyond_tv_confirmed_presentation_rows($slug,$rows); }
-        if (!$rows) { continue; }
+        if (!$rows) { $rows = beyond_tv_channel_fallback_rows($channelMeta); }
         $guide[] = [
             'slug' => $slug,
-            'name' => (string)($channel['name'] ?? $slug),
-            'icon' => (string)($channel['icon'] ?? '📺'),
+            'name' => (string)($channelMeta['name'] ?? $slug),
+            'icon' => (string)($channelMeta['icon'] ?? '📺'),
             'access' => 'Free · Live library',
             'rows' => $rows,
         ];

@@ -83,8 +83,18 @@ function beyond_anime_program_metadata(array $program): array
         'title' => $program['series'],
         'lineup' => $program['lineup'],
         'episode_number' => $program['episode_number'],
+        'provider' => beyond_anime_provider_label($program),
         'source_key' => $program['source_key'],
     ];
+}
+
+function beyond_anime_provider_label(array $program): string
+{
+    if (($program['source_type'] ?? '') === 'youtube') {
+        return 'Official YouTube embed';
+    }
+
+    return 'Internet Archive';
 }
 
 function beyond_anime_program_for_block(

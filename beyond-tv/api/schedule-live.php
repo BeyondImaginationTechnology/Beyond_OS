@@ -42,7 +42,19 @@ $fallbackNext = ['title'=>$channel['up_next'] ?? 'Next scheduled program'];
 $current = $schedule[$currentIndex] ?? $fallbackCurrent;
 $next = $schedule ? ($schedule[($currentIndex + 1) % count($schedule)] ?? $fallbackNext) : $fallbackNext;
 $embedUrl = null;
-if (($channel['source_type'] ?? '') === 'youtube_embed' && !empty($channel['youtube_id'])) {
+if (($channel['source_type'] ?? '') === 'youtube_playlist_embed' && !empty($channel['youtube_playlist_id'])) {
+    $query = [
+        'list' => (string)$channel['youtube_playlist_id'],
+        'autoplay' => 1,
+        'mute' => 1,
+        'controls' => 1,
+        'rel' => 0,
+        'playsinline' => 1,
+        'enablejsapi' => 1,
+    ];
+    $embedUrl = 'https://www.youtube-nocookie.com/embed/videoseries?' . http_build_query($query);
+}
+if ($embedUrl === null && ($channel['source_type'] ?? '') === 'youtube_embed' && !empty($channel['youtube_id'])) {
     $youtubeId = (string)$channel['youtube_id'];
     $playlistId = trim((string)($channel['youtube_playlist_id'] ?? ''));
     $query = [

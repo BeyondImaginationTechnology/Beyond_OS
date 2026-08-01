@@ -3,17 +3,12 @@ import CoreGraphics
 import Foundation
 
 let root = URL(fileURLWithPath: FileManager.default.currentDirectoryPath)
-let output = root.appendingPathComponent("AppStoreAssets/Screenshots/iPhone-6.5")
-try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
-
-let width = 1242
-let height = 2688
-let scale: CGFloat = 1
 let green = NSColor(calibratedRed: 0.09, green: 0.25, blue: 0.17, alpha: 1)
 let deepGreen = NSColor(calibratedRed: 0.03, green: 0.12, blue: 0.08, alpha: 1)
 let gold = NSColor(calibratedRed: 0.82, green: 0.64, blue: 0.30, alpha: 1)
 let cream = NSColor(calibratedRed: 0.96, green: 0.92, blue: 0.84, alpha: 1)
 let muted = NSColor(calibratedRed: 0.69, green: 0.74, blue: 0.69, alpha: 1)
+var canvasHeight: CGFloat = 0
 
 struct StoreScreen {
     let file: String
@@ -22,6 +17,15 @@ struct StoreScreen {
     let subtitle: String
     let tab: String
     let cards: [(String, String, String)]
+}
+
+struct ScreenshotFormat {
+    let folder: String
+    let width: Int
+    let height: Int
+    let deviceTitle: String
+    let chrome: CGRect
+    let content: CGRect
 }
 
 let screens = [
@@ -39,14 +43,14 @@ let screens = [
     ),
     StoreScreen(
         file: "02-bible-library.png",
-        eyebrow: "BIBLE LIBRARY",
-        title: "Scripture close at hand.",
-        subtitle: "Continue reading, listen to verses, and keep your daily place.",
+        eyebrow: "FULL BIBLE",
+        title: "Read all 66 books.",
+        subtitle: "Search the World English Bible, open chapters, and keep your place offline.",
         tab: "Bible",
         cards: [
-            ("Continue Reading", "Psalm 46", "God is our refuge and strength, a very present help in trouble."),
-            ("Books", "Genesis · Psalms · Proverbs", "A clean starting library designed for everyday reflection."),
-            ("Listen", "Chapter narration", "Built for quiet moments, commuting, prayer, and rest.")
+            ("World English Bible", "31,103 searchable verses", "Genesis through Revelation bundled locally for daily reading."),
+            ("Chapters", "Book-by-book navigation", "Old and New Testament sections make Scripture easy to browse."),
+            ("Continue Reading", "Saved chapter place", "Return to the last chapter you opened without needing a connection.")
         ]
     ),
     StoreScreen(
@@ -87,6 +91,25 @@ let screens = [
     )
 ]
 
+let formats = [
+    ScreenshotFormat(
+        folder: "iPhone-6.5",
+        width: 1242,
+        height: 2688,
+        deviceTitle: "DailyBreath",
+        chrome: CGRect(x: 96, y: 206, width: 1050, height: 2170),
+        content: CGRect(x: 122, y: 238, width: 998, height: 2110)
+    ),
+    ScreenshotFormat(
+        folder: "iPad-13",
+        width: 2064,
+        height: 2752,
+        deviceTitle: "DailyBreath for iPad",
+        chrome: CGRect(x: 174, y: 220, width: 1716, height: 2280),
+        content: CGRect(x: 214, y: 260, width: 1636, height: 2200)
+    )
+]
+
 func paragraph(_ text: String, font: NSFont, color: NSColor, rect: CGRect, lineHeight: CGFloat? = nil, alignment: NSTextAlignment = .left) {
     let style = NSMutableParagraphStyle()
     style.alignment = alignment
@@ -100,11 +123,11 @@ func paragraph(_ text: String, font: NSFont, color: NSColor, rect: CGRect, lineH
         .foregroundColor: color,
         .paragraphStyle: style
     ]
-    NSString(string: text).draw(in: rect, withAttributes: attrs)
+    NSString(string: text).draw(in: topLeft(rect), withAttributes: attrs)
 }
 
 func roundedRect(_ rect: CGRect, radius: CGFloat, fill: NSColor, stroke: NSColor? = nil, lineWidth: CGFloat = 1) {
-    let path = NSBezierPath(roundedRect: rect, xRadius: radius, yRadius: radius)
+    let path = NSBezierPath(roundedRect: topLeft(rect), xRadius: radius, yRadius: radius)
     fill.setFill()
     path.fill()
     if let stroke {
@@ -115,7 +138,7 @@ func roundedRect(_ rect: CGRect, radius: CGFloat, fill: NSColor, stroke: NSColor
 }
 
 func circle(_ rect: CGRect, fill: NSColor, stroke: NSColor? = nil, lineWidth: CGFloat = 1) {
-    let path = NSBezierPath(ovalIn: rect)
+    let path = NSBezierPath(ovalIn: topLeft(rect))
     fill.setFill()
     path.fill()
     if let stroke {
@@ -123,6 +146,10 @@ func circle(_ rect: CGRect, fill: NSColor, stroke: NSColor? = nil, lineWidth: CG
         path.lineWidth = lineWidth
         path.stroke()
     }
+}
+
+func topLeft(_ rect: CGRect) -> CGRect {
+    CGRect(x: rect.minX, y: canvasHeight - rect.minY - rect.height, width: rect.width, height: rect.height)
 }
 
 func writePNG(_ image: NSImage, to url: URL) throws {
@@ -134,60 +161,90 @@ func writePNG(_ image: NSImage, to url: URL) throws {
     try data.write(to: url)
 }
 
-func drawPhoneChrome(activeTab: String) {
-    roundedRect(CGRect(x: 96, y: 206, width: 1050, height: 2170), radius: 76, fill: NSColor.black.withAlphaComponent(0.82), stroke: NSColor.white.withAlphaComponent(0.22), lineWidth: 4)
-    roundedRect(CGRect(x: 122, y: 238, width: 998, height: 2110), radius: 56, fill: NSColor(calibratedRed: 0.95, green: 0.96, blue: 0.94, alpha: 1))
-    roundedRect(CGRect(x: 458, y: 270, width: 326, height: 42), radius: 21, fill: NSColor.black.withAlphaComponent(0.88))
-    paragraph("9:41", font: .systemFont(ofSize: 30, weight: .bold), color: .black, rect: CGRect(x: 176, y: 272, width: 120, height: 42))
+func drawTabIcon(_ tab: String, in rect: CGRect, selected: Bool) {
+    let centerX = rect.midX
+    let iconRect = CGRect(x: centerX - 21, y: rect.minY + 12, width: 42, height: 42)
+    circle(iconRect, fill: selected ? gold : NSColor.white.withAlphaComponent(0.14))
+    paragraph(tab, font: .systemFont(ofSize: 20, weight: selected ? .bold : .medium), color: selected ? gold : cream, rect: CGRect(x: rect.minX, y: rect.minY + 56, width: rect.width, height: 28), alignment: .center)
+}
+
+func drawDeviceChrome(format: ScreenshotFormat, activeTab: String) {
+    let chrome = format.chrome
+    let content = format.content
+    roundedRect(chrome, radius: format.folder == "iPad-13" ? 58 : 76, fill: NSColor.black.withAlphaComponent(0.82), stroke: NSColor.white.withAlphaComponent(0.22), lineWidth: 4)
+    roundedRect(content, radius: format.folder == "iPad-13" ? 40 : 56, fill: NSColor(calibratedRed: 0.95, green: 0.96, blue: 0.94, alpha: 1))
+    roundedRect(CGRect(x: content.midX - 132, y: content.minY + 30, width: 264, height: 34), radius: 17, fill: NSColor.black.withAlphaComponent(0.78))
+    paragraph("9:41", font: .systemFont(ofSize: 30, weight: .bold), color: .black, rect: CGRect(x: content.minX + 54, y: content.minY + 32, width: 120, height: 42))
 
     let tabs = ["Today", "Bible", "Academy", "Breathe", "Journal"]
-    let tabY: CGFloat = 2206
-    roundedRect(CGRect(x: 162, y: tabY, width: 918, height: 92), radius: 30, fill: green)
+    let tabBar = CGRect(x: content.minX + 40, y: content.maxY - 142, width: content.width - 80, height: 92)
+    roundedRect(tabBar, radius: 30, fill: green)
+    let itemWidth = tabBar.width / CGFloat(tabs.count)
     for (index, tab) in tabs.enumerated() {
-        let x = 186 + CGFloat(index) * 176
-        let selected = tab == activeTab
-        circle(CGRect(x: x + 58, y: tabY + 12, width: 42, height: 42), fill: selected ? gold : NSColor.white.withAlphaComponent(0.14))
-        paragraph(tab, font: .systemFont(ofSize: 20, weight: selected ? .bold : .medium), color: selected ? gold : cream, rect: CGRect(x: x, y: tabY + 56, width: 160, height: 28), alignment: .center)
+        let item = CGRect(x: tabBar.minX + CGFloat(index) * itemWidth, y: tabBar.minY, width: itemWidth, height: tabBar.height)
+        drawTabIcon(tab, in: item, selected: tab == activeTab)
     }
 }
 
-func drawAppContent(_ screen: StoreScreen) {
-    paragraph("DAILYBREATH", font: .systemFont(ofSize: 28, weight: .black), color: green, rect: CGRect(x: 178, y: 356, width: 300, height: 40))
-    paragraph("Faith-centered wellness", font: .systemFont(ofSize: 22, weight: .medium), color: muted, rect: CGRect(x: 178, y: 394, width: 340, height: 32))
-    roundedRect(CGRect(x: 930, y: 356, width: 96, height: 42), radius: 21, fill: green.withAlphaComponent(0.12))
-    paragraph("1.0", font: .systemFont(ofSize: 20, weight: .bold), color: green, rect: CGRect(x: 930, y: 366, width: 96, height: 24), alignment: .center)
+func drawAppContent(_ screen: StoreScreen, format: ScreenshotFormat) {
+    let content = format.content
+    let margin: CGFloat = format.folder == "iPad-13" ? 86 : 56
+    let x = content.minX + margin
+    let maxWidth = content.width - (margin * 2)
 
-    roundedRect(CGRect(x: 174, y: 470, width: 894, height: 650), radius: 34, fill: green)
-    paragraph(screen.eyebrow, font: .systemFont(ofSize: 24, weight: .black), color: gold, rect: CGRect(x: 222, y: 530, width: 520, height: 34))
-    paragraph(screen.title, font: .systemFont(ofSize: 66, weight: .black), color: .white, rect: CGRect(x: 222, y: 602, width: 760, height: 160), lineHeight: 74)
-    paragraph(screen.subtitle, font: .systemFont(ofSize: 31, weight: .medium), color: cream, rect: CGRect(x: 222, y: 792, width: 720, height: 92), lineHeight: 42)
-    roundedRect(CGRect(x: 222, y: 952, width: 322, height: 74), radius: 37, fill: gold)
-    paragraph("Open \(screen.tab)", font: .systemFont(ofSize: 26, weight: .black), color: deepGreen, rect: CGRect(x: 222, y: 972, width: 322, height: 34), alignment: .center)
+    paragraph("DAILYBREATH", font: .systemFont(ofSize: 28, weight: .black), color: green, rect: CGRect(x: x, y: content.minY + 118, width: 330, height: 40))
+    paragraph("Faith-centered wellness", font: .systemFont(ofSize: 22, weight: .medium), color: muted, rect: CGRect(x: x, y: content.minY + 156, width: 340, height: 32))
+    roundedRect(CGRect(x: content.maxX - margin - 96, y: content.minY + 118, width: 96, height: 42), radius: 21, fill: green.withAlphaComponent(0.12))
+    paragraph("1.1", font: .systemFont(ofSize: 20, weight: .bold), color: green, rect: CGRect(x: content.maxX - margin - 96, y: content.minY + 128, width: 96, height: 24), alignment: .center)
 
-    var y: CGFloat = 1162
-    for (label, title, subtitle) in screen.cards {
-        roundedRect(CGRect(x: 174, y: y, width: 894, height: 256), radius: 28, fill: .white, stroke: NSColor.black.withAlphaComponent(0.05))
-        paragraph(label.uppercased(), font: .systemFont(ofSize: 20, weight: .black), color: gold, rect: CGRect(x: 222, y: y + 38, width: 620, height: 30))
-        paragraph(title, font: .systemFont(ofSize: 36, weight: .bold), color: .black, rect: CGRect(x: 222, y: y + 80, width: 730, height: 50))
-        paragraph(subtitle, font: .systemFont(ofSize: 25, weight: .regular), color: NSColor.darkGray, rect: CGRect(x: 222, y: y + 140, width: 735, height: 74), lineHeight: 34)
-        y += 286
+    let heroHeight: CGFloat = format.folder == "iPad-13" ? 590 : 650
+    roundedRect(CGRect(x: x, y: content.minY + 232, width: maxWidth, height: heroHeight), radius: 34, fill: green)
+    paragraph(screen.eyebrow, font: .systemFont(ofSize: 24, weight: .black), color: gold, rect: CGRect(x: x + 48, y: content.minY + 292, width: 720, height: 34))
+    paragraph(screen.title, font: .systemFont(ofSize: format.folder == "iPad-13" ? 72 : 66, weight: .black), color: .white, rect: CGRect(x: x + 48, y: content.minY + 360, width: maxWidth - 96, height: 170), lineHeight: format.folder == "iPad-13" ? 80 : 74)
+    paragraph(screen.subtitle, font: .systemFont(ofSize: 31, weight: .medium), color: cream, rect: CGRect(x: x + 48, y: content.minY + 550, width: maxWidth - 160, height: 92), lineHeight: 42)
+    roundedRect(CGRect(x: x + 48, y: content.minY + 690, width: 322, height: 74), radius: 37, fill: gold)
+    paragraph("Open \(screen.tab)", font: .systemFont(ofSize: 26, weight: .black), color: deepGreen, rect: CGRect(x: x + 48, y: content.minY + 710, width: 322, height: 34), alignment: .center)
+
+    let columns = format.folder == "iPad-13" ? 2 : 1
+    let gap: CGFloat = 28
+    let cardWidth = (maxWidth - (CGFloat(columns - 1) * gap)) / CGFloat(columns)
+    let cardHeight: CGFloat = format.folder == "iPad-13" ? 302 : 256
+    let startY = content.minY + heroHeight + 276
+
+    for (index, card) in screen.cards.enumerated() {
+        let column = index % columns
+        let row = index / columns
+        let cardX = x + CGFloat(column) * (cardWidth + gap)
+        let cardY = startY + CGFloat(row) * (cardHeight + gap)
+        roundedRect(CGRect(x: cardX, y: cardY, width: cardWidth, height: cardHeight), radius: 28, fill: .white, stroke: NSColor.black.withAlphaComponent(0.05))
+        paragraph(card.0.uppercased(), font: .systemFont(ofSize: 20, weight: .black), color: gold, rect: CGRect(x: cardX + 42, y: cardY + 38, width: cardWidth - 84, height: 30))
+        paragraph(card.1, font: .systemFont(ofSize: 36, weight: .bold), color: .black, rect: CGRect(x: cardX + 42, y: cardY + 82, width: cardWidth - 84, height: 92), lineHeight: 42)
+        paragraph(card.2, font: .systemFont(ofSize: 25, weight: .regular), color: NSColor.darkGray, rect: CGRect(x: cardX + 42, y: cardY + 176, width: cardWidth - 84, height: 88), lineHeight: 34)
     }
 }
 
-for screen in screens {
-    let image = NSImage(size: NSSize(width: width, height: height))
+func drawScreenshot(screen: StoreScreen, format: ScreenshotFormat, output: URL) throws {
+    let image = NSImage(size: NSSize(width: format.width, height: format.height))
     image.lockFocus()
+    canvasHeight = CGFloat(format.height)
     NSGraphicsContext.current?.imageInterpolation = .high
     let background = NSGradient(colors: [deepGreen, green, NSColor(calibratedRed: 0.16, green: 0.34, blue: 0.23, alpha: 1)])!
-    background.draw(in: CGRect(x: 0, y: 0, width: width, height: height), angle: -35)
-    circle(CGRect(x: 780, y: -170, width: 650, height: 650), fill: gold.withAlphaComponent(0.14))
-    circle(CGRect(x: -210, y: 1620, width: 540, height: 540), fill: cream.withAlphaComponent(0.08))
-    paragraph("DailyBreath", font: .systemFont(ofSize: 74, weight: .black), color: cream, rect: CGRect(x: 96, y: 96, width: 640, height: 94))
+    background.draw(in: CGRect(x: 0, y: 0, width: format.width, height: format.height), angle: -35)
+    circle(CGRect(x: CGFloat(format.width) - 460, y: -170, width: 650, height: 650), fill: gold.withAlphaComponent(0.14))
+    circle(CGRect(x: -210, y: CGFloat(format.height) - 1068, width: 540, height: 540), fill: cream.withAlphaComponent(0.08))
+    paragraph(format.deviceTitle, font: .systemFont(ofSize: 74, weight: .black), color: cream, rect: CGRect(x: 96, y: 96, width: 920, height: 94))
     paragraph("Faith · Growth · Peace · Purpose", font: .systemFont(ofSize: 28, weight: .bold), color: gold, rect: CGRect(x: 100, y: 180, width: 760, height: 38))
-    drawPhoneChrome(activeTab: screen.tab)
-    drawAppContent(screen)
+    drawDeviceChrome(format: format, activeTab: screen.tab)
+    drawAppContent(screen, format: format)
     image.unlockFocus()
     try writePNG(image, to: output.appendingPathComponent(screen.file))
 }
 
-print("Generated \(screens.count) screenshots in \(output.path)")
+for format in formats {
+    let output = root.appendingPathComponent("AppStoreAssets/Screenshots/\(format.folder)")
+    try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
+    for screen in screens {
+        try drawScreenshot(screen: screen, format: format, output: output)
+    }
+    print("Generated \(screens.count) screenshots in \(output.path)")
+}

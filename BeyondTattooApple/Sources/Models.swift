@@ -1,4 +1,5 @@
 import Foundation
+import CoreLocation
 
 struct StencilDrop: Identifiable, Hashable {
     let id: String
@@ -37,12 +38,34 @@ struct TattooCollection: Identifiable, Hashable {
     let description: String
     let dropCount: Int
     let stencils: [ScheduledStencil]
+
+    var availableCount: Int {
+        stencils.filter(\.isAvailable).count
+    }
 }
 
 struct ScheduledStencil: Identifiable, Hashable {
     let name: String
     let isoDate: String
+    let style: String
+    let placement: String
+    let difficulty: String
+    let hasTransferAsset: Bool
+    let hasEditableAsset: Bool
     var id: String { name + isoDate }
+
+    var isAvailable: Bool {
+        guard let date = Self.releaseDateFormatter.date(from: isoDate) else { return false }
+        return date <= Date()
+    }
+
+    private static let releaseDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
 }
 
 struct HealingMilestone: Identifiable, Hashable {
@@ -56,10 +79,22 @@ struct HealingMilestone: Identifiable, Hashable {
 struct StudioLead: Identifiable, Hashable {
     let name: String
     let city: String
+    let region: String
+    let address: String
     let specialties: [String]
     let responseTime: String
     let isVerified: Bool
+    let acceptsWalkIns: Bool
+    let latitude: Double
+    let longitude: Double
+    let profileURL: URL
     var id: String { name + city }
+
+    func distanceMiles(from location: CLLocation?) -> Double? {
+        guard let location else { return nil }
+        let studioLocation = CLLocation(latitude: latitude, longitude: longitude)
+        return location.distance(from: studioLocation) / 1_609.344
+    }
 }
 
 enum WebDestination: String, Identifiable, CaseIterable {

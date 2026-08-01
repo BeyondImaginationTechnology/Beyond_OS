@@ -8,6 +8,7 @@ final class DailyBreathStore: ObservableObject {
     @Published var breathPhase = "Inhale"
     @Published var journalText = ""
     @Published private(set) var entries: [JournalEntry] = []
+    @Published private(set) var bibleLibrary = BibleLibrary.loadWorldEnglishBible()
 
     let practices = [
         PrayerPractice(id: 1, title: "Peace Breath", subtitle: "A four-count rhythm for calm and focus.", systemImage: "wind"),

@@ -1,1 +1,57 @@
-<?php $title='Terms and Conditions'; $updated='July 12, 2026'; ?><!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?= $title ?> | Beyond OS</title><style>body{margin:0;background:#090912;color:#eee;font:16px/1.75 system-ui}.page{max-width:820px;margin:auto;padding:50px 24px}a{color:#a78bfa}h1{font-size:44px;line-height:1.05}h2{margin-top:34px}.muted{color:#9999ab}.back{display:inline-block;margin-bottom:25px}.app-back{display:inline-flex;align-items:center;min-height:42px;padding:9px 15px;border:1px solid rgba(167,139,250,.4);border-radius:999px;background:rgba(167,139,250,.1);color:inherit!important;font-weight:800;text-decoration:none}.app-back:hover{background:rgba(167,139,250,.2)}</style></head><body><main class="page"><a class="app-back" href="register.php">← Back to registration</a><h1>Terms and Conditions</h1><p class="muted">Version 2.0 · Effective <?= $updated ?></p><p>These Terms govern access to Beyond ID, Beyond Wallet, and connected Beyond OS applications. By creating an account, you agree to use the services lawfully and provide accurate account information.</p><h2>Your account</h2><p>You are responsible for protecting your credentials and activity performed through your Beyond ID. Notify us promptly if you believe your account has been compromised.</p><h2>Beyond Wallet and bit$</h2><p>bit$ are an in-ecosystem unit used by supported Beyond applications. Unless a specific written offer states otherwise, bit$ are not legal tender, a bank deposit, cryptocurrency, or independently redeemable for cash.</p><h2>Acceptable use</h2><p>You may not abuse, disrupt, reverse engineer, automate unauthorized access to, or use the ecosystem to violate the rights of others.</p><h2>Availability and changes</h2><p>Products may evolve, enter beta, change, or be discontinued. We work to protect availability and data but do not promise uninterrupted service.</p><h2>Content and intellectual property</h2><p>Beyond OS branding, software, and original content remain the property of Beyond Imagination Corp. or their respective licensors. You retain ownership of content you lawfully submit.</p><h2>Disclaimers and liability</h2><p>Services are provided on an “as available” basis to the extent permitted by law. Health, financial, educational, and other informational features do not replace qualified professional advice.</p><h2>Contact</h2><p>Questions about these Terms may be sent through the official support contact published by Beyond Imagination Corp.</p></main><script src="/assets/js/visitor-analytics.js" defer></script></body></html>
+<?php
+$title = 'Terms of Service';
+$updated = 'August 1, 2026';
+?><!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title><?= $title ?> | Beyond OS</title>
+<style>body{margin:0;background:#090912;color:#eee;font:16px/1.75 system-ui}.page{max-width:860px;margin:auto;padding:50px 24px}a{color:#a78bfa}h1{font-size:44px;line-height:1.05}h2{margin-top:34px}.muted{color:#9999ab}.app-back{display:inline-flex;align-items:center;min-height:42px;padding:9px 15px;border:1px solid rgba(167,139,250,.4);border-radius:999px;background:rgba(167,139,250,.1);color:inherit!important;font-weight:800;text-decoration:none}.app-back:hover{background:rgba(167,139,250,.2)}</style>
+</head>
+<body>
+<main class="page">
+<a class="app-back" href="register.php">Back to registration</a>
+<h1>Terms of Service</h1>
+<p class="muted">Version 2.1 · Effective <?= $updated ?></p>
+<p>These Terms govern your use of Beyond OS, Beyond ID, Beyond Wallet, and connected Beyond Imagination Technology apps, websites, beta features, marketplaces, communities, and services. By creating an account or using the services, you agree to these Terms and our <a href="privacy.php">Privacy Policy</a>.</p>
+
+<h2>Your account</h2>
+<p>You must provide accurate account information, keep your credentials secure, and promptly notify us if you believe your account has been accessed without permission. You are responsible for activity under your Beyond ID unless the activity resulted from our failure to use reasonable safeguards.</p>
+
+<h2>Acceptable use</h2>
+<p>You may not use the services to break the law, infringe rights, harass others, distribute malware, scrape or automate access without permission, interfere with the platform, bypass security controls, misrepresent identity, or submit deceptive, unsafe, adult, hateful, exploitative, or unlawful content.</p>
+
+<h2>Beta services and availability</h2>
+<p>Some features are experimental or in beta. Beta services may be changed, paused, limited, reset, or discontinued at any time. We work to keep the services reliable, but we do not guarantee that every feature will be uninterrupted, error-free, or available in every location or on every device.</p>
+
+<h2>Beyond Wallet and bit$</h2>
+<p>bit$ are closed-loop ecosystem rewards for supported Beyond services. Unless a specific written offer says otherwise, bit$ are not legal tender, a bank deposit, cryptocurrency, securities, stored value, or a guaranteed cash balance. They have no independent cash value, may be adjusted for fraud or error, and may expire or change according to posted program rules.</p>
+
+<h2>Payments, subscriptions, refunds, and payouts</h2>
+<p>Paid features, subscriptions, marketplace purchases, task payments, and payouts may be handled by third-party payment providers and may require identity, fraud, tax, or eligibility checks. Prices, billing periods, refund windows, fees, holds, payout timing, and taxes may vary by feature or provider and will be presented where applicable.</p>
+
+<h2>Marketplace, creator, and task activity</h2>
+<p>Sellers, creators, studios, tutors, contributors, and task participants are responsible for lawful, accurate, original submissions and for honoring any commitments they make. We may review, reject, remove, withhold payment for, or limit content, listings, orders, or tasks that appear infringing, deceptive, unsafe, incomplete, abusive, or otherwise inconsistent with these Terms.</p>
+
+<h2>Content and intellectual property</h2>
+<p>You retain ownership of content you lawfully submit. You grant Beyond Imagination Technology a worldwide, non-exclusive license to host, store, reproduce, display, process, adapt, and distribute that content as needed to operate, protect, improve, and promote the services you use. Beyond OS branding, software, and original content remain the property of Beyond Imagination Technology or its licensors.</p>
+
+<h2>AI, education, wellness, finance, and creative tools</h2>
+<p>Some services use AI or provide educational, spiritual, wellness, financial, marketplace, legal-adjacent, or creative information. This content is for general informational and creative use. It may be incomplete or inaccurate and does not replace qualified medical, legal, financial, pastoral, educational, tax, safety, or professional advice.</p>
+
+<h2>Third-party services</h2>
+<p>The services may link to or integrate with third-party websites, media sources, payment providers, app stores, APIs, and platforms. Their terms and privacy policies apply to their services. We are not responsible for third-party content, availability, security, or practices.</p>
+
+<h2>Termination</h2>
+<p>You may stop using the services at any time. We may suspend or terminate access, remove content, disable rewards, or restrict features if we believe there is a Terms violation, legal risk, security issue, nonpayment, fraud, abuse, or harm to users or the platform.</p>
+
+<h2>Disclaimers and liability</h2>
+<p>The services are provided "as is" and "as available" to the fullest extent permitted by law. We disclaim implied warranties of merchantability, fitness for a particular purpose, and non-infringement. To the fullest extent permitted by law, Beyond Imagination Technology will not be liable for indirect, incidental, special, consequential, punitive, or lost-profit damages.</p>
+
+<h2>Changes and contact</h2>
+<p>We may update these Terms as the ecosystem evolves. Questions about these Terms may be sent through the official support contact published by Beyond Imagination Technology.</p>
+</main>
+<script src="/assets/js/visitor-analytics.js" defer></script>
+</body>
+</html>

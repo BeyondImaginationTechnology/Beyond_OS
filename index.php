@@ -824,7 +824,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     <div><a class="brand" href="./">BEYOND <span>OS</span></a><p>The connected imagination ecosystem.</p><p class="copyright">© 2026 Beyond Imagination Corp.</p></div>
     <div><h4>DISCOVER</h4><a href="app-store/">App Store</a><a href="beyond-id/dashboard/wallet.php">Wallet</a><a href="academy/">Learn</a><a href="beyond-tv/">Beyond TV</a></div>
     <div><h4>COMPANY</h4><a href="about.php">About</a><a href="blog.php">Blog</a><a href="coding-school/">Career Pathways</a><a href="contact.php">Contact</a></div>
-    <div><h4>SUPPORT</h4><a href="help-center.php">Help Center</a><a href="beyond-id/auth/privacy.php">Privacy Policy</a><a href="beyond-id/auth/terms.php">Terms of Service</a></div>
+    <div><h4>SUPPORT</h4><a href="help-center.php">Help Center</a><a href="legal/privacy.php">Privacy Policy</a><a href="legal/terms.php">Terms of Service</a></div>
     <div><h4>FOLLOW US</h4><a href="https://www.instagram.com/beyondimaginationtech/" target="_blank" rel="noopener noreferrer">Instagram @beyondimaginationtech</a></div>
 </footer>
 <script>

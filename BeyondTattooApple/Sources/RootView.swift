@@ -34,7 +34,7 @@ struct BrandHeader: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Text("1.0")
+            Text("1.1")
                 .font(.caption.bold())
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)

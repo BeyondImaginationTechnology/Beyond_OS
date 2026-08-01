@@ -35,7 +35,7 @@ It loads live schedules from the existing Beyond TV JSON APIs and uses AVPlayer 
 
 Before distribution:
 
-- Add final iOS and tvOS app icons.
+- Review the generated iOS and tvOS icons in App Store Connect against final brand artwork.
 - Add the tvOS privacy policy text in App Store Connect.
 - Configure Sign in with Apple only when Beyond ID authentication is implemented in the app.
 - Add Associated Domains only after the `apple-app-site-association` file is deployed.

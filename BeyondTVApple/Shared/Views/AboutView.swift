@@ -5,7 +5,22 @@ struct AboutView: View {
         NavigationStack {
             Form {
                 Section("Beyond TV") {
-                    LabeledContent("Version", value: "1.0 (1)")
+                    HStack(spacing: 14) {
+                        Image("BeyondTVLogo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 56, height: 56)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                            .accessibilityHidden(true)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Beyond TV")
+                                .font(.headline)
+                            Text("Live channels from Beyond Imagination")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    LabeledContent("Version", value: versionText)
                     LabeledContent("Schedule", value: "America/Vancouver")
                     LabeledContent("Platforms", value: "iOS · iPadOS · tvOS")
                 }
@@ -21,5 +36,11 @@ struct AboutView: View {
             }
             .navigationTitle("About")
         }
+    }
+
+    private var versionText: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
+        return "\(version) (\(build))"
     }
 }

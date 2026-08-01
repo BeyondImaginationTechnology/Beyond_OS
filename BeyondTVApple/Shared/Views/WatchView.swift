@@ -18,7 +18,14 @@ struct WatchView: View {
     }
 
     private var header: some View {
-        HStack(alignment: .firstTextBaseline) {
+        HStack(alignment: .center, spacing: 14) {
+            Image("BeyondTVLogo")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 52, height: 52)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .accessibilityHidden(true)
+
             VStack(alignment: .leading, spacing: 4) {
                 Text("BEYOND TV")
                     .font(.caption.bold())
@@ -70,13 +77,23 @@ struct WatchView: View {
                     .aspectRatio(16 / 9, contentMode: .fit)
                     .clipShape(RoundedRectangle(cornerRadius: 22))
             } else if model.isLoading {
-                ProgressView("Tuning channel…")
+                VStack(spacing: 12) {
+                    ProgressView()
+                    Text("Tuning \(model.selectedChannel?.name ?? "Beyond TV")")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+                }
             } else {
-                ContentUnavailableView(
-                    unavailableTitle,
-                    systemImage: "tv.slash",
-                    description: Text(model.errorMessage ?? "Try another channel from the guide.")
-                )
+                ContentUnavailableView {
+                    Label(unavailableTitle, systemImage: "tv.slash")
+                } description: {
+                    Text(model.errorMessage ?? "Try another channel from the guide.")
+                } actions: {
+                    Button("Retry") {
+                        Task { await model.retry() }
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
             }
         }
     }

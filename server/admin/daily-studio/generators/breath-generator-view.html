@@ -214,7 +214,7 @@
 
   function canonicalIdFromReference(reference){
     const clean=String(reference||'').toUpperCase();
-    const books={'GENESIS':'GEN','PSALM':'PSA','PSALMS':'PSA','PSAUME':'PSA','PSAUMES':'PSA','SALMOS':'PSA','SÒM':'PSA','PROVERBS':'PRO','PROVERBES':'PRO','PWOVÈB':'PRO','ISAIAH':'ISA','MATTHEW':'MAT','MATTHIEU':'MAT','MATEO':'MAT','MATYE':'MAT','MARK':'MRK','JOHN':'JHN','JEAN':'JHN','JUAN':'JHN','JAN':'JHN','ROMANS':'ROM','1 CORINTHIANS':'1CO','1 CORINTIOS':'1CO','1 KORENTYEN':'1CO','2 CORINTHIANS':'2CO','2 CORINTIOS':'2CO','2 KORENTYEN':'2CO','PHILIPPIANS':'PHP','PHILIPPIENS':'PHP','FILIPENSES':'PHP','FILIPYEN':'PHP','1 THESSALONIANS':'1TH','1 THESSALONICIENS':'1TH','1 TESALONICENSES':'1TH','HEBREWS':'HEB'};
+    const books={'GENESIS':'GEN','GENÈSE':'GEN','GÉNESIS':'GEN','JENÈZ':'GEN','PSALM':'PSA','PSALMS':'PSA','PSAUME':'PSA','PSAUMES':'PSA','SALMOS':'PSA','SÒM':'PSA','PROVERBS':'PRO','PROVERBES':'PRO','PROVERBIOS':'PRO','PWOVÈB':'PRO','ISAIAH':'ISA','ISAÍAS':'ISA','ÉSAÏE':'ISA','EZAYI':'ISA','MATTHEW':'MAT','MATTHIEU':'MAT','MATEO':'MAT','MATYE':'MAT','MARK':'MRK','JOHN':'JHN','JEAN':'JHN','JUAN':'JHN','JAN':'JHN','ROMANS':'ROM','ROMAINS':'ROM','ROMANOS':'ROM','WOMEN':'ROM','1 CORINTHIANS':'1CO','1 CORINTIOS':'1CO','1 KORENTYEN':'1CO','2 CORINTHIANS':'2CO','2 CORINTIOS':'2CO','2 KORENTYEN':'2CO','GALATIANS':'GAL','GALATES':'GAL','GÁLATAS':'GAL','GALAT':'GAL','PHILIPPIANS':'PHP','PHILIPPIENS':'PHP','FILIPENSES':'PHP','FILIPYEN':'PHP','COLOSSIANS':'COL','COLOSSIENS':'COL','COLOSENSES':'COL','KOLOSYEN':'COL','1 THESSALONIANS':'1TH','1 THESSALONICIENS':'1TH','1 TESALONICENSES':'1TH','HEBREWS':'HEB'};
     const match=clean.match(/^(.+?)\s+(\d+):(\d+)/u);
     if(!match)return '';
     const code=books[match[1].trim()];
@@ -275,6 +275,14 @@
       status(`Fresh verse selected — ${data.remaining.toLocaleString()} unused verses remain in this cycle.${data.cycle_restarted?' A new Bible cycle just began.':''}`);
     }catch(error){status(error.message||'Verse generation failed.',true)}finally{button.disabled=false}
   }
+  async function loadFreshVerseForCurrentLanguage(){
+    const response=await fetch(`/server/admin/daily-studio/api/random-content.php?type=bible&language=${encodeURIComponent(verseLanguage())}`,{cache:'no-store'});
+    const data=await response.json();
+    if(!response.ok||!data.item)throw new Error(data.error||'No verse was returned.');
+    applyVerseItem(data.item,true);
+    return data.item;
+  }
+  const nextFrame=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
   const narrationLocale = () => document.querySelector('input[name="narrationLanguage"]:checked')?.value || 'en-US';
   function narrationText(){
     const locale=narrationLocale();
@@ -320,9 +328,10 @@
       narrationPlaying=true;const started=performance.now();const animate=now=>{if(!running)return;draw((Math.sin((now-started)/420)+1)/2);requestAnimationFrame(animate)};requestAnimationFrame(animate);recorder.start(250);recorder.pause();
       for(let index=0;index<languages.length;index++){
         const [language,locale,label]=languages[index],textRadio=document.querySelector(`input[name="verseLanguage"][value="${language}"]`),voiceRadio=document.querySelector(`input[name="narrationLanguage"][value="${locale}"]`);if(textRadio)textRadio.checked=true;if(voiceRadio)voiceRadio.checked=true;$('locale').value=languageSettings[language].locale;$('heading').value=localizedHeading(language);
-        if(originalVerseId){await loadVerseTranslation(originalVerseId)}
-        draw();status(`Recording ${label} narration (${index+1} of ${languages.length})…`);
-        const response=await fetch('/beyond-id/admin/api/verse-narration.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale})});if(!response.ok)throw new Error(`${label} narration could not be generated.`);const blob=await response.blob(),buffer=await audioContext.decodeAudioData(await blob.arrayBuffer()),source=audioContext.createBufferSource();source.buffer=buffer;source.connect(destination);recorder.resume();source.start(0);await new Promise(resolve=>{source.onended=resolve});recorder.pause();source.disconnect();
+        const translated=originalVerseId?await loadVerseTranslation(originalVerseId):false;
+        if(!translated)await loadFreshVerseForCurrentLanguage();
+        draw();await nextFrame();status(`Recording ${label} narration (${index+1} of ${languages.length})…`);
+        const response=await fetch('/beyond-id/admin/api/verse-narration.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale})});if(!response.ok)throw new Error(`${label} narration could not be generated.`);const blob=await response.blob(),buffer=await audioContext.decodeAudioData(await blob.arrayBuffer()),source=audioContext.createBufferSource();source.buffer=buffer;source.connect(destination);recorder.resume();draw();await nextFrame();source.start(0);await new Promise(resolve=>{source.onended=resolve});recorder.pause();source.disconnect();
       }
       running=false;narrationPlaying=false;recorder.stop();await done;const mime=recorder.mimeType||type||'video/webm',mp4=mime.includes('mp4');downloadBlob(new Blob(chunks,{type:mime}),`${safeName()}-all-languages${mp4?'.mp4':'.webm'}`);status(mp4?'All narrated languages exported as one MP4.':'All narrated languages exported as one WebM because this browser cannot record MP4.');
     }catch(error){running=false;narrationPlaying=false;if(recorder&&recorder.state!=='inactive')recorder.stop();status(error.message||'Batch video export failed.',true)}finally{Object.entries(originalFields).forEach(([id,value])=>{$(id).value=value});currentVerseId=originalVerseId;const textRadio=document.querySelector(`input[name="verseLanguage"][value="${originalVerseLanguage}"]`),voiceRadio=document.querySelector(`input[name="narrationLanguage"][value="${originalNarration}"]`);if(textRadio)textRadio.checked=true;if(voiceRadio)voiceRadio.checked=true;if(audioContext)await audioContext.close().catch(()=>{});draw();button.disabled=false}

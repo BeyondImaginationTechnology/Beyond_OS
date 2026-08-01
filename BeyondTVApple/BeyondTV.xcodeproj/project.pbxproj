@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		002D862412DC99BF5FF899B4 /* Channel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8C7F48CE821B9515CA70FB /* Channel.swift */; };
+		0124BEEF0124BEEF0124BEE1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0124BEEF0124BEEF0124BEE0 /* Assets.xcassets */; };
+		0124BEEF0124BEEF0124BEE2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0124BEEF0124BEEF0124BEE0 /* Assets.xcassets */; };
 		06243E4E9438DB10ADDB303E /* ChannelButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F1A275EA2E3B188D0D3838 /* ChannelButton.swift */; };
 		147BB0EF1BBC206A641C1E44 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B35747769C659CFBAC312E0 /* RootView.swift */; };
 		166BAF9409DFEBF37F3ABCD5 /* WebPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65162F4835AD0A014CD6CED0 /* WebPlayerView.swift */; };
@@ -46,6 +48,9 @@
 
 /* Begin PBXFileReference section */
 		0B35747769C659CFBAC312E0 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		0124BEEF0124BEEF0124BEE0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0124BEEF0124BEEF0124BEE3 /* Info-iOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-iOS.plist"; sourceTree = "<group>"; };
+		0124BEEF0124BEEF0124BEE4 /* Info-tvOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-tvOS.plist"; sourceTree = "<group>"; };
 		10BEF522FAE4A627E161D802 /* BeyondTVTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BeyondTVTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1B552F01704CB870F4755F52 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		4925ADCCA61CAE1EFD56142E /* Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Platform.swift; sourceTree = "<group>"; };
@@ -60,8 +65,8 @@
 		BFAB78C091B622D00A31B313 /* BeyondTVAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeyondTVAPI.swift; sourceTree = "<group>"; };
 		C1C0974B9AA1131D215B82DF /* BeyondTVTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeyondTVTests.swift; sourceTree = "<group>"; };
 		C75CF20734E2A37D7B9D6DC0 /* WatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchView.swift; sourceTree = "<group>"; };
-		D48635E00D7AB887F152A34A /* BeyondTV-tvOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "BeyondTV-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F540D595A8220591F32E7276 /* BeyondTV-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "BeyondTV-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D48635E00D7AB887F152A34A /* BeyondTV-tvOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; name = "BeyondTV-tvOS.app"; path = BeyondTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F540D595A8220591F32E7276 /* BeyondTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeyondTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -92,6 +97,16 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
+		12BEEF0124BEEF0124BEEF01 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				0124BEEF0124BEEF0124BEE0 /* Assets.xcassets */,
+				0124BEEF0124BEEF0124BEE3 /* Info-iOS.plist */,
+				0124BEEF0124BEEF0124BEE4 /* Info-tvOS.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		3EC00F4B58BDD1F65E68C5B0 /* tvOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -112,7 +127,7 @@
 		48C545A7BC93568774095AA2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F540D595A8220591F32E7276 /* BeyondTV-iOS.app */,
+				F540D595A8220591F32E7276 /* BeyondTV.app */,
 				D48635E00D7AB887F152A34A /* BeyondTV-tvOS.app */,
 				10BEF522FAE4A627E161D802 /* BeyondTVTests.xctest */,
 			);
@@ -123,6 +138,7 @@
 			isa = PBXGroup;
 			children = (
 				40D1CFF306205F1A91F564BC /* Platforms */,
+				12BEEF0124BEEF0124BEEF01 /* Resources */,
 				08C8CF78AA569DAB1DE601FB /* Shared */,
 				0CB3C360480A462ABA374A94 /* Tests */,
 				48C545A7BC93568774095AA2 /* Products */,
@@ -168,6 +184,7 @@
 			buildConfigurationList = B1DF5689E83A23540CCF66A3 /* Build configuration list for PBXNativeTarget "BeyondTV-tvOS" */;
 			buildPhases = (
 				D8F5A7407E19FE27F8B6FCEC /* Sources */,
+				12BEEF0124BEEF0124BEEF02 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -185,6 +202,7 @@
 			buildConfigurationList = CC5305C68C1DE34A12F7D700 /* Build configuration list for PBXNativeTarget "BeyondTV-iOS" */;
 			buildPhases = (
 				F17A6ED3747EA4ACE6431529 /* Sources */,
+				12BEEF0124BEEF0124BEEF03 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -194,7 +212,7 @@
 			packageProductDependencies = (
 			);
 			productName = "BeyondTV-iOS";
-			productReference = F540D595A8220591F32E7276 /* BeyondTV-iOS.app */;
+			productReference = F540D595A8220591F32E7276 /* BeyondTV.app */;
 			productType = "com.apple.product-type.application";
 		};
 		B208F20409DB3D06507DED5B /* BeyondTVTests */ = {
@@ -228,10 +246,6 @@
 						DevelopmentTeam = FK9QM3VUNH;
 						ProvisioningStyle = Automatic;
 					};
-					7F260C4F7164AB6CF632197F = {
-						DevelopmentTeam = FK9QM3VUNH;
-						ProvisioningStyle = Automatic;
-					};
 					B208F20409DB3D06507DED5B = {
 						DevelopmentTeam = FK9QM3VUNH;
 						ProvisioningStyle = Automatic;
@@ -258,6 +272,25 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		12BEEF0124BEEF0124BEEF02 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0124BEEF0124BEEF0124BEE2 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		12BEEF0124BEEF0124BEEF03 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0124BEEF0124BEEF0124BEE1 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		D8F5A7407E19FE27F8B6FCEC /* Sources */ = {
@@ -339,12 +372,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				INFOPLIST_KEY_CFBundleDisplayName = "Beyond TV";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = FK9QM3VUNH;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Resources/Info-iOS.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -352,6 +385,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.beyondtv;
 				PRODUCT_MODULE_NAME = BeyondTVCore;
 				PRODUCT_NAME = BeyondTV;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Beyond TV";
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -449,10 +484,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				INFOPLIST_KEY_CFBundleDisplayName = "Beyond TV";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Resources/Info-tvOS.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -470,12 +503,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				INFOPLIST_KEY_CFBundleDisplayName = "Beyond TV";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Resources/Info-iOS.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -556,10 +585,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				INFOPLIST_KEY_CFBundleDisplayName = "Beyond TV";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Resources/Info-tvOS.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -50,7 +50,7 @@
   {"category":"Prints & Cards","name":"Photographic Print","retail_min":5.17,"retail_max":33.28,"margin_min":0,"margin_max":0,"default_percent":0},
   {"category":"Prints & Cards","name":"Greeting Card","retail_min":2.30,"retail_max":3.44,"margin_min":0,"margin_max":0,"default_percent":0},
   {"category":"Prints & Cards","name":"Framed Art Print","retail_min":82.74,"retail_max":140.67,"margin_min":0,"margin_max":0,"default_percent":0},
-  {"category":"Prints & Cards","name":"Canvas Print","retail_min":56.70,"retail_max":117.76,"margin_min":0,"margin_max":0,"default_percent":0},
+  {"category":"Prints & Cards","name":"Gallery Print","retail_min":56.70,"retail_max":117.76,"margin_min":0,"margin_max":0,"default_percent":0},
   {"category":"Prints & Cards","name":"Art Board Print","retail_min":13.24,"retail_max":28.08,"margin_min":0,"margin_max":0,"default_percent":0},
   {"category":"Prints & Cards","name":"Art Print","retail_min":22.87,"retail_max":55.08,"margin_min":0,"margin_max":0,"default_percent":0},
 

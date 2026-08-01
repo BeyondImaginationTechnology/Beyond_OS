@@ -80,25 +80,11 @@
   color: #17130c;
 }
 
-.market-page .canvas-studio,
 .market-page .product-market,
 .market-page .live-listings,
 .market-page .starter-art {
   border-color: var(--market-line);
   background: var(--market-panel);
-}
-
-.market-page .canvas-preview {
-  border-color: var(--market-line);
-  background: radial-gradient(circle at 50% 20%, rgba(232, 183, 90, .14), transparent 50%), #090e14;
-}
-
-.market-page .canvas-mark { color: #d39839; }
-.market-page .canvas-features span,
-.market-page .canvas-tools span {
-  border-color: var(--market-line);
-  background: rgba(255, 255, 255, .035);
-  color: var(--market-muted);
 }
 
 .market-page .market-heading > a,
@@ -162,7 +148,7 @@
 .market-page .product-visual > b { z-index: 2; }
 .market-page .product-mugs .product-visual { background-position: 33.333% 0; }
 .market-page .product-posters .product-visual,
-.market-page .product-wall-canvas .product-visual { background-position: 66.667% 0; }
+.market-page .product-wall-art .product-visual { background-position: 66.667% 0; }
 .market-page .product-stickers .product-visual { background-position: 66.667% 100%; }
 .market-page .product-t-shirts .product-visual,
 .market-page .product-hoodies .product-visual { background-position: 0 0; }

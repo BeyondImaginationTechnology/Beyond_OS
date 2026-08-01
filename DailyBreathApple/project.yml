@@ -1,4 +1,4 @@
-name: DailyBreath
+name: TheDailyBreath
 options:
   bundleIdPrefix: technology.co.beyondimagination
   deploymentTarget:
@@ -16,7 +16,7 @@ settings:
     ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
 targets:
-  DailyBreath:
+  TheDailyBreath:
     type: application
     platform: iOS
     sources:
@@ -25,25 +25,33 @@ targets:
       - path: Resources
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.dailybreath
-        PRODUCT_NAME: DailyBreath
-        INFOPLIST_KEY_CFBundleDisplayName: DailyBreath
+        PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.thedailybreath
+        PRODUCT_NAME: The Daily Breath
+        PRODUCT_MODULE_NAME: DailyBreath
+        INFOPLIST_KEY_CFBundleDisplayName: The Daily Breath
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.lifestyle
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIRequiresFullScreen: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         TARGETED_DEVICE_FAMILY: "1,2"
+      configs:
+        Release:
+          CODE_SIGN_IDENTITY: Apple Distribution
+          CODE_SIGN_STYLE: Manual
+          PROVISIONING_PROFILE: 6183f7f2-d0c2-44a0-a6eb-478e47f58eb9
+          PROVISIONING_PROFILE_SPECIFIER: 6183f7f2-d0c2-44a0-a6eb-478e47f58eb9
     scheme:
       testTargets:
-        - DailyBreathTests
-  DailyBreathTests:
+        - TheDailyBreathTests
+  TheDailyBreathTests:
     type: bundle.unit-test
     platform: iOS
     sources:
       - path: Tests
     dependencies:
-      - target: DailyBreath
+      - target: TheDailyBreath
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.dailybreath.tests
+        PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.thedailybreath.tests
+        PRODUCT_MODULE_NAME: DailyBreathTests
         GENERATE_INFOPLIST_FILE: YES

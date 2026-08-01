@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "111111111111111111111111"
-               BuildableName = "TheDailyBreath.app"
-               BlueprintName = "DailyBreath"
-               ReferencedContainer = "container:DailyBreath.xcodeproj">
+               BuildableName = "The Daily Breath.app"
+               BlueprintName = "TheDailyBreath"
+               ReferencedContainer = "container:TheDailyBreath.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -31,9 +31,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "111111111111111111111111"
-            BuildableName = "TheDailyBreath.app"
-            BlueprintName = "DailyBreath"
-            ReferencedContainer = "container:DailyBreath.xcodeproj">
+            BuildableName = "The Daily Breath.app"
+            BlueprintName = "TheDailyBreath"
+            ReferencedContainer = "container:TheDailyBreath.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -43,9 +43,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "222222222222222222222222"
-               BuildableName = "DailyBreathTests.xctest"
-               BlueprintName = "DailyBreathTests"
-               ReferencedContainer = "container:DailyBreath.xcodeproj">
+               BuildableName = "TheDailyBreathTests.xctest"
+               BlueprintName = "TheDailyBreathTests"
+               ReferencedContainer = "container:TheDailyBreath.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -65,9 +65,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "111111111111111111111111"
-            BuildableName = "TheDailyBreath.app"
-            BlueprintName = "DailyBreath"
-            ReferencedContainer = "container:DailyBreath.xcodeproj">
+            BuildableName = "The Daily Breath.app"
+            BlueprintName = "TheDailyBreath"
+            ReferencedContainer = "container:TheDailyBreath.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -82,9 +82,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "111111111111111111111111"
-            BuildableName = "TheDailyBreath.app"
-            BlueprintName = "DailyBreath"
-            ReferencedContainer = "container:DailyBreath.xcodeproj">
+            BuildableName = "The Daily Breath.app"
+            BlueprintName = "TheDailyBreath"
+            ReferencedContainer = "container:TheDailyBreath.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

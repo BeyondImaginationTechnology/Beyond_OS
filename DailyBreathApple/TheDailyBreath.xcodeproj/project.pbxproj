@@ -26,7 +26,7 @@
 			containerPortal = 000000000000000000000001 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 111111111111111111111111;
-			remoteInfo = DailyBreath;
+			remoteInfo = TheDailyBreath;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -42,9 +42,8 @@
 		100000000000000000000009 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		100000000000000000000010 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		100000000000000000000011 /* DailyBreathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyBreathTests.swift; sourceTree = "<group>"; };
-		100000000000000000000012 /* TheDailyBreath.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TheDailyBreath.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		100000000000000000000013 /* DailyBreathTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DailyBreathTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		FA63F9F9301D59F6003ED71A /* DailyBreath.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = DailyBreath.xcodeproj; sourceTree = SOURCE_ROOT; };
+		100000000000000000000012 /* The Daily Breath.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "The Daily Breath.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		100000000000000000000013 /* TheDailyBreathTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TheDailyBreathTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,7 +77,6 @@
 		200000000000000000000002 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				FA63F9F9301D59F6003ED71A /* DailyBreath.xcodeproj */,
 				100000000000000000000001 /* AcademyView.swift */,
 				100000000000000000000002 /* BibleView.swift */,
 				100000000000000000000003 /* BreatheView.swift */,
@@ -111,23 +109,18 @@
 		200000000000000000000005 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				100000000000000000000012 /* TheDailyBreath.app */,
-				100000000000000000000013 /* DailyBreathTests.xctest */,
+				100000000000000000000012 /* The Daily Breath.app */,
+				100000000000000000000013 /* TheDailyBreathTests.xctest */,
 			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		FA63F9FE301D6294003ED71A /* Products */ = {
-			isa = PBXGroup;
 			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		111111111111111111111111 /* DailyBreath */ = {
+		111111111111111111111111 /* TheDailyBreath */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 700000000000000000000001 /* Build configuration list for PBXNativeTarget "DailyBreath" */;
+			buildConfigurationList = 700000000000000000000001 /* Build configuration list for PBXNativeTarget "TheDailyBreath" */;
 			buildPhases = (
 				600000000000000000000001 /* Sources */,
 				500000000000000000000001 /* Frameworks */,
@@ -137,16 +130,16 @@
 			);
 			dependencies = (
 			);
-			name = DailyBreath;
+			name = TheDailyBreath;
 			packageProductDependencies = (
 			);
-			productName = DailyBreath;
-			productReference = 100000000000000000000012 /* TheDailyBreath.app */;
+			productName = "The Daily Breath";
+			productReference = 100000000000000000000012 /* The Daily Breath.app */;
 			productType = "com.apple.product-type.application";
 		};
-		222222222222222222222222 /* DailyBreathTests */ = {
+		222222222222222222222222 /* TheDailyBreathTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 700000000000000000000002 /* Build configuration list for PBXNativeTarget "DailyBreathTests" */;
+			buildConfigurationList = 700000000000000000000002 /* Build configuration list for PBXNativeTarget "TheDailyBreathTests" */;
 			buildPhases = (
 				600000000000000000000003 /* Sources */,
 				500000000000000000000002 /* Frameworks */,
@@ -156,11 +149,11 @@
 			dependencies = (
 				400000000000000000000002 /* PBXTargetDependency */,
 			);
-			name = DailyBreathTests;
+			name = TheDailyBreathTests;
 			packageProductDependencies = (
 			);
 			productName = DailyBreathTests;
-			productReference = 100000000000000000000013 /* DailyBreathTests.xctest */;
+			productReference = 100000000000000000000013 /* TheDailyBreathTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -178,7 +171,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 700000000000000000000003 /* Build configuration list for PBXProject "DailyBreath" */;
+			buildConfigurationList = 700000000000000000000003 /* Build configuration list for PBXProject "TheDailyBreath" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -190,16 +183,10 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 200000000000000000000005 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = FA63F9FE301D6294003ED71A /* Products */;
-					ProjectRef = FA63F9F9301D59F6003ED71A /* DailyBreath.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
-				111111111111111111111111 /* DailyBreath */,
-				222222222222222222222222 /* DailyBreathTests */,
+				111111111111111111111111 /* TheDailyBreath */,
+				222222222222222222222222 /* TheDailyBreathTests */,
 			);
 		};
 /* End PBXProject section */
@@ -245,7 +232,7 @@
 /* Begin PBXTargetDependency section */
 		400000000000000000000002 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 111111111111111111111111 /* DailyBreath */;
+			target = 111111111111111111111111 /* TheDailyBreath */;
 			targetProxy = 400000000000000000000001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -259,7 +246,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
-				INFOPLIST_KEY_CFBundleDisplayName = DailyBreath;
+				INFOPLIST_KEY_CFBundleDisplayName = "The Daily Breath";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -270,8 +257,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.dailybreath;
-				PRODUCT_NAME = TheDailyBreath;
+				PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.thedailybreath;
+				PRODUCT_MODULE_NAME = DailyBreath;
+				PRODUCT_NAME = "The Daily Breath";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
@@ -285,9 +273,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = FK9QM3VUNH;
-				INFOPLIST_KEY_CFBundleDisplayName = DailyBreath;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = FK9QM3VUNH;
+				INFOPLIST_KEY_CFBundleDisplayName = "The Daily Breath";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -299,8 +289,11 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.thedailybreath;
-				PRODUCT_NAME = TheDailyBreath;
+				PRODUCT_MODULE_NAME = DailyBreath;
+				PRODUCT_NAME = "The Daily Breath";
+				PROVISIONING_PROFILE = "6183f7f2-d0c2-44a0-a6eb-478e47f58eb9";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = GGOG;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -317,10 +310,12 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.dailybreath.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.thedailybreath.tests;
+				PRODUCT_MODULE_NAME = DailyBreathTests;
+				PRODUCT_NAME = TheDailyBreathTests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DailyBreath.app/DailyBreath";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/The Daily Breath.app/The Daily Breath";
 			};
 			name = Debug;
 		};
@@ -334,10 +329,12 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.dailybreath.tests;
+				PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.thedailybreath.tests;
+				PRODUCT_MODULE_NAME = DailyBreathTests;
+				PRODUCT_NAME = TheDailyBreathTests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DailyBreath.app/DailyBreath";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/The Daily Breath.app/The Daily Breath";
 			};
 			name = Release;
 		};
@@ -472,7 +469,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		700000000000000000000001 /* Build configuration list for PBXNativeTarget "DailyBreath" */ = {
+		700000000000000000000001 /* Build configuration list for PBXNativeTarget "TheDailyBreath" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				800000000000000000000001 /* Debug */,
@@ -481,7 +478,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		700000000000000000000002 /* Build configuration list for PBXNativeTarget "DailyBreathTests" */ = {
+		700000000000000000000002 /* Build configuration list for PBXNativeTarget "TheDailyBreathTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				800000000000000000000003 /* Debug */,
@@ -490,7 +487,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		700000000000000000000003 /* Build configuration list for PBXProject "DailyBreath" */ = {
+		700000000000000000000003 /* Build configuration list for PBXProject "TheDailyBreath" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				800000000000000000000005 /* Debug */,

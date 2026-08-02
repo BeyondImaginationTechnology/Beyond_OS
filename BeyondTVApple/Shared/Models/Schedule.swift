@@ -91,3 +91,14 @@ struct ChannelStatus: Sendable {
         sourceKey: ""
     )
 }
+
+struct GuideItem: Identifiable, Sendable {
+    let channel: Channel
+    let status: ChannelStatus
+    let currentIcon: String?
+    let currentLineup: String?
+    let nextLineup: String?
+    let loadedAt: Date
+
+    var id: String { channel.id }
+}

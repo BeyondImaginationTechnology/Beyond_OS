@@ -1,19 +1,29 @@
 import Foundation
 
-struct MusicTrack: Identifiable, Hashable {
+struct MusicTrack: Identifiable, Hashable, Codable {
     let id: String
-    let title: String
-    let artist: String
-    let album: String
-    let durationSeconds: Int?
+    var title: String
+    var artist: String?
+    var album: String?
+    var durationSeconds: Int?
     let mood: MusicMood
     let streamURL: URL?
     let downloadURL: URL?
     let artworkURL: URL?
     let sourceURL: URL?
-    let licenseNote: String
+    let licenseNote: String?
     let providerName: String
-    let isSeedDownloaded: Bool
+    let localFileName: String?
+    let originalFileName: String?
+    let importedAt: Date?
+
+    var displayArtist: String {
+        artist?.isEmpty == false ? artist! : "Unknown Artist"
+    }
+
+    var displayAlbum: String {
+        album?.isEmpty == false ? album! : "Unknown Album"
+    }
 
     var durationText: String {
         guard let durationSeconds else { return "--:--" }
@@ -21,41 +31,43 @@ struct MusicTrack: Identifiable, Hashable {
     }
 
     var downloadFileName: String {
-        "\(id).\(downloadURL?.pathExtension.isEmpty == false ? downloadURL?.pathExtension ?? "mp3" : "mp3")"
+        let preferredExtension = downloadURL?.pathExtension.isEmpty == false ? downloadURL?.pathExtension : "mp3"
+        return "\(id).\(preferredExtension ?? "mp3")"
     }
 
-    static let seed: [MusicTrack] = [
+    var isLocal: Bool {
+        localFileName != nil
+    }
+
+    var provenanceText: String {
+        if let localFileName {
+            return originalFileName ?? localFileName
+        }
+        if let licenseNote, !licenseNote.isEmpty {
+            return "\(providerName) · \(licenseNote)"
+        }
+        return providerName
+    }
+
+    func savedLocally(as fileName: String, originalName: String? = nil) -> MusicTrack {
         MusicTrack(
-            id: "midnight-frequency",
-            title: "Midnight Frequency",
-            artist: "Beyond Studio",
-            album: "Signal Bloom",
-            durationSeconds: 214,
-            mood: .focus,
-            streamURL: nil,
-            downloadURL: nil,
-            artworkURL: nil,
-            sourceURL: nil,
-            licenseNote: "Local demo cue",
-            providerName: "Beyond Music",
-            isSeedDownloaded: true
-        ),
-        MusicTrack(
-            id: "neon-devotional",
-            title: "Neon Devotional",
-            artist: "Daily Breath",
-            album: "Quiet Sparks",
-            durationSeconds: 188,
-            mood: .calm,
-            streamURL: nil,
-            downloadURL: nil,
-            artworkURL: nil,
-            sourceURL: nil,
-            licenseNote: "Local demo cue",
-            providerName: "Beyond Music",
-            isSeedDownloaded: true
+            id: id,
+            title: title,
+            artist: artist,
+            album: album,
+            durationSeconds: durationSeconds,
+            mood: mood,
+            streamURL: streamURL,
+            downloadURL: downloadURL,
+            artworkURL: artworkURL,
+            sourceURL: sourceURL,
+            licenseNote: licenseNote,
+            providerName: providerName,
+            localFileName: fileName,
+            originalFileName: originalName ?? originalFileName,
+            importedAt: importedAt ?? .now
         )
-    ]
+    }
 }
 
 struct MusicSearchPage: Hashable {
@@ -69,7 +81,7 @@ struct MusicSearchPage: Hashable {
     }
 }
 
-enum MusicMood: String, CaseIterable, Identifiable, Hashable {
+enum MusicMood: String, CaseIterable, Identifiable, Hashable, Codable {
     case focus = "Focus"
     case calm = "Calm"
     case energy = "Energy"
@@ -87,45 +99,12 @@ enum MusicMood: String, CaseIterable, Identifiable, Hashable {
     }
 }
 
-struct MusicStation: Identifiable, Hashable {
-    let id: String
-    let name: String
-    let tagline: String
-    let mood: MusicMood
-    let listenerCount: Int
-    let streamURL: URL?
-
-    static let seed: [MusicStation] = [
-        MusicStation(id: "open-discovery", name: "Open Discovery", tagline: "Fresh authorized finds from public catalogues", mood: .focus, listenerCount: 128, streamURL: nil),
-        MusicStation(id: "daily-breath-audio", name: "Daily Breath Audio", tagline: "Scripture, reflection, and soft instrumental beds", mood: .calm, listenerCount: 72, streamURL: nil),
-        MusicStation(id: "family-clean", name: "Family Clean", tagline: "Kid-safe queues for shared spaces", mood: .kids, listenerCount: 41, streamURL: nil)
-    ]
-}
-
 struct MusicPlaylist: Identifiable, Hashable {
     let id: String
     let title: String
     let subtitle: String
-    let trackIDs: [MusicTrack.ID]
-    let accentName: String
-
-    static let seed: [MusicPlaylist] = [
-        MusicPlaylist(id: "downloaded", title: "Downloaded", subtitle: "Tracks ready without service coverage", trackIDs: ["midnight-frequency", "neon-devotional"], accentName: "Aqua"),
-        MusicPlaylist(id: "deep-work", title: "Deep Work", subtitle: "Instrumental momentum for shipping", trackIDs: ["midnight-frequency"], accentName: "Rose"),
-        MusicPlaylist(id: "quiet-morning", title: "Quiet Morning", subtitle: "Low-friction starts and devotional pauses", trackIDs: ["neon-devotional"], accentName: "Gold")
-    ]
-}
-
-struct ArtistSpotlight: Identifiable, Hashable {
-    let id: String
-    let name: String
-    let note: String
-    let monthlyListeners: Int
-
-    static let seed: [ArtistSpotlight] = [
-        ArtistSpotlight(id: "beyond-studio", name: "Beyond Studio", note: "Original house cues and release-ready loops", monthlyListeners: 3600),
-        ArtistSpotlight(id: "open-archive", name: "Open Archive Artists", note: "Creative Commons and public-domain audio sources", monthlyListeners: 2100)
-    ]
+    let tracks: [MusicTrack]
+    let systemImage: String
 }
 
 enum DownloadState: Equatable {

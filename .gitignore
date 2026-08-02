@@ -17,6 +17,8 @@
 .idea/
 .vscode/
 .DS_Store
+**/xcuserdata/
+*.xcuserstate
 Thumbs.db
 *.zip
 /build/

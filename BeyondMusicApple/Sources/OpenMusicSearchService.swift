@@ -120,7 +120,7 @@ struct OpenMusicSearchService {
             id: "\(document.identifier)-\(file.name)".stableMusicID,
             title: document.title ?? file.name.removingAudioExtension,
             artist: creator,
-            album: metadata.metadata?.title ?? "Internet Archive",
+            album: metadata.metadata?.title,
             durationSeconds: file.lengthSeconds,
             mood: .focus,
             streamURL: fileURL,
@@ -129,7 +129,9 @@ struct OpenMusicSearchService {
             sourceURL: URL(string: "https://archive.org/details/\(document.identifier)"),
             licenseNote: document.licenseurl ?? "Review source license",
             providerName: "Internet Archive",
-            isSeedDownloaded: false
+            localFileName: nil,
+            originalFileName: nil,
+            importedAt: nil
         )
     }
 
@@ -172,7 +174,7 @@ struct OpenMusicSearchService {
                 id: "commons-\(page.pageid)-\(cleanTitle)".stableMusicID,
                 title: cleanTitle,
                 artist: artist.isEmpty ? "Wikimedia Commons" : artist,
-                album: "Wikimedia Commons",
+                album: nil,
                 durationSeconds: nil,
                 mood: .focus,
                 streamURL: streamURL,
@@ -181,7 +183,9 @@ struct OpenMusicSearchService {
                 sourceURL: URL(string: info.descriptionurl),
                 licenseNote: license,
                 providerName: "Wikimedia Commons",
-                isSeedDownloaded: false
+                localFileName: nil,
+                originalFileName: nil,
+                importedAt: nil
             )
         } ?? []
     }
@@ -222,7 +226,9 @@ struct OpenMusicSearchService {
                 sourceURL: URL(string: item.shareurl ?? ""),
                 licenseNote: item.licenseCCURL ?? "Jamendo license",
                 providerName: "Jamendo",
-                isSeedDownloaded: false
+                localFileName: nil,
+                originalFileName: nil,
+                importedAt: nil
             )
         }
     }
@@ -252,7 +258,7 @@ struct OpenMusicSearchService {
                 id: "freesound-\(sound.id)".stableMusicID,
                 title: sound.name.removingAudioExtension,
                 artist: sound.username,
-                album: "Freesound",
+                album: nil,
                 durationSeconds: Int(sound.duration.rounded()),
                 mood: .focus,
                 streamURL: previewURL,
@@ -261,7 +267,9 @@ struct OpenMusicSearchService {
                 sourceURL: URL(string: sound.url),
                 licenseNote: sound.license,
                 providerName: "Freesound",
-                isSeedDownloaded: false
+                localFileName: nil,
+                originalFileName: nil,
+                importedAt: nil
             )
         }
     }

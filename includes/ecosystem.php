@@ -88,6 +88,16 @@ function beyond_app_icon(string $appName): string {
     }
     return beyond_url('assets/icons/' . $file);
 }
+function beyond_splash_assets_markup(): string {
+    return '<link rel="stylesheet" href="' . e(beyond_url('assets/css/beyond-splash.css?v=20260802-1')) . '">'
+        . '<script src="' . e(beyond_url('assets/js/beyond-splash.js?v=20260802-1')) . '" defer></script>';
+}
+function beyond_inject_splash_assets(string $html): string {
+    if (stripos($html, '</head>') === false || str_contains($html, 'beyond-splash.js')) {
+        return $html;
+    }
+    return preg_replace('/<\/head>/i', beyond_splash_assets_markup() . '</head>', $html, 1) ?? $html;
+}
 function require_beyond_id(): void { if (empty($_SESSION['user_id'])) { $_SESSION['beyond_return_to'] = beyond_return_url(); header('Location: ' . beyond_url('beyond-id/auth/login.php?required=1')); exit; } }
 function beyond_db(): PDO {
     $databaseBootstrap = __DIR__ . '/../beyond-id/includes/db.php';
@@ -170,6 +180,7 @@ function beyond_nav_bootstrap(string $appName, ?array $wallet = null): array {
     if (PHP_SAPI !== 'cli' && empty($GLOBALS['beyond_nav_started'])) {
         $GLOBALS['beyond_nav_started'] = true;
         ob_start(static function (string $html) use ($appName, $wallet): string {
+            $html = beyond_inject_splash_assets($html);
             if (stripos($html, '<body') === false || str_contains($html, 'id="beyond-os-shell"')) return $html;
             $wallet = $GLOBALS['beyond_wallet_override'] ?? $wallet;
             $icon = beyond_app_icon($appName) ?: beyond_app_icon('Beyond OS');

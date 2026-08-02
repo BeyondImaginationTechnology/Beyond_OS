@@ -80,3 +80,49 @@ function unread_notification_count(PDO $pdo, int $userId): int {
         return (int)$stmt->fetchColumn();
     } catch (Throwable $e) { return 0; }
 }
+
+function beyond_profile_slug(string $value): string {
+    $slug = strtolower(trim(preg_replace('/[^a-z0-9]+/i', '-', $value), '-'));
+    return substr($slug, 0, 40);
+}
+
+function beyond_app_catalog(): array {
+    return [
+        'beyond-id' => ['name' => 'Beyond ID', 'url' => '/beyond-id/dashboard/', 'mark' => 'ID', 'permissions' => ['profile:read', 'security:manage', 'notifications:read']],
+        'beyond-math' => ['name' => 'Beyond Math', 'url' => '/beyond-math/', 'mark' => 'BM', 'permissions' => ['profile:read', 'progress:write', 'wallet:read']],
+        'beyond-french' => ['name' => 'Beyond French', 'url' => '/beyond-french/', 'mark' => 'FR', 'permissions' => ['profile:read', 'progress:write']],
+        'dailybreath' => ['name' => 'DailyBreath', 'url' => '/dailybreath/', 'mark' => 'DB', 'permissions' => ['profile:read', 'streaks:write']],
+        'beyond-health' => ['name' => 'Beyond Health', 'url' => '/beyond-health/', 'mark' => 'H', 'permissions' => ['profile:read', 'wellness:write']],
+        'beyond-tv' => ['name' => 'Beyond TV', 'url' => '/beyond-tv/', 'mark' => 'TV', 'permissions' => ['profile:read', 'watchlist:write']],
+        'beyond-catering' => ['name' => 'Beyond Catering', 'url' => '/contact.php?topic=catering', 'mark' => 'CA', 'permissions' => ['profile:read', 'business:write']],
+        'beyond-baby-names' => ['name' => 'Beyond Baby Names', 'url' => '/beyond-baby-names/', 'mark' => 'BN', 'permissions' => ['profile:read', 'favorites:write']],
+        'beyond-tattoo' => ['name' => 'Beyond Tattoo', 'url' => '/beyond-tattoo/', 'mark' => 'TT', 'permissions' => ['profile:read', 'private-journal:write']],
+        'beyond-space' => ['name' => 'Beyond Space', 'url' => '/beyond-space/', 'mark' => 'SP', 'permissions' => ['profile:read', 'progress:write']],
+        'beyond-ancient' => ['name' => 'Beyond Ancient', 'url' => '/beyond-ancient/', 'mark' => 'AN', 'permissions' => ['profile:read', 'progress:write']],
+        'beyond-market' => ['name' => 'Beyond Market', 'url' => '/beyond-market/', 'mark' => 'MK', 'permissions' => ['profile:read', 'wallet:read', 'commerce:write']],
+        'beyond-sell' => ['name' => 'Beyond Sell', 'url' => '/beyond-sell/', 'mark' => 'SL', 'permissions' => ['profile:read', 'seller:write', 'wallet:read']],
+    ];
+}
+
+function beyond_app_meta(string $slug): array {
+    $catalog = beyond_app_catalog();
+    return $catalog[$slug] ?? [
+        'name' => ucwords(str_replace('-', ' ', $slug)),
+        'url' => '/' . $slug . '/',
+        'mark' => strtoupper(substr(preg_replace('/[^a-z0-9]/i', '', $slug), 0, 2) ?: 'AP'),
+        'permissions' => ['profile:read'],
+    ];
+}
+
+function beyond_badges_for_user(array $user, array $profile, array $academyBadges = []): array {
+    $badges = [];
+    if (!empty($user['email_verified'])) $badges[] = ['label' => 'Email verified', 'type' => 'verified'];
+    if (!empty($profile['profile_completed_at'])) $badges[] = ['label' => 'Profile complete', 'type' => 'profile'];
+    if (!empty($profile['creator_verified_at'])) $badges[] = ['label' => 'Creator verified', 'type' => 'creator'];
+    if (!empty($profile['seller_verified_at'])) $badges[] = ['label' => 'Seller verified', 'type' => 'seller'];
+    if (in_array(strtolower((string)($user['role'] ?? '')), ['admin', 'super_admin'], true)) $badges[] = ['label' => 'Beyond team', 'type' => 'team'];
+    foreach ($academyBadges as $badge) {
+        $badges[] = ['label' => (string)($badge['title'] ?? 'Learner certified'), 'type' => 'academy'];
+    }
+    return $badges;
+}

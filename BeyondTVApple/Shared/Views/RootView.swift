@@ -11,9 +11,12 @@ struct RootView: View {
             ChannelGuideView()
                 .tabItem { Label("Guide", systemImage: "rectangle.grid.2x2.fill") }
 
+            BrowseView()
+                .tabItem { Label("Browse", systemImage: "square.grid.2x2.fill") }
+
             AboutView()
                 .tabItem { Label("About", systemImage: "info.circle.fill") }
         }
-        .tint(.purple)
+        .tint(.orange)
     }
 }

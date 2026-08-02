@@ -3,20 +3,20 @@ import XCTest
 
 final class BeyondMusicTests: XCTestCase {
     @MainActor
-    func testSeedDownloadsAreAvailableOffline() {
+    func testLibraryStartsWithoutFakeTracks() {
         let store = MusicStore()
 
-        XCTAssertEqual(store.downloadedTracks.count, 2)
-        XCTAssertTrue(store.isAvailableOffline(MusicTrack.seed[0]))
+        XCTAssertEqual(store.tracks.count, 0)
+        XCTAssertEqual(store.downloadedTracks.count, 0)
+        XCTAssertNil(store.currentTrack)
     }
 
     @MainActor
-    func testSearchFilterMatchesArtistAndMood() {
+    func testLocalPlaylistsReflectActualLibrary() {
         let store = MusicStore()
-        store.searchText = "Daily"
-        store.selectedMood = .calm
 
-        XCTAssertEqual(store.filteredTracks.map(\.title), ["Neon Devotional"])
+        XCTAssertEqual(store.playlists.map(\.title), ["Downloaded", "Recently Added"])
+        XCTAssertTrue(store.playlists.allSatisfy { $0.tracks.isEmpty })
     }
 
     func testCompactCountText() {

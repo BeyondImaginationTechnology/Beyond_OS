@@ -94,6 +94,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
 .schedule-card{margin-bottom:22px;padding:17px;border:1px solid #594725;border-radius:17px;background:linear-gradient(135deg,#241d12,#111214)}.schedule-card label{display:block;margin-bottom:8px;color:#f1cf87;font-weight:950}.schedule-card select{width:100%;padding:13px;border:1px solid #6d562c;border-radius:12px;background:#090a0b;color:#fff;font-weight:800}.drop-meta{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}.drop-meta span{padding:6px 9px;border-radius:999px;background:#342a19;color:#e6c57f;font-size:11px;font-weight:900}.preview-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.preview-tab{border:1px solid #39393d;border-radius:12px;padding:10px;background:#17181b;color:#92918e;font-weight:900;cursor:pointer}.preview-tab.active{border-color:#a07d3c;background:#302617;color:#f2ce83}.tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.tool-grid .wide{grid-column:1/-1}.lore-box{min-height:118px!important}.review-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:12px 0}.review-grid .check{margin:0;padding:10px;border:1px solid #333438;border-radius:11px;background:#111214;font-size:12px}
 @media(max-width:960px){.wrap{padding:20px}.hero{display:block}.badges{margin-top:15px}.layout{grid-template-columns:1fr}.preview{min-height:520px}.row{grid-template-columns:1fr}.preview-tabs{grid-template-columns:repeat(2,1fr)}}
 .asset-intel{margin-bottom:14px;padding:15px;border:1px solid #342f25;border-radius:16px;background:linear-gradient(135deg,#17130d,#111214)}.asset-intel-kicker{margin:0 0 4px;color:#d8ab52;font-size:11px;font-weight:950;letter-spacing:.16em;text-transform:uppercase}.asset-intel h3{margin:0 0 7px;font-size:20px}.asset-intel p{margin:0;color:#b8b0a3}.asset-intel-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.asset-intel-grid span{padding:8px 10px;border:1px solid #3a352d;border-radius:10px;background:#0d0e10;color:#d8c79d;font-size:12px;font-weight:850}@media(max-width:620px){.asset-intel-grid{grid-template-columns:1fr}}
+.fallback-panel{display:none;margin:14px 0 16px;padding:14px;border:1px solid #5d4824;border-radius:15px;background:#18140d}.fallback-panel.active{display:block}.fallback-panel h3{margin:0 0 6px;color:#f0cf87;font-size:16px}.fallback-panel p{margin:0 0 10px;color:#bdb4a5}.fallback-panel textarea{min-height:190px;margin-bottom:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.45}.fallback-actions{display:flex;gap:8px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -142,14 +143,26 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       </div>
       <div class="field"><label for="lore">Stencil lore</label><textarea class="lore-box" id="lore" maxlength="1200" placeholder="Collection story, symbolism and artist-facing meaning."></textarea><small>Schedule-aware lore is prepared automatically and can be edited before publishing.</small></div>
       <div class="actions"><button class="btn secondary" id="generateLore" type="button">Generate scheduled lore</button><button class="btn secondary" id="copyCaption" type="button">Copy drop caption</button></div>
-      <label class="check"><input id="includeNarration" type="checkbox" checked> Include OpenAI narration in the Remotion video</label>
+      <label class="check"><input id="includeNarration" type="checkbox"> Include server narration in the Remotion video</label>
       <div class="field"><label for="stencilUpload">Or upload the approved stencil</label><input id="stencilUpload" type="file" accept="image/png,image/jpeg,image/webp"><small>The selected schedule supplies the title, collection, date, sequence and lore automatically.</small></div>
-      <div class="actions"><button class="btn" id="generate" type="button">✦ Generate high-quality stencil</button><button class="btn secondary" id="clear" type="button">Clear</button></div>
+      <label class="check"><input id="preferFreeFallback" type="checkbox" checked> Use free image source before paid API</label>
+      <div class="actions"><button class="btn" id="generate" type="button">✦ Prepare free prompt</button><button class="btn secondary" id="generatePaidFallback" type="button">Use paid API fallback</button><button class="btn secondary" id="clear" type="button">Clear</button></div>
       <p class="status" id="status" role="status" aria-live="polite"></p>
+      <div class="fallback-panel" id="freeFallback" aria-live="polite">
+        <h3>Free image fallback sources</h3>
+        <p>Copy this prompt into a fallback image source, generate the image there, then upload the saved PNG/JPG/WebP above to continue the tattoo kit. Pexels, Unsplash and Pixabay are better for reference photos than final stencil output.</p>
+        <div class="field"><label for="fallbackProvider">Fallback source</label><select id="fallbackProvider"><optgroup label="Free browser tools"><option value="meta">Meta AI</option><option value="designer">Microsoft Designer</option><option value="firefly">Adobe Firefly</option><option value="canva">Canva Text to Image</option><option value="ideogram">Ideogram</option></optgroup><optgroup label="API candidates"><option value="runware">Runware API</option><option value="openrouter">OpenRouter Image API</option><option value="leonardo">Leonardo.AI API</option><option value="deepai">DeepAI Pro API</option></optgroup></select></div>
+        <textarea id="fallbackPrompt" readonly></textarea>
+        <div class="fallback-actions">
+          <button class="btn secondary" id="copyFallbackPrompt" type="button">Copy fallback prompt</button>
+          <button class="btn secondary" id="openFallbackSource" type="button">Open selected source</button>
+        </div>
+        <div class="field" style="margin:12px 0 0"><label for="fallbackAssetUpload">Upload fallback result for selected tab</label><input id="fallbackAssetUpload" type="file" accept="image/png,image/jpeg,image/webp"></div>
+      </div>
       <div class="safe-note">The existing static stencil package remains available. Promotional video output uses the separate animated Remotion renderer.</div>
       <div class="output">
         <h2>Complete daily drop kit</h2>
-        <p>Build the six coordinated assets shown in your reference sheets. Reference art, placement and packaging each use one image API request; both cards are composed locally with exact schedule text.</p>
+        <p>Build the six coordinated assets shown in your reference sheets. Free prompts are prepared first by default; paid API generation stays available as an explicit fallback. Both cards are composed locally with exact schedule text.</p>
         <div class="field"><label for="packStyle">Package format</label><select id="packStyle"><option>Premium retail hanging pack</option><option>Collector card and foil pouch</option><option>Luxury resealable stencil pouch</option><option>Artist box and supply pouch</option></select></div>
         <div class="tool-grid">
           <button class="btn secondary" id="generateReference" disabled type="button">1 · Generate reference art</button>
@@ -202,6 +215,19 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   const status = $('status');
   const preview = $('preview');
   const assetIntel = $('assetIntel');
+  const freeFallback = $('freeFallback');
+  const fallbackPrompt = $('fallbackPrompt');
+  const fallbackSources = {
+    meta: {label: 'Meta AI', url: 'https://www.meta.ai/'},
+    designer: {label: 'Microsoft Designer', url: 'https://designer.microsoft.com/image-creator'},
+    firefly: {label: 'Adobe Firefly', url: 'https://firefly.adobe.com/generate/images'},
+    canva: {label: 'Canva Text to Image', url: 'https://www.canva.com/ai-image-generator/'},
+    ideogram: {label: 'Ideogram', url: 'https://ideogram.ai/t/explore'},
+    runware: {label: 'Runware API', url: 'https://runware.ai/docs'},
+    openrouter: {label: 'OpenRouter Image API', url: 'https://openrouter.ai/docs/guides/overview/multimodal/image-generation'},
+    leonardo: {label: 'Leonardo.AI API', url: 'https://leonardo.ai/api'},
+    deepai: {label: 'DeepAI Pro API', url: 'https://deep.ai/docs'},
+  };
   const workflow = [...document.querySelectorAll('.workflow span')];
   let image = '';
   let referenceImage = '';
@@ -232,6 +258,52 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   const message = (text, error = false) => {
     status.textContent = text;
     status.classList.toggle('error', error);
+  };
+  const setFallbackPrompt = (prompt, note = 'Free image fallback prompt is ready.') => {
+    const value = String(prompt || '').trim();
+    fallbackPrompt.value = value;
+    freeFallback.classList.toggle('active', value !== '');
+    if (value && note) message(note, false);
+  };
+  const buildMetaStencilPrompt = () => {
+    const payload = generationPayload();
+    return [
+      'Create one original, premium tattoo stencil master suitable for a professional artist.',
+      '',
+      'DESIGN BRIEF',
+      `- Concept: ${payload.idea}`,
+      `- Tattoo style: ${payload.style}`,
+      `- Intended body placement: ${payload.placement}`,
+      `- Composition: ${payload.composition}`,
+      `- Line-weight plan: ${payload.line_weight}`,
+      `- Detail density: ${payload.detail}`,
+      '',
+      'OUTPUT REQUIREMENTS',
+      'Return a single isolated vertical stencil on a pure white background. Crisp black linework only. No skin, body, person, studio scene, paper texture, mockup, frame, border, crop marks, typography, letters, numbers, signature, logo, watermark, color, gray wash, soft shading, drop shadow, glow, or photographic rendering. Keep the entire design inside the canvas with comfortable white margins.',
+    ].join('\n');
+  };
+  const buildMetaAssetPrompt = (assetType) => {
+    const drop = activeDrop();
+    const shared = [
+      `Scheduled design: ${drop.title}`,
+      `Collection: ${drop.collection}`,
+      `Release date: ${drop.release_date}`,
+      `Season sequence: ${drop.sequence} of 55`,
+      `Creative context: ${$('idea').value.trim()}`,
+    ].join('\n');
+    const lead = {
+      reference: `Create a museum-quality, high-detail 2:3 vertical reference artwork for the Beyond Tattoo daily stencil "${drop.title}". Use the uploaded black-and-white stencil as the exact design blueprint. Preserve the central subject, pose, silhouette, major symbols, framing and proportions.`,
+      placement: `Create a premium editorial tattoo placement mockup in a 2:3 vertical frame for the Beyond Tattoo daily stencil "${drop.title}". Use the uploaded black-and-white stencil as the exact tattoo design. Show one consenting adult model in a tasteful, non-sexual, modest crop at this placement: ${$('placement').value}.`,
+      pack: `Create a premium, straight-on 2:3 vertical product-packaging hero for Beyond Tattoo. Use the uploaded black-and-white tattoo stencil as the exact central featured artwork in a large clean white or warm-ivory window. Package format: ${$('packStyle').value}.`,
+    }[assetType] || 'Create a premium Beyond Tattoo image using the uploaded stencil as the exact source artwork.';
+    return [
+      lead,
+      '',
+      shared,
+      '',
+      'CONSTRAINTS',
+      'Preserve the uploaded stencil identity. Do not invent readable words, dates, numbers, logos or watermarks. Keep the subject fully visible with safe margins. Return one finished vertical image.',
+    ].join('\n');
   };
   const setStep = (active) => workflow.forEach((step, index) => {
     step.classList.toggle('active', index === active);
@@ -315,6 +387,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     document.querySelectorAll('.preflight').forEach((checkbox) => { checkbox.checked = false; });
     $('providerMeta').textContent = 'Awaiting generation';
     $('qualityMeta').textContent = 'High quality · PNG';
+    setFallbackPrompt('', '');
     setStep(0);
     selectPreview('stencil');
   };
@@ -357,6 +430,16 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   const downloadDataUrl = async (dataUrl, name) => {
     if (!dataUrl) return;
     download(await (await fetch(dataUrl)).blob(), name);
+  };
+  const readImageFile = async (file) => {
+    if (!file) throw new Error('Choose a PNG, JPG or WebP image.');
+    if (file.size > 15 * 1024 * 1024) throw new Error('Upload an image smaller than 15 MB.');
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(new Error('The selected image could not be read.'));
+      reader.readAsDataURL(file);
+    });
   };
   const loadImage = (source) => new Promise((resolve, reject) => {
     const img = new Image();
@@ -633,6 +716,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     styleCard = '';
     renderToken = data.render_token || '';
     provider = data.provider || '';
+    setFallbackPrompt('', '');
     $('publishBtn').disabled = false;
     $('publishBtn').textContent = 'Publish artist pack';
     $('renderVideo').disabled = !renderToken;
@@ -651,17 +735,18 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     setStep(1);
   };
 
-  $('generate').onclick = async () => {
+  const runPaidStencilGeneration = async () => {
     const idea = $('idea').value.trim();
     if (idea.length < 8) {
       message('Describe the stencil concept in a little more detail.', true);
       return;
     }
     $('generate').disabled = true;
+    $('generatePaidFallback').disabled = true;
     $('publishBtn').disabled = true;
     $('renderVideo').disabled = true;
     setStep(0);
-    message('GPT Image 2 is creating the high-quality transfer master…');
+    message('Paid image API fallback is creating the high-quality transfer master…');
     try {
       const response = await fetch('api/generate-stencil.php', {
         method: 'POST',
@@ -669,43 +754,80 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
         body: JSON.stringify(generationPayload()),
       });
       const data = await response.json();
-      if (!response.ok || !data.ok) throw new Error(data.error || 'Image generation failed.');
+      if (!response.ok || !data.ok) {
+        setFallbackPrompt(data.fallback_prompt || buildMetaStencilPrompt(), 'Image APIs failed. Free image fallback prompt is ready below.');
+        throw new Error(data.error || 'Image generation failed.');
+      }
       await show(data);
       message('Stencil generated. Review the linework, then publish or export its Remotion reel.');
     } catch (error) {
       message(error.message || 'Image generation failed.', true);
     } finally {
       $('generate').disabled = false;
+      $('generatePaidFallback').disabled = false;
     }
   };
+  $('generate').onclick = async () => {
+    const idea = $('idea').value.trim();
+    if (idea.length < 8) {
+      message('Describe the stencil concept in a little more detail.', true);
+      return;
+    }
+    if (!$('preferFreeFallback').checked) {
+      await runPaidStencilGeneration();
+      return;
+    }
+    const source = fallbackSources[$('fallbackProvider').value] || fallbackSources.meta;
+    setFallbackPrompt(buildMetaStencilPrompt(), `${source.label} prompt is ready. Generate there first, then upload the result here.`);
+  };
+  $('generatePaidFallback').onclick = runPaidStencilGeneration;
 
+  const stageUploadedStencil = async (file) => {
+    message(`Staging ${activeDrop().title} for pack, publish and video tools…`);
+    const source = await readImageFile(file);
+    const response = await fetch('api/generate-stencil.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf},
+      body: JSON.stringify({...generationPayload(), stencil_image: source}),
+    });
+    const data = await response.json();
+    if (!response.ok || !data.ok) throw new Error(data.error || 'The uploaded stencil could not be staged.');
+    await show(data);
+    message(`${activeDrop().title} uploaded. Schedule metadata is ready for pack generation, publishing and Remotion.`);
+  };
   $('stencilUpload').onchange = async () => {
     const file = $('stencilUpload').files[0];
     if (!file) return;
-    if (file.size > 15 * 1024 * 1024) {
-      message('Upload a stencil image smaller than 15 MB.', true);
-      $('stencilUpload').value = '';
-      return;
-    }
-    message(`Staging ${activeDrop().title} for pack, publish and video tools…`);
     try {
-      const source = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result || ''));
-        reader.onerror = () => reject(new Error('The selected stencil could not be read.'));
-        reader.readAsDataURL(file);
-      });
-      const response = await fetch('api/generate-stencil.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf},
-        body: JSON.stringify({...generationPayload(), stencil_image: source}),
-      });
-      const data = await response.json();
-      if (!response.ok || !data.ok) throw new Error(data.error || 'The uploaded stencil could not be staged.');
-      await show(data);
-      message(`${activeDrop().title} uploaded. Schedule metadata is ready for pack generation, publishing and Remotion.`);
+      await stageUploadedStencil(file);
     } catch (error) {
       message(error.message || 'The uploaded stencil could not be staged.', true);
+      $('stencilUpload').value = '';
+    }
+  };
+  $('fallbackAssetUpload').onchange = async () => {
+    const file = $('fallbackAssetUpload').files[0];
+    if (!file) return;
+    try {
+      if (previewMode === 'stencil') {
+        await stageUploadedStencil(file);
+      } else {
+        const source = await readImageFile(file);
+        if (previewMode === 'reference') referenceImage = source;
+        if (previewMode === 'placement') placementImage = source;
+        if (previewMode === 'pack') packImage = source;
+        if (previewMode === 'lore') loreCard = source;
+        if (previewMode === 'style') styleCard = source;
+        $('downloadActive').disabled = false;
+        $('providerMeta').textContent = `Free image fallback upload · ${previewLabels[previewMode]}`;
+        $('qualityMeta').textContent = 'source quality · uploaded image';
+        renderPreview();
+        message(`${previewLabels[previewMode][0].toUpperCase()}${previewLabels[previewMode].slice(1)} loaded from free image fallback.`);
+      }
+      $('fallbackAssetUpload').value = '';
+    } catch (error) {
+      message(error.message || 'The fallback image could not be loaded.', true);
+      $('fallbackAssetUpload').value = '';
     }
   };
 
@@ -727,7 +849,10 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       }),
     });
     const data = await response.json();
-    if (!response.ok || !data.ok) throw new Error(data.error || `${previewLabels[assetType]} generation failed.`);
+    if (!response.ok || !data.ok) {
+      setFallbackPrompt(data.fallback_prompt || buildMetaAssetPrompt(assetType), `${previewLabels[assetType][0].toUpperCase()}${previewLabels[assetType].slice(1)} APIs failed. Free image fallback prompt is ready below.`);
+      throw new Error(data.error || `${previewLabels[assetType]} generation failed.`);
+    }
     const result = assetType === 'pack' ? await composePackImage(data.image) : data.image;
     if (assetType === 'reference') referenceImage = result;
     if (assetType === 'placement') placementImage = result;
@@ -739,6 +864,12 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   };
   const runAiAsset = async (assetType, buttonId) => {
     if (!image) return;
+    if ($('preferFreeFallback').checked) {
+      const source = fallbackSources[$('fallbackProvider').value] || fallbackSources.meta;
+      selectPreview(assetType);
+      setFallbackPrompt(buildMetaAssetPrompt(assetType), `${source.label} prompt is ready for ${previewLabels[assetType]}. Generate there, then upload the result for this tab.`);
+      return;
+    }
     const button = $(buttonId);
     button.disabled = true;
     message(`Creating ${previewLabels[assetType]} for ${activeDrop().title}…`);
@@ -769,6 +900,12 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   };
   $('generateFullKit').onclick = async () => {
     if (!image) return;
+    if ($('preferFreeFallback').checked) {
+      const source = fallbackSources[$('fallbackProvider').value] || fallbackSources.meta;
+      selectPreview('reference');
+      setFallbackPrompt(buildMetaAssetPrompt('reference'), `${source.label} reference prompt is ready. Work through reference, placement and pack one tab at a time, then build the cards locally.`);
+      return;
+    }
     const buttons = ['generateReference', 'generatePlacement', 'generatePack', 'buildCards', 'generateFullKit'].map($);
     buttons.forEach((button) => { button.disabled = true; });
     try {
@@ -831,6 +968,24 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       message('Clipboard access was unavailable. Select and copy the stencil lore manually.', true);
     }
   };
+  $('copyFallbackPrompt').onclick = async () => {
+    const source = fallbackSources[$('fallbackProvider').value] || fallbackSources.meta;
+    if (!fallbackPrompt.value.trim()) setFallbackPrompt(buildMetaStencilPrompt(), `${source.label} fallback prompt is ready below.`);
+    try {
+      await navigator.clipboard.writeText(fallbackPrompt.value);
+      message(`${source.label} fallback prompt copied. Generate there, then upload the result above.`);
+    } catch {
+      fallbackPrompt.focus();
+      fallbackPrompt.select();
+      message('Clipboard access was unavailable. The fallback prompt is selected for copying.', true);
+    }
+  };
+  $('openFallbackSource').onclick = () => {
+    if (!fallbackPrompt.value.trim()) setFallbackPrompt(buildMetaStencilPrompt(), '');
+    const source = fallbackSources[$('fallbackProvider').value] || fallbackSources.meta;
+    window.open(source.url, '_blank', 'noopener,noreferrer');
+    message(`${source.label} opened. Paste the fallback prompt, save the image, then upload it here.`);
+  };
 
   $('clear').onclick = () => {
     clearAssets();
@@ -867,7 +1022,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
           pack_png: packImage,
           lore_card_png: loreCard,
           style_card_png: styleCard,
-          seed: `${provider || 'openai'}-gpt-image-2`,
+          seed: provider ? `${provider}-image` : 'free-fallback-upload',
         }),
       });
       const data = await response.json();
@@ -890,7 +1045,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     let audioUrl = '';
     try {
       if ($('includeNarration').checked) {
-        message('Generating OpenAI narration for the tattoo reel…');
+        message('Generating paid server narration for the tattoo reel…');
         const response = await fetch('api/render-tattoo-remotion.php', {
           method: 'POST',
           headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf},

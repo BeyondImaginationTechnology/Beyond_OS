@@ -11,10 +11,13 @@ final class AppModel: ObservableObject {
     @Published private(set) var errorMessage: String?
     @Published private(set) var currentSource: StreamSource?
     @Published private(set) var webPlaybackURL: URL?
+    @Published private(set) var guideItems: [GuideItem] = []
+    @Published private(set) var isGuideLoading = false
 
     let player = AVPlayer()
     private let api: BeyondTVAPI
     private var refreshTask: Task<Void, Never>?
+    private var guideTask: Task<Void, Never>?
 
     init(api: BeyondTVAPI = .production) {
         self.api = api
@@ -24,6 +27,7 @@ final class AppModel: ObservableObject {
 
     deinit {
         refreshTask?.cancel()
+        guideTask?.cancel()
     }
 
     func start() async {
@@ -34,6 +38,7 @@ final class AppModel: ObservableObject {
             if let initial {
                 await tune(to: initial)
             }
+            await refreshGuide()
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -78,6 +83,16 @@ final class AppModel: ObservableObject {
                 label: response.state?.label ?? "LIVE · VANCOUVER",
                 sourceKey: response.state?.sourceKey ?? ""
             )
+            updateGuideItem(
+                GuideItem(
+                    channel: channel,
+                    status: status,
+                    currentIcon: response.state?.current?.icon,
+                    currentLineup: response.state?.current?.lineup,
+                    nextLineup: response.state?.next?.lineup,
+                    loadedAt: Date()
+                )
+            )
 
             guard let source = nativeSources.first ?? fallbackNativeSource else {
                 player.pause()
@@ -121,6 +136,38 @@ final class AppModel: ObservableObject {
         isLoading = false
     }
 
+    func refreshGuide() async {
+        guard !channels.isEmpty else { return }
+        guideTask?.cancel()
+        isGuideLoading = true
+
+        let channelList = channels
+        let api = api
+        guideTask = Task {
+            let loadedItems = await withTaskGroup(of: GuideItem?.self) { group in
+                for channel in channelList {
+                    group.addTask {
+                        try? await api.guideItem(for: channel)
+                    }
+                }
+
+                var items: [GuideItem] = []
+                for await item in group {
+                    if let item { items.append(item) }
+                }
+                return items.sorted { $0.channel.number < $1.channel.number }
+            }
+
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                self.guideItems = loadedItems
+                self.isGuideLoading = false
+            }
+        }
+
+        await guideTask?.value
+    }
+
     func retry() async {
         guard let selectedChannel else {
             await start()
@@ -142,6 +189,15 @@ final class AppModel: ObservableObject {
             try? await Task.sleep(for: .seconds(300))
             guard !Task.isCancelled, let self, self.selectedChannel == channel else { return }
             await self.tune(to: channel)
+        }
+    }
+
+    private func updateGuideItem(_ item: GuideItem) {
+        if let index = guideItems.firstIndex(where: { $0.channel == item.channel }) {
+            guideItems[index] = item
+        } else {
+            guideItems.append(item)
+            guideItems.sort { $0.channel.number < $1.channel.number }
         }
     }
 }

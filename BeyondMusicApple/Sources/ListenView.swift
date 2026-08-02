@@ -6,10 +6,10 @@ struct ListenView: View {
     var body: some View {
         MusicScreen(title: "Listen") {
             MusicPanel {
-                MusicEyebrow(text: "Now playing")
-                Text(store.currentTrack.title)
+                MusicEyebrow(text: store.currentTrack == nil ? "Ready" : "Now playing")
+                Text(store.currentTrack?.title ?? "Import your first song")
                     .font(.system(size: 34, weight: .black))
-                Text(store.currentTrack.artist)
+                Text(store.currentTrack?.displayArtist ?? "Use Library to add MP3, M4A, WAV, or AAC files.")
                     .foregroundStyle(.secondary)
                 HStack {
                     Button {
@@ -20,58 +20,28 @@ struct ListenView: View {
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
+                    .disabled(store.currentTrack == nil)
 
-                    Button {
-                        Task { await store.download(store.currentTrack) }
-                    } label: {
-                        Image(systemName: "arrow.down.circle.fill")
-                            .font(.title2)
-                            .frame(width: 48, height: 48)
+                    if let track = store.currentTrack {
+                        Button {
+                            Task { await store.download(track) }
+                        } label: {
+                            Image(systemName: "arrow.down.circle.fill")
+                                .font(.title2)
+                                .frame(width: 48, height: 48)
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(track.downloadURL == nil || store.isAvailableOffline(track))
+                        .accessibilityLabel("Download current track")
                     }
-                    .buttonStyle(.bordered)
-                    .disabled(store.currentTrack.downloadURL == nil || store.isAvailableOffline(store.currentTrack))
-                    .accessibilityLabel("Download current track")
                 }
             }
 
             VStack(alignment: .leading, spacing: 12) {
-                MusicEyebrow(text: "Stations")
-                ForEach(store.stations) { station in
-                    StationRow(station: station)
-                }
-            }
-
-            VStack(alignment: .leading, spacing: 12) {
-                MusicEyebrow(text: "Playlists")
+                MusicEyebrow(text: "Local playlists")
                 ForEach(store.playlists) { playlist in
                     PlaylistRow(playlist: playlist)
                 }
-            }
-        }
-    }
-}
-
-private struct StationRow: View {
-    let station: MusicStation
-
-    var body: some View {
-        MusicPanel {
-            HStack(spacing: 12) {
-                Image(systemName: station.mood.systemImage)
-                    .font(.title2)
-                    .foregroundStyle(Color.musicAqua)
-                    .frame(width: 40)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(station.name)
-                        .font(.headline)
-                    Text(station.tagline)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-                Text(station.listenerCount.compactCountText)
-                    .font(.caption.bold())
-                    .foregroundStyle(Color.musicGold)
             }
         }
     }
@@ -83,10 +53,19 @@ private struct PlaylistRow: View {
 
     var body: some View {
         NavigationLink {
-            TrackListView(title: playlist.title, tracks: store.tracks(for: playlist))
+            TrackListView(
+                title: playlist.title,
+                tracks: store.tracks(for: playlist),
+                emptyTitle: "Nothing here yet",
+                emptyMessage: "Imported and downloaded files will appear here automatically."
+            )
         } label: {
             MusicPanel {
-                HStack {
+                HStack(spacing: 12) {
+                    Image(systemName: playlist.systemImage)
+                        .font(.title2)
+                        .foregroundStyle(Color.musicAqua)
+                        .frame(width: 40)
                     VStack(alignment: .leading, spacing: 4) {
                         Text(playlist.title)
                             .font(.headline)

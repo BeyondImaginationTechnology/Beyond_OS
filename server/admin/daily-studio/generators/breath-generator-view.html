@@ -70,7 +70,7 @@
     <section class="group">
       <label>Narration</label>
       <div class="checks">
-        <label class="check"><input id="includeNarration" type="checkbox" checked> Include audio</label>
+        <label class="check"><input id="includeNarration" type="checkbox"> Include server audio</label>
         <label class="check"><input id="showBadge" type="checkbox" checked> Show playing badge</label>
         <label class="check"><input id="showFooter" type="checkbox" checked> Show footer</label>
         <label class="check"><input id="showFrame" type="checkbox" checked> Frame verse</label>
@@ -301,7 +301,7 @@
   function startNarrationPulse(){narrationPlaying=true;if(previewAnimation)cancelAnimationFrame(previewAnimation);const started=performance.now(),tick=now=>{if(!narrationPlaying)return;draw((Math.sin((now-started)/420)+1)/2);previewAnimation=requestAnimationFrame(tick)};previewAnimation=requestAnimationFrame(tick)}
   function stopNarrationPulse(){narrationPlaying=false;if(previewAnimation)cancelAnimationFrame(previewAnimation);previewAnimation=null;draw()}
   function stopNarration(){if(activeAudio){activeAudio.pause();URL.revokeObjectURL(activeAudio.src);activeAudio=null}window.speechSynthesis?.cancel();stopNarrationPulse()}
-  async function previewNarration(){stopNarration();status('Preparing narration…');try{const blob=await narrationBlob();const url=URL.createObjectURL(blob);activeAudio=new Audio(url);activeAudio.onended=()=>{URL.revokeObjectURL(url);activeAudio=null;stopNarrationPulse();status('Narration finished.')};startNarrationPulse();await activeAudio.play();status('Narration playing.')}catch(error){stopNarrationPulse();if('speechSynthesis'in window){const u=new SpeechSynthesisUtterance(narrationText());u.lang=narrationLocale();const selected=availableVoices.find(v=>v.voiceURI===$('browserVoice').value);if(selected)u.voice=selected;u.onstart=startNarrationPulse;u.onend=()=>{stopNarrationPulse();status('Local browser voice preview finished.')};window.speechSynthesis.speak(u);status('Using the local browser voice for preview.')}else status(error.message,true)}}
+  async function previewNarration(){stopNarration();if(!$('includeNarration').checked&&'speechSynthesis'in window){const u=new SpeechSynthesisUtterance(narrationText());u.lang=narrationLocale();const selected=availableVoices.find(v=>v.voiceURI===$('browserVoice').value);if(selected)u.voice=selected;u.onstart=startNarrationPulse;u.onend=()=>{stopNarrationPulse();status('Local browser voice preview finished.')};window.speechSynthesis.speak(u);status('Using the local browser voice for preview. Enable server audio to spend narration credits.');return}status('Preparing server narration…');try{const blob=await narrationBlob();const url=URL.createObjectURL(blob);activeAudio=new Audio(url);activeAudio.onended=()=>{URL.revokeObjectURL(url);activeAudio=null;stopNarrationPulse();status('Narration finished.')};startNarrationPulse();await activeAudio.play();status('Server narration playing.')}catch(error){stopNarrationPulse();if('speechSynthesis'in window){const u=new SpeechSynthesisUtterance(narrationText());u.lang=narrationLocale();const selected=availableVoices.find(v=>v.voiceURI===$('browserVoice').value);if(selected)u.voice=selected;u.onstart=startNarrationPulse;u.onend=()=>{stopNarrationPulse();status('Local browser voice preview finished.')};window.speechSynthesis.speak(u);status('Using the local browser voice for preview.')}else status(error.message,true)}}
   function downloadBlob(blob,name){const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(link.href),1500)}
   function downloadPng(){draw();canvas.toBlob(blob=>blob&&downloadBlob(blob,safeName()+'.png'),'image/png')}
   function recorderType(){const types=['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus'];return types.find(t=>MediaRecorder.isTypeSupported(t))||''}
@@ -319,6 +319,7 @@
   }
   async function exportAllLanguagesVideo(){
     if(!window.MediaRecorder||!canvas.captureStream){status('Batch video export is not supported by this browser.',true);return}
+    if(!confirm('Export all narrated languages will call server narration 5 times. Continue?'))return;
     const button=$('exportAllVideo'),originalVerseLanguage=verseLanguage(),originalNarration=narrationLocale(),originalFields={};['heading','verse','reference','translation','footer','locale','publishDate'].forEach(id=>{originalFields[id]=$(id).value});button.disabled=true;stopNarration();
     const languages=[['en','en-US','English'],['fr','fr-FR','French'],['es','es-ES','Spanish'],['jm','en-JM','Patois'],['ht','ht-HT','Kreyòl']];
     const originalVerseId=currentVerseId||canonicalIdFromReference(value('reference'));let audioContext=null,running=true,recorder=null;

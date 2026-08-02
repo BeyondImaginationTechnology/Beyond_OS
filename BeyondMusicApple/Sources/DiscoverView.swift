@@ -57,28 +57,12 @@ struct DiscoverView: View {
                 }
             }
 
-            TrackListView(title: "Results", tracks: store.searchResults)
-
-            VStack(alignment: .leading, spacing: 12) {
-                MusicEyebrow(text: "Artists")
-                ForEach(store.artists) { artist in
-                    MusicPanel {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(artist.name)
-                                    .font(.headline)
-                                Text(artist.note)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            Text(artist.monthlyListeners.compactCountText)
-                                .font(.caption.bold())
-                                .foregroundStyle(Color.musicGold)
-                        }
-                    }
-                }
-            }
+            TrackListView(
+                title: "Results",
+                tracks: store.searchResults,
+                emptyTitle: "No search results loaded",
+                emptyMessage: "Search a song, artist, or genre. Downloaded results are saved into your local library."
+            )
         }
     }
 }

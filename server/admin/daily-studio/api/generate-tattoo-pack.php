@@ -132,6 +132,74 @@ PROMPT;
     $googleKey = trim((string)beyond_ai_config('google_image_key', ''));
     $errors = [];
 
+    if ($googleKey !== '' && !str_contains($googleKey, 'YOUR_')) {
+        $model = trim((string)beyond_ai_config('google_image_model', 'gemini-3.1-flash-image')) ?: 'gemini-3.1-flash-image';
+        if (!preg_match('/^[a-zA-Z0-9._-]+$/', $model)) throw new RuntimeException('The configured Google image model is invalid.');
+        $body = json_encode([
+            'contents' => [[
+                'parts' => [
+                    ['text' => $prompt],
+                    ['inlineData' => ['mimeType' => $stencilMime, 'data' => base64_encode($stencilBytes)]],
+                ],
+            ]],
+            'generationConfig' => [
+                'responseModalities' => ['IMAGE'],
+                'responseFormat' => ['image' => ['aspectRatio' => '2:3', 'imageSize' => '1K']],
+            ],
+        ], JSON_THROW_ON_ERROR);
+        $curl = curl_init('https://generativelanguage.googleapis.com/v1/models/' . rawurlencode($model) . ':generateContent');
+        curl_setopt_array($curl, [
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 15,
+            CURLOPT_TIMEOUT => 180,
+            CURLOPT_HTTPHEADER => ['x-goog-api-key: ' . $googleKey, 'Content-Type: application/json'],
+            CURLOPT_POSTFIELDS => $body,
+        ]);
+        $raw = curl_exec($curl);
+        $curlError = curl_error($curl);
+        $status = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        $response = is_string($raw) ? json_decode($raw, true) : null;
+        $image = '';
+        $mime = 'image/png';
+        foreach ((array)($response['candidates'][0]['content']['parts'] ?? []) as $part) {
+            if (!empty($part['inlineData']['data'])) {
+                $image = (string)$part['inlineData']['data'];
+                $mime = (string)($part['inlineData']['mimeType'] ?? 'image/png');
+                break;
+            }
+        }
+        if ($status >= 200 && $status < 300 && $image !== '' && ($bytes = base64_decode($image, true)) !== false) {
+            if ($mime !== 'image/png' && function_exists('imagecreatefromstring')) {
+                $canvas = @imagecreatefromstring($bytes);
+                if ($canvas !== false) {
+                    ob_start();
+                    imagepng($canvas, null, 9);
+                    $png = ob_get_clean();
+                    imagedestroy($canvas);
+                    if (is_string($png) && $png !== '') {
+                        $image = base64_encode($png);
+                        $mime = 'image/png';
+                    }
+                }
+            }
+            if ($mime !== 'image/png') throw new RuntimeException('Google returned a pack image, but PHP GD is required to convert it to PNG.');
+            tattooPackJson([
+                'ok' => true,
+                'asset_type' => $assetType,
+                'image' => 'data:image/png;base64,' . $image,
+                'provider' => 'google',
+                'model' => $model,
+                'quality' => 'high',
+                'size' => '2:3 · 1K',
+            ]);
+        }
+        $errors[] = is_array($response)
+            ? (string)($response['error']['message'] ?? 'Google tattoo asset generation failed.')
+            : ($curlError ?: 'Google tattoo asset generation failed.');
+    }
+
     if ($openAiKey !== '' && !str_contains($openAiKey, 'YOUR_')) {
         $temporary = tempnam(sys_get_temp_dir(), 'bt-asset-reference-');
         if (!is_string($temporary) || file_put_contents($temporary, $stencilBytes, LOCK_EX) === false) {
@@ -182,76 +250,20 @@ PROMPT;
         }
     }
 
-    if ($googleKey !== '' && !str_contains($googleKey, 'YOUR_')) {
-        $model = trim((string)beyond_ai_config('google_image_model', 'gemini-3.1-flash-image')) ?: 'gemini-3.1-flash-image';
-        if (!preg_match('/^[a-zA-Z0-9._-]+$/', $model)) throw new RuntimeException('The configured Google image model is invalid.');
-        $body = json_encode([
-            'contents' => [[
-                'parts' => [
-                    ['text' => $prompt],
-                    ['inlineData' => ['mimeType' => $stencilMime, 'data' => base64_encode($stencilBytes)]],
-                ],
-            ]],
-            'generationConfig' => [
-                'responseModalities' => ['TEXT', 'IMAGE'],
-                'imageConfig' => ['aspectRatio' => '2:3'],
-            ],
-        ], JSON_THROW_ON_ERROR);
-        $curl = curl_init('https://generativelanguage.googleapis.com/v1beta/models/' . rawurlencode($model) . ':generateContent');
-        curl_setopt_array($curl, [
-            CURLOPT_POST => true,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => 15,
-            CURLOPT_TIMEOUT => 180,
-            CURLOPT_HTTPHEADER => ['x-goog-api-key: ' . $googleKey, 'Content-Type: application/json'],
-            CURLOPT_POSTFIELDS => $body,
-        ]);
-        $raw = curl_exec($curl);
-        $curlError = curl_error($curl);
-        $status = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        curl_close($curl);
-        $response = is_string($raw) ? json_decode($raw, true) : null;
-        $image = '';
-        $mime = 'image/png';
-        foreach ((array)($response['candidates'][0]['content']['parts'] ?? []) as $part) {
-            if (!empty($part['inlineData']['data'])) {
-                $image = (string)$part['inlineData']['data'];
-                $mime = (string)($part['inlineData']['mimeType'] ?? 'image/png');
-                break;
-            }
-        }
-        if ($status >= 200 && $status < 300 && $image !== '' && ($bytes = base64_decode($image, true)) !== false) {
-            if ($mime !== 'image/png' && function_exists('imagecreatefromstring')) {
-                $canvas = @imagecreatefromstring($bytes);
-                if ($canvas !== false) {
-                    ob_start();
-                    imagepng($canvas, null, 9);
-                    $png = ob_get_clean();
-                    imagedestroy($canvas);
-                    if (is_string($png) && $png !== '') {
-                        $image = base64_encode($png);
-                        $mime = 'image/png';
-                    }
-                }
-            }
-            if ($mime !== 'image/png') throw new RuntimeException('Google returned a pack image, but PHP GD is required to convert it to PNG.');
-            tattooPackJson([
-                'ok' => true,
-                'asset_type' => $assetType,
-                'image' => 'data:image/png;base64,' . $image,
-                'provider' => 'google',
-                'model' => $model,
-                'quality' => 'high',
-                'size' => '1024x1536',
-            ]);
-        }
-        $errors[] = is_array($response)
-            ? (string)($response['error']['message'] ?? 'Google tattoo asset generation failed.')
-            : ($curlError ?: 'Google tattoo asset generation failed.');
+    if (!$errors) {
+        tattooPackJson([
+            'ok' => false,
+            'error' => 'Add an OpenAI or Google image API key in protected Site Settings, or use a free image fallback prompt.',
+            'fallback_provider' => 'free-image-tools',
+            'fallback_prompt' => $prompt,
+        ], 400);
     }
-
-    if (!$errors) throw new RuntimeException('Add an OpenAI or Google image API key in protected Site Settings.');
-    throw new RuntimeException('Image providers failed: ' . implode(' | ', $errors));
+    tattooPackJson([
+        'ok' => false,
+        'error' => 'Image providers failed: ' . implode(' | ', $errors) . ' You can use the free image fallback prompt below, then upload the result.',
+        'fallback_provider' => 'free-image-tools',
+        'fallback_prompt' => $prompt,
+    ], 400);
 } catch (Throwable $error) {
     error_log('Tattoo asset generation failed: ' . $error->getMessage());
     tattooPackJson(['ok' => false, 'error' => $error->getMessage()], 400);

@@ -1,19 +1,39 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct LibraryView: View {
     @EnvironmentObject private var store: MusicStore
+    @State private var showingImporter = false
 
     var body: some View {
         MusicScreen(title: "Library") {
             MusicPanel {
-                MusicEyebrow(text: "Personal library")
-                Text("\(store.allTracks.count) tracks")
-                    .font(.largeTitle.bold())
-                Text("\(store.downloadedTracks.count) downloaded · \(store.totalLibraryMinutes) minutes indexed")
-                    .foregroundStyle(.secondary)
+                HStack(alignment: .top, spacing: 14) {
+                    Image(systemName: "music.note.house.fill")
+                        .font(.title)
+                        .foregroundStyle(Color.musicAqua)
+                    VStack(alignment: .leading, spacing: 8) {
+                        MusicEyebrow(text: "On this device")
+                        Text("\(store.tracks.count) songs")
+                            .font(.largeTitle.bold())
+                        Text("\(store.downloadedTracks.count) local files · \(store.totalLibraryMinutes) minutes indexed")
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                }
+
+                Button {
+                    showingImporter = true
+                } label: {
+                    Label("Import MP3 or audio files", systemImage: "square.and.arrow.down.fill")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(store.isImporting)
             }
 
-            TextField("Search tracks, artists, albums", text: $store.searchText)
+            TextField("Search songs, artists, albums, filenames", text: $store.searchText)
                 .textFieldStyle(.roundedBorder)
                 .textInputAutocapitalization(.never)
 
@@ -26,7 +46,21 @@ struct LibraryView: View {
                 }
             }
 
-            TrackListView(title: "Tracks", tracks: store.filteredTracks)
+            TrackListView(
+                title: "Local Songs",
+                tracks: store.filteredTracks,
+                emptyTitle: "No local songs yet",
+                emptyMessage: "Import MP3, M4A, WAV, or AAC files from Files, or download authorized search results."
+            )
+        }
+        .fileImporter(
+            isPresented: $showingImporter,
+            allowedContentTypes: [.mp3, .mpeg4Audio, .wav, .audio],
+            allowsMultipleSelection: true
+        ) { result in
+            if case .success(let urls) = result {
+                Task { await store.importAudioFiles(from: urls) }
+            }
         }
     }
 }
@@ -54,15 +88,17 @@ private struct MoodButton: View {
 struct TrackListView: View {
     let title: String
     let tracks: [MusicTrack]
+    var emptyTitle = "No tracks yet"
+    var emptyMessage = "Search open music to find playable tracks."
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             MusicEyebrow(text: title)
             if tracks.isEmpty {
                 MusicPanel {
-                    Text("No tracks yet")
+                    Text(emptyTitle)
                         .font(.headline)
-                    Text("Search open music to add playable tracks.")
+                    Text(emptyMessage)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -85,7 +121,7 @@ struct TrackRow: View {
                 Button {
                     store.play(track)
                 } label: {
-                    Image(systemName: store.currentTrack.id == track.id && store.isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                    Image(systemName: store.currentTrack?.id == track.id && store.isPlaying ? "pause.circle.fill" : "play.circle.fill")
                         .font(.title)
                         .foregroundStyle(Color.musicAqua)
                 }
@@ -95,10 +131,12 @@ struct TrackRow: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(track.title)
                         .font(.headline)
-                    Text("\(track.artist) · \(track.album)")
+                        .lineLimit(1)
+                    Text("\(track.displayArtist) · \(track.displayAlbum)")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("\(track.providerName) · \(track.licenseNote)")
+                        .lineLimit(1)
+                    Text(track.provenanceText)
                         .font(.caption2)
                         .foregroundStyle(Color.musicGold)
                         .lineLimit(1)

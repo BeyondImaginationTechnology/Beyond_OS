@@ -104,11 +104,11 @@ struct ScreenshotSpec {
 }
 
 let screenshotSpecs = [
-    ScreenshotSpec(slug: "search-open-music", title: "Search open music", subtitle: "Find tracks across public and creator-friendly catalogs.", tab: "Discover", lines: ["Internet Archive 8", "Wikimedia Commons 5", "Jamendo ready", "Freesound ready"], accent: NSColor(calibratedRed: 0.27, green: 0.93, blue: 0.86, alpha: 1)),
-    ScreenshotSpec(slug: "play-screen-off", title: "Play with screen off", subtitle: "Background audio mode keeps your queue moving.", tab: "Listen", lines: ["Now playing", "Midnight Frequency", "Beyond Studio", "Audio session: playback"], accent: NSColor(calibratedRed: 0.93, green: 0.31, blue: 0.61, alpha: 1)),
-    ScreenshotSpec(slug: "download-offline", title: "Download for offline", subtitle: "Save authorized audio into your personal library.", tab: "Library", lines: ["2 downloaded", "Local storage", "License visible", "Tap to play anytime"], accent: NSColor(calibratedRed: 0.98, green: 0.78, blue: 0.30, alpha: 1)),
-    ScreenshotSpec(slug: "random-discovery", title: "Pages of discovery", subtitle: "Next page and random audio keep results fresh.", tab: "Discover", lines: ["Next page", "Random audio", "Fresh public-domain searches", "Dedupe built in"], accent: NSColor(calibratedRed: 0.42, green: 0.72, blue: 1.0, alpha: 1)),
-    ScreenshotSpec(slug: "personal-service", title: "Your music service", subtitle: "Search, play, download, and review source licenses.", tab: "Profile", lines: ["Background audio enabled", "Offline tracks", "Authorized/open policy", "Personal library"], accent: NSColor(calibratedRed: 0.72, green: 0.52, blue: 1.0, alpha: 1))
+    ScreenshotSpec(slug: "search-open-music", title: "Search open music", subtitle: "Find tracks across public and creator-friendly catalogs.", tab: "Discover", lines: ["Authorized results", "Provider shown", "License note visible", "Download after review"], accent: NSColor(calibratedRed: 0.27, green: 0.93, blue: 0.86, alpha: 1)),
+    ScreenshotSpec(slug: "play-screen-off", title: "Play with screen off", subtitle: "Background audio mode keeps your queue moving.", tab: "Listen", lines: ["Now playing", "Local or streamed audio", "Lock-screen friendly", "Audio session: playback"], accent: NSColor(calibratedRed: 0.93, green: 0.31, blue: 0.61, alpha: 1)),
+    ScreenshotSpec(slug: "download-offline", title: "Download for offline", subtitle: "Save authorized audio into your personal library.", tab: "Library", lines: ["Local files", "Stored on device", "Metadata from audio", "Tap to play anytime"], accent: NSColor(calibratedRed: 0.98, green: 0.78, blue: 0.30, alpha: 1)),
+    ScreenshotSpec(slug: "random-discovery", title: "Pages of discovery", subtitle: "Next page and random audio keep results fresh.", tab: "Discover", lines: ["Next page", "Random audio", "Open catalog search", "Dedupe built in"], accent: NSColor(calibratedRed: 0.42, green: 0.72, blue: 1.0, alpha: 1)),
+    ScreenshotSpec(slug: "personal-service", title: "Your music service", subtitle: "Search, play, download, import, and review source licenses.", tab: "Profile", lines: ["Background audio enabled", "Imported files", "Authorized/open policy", "Private library"], accent: NSColor(calibratedRed: 0.72, green: 0.52, blue: 1.0, alpha: 1))
 ]
 
 func drawText(_ text: String, in rect: NSRect, size: CGFloat, weight: NSFont.Weight, color: NSColor, alignment: NSTextAlignment = .left) {
@@ -201,7 +201,7 @@ func makeScreenshot(width: Int, height: Int, spec: ScreenshotSpec) -> NSImage {
     let mini = NSRect(x: screenX, y: screenY + 28, width: screenW, height: 96)
     drawRoundedRect(mini, radius: 18, color: NSColor(calibratedRed: 0.05, green: 0.06, blue: 0.08, alpha: 0.96))
     drawText("Now playing", in: NSRect(x: mini.minX + 28, y: mini.minY + 51, width: mini.width - 140, height: 24), size: 18, weight: .bold, color: spec.accent)
-    drawText("Authorized audio", in: NSRect(x: mini.minX + 28, y: mini.minY + 22, width: mini.width - 140, height: 24), size: 21, weight: .semibold, color: .white)
+    drawText("Local library ready", in: NSRect(x: mini.minX + 28, y: mini.minY + 22, width: mini.width - 140, height: 24), size: 21, weight: .semibold, color: .white)
     drawRoundedRect(NSRect(x: mini.maxX - 72, y: mini.minY + 24, width: 48, height: 48), radius: 24, color: spec.accent)
 
     image.unlockFocus()

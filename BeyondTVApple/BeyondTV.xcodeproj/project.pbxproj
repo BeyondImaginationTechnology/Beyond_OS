@@ -13,8 +13,12 @@
 		06243E4E9438DB10ADDB303E /* ChannelButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F1A275EA2E3B188D0D3838 /* ChannelButton.swift */; };
 		147BB0EF1BBC206A641C1E44 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B35747769C659CFBAC312E0 /* RootView.swift */; };
 		166BAF9409DFEBF37F3ABCD5 /* WebPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65162F4835AD0A014CD6CED0 /* WebPlayerView.swift */; };
+		17BTVSTYLE000000000000001 /* BeyondTVStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17BTVSTYLE000000000000000 /* BeyondTVStyle.swift */; };
+		17BTVSTYLE000000000000002 /* BeyondTVStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17BTVSTYLE000000000000000 /* BeyondTVStyle.swift */; };
 		1DCA5D3CBCCB0ECBC19FFBC2 /* Channel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8C7F48CE821B9515CA70FB /* Channel.swift */; };
 		29B307E3E00859FE06085733 /* Schedule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9683DF9600C6693B7BF9F9 /* Schedule.swift */; };
+		2BROWSE00000000000000001 /* BrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BROWSE00000000000000000 /* BrowseView.swift */; };
+		2BROWSE00000000000000002 /* BrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BROWSE00000000000000000 /* BrowseView.swift */; };
 		2C783C046567D72BF9D7E6BB /* WatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C75CF20734E2A37D7B9D6DC0 /* WatchView.swift */; };
 		3099DD0EE6F59A27D45DCACF /* BeyondTVApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5795699BBE66CE593A0F1C2E /* BeyondTVApp.swift */; };
 		358A996E03315E09FCBD0E54 /* ChannelGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC318009189631630E98B082 /* ChannelGuideView.swift */; };
@@ -52,7 +56,9 @@
 		0124BEEF0124BEEF0124BEE3 /* Info-iOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-iOS.plist"; sourceTree = "<group>"; };
 		0124BEEF0124BEEF0124BEE4 /* Info-tvOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-tvOS.plist"; sourceTree = "<group>"; };
 		10BEF522FAE4A627E161D802 /* BeyondTVTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BeyondTVTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		17BTVSTYLE000000000000000 /* BeyondTVStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeyondTVStyle.swift; sourceTree = "<group>"; };
 		1B552F01704CB870F4755F52 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		2BROWSE00000000000000000 /* BrowseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseView.swift; sourceTree = "<group>"; };
 		4925ADCCA61CAE1EFD56142E /* Platform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Platform.swift; sourceTree = "<group>"; };
 		5795699BBE66CE593A0F1C2E /* BeyondTVApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeyondTVApp.swift; sourceTree = "<group>"; };
 		65162F4835AD0A014CD6CED0 /* WebPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebPlayerView.swift; sourceTree = "<group>"; };
@@ -149,6 +155,8 @@
 			isa = PBXGroup;
 			children = (
 				79A02F3A217244CB3D24C543 /* AboutView.swift */,
+				2BROWSE00000000000000000 /* BrowseView.swift */,
+				17BTVSTYLE000000000000000 /* BeyondTVStyle.swift */,
 				81F1A275EA2E3B188D0D3838 /* ChannelButton.swift */,
 				AC318009189631630E98B082 /* ChannelGuideView.swift */,
 				0B35747769C659CFBAC312E0 /* RootView.swift */,
@@ -300,7 +308,9 @@
 				90F5A31A760C2A7BD42D282D /* AboutView.swift in Sources */,
 				A5EA68E9229250A773567F6A /* AppModel.swift in Sources */,
 				A7036391AAD510E276BB0F5A /* BeyondTVAPI.swift in Sources */,
+				17BTVSTYLE000000000000001 /* BeyondTVStyle.swift in Sources */,
 				EEA71507756EC5AE652B1BA4 /* BeyondTVApp.swift in Sources */,
+				2BROWSE00000000000000001 /* BrowseView.swift in Sources */,
 				002D862412DC99BF5FF899B4 /* Channel.swift in Sources */,
 				8C01069072731B2EE4B2B815 /* ChannelButton.swift in Sources */,
 				358A996E03315E09FCBD0E54 /* ChannelGuideView.swift in Sources */,
@@ -319,7 +329,9 @@
 				92C5B0A332E2FA13D8EB7C2F /* AboutView.swift in Sources */,
 				9C8F80BC1AC5F597FE7788DE /* AppModel.swift in Sources */,
 				BAAA36B2E6091A46E6FF35D3 /* BeyondTVAPI.swift in Sources */,
+				17BTVSTYLE000000000000002 /* BeyondTVStyle.swift in Sources */,
 				3099DD0EE6F59A27D45DCACF /* BeyondTVApp.swift in Sources */,
+				2BROWSE00000000000000002 /* BrowseView.swift in Sources */,
 				1DCA5D3CBCCB0ECBC19FFBC2 /* Channel.swift in Sources */,
 				06243E4E9438DB10ADDB303E /* ChannelButton.swift in Sources */,
 				82F533812AE4D530BBBE3C39 /* ChannelGuideView.swift in Sources */,

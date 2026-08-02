@@ -9,13 +9,14 @@ struct ProfileView: View {
                 MusicEyebrow(text: "Plan")
                 Text("Personal Music Service")
                     .font(.largeTitle.bold())
-                Text("Search, play, download, and keep audio going with the screen off.")
+                Text("Import your own audio files, download authorized tracks, and keep playback running with the screen off.")
                     .foregroundStyle(.secondary)
             }
 
             MusicPanel {
                 SettingRow(icon: "speaker.wave.2.fill", title: "Background audio", value: "Enabled")
-                SettingRow(icon: "arrow.down.circle.fill", title: "Offline tracks", value: "\(store.downloadedTracks.count)")
+                SettingRow(icon: "music.note.list", title: "Library songs", value: "\(store.tracks.count)")
+                SettingRow(icon: "arrow.down.circle.fill", title: "Local files", value: "\(store.downloadedTracks.count)")
                 SettingRow(icon: "lock.shield.fill", title: "Source policy", value: "Authorized/open")
             }
         }

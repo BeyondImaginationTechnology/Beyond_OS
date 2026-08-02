@@ -32,11 +32,9 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.beyondhealthmobile
         PRODUCT_NAME: BeyondHealthMobile
         PRODUCT_MODULE_NAME: BeyondHealthMobile
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Resources/Info.plist
         PROVISIONING_PROFILE_SPECIFIER: ""
-        INFOPLIST_KEY_CFBundleDisplayName: Beyond Health Mobile
-        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.healthcare-fitness
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
-        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
         TARGETED_DEVICE_FAMILY: "1,2"
     scheme:
       testTargets:

@@ -42,6 +42,27 @@ struct BeyondTVAPI: Sendable {
         return try decoder.decode(ScheduleResponse.self, from: data)
     }
 
+    func guideItem(for channel: Channel) async throws -> GuideItem {
+        let response = try await schedule(for: channel)
+        let current = response.state?.current
+        let next = response.state?.next
+        let nativeSources = response.sources.filter(\.isNativelyPlayable)
+        let status = ChannelStatus(
+            now: current?.title ?? nativeSources.first?.title ?? "Live now",
+            next: next?.title ?? "More on Beyond TV",
+            label: response.state?.label ?? "LIVE · VANCOUVER",
+            sourceKey: response.state?.sourceKey ?? ""
+        )
+        return GuideItem(
+            channel: channel,
+            status: status,
+            currentIcon: current?.icon,
+            currentLineup: current?.lineup,
+            nextLineup: next?.lineup,
+            loadedAt: Date()
+        )
+    }
+
     private func data(from url: URL) async throws -> Data {
         var request = URLRequest(url: url)
         request.timeoutInterval = 15

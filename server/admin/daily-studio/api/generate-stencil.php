@@ -97,6 +97,33 @@ PROMPT;
     $openAiKey = trim((string)beyond_ai_config('api_key', ''));
     $googleKey = trim((string)beyond_ai_config('google_image_key', ''));
     $errors = [];
+    if ($googleKey !== '' && !str_contains($googleKey, 'YOUR_')) {
+        $model = trim((string)beyond_ai_config('google_image_model', 'gemini-3.1-flash-image')) ?: 'gemini-3.1-flash-image';
+        if (!preg_match('/^[a-zA-Z0-9._-]+$/', $model)) throw new RuntimeException('The configured Google image model is invalid.');
+        $body = json_encode([
+            'contents'=>[['parts'=>[['text'=>$prompt]]]],
+            'generationConfig'=>[
+                'responseModalities'=>['IMAGE'],
+                'responseFormat'=>['image'=>['aspectRatio'=>'2:3','imageSize'=>'1K']],
+            ],
+        ], JSON_THROW_ON_ERROR);
+        $curl = curl_init('https://generativelanguage.googleapis.com/v1/models/'.rawurlencode($model).':generateContent');
+        curl_setopt_array($curl, [CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>180,CURLOPT_HTTPHEADER=>['x-goog-api-key: '.$googleKey,'Content-Type: application/json'],CURLOPT_POSTFIELDS=>$body]);
+        $raw = curl_exec($curl); $curlError = curl_error($curl); $status = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE); curl_close($curl);
+        $response = is_string($raw) ? json_decode($raw, true) : null; $image=''; $mime='image/png';
+        foreach ((array)($response['candidates'][0]['content']['parts'] ?? []) as $part) { if (!empty($part['inlineData']['data'])) { $image=(string)$part['inlineData']['data']; $mime=(string)($part['inlineData']['mimeType']??'image/png'); break; } }
+        if ($status >= 200 && $status < 300 && $image !== '' && ($bytes=base64_decode($image, true)) !== false) {
+            // Publishing expects a PNG. Normalize Google's JPEG/WebP output
+            // when GD is available so preview and publishing use one format.
+            if ($mime !== 'image/png' && function_exists('imagecreatefromstring')) {
+                $canvas=@imagecreatefromstring($bytes);
+                if ($canvas !== false) { ob_start(); imagepng($canvas, null, 9); $png=ob_get_clean(); imagedestroy($canvas); if (is_string($png) && $png!=='') { $image=base64_encode($png); $mime='image/png'; } }
+            }
+            if ($mime !== 'image/png') throw new RuntimeException('Google returned an image, but PHP GD is required to convert it to PNG for publishing.');
+            stencilJson(['ok'=>true,'image'=>'data:image/png;base64,'.$image,'render_token'=>stencilRenderToken((string)base64_decode($image, true)),'model'=>$model,'provider'=>'google','quality'=>'high','size'=>'2:3 · 1K']);
+        }
+        $errors[] = is_array($response) ? (string)($response['error']['message'] ?? 'Google Imagen generation failed.') : ($curlError ?: 'Google Imagen generation failed.');
+    }
     if ($openAiKey !== '' && !str_contains($openAiKey, 'YOUR_')) {
         $body = json_encode(['model'=>'gpt-image-2','prompt'=>$prompt,'size'=>'1024x1536','quality'=>'high','output_format'=>'png','background'=>'opaque'], JSON_THROW_ON_ERROR);
         $curl = curl_init('https://api.openai.com/v1/images/generations');
@@ -119,29 +146,20 @@ PROMPT;
         }
         $errors[] = is_array($response) ? (string)($response['error']['message'] ?? 'OpenAI image generation failed.') : ($curlError ?: 'OpenAI image generation failed.');
     }
-    if ($googleKey !== '' && !str_contains($googleKey, 'YOUR_')) {
-        $model = trim((string)beyond_ai_config('google_image_model', 'gemini-3.1-flash-image')) ?: 'gemini-3.1-flash-image';
-        if (!preg_match('/^[a-zA-Z0-9._-]+$/', $model)) throw new RuntimeException('The configured Google image model is invalid.');
-        $body = json_encode(['contents'=>[['parts'=>[['text'=>$prompt]]]],'generationConfig'=>['responseModalities'=>['TEXT','IMAGE'],'imageConfig'=>['aspectRatio'=>'2:3']]], JSON_THROW_ON_ERROR);
-        $curl = curl_init('https://generativelanguage.googleapis.com/v1beta/models/'.rawurlencode($model).':generateContent');
-        curl_setopt_array($curl, [CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>180,CURLOPT_HTTPHEADER=>['x-goog-api-key: '.$googleKey,'Content-Type: application/json'],CURLOPT_POSTFIELDS=>$body]);
-        $raw = curl_exec($curl); $curlError = curl_error($curl); $status = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE); curl_close($curl);
-        $response = is_string($raw) ? json_decode($raw, true) : null; $image=''; $mime='image/png';
-        foreach ((array)($response['candidates'][0]['content']['parts'] ?? []) as $part) { if (!empty($part['inlineData']['data'])) { $image=(string)$part['inlineData']['data']; $mime=(string)($part['inlineData']['mimeType']??'image/png'); break; } }
-        if ($status >= 200 && $status < 300 && $image !== '' && ($bytes=base64_decode($image, true)) !== false) {
-            // Publishing expects a PNG. Normalize Google's JPEG/WebP output
-            // when GD is available so preview and publishing use one format.
-            if ($mime !== 'image/png' && function_exists('imagecreatefromstring')) {
-                $canvas=@imagecreatefromstring($bytes);
-                if ($canvas !== false) { ob_start(); imagepng($canvas, null, 9); $png=ob_get_clean(); imagedestroy($canvas); if (is_string($png) && $png!=='') { $image=base64_encode($png); $mime='image/png'; } }
-            }
-            if ($mime !== 'image/png') throw new RuntimeException('Google returned an image, but PHP GD is required to convert it to PNG for publishing.');
-            stencilJson(['ok'=>true,'image'=>'data:image/png;base64,'.$image,'render_token'=>stencilRenderToken((string)base64_decode($image, true)),'model'=>$model,'provider'=>'google']);
-        }
-        $errors[] = is_array($response) ? (string)($response['error']['message'] ?? 'Google Imagen generation failed.') : ($curlError ?: 'Google Imagen generation failed.');
+    if (!$errors) {
+        stencilJson([
+            'ok'=>false,
+            'error'=>'Add an OpenAI or Google Imagen API key in protected Site Settings, or use a free image fallback prompt.',
+            'fallback_provider'=>'free-image-tools',
+            'fallback_prompt'=>$prompt,
+        ], 400);
     }
-    if (!$errors) throw new RuntimeException('Add an OpenAI or Google Imagen API key in protected Site Settings.');
-    throw new RuntimeException('Image providers failed: '.implode(' | ', $errors));
+    stencilJson([
+        'ok'=>false,
+        'error'=>'Image providers failed: '.implode(' | ', $errors).' You can use the free image fallback prompt below, then upload the result.',
+        'fallback_provider'=>'free-image-tools',
+        'fallback_prompt'=>$prompt,
+    ], 400);
 } catch (Throwable $error) {
     error_log('Stencil generation failed: '.$error->getMessage());
     stencilJson(['ok'=>false,'error'=>$error->getMessage()], 400);

@@ -48,14 +48,14 @@ struct MusicHeader: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("BEYOND MUSIC")
                     .font(.headline.weight(.black))
-                Text("Radio, playlists, and private listening")
+                Text("Local files, downloads, and private listening")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
             Spacer()
 
-            Text("MVP")
+            Text("LOCAL")
                 .font(.caption.bold())
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
@@ -99,9 +99,9 @@ struct MiniPlayer: View {
                     .foregroundStyle(Color.musicAqua)
                     .frame(width: 42)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(store.currentTrack.title)
+                    Text(store.currentTrack?.title ?? "No song selected")
                         .font(.headline)
-                    Text(store.currentTrack.artist)
+                    Text(store.currentTrack?.displayArtist ?? "Import or download music")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -116,6 +116,7 @@ struct MiniPlayer: View {
                         .foregroundStyle(Color.musicBackground)
                 }
                 .buttonStyle(.plain)
+                .disabled(store.currentTrack == nil)
                 .accessibilityLabel(store.isPlaying ? "Pause" : "Play")
             }
         }

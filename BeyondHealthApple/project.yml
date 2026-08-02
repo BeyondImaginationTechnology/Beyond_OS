@@ -26,8 +26,9 @@ targets:
     settings:
       base:
         CODE_SIGN_STYLE: Automatic
-        CODE_SIGN_ENTITLEMENTS: ""
+        CODE_SIGN_ENTITLEMENTS: BeyondHealthMobile.entitlements
         DEVELOPMENT_TEAM: FK9QM3VUNH
+        CODE_SIGN_IDENTITY: Apple Development
         PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.beyondhealthmobile
         PRODUCT_NAME: BeyondHealthMobile
         PRODUCT_MODULE_NAME: BeyondHealthMobile

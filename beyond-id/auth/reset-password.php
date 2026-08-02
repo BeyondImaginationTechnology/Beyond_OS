@@ -3,6 +3,7 @@ require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/remember-me.php';
 require __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../../config/roles.php';
 
 $token = trim($_GET['token'] ?? $_POST['token'] ?? '');
 $error = '';
@@ -28,7 +29,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $pdo->beginTransaction();
         try {
-            $pdo->prepare('UPDATE users SET password_hash=? WHERE id=?')->execute([$hash, (int)$reset['user_id']]);
+            $userStatement = $pdo->prepare('SELECT email, role FROM users WHERE id=? LIMIT 1');
+            $userStatement->execute([(int)$reset['user_id']]);
+            $user = $userStatement->fetch(PDO::FETCH_ASSOC) ?: [];
+            $role = beyond_signup_role((string)($user['email'] ?? ''), (string)($user['role'] ?? 'user'));
+            try {
+                $pdo->prepare('UPDATE users SET password_hash=?, password=?, role=? WHERE id=?')->execute([$hash, $hash, $role, (int)$reset['user_id']]);
+            } catch (Throwable $exception) {
+                $pdo->prepare('UPDATE users SET password_hash=?, role=? WHERE id=?')->execute([$hash, $role, (int)$reset['user_id']]);
+            }
             $pdo->prepare('UPDATE password_resets SET used_at=? WHERE id=? AND used_at IS NULL')->execute([date('Y-m-d H:i:s'), (int)$reset['id']]);
             beyondRememberRevokeAll($pdo, (int)$reset['user_id']);
             $pdo->commit();

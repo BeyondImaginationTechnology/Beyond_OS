@@ -8,19 +8,41 @@ class Auth {
         return $stmt->fetch() ?: null;
     }
     public static function login(string $email, string $password): array {
-        $stmt = Database::conn()->prepare("SELECT id,name,email,password_hash,role,status FROM users WHERE email=? LIMIT 1");
-        $stmt->execute([$email]);
+        $normalizedEmail = strtolower(trim($email));
+        $stmt = Database::conn()->prepare("SELECT id,name,email,password,password_hash,role,status FROM users WHERE email=? LIMIT 1");
+        $stmt->execute([$normalizedEmail]);
         $user = $stmt->fetch();
-        if (!$user || !password_verify($password, $user['password_hash'])) {
-            self::log(null, 'login_failed', $email);
+        $valid = false;
+        $matchedHash = '';
+        if ($user) {
+            foreach (array_unique(array_filter([(string)($user['password_hash'] ?? ''), (string)($user['password'] ?? '')])) as $candidateHash) {
+                if (password_verify($password, $candidateHash)) {
+                    $valid = true;
+                    $matchedHash = $candidateHash;
+                    break;
+                }
+            }
+        }
+        if (!$valid) {
+            self::log(null, 'login_failed', $normalizedEmail);
             return ['ok'=>false, 'message'=>'Invalid email or password.'];
         }
+        if ($matchedHash !== (string)($user['password_hash'] ?? '') || password_needs_rehash($matchedHash, PASSWORD_DEFAULT)) {
+            $freshHash = password_hash($password, PASSWORD_DEFAULT);
+            try { Database::conn()->prepare("UPDATE users SET password_hash=?, password=? WHERE id=?")->execute([$freshHash, $freshHash, $user['id']]); }
+            catch (Throwable $e) { Database::conn()->prepare("UPDATE users SET password_hash=? WHERE id=?")->execute([$freshHash, $user['id']]); }
+        }
         if (($user['status'] ?? 'active') !== 'active') return ['ok'=>false, 'message'=>'Account inactive.'];
+        require_once dirname(__DIR__, 2) . '/config/roles.php';
+        $role = beyond_signup_role($normalizedEmail, (string)($user['role'] ?? 'user'));
+        if ($role !== (string)($user['role'] ?? 'user')) {
+            try { Database::conn()->prepare("UPDATE users SET role=? WHERE id=?")->execute([$role, $user['id']]); } catch (Throwable $e) {}
+        }
         session_regenerate_id(true);
         $_SESSION['user_id'] = (int)$user['id'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_name'] = $user['name'];
-        $_SESSION['user_role'] = $user['role'];
+        $_SESSION['user_role'] = $role;
         Database::conn()->prepare("UPDATE users SET last_login=NOW() WHERE id=?")->execute([$user['id']]);
         self::log((int)$user['id'], 'login_success', $user['email']);
         return ['ok'=>true];

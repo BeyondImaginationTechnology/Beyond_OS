@@ -48,14 +48,14 @@ struct MusicHeader: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("BEYOND MUSIC")
                     .font(.headline.weight(.black))
-                Text("Local files, downloads, and private listening")
+                Text("Search, save, import, and private listening")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
             Spacer()
 
-            Text("LOCAL")
+            Text("1.1 BETA")
                 .font(.caption.bold())
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)

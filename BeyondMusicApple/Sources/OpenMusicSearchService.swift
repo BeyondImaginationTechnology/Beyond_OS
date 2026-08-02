@@ -191,10 +191,30 @@ struct OpenMusicSearchService {
     }
 
     private func searchJamendo(query: String, page: Int) async throws -> [MusicTrack] {
+        if let serverURL = jamendoProxyURL(query: query, page: page),
+           let tracks = try? await fetchJamendoTracks(from: serverURL) {
+            return tracks
+        }
+
+        guard let directURL = directJamendoURL(query: query, page: page) else { return [] }
+        return try await fetchJamendoTracks(from: directURL)
+    }
+
+    private func jamendoProxyURL(query: String, page: Int) -> URL? {
+        let rawBaseURL = Bundle.main.object(forInfoDictionaryKey: "BeyondMusicAPIBaseURL") as? String
+        guard let baseURL = URL(string: rawBaseURL?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "") else { return nil }
+        var components = URLComponents(url: baseURL.appending(path: "/beyond-media/api/jamendo-search.php"), resolvingAgainstBaseURL: false)
+        components?.queryItems = [
+            URLQueryItem(name: "q", value: query),
+            URLQueryItem(name: "page", value: "\(max(1, page))")
+        ]
+        return components?.url
+    }
+
+    private func directJamendoURL(query: String, page: Int) -> URL? {
         guard let clientID = Bundle.main.object(forInfoDictionaryKey: "JamendoClientID") as? String,
               !clientID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        else { return [] }
-
+        else { return nil }
         var components = URLComponents(string: "https://api.jamendo.com/v3.0/tracks/")
         components?.queryItems = [
             URLQueryItem(name: "client_id", value: clientID),
@@ -206,7 +226,10 @@ struct OpenMusicSearchService {
             URLQueryItem(name: "audioformat", value: "mp32"),
             URLQueryItem(name: "order", value: page.isMultiple(of: 2) ? "popularity_month" : "relevance")
         ]
-        guard let url = components?.url else { throw URLError(.badURL) }
+        return components?.url
+    }
+
+    private func fetchJamendoTracks(from url: URL) async throws -> [MusicTrack] {
         let (data, _) = try await URLSession.shared.data(from: url)
         let response = try JSONDecoder().decode(JamendoResponse.self, from: data)
 

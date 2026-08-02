@@ -9,7 +9,7 @@ struct DiscoverView: View {
                 MusicEyebrow(text: "Search")
                 Text("Find authorized music")
                     .font(.largeTitle.bold())
-                Text("MVP search mixes public audio catalogs and optional app-key providers. Review licenses before publishing or commercial reuse.")
+                Text("Search open audio catalogs and optional app-key providers. Downloaded results are copied into your local library after you review the source license.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 HStack {
@@ -46,6 +46,22 @@ struct DiscoverView: View {
                 Text(store.statusMessage)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+
+            MusicPanel {
+                HStack(spacing: 12) {
+                    Image(systemName: store.hasBeyondID ? "person.crop.circle.badge.checkmark" : "person.crop.circle.badge.exclamationmark")
+                        .font(.title2)
+                        .foregroundStyle(Color.musicAqua)
+                    VStack(alignment: .leading, spacing: 4) {
+                        MusicEyebrow(text: "Beyond ID")
+                        Text(store.beyondIDSession.label)
+                            .font(.headline)
+                        Text(store.hasBeyondID ? "Searches and local choices can stay associated with your Beyond ID beta profile." : "Connect on Profile when you are ready to pair this device.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
 
             if store.isSearching {

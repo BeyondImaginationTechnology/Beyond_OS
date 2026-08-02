@@ -1,6 +1,7 @@
 .env
 .env.*
 !.env.example
+/config/live.php
 /var/
 **/*.sqlite
 **/*.sqlite3

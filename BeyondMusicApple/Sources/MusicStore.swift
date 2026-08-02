@@ -12,29 +12,85 @@ final class MusicStore: ObservableObject {
     @Published private(set) var statusMessage = "Import audio files or search open catalogs"
     @Published private(set) var currentSearchPage = 1
     @Published private(set) var downloadStates: [MusicTrack.ID: DownloadState] = [:]
+    @Published private(set) var beyondIDSession: BeyondIDSession = .signedOut
+    @Published private(set) var isAuthenticatingBeyondID = false
     @Published var selectedMood: MusicMood?
     @Published var searchText = ""
+    @Published var libraryFilter: LibraryFilter = .all {
+        didSet { savePreferences() }
+    }
+    @Published var librarySort: LibrarySort = .recentlyAdded {
+        didSet { savePreferences() }
+    }
 
     private let player = AudioPlayer()
     private let searchService = OpenMusicSearchService()
+    private let beyondIDService = BeyondIDService()
     private let fileManager = FileManager.default
 
     init() {
         player.configureForBackgroundPlayback()
+        loadPreferences()
         loadLibrary()
     }
 
-    var downloadedTracks: [MusicTrack] {
+    var localTracks: [MusicTrack] {
         tracks.filter { localURL(for: $0) != nil }
     }
 
+    var downloadedTracks: [MusicTrack] {
+        localTracks.filter { $0.sourceKind == .downloaded }
+    }
+
+    var importedTracks: [MusicTrack] {
+        localTracks.filter { $0.sourceKind == .imported }
+    }
+
+    var favoriteTracks: [MusicTrack] {
+        tracks.filter(\.isFavorite)
+    }
+
+    var recentlyPlayedTracks: [MusicTrack] {
+        tracks
+            .filter { $0.lastPlayedAt != nil }
+            .sorted { ($0.lastPlayedAt ?? .distantPast) > ($1.lastPlayedAt ?? .distantPast) }
+    }
+
+    var mostPlayedTracks: [MusicTrack] {
+        tracks
+            .filter { $0.playCount > 0 }
+            .sorted {
+                if $0.playCount == $1.playCount {
+                    return ($0.lastPlayedAt ?? .distantPast) > ($1.lastPlayedAt ?? .distantPast)
+                }
+                return $0.playCount > $1.playCount
+            }
+    }
+
     var filteredTracks: [MusicTrack] {
-        tracks.filter { track in
+        let filtered = tracks.filter { track in
             let matchesMood = selectedMood == nil || track.mood == selectedMood
+            let matchesLibraryFilter: Bool = switch libraryFilter {
+            case .all: true
+            case .imported: track.sourceKind == .imported
+            case .downloaded: track.sourceKind == .downloaded
+            case .favorites: track.isFavorite
+            }
             let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
             let searchable = [track.title, track.artist ?? "", track.album ?? "", track.originalFileName ?? ""]
             let matchesSearch = query.isEmpty || searchable.contains { $0.lowercased().contains(query) }
-            return matchesMood && matchesSearch
+            return matchesMood && matchesLibraryFilter && matchesSearch
+        }
+
+        return switch librarySort {
+        case .recentlyAdded:
+            filtered.sorted { ($0.importedAt ?? .distantPast) > ($1.importedAt ?? .distantPast) }
+        case .recentlyPlayed:
+            filtered.sorted { ($0.lastPlayedAt ?? .distantPast) > ($1.lastPlayedAt ?? .distantPast) }
+        case .mostPlayed:
+            filtered.sorted { $0.playCount == $1.playCount ? $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending : $0.playCount > $1.playCount }
+        case .title:
+            filtered.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
         }
     }
 
@@ -52,6 +108,20 @@ final class MusicStore: ObservableObject {
                 systemImage: "arrow.down.circle.fill"
             ),
             MusicPlaylist(
+                id: "imported",
+                title: "Imported Files",
+                subtitle: "\(importedTracks.count) files copied from Files",
+                tracks: importedTracks,
+                systemImage: "folder.fill"
+            ),
+            MusicPlaylist(
+                id: "favorites",
+                title: "Favorites",
+                subtitle: "\(favoriteTracks.count) saved choices",
+                tracks: favoriteTracks,
+                systemImage: "heart.fill"
+            ),
+            MusicPlaylist(
                 id: "recent",
                 title: "Recently Added",
                 subtitle: "Latest imported and downloaded songs",
@@ -59,6 +129,10 @@ final class MusicStore: ObservableObject {
                 systemImage: "clock.fill"
             )
         ]
+    }
+
+    var hasBeyondID: Bool {
+        beyondIDSession.isConnected
     }
 
     func searchOpenMusic(resetPage: Bool = true) async {
@@ -104,6 +178,7 @@ final class MusicStore: ObservableObject {
         }
         player.play(url: url)
         isPlaying = true
+        recordPlayback(for: track)
         statusMessage = localURL(for: track) == nil ? "Streaming \(track.title)" : "Playing \(track.title)"
     }
 
@@ -198,6 +273,69 @@ final class MusicStore: ObservableObject {
         saveLibrary()
     }
 
+    func toggleFavorite(_ track: MusicTrack) {
+        guard let index = tracks.firstIndex(where: { $0.id == track.id }) else { return }
+        tracks[index].isFavorite.toggle()
+        if currentTrack?.id == track.id {
+            currentTrack = tracks[index]
+        }
+        saveLibrary()
+    }
+
+    func refreshBeyondIDSession() async {
+        isAuthenticatingBeyondID = true
+        defer { isAuthenticatingBeyondID = false }
+
+        do {
+            beyondIDSession = try await beyondIDService.currentSession()
+            statusMessage = "Beyond ID session verified"
+            savePreferences()
+        } catch BeyondIDError.unauthorized {
+            beyondIDSession = .signedOut
+            savePreferences()
+        } catch {
+            statusMessage = "Beyond ID check failed: \(error.localizedDescription)"
+        }
+    }
+
+    func signInBeyondID(email: String, password: String) async {
+        isAuthenticatingBeyondID = true
+        defer { isAuthenticatingBeyondID = false }
+
+        do {
+            beyondIDSession = try await beyondIDService.signIn(email: email, password: password)
+            statusMessage = "Signed in with Beyond ID"
+            savePreferences()
+        } catch {
+            statusMessage = "Beyond ID sign in failed: \(error.localizedDescription)"
+        }
+    }
+
+    func registerBeyondID(firstName: String, lastName: String, email: String, password: String) async {
+        isAuthenticatingBeyondID = true
+        defer { isAuthenticatingBeyondID = false }
+
+        do {
+            try await beyondIDService.register(firstName: firstName, lastName: lastName, email: email, password: password)
+            statusMessage = "Beyond ID created. Check your email to verify, then sign in."
+        } catch {
+            statusMessage = "Beyond ID registration failed: \(error.localizedDescription)"
+        }
+    }
+
+    func signOutBeyondID() async {
+        isAuthenticatingBeyondID = true
+        defer { isAuthenticatingBeyondID = false }
+
+        do {
+            try await beyondIDService.signOut()
+        } catch {
+            statusMessage = "Beyond ID sign out could not reach the server"
+        }
+        beyondIDSession = .signedOut
+        savePreferences()
+    }
+
     private func importAudioFile(from sourceURL: URL) async throws -> MusicTrack {
         try ensureStorage()
         let accessed = sourceURL.startAccessingSecurityScopedResource()
@@ -229,7 +367,10 @@ final class MusicStore: ObservableObject {
             providerName: "Imported File",
             localFileName: fileName,
             originalFileName: sourceURL.lastPathComponent,
-            importedAt: .now
+            importedAt: .now,
+            playCount: 0,
+            lastPlayedAt: nil,
+            isFavorite: false
         )
         return try await trackWithFileMetadata(baseTrack, fileURL: destinationURL)
     }
@@ -275,7 +416,10 @@ final class MusicStore: ObservableObject {
             providerName: track.providerName,
             localFileName: track.localFileName,
             originalFileName: track.originalFileName,
-            importedAt: track.importedAt
+            importedAt: track.importedAt,
+            playCount: track.playCount,
+            lastPlayedAt: track.lastPlayedAt,
+            isFavorite: track.isFavorite
         )
     }
 
@@ -286,6 +430,14 @@ final class MusicStore: ObservableObject {
             tracks.insert(track, at: 0)
         }
         currentTrack = currentTrack ?? track
+        saveLibrary()
+    }
+
+    private func recordPlayback(for track: MusicTrack) {
+        guard let index = tracks.firstIndex(where: { $0.id == track.id }) else { return }
+        tracks[index].playCount += 1
+        tracks[index].lastPlayedAt = .now
+        currentTrack = tracks[index]
         saveLibrary()
     }
 
@@ -310,6 +462,35 @@ final class MusicStore: ObservableObject {
             try data.write(to: libraryIndexURL, options: [.atomic])
         } catch {
             statusMessage = "Could not save library index"
+        }
+    }
+
+    private func loadPreferences() {
+        do {
+            let data = try Data(contentsOf: preferencesURL)
+            let preferences = try JSONDecoder().decode(MusicPreferences.self, from: data)
+            libraryFilter = preferences.libraryFilter
+            librarySort = preferences.librarySort
+            beyondIDSession = preferences.beyondIDSession
+        } catch {
+            libraryFilter = .all
+            librarySort = .recentlyAdded
+            beyondIDSession = .signedOut
+        }
+    }
+
+    private func savePreferences() {
+        do {
+            try ensureStorage()
+            let preferences = MusicPreferences(
+                libraryFilter: libraryFilter,
+                librarySort: librarySort,
+                beyondIDSession: beyondIDSession
+            )
+            let data = try JSONEncoder().encode(preferences)
+            try data.write(to: preferencesURL, options: [.atomic])
+        } catch {
+            statusMessage = "Could not save music preferences"
         }
     }
 
@@ -350,6 +531,12 @@ final class MusicStore: ObservableObject {
             .appendingPathComponent("BeyondMusic", isDirectory: true)
             .appendingPathComponent("Library.json")
     }
+
+    private var preferencesURL: URL {
+        fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("BeyondMusic", isDirectory: true)
+            .appendingPathComponent("Preferences.json")
+    }
 }
 
 extension Int {
@@ -358,6 +545,234 @@ extension Int {
             return String(format: "%.1fk", Double(self) / 1000)
         }
         return "\(self)"
+    }
+}
+
+private struct BeyondIDService {
+    private let session: URLSession
+    private let decoder = JSONDecoder()
+
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
+
+    func currentSession() async throws -> BeyondIDSession {
+        let url = baseURL.appending(path: "/beyond-id/api/me.php")
+        let (data, response) = try await session.data(from: url)
+        try validate(response: response, data: data)
+        let payload = try decoder.decode(BeyondIDMeResponse.self, from: data)
+        guard payload.ok, payload.authenticated, let user = payload.user else {
+            throw BeyondIDError.unauthorized
+        }
+        return BeyondIDSession(user: user, wallet: payload.wallet, connectedAt: .now)
+    }
+
+    func signIn(email: String, password: String) async throws -> BeyondIDSession {
+        let body = [
+            "email": email.trimmingCharacters(in: .whitespacesAndNewlines),
+            "password": password
+        ]
+        let data = try await postJSON(path: "/beyond-id/api/login.php", body: body)
+        let payload = try decoder.decode(BeyondIDLoginResponse.self, from: data)
+        guard payload.ok, let user = payload.user else {
+            throw BeyondIDError.server(payload.error ?? "Sign in failed")
+        }
+        do {
+            return try await currentSession()
+        } catch {
+            return BeyondIDSession(user: user, wallet: nil, connectedAt: .now)
+        }
+    }
+
+    func register(firstName: String, lastName: String, email: String, password: String) async throws {
+        let body = [
+            "first_name": firstName.trimmingCharacters(in: .whitespacesAndNewlines),
+            "last_name": lastName.trimmingCharacters(in: .whitespacesAndNewlines),
+            "email": email.trimmingCharacters(in: .whitespacesAndNewlines),
+            "password": password,
+            "locale": Locale.current.language.languageCode?.identifier ?? "en"
+        ]
+        let data = try await postJSON(path: "/beyond-id/api/register.php", body: body)
+        let payload = try decoder.decode(BeyondIDRegisterResponse.self, from: data)
+        guard payload.ok else {
+            throw BeyondIDError.server(payload.error ?? "Registration failed")
+        }
+    }
+
+    func signOut() async throws {
+        let url = baseURL.appending(path: "/beyond-id/auth/logout.php")
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        _ = try await session.data(for: request)
+    }
+
+    private func postJSON(path: String, body: [String: String]) async throws -> Data {
+        let url = baseURL.appending(path: path)
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.httpBody = try JSONEncoder().encode(body)
+        let (data, response) = try await session.data(for: request)
+        try validate(response: response, data: data)
+        return data
+    }
+
+    private func validate(response: URLResponse, data: Data) throws {
+        guard let httpResponse = response as? HTTPURLResponse else { return }
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            if httpResponse.statusCode == 401 {
+                throw BeyondIDError.unauthorized
+            }
+            if let apiError = try? decoder.decode(BeyondIDAPIError.self, from: data),
+               let message = apiError.error {
+                throw BeyondIDError.server(message)
+            }
+            throw BeyondIDError.server("Beyond ID returned HTTP \(httpResponse.statusCode)")
+        }
+    }
+
+    private var baseURL: URL {
+        if let rawValue = Bundle.main.object(forInfoDictionaryKey: "BeyondIDBaseURL") as? String,
+           let url = URL(string: rawValue.trimmingCharacters(in: .whitespacesAndNewlines)),
+           !rawValue.isEmpty {
+            return url
+        }
+        return URL(string: "https://beyondimagination.co.technology")!
+    }
+}
+
+private enum BeyondIDError: LocalizedError, Equatable {
+    case unauthorized
+    case server(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .unauthorized:
+            "No active Beyond ID session"
+        case .server(let message):
+            message
+        }
+    }
+}
+
+private struct BeyondIDAPIError: Decodable {
+    let error: String?
+}
+
+private struct BeyondIDLoginResponse: Decodable {
+    let ok: Bool
+    let error: String?
+    let user: BeyondIDUser?
+}
+
+private struct BeyondIDRegisterResponse: Decodable {
+    let ok: Bool
+    let error: String?
+    let verificationRequired: Bool?
+
+    private enum CodingKeys: String, CodingKey {
+        case ok
+        case error
+        case verificationRequired = "verification_required"
+    }
+}
+
+private struct BeyondIDMeResponse: Decodable {
+    let ok: Bool
+    let authenticated: Bool
+    let user: BeyondIDUser?
+    let wallet: BeyondIDWallet?
+}
+
+private struct BeyondIDUser: Decodable {
+    let id: FlexibleInt?
+    let email: String?
+    let name: String?
+    let firstName: String?
+    let lastName: String?
+    let displayName: String?
+    let role: String?
+    let locale: String?
+    let preferredLocale: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case email
+        case name
+        case firstName = "first_name"
+        case lastName = "last_name"
+        case displayName = "display_name"
+        case role
+        case locale
+        case preferredLocale = "preferred_locale"
+    }
+
+    var bestDisplayName: String {
+        let fullName = [firstName, lastName]
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+        return [displayName, name, fullName, email]
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .first { !$0.isEmpty } ?? "Beyond ID"
+    }
+
+    var bestLocale: String? {
+        locale ?? preferredLocale
+    }
+}
+
+private struct BeyondIDWallet: Decodable {
+    let balance: FlexibleString?
+    let currency: String?
+}
+
+private struct FlexibleInt: Decodable {
+    let value: Int
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let intValue = try? container.decode(Int.self) {
+            value = intValue
+        } else if let stringValue = try? container.decode(String.self), let intValue = Int(stringValue) {
+            value = intValue
+        } else {
+            throw DecodingError.typeMismatch(Int.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Expected int or numeric string"))
+        }
+    }
+}
+
+private struct FlexibleString: Decodable {
+    let value: String
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let stringValue = try? container.decode(String.self) {
+            value = stringValue
+        } else if let doubleValue = try? container.decode(Double.self) {
+            value = String(format: "%.2f", doubleValue)
+        } else if let intValue = try? container.decode(Int.self) {
+            value = "\(intValue)"
+        } else {
+            throw DecodingError.typeMismatch(String.self, DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Expected string or number"))
+        }
+    }
+}
+
+private extension BeyondIDSession {
+    init(user: BeyondIDUser, wallet: BeyondIDWallet?, connectedAt: Date) {
+        self.init(
+            isConnected: true,
+            userID: user.id?.value,
+            displayName: user.bestDisplayName,
+            email: user.email ?? "",
+            role: user.role,
+            locale: user.bestLocale,
+            walletBalance: wallet?.balance?.value,
+            walletCurrency: wallet?.currency,
+            connectedAt: connectedAt
+        )
     }
 }
 

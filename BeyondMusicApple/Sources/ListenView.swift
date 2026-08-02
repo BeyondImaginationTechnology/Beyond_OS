@@ -37,8 +37,22 @@ struct ListenView: View {
                 }
             }
 
+            TrackListView(
+                title: "Most Played",
+                tracks: Array(store.mostPlayedTracks.prefix(6)),
+                emptyTitle: "No play history yet",
+                emptyMessage: "Songs you play from your library will rank here automatically."
+            )
+
+            TrackListView(
+                title: "Recently Played",
+                tracks: Array(store.recentlyPlayedTracks.prefix(6)),
+                emptyTitle: "Nothing played yet",
+                emptyMessage: "Start a local or downloaded track to build your listening history."
+            )
+
             VStack(alignment: .leading, spacing: 12) {
-                MusicEyebrow(text: "Local playlists")
+                MusicEyebrow(text: "Playlists")
                 ForEach(store.playlists) { playlist in
                     PlaylistRow(playlist: playlist)
                 }

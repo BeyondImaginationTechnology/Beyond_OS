@@ -1,5 +1,6 @@
 # Beyond OS documentation
 
+- `open-source-readiness.md`: public-release checklist and cleanup notes.
 - `deployment/`: deployment and rollback procedures.
 - `patch-notes/`: versioned change notes moved out of the web root.
 - `security/`: shared security controls and release requirements.

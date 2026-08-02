@@ -16,7 +16,7 @@ struct LibraryView: View {
                         MusicEyebrow(text: "On this device")
                         Text("\(store.tracks.count) songs")
                             .font(.largeTitle.bold())
-                        Text("\(store.downloadedTracks.count) local files · \(store.totalLibraryMinutes) minutes indexed")
+                        Text("\(store.downloadedTracks.count) downloaded · \(store.importedTracks.count) imported · \(store.totalLibraryMinutes) minutes indexed")
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
@@ -36,6 +36,29 @@ struct LibraryView: View {
             TextField("Search songs, artists, albums, filenames", text: $store.searchText)
                 .textFieldStyle(.roundedBorder)
                 .textInputAutocapitalization(.never)
+
+            MusicPanel {
+                MusicEyebrow(text: "Saved view")
+                Picker("Library filter", selection: $store.libraryFilter) {
+                    ForEach(LibraryFilter.allCases) { filter in
+                        Text(filter.rawValue).tag(filter)
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                HStack {
+                    Label("Sort", systemImage: "arrow.up.arrow.down")
+                        .font(.caption.bold())
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Picker("Sort", selection: $store.librarySort) {
+                        ForEach(LibrarySort.allCases) { sort in
+                            Text(sort.rawValue).tag(sort)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                }
+            }
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
@@ -148,7 +171,19 @@ struct TrackRow: View {
                     Text(track.durationText)
                         .font(.caption.monospacedDigit())
                         .foregroundStyle(.secondary)
-                    DownloadButton(track: track)
+                    HStack(spacing: 12) {
+                        Button {
+                            store.toggleFavorite(track)
+                        } label: {
+                            Image(systemName: track.isFavorite ? "heart.fill" : "heart")
+                                .font(.title3)
+                                .foregroundStyle(track.isFavorite ? Color.musicRose : .secondary)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(track.isFavorite ? "Remove favorite" : "Save favorite")
+
+                        DownloadButton(track: track)
+                    }
                 }
             }
         }

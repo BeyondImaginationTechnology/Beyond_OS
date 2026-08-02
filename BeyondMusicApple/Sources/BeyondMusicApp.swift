@@ -10,6 +10,9 @@ struct BeyondMusicApp: App {
                 .environmentObject(store)
                 .tint(.musicAqua)
                 .preferredColorScheme(.dark)
+                .task {
+                    await store.refreshBeyondIDSession()
+                }
         }
     }
 }

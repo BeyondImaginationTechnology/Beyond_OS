@@ -20,10 +20,14 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>BeyondIDBaseURL</key>
+	<string>https://beyondimagination.co.technology</string>
+	<key>BeyondMusicAPIBaseURL</key>
+	<string>https://beyondimagination.co.technology</string>
 	<key>FreesoundAPIToken</key>
 	<string></string>
 	<key>JamendoClientID</key>
-	<string></string>
+	<string>3ed5d059</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.music</string>
 	<key>LSSupportsOpeningDocumentsInPlace</key>

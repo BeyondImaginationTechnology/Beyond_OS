@@ -63,16 +63,56 @@ function dailybreath_verse_of_day(PDO $pdo, string $locale = 'en'): array
     }
 
     if ($result === null) {
-        $index = (int)(abs(crc32(date('Y-m-d'))) % count($fallbacks));
-        $result = [
-            'text' => $fallbacks[$index][0],
-            'reference' => $fallbacks[$index][1],
-            'source' => 'bundled_rotation',
-        ];
+        $webFallback = dailybreath_web_verse_fallback();
+        if ($webFallback !== null) {
+            $result = $webFallback;
+        } else {
+            $index = (int)(abs(crc32(date('Y-m-d'))) % count($fallbacks));
+            $result = [
+                'text' => $fallbacks[$index][0],
+                'reference' => $fallbacks[$index][1],
+                'source' => 'bundled_rotation',
+            ];
+        }
     }
 
     $location = dailybreath_reference_location($result['reference']);
     return $result + $location;
+}
+
+/** @return array{text:string,reference:string,source:string}|null */
+function dailybreath_web_verse_fallback(): ?array
+{
+    $source = dirname(__DIR__) . '/data/engwebp_vpl.txt';
+    if (!is_file($source)) return null;
+    $lines = file($source, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if (!$lines) return null;
+
+    $bookNames = [
+        'GEN'=>'Genesis','EXO'=>'Exodus','LEV'=>'Leviticus','NUM'=>'Numbers','DEU'=>'Deuteronomy','JOS'=>'Joshua','JDG'=>'Judges','RUT'=>'Ruth',
+        '1SA'=>'1 Samuel','2SA'=>'2 Samuel','1KI'=>'1 Kings','2KI'=>'2 Kings','1CH'=>'1 Chronicles','2CH'=>'2 Chronicles','EZR'=>'Ezra','NEH'=>'Nehemiah',
+        'EST'=>'Esther','JOB'=>'Job','PSA'=>'Psalms','PRO'=>'Proverbs','ECC'=>'Ecclesiastes','SOL'=>'Song of Solomon','ISA'=>'Isaiah','JER'=>'Jeremiah',
+        'LAM'=>'Lamentations','EZE'=>'Ezekiel','DAN'=>'Daniel','HOS'=>'Hosea','JOE'=>'Joel','AMO'=>'Amos','OBA'=>'Obadiah','JON'=>'Jonah','MIC'=>'Micah',
+        'NAH'=>'Nahum','HAB'=>'Habakkuk','ZEP'=>'Zephaniah','HAG'=>'Haggai','ZEC'=>'Zechariah','MAL'=>'Malachi','MAT'=>'Matthew','MAR'=>'Mark',
+        'LUK'=>'Luke','JOH'=>'John','ACT'=>'Acts','ROM'=>'Romans','1CO'=>'1 Corinthians','2CO'=>'2 Corinthians','GAL'=>'Galatians','EPH'=>'Ephesians',
+        'PHI'=>'Philippians','COL'=>'Colossians','1TH'=>'1 Thessalonians','2TH'=>'2 Thessalonians','1TI'=>'1 Timothy','2TI'=>'2 Timothy','TIT'=>'Titus',
+        'PHM'=>'Philemon','HEB'=>'Hebrews','JAM'=>'James','1PE'=>'1 Peter','2PE'=>'2 Peter','1JO'=>'1 John','2JO'=>'2 John','3JO'=>'3 John','JUD'=>'Jude','REV'=>'Revelation',
+    ];
+
+    $start = (int)(abs(crc32(date('Y-m-d'))) % count($lines));
+    for ($offset = 0, $total = count($lines); $offset < $total; $offset++) {
+        $line = $lines[($start + $offset) % $total];
+        if (!preg_match('/^([1-3]?[A-Z]{2,3})\s+(\d+):(\d+)\s+(.+)$/u', $line, $match)) continue;
+        if (!isset($bookNames[$match[1]])) continue;
+        $result = [
+            'text' => trim($match[4]),
+            'reference' => $bookNames[$match[1]] . ' ' . (int)$match[2] . ':' . (int)$match[3],
+            'source' => 'web_bundled_bible',
+        ];
+        return $result;
+    }
+
+    return null;
 }
 
 /** @return array{book:string,chapter:int,verse:int} */

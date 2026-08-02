@@ -59,11 +59,11 @@
       <button id="loadSelectedVerse" class="btn secondary" type="button" style="width:100%;margin:0 0 18px">Use selected verse</button>
       <div class="field"><label for="daypart">Verse edition</label><select id="daypart"><option value="auto">Automatic by local time</option><option value="morning">Morning</option><option value="day">Day</option><option value="night">Night</option></select></div>
       <div class="field"><label for="heading">Localized heading</label><input id="heading" type="text" value="VERSE OF THE DAY"></div>
-      <div class="field"><label for="verse">Verse text</label><textarea id="verse">Then God said, “Let there be light”; and there was light. God saw that the light was good, and He separated the light from the darkness.</textarea></div>
-      <div class="field"><label for="reference">Reference</label><input id="reference" type="text" value="GENESIS 1:3–4"></div>
-      <div class="field"><label for="translation">Translation</label><input id="translation" type="text" value="KJV"></div>
+      <div class="field"><label for="verse">Verse text</label><textarea id="verse">Loading today’s verse…</textarea></div>
+      <div class="field"><label for="reference">Reference</label><input id="reference" type="text" value=""></div>
+      <div class="field"><label for="translation">Translation</label><input id="translation" type="text" value=""></div>
       <div class="field"><label for="footer">Footer message</label><input id="footer" type="text" value="BREATHE DEEP, GOD’S GOT YOU."></div>
-      <div class="field"><label for="publishDate">Publish date</label><input id="publishDate" type="date" value="2026-07-14"></div>
+      <div class="field"><label for="publishDate">Publish date</label><input id="publishDate" type="date"></div>
       <div class="field"><label for="locale">Locale</label><select id="locale"><option value="en-US">English (US)</option><option value="en-JM">English (Jamaica)</option><option value="fr-FR">French</option><option value="ht-HT">Haitian Kreyòl</option><option value="es-ES">Spanish</option></select></div>
     </section>
 
@@ -136,6 +136,7 @@
   const resolvedDaypart=()=>{const selected=value('daypart');if(selected!=='auto')return selected;const hour=new Date().getHours();return hour<11?'morning':(hour>=18?'night':'day')};
   const localizedHeading=(language=verseLanguage())=>languageSettings[language].headings[resolvedDaypart()];
   const syncHeading=()=>{$('heading').value=localizedHeading()};
+  const setPublishDateToToday=()=>{if(value('publishDate'))return;const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000);$('publishDate').value=local.toISOString().slice(0,10)};
   const status = (message, error=false) => { $('status').textContent = message; $('status').classList.toggle('error', error); };
   const safeName = () => `daily-breath-verse-${value('publishDate') || 'post'}`;
   const dateInfo = () => {
@@ -366,12 +367,18 @@
   if('speechSynthesis' in window){window.speechSynthesis.onvoiceschanged=populateVoices;populateVoices()}
   document.querySelectorAll('input[name="narrationLanguage"]').forEach(input=>input.addEventListener('change',()=>{populateVoices();status(`${input.nextElementSibling.textContent.trim()} narrator selected.`);draw()}));
   document.querySelectorAll('input[name="verseLanguage"]').forEach(input=>input.addEventListener('change',async()=>{const settings=languageSettings[input.value],verseId=currentVerseId;const narration=document.querySelector(`input[name="narrationLanguage"][value="${settings.narration}"]`);if(narration)narration.checked=true;$('locale').value=settings.locale;syncHeading();populateVoices();status(`Loading ${input.nextElementSibling.textContent.trim()} scripture…`);await loadVerseCatalog();const managedLoaded=await loadManagedVerse();const translated=managedLoaded||await loadVerseTranslation(verseId);if(!translated)await generateTodayVerse();status(`${input.nextElementSibling.textContent.trim()} selected for scripture text and audio.`);draw()}));
-  $('daypart').addEventListener('change',()=>{syncHeading();status(`${$('daypart').selectedOptions[0].textContent} edition selected.`);draw()});
+  $('daypart').addEventListener('change',async()=>{syncHeading();status(`Loading a ${$('daypart').selectedOptions[0].textContent.toLowerCase()} verse edition…`);await generateTodayVerse();draw()});
   $('verseBook').addEventListener('change',populateChapters);$('verseChapter').addEventListener('change',populateVerseNumbers);$('loadSelectedVerse').addEventListener('click',loadSelectedVerse);$('publishDate').addEventListener('change',()=>loadManagedVerse(true));
 
   controls.forEach(control=>{control.addEventListener(control.type==='file'?'change':'input',draw);control.addEventListener('change',draw)});
   $('downloadPng').addEventListener('click',downloadPng);$('saveDraft').addEventListener('click',saveDraft);$('previewAudio').addEventListener('click',previewNarration);$('stopAudio').addEventListener('click',()=>{stopNarration();status('Narration stopped.')});$('exportVideo').addEventListener('click',exportVideo);$('exportAllVideo').addEventListener('click',exportAllLanguagesVideo);$('exportMp3').addEventListener('click',exportMp3);$('generateTodayVerse').addEventListener('click',generateTodayVerse);
-  livingSanctuary.onload=draw;modernAurora.onload=draw;heritageBotanical.onload=draw;syncHeading();loadVerseCatalog();loadManagedVerse();draw();
+  async function bootGenerator(){
+    setPublishDateToToday();syncHeading();draw();await loadVerseCatalog();
+    const managedLoaded=await loadManagedVerse();
+    if(!managedLoaded)await generateTodayVerse();
+    draw();
+  }
+  livingSanctuary.onload=draw;modernAurora.onload=draw;heritageBotanical.onload=draw;bootGenerator();
 })();
 </script>
 </body>

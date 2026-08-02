@@ -33,6 +33,50 @@ function chooseUnused(array $items, array $history, callable $keyFn): array {
     $history[] = (string)$keyFn($item);
     return [$item, $history, $cycled, count($available) - 1];
 }
+function bibleCodeNames(): array {
+    return [
+        'GEN'=>'GENESIS','EXO'=>'EXODUS','LEV'=>'LEVITICUS','NUM'=>'NUMBERS','DEU'=>'DEUTERONOMY','JOS'=>'JOSHUA','JDG'=>'JUDGES','RUT'=>'RUTH',
+        '1SA'=>'1 SAMUEL','2SA'=>'2 SAMUEL','1KI'=>'1 KINGS','2KI'=>'2 KINGS','1CH'=>'1 CHRONICLES','2CH'=>'2 CHRONICLES','EZR'=>'EZRA','NEH'=>'NEHEMIAH',
+        'EST'=>'ESTHER','JOB'=>'JOB','PSA'=>'PSALM','PRO'=>'PROVERBS','ECC'=>'ECCLESIASTES','SOL'=>'SONG OF SOLOMON','ISA'=>'ISAIAH','JER'=>'JEREMIAH',
+        'LAM'=>'LAMENTATIONS','EZE'=>'EZEKIEL','DAN'=>'DANIEL','HOS'=>'HOSEA','JOE'=>'JOEL','AMO'=>'AMOS','OBA'=>'OBADIAH','JON'=>'JONAH','MIC'=>'MICAH',
+        'NAH'=>'NAHUM','HAB'=>'HABAKKUK','ZEP'=>'ZEPHANIAH','HAG'=>'HAGGAI','ZEC'=>'ZECHARIAH','MAL'=>'MALACHI','MAT'=>'MATTHEW','MAR'=>'MARK',
+        'LUK'=>'LUKE','JOH'=>'JOHN','ACT'=>'ACTS','ROM'=>'ROMANS','1CO'=>'1 CORINTHIANS','2CO'=>'2 CORINTHIANS','GAL'=>'GALATIANS','EPH'=>'EPHESIANS',
+        'PHI'=>'PHILIPPIANS','COL'=>'COLOSSIANS','1TH'=>'1 THESSALONIANS','2TH'=>'2 THESSALONIANS','1TI'=>'1 TIMOTHY','2TI'=>'2 TIMOTHY','TIT'=>'TITUS',
+        'PHM'=>'PHILEMON','HEB'=>'HEBREWS','JAM'=>'JAMES','1PE'=>'1 PETER','2PE'=>'2 PETER','1JO'=>'1 JOHN','2JO'=>'2 JOHN','3JO'=>'3 JOHN','JUD'=>'JUDE','REV'=>'REVELATION',
+    ];
+}
+function canonicalBibleCode(string $code): string {
+    return ['JOH'=>'JHN','MAR'=>'MRK','PHI'=>'PHP'][$code] ?? $code;
+}
+function bibleIdAliases(string $id): array {
+    $id = strtoupper(trim($id));
+    $aliases = [$id];
+    foreach (['JHN'=>'JOH','JOH'=>'JHN','MRK'=>'MAR','MAR'=>'MRK','PHP'=>'PHI','PHI'=>'PHP'] as $from => $to) {
+        if (str_starts_with($id, $from . ' ')) $aliases[] = $to . substr($id, strlen($from));
+    }
+    return array_values(array_unique($aliases));
+}
+function loadEnglishBibleBank(string $source): array {
+    $names = bibleCodeNames();
+    if (!is_file($source)) return [];
+    $items = [];
+    $handle = fopen($source, 'rb');
+    if (!$handle) return [];
+    while (($line = fgets($handle)) !== false) {
+        if (!preg_match('/^([1-3]?[A-Z]{2,3})\s+(\d+):(\d+)\s+(.+)$/u', trim($line), $match)) continue;
+        $code = $match[1];
+        if (!isset($names[$code])) continue;
+        $chapter = (int)$match[2];
+        $verse = (int)$match[3];
+        $items[] = [
+            canonicalBibleCode($code) . ' ' . $chapter . ':' . $verse,
+            trim($match[4]),
+            $names[$code] . ' ' . $chapter . ':' . $verse,
+        ];
+    }
+    fclose($handle);
+    return $items;
+}
 
 try {
     if ($type === 'bible') {
@@ -77,8 +121,10 @@ try {
         }
         $historyFile = $storage . '/bible-history-' . $language . '.json';
         if ($reset) { writeHistory($historyFile, []); jsonOut(['ok'=>true,'reset'=>true,'language'=>$language]); }
-        // Local KJV bank: generation does not depend on a web request or WEB text file.
-        $kjv = [
+        // Prefer the bundled public-domain World English Bible so the generator
+        // can rotate through the whole local Bible instead of a tiny old bank.
+        $web = loadEnglishBibleBank($root . '/dailybreath/data/engwebp_vpl.txt');
+        $kjvFallback = [
           ['GEN 1:3','And God said, Let there be light: and there was light.','GENESIS 1:3'],
           ['GEN 28:15','And, behold, I am with thee, and will keep thee in all places whither thou goest.','GENESIS 28:15'],
           ['PSA 23:1','The LORD is my shepherd; I shall not want.','PSALM 23:1'],
@@ -113,6 +159,7 @@ try {
           ['1TH 5:17','Pray without ceasing.','1 THESSALONIANS 5:17'],
           ['HEB 11:1','Now faith is the substance of things hoped for, the evidence of things not seen.','HEBREWS 11:1']
         ];
+        $englishBank = $web ?: $kjvFallback;
         $french = [
           ['GEN 28:15','Voici, je suis avec toi, je te garderai partout où tu iras.','GENÈSE 28:15'],
           ['PSA 23:1','L’Éternel est mon berger: je ne manquerai de rien.','PSAUME 23:1'],
@@ -197,7 +244,7 @@ try {
           ['COL 3:15','Se pou lapè Kris la dirije kè nou.','KOLOSYEN 3:15'],
           ['1TH 5:17','Priye san rete.','1 TESALONISYEN 5:17']
         ];
-        $banks = ['en'=>[$kjv,'KJV'], 'fr'=>[$french,'LSG'], 'es'=>[$spanish,'RVR'], 'jm'=>[$patois,'PATOIS'], 'ht'=>[$kreyol,'KREYÒL']];
+        $banks = ['en'=>[$englishBank,$web ? 'WEB' : 'KJV'], 'fr'=>[$french,'LSG'], 'es'=>[$spanish,'RVR'], 'jm'=>[$patois,'PATOIS'], 'ht'=>[$kreyol,'KREYÒL']];
         [$bank,$translation] = $banks[$language];
         $items = array_map(function ($v) use ($translation) {
             preg_match('/^(.+)\s+(\d+):(\d+)$/u', $v[2], $parts);
@@ -222,7 +269,8 @@ try {
         $cycled = false;
         $remaining = count($items);
         if ($selectedId !== '') {
-            $matches = array_values(array_filter($items, fn($i) => strtoupper($i['id']) === $selectedId));
+            $selectedAliases = array_fill_keys(bibleIdAliases($selectedId), true);
+            $matches = array_values(array_filter($items, fn($i) => isset($selectedAliases[strtoupper($i['id'])])));
             if (!$matches) jsonOut(['error'=>'The selected verse is not available in this language bank.'], 404);
             $item = $matches[0];
         } elseif ($selectedBook !== '' && $selectedChapter > 0 && $selectedVerse > 0) {

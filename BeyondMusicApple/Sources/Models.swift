@@ -175,6 +175,7 @@ struct BeyondIDSession: Codable, Hashable {
     var walletBalance: String?
     var walletCurrency: String?
     var connectedAt: Date?
+    var mobileToken: String?
 
     static let signedOut = BeyondIDSession(
         isConnected: false,
@@ -185,7 +186,8 @@ struct BeyondIDSession: Codable, Hashable {
         locale: nil,
         walletBalance: nil,
         walletCurrency: nil,
-        connectedAt: nil
+        connectedAt: nil,
+        mobileToken: nil
     )
 
     init(
@@ -197,7 +199,8 @@ struct BeyondIDSession: Codable, Hashable {
         locale: String? = nil,
         walletBalance: String? = nil,
         walletCurrency: String? = nil,
-        connectedAt: Date?
+        connectedAt: Date?,
+        mobileToken: String? = nil
     ) {
         self.isConnected = isConnected
         self.userID = userID
@@ -208,6 +211,7 @@ struct BeyondIDSession: Codable, Hashable {
         self.walletBalance = walletBalance
         self.walletCurrency = walletCurrency
         self.connectedAt = connectedAt
+        self.mobileToken = mobileToken
     }
 
     init(from decoder: Decoder) throws {
@@ -221,6 +225,7 @@ struct BeyondIDSession: Codable, Hashable {
         walletBalance = try container.decodeIfPresent(String.self, forKey: .walletBalance)
         walletCurrency = try container.decodeIfPresent(String.self, forKey: .walletCurrency)
         connectedAt = try container.decodeIfPresent(Date.self, forKey: .connectedAt)
+        mobileToken = try container.decodeIfPresent(String.self, forKey: .mobileToken)
     }
 
     var label: String {

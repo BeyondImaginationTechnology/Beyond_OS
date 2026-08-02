@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Beyond TV animated splash</title>
+  <desc id="desc">Animated Beyond TV logo splash with a glowing screen, moving scan lines, and tuning bars.</desc>
+  <defs>
+    <linearGradient id="screenGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#26104c">
+        <animate attributeName="stop-color" values="#26104c;#6a1e55;#16255f;#26104c" dur="6s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="0.55" stop-color="#0b1235">
+        <animate attributeName="stop-color" values="#0b1235;#221342;#421432;#0b1235" dur="6s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="1" stop-color="#050610"/>
+    </linearGradient>
+    <linearGradient id="brandGradient" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff8a4d"/>
+      <stop offset="0.45" stop-color="#ff3f86"/>
+      <stop offset="1" stop-color="#7e63ff"/>
+    </linearGradient>
+    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.95  0 1 0 0 0.25  0 0 1 0 0.75  0 0 0 0.75 0" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="scanLines" width="1" height="14" patternUnits="userSpaceOnUse">
+      <rect width="1" height="2" fill="#ffffff" opacity="0.07"/>
+    </pattern>
+    <clipPath id="screenClip">
+      <rect x="168" y="88" width="864" height="486" rx="44"/>
+    </clipPath>
+    <style>
+      .frame { fill: #090a14; stroke: rgba(255,255,255,.18); stroke-width: 4; }
+      .screen { fill: url(#screenGradient); }
+      .brand { font-family: Inter, Arial, sans-serif; font-weight: 900; letter-spacing: 7px; }
+      .meta { font-family: Inter, Arial, sans-serif; font-weight: 800; letter-spacing: 4px; }
+      .pulse { animation: pulse 1.45s ease-in-out infinite; transform-origin: center; }
+      .rise { animation: rise 3.8s ease-in-out infinite; }
+      .sweep { animation: sweep 2.8s linear infinite; }
+      .tune-a { animation: tuneA 1.3s ease-in-out infinite; }
+      .tune-b { animation: tuneB 1.3s ease-in-out infinite; animation-delay: .16s; }
+      .tune-c { animation: tuneC 1.3s ease-in-out infinite; animation-delay: .32s; }
+      .mark { animation: markIn 3.2s ease-in-out infinite; transform-origin: 600px 332px; }
+      @keyframes pulse {
+        0%, 100% { opacity: .72; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.035); }
+      }
+      @keyframes rise {
+        0%, 100% { transform: translateY(9px); opacity: .58; }
+        50% { transform: translateY(-9px); opacity: .9; }
+      }
+      @keyframes sweep {
+        from { transform: translateY(-150px); }
+        to { transform: translateY(540px); }
+      }
+      @keyframes tuneA {
+        0%, 100% { transform: scaleX(.38); opacity: .55; }
+        50% { transform: scaleX(1); opacity: 1; }
+      }
+      @keyframes tuneB {
+        0%, 100% { transform: scaleX(.62); opacity: .62; }
+        50% { transform: scaleX(1.18); opacity: 1; }
+      }
+      @keyframes tuneC {
+        0%, 100% { transform: scaleX(.5); opacity: .56; }
+        50% { transform: scaleX(.94); opacity: 1; }
+      }
+      @keyframes markIn {
+        0%, 100% { opacity: .98; transform: scale(1); }
+        45% { opacity: 1; transform: scale(1.025); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .pulse, .rise, .sweep, .tune-a, .tune-b, .tune-c, .mark { animation: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="1200" height="675" fill="#050610"/>
+  <rect x="168" y="88" width="864" height="486" rx="44" class="screen"/>
+  <rect x="168" y="88" width="864" height="486" rx="44" class="frame"/>
+
+  <g clip-path="url(#screenClip)">
+    <rect x="168" y="88" width="864" height="486" fill="url(#scanLines)" opacity="0.7"/>
+    <rect x="168" y="-30" width="864" height="92" fill="#ffffff" opacity="0.08" class="sweep"/>
+    <path d="M170 418 C 318 332, 462 488, 610 398 S 888 260, 1032 336" fill="none" stroke="#ff5f91" stroke-width="3" opacity="0.52" class="rise"/>
+    <path d="M170 482 C 340 420, 460 536, 610 462 S 842 358, 1032 402" fill="none" stroke="#76e4ff" stroke-width="3" opacity="0.42" class="rise"/>
+  </g>
+
+  <g class="mark" filter="url(#softGlow)">
+    <rect x="372" y="214" width="456" height="190" rx="30" fill="#070916" opacity="0.72" stroke="rgba(255,255,255,.16)" stroke-width="3"/>
+    <text x="600" y="303" text-anchor="middle" class="brand" font-size="70" fill="#ffffff">BEYOND</text>
+    <text x="600" y="378" text-anchor="middle" class="brand" font-size="74" fill="url(#brandGradient)">TV</text>
+  </g>
+
+  <g transform="translate(442 462)">
+    <text x="158" y="-22" text-anchor="middle" class="meta" font-size="18" fill="#d7d9ee">TUNING LIVE CHANNELS</text>
+    <rect x="0" y="0" width="110" height="9" rx="5" fill="#ff8a4d" class="tune-a" style="transform-origin: 0 4.5px"/>
+    <rect x="126" y="0" width="110" height="9" rx="5" fill="#ff3f86" class="tune-b" style="transform-origin: 0 4.5px"/>
+    <rect x="252" y="0" width="110" height="9" rx="5" fill="#7e63ff" class="tune-c" style="transform-origin: 0 4.5px"/>
+  </g>
+
+  <circle cx="920" cy="152" r="9" fill="#b9e300" class="pulse"/>
+  <text x="945" y="158" class="meta" font-size="16" fill="#dce7a9">LIVE</text>
+  <path d="M470 608 H730" stroke="#25293f" stroke-width="20" stroke-linecap="round"/>
+  <path d="M540 574 L512 608 M660 574 L688 608" stroke="#25293f" stroke-width="18" stroke-linecap="round"/>
+</svg>

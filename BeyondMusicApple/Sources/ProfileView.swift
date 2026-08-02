@@ -24,7 +24,7 @@ struct ProfileView: View {
                 MusicEyebrow(text: "Beyond Music 1.1")
                 Text("Personal Music Beta")
                     .font(.largeTitle.bold())
-                Text("Import your own audio files, download authorized tracks, and keep playback running with the screen off.")
+                Text("Import your own audio files, download tracks under their source terms, and keep playback running with the screen off.")
                     .foregroundStyle(.secondary)
             }
 
@@ -75,6 +75,18 @@ struct ProfileView: View {
                         .disabled(store.isAuthenticatingBeyondID)
                     }
                 } else {
+                    Button {
+                        Task {
+                            await store.signInBeyondIDWithGoogle()
+                            password = ""
+                        }
+                    } label: {
+                        Label("Continue with Google", systemImage: "g.circle.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(store.isAuthenticatingBeyondID)
+
                     Picker("Beyond ID mode", selection: $authMode) {
                         ForEach(BeyondIDAuthMode.allCases) { mode in
                             Text(mode.rawValue).tag(mode)
@@ -138,7 +150,7 @@ struct ProfileView: View {
                 SettingRow(icon: "arrow.down.circle.fill", title: "Downloaded", value: "\(store.downloadedTracks.count)")
                 SettingRow(icon: "folder.fill", title: "Imported", value: "\(store.importedTracks.count)")
                 SettingRow(icon: "heart.fill", title: "Favorites", value: "\(store.favoriteTracks.count)")
-                SettingRow(icon: "lock.shield.fill", title: "Source policy", value: "Authorized/open")
+                SettingRow(icon: "lock.shield.fill", title: "Source policy", value: "Terms-aware")
             }
         }
         .onAppear {

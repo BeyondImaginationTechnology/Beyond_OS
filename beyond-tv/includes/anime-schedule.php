@@ -45,14 +45,7 @@ function beyond_anime_schedule_state(?DateTimeImmutable $now = null): array
         $state['embed_url'] = $current['url'];
     } else {
         $state['player_url'] = $current['url'];
-        $state['sources'] = [[
-            'provider' => 'Internet Archive',
-            'title' => $current['series'] . ' · ' . $current['episode_title'],
-            'url' => $current['url'],
-            'duration' => $current['duration'],
-            'type' => 'video',
-            'license' => 'Internet Archive item',
-        ]];
+        $state['sources'] = beyond_anime_fallback_sources($current);
     }
 
     return $state;
@@ -292,6 +285,64 @@ function beyond_anime_episode(string $key, int $seed, int $duration, int $startO
         'source_type' => 'archive',
         'url' => 'https://archive.org/download/pokemon-indigo-league-season-1-1998/'
             . rawurlencode((string)($episode['file'] ?? '')),
+    ];
+}
+
+function beyond_anime_fallback_sources(array $program, int $limit = 6): array
+{
+    $key = explode(':', (string)($program['source_key'] ?? ''), 2)[0] ?: '';
+    $episodeNumber = max(1, (int)($program['episode_number'] ?? 1));
+    $duration = max(60, (int)($program['duration'] ?? 1380));
+    $sources = [beyond_anime_stream_source($program)];
+
+    if (!in_array($key, ['dragon-ball', 'dragon-ball-z'], true)) {
+        return $sources;
+    }
+
+    $libraryFile = $key === 'dragon-ball' ? 'dragon-ball-library.json' : 'dbz-westwood-sd-library.json';
+    $series = $key === 'dragon-ball' ? 'Dragon Ball' : 'Dragon Ball Z';
+    $library = beyond_anime_playable_library($libraryFile);
+    if (!$library) {
+        return $sources;
+    }
+
+    $episodeIndex = 0;
+    foreach ($library as $index => $episode) {
+        if ((int)($episode['episode'] ?? 0) === $episodeNumber) {
+            $episodeIndex = $index;
+            break;
+        }
+    }
+
+    for ($step = 1; count($sources) < $limit && $step < count($library); $step++) {
+        $episode = $library[($episodeIndex + $step) % count($library)] ?? [];
+        $url = trim((string)($episode['video_url'] ?? ''));
+        if ($url === '') {
+            continue;
+        }
+        $number = (int)($episode['episode'] ?? ($episodeNumber + $step));
+        $title = (string)($episode['title'] ?? ('Episode ' . $number));
+        $sources[] = beyond_anime_stream_source([
+            'series' => $series,
+            'episode_number' => $number,
+            'episode_title' => $title,
+            'url' => $url,
+            'duration' => max(60, (int)($episode['runtime_seconds'] ?? $duration)),
+        ]);
+    }
+
+    return $sources;
+}
+
+function beyond_anime_stream_source(array $program): array
+{
+    return [
+        'provider' => 'Internet Archive',
+        'title' => (string)$program['series'] . ' · ' . (string)$program['episode_title'],
+        'url' => (string)$program['url'],
+        'duration' => max(60, (int)($program['duration'] ?? 1380)),
+        'type' => 'video',
+        'license' => 'Internet Archive item',
     ];
 }
 

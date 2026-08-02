@@ -41,14 +41,12 @@ return [
         ],
     ],
     'music' => [
-        'jamendo' => [
-            'application' => 'Beyond Music',
-            'client_id' => '',
-            'client_secret' => '',
-            'redirect_url' => '',
-            'platform' => 'ios',
-            'usage' => 'Non-commercial',
-            'home_page' => 'https://beyondimagination.co.technology',
+        'youtube' => [
+            // Optional: leave blank to reuse the first key from config/youtube.php.
+            'data_api_key' => '',
+            // Required for YouTube MP3 downloads. Hostdeal can proxy this, but the
+            // converter itself must run on Python + FFmpeg hosting.
+            'audio_api_base_url' => '',
         ],
     ],
 ];

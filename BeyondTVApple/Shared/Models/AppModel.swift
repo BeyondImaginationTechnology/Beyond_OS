@@ -1,6 +1,9 @@
 import AVFoundation
 import Combine
 import Foundation
+#if os(iOS)
+import AuthenticationServices
+#endif
 
 @MainActor
 final class AppModel: ObservableObject {
@@ -13,14 +16,26 @@ final class AppModel: ObservableObject {
     @Published private(set) var webPlaybackURL: URL?
     @Published private(set) var guideItems: [GuideItem] = []
     @Published private(set) var isGuideLoading = false
+    @Published private(set) var beyondIDUser: BeyondIDUser?
+    @Published private(set) var beyondIDWallet: BeyondIDWallet?
+    @Published private(set) var isSigningIn = false
+    @Published private(set) var authErrorMessage: String?
 
     let player = AVPlayer()
     private let api: BeyondTVAPI
+    private let beyondID: BeyondIDService
     private var refreshTask: Task<Void, Never>?
     private var guideTask: Task<Void, Never>?
+    private var tuneSequence = 0
+    private let tokenKey = "BeyondTV.BeyondID.mobileToken"
+    #if os(iOS)
+    private var webAuthSession: ASWebAuthenticationSession?
+    private let webAuthPresentationProvider = WebAuthPresentationContextProvider()
+    #endif
 
-    init(api: BeyondTVAPI = .production) {
+    init(api: BeyondTVAPI = .production, beyondID: BeyondIDService = .production) {
         self.api = api
+        self.beyondID = beyondID
         player.automaticallyWaitsToMinimizeStalling = true
         player.preventsDisplaySleepDuringVideoPlayback = true
     }
@@ -33,27 +48,79 @@ final class AppModel: ObservableObject {
     func start() async {
         guard channels.isEmpty else { return }
         do {
+            await restoreBeyondIDSession()
             channels = try await api.channels()
-            let initial = channels.first(where: { $0.slug == "classic-cinema" }) ?? channels.first
+            let initial = Channel.defaultChannel(in: channels)
             if let initial {
                 await tune(to: initial)
             }
-            await refreshGuide()
+            Task { await refreshGuide() }
         } catch {
             errorMessage = error.localizedDescription
         }
     }
 
+    func signInWithGoogle() async {
+        #if os(iOS)
+        guard !isSigningIn else { return }
+        isSigningIn = true
+        authErrorMessage = nil
+
+        do {
+            let callbackURL = try await authenticate(url: beyondID.googleSignInURL())
+            let token = try mobileToken(from: callbackURL)
+            UserDefaults.standard.set(token, forKey: tokenKey)
+            try await loadBeyondIDSession(token: token)
+        } catch {
+            authErrorMessage = error.localizedDescription
+        }
+
+        isSigningIn = false
+        #else
+        authErrorMessage = BeyondIDError.unavailableOnPlatform.localizedDescription
+        #endif
+    }
+
+    func restoreBeyondIDSession() async {
+        guard let token = UserDefaults.standard.string(forKey: tokenKey), !token.isEmpty else { return }
+        do {
+            try await loadBeyondIDSession(token: token)
+        } catch {
+            UserDefaults.standard.removeObject(forKey: tokenKey)
+            beyondIDUser = nil
+            beyondIDWallet = nil
+        }
+    }
+
+    func signOutBeyondID() {
+        UserDefaults.standard.removeObject(forKey: tokenKey)
+        beyondIDUser = nil
+        beyondIDWallet = nil
+        authErrorMessage = nil
+    }
+
     func tune(to channel: Channel) async {
+        tuneSequence += 1
+        let sequence = tuneSequence
         refreshTask?.cancel()
         selectedChannel = channel
         status = .loading
         isLoading = true
         errorMessage = nil
+        currentSource = nil
         webPlaybackURL = nil
+        player.pause()
+        player.replaceCurrentItem(with: nil)
+
+        #if os(iOS)
+        if let embedURL = URL(string: channel.embedPath, relativeTo: api.baseURL)?.absoluteURL {
+            webPlaybackURL = embedURL
+        }
+        #endif
 
         do {
             let response = try await api.schedule(for: channel)
+            guard sequence == tuneSequence else { return }
             let nativeSources = response.sources.filter(\.isNativelyPlayable)
             let fallbackURL = response.webPlaybackLocation.flatMap {
                 URL(string: $0, relativeTo: api.baseURL)?.absoluteURL
@@ -94,16 +161,28 @@ final class AppModel: ObservableObject {
                 )
             )
 
+            #if os(iOS)
+            if channel.isWebPlaybackChannel {
+                player.pause()
+                player.replaceCurrentItem(with: nil)
+                currentSource = nil
+
+                let channelPlayerURL = URL(string: channel.embedPath, relativeTo: api.baseURL)?.absoluteURL
+                let isEmbedFallback = fallbackURL?.host()?.contains("youtube") == true
+                webPlaybackURL = isEmbedFallback ? fallbackURL : channelPlayerURL
+                scheduleRefresh(for: channel)
+                isLoading = false
+                return
+            }
+            #endif
+
             guard let source = nativeSources.first ?? fallbackNativeSource else {
                 player.pause()
                 player.replaceCurrentItem(with: nil)
                 currentSource = nil
 
                 #if os(iOS)
-                let channelPageURL = URL(
-                    string: "/beyond-tv/channel.php?slug=\(channel.slug)",
-                    relativeTo: api.baseURL
-                )?.absoluteURL
+                let channelPageURL = URL(string: channel.embedPath, relativeTo: api.baseURL)?.absoluteURL
                 if let webURL = fallbackURL ?? channelPageURL {
                     webPlaybackURL = webURL
                     scheduleRefresh(for: channel)
@@ -126,10 +205,12 @@ final class AppModel: ObservableObject {
             if response.startOffset > 0 {
                 let time = CMTime(seconds: response.startOffset, preferredTimescale: 600)
                 await player.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero)
+                guard sequence == tuneSequence else { return }
             }
             player.play()
             scheduleRefresh(for: channel)
         } catch {
+            guard sequence == tuneSequence else { return }
             errorMessage = error.localizedDescription
         }
 
@@ -200,4 +281,49 @@ final class AppModel: ObservableObject {
             guideItems.sort { $0.channel.number < $1.channel.number }
         }
     }
+
+    private func loadBeyondIDSession(token: String) async throws {
+        let session = try await beyondID.session(for: token)
+        beyondIDUser = session.user
+        beyondIDWallet = session.wallet
+        authErrorMessage = nil
+    }
+
+    #if os(iOS)
+    private func authenticate(url: URL) async throws -> URL {
+        try await withCheckedThrowingContinuation { continuation in
+            let session = ASWebAuthenticationSession(
+                url: url,
+                callbackURLScheme: "beyondtv"
+            ) { callbackURL, error in
+                if let error {
+                    continuation.resume(throwing: error)
+                    return
+                }
+                guard let callbackURL else {
+                    continuation.resume(throwing: BeyondIDError.missingCallbackToken)
+                    return
+                }
+                continuation.resume(returning: callbackURL)
+            }
+            session.presentationContextProvider = webAuthPresentationProvider
+            session.prefersEphemeralWebBrowserSession = false
+            webAuthSession = session
+            if !session.start() {
+                continuation.resume(throwing: BeyondIDError.server("Could not open Google sign-in."))
+            }
+        }
+    }
+
+    private func mobileToken(from callbackURL: URL) throws -> String {
+        let components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false)
+        if let error = components?.queryItems?.first(where: { $0.name == "error" })?.value, !error.isEmpty {
+            throw BeyondIDError.server(error)
+        }
+        guard let token = components?.queryItems?.first(where: { $0.name == "token" })?.value, !token.isEmpty else {
+            throw BeyondIDError.missingCallbackToken
+        }
+        return token
+    }
+    #endif
 }

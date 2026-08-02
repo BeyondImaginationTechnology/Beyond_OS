@@ -7,9 +7,9 @@ struct DiscoverView: View {
         MusicScreen(title: "Discover") {
             MusicPanel {
                 MusicEyebrow(text: "Search")
-                Text("Find authorized music")
+                Text("Find music")
                     .font(.largeTitle.bold())
-                Text("Search open audio catalogs and optional app-key providers. Downloaded results are copied into your local library after you review the source license.")
+                Text("Search Internet Archive and YouTube from one bar. Internet Archive files download directly; YouTube results use the configured converter API and remain subject to YouTube terms, rights-holder permissions, and applicable law.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 HStack {
@@ -34,14 +34,6 @@ struct DiscoverView: View {
                     }
                     .buttonStyle(.bordered)
                     .disabled(store.searchResults.isEmpty || store.isSearching)
-
-                    Button {
-                        Task { await store.surpriseMe() }
-                    } label: {
-                        Label("Random audio", systemImage: "shuffle.circle")
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(store.isSearching)
                 }
                 Text(store.statusMessage)
                     .font(.caption)
@@ -67,7 +59,7 @@ struct DiscoverView: View {
             if store.isSearching {
                 MusicPanel {
                     ProgressView()
-                    Text("Searching open music")
+                    Text("Searching music")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -77,7 +69,8 @@ struct DiscoverView: View {
                 title: "Results",
                 tracks: store.searchResults,
                 emptyTitle: "No search results loaded",
-                emptyMessage: "Search a song, artist, or genre. Downloaded results are saved into your local library."
+                emptyMessage: "Search a song, artist, genre, or YouTube URL. Downloads are saved into your local library.",
+                showsSource: true
             )
         }
     }

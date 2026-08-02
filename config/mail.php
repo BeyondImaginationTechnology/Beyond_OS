@@ -56,7 +56,9 @@ function smtp_send_html(string $to, string $subject, string $html, string $fromN
         smtp_command($socket, 'RCPT TO:<' . $to . '>', [250, 251]);
         smtp_command($socket, 'DATA', [354]);
 
-        $safeSubject = mb_encode_mimeheader($subject, 'UTF-8');
+        $safeSubject = function_exists('mb_encode_mimeheader')
+            ? mb_encode_mimeheader($subject, 'UTF-8')
+            : '=?UTF-8?B?' . base64_encode($subject) . '?=';
         $headers = [];
         $headers[] = 'From: ' . $fromName . ' <' . SMTP_FROM . '>';
         $headers[] = 'Reply-To: ' . SMTP_REPLY_TO;

@@ -14,6 +14,7 @@ struct Channel: Codable, Identifiable, Hashable, Sendable {
     var isWebPlaybackChannel: Bool {
         [
             "beyond-cartoons",
+            "yugioh-tv",
             "classic-cartoon-theater",
             "space-tv",
             "beyond-ancient",
@@ -39,6 +40,14 @@ struct Channel: Codable, Identifiable, Hashable, Sendable {
         default:
             "/beyond-tv/api/channel-stream.php?slug=\(slug)"
         }
+    }
+
+    var guideEndpoint: String {
+        "/beyond-tv/api/schedule-live.php?slug=\(slug)"
+    }
+
+    var embedPath: String {
+        "/beyond-tv/embed-player.php?slug=\(slug)"
     }
 
     var displayNumber: String {
@@ -121,6 +130,12 @@ struct Channel: Codable, Identifiable, Hashable, Sendable {
 
     var statusLabel: String {
         isWebPlaybackChannel ? "WEB" : "LIVE"
+    }
+
+    static func defaultChannel(in channels: [Channel]) -> Channel? {
+        channels.first(where: { $0.number == 1 })
+            ?? channels.first(where: { $0.slug == "beyond-after-dark" })
+            ?? channels.first
     }
 
     static let preview = Channel(

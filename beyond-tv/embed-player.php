@@ -1,7 +1,14 @@
 <?php
 declare(strict_types=1);
 $slug = preg_replace('/[^a-z0-9-]/', '', strtolower((string)($_GET['slug'] ?? '')));
-$streamEndpoint = 'api/channel-stream.php?slug=' . rawurlencode($slug);
+$streamEndpoints = [
+    'classic-cinema' => 'api/movies-live.php',
+    'beyond-cartoons' => 'api/beyond-cartoons-live.php',
+    'yugioh-tv' => 'api/anime-live.php',
+    'classic-cartoon-theater' => 'api/classic-live.php',
+    'space-tv' => 'api/space-live.php',
+];
+$streamEndpoint = $streamEndpoints[$slug] ?? ('api/channel-stream.php?slug=' . rawurlencode($slug));
 ?><!doctype html>
 <html lang="en">
 <head>

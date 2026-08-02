@@ -104,10 +104,10 @@ struct ScreenshotSpec {
 }
 
 let screenshotSpecs = [
-    ScreenshotSpec(slug: "search-open-music", title: "Search open music", subtitle: "Find tracks across public and creator-friendly catalogs.", tab: "Discover", lines: ["Authorized results", "Provider shown", "License note visible", "Download after review"], accent: NSColor(calibratedRed: 0.27, green: 0.93, blue: 0.86, alpha: 1)),
+    ScreenshotSpec(slug: "search-open-music", title: "Search music", subtitle: "Find Internet Archive and YouTube results from one bar.", tab: "Discover", lines: ["One search bar", "Provider shown", "Source terms visible", "Download into library"], accent: NSColor(calibratedRed: 0.27, green: 0.93, blue: 0.86, alpha: 1)),
     ScreenshotSpec(slug: "play-screen-off", title: "Play with screen off", subtitle: "Background audio mode keeps your queue moving.", tab: "Listen", lines: ["Now playing", "Local or streamed audio", "Lock-screen friendly", "Audio session: playback"], accent: NSColor(calibratedRed: 0.93, green: 0.31, blue: 0.61, alpha: 1)),
     ScreenshotSpec(slug: "download-offline", title: "Download for offline", subtitle: "Save authorized audio into your personal library.", tab: "Library", lines: ["Local files", "Stored on device", "Metadata from audio", "Tap to play anytime"], accent: NSColor(calibratedRed: 0.98, green: 0.78, blue: 0.30, alpha: 1)),
-    ScreenshotSpec(slug: "random-discovery", title: "Pages of discovery", subtitle: "Next page and random audio keep results fresh.", tab: "Discover", lines: ["Next page", "Random audio", "Open catalog search", "Dedupe built in"], accent: NSColor(calibratedRed: 0.42, green: 0.72, blue: 1.0, alpha: 1)),
+    ScreenshotSpec(slug: "music-providers", title: "Two music sources", subtitle: "Internet Archive and YouTube results stay clearly separated.", tab: "Discover", lines: ["Internet Archive", "YouTube", "Next page", "Dedupe built in"], accent: NSColor(calibratedRed: 0.42, green: 0.72, blue: 1.0, alpha: 1)),
     ScreenshotSpec(slug: "personal-service", title: "Your music service", subtitle: "Search, play, download, import, and review source licenses.", tab: "Profile", lines: ["Background audio enabled", "Imported files", "Authorized/open policy", "Private library"], accent: NSColor(calibratedRed: 0.72, green: 0.52, blue: 1.0, alpha: 1))
 ]
 

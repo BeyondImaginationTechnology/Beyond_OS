@@ -1,5 +1,7 @@
 import AVFoundation
+import AuthenticationServices
 import Foundation
+import UIKit
 
 @MainActor
 final class MusicStore: ObservableObject {
@@ -25,7 +27,9 @@ final class MusicStore: ObservableObject {
 
     private let player = AudioPlayer()
     private let searchService = OpenMusicSearchService()
+    private let youtubeAudioService = YouTubeAudioConverterService()
     private let beyondIDService = BeyondIDService()
+    private let beyondIDWebAuthenticator = BeyondIDWebAuthenticator()
     private let fileManager = FileManager.default
 
     init() {
@@ -152,7 +156,7 @@ final class MusicStore: ObservableObject {
         do {
             let page = try await searchService.search(query: query, page: currentSearchPage)
             searchResults = resetPage ? page.tracks : searchResults + page.tracks.filter { incoming in !searchResults.contains { $0.id == incoming.id } }
-            statusMessage = page.tracks.isEmpty ? "No authorized tracks found on page \(currentSearchPage)" : "Page \(currentSearchPage): \(page.summaryText)"
+            statusMessage = page.tracks.isEmpty ? "No tracks found on page \(currentSearchPage)" : "Page \(currentSearchPage): \(page.summaryText)"
         } catch {
             statusMessage = "Search failed: \(error.localizedDescription)"
         }
@@ -161,12 +165,6 @@ final class MusicStore: ObservableObject {
     func loadNextSearchPage() async {
         currentSearchPage += 1
         await searchOpenMusic(resetPage: false)
-    }
-
-    func surpriseMe() async {
-        searchText = searchService.randomDiscoveryQuery()
-        currentSearchPage = Int.random(in: 1...4)
-        await searchOpenMusic(resetPage: true)
     }
 
     func play(_ track: MusicTrack) {
@@ -197,6 +195,11 @@ final class MusicStore: ObservableObject {
     }
 
     func download(_ track: MusicTrack) async {
+        if track.providerName == "YouTube" {
+            await downloadYouTubeTrack(track)
+            return
+        }
+
         guard let downloadURL = track.downloadURL else {
             statusMessage = "No downloadable file is available for this track"
             return
@@ -219,6 +222,53 @@ final class MusicStore: ObservableObject {
         } catch {
             downloadStates[track.id] = .failed(error.localizedDescription)
             statusMessage = "Download failed: \(error.localizedDescription)"
+        }
+    }
+
+    private func downloadYouTubeTrack(_ track: MusicTrack) async {
+        guard let sourceURL = track.sourceURL else {
+            statusMessage = "No YouTube URL is available for this result"
+            return
+        }
+
+        downloadStates[track.id] = .downloading
+        do {
+            try ensureStorage()
+            let mp3URL = try await youtubeAudioService.mp3URL(for: sourceURL)
+            let (temporaryURL, _) = try await URLSession.shared.download(from: mp3URL)
+            let fileName = uniqueStoredFileName(for: "\(track.id).mp3")
+            let destinationURL = audioDirectory.appendingPathComponent(fileName)
+            if fileManager.fileExists(atPath: destinationURL.path) {
+                try fileManager.removeItem(at: destinationURL)
+            }
+            try fileManager.moveItem(at: temporaryURL, to: destinationURL)
+            let localTrack = MusicTrack(
+                id: track.id,
+                title: track.title,
+                artist: track.artist,
+                album: track.album,
+                durationSeconds: track.durationSeconds,
+                mood: track.mood,
+                streamURL: nil,
+                downloadURL: mp3URL,
+                artworkURL: track.artworkURL,
+                sourceURL: track.sourceURL,
+                licenseNote: track.licenseNote,
+                providerName: track.providerName,
+                localFileName: fileName,
+                originalFileName: sourceURL.lastPathComponent.isEmpty ? sourceURL.absoluteString : sourceURL.lastPathComponent,
+                importedAt: .now,
+                playCount: track.playCount,
+                lastPlayedAt: track.lastPlayedAt,
+                isFavorite: track.isFavorite
+            )
+            let enrichedTrack = try await trackWithFileMetadata(localTrack, fileURL: destinationURL)
+            upsertLibraryTrack(enrichedTrack)
+            downloadStates[track.id] = .downloaded
+            statusMessage = "Saved \(enrichedTrack.title)"
+        } catch {
+            downloadStates[track.id] = .failed(error.localizedDescription)
+            statusMessage = "YouTube download failed: \(error.localizedDescription)"
         }
     }
 
@@ -291,8 +341,19 @@ final class MusicStore: ObservableObject {
             statusMessage = "Beyond ID session verified"
             savePreferences()
         } catch BeyondIDError.unauthorized {
-            beyondIDSession = .signedOut
-            savePreferences()
+            if let mobileToken = beyondIDSession.mobileToken {
+                do {
+                    beyondIDSession = try await beyondIDService.mobileSession(token: mobileToken)
+                    statusMessage = "Beyond ID session verified"
+                    savePreferences()
+                } catch {
+                    beyondIDSession = .signedOut
+                    savePreferences()
+                }
+            } else {
+                beyondIDSession = .signedOut
+                savePreferences()
+            }
         } catch {
             statusMessage = "Beyond ID check failed: \(error.localizedDescription)"
         }
@@ -320,6 +381,21 @@ final class MusicStore: ObservableObject {
             statusMessage = "Beyond ID created. Check your email to verify, then sign in."
         } catch {
             statusMessage = "Beyond ID registration failed: \(error.localizedDescription)"
+        }
+    }
+
+    func signInBeyondIDWithGoogle() async {
+        isAuthenticatingBeyondID = true
+        defer { isAuthenticatingBeyondID = false }
+
+        do {
+            let url = beyondIDService.googleSignInURL()
+            let callbackURL = try await beyondIDWebAuthenticator.authenticate(url: url, callbackScheme: "beyondmusic")
+            beyondIDSession = try await beyondIDService.completeMobileSignIn(callbackURL: callbackURL)
+            statusMessage = "Signed in with Google"
+            savePreferences()
+        } catch {
+            statusMessage = "Google sign in failed: \(error.localizedDescription)"
         }
     }
 
@@ -548,6 +624,79 @@ extension Int {
     }
 }
 
+private struct YouTubeAudioConverterService {
+    private let session: URLSession
+    private let decoder = JSONDecoder()
+
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
+
+    func mp3URL(for youtubeURL: URL) async throws -> URL {
+        let baseURL = try configuredBaseURL()
+        var conversionComponents = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)
+        conversionComponents?.queryItems = [URLQueryItem(name: "url", value: youtubeURL.absoluteString)]
+        guard let conversionURL = conversionComponents?.url else { throw URLError(.badURL) }
+
+        let (data, response) = try await session.data(from: conversionURL)
+        try validate(response: response, data: data)
+        let payload = try decoder.decode(YouTubeAudioConversionResponse.self, from: data)
+        guard !payload.token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw YouTubeAudioError.server("Converter did not return a token")
+        }
+        if let downloadURL = payload.downloadURL {
+            return downloadURL
+        }
+
+        var downloadComponents = URLComponents(url: baseURL.appending(path: "/download"), resolvingAgainstBaseURL: false)
+        downloadComponents?.queryItems = [URLQueryItem(name: "token", value: payload.token)]
+        guard let downloadURL = downloadComponents?.url else { throw URLError(.badURL) }
+        return downloadURL
+    }
+
+    private func configuredBaseURL() throws -> URL {
+        guard let rawValue = Bundle.main.object(forInfoDictionaryKey: "YouTubeAudioAPIBaseURL") as? String,
+              let url = URL(string: rawValue.trimmingCharacters(in: .whitespacesAndNewlines)),
+              ["http", "https"].contains(url.scheme?.lowercased())
+        else {
+            throw YouTubeAudioError.notConfigured
+        }
+        return url
+    }
+
+    private func validate(response: URLResponse, data: Data) throws {
+        guard let httpResponse = response as? HTTPURLResponse else { return }
+        guard (200...299).contains(httpResponse.statusCode) else {
+            let message = String(data: data, encoding: .utf8) ?? "HTTP \(httpResponse.statusCode)"
+            throw YouTubeAudioError.server(message)
+        }
+    }
+}
+
+private struct YouTubeAudioConversionResponse: Decodable {
+    let token: String
+    let downloadURL: URL?
+
+    enum CodingKeys: String, CodingKey {
+        case token
+        case downloadURL = "download_url"
+    }
+}
+
+private enum YouTubeAudioError: LocalizedError {
+    case notConfigured
+    case server(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .notConfigured:
+            "Set YouTubeAudioAPIBaseURL to the yt-audio-api endpoint"
+        case .server(let message):
+            message
+        }
+    }
+}
+
 private struct BeyondIDService {
     private let session: URLSession
     private let decoder = JSONDecoder()
@@ -597,6 +746,43 @@ private struct BeyondIDService {
         guard payload.ok else {
             throw BeyondIDError.server(payload.error ?? "Registration failed")
         }
+    }
+
+    func googleSignInURL() -> URL {
+        var components = URLComponents(url: baseURL.appending(path: "/beyond-id/auth/oauth-start.php"), resolvingAgainstBaseURL: false)
+        components?.queryItems = [
+            URLQueryItem(name: "provider", value: "google"),
+            URLQueryItem(name: "app", value: "beyond-music"),
+            URLQueryItem(name: "return", value: "/beyond-id/auth/mobile-complete.php")
+        ]
+        return components?.url ?? baseURL.appending(path: "/beyond-id/auth/login.php")
+    }
+
+    func completeMobileSignIn(callbackURL: URL) async throws -> BeyondIDSession {
+        guard let components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false),
+              let token = components.queryItems?.first(where: { $0.name == "token" })?.value,
+              !token.isEmpty
+        else {
+            let message = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false)?
+                .queryItems?
+                .first(where: { $0.name == "error" })?
+                .value ?? "Google sign in did not return a mobile token"
+            throw BeyondIDError.server(message)
+        }
+        return try await mobileSession(token: token)
+    }
+
+    func mobileSession(token: String) async throws -> BeyondIDSession {
+        var components = URLComponents(url: baseURL.appending(path: "/beyond-id/api/mobile-session.php"), resolvingAgainstBaseURL: false)
+        components?.queryItems = [URLQueryItem(name: "token", value: token)]
+        guard let url = components?.url else { throw URLError(.badURL) }
+        let (data, response) = try await session.data(from: url)
+        try validate(response: response, data: data)
+        let payload = try decoder.decode(BeyondIDMeResponse.self, from: data)
+        guard payload.ok, payload.authenticated, let user = payload.user else {
+            throw BeyondIDError.unauthorized
+        }
+        return BeyondIDSession(user: user, wallet: payload.wallet, connectedAt: .now, mobileToken: token)
     }
 
     func signOut() async throws {
@@ -653,6 +839,38 @@ private enum BeyondIDError: LocalizedError, Equatable {
         case .server(let message):
             message
         }
+    }
+}
+
+@MainActor
+private final class BeyondIDWebAuthenticator: NSObject, ASWebAuthenticationPresentationContextProviding {
+    private var currentSession: ASWebAuthenticationSession?
+
+    func authenticate(url: URL, callbackScheme: String) async throws -> URL {
+        try await withCheckedThrowingContinuation { continuation in
+            let session = ASWebAuthenticationSession(url: url, callbackURLScheme: callbackScheme) { [weak self] callbackURL, error in
+                self?.currentSession = nil
+                if let callbackURL {
+                    continuation.resume(returning: callbackURL)
+                } else {
+                    continuation.resume(throwing: error ?? BeyondIDError.server("Google sign in was cancelled"))
+                }
+            }
+            session.presentationContextProvider = self
+            session.prefersEphemeralWebBrowserSession = false
+            currentSession = session
+            if !session.start() {
+                currentSession = nil
+                continuation.resume(throwing: BeyondIDError.server("Could not start Google sign in"))
+            }
+        }
+    }
+
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow } ?? ASPresentationAnchor()
     }
 }
 
@@ -761,7 +979,7 @@ private struct FlexibleString: Decodable {
 }
 
 private extension BeyondIDSession {
-    init(user: BeyondIDUser, wallet: BeyondIDWallet?, connectedAt: Date) {
+    init(user: BeyondIDUser, wallet: BeyondIDWallet?, connectedAt: Date, mobileToken: String? = nil) {
         self.init(
             isConnected: true,
             userID: user.id?.value,
@@ -771,7 +989,8 @@ private extension BeyondIDSession {
             locale: user.bestLocale,
             walletBalance: wallet?.balance?.value,
             walletCurrency: wallet?.currency,
-            connectedAt: connectedAt
+            connectedAt: connectedAt,
+            mobileToken: mobileToken
         )
     }
 }

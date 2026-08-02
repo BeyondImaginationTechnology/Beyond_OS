@@ -1,29 +1,10 @@
 import Foundation
 
 struct OpenMusicSearchService {
-    private let fallbackQueries = [
-        "public domain piano",
-        "creative commons jazz",
-        "classical guitar",
-        "ambient instrumental",
-        "lofi beat",
-        "synthwave",
-        "folk acoustic",
-        "orchestral public domain",
-        "study music",
-        "electronic instrumental"
-    ]
-
-    func randomDiscoveryQuery() -> String {
-        fallbackQueries.randomElement() ?? "creative commons music"
-    }
-
     func search(query: String, page: Int) async throws -> MusicSearchPage {
         let providerResults = await withTaskGroup(of: (String, Result<[MusicTrack], Error>).self) { group in
             group.addTask { ("Internet Archive", await providerResult { try await searchInternetArchive(query: query, page: page) }) }
-            group.addTask { ("Wikimedia Commons", await providerResult { try await searchWikimediaCommons(query: query, page: page) }) }
-            group.addTask { ("Jamendo", await providerResult { try await searchJamendo(query: query, page: page) }) }
-            group.addTask { ("Freesound", await providerResult { try await searchFreesound(query: query, page: page) }) }
+            group.addTask { ("YouTube", await providerResult { try await searchYouTube(query: query, page: page) }) }
 
             var results: [(String, Result<[MusicTrack], Error>)] = []
             for await result in group {
@@ -52,17 +33,6 @@ struct OpenMusicSearchService {
             if !duplicate {
                 partialResult.append(track)
             }
-        }
-
-        if deduped.isEmpty && page == 1 {
-            let fallback = fallbackQueries.shuffled().prefix(2)
-            var fallbackTracks: [MusicTrack] = []
-            for fallbackQuery in fallback {
-                fallbackTracks += (try? await searchInternetArchive(query: fallbackQuery, page: Int.random(in: 1...3))) ?? []
-                fallbackTracks += (try? await searchWikimediaCommons(query: fallbackQuery, page: Int.random(in: 1...3))) ?? []
-            }
-            let randomTracks = fallbackTracks.shuffled().prefix(18)
-            return MusicSearchPage(query: query, page: page, tracks: Array(randomTracks), providerSummaries: ["Random open-audio fallback \(randomTracks.count)"])
         }
 
         return MusicSearchPage(query: query, page: page, tracks: deduped.shuffled(), providerSummaries: summaries)
@@ -143,158 +113,110 @@ struct OpenMusicSearchService {
         return components.url
     }
 
-    private func searchWikimediaCommons(query: String, page: Int) async throws -> [MusicTrack] {
-        var components = URLComponents(string: "https://commons.wikimedia.org/w/api.php")
-        components?.queryItems = [
-            URLQueryItem(name: "action", value: "query"),
-            URLQueryItem(name: "format", value: "json"),
-            URLQueryItem(name: "generator", value: "search"),
-            URLQueryItem(name: "gsrnamespace", value: "6"),
-            URLQueryItem(name: "gsrsearch", value: "\(query) filetype:audio"),
-            URLQueryItem(name: "gsrlimit", value: "12"),
-            URLQueryItem(name: "gsroffset", value: "\(max(0, (page - 1) * 12))"),
-            URLQueryItem(name: "prop", value: "imageinfo"),
-            URLQueryItem(name: "iiprop", value: "url|mime|extmetadata|size"),
-            URLQueryItem(name: "iiurlwidth", value: "300")
-        ]
-        guard let url = components?.url else { throw URLError(.badURL) }
-        let (data, _) = try await URLSession.shared.data(from: url)
-        let response = try JSONDecoder().decode(CommonsSearchResponse.self, from: data)
+    private func searchYouTube(query: String, page: Int) async throws -> [MusicTrack] {
+        if let youtubeURL = youtubeURL(from: query) {
+            return [youtubeTrack(title: "YouTube \(youtubeVideoID(from: youtubeURL) ?? "audio")", url: youtubeURL)]
+        }
 
-        return response.query?.pages.values.compactMap { page in
-            guard let info = page.imageinfo?.first,
-                  info.mime?.hasPrefix("audio/") == true,
-                  let streamURL = URL(string: info.url)
-            else { return nil }
-
-            let cleanTitle = page.title.replacingOccurrences(of: "File:", with: "").removingAudioExtension
-            let artist = info.extmetadata?.artist?.value.strippingHTML ?? "Wikimedia Commons"
-            let license = info.extmetadata?.licenseShortName?.value.strippingHTML ?? "Free license"
-            return MusicTrack(
-                id: "commons-\(page.pageid)-\(cleanTitle)".stableMusicID,
-                title: cleanTitle,
-                artist: artist.isEmpty ? "Wikimedia Commons" : artist,
-                album: nil,
-                durationSeconds: nil,
-                mood: .focus,
-                streamURL: streamURL,
-                downloadURL: streamURL,
-                artworkURL: info.thumburl.flatMap(URL.init(string:)),
-                sourceURL: URL(string: info.descriptionurl),
-                licenseNote: license,
-                providerName: "Wikimedia Commons",
-                localFileName: nil,
-                originalFileName: nil,
-                importedAt: nil
-            )
-        } ?? []
-    }
-
-    private func searchJamendo(query: String, page: Int) async throws -> [MusicTrack] {
-        if let serverURL = jamendoProxyURL(query: query, page: page),
-           let tracks = try? await fetchJamendoTracks(from: serverURL) {
+        guard page == 1 else { return [] }
+        if let proxyURL = youtubeProxyURL(query: query),
+           let tracks = try? await fetchYouTubeTracks(from: proxyURL) {
             return tracks
         }
 
-        guard let directURL = directJamendoURL(query: query, page: page) else { return [] }
-        return try await fetchJamendoTracks(from: directURL)
+        guard let directURL = directYouTubeSearchURL(query: query) else { return [] }
+        return try await fetchYouTubeTracks(from: directURL)
     }
 
-    private func jamendoProxyURL(query: String, page: Int) -> URL? {
+    private func youtubeProxyURL(query: String) -> URL? {
         let rawBaseURL = Bundle.main.object(forInfoDictionaryKey: "BeyondMusicAPIBaseURL") as? String
         guard let baseURL = URL(string: rawBaseURL?.trimmingCharacters(in: .whitespacesAndNewlines) ?? "") else { return nil }
-        var components = URLComponents(url: baseURL.appending(path: "/beyond-media/api/jamendo-search.php"), resolvingAgainstBaseURL: false)
-        components?.queryItems = [
-            URLQueryItem(name: "q", value: query),
-            URLQueryItem(name: "page", value: "\(max(1, page))")
-        ]
+        var components = URLComponents(url: baseURL.appending(path: "/beyond-media/api/youtube-search.php"), resolvingAgainstBaseURL: false)
+        components?.queryItems = [URLQueryItem(name: "q", value: query)]
         return components?.url
     }
 
-    private func directJamendoURL(query: String, page: Int) -> URL? {
-        guard let clientID = Bundle.main.object(forInfoDictionaryKey: "JamendoClientID") as? String,
-              !clientID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    private func directYouTubeSearchURL(query: String) -> URL? {
+        guard let key = Bundle.main.object(forInfoDictionaryKey: "YouTubeDataAPIKey") as? String,
+              !key.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         else { return nil }
-        var components = URLComponents(string: "https://api.jamendo.com/v3.0/tracks/")
+        var components = URLComponents(string: "https://www.googleapis.com/youtube/v3/search")
         components?.queryItems = [
-            URLQueryItem(name: "client_id", value: clientID),
-            URLQueryItem(name: "format", value: "json"),
-            URLQueryItem(name: "limit", value: "15"),
-            URLQueryItem(name: "offset", value: "\(max(0, (page - 1) * 15))"),
-            URLQueryItem(name: "search", value: query),
-            URLQueryItem(name: "include", value: "licenses+musicinfo"),
-            URLQueryItem(name: "audioformat", value: "mp32"),
-            URLQueryItem(name: "order", value: page.isMultiple(of: 2) ? "popularity_month" : "relevance")
+            URLQueryItem(name: "part", value: "snippet"),
+            URLQueryItem(name: "type", value: "video"),
+            URLQueryItem(name: "videoCategoryId", value: "10"),
+            URLQueryItem(name: "maxResults", value: "10"),
+            URLQueryItem(name: "q", value: query),
+            URLQueryItem(name: "key", value: key)
         ]
         return components?.url
     }
 
-    private func fetchJamendoTracks(from url: URL) async throws -> [MusicTrack] {
-        let (data, _) = try await URLSession.shared.data(from: url)
-        let response = try JSONDecoder().decode(JamendoResponse.self, from: data)
-
-        return response.results.compactMap { item in
-            guard let streamURL = URL(string: item.audio) else { return nil }
-            let downloadURL = item.audiodownloadAllowed == true ? URL(string: item.audiodownload ?? "") : nil
-            return MusicTrack(
-                id: "jamendo-\(item.id)".stableMusicID,
-                title: item.name,
-                artist: item.artistName,
-                album: item.albumName,
-                durationSeconds: item.duration,
-                mood: .focus,
-                streamURL: streamURL,
-                downloadURL: downloadURL ?? streamURL,
-                artworkURL: URL(string: item.albumImage ?? ""),
-                sourceURL: URL(string: item.shareurl ?? ""),
-                licenseNote: item.licenseCCURL ?? "Jamendo license",
-                providerName: "Jamendo",
-                localFileName: nil,
-                originalFileName: nil,
-                importedAt: nil
+    private func fetchYouTubeTracks(from url: URL) async throws -> [MusicTrack] {
+        let (data, response) = try await URLSession.shared.data(from: url)
+        if let httpResponse = response as? HTTPURLResponse,
+           !(200...299).contains(httpResponse.statusCode) {
+            throw URLError(.badServerResponse)
+        }
+        let payload = try JSONDecoder().decode(YouTubeSearchResponse.self, from: data)
+        return payload.items.compactMap { item in
+            guard let videoID = item.id.videoID,
+                  let sourceURL = URL(string: "https://www.youtube.com/watch?v=\(videoID)")
+            else { return nil }
+            return youtubeTrack(
+                id: "youtube-\(videoID)".stableMusicID,
+                title: item.snippet.title.decodingHTMLEntities,
+                artist: item.snippet.channelTitle,
+                artworkURL: item.snippet.thumbnails.high?.url ?? item.snippet.thumbnails.medium?.url ?? item.snippet.thumbnails.default?.url,
+                url: sourceURL
             )
         }
     }
 
-    private func searchFreesound(query: String, page: Int) async throws -> [MusicTrack] {
-        guard let token = Bundle.main.object(forInfoDictionaryKey: "FreesoundAPIToken") as? String,
-              !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-        else { return [] }
+    private func youtubeTrack(id: String? = nil, title: String, artist: String? = nil, artworkURL: URL? = nil, url: URL) -> MusicTrack {
+        let videoID = youtubeVideoID(from: url) ?? url.absoluteString.stableMusicID
+        return MusicTrack(
+            id: id ?? "youtube-\(videoID)".stableMusicID,
+            title: title,
+            artist: artist,
+            album: nil,
+            durationSeconds: nil,
+            mood: .focus,
+            streamURL: nil,
+            downloadURL: nil,
+            artworkURL: artworkURL,
+            sourceURL: url,
+            licenseNote: "YouTube",
+            providerName: "YouTube",
+            localFileName: nil,
+            originalFileName: nil,
+            importedAt: nil
+        )
+    }
 
-        var components = URLComponents(string: "https://freesound.org/apiv2/search/")
-        components?.queryItems = [
-            URLQueryItem(name: "query", value: query),
-            URLQueryItem(name: "page", value: "\(max(1, page))"),
-            URLQueryItem(name: "page_size", value: "15"),
-            URLQueryItem(name: "fields", value: "id,name,username,license,duration,url,previews,type"),
-            URLQueryItem(name: "filter", value: "license:\"Creative Commons 0\" OR license:\"Attribution\"")
-        ]
-        guard let url = components?.url else { throw URLError(.badURL) }
-        var request = URLRequest(url: url)
-        request.setValue("Token \(token)", forHTTPHeaderField: "Authorization")
-        let (data, _) = try await URLSession.shared.data(for: request)
-        let response = try JSONDecoder().decode(FreesoundResponse.self, from: data)
+    private func youtubeURL(from value: String) -> URL? {
+        guard let url = URL(string: value.trimmingCharacters(in: .whitespacesAndNewlines)),
+              let host = url.host(percentEncoded: false)?.lowercased(),
+              host == "youtu.be" || host.hasSuffix(".youtube.com") || host == "youtube.com",
+              youtubeVideoID(from: url) != nil
+        else { return nil }
+        return url
+    }
 
-        return response.results.compactMap { sound in
-            guard let previewURL = sound.previews.previewURL else { return nil }
-            return MusicTrack(
-                id: "freesound-\(sound.id)".stableMusicID,
-                title: sound.name.removingAudioExtension,
-                artist: sound.username,
-                album: nil,
-                durationSeconds: Int(sound.duration.rounded()),
-                mood: .focus,
-                streamURL: previewURL,
-                downloadURL: previewURL,
-                artworkURL: nil,
-                sourceURL: URL(string: sound.url),
-                licenseNote: sound.license,
-                providerName: "Freesound",
-                localFileName: nil,
-                originalFileName: nil,
-                importedAt: nil
-            )
+    private func youtubeVideoID(from url: URL) -> String? {
+        let host = url.host(percentEncoded: false)?.lowercased() ?? ""
+        if host == "youtu.be" {
+            return url.pathComponents.dropFirst().first
         }
+        if url.pathComponents.contains("shorts"),
+           let index = url.pathComponents.firstIndex(of: "shorts"),
+           url.pathComponents.indices.contains(index + 1) {
+            return url.pathComponents[index + 1]
+        }
+        return URLComponents(url: url, resolvingAgainstBaseURL: false)?
+            .queryItems?
+            .first(where: { $0.name == "v" })?
+            .value
     }
 }
 
@@ -360,100 +282,37 @@ private struct ArchiveFile: Decodable {
     }
 }
 
-private struct CommonsSearchResponse: Decodable {
-    let query: CommonsQuery?
+private struct YouTubeSearchResponse: Decodable {
+    let items: [YouTubeSearchItem]
 }
 
-private struct CommonsQuery: Decodable {
-    let pages: [String: CommonsPage]
+private struct YouTubeSearchItem: Decodable {
+    let id: YouTubeSearchID
+    let snippet: YouTubeSnippet
 }
 
-private struct CommonsPage: Decodable {
-    let pageid: Int
+private struct YouTubeSearchID: Decodable {
+    let videoID: String?
+
+    enum CodingKeys: String, CodingKey {
+        case videoID = "videoId"
+    }
+}
+
+private struct YouTubeSnippet: Decodable {
     let title: String
-    let imageinfo: [CommonsImageInfo]?
+    let channelTitle: String?
+    let thumbnails: YouTubeThumbnails
 }
 
-private struct CommonsImageInfo: Decodable {
-    let url: String
-    let descriptionurl: String
-    let thumburl: String?
-    let mime: String?
-    let extmetadata: CommonsMetadata?
+private struct YouTubeThumbnails: Decodable {
+    let `default`: YouTubeThumbnail?
+    let medium: YouTubeThumbnail?
+    let high: YouTubeThumbnail?
 }
 
-private struct CommonsMetadata: Decodable {
-    let artist: CommonsMetadataValue?
-    let licenseShortName: CommonsMetadataValue?
-
-    enum CodingKeys: String, CodingKey {
-        case artist = "Artist"
-        case licenseShortName = "LicenseShortName"
-    }
-}
-
-private struct CommonsMetadataValue: Decodable {
-    let value: String
-}
-
-private struct JamendoResponse: Decodable {
-    let results: [JamendoTrack]
-}
-
-private struct JamendoTrack: Decodable {
-    let id: String
-    let name: String
-    let duration: Int
-    let artistName: String
-    let albumName: String
-    let albumImage: String?
-    let audio: String
-    let audiodownload: String?
-    let audiodownloadAllowed: Bool?
-    let licenseCCURL: String?
-    let shareurl: String?
-
-    enum CodingKeys: String, CodingKey {
-        case id
-        case name
-        case duration
-        case artistName = "artist_name"
-        case albumName = "album_name"
-        case albumImage = "album_image"
-        case audio
-        case audiodownload
-        case audiodownloadAllowed = "audiodownload_allowed"
-        case licenseCCURL = "license_ccurl"
-        case shareurl
-    }
-}
-
-private struct FreesoundResponse: Decodable {
-    let results: [FreesoundSound]
-}
-
-private struct FreesoundSound: Decodable {
-    let id: Int
-    let name: String
-    let username: String
-    let license: String
-    let duration: Double
-    let url: String
-    let previews: FreesoundPreviews
-}
-
-private struct FreesoundPreviews: Decodable {
-    let highQualityMP3: String?
-    let lowQualityMP3: String?
-
-    var previewURL: URL? {
-        URL(string: highQualityMP3 ?? lowQualityMP3 ?? "")
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case highQualityMP3 = "preview-hq-mp3"
-        case lowQualityMP3 = "preview-lq-mp3"
-    }
+private struct YouTubeThumbnail: Decodable {
+    let url: URL?
 }
 
 private extension String {
@@ -472,10 +331,14 @@ private extension String {
             .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
     }
 
-    var strippingHTML: String {
-        replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
-            .replacingOccurrences(of: "&amp;", with: "&")
-            .replacingOccurrences(of: "&quot;", with: "\"")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+    var decodingHTMLEntities: String {
+        guard let data = data(using: .utf8),
+              let decoded = try? NSAttributedString(
+                data: data,
+                options: [.documentType: NSAttributedString.DocumentType.html, .characterEncoding: String.Encoding.utf8.rawValue],
+                documentAttributes: nil
+              ).string
+        else { return self }
+        return decoded
     }
 }

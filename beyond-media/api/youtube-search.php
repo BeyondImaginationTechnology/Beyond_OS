@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../config/bootstrap.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: public, max-age=120');
 
-function jamendo_fetch_json(string $url): ?array
+function youtube_fetch_json(string $url): ?array
 {
     $body = null;
     if (function_exists('curl_init')) {
@@ -15,7 +15,7 @@ function jamendo_fetch_json(string $url): ?array
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_CONNECTTIMEOUT => 4,
-            CURLOPT_TIMEOUT => 12,
+            CURLOPT_TIMEOUT => 10,
             CURLOPT_USERAGENT => 'BeyondMusic/1.1 iOS',
         ]);
         $result = curl_exec($ch);
@@ -29,7 +29,7 @@ function jamendo_fetch_json(string $url): ?array
     if ($body === null && filter_var(ini_get('allow_url_fopen'), FILTER_VALIDATE_BOOLEAN)) {
         $result = @file_get_contents($url, false, stream_context_create([
             'http' => [
-                'timeout' => 12,
+                'timeout' => 10,
                 'user_agent' => 'BeyondMusic/1.1 iOS',
             ],
         ]));
@@ -43,39 +43,46 @@ function jamendo_fetch_json(string $url): ?array
 }
 
 $query = trim((string)($_GET['q'] ?? ''));
-$page = max(1, min(100, (int)($_GET['page'] ?? 1)));
 if ($query === '' || strlen($query) > 120) {
     http_response_code(400);
-    echo json_encode(['ok' => false, 'error' => 'Enter a search query up to 120 characters.']);
+    echo json_encode(['items' => [], 'error' => ['message' => 'Enter a search query up to 120 characters.']]);
     exit;
 }
 
 try {
-    $clientId = trim((string)beyond_config('music.jamendo.client_id', ''));
+    $apiKey = trim((string)beyond_config('music.youtube.data_api_key', ''));
 } catch (Throwable $exception) {
-    $clientId = '';
+    $apiKey = '';
 }
-if ($clientId === '') {
+if ($apiKey === '') {
+    $youtubeConfigFile = __DIR__ . '/../../config/youtube.php';
+    if (is_file($youtubeConfigFile)) {
+        $youtubeConfig = require $youtubeConfigFile;
+        $apiKeys = is_array($youtubeConfig) ? ($youtubeConfig['api_keys'] ?? []) : [];
+        if (is_array($apiKeys) && isset($apiKeys[0])) {
+            $apiKey = trim((string)$apiKeys[0]);
+        }
+    }
+}
+if ($apiKey === '') {
     http_response_code(503);
-    echo json_encode(['ok' => false, 'error' => 'Jamendo is not configured.']);
+    echo json_encode(['items' => [], 'error' => ['message' => 'YouTube search is not configured.']]);
     exit;
 }
 
-$components = [
-    'client_id' => $clientId,
-    'format' => 'json',
-    'limit' => '15',
-    'offset' => (string)(($page - 1) * 15),
-    'search' => $query,
-    'include' => 'licenses+musicinfo',
-    'audioformat' => 'mp32',
-    'order' => $page % 2 === 0 ? 'popularity_month' : 'relevance',
+$params = [
+    'part' => 'snippet',
+    'type' => 'video',
+    'videoCategoryId' => '10',
+    'maxResults' => '10',
+    'q' => $query,
+    'key' => $apiKey,
 ];
 
-$payload = jamendo_fetch_json('https://api.jamendo.com/v3.0/tracks/?' . http_build_query($components));
+$payload = youtube_fetch_json('https://www.googleapis.com/youtube/v3/search?' . http_build_query($params));
 if (!$payload) {
     http_response_code(502);
-    echo json_encode(['ok' => false, 'error' => 'Jamendo search is temporarily unavailable.']);
+    echo json_encode(['items' => [], 'error' => ['message' => 'YouTube search is temporarily unavailable.']]);
     exit;
 }
 

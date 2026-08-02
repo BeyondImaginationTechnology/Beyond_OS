@@ -14,6 +14,9 @@ struct RootView: View {
             BrowseView()
                 .tabItem { Label("Browse", systemImage: "square.grid.2x2.fill") }
 
+            AccountView()
+                .tabItem { Label("Account", systemImage: "person.crop.circle.fill") }
+
             AboutView()
                 .tabItem { Label("About", systemImage: "info.circle.fill") }
         }

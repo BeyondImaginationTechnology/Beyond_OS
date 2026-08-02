@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="launch-view-controller">
+    <device id="retina6_12" orientation="portrait" appearance="dark"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <scene sceneID="launch-scene">
+            <objects>
+                <viewController id="launch-view-controller" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="launch-root-view">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="BeyondLaunchLogo" translatesAutoresizingMaskIntoConstraints="NO" id="launch-logo">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                            </imageView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="launch-safe-area"/>
+                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="launch-logo" firstAttribute="top" secondItem="launch-root-view" secondAttribute="top" id="logo-top"/>
+                            <constraint firstItem="launch-logo" firstAttribute="bottom" secondItem="launch-root-view" secondAttribute="bottom" id="logo-bottom"/>
+                            <constraint firstItem="launch-logo" firstAttribute="leading" secondItem="launch-root-view" secondAttribute="leading" id="logo-leading"/>
+                            <constraint firstItem="launch-logo" firstAttribute="trailing" secondItem="launch-root-view" secondAttribute="trailing" id="logo-trailing"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="launch-first-responder" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="118" y="132"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="BeyondLaunchLogo" width="430" height="932"/>
+    </resources>
+</document>

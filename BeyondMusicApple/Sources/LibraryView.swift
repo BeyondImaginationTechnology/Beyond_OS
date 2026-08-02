@@ -73,7 +73,7 @@ struct LibraryView: View {
                 title: "Local Songs",
                 tracks: store.filteredTracks,
                 emptyTitle: "No local songs yet",
-                emptyMessage: "Import MP3, M4A, WAV, or AAC files from Files, or download authorized search results."
+                emptyMessage: "Import MP3, M4A, WAV, or AAC files from Files, or download search results under their source terms."
             )
         }
         .fileImporter(
@@ -113,6 +113,7 @@ struct TrackListView: View {
     let tracks: [MusicTrack]
     var emptyTitle = "No tracks yet"
     var emptyMessage = "Search open music to find playable tracks."
+    var showsSource = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -127,7 +128,7 @@ struct TrackListView: View {
                 }
             } else {
                 ForEach(tracks) { track in
-                    TrackRow(track: track)
+                    TrackRow(track: track, showsSource: showsSource)
                 }
             }
         }
@@ -137,6 +138,7 @@ struct TrackListView: View {
 struct TrackRow: View {
     @EnvironmentObject private var store: MusicStore
     let track: MusicTrack
+    var showsSource = false
 
     var body: some View {
         MusicPanel {
@@ -159,10 +161,12 @@ struct TrackRow: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
-                    Text(track.provenanceText)
-                        .font(.caption2)
-                        .foregroundStyle(Color.musicGold)
-                        .lineLimit(1)
+                    if showsSource {
+                        Text(track.provenanceText)
+                            .font(.caption2)
+                            .foregroundStyle(Color.musicGold)
+                            .lineLimit(1)
+                    }
                 }
 
                 Spacer()
@@ -216,6 +220,6 @@ struct DownloadButton: View {
     }
 
     private var isDisabled: Bool {
-        track.downloadURL == nil || store.downloadState(for: track) == .downloading || store.isAvailableOffline(track)
+        (track.downloadURL == nil && track.providerName != "YouTube") || store.downloadState(for: track) == .downloading || store.isAvailableOffline(track)
     }
 }

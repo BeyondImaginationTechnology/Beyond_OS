@@ -1,6 +1,6 @@
 <?php
 $title = 'Terms of Service';
-$updated = 'August 1, 2026';
+$updated = 'August 2, 2026';
 ?><!doctype html>
 <html lang="en">
 <head>
@@ -13,7 +13,7 @@ $updated = 'August 1, 2026';
 <main class="page">
 <a class="app-back" href="register.php">Back to registration</a>
 <h1>Terms of Service</h1>
-<p class="muted">Version 2.1 · Effective <?= $updated ?></p>
+<p class="muted">Version 2.3.3 · Effective <?= $updated ?></p>
 <p>These Terms govern your use of Beyond OS, Beyond ID, Beyond Wallet, and connected Beyond Imagination Technology apps, websites, beta features, marketplaces, communities, and services. By creating an account or using the services, you agree to these Terms and our <a href="privacy.php">Privacy Policy</a>.</p>
 
 <h2>Your account</h2>
@@ -42,6 +42,10 @@ $updated = 'August 1, 2026';
 
 <h2>Third-party services</h2>
 <p>The services may link to or integrate with third-party websites, media sources, payment providers, app stores, APIs, and platforms. Their terms and privacy policies apply to their services. We are not responsible for third-party content, availability, security, or practices.</p>
+
+<h2>Beyond Music and media sources</h2>
+<p>Beyond Music may search, stream, import, and download media from local files, Internet Archive records, YouTube search results, converter APIs, and other third-party media services. Each source remains governed by its own license, permissions, platform rules, and terms of service. You are responsible for using downloaded, converted, imported, shared, or reused media only where you have the required rights and where the source platform permits that use.</p>
+<p>YouTube results and YouTube-to-audio conversion features depend on third-party APIs and are subject to YouTube terms, rights-holder permissions, and applicable law. Beyond Music does not grant rights in third-party media and may disable providers, downloads, or conversion features to address platform policy, legal risk, abuse, availability, or security concerns.</p>
 
 <h2>Termination</h2>
 <p>You may stop using the services at any time. We may suspend or terminate access, remove content, disable rewards, or restrict features if we believe there is a Terms violation, legal risk, security issue, nonpayment, fraud, abuse, or harm to users or the platform.</p>

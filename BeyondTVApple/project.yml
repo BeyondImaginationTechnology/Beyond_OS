@@ -29,6 +29,8 @@ targets:
       - path: Platforms/iOS
     resources:
       - path: Resources/Assets.xcassets
+      - path: Resources/LaunchScreen.storyboard
+      - path: Resources/BeyondTVSplash.svg
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.beyondtv
@@ -49,6 +51,7 @@ targets:
       - path: Platforms/tvOS
     resources:
       - path: Resources/Assets.xcassets
+      - path: Resources/BeyondTVSplash.svg
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.beyondtv

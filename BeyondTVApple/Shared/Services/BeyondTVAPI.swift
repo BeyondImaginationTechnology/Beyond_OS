@@ -43,7 +43,11 @@ struct BeyondTVAPI: Sendable {
     }
 
     func guideItem(for channel: Channel) async throws -> GuideItem {
-        let response = try await schedule(for: channel)
+        guard let url = URL(string: channel.guideEndpoint, relativeTo: baseURL)?.absoluteURL else {
+            throw APIError.invalidResponse
+        }
+        let data = try await data(from: url)
+        let response = try decoder.decode(ScheduleResponse.self, from: data)
         let current = response.state?.current
         let next = response.state?.next
         let nativeSources = response.sources.filter(\.isNativelyPlayable)
@@ -65,7 +69,7 @@ struct BeyondTVAPI: Sendable {
 
     private func data(from url: URL) async throws -> Data {
         var request = URLRequest(url: url)
-        request.timeoutInterval = 15
+        request.timeoutInterval = 8
         request.cachePolicy = .reloadRevalidatingCacheData
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("BeyondTV-Apple/1.0", forHTTPHeaderField: "User-Agent")

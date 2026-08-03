@@ -16,6 +16,9 @@ final class AppModel: ObservableObject {
     @Published private(set) var webPlaybackURL: URL?
     @Published private(set) var guideItems: [GuideItem] = []
     @Published private(set) var isGuideLoading = false
+    @Published private(set) var guideSchedule: [String: [GuideBlock]] = [:]
+    @Published private(set) var catalogItems: [CatalogItem] = []
+    @Published private(set) var isCatalogLoading = false
     @Published private(set) var beyondIDUser: BeyondIDUser?
     @Published private(set) var beyondIDWallet: BeyondIDWallet?
     @Published private(set) var isSigningIn = false
@@ -26,6 +29,7 @@ final class AppModel: ObservableObject {
     private let beyondID: BeyondIDService
     private var refreshTask: Task<Void, Never>?
     private var guideTask: Task<Void, Never>?
+    private var catalogTask: Task<Void, Never>?
     private var tuneSequence = 0
     private let tokenKey = "BeyondTV.BeyondID.mobileToken"
     #if os(iOS)
@@ -43,6 +47,7 @@ final class AppModel: ObservableObject {
     deinit {
         refreshTask?.cancel()
         guideTask?.cancel()
+        catalogTask?.cancel()
     }
 
     func start() async {
@@ -55,6 +60,7 @@ final class AppModel: ObservableObject {
                 await tune(to: initial)
             }
             Task { await refreshGuide() }
+            Task { await refreshCatalog() }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -217,6 +223,54 @@ final class AppModel: ObservableObject {
         isLoading = false
     }
 
+    func play(catalog item: CatalogItem) async {
+        tuneSequence += 1
+        refreshTask?.cancel()
+        selectedChannel = item.channelSlug.flatMap { slug in channels.first(where: { $0.slug == slug }) }
+        status = ChannelStatus(
+            now: item.title,
+            next: item.genre ?? item.subtitle ?? "Browse library",
+            label: item.categoryLabel.uppercased(),
+            sourceKey: item.slug
+        )
+        isLoading = false
+        errorMessage = nil
+        currentSource = nil
+        webPlaybackURL = nil
+        player.pause()
+        player.replaceCurrentItem(with: nil)
+
+        guard let playbackURL = item.playbackURL else {
+            errorMessage = APIError.noNativeStream.localizedDescription
+            return
+        }
+
+        let value = playbackURL.absoluteString.lowercased()
+        let isNative = value.contains(".mp4") || value.contains(".m4v")
+            || value.contains(".mov") || value.contains(".m3u8")
+        if isNative {
+            let source = StreamSource(
+                provider: item.sourceLabel ?? "Beyond TV",
+                title: item.title,
+                url: playbackURL,
+                duration: nil,
+                type: item.sourceType,
+                license: nil,
+                rightsURL: nil
+            )
+            currentSource = source
+            player.replaceCurrentItem(with: AVPlayerItem(url: playbackURL))
+            player.play()
+            return
+        }
+
+        #if os(iOS)
+        webPlaybackURL = playbackURL
+        #else
+        errorMessage = APIError.webPlaybackOnly.localizedDescription
+        #endif
+    }
+
     func refreshGuide() async {
         guard !channels.isEmpty else { return }
         guideTask?.cancel()
@@ -225,6 +279,7 @@ final class AppModel: ObservableObject {
         let channelList = channels
         let api = api
         guideTask = Task {
+            async let scheduleMap = try? api.guideSchedule()
             let loadedItems = await withTaskGroup(of: GuideItem?.self) { group in
                 for channel in channelList {
                     group.addTask {
@@ -238,15 +293,35 @@ final class AppModel: ObservableObject {
                 }
                 return items.sorted { $0.channel.number < $1.channel.number }
             }
+            let loadedSchedule = await scheduleMap
 
             guard !Task.isCancelled else { return }
             await MainActor.run {
+                self.guideSchedule = loadedSchedule ?? self.guideSchedule
                 self.guideItems = loadedItems
                 self.isGuideLoading = false
             }
         }
 
         await guideTask?.value
+    }
+
+    func refreshCatalog() async {
+        guard catalogItems.isEmpty else { return }
+        catalogTask?.cancel()
+        isCatalogLoading = true
+
+        let api = api
+        catalogTask = Task {
+            let items = (try? await api.catalog()) ?? []
+            guard !Task.isCancelled else { return }
+            await MainActor.run {
+                self.catalogItems = items
+                self.isCatalogLoading = false
+            }
+        }
+
+        await catalogTask?.value
     }
 
     func retry() async {

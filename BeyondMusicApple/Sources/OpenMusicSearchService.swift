@@ -35,7 +35,7 @@ struct OpenMusicSearchService {
             }
         }
 
-        return MusicSearchPage(query: query, page: page, tracks: deduped.shuffled(), providerSummaries: summaries)
+        return MusicSearchPage(query: query, page: page, tracks: providerBalancedTracks(deduped), providerSummaries: summaries)
     }
 
     private func providerResult(_ operation: () async throws -> [MusicTrack]) async -> Result<[MusicTrack], Error> {
@@ -50,7 +50,7 @@ struct OpenMusicSearchService {
         let searchURL = try archiveSearchURL(query: query, page: page)
         let (data, _) = try await URLSession.shared.data(from: searchURL)
         let response = try JSONDecoder().decode(ArchiveSearchResponse.self, from: data)
-        let documents = Array(response.response.docs.prefix(8))
+        let documents = Array(response.response.docs.prefix(6))
         var tracks: [MusicTrack] = []
 
         for document in documents {
@@ -145,7 +145,7 @@ struct OpenMusicSearchService {
             URLQueryItem(name: "part", value: "snippet"),
             URLQueryItem(name: "type", value: "video"),
             URLQueryItem(name: "videoCategoryId", value: "10"),
-            URLQueryItem(name: "maxResults", value: "10"),
+            URLQueryItem(name: "maxResults", value: "25"),
             URLQueryItem(name: "q", value: query),
             URLQueryItem(name: "key", value: key)
         ]
@@ -217,6 +217,30 @@ struct OpenMusicSearchService {
             .queryItems?
             .first(where: { $0.name == "v" })?
             .value
+    }
+
+    private func providerBalancedTracks(_ tracks: [MusicTrack]) -> [MusicTrack] {
+        var youtube = tracks.filter { $0.providerName == "YouTube" }
+        var archive = tracks.filter { $0.providerName == "Internet Archive" }
+        var other = tracks.filter { $0.providerName != "YouTube" && $0.providerName != "Internet Archive" }
+        var balanced: [MusicTrack] = []
+
+        while !youtube.isEmpty || !archive.isEmpty || !other.isEmpty {
+            if !youtube.isEmpty {
+                balanced.append(youtube.removeFirst())
+            }
+            if !youtube.isEmpty {
+                balanced.append(youtube.removeFirst())
+            }
+            if !archive.isEmpty {
+                balanced.append(archive.removeFirst())
+            }
+            if !other.isEmpty {
+                balanced.append(other.removeFirst())
+            }
+        }
+
+        return balanced
     }
 }
 

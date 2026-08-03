@@ -245,6 +245,27 @@ struct MusicPreferences: Codable, Hashable {
     var libraryFilter: LibraryFilter = .all
     var librarySort: LibrarySort = .recentlyAdded
     var beyondIDSession: BeyondIDSession = .signedOut
+    var searchProviderFilter: MusicProviderFilter = .all
+
+    init(
+        libraryFilter: LibraryFilter = .all,
+        librarySort: LibrarySort = .recentlyAdded,
+        beyondIDSession: BeyondIDSession = .signedOut,
+        searchProviderFilter: MusicProviderFilter = .all
+    ) {
+        self.libraryFilter = libraryFilter
+        self.librarySort = librarySort
+        self.beyondIDSession = beyondIDSession
+        self.searchProviderFilter = searchProviderFilter
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        libraryFilter = try container.decodeIfPresent(LibraryFilter.self, forKey: .libraryFilter) ?? .all
+        librarySort = try container.decodeIfPresent(LibrarySort.self, forKey: .librarySort) ?? .recentlyAdded
+        beyondIDSession = try container.decodeIfPresent(BeyondIDSession.self, forKey: .beyondIDSession) ?? .signedOut
+        searchProviderFilter = try container.decodeIfPresent(MusicProviderFilter.self, forKey: .searchProviderFilter) ?? .all
+    }
 }
 
 struct MusicSearchPage: Hashable {
@@ -289,4 +310,23 @@ enum DownloadState: Equatable {
     case downloading
     case downloaded
     case failed(String)
+}
+
+enum MusicProviderFilter: String, CaseIterable, Identifiable, Codable, Hashable {
+    case all = "All"
+    case youtube = "YouTube"
+    case internetArchive = "Archive"
+
+    var id: String { rawValue }
+
+    func matches(_ track: MusicTrack) -> Bool {
+        switch self {
+        case .all:
+            true
+        case .youtube:
+            track.providerName == "YouTube"
+        case .internetArchive:
+            track.providerName == "Internet Archive"
+        }
+    }
 }

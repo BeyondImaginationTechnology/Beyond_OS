@@ -74,7 +74,7 @@ $params = [
     'part' => 'snippet',
     'type' => 'video',
     'videoCategoryId' => '10',
-    'maxResults' => '10',
+    'maxResults' => '25',
     'q' => $query,
     'key' => $apiKey,
 ];

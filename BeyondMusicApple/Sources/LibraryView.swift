@@ -108,16 +108,21 @@ private struct MoodButton: View {
     }
 }
 
-struct TrackListView: View {
+struct TrackListView<HeaderAccessory: View>: View {
     let title: String
     let tracks: [MusicTrack]
     var emptyTitle = "No tracks yet"
     var emptyMessage = "Search open music to find playable tracks."
     var showsSource = false
+    @ViewBuilder var headerAccessory: () -> HeaderAccessory
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            MusicEyebrow(text: title)
+            HStack(alignment: .center) {
+                MusicEyebrow(text: title)
+                Spacer()
+            }
+            headerAccessory()
             if tracks.isEmpty {
                 MusicPanel {
                     Text(emptyTitle)
@@ -132,6 +137,23 @@ struct TrackListView: View {
                 }
             }
         }
+    }
+}
+
+extension TrackListView where HeaderAccessory == EmptyView {
+    init(
+        title: String,
+        tracks: [MusicTrack],
+        emptyTitle: String = "No tracks yet",
+        emptyMessage: String = "Search open music to find playable tracks.",
+        showsSource: Bool = false
+    ) {
+        self.title = title
+        self.tracks = tracks
+        self.emptyTitle = emptyTitle
+        self.emptyMessage = emptyMessage
+        self.showsSource = showsSource
+        self.headerAccessory = { EmptyView() }
     }
 }
 

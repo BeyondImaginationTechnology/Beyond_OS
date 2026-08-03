@@ -66,6 +66,12 @@ try {
     if (!$user || ($user['status'] ?? 'active') !== 'active') throw new RuntimeException('This Beyond ID is not active.');
     $pdo->commit();
     beyond_social_login_session($pdo, $user, $provider);
+    $mobileScheme = strtolower(trim((string)($flow['mobile_scheme'] ?? '')));
+    if (in_array($mobileScheme, ['beyondmusic', 'beyondtv'], true)) {
+        unset($_SESSION['beyond_return_to']);
+        header('Location: mobile-complete.php?scheme=' . rawurlencode($mobileScheme));
+        exit;
+    }
 } catch (Throwable $exception) {
     if ($pdo->inTransaction()) $pdo->rollBack();
     error_log('OAuth callback failed: ' . $exception->getMessage());

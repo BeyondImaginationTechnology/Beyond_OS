@@ -3,17 +3,15 @@ import SwiftUI
 struct ChannelGuideView: View {
     @EnvironmentObject private var model: AppModel
 
-    private var rows: [GuideItem] {
-        if !model.guideItems.isEmpty { return model.guideItems }
-        return model.channels.map {
-            GuideItem(
-                channel: $0,
-                status: ChannelStatus(now: "Loading live schedule…", next: "Up next", label: "LIVE · VANCOUVER", sourceKey: ""),
-                currentIcon: $0.icon,
-                currentLineup: $0.description,
-                nextLineup: nil,
-                loadedAt: Date()
-            )
+    private var currentHour: Int {
+        Calendar(identifier: .gregorian).component(.hour, from: Date())
+    }
+
+    private var rows: [GuideChannelRow] {
+        model.channels.map { channel in
+            let guideItem = model.guideItems.first(where: { $0.channel == channel })
+            let blocks = model.guideSchedule[channel.slug] ?? fallbackBlocks(for: channel, guideItem: guideItem)
+            return GuideChannelRow(channel: channel, guideItem: guideItem, blocks: blocks)
         }
     }
 
@@ -23,21 +21,22 @@ struct ChannelGuideView: View {
                 VStack(alignment: .leading, spacing: 18) {
                     header
 
-                    LazyVStack(spacing: 12) {
-                        ForEach(rows) { item in
-                            Button {
-                                Task { await model.tune(to: item.channel) }
-                            } label: {
-                                ChannelGuideRow(item: item, selected: model.selectedChannel == item.channel)
+                    LazyVStack(spacing: 14) {
+                        ForEach(rows) { row in
+                            FullGuideRow(
+                                row: row,
+                                selected: model.selectedChannel == row.channel,
+                                currentHour: currentHour
+                            ) {
+                                Task { await model.tune(to: row.channel) }
                             }
-                            .buttonStyle(.plain)
                         }
                     }
                 }
                 .padding()
             }
             .background(BeyondTVBackground().ignoresSafeArea())
-            .navigationTitle("Live Guide")
+            .navigationTitle("Full Guide")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     HStack {
@@ -53,12 +52,12 @@ struct ChannelGuideView: View {
                 }
             }
             .overlay {
-                if model.channels.isEmpty || model.isGuideLoading && model.guideItems.isEmpty {
-                    ProgressView("Loading live guide…")
+                if model.channels.isEmpty || model.isGuideLoading && model.guideItems.isEmpty && model.guideSchedule.isEmpty {
+                    ProgressView("Loading full guide…")
                 }
             }
             .task {
-                if model.guideItems.isEmpty {
+                if model.guideItems.isEmpty || model.guideSchedule.isEmpty {
                     await model.refreshGuide()
                 }
             }
@@ -67,8 +66,8 @@ struct ChannelGuideView: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 8) {
-            SectionHeading(kicker: "REAL GUIDE · AMERICA/VANCOUVER", title: "What’s on now")
-            Text("Live program data from each channel endpoint, including current and up-next blocks.")
+            SectionHeading(kicker: "FULL GUIDE · AMERICA/VANCOUVER", title: "Today’s schedule")
+            Text("Every channel with its full schedule blocks. Tap a channel row to tune.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             if let loadedAt = model.guideItems.map(\.loadedAt).max() {
@@ -78,97 +77,116 @@ struct ChannelGuideView: View {
             }
         }
     }
+
+    private func fallbackBlocks(for channel: Channel, guideItem: GuideItem?) -> [GuideBlock] {
+        let now = guideItem?.status.now ?? channel.description
+        let next = guideItem?.status.next ?? "More on \(channel.name)"
+        return [
+            GuideBlock(start: 0, end: 12, icon: guideItem?.currentIcon ?? channel.icon, title: now, lineup: guideItem?.currentLineup),
+            GuideBlock(start: 12, end: 24, icon: channel.icon, title: next, lineup: guideItem?.nextLineup ?? channel.description)
+        ]
+    }
 }
 
-private struct ChannelGuideRow: View {
-    let item: GuideItem
-    let selected: Bool
+private struct GuideChannelRow: Identifiable {
+    let channel: Channel
+    let guideItem: GuideItem?
+    let blocks: [GuideBlock]
 
-    private var channel: Channel { item.channel }
+    var id: String { channel.id }
+}
+
+private struct FullGuideRow: View {
+    let row: GuideChannelRow
+    let selected: Bool
+    let currentHour: Int
+    let tune: () -> Void
+
+    private var channel: Channel { row.channel }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(spacing: 14) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(LinearGradient(colors: channel.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing))
-                    Image(systemName: channel.symbolName)
-                        .font(.title2.bold())
-                }
-                .frame(width: 62, height: 62)
-
-                VStack(alignment: .leading, spacing: 5) {
-                    HStack(spacing: 8) {
-                        Text("CH \(channel.displayNumber)")
-                            .font(.caption.bold())
-                            .foregroundStyle(.orange)
-                        Text(item.status.label)
-                            .font(.caption2.bold())
-                            .lineLimit(1)
-                            .padding(.horizontal, 7)
-                            .padding(.vertical, 4)
-                            .background(.white.opacity(0.11), in: Capsule())
+        Button(action: tune) {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(LinearGradient(colors: channel.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing))
+                        Image(systemName: channel.symbolName)
+                            .font(.title3.bold())
                     }
-                    Text(channel.name)
-                        .font(.headline)
-                    Text(channel.category)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    .frame(width: 54, height: 54)
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("CH \(channel.displayNumber) · \(channel.name)")
+                            .font(.headline)
+                            .lineLimit(1)
+                        Text(row.guideItem?.status.label ?? channel.category)
+                            .font(.caption.bold())
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+
+                    Spacer()
+
+                    Image(systemName: selected ? "waveform.circle.fill" : "play.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(selected ? .orange : .secondary)
                 }
 
-                Spacer()
-
-                Image(systemName: selected ? "waveform.circle.fill" : "play.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(selected ? .orange : .secondary)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(row.blocks) { block in
+                            GuideBlockCard(block: block, isCurrent: block.contains(hour: currentHour))
+                        }
+                    }
+                    .padding(.bottom, 2)
+                }
             }
+            .padding(14)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
+            .overlay {
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(selected ? .orange.opacity(0.65) : .white.opacity(0.11), lineWidth: selected ? 2 : 1)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+}
 
-            VStack(alignment: .leading, spacing: 7) {
-                Label {
-                    Text([item.currentIcon, item.status.now].compactMap { $0 }.joined(separator: " "))
-                        .font(.headline)
-                        .lineLimit(2)
-                } icon: {
+private struct GuideBlockCard: View {
+    let block: GuideBlock
+    let isCurrent: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            HStack(spacing: 6) {
+                Text(block.timeLabel)
+                    .font(.caption2.monospacedDigit().bold())
+                if isCurrent {
                     Text("NOW")
                         .font(.caption2.bold())
                         .foregroundStyle(.black)
-                        .padding(.horizontal, 7)
-                        .padding(.vertical, 4)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
                         .background(.orange, in: Capsule())
                 }
-
-                if let lineup = item.currentLineup, !lineup.isEmpty {
-                    Text(lineup)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                }
             }
+            .foregroundStyle(isCurrent ? .orange : .secondary)
 
-            Divider()
-                .overlay(.white.opacity(0.13))
-
-            VStack(alignment: .leading, spacing: 5) {
-                Text("UP NEXT")
-                    .font(.caption.bold())
-                    .tracking(1)
-                    .foregroundStyle(.secondary)
-                Text(item.status.next)
-                    .font(.subheadline.bold())
-                    .lineLimit(2)
-                if let nextLineup = item.nextLineup, !nextLineup.isEmpty {
-                    Text(nextLineup)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                }
-            }
+            Text([block.icon, block.title].compactMap { $0 }.joined(separator: " "))
+                .font(.subheadline.bold())
+                .lineLimit(2)
+            Text(block.lineup ?? "Featured presentation")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
         }
-        .padding(14)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20))
+        .frame(width: 178, height: 112, alignment: .topLeading)
+        .padding(11)
+        .background(isCurrent ? .orange.opacity(0.14) : .white.opacity(0.07), in: RoundedRectangle(cornerRadius: 14))
         .overlay {
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(selected ? .orange.opacity(0.65) : .white.opacity(0.11), lineWidth: selected ? 2 : 1)
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(isCurrent ? .orange.opacity(0.8) : .white.opacity(0.10), lineWidth: isCurrent ? 1.5 : 1)
         }
     }
 }

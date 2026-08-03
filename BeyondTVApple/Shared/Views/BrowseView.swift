@@ -2,68 +2,83 @@ import SwiftUI
 
 struct BrowseView: View {
     @EnvironmentObject private var model: AppModel
-    @State private var selectedCategory = "All"
+    @State private var selectedFilter = "All"
 
-    private var categories: [String] {
-        ["All"] + Array(Set(model.channels.map(\.category))).sorted()
+    private var filters: [String] {
+        let types = Set(model.catalogItems.compactMap { $0.type?.capitalized })
+        return ["All"] + Array(types).sorted()
     }
 
-    private var filteredChannels: [Channel] {
-        guard selectedCategory != "All" else { return model.channels }
-        return model.channels.filter { $0.category == selectedCategory }
+    private var filteredItems: [CatalogItem] {
+        let items = model.catalogItems
+        guard selectedFilter != "All" else { return items }
+        return items.filter { $0.type?.capitalized == selectedFilter }
     }
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 22) {
                     hero
-                    categoryPicker
-                    channelGrid
+                    filterPicker
+                    catalogGrid
                 }
                 .padding()
             }
             .background(BeyondTVBackground().ignoresSafeArea())
             .navigationTitle("Browse")
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    ThemeToggleButton()
+                }
+            }
+            .overlay {
+                if model.isCatalogLoading && model.catalogItems.isEmpty {
+                    ProgressView("Loading stream catalog…")
+                }
+            }
+            .task {
+                await model.refreshCatalog()
+            }
         }
     }
 
     private var hero: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("BROWSE LIBRARY")
+            Text("STREAM CATALOG")
                 .font(.caption.bold())
                 .tracking(2)
                 .foregroundStyle(.orange)
-            Text("Cartoons, movies, anime, learning, wellness, sports, and mystery in one lineup.")
+            Text("Movies, seasons, specials, and direct streams ready to play.")
                 .font(.title.bold())
                 .lineLimit(3)
-            Text("\(model.channels.count) free channels · schedule synced to Vancouver time")
+            Text("\(model.catalogItems.count) catalog titles · channels stay in the Watch tab")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 24))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
         .overlay {
-            RoundedRectangle(cornerRadius: 24)
+            RoundedRectangle(cornerRadius: 18)
                 .stroke(.white.opacity(0.12), lineWidth: 1)
         }
     }
 
-    private var categoryPicker: some View {
+    private var filterPicker: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
-                ForEach(categories, id: \.self) { category in
+                ForEach(filters, id: \.self) { filter in
                     Button {
-                        selectedCategory = category
+                        selectedFilter = filter
                     } label: {
-                        Text(category.uppercased())
+                        Text(filter.uppercased())
                             .font(.caption.bold())
                             .tracking(0.8)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 10)
                             .background(
-                                selectedCategory == category
+                                selectedFilter == filter
                                     ? AnyShapeStyle(LinearGradient(colors: [.orange, .pink, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
                                     : AnyShapeStyle(.white.opacity(0.10)),
                                 in: Capsule()
@@ -75,13 +90,13 @@ struct BrowseView: View {
         }
     }
 
-    private var channelGrid: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 165), spacing: 14)], spacing: 14) {
-            ForEach(filteredChannels) { channel in
+    private var catalogGrid: some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 168), spacing: 14)], spacing: 14) {
+            ForEach(filteredItems) { item in
                 Button {
-                    Task { await model.tune(to: channel) }
+                    Task { await model.play(catalog: item) }
                 } label: {
-                    BrowseChannelCard(channel: channel, selected: model.selectedChannel == channel)
+                    CatalogCard(item: item)
                 }
                 .buttonStyle(.plain)
             }
@@ -89,57 +104,90 @@ struct BrowseView: View {
     }
 }
 
-private struct BrowseChannelCard: View {
-    let channel: Channel
-    let selected: Bool
+private struct CatalogCard: View {
+    let item: CatalogItem
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: channel.symbolName)
-                    .font(.title2.bold())
-                    .frame(width: 42, height: 42)
-                    .background(.black.opacity(0.22), in: RoundedRectangle(cornerRadius: 12))
-                Spacer()
-                Text("CH \(channel.displayNumber)")
-                    .font(.caption2.monospacedDigit().bold())
+            ZStack(alignment: .topLeading) {
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(.black.opacity(0.32))
+
+                if let thumbnail = item.thumbnail {
+                    AsyncImage(url: thumbnail) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        case .failure:
+                            fallbackArt
+                        case .empty:
+                            ProgressView()
+                        @unknown default:
+                            fallbackArt
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .aspectRatio(16 / 10, contentMode: .fill)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                } else {
+                    fallbackArt
+                }
+
+                Text(item.categoryLabel.uppercased())
+                    .font(.caption2.bold())
+                    .tracking(0.9)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 6)
-                    .background(.black.opacity(0.28), in: Capsule())
+                    .background(.black.opacity(0.66), in: Capsule())
+                    .padding(8)
+            }
+            .aspectRatio(16 / 10, contentMode: .fit)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text([item.icon, item.title].compactMap { $0 }.joined(separator: " "))
+                    .font(.headline)
+                    .lineLimit(2)
+                if !item.detailLine.isEmpty {
+                    Text(item.detailLine)
+                        .font(.caption.bold())
+                        .foregroundStyle(.orange)
+                        .lineLimit(1)
+                }
+                Text(item.description ?? item.subtitle ?? item.sourceLabel ?? "Playable Beyond TV catalog item.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(3)
             }
 
-            Spacer(minLength: 18)
+            Spacer(minLength: 0)
 
-            Text(channel.category.uppercased())
-                .font(.caption2.bold())
-                .tracking(1)
-                .foregroundStyle(.orange.opacity(0.9))
-            Text(channel.name)
-                .font(.headline)
-                .lineLimit(2)
-            Text(channel.description)
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.76))
-                .lineLimit(3)
-        }
-        .frame(maxWidth: .infinity, minHeight: 210, alignment: .leading)
-        .padding(16)
-        .background(
-            LinearGradient(colors: channel.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing),
-            in: RoundedRectangle(cornerRadius: 22)
-        )
-        .overlay(alignment: .topTrailing) {
-            if selected {
-                Image(systemName: "waveform.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(.white)
-                    .padding(12)
+            HStack {
+                Label(item.sourceLabel ?? "Play", systemImage: item.videoURL == nil ? "safari.fill" : "play.fill")
+                    .font(.caption2.bold())
+                    .lineLimit(1)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption.bold())
             }
+            .foregroundStyle(.secondary)
         }
+        .frame(maxWidth: .infinity, minHeight: 298, alignment: .leading)
+        .padding(12)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
         .overlay {
-            RoundedRectangle(cornerRadius: 22)
-                .stroke(selected ? .white.opacity(0.75) : .white.opacity(0.14), lineWidth: selected ? 2 : 1)
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(.white.opacity(0.12), lineWidth: 1)
         }
-        .foregroundStyle(.white)
+    }
+
+    private var fallbackArt: some View {
+        ZStack {
+            LinearGradient(colors: [.purple.opacity(0.8), .orange.opacity(0.45)], startPoint: .topLeading, endPoint: .bottomTrailing)
+            Text(item.icon ?? "▶")
+                .font(.system(size: 42))
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 14))
     }
 }

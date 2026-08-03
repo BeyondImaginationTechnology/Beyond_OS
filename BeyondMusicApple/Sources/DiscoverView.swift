@@ -42,16 +42,25 @@ struct DiscoverView: View {
 
             MusicPanel {
                 HStack(spacing: 12) {
-                    Image(systemName: store.hasBeyondID ? "person.crop.circle.badge.checkmark" : "person.crop.circle.badge.exclamationmark")
+                    Image(systemName: store.hasBeyondID ? "checkmark.seal.fill" : "person.crop.circle.badge.exclamationmark")
                         .font(.title2)
                         .foregroundStyle(Color.musicAqua)
                     VStack(alignment: .leading, spacing: 4) {
-                        MusicEyebrow(text: "Beyond ID")
+                        MusicEyebrow(text: store.hasBeyondID ? "Signed In" : "Beyond ID")
                         Text(store.beyondIDSession.label)
                             .font(.headline)
-                        Text(store.hasBeyondID ? "Searches and local choices can stay associated with your Beyond ID beta profile." : "Connect on Profile when you are ready to pair this device.")
+                        Text(store.beyondIDDetailText)
                             .font(.caption)
                             .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    if store.hasBeyondID {
+                        Text("BETA")
+                            .font(.caption2.bold())
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 5)
+                            .background(Color.musicAqua.opacity(0.16), in: Capsule())
+                            .foregroundStyle(Color.musicAqua)
                     }
                 }
             }
@@ -67,10 +76,18 @@ struct DiscoverView: View {
 
             TrackListView(
                 title: "Results",
-                tracks: store.searchResults,
+                tracks: store.filteredSearchResults,
                 emptyTitle: "No search results loaded",
                 emptyMessage: "Search a song, artist, genre, or YouTube URL. Downloads are saved into your local library.",
-                showsSource: true
+                showsSource: true,
+                headerAccessory: {
+                    Picker("Provider", selection: $store.searchProviderFilter) {
+                        ForEach(MusicProviderFilter.allCases) { filter in
+                            Text("\(filter.rawValue) \(store.searchProviderCounts[filter, default: 0])").tag(filter)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                }
             )
         }
     }

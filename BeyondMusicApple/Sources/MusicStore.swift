@@ -24,6 +24,9 @@ final class MusicStore: ObservableObject {
     @Published var librarySort: LibrarySort = .recentlyAdded {
         didSet { savePreferences() }
     }
+    @Published var searchProviderFilter: MusicProviderFilter = .all {
+        didSet { savePreferences() }
+    }
 
     private let player = AudioPlayer()
     private let searchService = OpenMusicSearchService()
@@ -139,6 +142,27 @@ final class MusicStore: ObservableObject {
         beyondIDSession.isConnected
     }
 
+    var filteredSearchResults: [MusicTrack] {
+        searchResults.filter { searchProviderFilter.matches($0) }
+    }
+
+    var searchProviderCounts: [MusicProviderFilter: Int] {
+        [
+            .all: searchResults.count,
+            .youtube: searchResults.filter { $0.providerName == "YouTube" }.count,
+            .internetArchive: searchResults.filter { $0.providerName == "Internet Archive" }.count
+        ]
+    }
+
+    var beyondIDDetailText: String {
+        guard hasBeyondID else { return "Connect on Profile to keep this device paired with Beyond ID." }
+        let name = beyondIDSession.label
+        if !beyondIDSession.walletText.isEmpty, beyondIDSession.walletText != "Unavailable" {
+            return "\(name) · \(beyondIDSession.walletText)"
+        }
+        return !beyondIDSession.email.isEmpty ? "\(name) · \(beyondIDSession.email)" : name
+    }
+
     func searchOpenMusic(resetPage: Bool = true) async {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard query.count >= 2 else {
@@ -156,6 +180,9 @@ final class MusicStore: ObservableObject {
         do {
             let page = try await searchService.search(query: query, page: currentSearchPage)
             searchResults = resetPage ? page.tracks : searchResults + page.tracks.filter { incoming in !searchResults.contains { $0.id == incoming.id } }
+            if searchProviderFilter != .all && searchProviderCounts[searchProviderFilter, default: 0] == 0 {
+                searchProviderFilter = .all
+            }
             statusMessage = page.tracks.isEmpty ? "No tracks found on page \(currentSearchPage)" : "Page \(currentSearchPage): \(page.summaryText)"
         } catch {
             statusMessage = "Search failed: \(error.localizedDescription)"
@@ -267,8 +294,9 @@ final class MusicStore: ObservableObject {
             downloadStates[track.id] = .downloaded
             statusMessage = "Saved \(enrichedTrack.title)"
         } catch {
-            downloadStates[track.id] = .failed(error.localizedDescription)
-            statusMessage = "YouTube download failed: \(error.localizedDescription)"
+            let message = userFacingYouTubeError(error.localizedDescription)
+            downloadStates[track.id] = .failed(message)
+            statusMessage = "YouTube download failed: \(message)"
         }
     }
 
@@ -548,10 +576,12 @@ final class MusicStore: ObservableObject {
             libraryFilter = preferences.libraryFilter
             librarySort = preferences.librarySort
             beyondIDSession = preferences.beyondIDSession
+            searchProviderFilter = preferences.searchProviderFilter
         } catch {
             libraryFilter = .all
             librarySort = .recentlyAdded
             beyondIDSession = .signedOut
+            searchProviderFilter = .all
         }
     }
 
@@ -561,7 +591,8 @@ final class MusicStore: ObservableObject {
             let preferences = MusicPreferences(
                 libraryFilter: libraryFilter,
                 librarySort: librarySort,
-                beyondIDSession: beyondIDSession
+                beyondIDSession: beyondIDSession,
+                searchProviderFilter: searchProviderFilter
             )
             let data = try JSONEncoder().encode(preferences)
             try data.write(to: preferencesURL, options: [.atomic])
@@ -591,6 +622,17 @@ final class MusicStore: ObservableObject {
 
     private func stableID(for url: URL) -> String {
         "\(url.deletingPathExtension().lastPathComponent)-\(UUID().uuidString)".stableMusicID
+    }
+
+    private func userFacingYouTubeError(_ message: String) -> String {
+        let lowered = message.lowercased()
+        if lowered.contains("captcha") || lowered.contains("sign in") || lowered.contains("confirm") || lowered.contains("bot") || lowered.contains("verify") {
+            return "YouTube asked the converter for CAPTCHA or sign-in verification. Try a different result, or retry later after the converter IP cools down."
+        }
+        if lowered.contains("unavailable") || lowered.contains("private") {
+            return "That YouTube video is unavailable to the converter. Try another result."
+        }
+        return message
     }
 
     private func ensureStorage() throws {
@@ -753,20 +795,19 @@ private struct BeyondIDService {
         components?.queryItems = [
             URLQueryItem(name: "provider", value: "google"),
             URLQueryItem(name: "app", value: "beyond-music"),
-            URLQueryItem(name: "return", value: "/beyond-id/auth/mobile-complete.php")
+            URLQueryItem(name: "return", value: "/beyond-id/auth/mobile-complete.php"),
+            URLQueryItem(name: "scheme", value: "beyondmusic")
         ]
         return components?.url ?? baseURL.appending(path: "/beyond-id/auth/login.php")
     }
 
     func completeMobileSignIn(callbackURL: URL) async throws -> BeyondIDSession {
-        guard let components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false),
-              let token = components.queryItems?.first(where: { $0.name == "token" })?.value,
-              !token.isEmpty
-        else {
-            let message = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false)?
-                .queryItems?
-                .first(where: { $0.name == "error" })?
-                .value ?? "Google sign in did not return a mobile token"
+        let components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false)
+        let queryItems = components?.queryItems ?? []
+        let token = queryItems.first(where: { $0.name == "token" })?.value
+            ?? callbackURL.absoluteString.components(separatedBy: "token=").dropFirst().first?.components(separatedBy: "&").first
+        guard let token, !token.isEmpty else {
+            let message = queryItems.first(where: { $0.name == "error" })?.value ?? "Google sign in did not return a mobile token"
             throw BeyondIDError.server(message)
         }
         return try await mobileSession(token: token)

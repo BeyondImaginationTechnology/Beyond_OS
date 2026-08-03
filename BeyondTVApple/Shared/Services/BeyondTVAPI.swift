@@ -34,6 +34,18 @@ struct BeyondTVAPI: Sendable {
         return try decoder.decode([Channel].self, from: data).sorted { $0.number < $1.number }
     }
 
+    func catalog() async throws -> [CatalogItem] {
+        let url = baseURL.appending(path: "beyond-tv/data/catalog.json")
+        let data = try await data(from: url)
+        return try decoder.decode([CatalogItem].self, from: data)
+    }
+
+    func guideSchedule() async throws -> [String: [GuideBlock]] {
+        let url = baseURL.appending(path: "beyond-tv/data/channel-schedules.json")
+        let data = try await data(from: url)
+        return try decoder.decode([String: [GuideBlock]].self, from: data)
+    }
+
     func schedule(for channel: Channel) async throws -> ScheduleResponse {
         guard let url = URL(string: channel.endpoint, relativeTo: baseURL)?.absoluteURL else {
             throw APIError.invalidResponse

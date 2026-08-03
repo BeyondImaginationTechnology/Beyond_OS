@@ -94,4 +94,25 @@ final class BeyondTVTests: XCTestCase {
         XCTAssertEqual(session.user?.preferredName, "Ari Beyond")
         XCTAssertEqual(session.wallet?.balanceText, "12.50 BITS")
     }
+
+    func testCatalogItemDecodesPlayableStream() throws {
+        let data = Data(
+            #"{"slug":"sister-act-2","type":"movie","title":"Sister Act 2","video_url":"https://archive.org/download/sister-act-2/Sister%20Act%202.mp4","thumbnail":"https://archive.org/services/img/sister-act-2","source_label":"Internet Archive","channel_slug":"beyond-comedy"}"#.utf8
+        )
+        let item = try JSONDecoder().decode(CatalogItem.self, from: data)
+
+        XCTAssertEqual(item.categoryLabel, "Movie")
+        XCTAssertEqual(item.playbackURL?.absoluteString, "https://archive.org/download/sister-act-2/Sister%20Act%202.mp4")
+        XCTAssertEqual(item.channelSlug, "beyond-comedy")
+    }
+
+    func testGuideBlockCurrentHourMatching() {
+        let morning = GuideBlock(start: 6, end: 9, icon: "☀️", title: "Morning", lineup: "Breakfast block")
+        let overnight = GuideBlock(start: 21, end: 3, icon: "🌙", title: "Overnight", lineup: "Late block")
+
+        XCTAssertTrue(morning.contains(hour: 7))
+        XCTAssertFalse(morning.contains(hour: 10))
+        XCTAssertTrue(overnight.contains(hour: 22))
+        XCTAssertTrue(overnight.contains(hour: 1))
+    }
 }

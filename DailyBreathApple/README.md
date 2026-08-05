@@ -7,9 +7,10 @@ Native SwiftUI app for DailyBreath 1.0.
 - Verse of the Day with speech playback
 - Daily devotional card
 - Bible library starter view
-- Bible Academy module list
+- Bible Academy Fall 2026 preview
 - Peace Breath practice
 - Private in-memory reflection journal
+- App Clip with a fast verse-and-breath preview
 
 ## Build
 

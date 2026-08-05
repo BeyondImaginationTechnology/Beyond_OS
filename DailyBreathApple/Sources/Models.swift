@@ -11,8 +11,11 @@ struct Devotional: Identifiable, Equatable {
     let id: Int
     let title: String
     let excerpt: String
+    let body: String
     let scripture: String
     let minutes: Int
+    let prayer: String
+    let practice: String
 }
 
 struct PrayerPractice: Identifiable, Equatable {
@@ -203,7 +206,10 @@ extension Devotional {
         id: 1,
         title: "Walk in Quiet Confidence",
         excerpt: "Make room for stillness and remember that God is present before your next step.",
+        body: "Stillness is not empty time. It is a faithful pause where you remember that God is already present, already attentive, and already enough for the road in front of you. Begin today by slowing your pace before you solve everything. Let confidence grow from trust, not hurry.",
         scripture: "Psalm 46:10",
-        minutes: 5
+        minutes: 5,
+        prayer: "Lord, quiet my heart and steady my thoughts. Help me move through today with trust, patience, and courage.",
+        practice: "Before your next task, take three slow breaths and name one thing you can entrust to God."
     )
 }

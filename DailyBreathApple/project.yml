@@ -30,9 +30,10 @@ targets:
         PRODUCT_MODULE_NAME: DailyBreath
         INFOPLIST_KEY_CFBundleDisplayName: The Daily Breath
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.lifestyle
-        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UILaunchStoryboardName: LaunchScreen
         INFOPLIST_KEY_UIRequiresFullScreen: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown"
         TARGETED_DEVICE_FAMILY: "1,2"
       configs:
         Release:
@@ -43,6 +44,21 @@ targets:
     scheme:
       testTargets:
         - TheDailyBreathTests
+  TheDailyBreathClip:
+    type: application.on-demand-install-capable
+    platform: iOS
+    sources:
+      - path: AppClip
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.thedailybreath.Clip
+        PRODUCT_NAME: The Daily Breath Clip
+        PRODUCT_MODULE_NAME: DailyBreathClip
+        CODE_SIGN_ENTITLEMENTS: AppClip/TheDailyBreathClip.entitlements
+        INFOPLIST_KEY_CFBundleDisplayName: Daily Breath Clip
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        TARGETED_DEVICE_FAMILY: "1"
   TheDailyBreathTests:
     type: bundle.unit-test
     platform: iOS

@@ -360,18 +360,19 @@ $homeLiveControls = [
   <div class="featured-title-carousel" data-featured-title-carousel tabindex="0" role="region" aria-roledescription="carousel" aria-label="All <?=number_format($featuredTitleCount)?> currently available Beyond TV titles">
     <?php foreach ($featuredTitles as $featuredIndex => $featuredTitle):
       $featuredSlug = (string)($featuredTitle['slug'] ?? '');
+      $featuredFallbackThumbnail = trim((string)($featuredTitle['thumbnail'] ?? ''));
       $featuredThumbnail = $premiumPosterProvider
           ? '/beyond-tv/api/poster.php?slug=' . rawurlencode($featuredSlug)
-          : trim((string)($featuredTitle['tmdb_poster_url'] ?? $featuredTitle['poster_url'] ?? ''));
-      if (!$premiumPosterProvider && $featuredThumbnail === '' && $featuredSlug === 'malcolm-in-the-middle') {
-          $featuredThumbnail = trim((string)($featuredTitle['thumbnail'] ?? ''));
+          : trim((string)($featuredTitle['tmdb_poster_url'] ?? $featuredTitle['poster_url'] ?? $featuredFallbackThumbnail));
+      if (!$premiumPosterProvider && $featuredThumbnail === '') {
+          $featuredThumbnail = $featuredFallbackThumbnail;
       }
       $featuredIsNew = !empty($featuredTitle['new_addition']) || $featuredIndex < 12;
     ?>
     <a class="featured-title-card" href="/beyond-tv/title.php?slug=<?=urlencode((string)($featuredTitle['slug'] ?? ''))?>" style="--title-gradient:<?=htmlspecialchars((string)($featuredTitle['gradient'] ?? 'linear-gradient(135deg,#151a34,#623d85)'))?>" aria-label="<?=htmlspecialchars((string)($featuredTitle['title'] ?? 'Beyond TV title'))?>">
       <span class="featured-title-card__cover">
         <span class="featured-title-card__fallback" aria-hidden="true"><span class="featured-title-card__orbit"></span><span class="featured-title-card__icon"><?=htmlspecialchars((string)($featuredTitle['icon'] ?? '▶'))?></span><strong><?=htmlspecialchars((string)($featuredTitle['title'] ?? 'Beyond TV'))?></strong><small><?=($featuredTitle['type'] ?? '') === 'movie' ? 'A BEYOND MOVIE' : 'A BEYOND SERIES'?></small></span>
-        <?php if ($featuredThumbnail !== ''): ?><img class="featured-title-card__poster" src="<?=htmlspecialchars($featuredThumbnail)?>" alt="" width="420" height="630" loading="<?=$featuredIndex < 6 ? 'eager' : 'lazy'?>" decoding="async"><?php endif; ?>
+        <?php if ($featuredThumbnail !== ''): ?><img class="featured-title-card__poster" src="<?=htmlspecialchars($featuredThumbnail)?>"<?php if ($premiumPosterProvider && $featuredFallbackThumbnail !== ''): ?> data-fallback-src="<?=htmlspecialchars($featuredFallbackThumbnail)?>"<?php endif; ?> alt="" width="420" height="630" loading="<?=$featuredIndex < 6 ? 'eager' : 'lazy'?>" decoding="async"><?php endif; ?>
         <span class="featured-title-card__type"><?=$featuredIsNew ? 'NEW · ' : ''?><?=($featuredTitle['type'] ?? '') === 'movie' ? 'MOVIE' : 'SERIES'?></span>
         <span class="featured-title-card__play" aria-hidden="true">▶</span>
       </span>
@@ -557,8 +558,16 @@ html[data-theme="light"] .home-live-stage,html[data-theme="light"] .live-app-car
    card.setAttribute('aria-label',`${card.getAttribute('aria-label')||'Title'}, ${index+1} of ${cards.length}`);
    const poster=card.querySelector('.featured-title-card__poster');
    if(poster){
-     const removeBrokenPoster=()=>poster.remove();
-     poster.addEventListener('error',removeBrokenPoster,{once:true});
+     const removeBrokenPoster=()=>{
+       const fallback=poster.dataset.fallbackSrc||'';
+       if(fallback&&poster.src!==new URL(fallback,window.location.href).href){
+         poster.src=fallback;
+         poster.removeAttribute('data-fallback-src');
+         return;
+       }
+       poster.remove();
+     };
+     poster.addEventListener('error',removeBrokenPoster);
      if(poster.complete&&poster.naturalWidth===0)removeBrokenPoster();
    }
  });

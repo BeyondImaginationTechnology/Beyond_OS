@@ -95,8 +95,48 @@ OUTPUT REQUIREMENTS
 Return a single isolated vertical stencil on a pure white background. Crisp black linework only. No skin, body, person, studio scene, paper texture, mockup, frame, border, crop marks, typography, letters, numbers, signature, logo, watermark, color, gray wash, soft shading, drop shadow, glow, or photographic rendering. Keep the entire design inside the canvas with comfortable white margins. The result must look like a high-end transfer-ready master an experienced tattoo artist can print, size, and refine.
 PROMPT;
     $openAiKey = trim((string)beyond_ai_config('api_key', ''));
+    $azureImageKey = trim((string)beyond_ai_config('azure_image_key', ''));
+    $azureImageEndpoint = rtrim(trim((string)beyond_ai_config('azure_image_endpoint', '')), '/');
+    $azureImageModel = trim((string)beyond_ai_config('azure_image_model', 'MAI-Image-2.5')) ?: 'MAI-Image-2.5';
+    $azureImageWidth = (int)beyond_ai_config('azure_image_width', 768);
+    $azureImageHeight = (int)beyond_ai_config('azure_image_height', 1365);
     $googleKey = trim((string)beyond_ai_config('google_image_key', ''));
     $errors = [];
+    if ($azureImageKey !== '' && $azureImageEndpoint !== '' && !str_contains($azureImageKey, 'YOUR_')) {
+        if (!preg_match('#^https://[a-z0-9.-]+\.services\.ai\.azure\.com$#i', $azureImageEndpoint)) {
+            throw new RuntimeException('The configured Azure image endpoint is invalid. Use the base services.ai.azure.com endpoint.');
+        }
+        if (!preg_match('/^[a-zA-Z0-9._-]+$/', $azureImageModel)) {
+            throw new RuntimeException('The configured Azure image model is invalid.');
+        }
+        if ($azureImageWidth < 768 || $azureImageHeight < 768 || ($azureImageWidth * $azureImageHeight) > 1048576) {
+            throw new RuntimeException('Azure image dimensions must be at least 768px each and no more than 1,048,576 total pixels.');
+        }
+        $body = json_encode([
+            'model'=>$azureImageModel,
+            'prompt'=>$prompt,
+            'width'=>$azureImageWidth,
+            'height'=>$azureImageHeight,
+        ], JSON_THROW_ON_ERROR);
+        $curl = curl_init($azureImageEndpoint . '/mai/v1/images/generations');
+        curl_setopt_array($curl, [CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>180,CURLOPT_HTTPHEADER=>['api-key: '.$azureImageKey,'Content-Type: application/json'],CURLOPT_POSTFIELDS=>$body]);
+        $raw = curl_exec($curl); $curlError = curl_error($curl); $status = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE); curl_close($curl);
+        $response = is_string($raw) ? json_decode($raw, true) : null;
+        $image = is_array($response) ? (string)($response['data'][0]['b64_json'] ?? '') : '';
+        $decodedImage = $image !== '' ? base64_decode($image, true) : false;
+        if ($status >= 200 && $status < 300 && is_string($decodedImage)) {
+            stencilJson([
+                'ok'=>true,
+                'image'=>'data:image/png;base64,'.$image,
+                'render_token'=>stencilRenderToken($decodedImage),
+                'model'=>$azureImageModel,
+                'provider'=>'azure-mai',
+                'quality'=>'high',
+                'size'=>(string)$azureImageWidth.'×'.(string)$azureImageHeight,
+            ]);
+        }
+        $errors[] = is_array($response) ? (string)($response['error']['message'] ?? 'Azure MAI image generation failed.') : ($curlError ?: 'Azure MAI image generation failed.');
+    }
     if ($googleKey !== '' && !str_contains($googleKey, 'YOUR_')) {
         $model = trim((string)beyond_ai_config('google_image_model', 'gemini-3.1-flash-image')) ?: 'gemini-3.1-flash-image';
         if (!preg_match('/^[a-zA-Z0-9._-]+$/', $model)) throw new RuntimeException('The configured Google image model is invalid.');
@@ -149,7 +189,7 @@ PROMPT;
     if (!$errors) {
         stencilJson([
             'ok'=>false,
-            'error'=>'Add an OpenAI or Google Imagen API key in protected Site Settings, or use a free image fallback prompt.',
+            'error'=>'Add an Azure MAI, OpenAI, or Google Imagen API key in protected Site Settings, or use a free image fallback prompt.',
             'fallback_provider'=>'free-image-tools',
             'fallback_prompt'=>$prompt,
         ], 400);

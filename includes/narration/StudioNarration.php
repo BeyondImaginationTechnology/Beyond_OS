@@ -77,7 +77,7 @@ function studio_store_mp3(string $audio,string $library,string $date,string $loc
   $base=dirname(__DIR__,2).'/'.$folder.'/assets/audio/'.$year.'/'.$month;
   if(!is_dir($base) && !mkdir($base,0775,true) && !is_dir($base)) throw new RuntimeException('The audio library could not be created. Check PHP write permissions for '.$folder.'/assets/audio.');
   if(!is_writable($base)) throw new RuntimeException('The audio library is not writable. Set '.$folder.'/assets/audio to 775 on the server.');
-  $slug=$library==='beyond-french'?'francais-du-jour':'daily-breath';
+  $slug=$library==='beyond-french'?'francais-du-jour':($library==='beyond-space'?'beyond-space-horoscope':'daily-breath');
   $name=$slug.'-'.$date.'-'.strtolower(str_replace('-','_',$locale)).'-'.substr(hash('sha256',$text),0,10).'.mp3';
   $file=$base.'/'.$name;
   if(!is_file($file) && file_put_contents($file,$audio,LOCK_EX)===false) throw new RuntimeException('The MP3 could not be saved.');

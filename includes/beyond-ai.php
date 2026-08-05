@@ -5,6 +5,9 @@ function beyond_ai_config(string $key, $default = null)
 {
     $envMap = [
         'api_key' => 'OPENAI_API_KEY',
+        'azure_image_key' => 'AZURE_IMAGE_KEY',
+        'azure_image_endpoint' => 'AZURE_IMAGE_ENDPOINT',
+        'azure_image_model' => 'AZURE_IMAGE_MODEL',
         'google_image_key' => 'GEMINI_API_KEY',
         'google_image_model' => 'BEYOND_GOOGLE_IMAGE_MODEL',
         'quick_model' => 'BEYOND_AI_QUICK_MODEL',
@@ -16,6 +19,11 @@ function beyond_ai_config(string $key, $default = null)
     }
     $paths = [
         'api_key' => ['ai.openai.api_key', 'narration.openai.api_key'],
+        'azure_image_key' => ['ai.azure_image.api_key', 'ai.azure.image_api_key', 'azure.image.api_key'],
+        'azure_image_endpoint' => ['ai.azure_image.endpoint', 'ai.azure.image_endpoint', 'azure.image.endpoint'],
+        'azure_image_model' => ['ai.azure_image.model', 'ai.azure.image_model', 'azure.image.model'],
+        'azure_image_width' => ['ai.azure_image.width', 'ai.azure.image_width'],
+        'azure_image_height' => ['ai.azure_image.height', 'ai.azure.image_height'],
         'google_image_key' => ['ai.google.imagen_api_key', 'ai.google.api_key', 'ai.gemini.api_key', 'google.imagen.api_key'],
         'google_image_model' => ['ai.google.imagen_model', 'ai.google.image_model'],
         'quick_model' => ['ai.openai.quick_model'],

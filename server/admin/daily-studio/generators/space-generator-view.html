@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="csrf-token" content="__CSRF_TOKEN__">
+  <title>Beyond Space Horoscope Generator</title>
+  <style>
+    :root{color-scheme:dark;--bg:#070705;--panel:#12100b;--line:rgba(232,198,116,.24);--text:#fff7df;--muted:#b7a783;--gold:#e9c675;--gold2:#9d7429;--ink:#050504}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#1b160b 0,#090806 46%,#030302 100%);color:var(--text);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+    button,input,select,textarea{font:inherit}.shell{min-height:100vh;display:grid;grid-template-columns:minmax(320px,440px) minmax(0,1fr)}
+    .controls{padding:24px;overflow:auto;background:rgba(12,10,7,.96);border-right:1px solid var(--line);box-shadow:10px 0 34px rgba(0,0,0,.28)}.preview{display:grid;place-items:center;padding:28px;min-width:0}
+    .back{display:inline-block;color:var(--gold);text-decoration:none;margin-bottom:15px}h1{font:800 28px/1.05 Georgia,serif;margin:0 0 6px;color:var(--gold)}.lede,.hint{color:var(--muted)}.lede{margin:0 0 22px}.group{padding:17px 0;border-top:1px solid var(--line)}.group:first-of-type{border-top:0}
+    label{display:block;font-weight:800;margin:0 0 7px}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;background:#080704;color:var(--text);padding:11px 12px;outline:none}textarea{resize:vertical;min-height:112px}input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(233,198,117,.13)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{border:1px solid var(--line);border-radius:11px;padding:12px 14px;font-weight:900;cursor:pointer;background:#1b160d;color:var(--text)}.btn.primary{background:linear-gradient(135deg,#f3d886,#9f7024);color:#110d05;border:0}.btn.wide{grid-column:1/-1}.btn:disabled{opacity:.55;cursor:wait}
+    .status{min-height:23px;color:#dec37b;margin-top:10px}.status.error{color:#ff9c8b}.canvas-wrap{width:min(76vh,720px);max-width:100%;filter:drop-shadow(0 24px 42px rgba(0,0,0,.48))}canvas{display:block;width:100%;height:auto;background:#050504;border-radius:12px}.sign-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.sign-grid button{min-height:44px;padding:8px;border-radius:9px;border:1px solid var(--line);background:#0d0b07;color:var(--muted);font-weight:800;cursor:pointer}.sign-grid button.active{background:#32240d;color:var(--gold);border-color:var(--gold)}
+    @media(max-width:930px){.shell{display:block}.controls{border-right:0;border-bottom:1px solid var(--line)}.preview{padding:18px}.canvas-wrap{width:min(100%,620px)}}@media(max-width:520px){.controls{padding:19px}.row,.actions{grid-template-columns:1fr}.btn.wide{grid-column:auto}.sign-grid{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <aside class="controls">
+    <a class="back" href="/server/admin/daily-studio/">&larr; Admin dashboard</a>
+    <h1>Beyond Space Daily Astrology</h1>
+    <p class="lede">Generate all 12 original horoscope posts, import your sign backgrounds, and export the full set.</p>
+
+    <section class="group">
+      <div class="row">
+        <div><label for="publishDate">Publish date</label><input id="publishDate" type="date"></div>
+        <div><label for="theme">Creative theme</label><input id="theme" type="text" value="cosmic reset"></div>
+      </div>
+      <label style="margin-top:14px">Current sign</label>
+      <div class="sign-grid" id="signGrid"></div>
+    </section>
+
+    <section class="group">
+      <div class="actions">
+        <button class="btn primary wide" id="generateAll" type="button">Generate all 12 horoscopes</button>
+      </div>
+      <label style="margin-top:13px"><input id="saveDrafts" type="checkbox" checked style="width:auto;margin-right:8px;accent-color:#d6aa47"> Save generated horoscopes as Beyond Space drafts</label>
+      <div class="hint">Use original imported backgrounds named with the sign slug, like leo.png, gemini.jpg, or 2026-08-05-pisces.webp.</div>
+    </section>
+
+    <section class="group">
+      <label for="backgroundFiles">Import sign backgrounds</label>
+      <input id="backgroundFiles" type="file" accept="image/png,image/jpeg,image/webp" multiple>
+      <div class="hint" style="margin-bottom:12px">Select up to 12 files at once. Filenames are matched to Aries through Pisces automatically.</div>
+      <label for="headline">Headline</label><input id="headline" type="text">
+      <label for="bodyText" style="margin-top:12px">Horoscope copy</label><textarea id="bodyText"></textarea>
+      <div class="row">
+        <div><label for="mood">Mood</label><input id="mood" type="text"></div>
+        <div><label for="powerHour">Power hour</label><input id="powerHour" type="text"></div>
+      </div>
+      <label for="evening" style="margin-top:12px">Evening note</label><input id="evening" type="text">
+      <label for="backgroundUrl" style="margin-top:12px">Background URL</label><input id="backgroundUrl" type="text" placeholder="/beyond-space/assets/img/horoscopes/...">
+    </section>
+
+    <section class="group">
+      <label for="narrationProvider">Narration provider</label>
+      <select id="narrationProvider"><option value="">Studio default</option><option value="azure">Azure Speech</option></select>
+      <div class="hint">Azure uses en-US-JennyMultilingualNeural for the English/French/Spanish-friendly voice.</div>
+      <div class="actions" style="margin-top:12px">
+        <button class="btn" id="previewAudio" type="button">Preview narration</button>
+        <button class="btn" id="exportMp3" type="button">Download sign MP3</button>
+        <button class="btn wide" id="exportAllMp3" type="button">Download all 12 MP3s</button>
+      </div>
+    </section>
+
+    <section class="group">
+      <div class="actions">
+        <button class="btn primary" id="downloadPng" type="button">Download PNG</button>
+        <button class="btn primary" id="downloadAllPng" type="button">Download all 12 PNGs</button>
+      </div>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+    </section>
+  </aside>
+  <section class="preview"><div class="canvas-wrap"><canvas id="art" width="1080" height="1080" aria-label="Daily horoscope preview"></canvas></div></section>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const signs=[
+    ['aries','Aries','♈','Mar 21 - Apr 19'],['taurus','Taurus','♉','Apr 20 - May 20'],['gemini','Gemini','♊','May 21 - Jun 20'],['cancer','Cancer','♋','Jun 21 - Jul 22'],
+    ['leo','Leo','♌','Jul 23 - Aug 22'],['virgo','Virgo','♍','Aug 23 - Sep 22'],['libra','Libra','♎','Sep 23 - Oct 22'],['scorpio','Scorpio','♏','Oct 23 - Nov 21'],
+    ['sagittarius','Sagittarius','♐','Nov 22 - Dec 21'],['capricorn','Capricorn','♑','Dec 22 - Jan 19'],['aquarius','Aquarius','♒','Jan 20 - Feb 18'],['pisces','Pisces','♓','Feb 19 - Mar 20']
+  ];
+  const $=id=>document.getElementById(id),csrf=document.querySelector('meta[name="csrf-token"]').content,canvas=$('art'),ctx=canvas.getContext('2d',{alpha:false});
+  const defaultBackgrounds={
+    aries:'/beyond-space/assets/img/horoscopes/imported/aries.jpg',
+    taurus:'/beyond-space/assets/img/horoscopes/imported/taurus.jpg',
+    gemini:'/beyond-space/assets/img/horoscopes/imported/gemini.webp',
+    cancer:'/beyond-space/assets/img/horoscopes/imported/cancer.jpg',
+    leo:'/beyond-space/assets/img/horoscopes/imported/leo.webp',
+    virgo:'/beyond-space/assets/img/horoscopes/imported/virgo.webp',
+    libra:'/beyond-space/assets/img/horoscopes/imported/libra.webp',
+    scorpio:'/beyond-space/assets/img/horoscopes/imported/scorpio.jpg',
+    sagittarius:'/beyond-space/assets/img/horoscopes/imported/sagittarius.webp',
+    capricorn:'/beyond-space/assets/img/horoscopes/imported/capricorn.webp',
+    aquarius:'/beyond-space/assets/img/horoscopes/imported/aquarius.jpg',
+    pisces:'/beyond-space/assets/img/horoscopes/imported/pisces.jpg'
+  };
+  let current='aries',items={},backgrounds={...defaultBackgrounds},activeAudio=null;
+  const value=id=>$(id).value.trim(),selectedProvider=()=>value('narrationProvider'),selectedVoice=()=>selectedProvider()==='azure'?'en-US-JennyMultilingualNeural':'';
+  const status=(m,e=false)=>{$('status').textContent=m;$('status').classList.toggle('error',e)};
+  const today=()=>{const n=new Date(),d=new Date(n.getTime()-n.getTimezoneOffset()*60000);return d.toISOString().slice(0,10)};
+  $('publishDate').value=today();
+  function itemFor(slug=current){return items[slug]||{slug,sign:signs.find(s=>s[0]===slug)[1],symbol:signs.find(s=>s[0]===slug)[2],season:signs.find(s=>s[0]===slug)[3],headline:'COSMIC RESET',paragraphs:['Generate the daily set to fill this sign with original Beyond Space horoscope copy.','Imported backgrounds will sit behind the text as reusable premium sign art.','Export one card or all twelve when the set feels ready.'],mood:'Open & Grounded',power_hour:'Moon PM',evening:'Restore your center'};}
+  function syncButtons(){document.querySelectorAll('#signGrid button').forEach(b=>b.classList.toggle('active',b.dataset.sign===current))}
+  function loadCurrent(){const item=itemFor();$('headline').value=item.headline||'COSMIC WEATHER';$('bodyText').value=(item.paragraphs||[]).join('\n\n');$('mood').value=item.mood||'';$('powerHour').value=item.power_hour||'';$('evening').value=item.evening||'';$('backgroundUrl').value=backgrounds[current]||item.background_url||'';syncButtons();draw()}
+  function saveCurrent(){const item=itemFor();item.headline=value('headline');item.paragraphs=value('bodyText').split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);item.mood=value('mood');item.power_hour=value('powerHour');item.evening=value('evening');item.background_url=value('backgroundUrl');items[current]=item;if(item.background_url)backgrounds[current]=item.background_url}
+  $('signGrid').innerHTML=signs.map(([slug,name,symbol])=>`<button type="button" data-sign="${slug}">${symbol} ${name}</button>`).join('');
+  document.querySelectorAll('#signGrid button').forEach(button=>button.addEventListener('click',()=>{saveCurrent();current=button.dataset.sign;loadCurrent()}));
+  ['headline','bodyText','mood','powerHour','evening','backgroundUrl','publishDate'].forEach(id=>$(id).addEventListener('input',()=>{saveCurrent();draw()}));
+  $('backgroundFiles').addEventListener('change',event=>{let matched=0;for(const file of event.target.files||[]){const name=file.name.toLowerCase();const sign=signs.find(([slug,label])=>name.includes(slug)||name.includes(label.toLowerCase()));if(!sign)continue;if(backgrounds[sign[0]]&&backgrounds[sign[0]].startsWith('blob:'))URL.revokeObjectURL(backgrounds[sign[0]]);backgrounds[sign[0]]=URL.createObjectURL(file);if(items[sign[0]])items[sign[0]].background_url=backgrounds[sign[0]];matched++}loadCurrent();status(matched?`Imported ${matched} sign background${matched===1?'':'s'}.`:'No sign names were found in those filenames.',!matched)});
+  function dateLabel(){const d=new Date((value('publishDate')||today())+'T12:00:00');return `${d.toLocaleDateString('en-US',{weekday:'long'}).toUpperCase()} • ${d.toLocaleDateString('en-US',{month:'short'}).toUpperCase()} ${String(d.getDate()).padStart(2,'0')}, ${d.getFullYear()}`}
+  function drawFallbackBg(symbol){const g=ctx.createRadialGradient(540,340,80,540,540,700);g.addColorStop(0,'#241a0b');g.addColorStop(.55,'#090806');g.addColorStop(1,'#020202');ctx.fillStyle=g;ctx.fillRect(0,0,1080,1080);ctx.strokeStyle='rgba(232,198,116,.72)';ctx.lineWidth=3;for(let r of [424,468,506]){ctx.beginPath();ctx.arc(540,530,r,Math.PI*1.08,Math.PI*1.92);ctx.stroke()}ctx.font='320px Georgia,serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='rgba(232,198,116,.22)';ctx.fillText(symbol,540,500);ctx.fillStyle='rgba(232,198,116,.86)';for(let i=0;i<150;i++){const x=(i*197)%1080,y=(i*83)%950+40,s=i%8===0?3:1;ctx.fillRect(x,y,s,s)}}
+  const imageCache={};
+  async function loadImage(url){if(!url)return null;if(imageCache[url])return imageCache[url];const img=new Image();img.crossOrigin='anonymous';const p=new Promise(resolve=>{img.onload=()=>resolve(img);img.onerror=()=>resolve(null)});img.src=url;imageCache[url]=await p;return imageCache[url]}
+  function wrap(text,x,y,w,lh,max){const words=text.replace(/\s+/g,' ').trim().split(' '),lines=[];let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>w&&line){lines.push(line);line=word}else line=test}if(line)lines.push(line);lines.slice(0,max).forEach((l,i)=>ctx.fillText(l,x,y+i*lh));return Math.min(lines.length,max)*lh}
+  async function draw(slug=current){const item=itemFor(slug),bg=value('backgroundUrl')&&slug===current?value('backgroundUrl'):(backgrounds[slug]||item.background_url||'');ctx.clearRect(0,0,1080,1080);const img=await loadImage(bg);if(img){const s=Math.max(1080/img.width,1080/img.height),w=img.width*s,h=img.height*s;ctx.drawImage(img,(1080-w)/2,(1080-h)/2,w,h)}else drawFallbackBg(item.symbol||'✦');const veil=ctx.createLinearGradient(0,0,0,1080);veil.addColorStop(0,'rgba(0,0,0,.18)');veil.addColorStop(.38,'rgba(0,0,0,.34)');veil.addColorStop(.72,'rgba(0,0,0,.62)');veil.addColorStop(1,'rgba(0,0,0,.82)');ctx.fillStyle=veil;ctx.fillRect(0,0,1080,1080);ctx.strokeStyle='#d9b15b';ctx.lineWidth=2;ctx.strokeRect(36,36,1008,1008);ctx.strokeStyle='rgba(217,177,91,.55)';ctx.strokeRect(50,50,980,980);ctx.textAlign='center';ctx.textBaseline='alphabetic';ctx.shadowColor='rgba(0,0,0,.75)';ctx.shadowBlur=14;ctx.fillStyle='#e6c473';ctx.font='700 25px Arial';ctx.fillText('BEYOND SPACE • DAILY ASTROLOGY',540,105);ctx.font='900 74px Georgia';ctx.fillText(`${item.symbol||''}  ${(item.sign||'').toUpperCase()}`,540,190);ctx.fillStyle='#f8f0d8';ctx.font='800 25px Arial';ctx.fillText(dateLabel(),540,238);ctx.strokeStyle='rgba(232,198,116,.72)';ctx.beginPath();ctx.moveTo(145,282);ctx.lineTo(935,282);ctx.stroke();ctx.fillStyle='#fff8e7';ctx.font='700 34px Georgia';let y=335;(item.paragraphs||[]).slice(0,4).forEach(p=>{y+=wrap(p,540,y,730,47,3)+24});ctx.strokeStyle='rgba(232,198,116,.72)';ctx.beginPath();ctx.moveTo(145,870);ctx.lineTo(935,870);ctx.stroke();ctx.shadowBlur=0;ctx.font='900 20px Arial';ctx.fillStyle='#ffe69d';function chip(text,x,y,w){ctx.beginPath();ctx.roundRect(x,y,w,38,14);ctx.fillStyle='rgba(90,62,18,.9)';ctx.fill();ctx.strokeStyle='#e8c674';ctx.stroke();ctx.fillStyle='#ffeaa8';ctx.fillText(text,x+w/2,y+26)}chip('MOOD: '+(item.mood||''),130,910,330);chip('POWER HOUR: '+(item.power_hour||''),480,910,310);chip('EVENING: '+(item.evening||''),250,966,580)}
+  function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1600)}
+  async function pngBlob(slug){saveCurrent();await draw(slug);await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return new Promise(resolve=>canvas.toBlob(resolve,'image/png'))}
+  async function downloadPng(){const blob=await pngBlob(current);if(blob)downloadBlob(blob,`beyond-space-${value('publishDate')}-${current}.png`);status('PNG downloaded.')}
+  async function downloadAllPng(){saveCurrent();$('downloadAllPng').disabled=true;try{for(const [slug] of signs){const blob=await pngBlob(slug);if(blob)downloadBlob(blob,`beyond-space-${value('publishDate')}-${slug}.png`);await new Promise(r=>setTimeout(r,350))}loadCurrent();status('All 12 PNGs downloaded.')}catch(e){status(e.message||'Batch PNG export failed.',true)}finally{$('downloadAllPng').disabled=false}}
+  async function generateAll(){saveCurrent();const b=$('generateAll');b.disabled=true;status('Generating all 12 horoscope texts…');try{const r=await fetch('/server/admin/daily-studio/api/generate-space-horoscopes.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({publish_date:value('publishDate'),theme:value('theme'),save_drafts:$('saveDrafts').checked})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||'Horoscope generation failed.');items={};d.items.forEach(item=>{items[item.slug]=item;if(item.background_url)backgrounds[item.slug]=item.background_url});loadCurrent();status(`Generated ${d.items.length} signs via ${d.provider}${d.saved?`; saved ${d.saved} drafts`:''}.`)}catch(e){status(e.message,true)}finally{b.disabled=false}}
+  function narrationText(slug=current){const item=itemFor(slug);return `Beyond Space daily astrology for ${item.sign}. ${(item.paragraphs||[]).join(' ')} Mood: ${item.mood}. Power hour: ${item.power_hour}. Evening: ${item.evening}.`}
+  function stopAudio(){if(activeAudio){activeAudio.pause();URL.revokeObjectURL(activeAudio.src);activeAudio=null}}
+  async function previewAudio(){stopAudio();status('Preparing narration…');try{const r=await fetch('/beyond-id/admin/api/verse-narration.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale:'en-US',provider:selectedProvider(),voice:selectedVoice()})});if(!r.ok)throw new Error('Narration could not be generated.');const blob=await r.blob(),url=URL.createObjectURL(blob);activeAudio=new Audio(url);activeAudio.onended=()=>{URL.revokeObjectURL(url);activeAudio=null;status('Narration finished.')};await activeAudio.play();status('Narration playing.')}catch(e){status(e.message,true)}}
+  async function exportMp3(slug=current){const item=itemFor(slug),r=await fetch('/beyond-id/admin/api/studio-narration-export.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(slug),locale:'en-US',publish_date:value('publishDate'),library:'beyond-space',provider:selectedProvider(),voice:selectedVoice()})});if(!r.ok)throw new Error(`${item.sign} MP3 failed.`);const blob=await r.blob();downloadBlob(blob,`beyond-space-${value('publishDate')}-${slug}.mp3`)}
+  async function exportAllMp3(){if(!confirm('Generate 12 narration MP3s? This will call the selected speech provider 12 times.'))return;const b=$('exportAllMp3');b.disabled=true;try{for(const [slug,name] of signs){status(`Generating ${name} MP3…`);await exportMp3(slug);await new Promise(r=>setTimeout(r,350))}status('All 12 MP3s downloaded.')}catch(e){status(e.message,true)}finally{b.disabled=false}}
+  $('generateAll').addEventListener('click',generateAll);$('downloadPng').addEventListener('click',downloadPng);$('downloadAllPng').addEventListener('click',downloadAllPng);$('previewAudio').addEventListener('click',previewAudio);$('exportMp3').addEventListener('click',()=>exportMp3().then(()=>status('MP3 downloaded.')).catch(e=>status(e.message,true)));$('exportAllMp3').addEventListener('click',exportAllMp3);
+  loadCurrent();
+})();
+</script>
+</body>
+</html>

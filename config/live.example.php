@@ -40,6 +40,15 @@ return [
             'api_key' => '',
         ],
     ],
+    'ai' => [
+        'azure_image' => [
+            'api_key' => '',
+            'endpoint' => 'https://your-resource.services.ai.azure.com',
+            'model' => 'MAI-Image-2.5',
+            'width' => 768,
+            'height' => 1365,
+        ],
+    ],
     'music' => [
         'youtube' => [
             // Optional: leave blank to reuse the first key from config/youtube.php.

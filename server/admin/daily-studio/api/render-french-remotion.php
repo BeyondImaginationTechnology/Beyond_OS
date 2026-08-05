@@ -50,6 +50,14 @@ foreach ($limits as $field => $limit) {
 
 $includeNarration = !array_key_exists('include_narration', $input)
     || (bool)$input['include_narration'];
+$narrationProvider = strtolower(trim((string)($input['narration_provider'] ?? '')));
+if ($narrationProvider !== '' && !in_array($narrationProvider, ['openai', 'elevenlabs', 'azure'], true)) {
+    remotion_error(422, 'The selected narration provider is invalid.');
+}
+$narrationVoice = trim((string)($input['narration_voice'] ?? ''));
+if ($narrationVoice !== '' && !preg_match('/^[A-Za-z0-9:_-]+$/', $narrationVoice)) {
+    remotion_error(422, 'The selected narration voice is invalid.');
+}
 $publishDate = trim((string)($input['publish_date'] ?? date('Y-m-d')));
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $publishDate)) {
     $publishDate = date('Y-m-d');
@@ -94,7 +102,7 @@ try {
             $props['spanish'],
             $props['patois']
         );
-        $narration = studio_narration_generate($script, 'en-US');
+        $narration = studio_narration_generate($script, 'en-US', $narrationProvider, $narrationVoice);
         $audio = (string)($narration['audio_content'] ?? '');
         if (strlen($audio) < 128 || file_put_contents($audioFile, $audio, LOCK_EX) === false) {
             throw new RuntimeException('The narration MP3 could not be prepared.');

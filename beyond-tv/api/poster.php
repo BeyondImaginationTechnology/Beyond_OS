@@ -19,9 +19,23 @@ if (!is_array($item)) {
 }
 
 $poster = beyond_tv_poster_url($item);
+if (!$poster) {
+    $poster = trim((string)($item['tmdb_poster_url'] ?? $item['poster_url'] ?? $item['thumbnail'] ?? ''));
+}
+
 $host = strtolower((string)parse_url((string)$poster, PHP_URL_HOST));
-$allowedHosts = ['image.tmdb.org', 'm.media-amazon.com', 'ia.media-imdb.com'];
-if (!$poster || !in_array($host, $allowedHosts, true)) {
+$path = (string)parse_url((string)$poster, PHP_URL_PATH);
+$allowedHosts = [
+    'image.tmdb.org',
+    'm.media-amazon.com',
+    'ia.media-imdb.com',
+    'archive.org',
+    'i.ytimg.com',
+    'img.youtube.com',
+    'upload.wikimedia.org',
+];
+$isLocalAsset = $host === '' && preg_match('#^/(?:assets|beyond-tv)/#', $path) === 1;
+if (!$poster || (!in_array($host, $allowedHosts, true) && !$isLocalAsset)) {
     header('Cache-Control: no-store');
     http_response_code(404);
     exit;

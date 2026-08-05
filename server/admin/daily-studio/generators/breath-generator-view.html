@@ -75,6 +75,7 @@
         <label class="check"><input id="showFooter" type="checkbox" checked> Show footer</label>
         <label class="check"><input id="showFrame" type="checkbox" checked> Frame verse</label>
       </div>
+      <div class="field" style="margin-top:14px"><label for="narrationProvider">Narration provider for export</label><select id="narrationProvider"><option value="">Studio default</option><option value="azure">Azure Speech</option></select><div class="hint">Choose Azure Speech to use your Azure credit for this preview, MP3, or video export.</div></div>
       <div class="field" style="margin-top:14px">
         <label>Narration language</label>
         <div class="language-toggle" role="radiogroup" aria-label="Narration language">
@@ -285,6 +286,8 @@
   }
   const nextFrame=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
   const narrationLocale = () => document.querySelector('input[name="narrationLanguage"]:checked')?.value || 'en-US';
+  const selectedProvider = () => value('narrationProvider');
+  const selectedVoice = () => selectedProvider()==='azure' ? 'en-US-JennyMultilingualNeural' : '';
   function narrationText(){
     const locale=narrationLocale();
     if(locale==='fr-FR')return `Bienvenue au Souffle du Jour. ${value('heading')}. ${value('verse')} ${value('reference')}. ${value('footer')}`;
@@ -295,7 +298,7 @@
   }
   async function narrationBlob(){
     const file=$('audioFile').files[0];if(file)return file;
-    const response=await fetch('/beyond-id/admin/api/verse-narration.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale:narrationLocale()})});
+    const response=await fetch('/beyond-id/admin/api/verse-narration.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale:narrationLocale(),provider:selectedProvider(),voice:selectedVoice()})});
     if(!response.ok){let msg='Narration service is unavailable.';try{const data=await response.json();msg=data.error||msg}catch{}throw new Error(msg)}return response.blob();
   }
   function startNarrationPulse(){narrationPlaying=true;if(previewAnimation)cancelAnimationFrame(previewAnimation);const started=performance.now(),tick=now=>{if(!narrationPlaying)return;draw((Math.sin((now-started)/420)+1)/2);previewAnimation=requestAnimationFrame(tick)};previewAnimation=requestAnimationFrame(tick)}
@@ -333,7 +336,7 @@
         const translated=originalVerseId?await loadVerseTranslation(originalVerseId):false;
         if(!translated)await loadFreshVerseForCurrentLanguage();
         draw();await nextFrame();status(`Recording ${label} narration (${index+1} of ${languages.length})…`);
-        const response=await fetch('/beyond-id/admin/api/verse-narration.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale})});if(!response.ok)throw new Error(`${label} narration could not be generated.`);const blob=await response.blob(),buffer=await audioContext.decodeAudioData(await blob.arrayBuffer()),source=audioContext.createBufferSource();source.buffer=buffer;source.connect(destination);recorder.resume();draw();await nextFrame();source.start(0);await new Promise(resolve=>{source.onended=resolve});recorder.pause();source.disconnect();
+        const response=await fetch('/beyond-id/admin/api/verse-narration.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale,provider:selectedProvider(),voice:selectedVoice()})});if(!response.ok)throw new Error(`${label} narration could not be generated.`);const blob=await response.blob(),buffer=await audioContext.decodeAudioData(await blob.arrayBuffer()),source=audioContext.createBufferSource();source.buffer=buffer;source.connect(destination);recorder.resume();draw();await nextFrame();source.start(0);await new Promise(resolve=>{source.onended=resolve});recorder.pause();source.disconnect();
       }
       running=false;narrationPlaying=false;recorder.stop();await done;const mime=recorder.mimeType||type||'video/webm',mp4=mime.includes('mp4');downloadBlob(new Blob(chunks,{type:mime}),`${safeName()}-all-languages${mp4?'.mp4':'.webm'}`);status(mp4?'All narrated languages exported as one MP4.':'All narrated languages exported as one WebM because this browser cannot record MP4.');
     }catch(error){running=false;narrationPlaying=false;if(recorder&&recorder.state!=='inactive')recorder.stop();status(error.message||'Batch video export failed.',true)}finally{Object.entries(originalFields).forEach(([id,value])=>{$(id).value=value});currentVerseId=originalVerseId;const textRadio=document.querySelector(`input[name="verseLanguage"][value="${originalVerseLanguage}"]`),voiceRadio=document.querySelector(`input[name="narrationLanguage"][value="${originalNarration}"]`);if(textRadio)textRadio.checked=true;if(voiceRadio)voiceRadio.checked=true;if(audioContext)await audioContext.close().catch(()=>{});draw();button.disabled=false}
@@ -348,7 +351,7 @@
     try{
       const uploaded=$('audioFile').files[0];
       if(uploaded){if(!(uploaded.type||'').includes('mpeg')&&!uploaded.name.toLowerCase().endsWith('.mp3'))throw new Error('Upload an MP3 file for direct download.');downloadBlob(uploaded,safeName()+'.mp3');status('Uploaded MP3 downloaded.');return;}
-      const response=await fetch('/beyond-id/admin/api/studio-narration-export.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale:narrationLocale(),publish_date:value('publishDate'),library:'daily-breath'})});
+      const response=await fetch('/beyond-id/admin/api/studio-narration-export.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale:narrationLocale(),publish_date:value('publishDate'),library:'daily-breath',provider:selectedProvider(),voice:selectedVoice()})});
       if(!response.ok){let m='MP3 generation failed.';try{const d=await response.json();m=d.error||m}catch{m+=` (HTTP ${response.status})`}throw new Error(m)}
       const blob=await response.blob(),disp=response.headers.get('Content-Disposition')||'',match=disp.match(/filename="?([^";]+)"?/i);downloadBlob(blob,match?match[1]:safeName()+'.mp3');status('MP3 saved to the Daily Breath audio library and downloaded.');
     }catch(e){status(e.message||'MP3 export failed.',true)}finally{button.disabled=false}

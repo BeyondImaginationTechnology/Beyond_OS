@@ -4,16 +4,27 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/includes/config.php';
 
 $elevenVoices = (array)beyond_config('narration.elevenlabs.voices', beyond_config('voice.voices', []));
+$azureDailyVoice = 'en-US-JennyMultilingualNeural';
 $azureVoices = (array)beyond_config('narration.azure.voices', [
-    'en-US' => ['en-US-JennyNeural' => 'Jenny - English'],
-    'fr-CA' => ['fr-CA-SylvieNeural' => 'Sylvie - Canadian French', 'fr-CA-AntoineNeural' => 'Antoine - Canadian French'],
-    'fr-FR' => ['fr-FR-DeniseNeural' => 'Denise - French', 'fr-FR-HenriNeural' => 'Henri - French'],
-    'es-ES' => ['es-ES-ElviraNeural' => 'Elvira - Spanish', 'es-ES-AlvaroNeural' => 'Alvaro - Spanish'],
+    'en-US' => [$azureDailyVoice => 'Jenny Multilingual - English/French/Spanish'],
+    'fr-CA' => [$azureDailyVoice => 'Jenny Multilingual - French fallback'],
+    'fr-FR' => [$azureDailyVoice => 'Jenny Multilingual - French'],
+    'es-ES' => [$azureDailyVoice => 'Jenny Multilingual - Spanish'],
     // Azure does not publish dedicated en-JM or ht-HT TTS voices. These
     // controlled fallbacks keep batch exports narrated instead of failing.
-    'en-JM' => ['en-US-JennyNeural' => 'Jenny - Patois fallback'],
-    'ht-HT' => ['fr-FR-DeniseNeural' => 'Denise - Kreyòl fallback'],
+    'en-JM' => [$azureDailyVoice => 'Jenny Multilingual - Patois fallback'],
+    'ht-HT' => [$azureDailyVoice => 'Jenny Multilingual - Kreyòl fallback'],
 ]);
+foreach (['en-US', 'fr-CA', 'fr-FR', 'es-ES', 'en-JM', 'ht-HT'] as $azureLocale) {
+    $configuredVoices = $azureVoices[$azureLocale] ?? [];
+    if (is_string($configuredVoices) && trim($configuredVoices) !== '') {
+        $configuredVoices = [$configuredVoices => $configuredVoices];
+    }
+    if (!is_array($configuredVoices)) {
+        $configuredVoices = [];
+    }
+    $azureVoices[$azureLocale] = [$azureDailyVoice => 'Jenny Multilingual - English/French/Spanish'] + $configuredVoices;
+}
 
 return [
     'allowed_providers' => ['openai', 'elevenlabs', 'azure'],

@@ -107,7 +107,12 @@ function playCurrent(){
 
 fetch(endpoint,{cache:'default'})
   .then(response=>{if(!response.ok)throw new Error('Channel unavailable');return response.json()})
-  .then(data=>{sources=Array.isArray(data.sources)?data.sources:[];offset=Number(data.start_offset)||0;playCurrent()})
+  .then(data=>{
+    sources=Array.isArray(data.sources)?data.sources:[];
+    offset=Number(data.start_offset)||0;
+    if(window.parent!==window)window.parent.postMessage({type:'beyond-tv:state',slug:<?=json_encode($slug)?>,state:data.state||data},window.location.origin);
+    playCurrent();
+  })
   .catch(error=>showStatus(error.message||'Channel unavailable',{error:true}));
 
 unmute.onclick=()=>{video.muted=false;video.volume=1;video.play().catch(()=>{});unmute.hidden=true};

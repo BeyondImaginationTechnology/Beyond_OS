@@ -3,7 +3,6 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/ecosystem.php';
 require_once __DIR__ . '/beyond-tv/includes/classic-schedule.php';
 require_once __DIR__ . '/beyond-tv/includes/beyond-cartoons-schedule.php';
-require_once __DIR__ . '/beyond-tv/includes/movie-art.php';
 require_once __DIR__ . '/beyond-tv/includes/public-channel-catalog.php';
 beyond_nav_bootstrap('Beyond OS');
 $signedIn = isset($_SESSION['user_id']);
@@ -317,13 +316,6 @@ $classicNext = $classicSchedule['next'];
 $cartoonSchedule = beyond_cartoons_schedule_state();
 $cartoonCurrent = $cartoonSchedule['current'];
 $cartoonNext = $cartoonSchedule['next'];
-$featuredTitles = json_decode((string)@file_get_contents(__DIR__ . '/beyond-tv/data/catalog.json'), true) ?: [];
-// Catalogue additions are appended, so newest titles lead the discovery carousel.
-$featuredTitles = array_reverse($featuredTitles);
-$featuredTitleCount = count($featuredTitles);
-$posterProviderConfig = beyond_tv_poster_config();
-$premiumPosterProvider = beyond_tv_poster_provider_configured();
-$tmdbPosterProvider = $posterProviderConfig['tmdb_read_token'] !== '' || $posterProviderConfig['tmdb_api_key'] !== '';
 $homeLiveCatalogue = json_decode((string)@file_get_contents(__DIR__ . '/beyond-tv/data/channels.json'), true) ?: [];
 $homeLiveFeatured = json_decode((string)@file_get_contents(__DIR__ . '/beyond-tv/data/featured-channels.json'), true) ?: [];
 $homeLiveChannels = beyond_tv_public_channels($homeLiveCatalogue, $homeLiveFeatured);
@@ -331,7 +323,7 @@ $homeLiveControls = [
     'beyond-after-dark' => ['theme'=>'after-dark','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=beyond-after-dark','embed'=>'/beyond-tv/embed-player.php?slug=beyond-after-dark','icon'=>'moon-star','label'=>'After Dark','now'=>'Loading the live program...','next'=>'Live schedule connecting'],
     'beyond-cartoons' => ['theme'=>'cartoons','endpoint'=>'/beyond-tv/api/beyond-cartoons-live.php','icon'=>'tv','label'=>'Kartoons'],
     'yugioh-tv' => ['theme'=>'anime','endpoint'=>'/beyond-tv/api/anime-live.php','icon'=>'zap','label'=>'Anime'],
-    'classic-cinema' => ['theme'=>'cinema','endpoint'=>'/beyond-tv/api/movies-live.php','embed'=>'/beyond-tv/movie-player.php','icon'=>'clapperboard','label'=>'Movies','now'=>'Loading the live feature...','next'=>'Next movie loading','sync'=>'300000'],
+    'classic-cinema' => ['theme'=>'cinema','endpoint'=>'/beyond-tv/api/movies-live.php','embed'=>'/beyond-tv/movie-player.php','icon'=>'clapperboard','label'=>'Movies','now'=>'Loading the live feature...','next'=>'Next movie loading','sync'=>'7200000'],
     'beyond-comedy' => ['theme'=>'comedy','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=beyond-comedy','embed'=>'/beyond-tv/embed-player.php?slug=beyond-comedy','icon'=>'laugh','label'=>'Comedy','now'=>'Loading the live program...','next'=>'Live schedule connecting'],
     'beyond-family' => ['theme'=>'family','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=beyond-family','embed'=>'/beyond-tv/embed-player.php?slug=beyond-family','icon'=>'sparkles','label'=>'Family','now'=>'Loading the live program...','next'=>'Live schedule connecting'],
     'classic-cartoon-theater' => ['theme'=>'classic','endpoint'=>'/beyond-tv/api/classic-live.php','icon'=>'film','label'=>'Classic'],
@@ -346,48 +338,7 @@ $homeLiveControls = [
     'beyond-mystery' => ['theme'=>'mystery','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=beyond-mystery','embed'=>'/beyond-tv/embed-player.php?slug=beyond-mystery','icon'=>'search','label'=>'Mystery','now'=>'Loading the live program...','next'=>'Live schedule connecting'],
 ];
 ?>
-<section class="featured-library wrap" aria-labelledby="featuredLibraryTitle">
-  <header class="featured-library__heading">
-    <div><span>NEW ADDITIONS TO BEYOND TV</span><h2 id="featuredLibraryTitle"><?=number_format($featuredTitleCount)?> titles. Pick your next watch.</h2></div>
-    <div class="featured-library__actions">
-      <a href="/beyond-tv/browse.php">Browse everything →</a>
-      <div class="featured-library__controls" aria-label="Featured title carousel controls">
-        <button type="button" data-featured-title-prev aria-label="Previous featured title">←</button>
-        <button type="button" data-featured-title-next aria-label="Next featured title">→</button>
-      </div>
-    </div>
-  </header>
-  <div class="featured-title-carousel" data-featured-title-carousel tabindex="0" role="region" aria-roledescription="carousel" aria-label="All <?=number_format($featuredTitleCount)?> currently available Beyond TV titles">
-    <?php foreach ($featuredTitles as $featuredIndex => $featuredTitle):
-      $featuredSlug = (string)($featuredTitle['slug'] ?? '');
-      $featuredFallbackThumbnail = trim((string)($featuredTitle['thumbnail'] ?? ''));
-      $featuredThumbnail = $premiumPosterProvider
-          ? '/beyond-tv/api/poster.php?slug=' . rawurlencode($featuredSlug)
-          : trim((string)($featuredTitle['tmdb_poster_url'] ?? $featuredTitle['poster_url'] ?? $featuredFallbackThumbnail));
-      if (!$premiumPosterProvider && $featuredThumbnail === '') {
-          $featuredThumbnail = $featuredFallbackThumbnail;
-      }
-      $featuredIsNew = !empty($featuredTitle['new_addition']) || $featuredIndex < 12;
-    ?>
-    <a class="featured-title-card" href="/beyond-tv/title.php?slug=<?=urlencode((string)($featuredTitle['slug'] ?? ''))?>" style="--title-gradient:<?=htmlspecialchars((string)($featuredTitle['gradient'] ?? 'linear-gradient(135deg,#151a34,#623d85)'))?>" aria-label="<?=htmlspecialchars((string)($featuredTitle['title'] ?? 'Beyond TV title'))?>">
-      <span class="featured-title-card__cover">
-        <span class="featured-title-card__fallback" aria-hidden="true"><span class="featured-title-card__orbit"></span><span class="featured-title-card__icon"><?=htmlspecialchars((string)($featuredTitle['icon'] ?? '▶'))?></span><strong><?=htmlspecialchars((string)($featuredTitle['title'] ?? 'Beyond TV'))?></strong><small><?=($featuredTitle['type'] ?? '') === 'movie' ? 'A BEYOND MOVIE' : 'A BEYOND SERIES'?></small></span>
-        <?php if ($featuredThumbnail !== ''): ?><img class="featured-title-card__poster" src="<?=htmlspecialchars($featuredThumbnail)?>"<?php if ($premiumPosterProvider && $featuredFallbackThumbnail !== ''): ?> data-fallback-src="<?=htmlspecialchars($featuredFallbackThumbnail)?>"<?php endif; ?> alt="" width="420" height="630" loading="<?=$featuredIndex < 6 ? 'eager' : 'lazy'?>" decoding="async"><?php endif; ?>
-        <span class="featured-title-card__type"><?=$featuredIsNew ? 'NEW · ' : ''?><?=($featuredTitle['type'] ?? '') === 'movie' ? 'MOVIE' : 'SERIES'?></span>
-        <span class="featured-title-card__play" aria-hidden="true">▶</span>
-      </span>
-      <span class="featured-title-card__copy">
-        <strong><?=htmlspecialchars((string)($featuredTitle['title'] ?? 'Untitled'))?></strong>
-        <small><?=htmlspecialchars((string)($featuredTitle['year'] ?? ''))?><?php if (!empty($featuredTitle['rating'])): ?> · <?=htmlspecialchars((string)$featuredTitle['rating'])?><?php endif; ?></small>
-        <span><?=htmlspecialchars((string)($featuredTitle['genre'] ?? 'Beyond TV'))?></span>
-      </span>
-    </a>
-    <?php endforeach; ?>
-  </div>
-  <div class="featured-title-progress"><span data-featured-title-position>1</span> / <?=number_format($featuredTitleCount)?></div>
-  <?php if ($tmdbPosterProvider): ?><p class="featured-library__credit"><a href="https://www.themoviedb.org/" target="_blank" rel="noopener"><img src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_long_2-9665a76b1ae401a510ec1e0ca40ddcb3b0cfe45f1d51b77a308fea0845885648.svg" alt="TMDB"></a><span>This product uses the TMDB API but is not endorsed or certified by TMDB.</span></p><?php elseif ($premiumPosterProvider): ?><p class="featured-library__credit">Poster data provided by <a href="https://www.omdbapi.com/" target="_blank" rel="noopener">OMDb</a>.</p><?php endif; ?>
-</section>
-<section class="home-live-stage" data-channel-theme="after-dark" aria-labelledby="homeLiveHeading">
+<section class="home-live-stage" data-channel-theme="after-dark" data-sync-owner="page" aria-labelledby="homeLiveHeading">
   <div class="home-live-stage__background" aria-hidden="true"></div>
   <div class="home-live-stage__inner">
     <header class="home-live-stage__top">
@@ -421,7 +372,7 @@ $homeLiveControls = [
             'label' => (string)($homeLiveChannel['short_name'] ?? $homeLiveChannel['name'] ?? 'Channel'),
         ];
       ?>
-      <button type="button"<?=$homeLiveIndex === 0 ? ' class="active"' : ''?> data-home-channel="<?=htmlspecialchars((string)$homeLiveControl['theme'])?>" data-channel-number="<?=htmlspecialchars((string)($homeLiveChannel['display_number'] ?? ($homeLiveIndex + 1)))?>" data-channel-name="<?=htmlspecialchars((string)($homeLiveChannel['name'] ?? 'Beyond TV'))?>" data-endpoint="<?=htmlspecialchars((string)$homeLiveControl['endpoint'])?>"<?php if (!empty($homeLiveControl['embed'])): ?> data-embed="<?=htmlspecialchars((string)$homeLiveControl['embed'])?>"<?php endif; ?><?php if (!empty($homeLiveControl['sync'])): ?> data-sync-ms="<?=htmlspecialchars((string)$homeLiveControl['sync'])?>"<?php endif; ?> data-now="<?=htmlspecialchars((string)($homeLiveControl['now'] ?? $homeLiveChannel['now'] ?? 'Loading the live program...'))?>" data-next="<?=htmlspecialchars((string)($homeLiveControl['next'] ?? $homeLiveChannel['up_next'] ?? 'Live schedule connecting'))?>" data-icon-name="<?=htmlspecialchars((string)$homeLiveControl['icon'])?>" data-open="/beyond-tv/channel.php?slug=<?=urlencode($homeLiveSlug)?>"><span class="home-live-switch__icon" aria-hidden="true"><i data-lucide="<?=htmlspecialchars((string)$homeLiveControl['icon'])?>"></i></span><span class="home-live-switch__number"><?=str_pad((string)($homeLiveChannel['display_number'] ?? ($homeLiveIndex + 1)), 2, '0', STR_PAD_LEFT)?></span><span class="home-live-switch__label"><?=htmlspecialchars((string)$homeLiveControl['label'])?></span></button>
+      <button type="button"<?=$homeLiveIndex === 0 ? ' class="active"' : ''?> data-home-channel="<?=htmlspecialchars((string)$homeLiveControl['theme'])?>" data-channel-slug="<?=htmlspecialchars($homeLiveSlug)?>" data-channel-number="<?=htmlspecialchars((string)($homeLiveChannel['display_number'] ?? ($homeLiveIndex + 1)))?>" data-channel-name="<?=htmlspecialchars((string)($homeLiveChannel['name'] ?? 'Beyond TV'))?>" data-endpoint="<?=htmlspecialchars((string)$homeLiveControl['endpoint'])?>"<?php if (!empty($homeLiveControl['embed'])): ?> data-embed="<?=htmlspecialchars((string)$homeLiveControl['embed'])?>"<?php endif; ?><?php if (!empty($homeLiveControl['sync'])): ?> data-sync-ms="<?=htmlspecialchars((string)$homeLiveControl['sync'])?>"<?php endif; ?> data-now="<?=htmlspecialchars((string)($homeLiveControl['now'] ?? $homeLiveChannel['now'] ?? 'Loading the live program...'))?>" data-next="<?=htmlspecialchars((string)($homeLiveControl['next'] ?? $homeLiveChannel['up_next'] ?? 'Live schedule connecting'))?>" data-icon-name="<?=htmlspecialchars((string)$homeLiveControl['icon'])?>" data-open="/beyond-tv/channel.php?slug=<?=urlencode($homeLiveSlug)?>"><span class="home-live-switch__icon" aria-hidden="true"><i data-lucide="<?=htmlspecialchars((string)$homeLiveControl['icon'])?>"></i></span><span class="home-live-switch__number"><?=str_pad((string)($homeLiveChannel['display_number'] ?? ($homeLiveIndex + 1)), 2, '0', STR_PAD_LEFT)?></span><span class="home-live-switch__label"><?=htmlspecialchars((string)$homeLiveControl['label'])?></span></button>
       <?php endforeach; ?>
     </div>
   </div>
@@ -517,7 +468,6 @@ $homeLiveControls = [
 </nav>
 
 <style>
-.featured-library{margin-top:8px;margin-bottom:34px}.featured-library__heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:18px}.featured-library__heading>div:first-child>span{color:#ff7fc0;font-size:10px;font-weight:950;letter-spacing:.16em}.featured-library__heading h2{margin:5px 0 0;font-size:clamp(31px,4vw,52px);line-height:1;letter-spacing:-.052em}.featured-library__actions{display:flex;align-items:center;gap:14px;flex:0 0 auto}.featured-library__actions>a{font-size:13px;font-weight:900;text-decoration:none}.featured-library__controls{display:flex;gap:8px}.featured-library__controls button{display:grid;width:44px;height:44px;place-items:center;border:1px solid rgba(255,255,255,.19);border-radius:50%;background:rgba(12,15,31,.86);color:#fff;font:900 18px/1 inherit;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.22);transition:transform .2s ease,border-color .2s ease,background .2s ease}.featured-library__controls button:hover,.featured-library__controls button:focus-visible{transform:translateY(-2px);border-color:#ff8bc8;background:#b82f76}.featured-library__controls button:disabled{cursor:default;opacity:.35;transform:none}.featured-title-carousel{display:flex;gap:15px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scroll-padding-inline:2px;scrollbar-width:none;padding:4px 2px 20px}.featured-title-carousel::-webkit-scrollbar{display:none}.featured-title-carousel:focus-visible{outline:2px solid #ff7fc0;outline-offset:6px;border-radius:20px}.featured-title-card{flex:0 0 clamp(215px,22vw,272px);scroll-snap-align:start;scroll-snap-stop:always;color:#fff;text-decoration:none;transition:transform .28s ease,opacity .28s ease}.featured-title-card:not(.is-current){opacity:.82}.featured-title-card:hover,.featured-title-card:focus-visible,.featured-title-card.is-current{opacity:1;transform:translateY(-5px)}.featured-title-card:focus-visible{outline:2px solid #fff;outline-offset:4px;border-radius:20px}.featured-title-card__cover{position:relative;display:block;aspect-ratio:2/3;overflow:hidden;border:1px solid rgba(255,255,255,.16);border-radius:20px;background:var(--title-gradient);box-shadow:0 20px 48px rgba(0,0,0,.42)}.featured-title-card__cover:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(3,5,13,0) 52%,rgba(3,5,13,.86));pointer-events:none}.featured-title-card__cover img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover;transition:transform .55s cubic-bezier(.2,.8,.2,1),filter .3s ease}.featured-title-card:hover img,.featured-title-card:focus-visible img{transform:scale(1.045);filter:saturate(1.08)}.featured-title-card__fallback{position:relative;isolation:isolate;display:flex;width:100%;height:100%;flex-direction:column;justify-content:flex-end;overflow:hidden;padding:74px 19px 25px;background:radial-gradient(circle at 70% 18%,rgba(255,255,255,.15),transparent 22%),var(--title-gradient)}.featured-title-card__fallback:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(155deg,rgba(255,255,255,.08),transparent 28%,rgba(2,4,12,.18) 54%,rgba(2,4,12,.88));box-shadow:inset 0 0 70px rgba(0,0,0,.28)}.featured-title-card__fallback:after{content:"BEYOND TV";position:absolute;right:-33px;top:62px;transform:rotate(90deg);color:rgba(255,255,255,.17);font:700 10px/1 "Space Grotesk",sans-serif;letter-spacing:.34em}.featured-title-card__orbit{position:absolute;right:-32px;top:34px;width:150px;height:150px;border:1px solid rgba(255,255,255,.18);border-radius:50%;box-shadow:0 0 0 24px rgba(255,255,255,.035),0 0 0 48px rgba(255,255,255,.025)}.featured-title-card__icon{position:absolute;left:19px;top:47px;display:grid;width:66px;height:66px;place-items:center;border:1px solid rgba(255,255,255,.2);border-radius:21px;background:rgba(5,7,18,.2);backdrop-filter:blur(12px);font-size:32px;box-shadow:0 18px 42px rgba(0,0,0,.2)}.featured-title-card__fallback strong{position:relative;z-index:1;font:700 clamp(23px,2.4vw,32px)/.96 "Space Grotesk",Inter,sans-serif;letter-spacing:-.055em;text-wrap:balance;text-shadow:0 4px 18px rgba(0,0,0,.45)}.featured-title-card__fallback small{position:relative;z-index:1;margin-top:10px;color:rgba(255,255,255,.7);font:700 8px/1 "Space Grotesk",sans-serif;letter-spacing:.17em}.featured-title-card__type{position:absolute;left:12px;top:12px;z-index:2;padding:6px 8px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(5,7,18,.74);backdrop-filter:blur(10px);font-size:8px;font-weight:950;letter-spacing:.13em}.featured-title-card__play{position:absolute;right:13px;bottom:13px;z-index:2;display:grid;width:40px;height:40px;place-items:center;border-radius:50%;background:#fff;color:#101224;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.35)}.featured-title-card__copy{display:block;padding:13px 3px 0}.featured-title-card__copy strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px;letter-spacing:-.02em}.featured-title-card__copy small{display:block;margin-top:6px;color:#d1d5e2;font-size:11px}.featured-title-card__copy>span{display:block;overflow:hidden;margin-top:5px;color:#9da5ba;font-size:10px;text-overflow:ellipsis;white-space:nowrap}.featured-title-progress{display:flex;justify-content:flex-end;margin-top:-2px;color:#aeb4c8;font-size:11px;font-weight:900;font-variant-numeric:tabular-nums}.featured-title-progress span{color:#fff}.featured-library__credit{display:flex;align-items:center;justify-content:flex-end;gap:9px;margin:10px 0 0;color:#747d92;font-size:9px;text-align:right}.featured-library__credit a{color:#a9b0c2}.featured-library__credit img{display:block;width:auto;height:13px;opacity:.78}
 .home-live-stage{position:relative;isolation:isolate;width:min(1600px,calc(100vw - 24px));margin:4px auto 42px;overflow:hidden;border:1px solid rgba(151,112,255,.48);border-radius:32px;background:#080a18;box-shadow:0 30px 90px rgba(0,0,0,.48)}
 .home-live-stage__background{position:absolute;inset:-18px;z-index:-2;background-image:url('/beyond-tv/assets/img/channel-backgrounds-sprite.png');background-repeat:no-repeat;background-size:400% 200%;background-position:var(--channel-bg,33.333% 0);filter:blur(9px) saturate(1.34) contrast(1.08) hue-rotate(var(--channel-hue,0deg));transform:scale(1.035);opacity:1;transition:background-position .35s ease,filter .35s ease}
 .home-live-stage:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(3,5,13,.12),rgba(3,5,13,.48) 82%,rgba(5,7,18,.72));pointer-events:none}
@@ -528,7 +478,6 @@ $homeLiveControls = [
 .home-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:45px}.home-shortcuts a{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center;padding:18px;border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(10,14,29,.72);text-decoration:none}.home-shortcuts span{grid-row:1/3;font-size:29px}.home-shortcuts strong{font-size:15px}.home-shortcuts small{margin-top:3px;color:#aeb5c9}
 @media(max-width:1100px){.home-live-player{min-height:0;aspect-ratio:16/9}.home-live-switch{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:800px){.home-live-stage{width:calc(100vw - 12px);border-radius:23px;margin-bottom:32px}.home-live-stage__inner{padding:14px}.home-live-stage__top{align-items:flex-start;flex-direction:column;margin-bottom:14px}.home-live-actions{width:100%}.home-live-button{flex:1}.home-live-player{aspect-ratio:16/9;border-radius:16px}.home-live-meta{align-items:flex-start;flex-direction:column}.home-live-switch{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 1px 8px}.home-live-switch button{min-width:102px;scroll-snap-align:start}.live-apps-heading{align-items:flex-start;flex-direction:column}.live-apps-heading__actions{width:100%;justify-content:space-between}.live-app-grid{width:calc(100vw - 16px);margin-left:calc((100% - 100vw)/2 + 8px);padding-inline:4px}.live-app-card{flex-basis:min(88vw,560px);min-height:390px}.home-shortcuts{grid-template-columns:1fr}}
-@media(max-width:800px){.featured-library__heading{align-items:flex-start;flex-direction:column}.featured-library__actions{width:100%;justify-content:space-between}.featured-title-carousel{width:calc(100vw - 8px);margin-left:calc((100% - 100vw)/2 + 4px);padding-inline:8px}.featured-title-card{flex-basis:min(58vw,250px)}}
 .games-card:before{background:radial-gradient(circle at 77% 17%,rgba(255,203,103,.34),transparent 24%),linear-gradient(135deg,#24120b,#7c2f20 55%,#e88a25)}.games-card .live-app-label{color:#ffd17f}.games-card .live-app-card__art{filter:drop-shadow(0 18px 32px rgba(0,0,0,.28))}
 .game-demo-card:before{background:radial-gradient(circle at 78% 18%,color-mix(in srgb,var(--game-color) 38%,transparent),transparent 25%),linear-gradient(135deg,#07101a,color-mix(in srgb,var(--game-color) 42%,#111827) 58%,#111820)}
 .game-demo-card .live-app-label{color:color-mix(in srgb,var(--game-color) 48%,#fff)}
@@ -538,79 +487,10 @@ $homeLiveControls = [
 .math-card:before{background:radial-gradient(circle at 78% 18%,rgba(91,219,69,.3),transparent 24%),linear-gradient(135deg,#06172d,#0a4c82 58%,#178b73)}.math-card .live-app-label{color:#8ff0b3}.coding-card:before{background:radial-gradient(circle at 78% 18%,rgba(53,214,255,.28),transparent 24%),linear-gradient(135deg,#16092c,#51269a 56%,#087f9b)}.coding-card .live-app-label{color:#95eaff}.coding-card .live-app-card__art{font-size:clamp(60px,9vw,124px);font-weight:950;letter-spacing:-.12em}
 @media(min-width:1051px){.live-app-card{flex-basis:min(62vw,760px)}}
 @media(max-width:480px){.home-live-stage h2{font-size:34px}.home-live-stage__top p{font-size:13px}.home-live-actions{display:grid;grid-template-columns:1fr 1fr}.home-live-button{padding:0 10px}.home-live-player{aspect-ratio:16/10}.home-live-clock{display:none}.live-app-card{min-height:315px;padding:23px}.live-app-card blockquote,.live-app-card h3{font-size:36px}}
-@media(max-width:480px){.featured-library__heading h2{font-size:34px}.featured-title-card{flex-basis:64vw}.featured-library__actions>a{font-size:12px}}
 html[data-theme="light"] .home-live-stage,html[data-theme="light"] .live-app-card{color:#fff}html[data-theme="light"] .home-shortcuts a{background:rgba(255,255,255,.82);border-color:rgba(26,31,54,.14)}html[data-theme="light"] .home-shortcuts small{color:#5e667a}
 </style>
 
 <script>
-(function(){
- const carousel=document.querySelector('[data-featured-title-carousel]');
- const previous=document.querySelector('[data-featured-title-prev]');
- const next=document.querySelector('[data-featured-title-next]');
- const position=document.querySelector('[data-featured-title-position]');
- if(!carousel||!previous||!next||!position)return;
- const cards=[...carousel.querySelectorAll('.featured-title-card')];
- let current=0;
-
- cards.forEach((card,index)=>{
-   card.setAttribute('role','group');
-   card.setAttribute('aria-roledescription','slide');
-   card.setAttribute('aria-label',`${card.getAttribute('aria-label')||'Title'}, ${index+1} of ${cards.length}`);
-   const poster=card.querySelector('.featured-title-card__poster');
-   if(poster){
-     const removeBrokenPoster=()=>{
-       const fallback=poster.dataset.fallbackSrc||'';
-       if(fallback&&poster.src!==new URL(fallback,window.location.href).href){
-         poster.src=fallback;
-         poster.removeAttribute('data-fallback-src');
-         return;
-       }
-       poster.remove();
-     };
-     poster.addEventListener('error',removeBrokenPoster);
-     if(poster.complete&&poster.naturalWidth===0)removeBrokenPoster();
-   }
- });
-
- function update(){
-   cards.forEach((card,index)=>card.classList.toggle('is-current',index===current));
-   position.textContent=String(current+1);
-   previous.disabled=current===0;
-   next.disabled=current===cards.length-1;
- }
-
- function goTo(index){
-   current=Math.max(0,Math.min(cards.length-1,index));
-   cards[current].scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'});
-   update();
- }
-
- previous.addEventListener('click',()=>goTo(current-1));
- next.addEventListener('click',()=>goTo(current+1));
- carousel.addEventListener('keydown',event=>{
-   if(event.key==='ArrowLeft'){event.preventDefault();goTo(current-1);}
-   if(event.key==='ArrowRight'){event.preventDefault();goTo(current+1);}
-   if(event.key==='Home'){event.preventDefault();goTo(0);}
-   if(event.key==='End'){event.preventDefault();goTo(cards.length-1);}
- });
-
- let frame=0;
- carousel.addEventListener('scroll',()=>{
-   if(frame)return;
-   frame=requestAnimationFrame(()=>{
-     frame=0;
-     const left=carousel.getBoundingClientRect().left;
-     current=cards.reduce((best,card,index)=>{
-       const distance=Math.abs(card.getBoundingClientRect().left-left);
-       const bestDistance=Math.abs(cards[best].getBoundingClientRect().left-left);
-       return distance<bestDistance?index:best;
-     },current);
-     update();
-   });
- },{passive:true});
-
- update();
-})();
 (function(){
  const frame=document.getElementById('homeBeyondTvPlayer');
  const stage=document.querySelector('.home-live-stage');
@@ -622,7 +502,22 @@ html[data-theme="light"] .home-live-stage,html[data-theme="light"] .live-app-car
  const kicker=document.getElementById('homeLiveKicker');
  const heading=document.getElementById('homeLiveHeading');
  const description=document.getElementById('homeLiveDescription');
+ const clock=stage.querySelector('.home-live-clock');
+ const EPISODE_SYNC_MS=30*60*1000;
+ const LONG_FORM_SYNC_MS=2*60*60*1000;
+ const longFormChannels=new Set(['space','ancient','cinema','health','comedy','family']);
+ let syncTimer=0;
+ let nextSyncAt=0;
  const clean=value=>String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));
+ function syncInterval(button){
+   const explicit=Number(button?.dataset.syncMs||0);
+   if(Number.isFinite(explicit)&&explicit>=60000)return explicit;
+   return longFormChannels.has(button?.dataset.homeChannel||'')?LONG_FORM_SYNC_MS:EPISODE_SYNC_MS;
+ }
+ function updateClock(button){
+   if(!clock)return;
+   clock.textContent=(syncInterval(button)===LONG_FORM_SYNC_MS?'Long-form sync · every 2 hours':'Episode sync · every 30 minutes')+' · America/Vancouver';
+ }
  function render(button,state={}){
    stage.dataset.channelTheme=button.dataset.homeChannel||'cartoons';
    const channelName=button.dataset.channelName||'Beyond TV';
@@ -649,14 +544,22 @@ html[data-theme="light"] .home-live-stage,html[data-theme="light"] .live-app-car
    if(window.lucide)window.lucide.createIcons({attrs:{'stroke-width':2}});
    open.href=button.dataset.open||'/beyond-tv/';
  }
- async function tune(button){
+ function schedule(button){
+   if(syncTimer)window.clearTimeout(syncTimer);
+   const delay=syncInterval(button);
+   nextSyncAt=Date.now()+delay;
+   syncTimer=window.setTimeout(()=>tune(button),delay);
+   updateClock(button);
+ }
+ async function tune(button,{refreshState=true}={}){
    buttons.forEach(item=>{
      const isActive=item===button;
      item.classList.toggle('active',isActive);
      item.setAttribute('aria-pressed',String(isActive));
    });
    render(button);
-   if(!button.dataset.endpoint)return;
+   const playerOwnsSchedule=String(button.dataset.embed||'').startsWith('/beyond-tv/embed-player.php');
+   if(!refreshState||playerOwnsSchedule||!button.dataset.endpoint){schedule(button);return;}
    const requestedEndpoint=button.dataset.endpoint;
    try{
      const response=await fetch(requestedEndpoint,{cache:'default'});
@@ -664,11 +567,22 @@ html[data-theme="light"] .home-live-stage,html[data-theme="light"] .live-app-car
      const data=await response.json();
      if(button.classList.contains('active'))render(button,data.state||data);
    }catch(error){console.warn('Beyond TV channel refresh unavailable',error);}
+   finally{if(button.classList.contains('active'))schedule(button);}
  }
  buttons.forEach(button=>button.addEventListener('click',()=>tune(button)));
+ window.addEventListener('message',event=>{
+   if(event.origin!==window.location.origin||event.source!==frame.contentWindow)return;
+   if(event.data?.type!=='beyond-tv:state'||typeof event.data.slug!=='string')return;
+   const active=stage.querySelector('[data-home-channel].active');
+   if(active?.dataset.channelSlug===event.data.slug)render(active,event.data.state||{});
+ });
  const initial=stage.querySelector('[data-home-channel].active');
- if(initial)tune(initial);
- setInterval(()=>{const active=stage.querySelector('[data-home-channel].active');if(active&&active.dataset.endpoint)tune(active);},60000);
+ if(initial)tune(initial,{refreshState:false});
+ document.addEventListener('visibilitychange',()=>{
+   if(document.hidden||!nextSyncAt||Date.now()<nextSyncAt)return;
+   const active=stage.querySelector('[data-home-channel].active');
+   if(active)tune(active);
+ });
 })();
 window.addEventListener('DOMContentLoaded',()=>{
  if(window.lucide)window.lucide.createIcons({attrs:{'stroke-width':2}});
@@ -829,7 +743,7 @@ window.addEventListener('DOMContentLoaded',()=>{
  picker.addEventListener('change',()=>applyCurrency(picker.value,true));
 })();
 </script>
-<script src="/beyond-tv/assets/js/app.js?v=3.0.1"></script>
+<script src="/beyond-tv/assets/js/app.js?v=3.0.2"></script>
 </main>
 <footer class="footer wrap">
     <div><a class="brand" href="./">BEYOND <span>OS</span></a><p>The connected imagination ecosystem.</p><p class="copyright">© 2026 Beyond Imagination Corp.</p></div>

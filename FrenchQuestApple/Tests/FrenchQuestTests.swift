@@ -1,3 +1,4 @@
+import Foundation
 import XCTest
 @testable import FrenchQuest
 
@@ -17,6 +18,21 @@ final class FrenchQuestTests: XCTestCase {
 
     func testQuestThemesAreAvailable() {
         XCTAssertEqual(QuestTheme.allCases.map(\.title), ["Night", "Riviera", "Market", "Garden"])
+    }
+
+    func testCloudSaveUsesServerFieldNames() throws {
+        let save = FrenchQuestCloudSave(
+            completedChallengeIDs: ["hello", "thanks"],
+            xp: 55,
+            hearts: 4,
+            streak: 2,
+            theme: "riviera"
+        )
+        let data = try JSONEncoder().encode(save)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+
+        XCTAssertEqual(object["completed_challenge_ids"] as? [String], ["hello", "thanks"])
+        XCTAssertEqual(object["xp"] as? Int, 55)
     }
 
     @MainActor

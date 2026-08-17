@@ -1,6 +1,9 @@
 import AVFoundation
+import AuthenticationServices
 import Combine
 import Foundation
+import Security
+import UIKit
 
 @MainActor
 final class QuestStore: ObservableObject {
@@ -11,8 +14,14 @@ final class QuestStore: ObservableObject {
     @Published private(set) var lastResult: QuestResult?
     @Published private(set) var dictionary: [DictionaryWord] = []
     @Published private(set) var musicEnabled = true
+    @Published private(set) var beyondIDAccount: BeyondIDAccount?
+    @Published private(set) var cloudMessage = "Sign in to save this quest across devices."
+    @Published private(set) var isCloudBusy = false
     @Published var theme = QuestTheme.riviera {
-        didSet { UserDefaults.standard.set(theme.rawValue, forKey: themeKey) }
+        didSet {
+            UserDefaults.standard.set(theme.rawValue, forKey: themeKey)
+            scheduleCloudSave()
+        }
     }
 
     let regions = QuestContent.regions
@@ -26,10 +35,16 @@ final class QuestStore: ObservableObject {
     private let streakKey = "FrenchQuest.streak"
     private let themeKey = "FrenchQuest.theme"
     private let musicKey = "FrenchQuest.musicEnabled"
+    private let beyondID = FrenchQuestBeyondIDService()
+    private let webAuthenticator = FrenchQuestWebAuthenticator()
+    private var mobileToken: String?
+    private var cloudSaveTask: Task<Void, Never>?
+    private var isApplyingCloudSave = false
 
     init() {
         load()
         loadDictionary()
+        Task { await restoreBeyondIDSession() }
     }
 
     var totalChallenges: Int {
@@ -77,6 +92,7 @@ final class QuestStore: ObservableObject {
             lastResult = QuestResult(correct: false, message: "Not yet. Listen, then try again.")
         }
         save()
+        scheduleCloudSave()
     }
 
     func resetResult() {
@@ -86,6 +102,7 @@ final class QuestStore: ObservableObject {
     func refillHearts() {
         hearts = 5
         save()
+        scheduleCloudSave()
     }
 
     func resetProgress() {
@@ -95,6 +112,81 @@ final class QuestStore: ObservableObject {
         streak = 0
         lastResult = nil
         save()
+        scheduleCloudSave()
+    }
+
+    func signInToBeyondID() async {
+        guard !isCloudBusy else { return }
+        isCloudBusy = true
+        cloudMessage = "Opening Beyond ID…"
+        defer { isCloudBusy = false }
+        do {
+            let callbackURL = try await webAuthenticator.authenticate(
+                url: beyondID.signInURL(),
+                callbackScheme: "frenchquest"
+            )
+            let token = try beyondID.token(from: callbackURL)
+            let account = try await beyondID.account(for: token)
+            try FrenchQuestKeychain.save(token)
+            mobileToken = token
+            beyondIDAccount = account
+            cloudMessage = "Signed in as \(account.displayName). Choose Load to restore a save or Save to upload this device."
+        } catch {
+            cloudMessage = error.localizedDescription
+        }
+    }
+
+    func signOutOfBeyondID() {
+        cloudSaveTask?.cancel()
+        mobileToken = nil
+        beyondIDAccount = nil
+        FrenchQuestKeychain.deleteToken()
+        cloudMessage = "Signed out. Your progress remains saved on this device."
+    }
+
+    func saveToCloud() async {
+        guard let mobileToken else {
+            cloudMessage = "Sign in with Beyond ID before saving to the cloud."
+            return
+        }
+        isCloudBusy = true
+        cloudMessage = "Saving quest…"
+        defer { isCloudBusy = false }
+        do {
+            try await beyondID.save(snapshot: cloudSnapshot, token: mobileToken)
+            cloudMessage = "Quest saved to Beyond ID."
+        } catch {
+            handleCloudError(error)
+        }
+    }
+
+    func loadFromCloud() async {
+        guard let mobileToken else {
+            cloudMessage = "Sign in with Beyond ID before loading a cloud save."
+            return
+        }
+        isCloudBusy = true
+        cloudMessage = "Loading quest…"
+        defer { isCloudBusy = false }
+        do {
+            guard let snapshot = try await beyondID.loadSave(token: mobileToken) else {
+                cloudMessage = "No cloud save exists yet. Choose Save to create one."
+                return
+            }
+            isApplyingCloudSave = true
+            completedChallengeIDs = Set(snapshot.completedChallengeIDs)
+            xp = max(0, snapshot.xp)
+            hearts = min(5, max(0, snapshot.hearts))
+            streak = max(0, snapshot.streak)
+            if let savedTheme = QuestTheme(rawValue: snapshot.theme) { theme = savedTheme }
+            lastResult = nil
+            save()
+            isApplyingCloudSave = false
+            cloudMessage = "Cloud save loaded."
+        } catch {
+            isApplyingCloudSave = false
+            handleCloudError(error)
+        }
     }
 
     func speak(_ text: String) {
@@ -200,6 +292,48 @@ final class QuestStore: ObservableObject {
         UserDefaults.standard.set(streak, forKey: streakKey)
     }
 
+    private var cloudSnapshot: FrenchQuestCloudSave {
+        FrenchQuestCloudSave(
+            completedChallengeIDs: Array(completedChallengeIDs).sorted(),
+            xp: xp,
+            hearts: hearts,
+            streak: streak,
+            theme: theme.rawValue
+        )
+    }
+
+    private func scheduleCloudSave() {
+        guard mobileToken != nil, !isApplyingCloudSave else { return }
+        cloudSaveTask?.cancel()
+        cloudSaveTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(700))
+            guard !Task.isCancelled, let self else { return }
+            await self.saveToCloud()
+        }
+    }
+
+    private func restoreBeyondIDSession() async {
+        guard let token = FrenchQuestKeychain.token else { return }
+        do {
+            beyondIDAccount = try await beyondID.account(for: token)
+            mobileToken = token
+            cloudMessage = "Beyond ID connected."
+        } catch {
+            FrenchQuestKeychain.deleteToken()
+            cloudMessage = "Your Beyond ID session expired. Sign in again to use cloud saves."
+        }
+    }
+
+    private func handleCloudError(_ error: Error) {
+        if let beyondIDError = error as? FrenchQuestBeyondIDError,
+           case .unauthorized = beyondIDError {
+            mobileToken = nil
+            beyondIDAccount = nil
+            FrenchQuestKeychain.deleteToken()
+        }
+        cloudMessage = error.localizedDescription
+    }
+
     private func normalized(_ value: String) -> String {
         value
             .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
@@ -260,5 +394,218 @@ final class QuestStore: ObservableObject {
         case "ht-HT": 0.41
         default: 0.42
         }
+    }
+}
+
+struct BeyondIDAccount: Decodable, Equatable {
+    let name: String?
+    let firstName: String?
+    let displayNameValue: String?
+    let email: String
+
+    enum CodingKeys: String, CodingKey {
+        case name, email
+        case firstName = "first_name"
+        case displayNameValue = "display_name"
+    }
+
+    var displayName: String {
+        for candidate in [displayNameValue, name, firstName] {
+            if let candidate, !candidate.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                return candidate
+            }
+        }
+        return email
+    }
+}
+
+struct FrenchQuestCloudSave: Codable, Equatable {
+    let completedChallengeIDs: [String]
+    let xp: Int
+    let hearts: Int
+    let streak: Int
+    let theme: String
+
+    enum CodingKeys: String, CodingKey {
+        case completedChallengeIDs = "completed_challenge_ids"
+        case xp, hearts, streak, theme
+    }
+}
+
+private struct FrenchQuestSessionResponse: Decodable {
+    let ok: Bool
+    let authenticated: Bool
+    let user: BeyondIDAccount?
+    let error: String?
+}
+
+private struct FrenchQuestSaveResponse: Decodable {
+    let ok: Bool
+    let save: FrenchQuestCloudSave?
+    let error: String?
+}
+
+private struct FrenchQuestAPIResponse: Decodable {
+    let ok: Bool
+    let error: String?
+}
+
+enum FrenchQuestBeyondIDError: LocalizedError {
+    case missingCallbackToken
+    case unauthorized
+    case server(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .missingCallbackToken: "Beyond ID did not return a sign-in token."
+        case .unauthorized: "Your Beyond ID session expired. Sign in again."
+        case .server(let message): message
+        }
+    }
+}
+
+private struct FrenchQuestBeyondIDService: Sendable {
+    private let baseURL = URL(string: "https://beyondimagination.co.technology")!
+
+    func signInURL() -> URL {
+        var components = URLComponents(url: baseURL.appending(path: "beyond-id/auth/login.php"), resolvingAgainstBaseURL: false)!
+        components.queryItems = [
+            URLQueryItem(name: "app", value: "beyond-french"),
+            URLQueryItem(name: "return", value: "/beyond-id/auth/mobile-complete.php?scheme=frenchquest")
+        ]
+        return components.url!
+    }
+
+    func token(from callbackURL: URL) throws -> String {
+        let items = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false)?.queryItems ?? []
+        if let message = items.first(where: { $0.name == "error" })?.value, !message.isEmpty {
+            throw FrenchQuestBeyondIDError.server(message)
+        }
+        guard let token = items.first(where: { $0.name == "token" })?.value, !token.isEmpty else {
+            throw FrenchQuestBeyondIDError.missingCallbackToken
+        }
+        return token
+    }
+
+    func account(for token: String) async throws -> BeyondIDAccount {
+        var request = URLRequest(url: baseURL.appending(path: "beyond-id/api/mobile-session.php"))
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try validate(response, data: data)
+        let payload = try JSONDecoder().decode(FrenchQuestSessionResponse.self, from: data)
+        guard payload.ok, payload.authenticated, let account = payload.user else {
+            throw FrenchQuestBeyondIDError.server(payload.error ?? "Beyond ID sign-in failed.")
+        }
+        return account
+    }
+
+    func loadSave(token: String) async throws -> FrenchQuestCloudSave? {
+        var request = URLRequest(url: baseURL.appending(path: "beyond-id/api/french-quest-save.php"))
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try validate(response, data: data)
+        let payload = try JSONDecoder().decode(FrenchQuestSaveResponse.self, from: data)
+        guard payload.ok else { throw FrenchQuestBeyondIDError.server(payload.error ?? "Could not load the cloud save.") }
+        return payload.save
+    }
+
+    func save(snapshot: FrenchQuestCloudSave, token: String) async throws {
+        var request = URLRequest(url: baseURL.appending(path: "beyond-id/api/french-quest-save.php"))
+        request.httpMethod = "PUT"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(snapshot)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try validate(response, data: data)
+        let payload = try JSONDecoder().decode(FrenchQuestAPIResponse.self, from: data)
+        guard payload.ok else { throw FrenchQuestBeyondIDError.server(payload.error ?? "Could not save the quest.") }
+    }
+
+    private func validate(_ response: URLResponse, data: Data) throws {
+        guard let response = response as? HTTPURLResponse else {
+            throw FrenchQuestBeyondIDError.server("Beyond ID returned an invalid response.")
+        }
+        if response.statusCode == 401 { throw FrenchQuestBeyondIDError.unauthorized }
+        guard (200..<300).contains(response.statusCode) else {
+            let message = (try? JSONDecoder().decode(FrenchQuestAPIResponse.self, from: data).error)
+            throw FrenchQuestBeyondIDError.server(message ?? "Beyond ID returned HTTP \(response.statusCode).")
+        }
+    }
+}
+
+@MainActor
+private final class FrenchQuestWebAuthenticator: NSObject, ASWebAuthenticationPresentationContextProviding {
+    private var session: ASWebAuthenticationSession?
+
+    func authenticate(url: URL, callbackScheme: String) async throws -> URL {
+        try await withCheckedThrowingContinuation { continuation in
+            let session = ASWebAuthenticationSession(url: url, callbackURLScheme: callbackScheme) { [weak self] callbackURL, error in
+                self?.session = nil
+                if let callbackURL {
+                    continuation.resume(returning: callbackURL)
+                } else {
+                    continuation.resume(throwing: error ?? FrenchQuestBeyondIDError.server("Beyond ID sign-in was cancelled."))
+                }
+            }
+            session.presentationContextProvider = self
+            session.prefersEphemeralWebBrowserSession = false
+            self.session = session
+            if !session.start() {
+                self.session = nil
+                continuation.resume(throwing: FrenchQuestBeyondIDError.server("Could not open Beyond ID sign-in."))
+            }
+        }
+    }
+
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap(\.windows)
+            .first { $0.isKeyWindow } ?? ASPresentationAnchor()
+    }
+}
+
+private enum FrenchQuestKeychain {
+    private static let service = "technology.co.beyondimagination.frenchquest"
+    private static let account = "beyond-id-mobile-token"
+
+    static var token: String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        var result: CFTypeRef?
+        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess,
+              let data = result as? Data else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    static func save(_ token: String) throws {
+        deleteToken()
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+            kSecValueData as String: Data(token.utf8)
+        ]
+        let status = SecItemAdd(query as CFDictionary, nil)
+        guard status == errSecSuccess else {
+            throw FrenchQuestBeyondIDError.server("Could not securely store the Beyond ID session.")
+        }
+    }
+
+    static func deleteToken() {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account
+        ]
+        _ = SecItemDelete(query as CFDictionary)
     }
 }

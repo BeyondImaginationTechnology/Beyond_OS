@@ -5,8 +5,14 @@ require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/mobile-auth.php';
 
 $requestedScheme = strtolower(trim((string)($_GET['scheme'] ?? 'beyondmusic')));
-$scheme = in_array($requestedScheme, ['beyondmusic', 'beyondtv'], true) ? $requestedScheme . '://auth' : 'beyondmusic://auth';
-$audience = $requestedScheme === 'beyondtv' ? 'beyond-tv-ios' : 'beyond-music-ios';
+$mobileApps = [
+    'beyondmusic' => 'beyond-music-ios',
+    'beyondtv' => 'beyond-tv-ios',
+    'frenchquest' => 'french-quest-ios',
+];
+$requestedScheme = array_key_exists($requestedScheme, $mobileApps) ? $requestedScheme : 'beyondmusic';
+$scheme = $requestedScheme . '://auth';
+$audience = $mobileApps[$requestedScheme];
 if (empty($_SESSION['user_id'])) {
     header('Location: ' . $scheme . '?error=' . rawurlencode('Beyond ID sign in was not completed.'));
     exit;

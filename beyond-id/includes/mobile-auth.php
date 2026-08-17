@@ -21,9 +21,14 @@ function beyond_mobile_secret(): string
     return $secret !== '' ? $secret : hash('sha256', __DIR__);
 }
 
+function beyond_mobile_audiences(): array
+{
+    return ['beyond-music-ios', 'beyond-tv-ios', 'french-quest-ios'];
+}
+
 function beyond_mobile_issue_token(int $userId, int $ttl = 300, string $audience = 'beyond-music-ios'): string
 {
-    $allowedAudiences = ['beyond-music-ios', 'beyond-tv-ios'];
+    $allowedAudiences = beyond_mobile_audiences();
     if (!in_array($audience, $allowedAudiences, true)) {
         $audience = 'beyond-music-ios';
     }
@@ -38,7 +43,7 @@ function beyond_mobile_issue_token(int $userId, int $ttl = 300, string $audience
     return $payload . '.' . $signature;
 }
 
-function beyond_mobile_verify_token(string $token): int
+function beyond_mobile_verify_token(string $token, ?string $requiredAudience = null): int
 {
     $parts = explode('.', $token);
     if (count($parts) !== 2) {
@@ -55,8 +60,29 @@ function beyond_mobile_verify_token(string $token): int
         throw new RuntimeException('Mobile token expired.');
     }
     $userId = (int)($claims['sub'] ?? 0);
-    if ($userId <= 0 || !in_array((string)($claims['aud'] ?? ''), ['beyond-music-ios', 'beyond-tv-ios'], true)) {
+    $audience = (string)($claims['aud'] ?? '');
+    if ($userId <= 0 || !in_array($audience, beyond_mobile_audiences(), true)) {
         throw new RuntimeException('Invalid mobile token claims.');
     }
+    if ($requiredAudience !== null && !hash_equals($requiredAudience, $audience)) {
+        throw new RuntimeException('Mobile token is not valid for this app.');
+    }
     return $userId;
+}
+
+function beyond_mobile_bearer_token(): string
+{
+    $authorization = trim((string)(
+        $_SERVER['HTTP_AUTHORIZATION']
+        ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION']
+        ?? ''
+    ));
+    if ($authorization === '' && function_exists('getallheaders')) {
+        $headers = getallheaders();
+        $authorization = trim((string)($headers['Authorization'] ?? $headers['authorization'] ?? ''));
+    }
+    if (!preg_match('/^Bearer\s+(.+)$/i', $authorization, $matches)) {
+        throw new RuntimeException('A mobile bearer token is required.');
+    }
+    return trim($matches[1]);
 }

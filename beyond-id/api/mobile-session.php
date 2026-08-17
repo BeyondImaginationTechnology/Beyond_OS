@@ -9,6 +9,7 @@ header('Cache-Control: no-store');
 
 $token = trim((string)($_GET['token'] ?? $_POST['token'] ?? ''));
 try {
+    if ($token === '') $token = beyond_mobile_bearer_token();
     $userId = beyond_mobile_verify_token($token);
     $stmt = $pdo->prepare('SELECT u.id,u.name,u.first_name,u.last_name,u.email,u.role,u.status,u.preferred_locale,u.timezone,p.display_name,p.avatar,p.country,p.city,p.bio,p.interests,p.goals FROM users u LEFT JOIN profiles p ON p.user_id=u.id WHERE u.id=? LIMIT 1');
     $stmt->execute([$userId]);

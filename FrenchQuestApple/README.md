@@ -13,6 +13,8 @@ Native SwiftUI game build for French Quest 1.1.1.
 - Looping French accordion game soundtrack with a persistent mute control
 - Training room for typed recall
 - Themeable game shell
+- Beyond ID sign-in with secure Keychain session storage
+- Per-account cloud save/load with automatic gameplay sync
 
 ## Build
 

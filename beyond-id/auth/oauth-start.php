@@ -11,9 +11,13 @@ if (!in_array($provider, ['google', 'meta'], true) || !beyond_social_enabled($pr
     header('Location: login.php');
     exit;
 }
-$requestedScheme = strtolower(trim((string)($_GET['scheme'] ?? '')));
-$mobileScheme = in_array($requestedScheme, ['beyondmusic', 'beyondtv'], true) ? $requestedScheme : '';
 $returnTo = safe_return_path((string)($_GET['return'] ?? ''), '');
+$requestedScheme = strtolower(trim((string)($_GET['scheme'] ?? '')));
+if ($requestedScheme === '' && $returnTo !== '') {
+    parse_str((string)parse_url($returnTo, PHP_URL_QUERY), $returnQuery);
+    $requestedScheme = strtolower(trim((string)($returnQuery['scheme'] ?? '')));
+}
+$mobileScheme = in_array($requestedScheme, ['beyondmusic', 'beyondtv', 'frenchquest'], true) ? $requestedScheme : '';
 if ($returnTo !== '') $_SESSION['beyond_return_to'] = $returnTo;
 $state = bin2hex(random_bytes(32));
 $verifier = rtrim(strtr(base64_encode(random_bytes(64)), '+/', '-_'), '=');

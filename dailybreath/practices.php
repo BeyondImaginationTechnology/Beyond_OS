@@ -75,7 +75,8 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 $exercise=$pdo->query("SELECT * FROM breathing_exercises WHERE is_published=1 ORDER BY sort_order,id LIMIT 1")->fetch(PDO::FETCH_ASSOC);
 $prayers=$pdo->query("SELECT * FROM guided_prayers WHERE is_published=1 ORDER BY sort_order,id")->fetchAll(PDO::FETCH_ASSOC);
 $prompt=$pdo->query("SELECT * FROM reflection_prompts WHERE is_published=1 ORDER BY prompt_date DESC,id DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-$challenge=dailybreath_recovery_challenge_for_date(date('Y-m-d'));if(!$challenge)try{$challenge=$pdo->query("SELECT * FROM weekly_challenges WHERE is_published=1 AND starts_on<=CURRENT_DATE AND ends_on>=CURRENT_DATE ORDER BY starts_on DESC,id DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC)?:null;}catch(Throwable $e){}
+$challenge=null;try{$challenge=$pdo->query("SELECT * FROM weekly_challenges WHERE is_published=1 AND starts_on<=CURRENT_DATE AND ends_on>=CURRENT_DATE ORDER BY starts_on DESC,id DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC)?:null;}catch(Throwable $e){}
+$challenge=$challenge?:dailybreath_recovery_challenge_for_date(date('Y-m-d'));
 $progress=0;if($challenge){if(($challenge['source']??'')==='bundled_recovery_challenge'){$progress=(int)($_SESSION['recovery_challenge_progress'][$challenge['id']]??0);}else{$s=$pdo->prepare('SELECT completed_count FROM weekly_challenge_progress WHERE user_id=? AND challenge_id=?');$s->execute([$userId,$challenge['id']]);$progress=(int)$s->fetchColumn();}}
 $journalEntries=[];
 if($section==='journal'){

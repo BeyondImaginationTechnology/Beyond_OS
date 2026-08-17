@@ -14,13 +14,14 @@ $dailyAudioUrl = preg_match('/^verse-[a-z0-9-]+\.mp3$/', $dailyAudioFile)
     ? 'assets/audio/verses/' . rawurlencode($dailyAudioFile)
     : '';
 
-$devotional = dailybreath_recovery_devotional_for_date(date('Y-m-d'), false);
-if (!$devotional) try {
-    $query = $pdo->prepare('SELECT title,excerpt,scripture_reference,duration_minutes FROM devotionals WHERE is_published=1 AND locale=? AND publish_date<=? ORDER BY publish_date DESC,id DESC LIMIT 1');
+$devotional = null;
+try {
+    $query = $pdo->prepare('SELECT title,excerpt,scripture_reference,duration_minutes FROM devotionals WHERE is_published=1 AND locale=? AND publish_date=? ORDER BY id DESC LIMIT 1');
     $query->execute([$_SESSION['locale'] ?? 'en', date('Y-m-d')]);
-    $devotional = $query->fetch(PDO::FETCH_ASSOC) ?: $devotional;
+    $devotional = $query->fetch(PDO::FETCH_ASSOC) ?: null;
 } catch (Throwable $exception) {}
-$devotional = $devotional ?: dailybreath_recovery_devotional_for_date(date('Y-m-d'))
+$devotional = $devotional ?: dailybreath_recovery_devotional_for_date(date('Y-m-d'), false)
+    ?: dailybreath_recovery_devotional_for_date(date('Y-m-d'))
     ?: ['title'=>'Walk in Quiet Confidence','excerpt'=>'Make room for stillness and remember that God is present before your next step.','scripture_reference'=>'Psalm 46:10','duration_minutes'=>5];
 
 $name = trim((string)($_SESSION['name'] ?? '')) ?: 'Friend';

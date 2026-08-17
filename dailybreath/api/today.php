@@ -5,7 +5,8 @@ require_once __DIR__ . '/../../includes/ecosystem.php';
 require_once __DIR__ . '/../includes/verse-of-day.php';
 
 header('Content-Type: application/json; charset=utf-8');
-header('Cache-Control: public, max-age=300, stale-while-revalidate=3600');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
 
 $locale = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($_GET['locale'] ?? 'en')) ?: 'en';
 $fallbackVerse = [
@@ -35,13 +36,28 @@ $devotional = $bundledDevotional ? [
     'prayer' => (string)$bundledDevotional['prayer'],
     'practice' => (string)$bundledDevotional['practice'],
 ] : $fallbackDevotional;
+$bundledChallenge = dailybreath_recovery_challenge_for_date(date('Y-m-d'));
+$challenge = $bundledChallenge ?: [
+    'id' => 'weekly-faith-in-action',
+    'title' => 'Faith in Action',
+    'description' => 'Choose one quiet act of faith this week and make it concrete.',
+    'scripture_reference' => 'James 2:17',
+    'steps' => [
+        'Choose when and where you will practice this challenge.',
+        'Complete one intentional step each day.',
+        'Record what changed and who you can encourage.',
+    ],
+    'target_count' => 7,
+    'starts_on' => date('Y-m-d', strtotime('monday this week')),
+    'ends_on' => date('Y-m-d', strtotime('sunday this week')),
+];
 
 try {
     $pdo = beyond_db();
     $verse = dailybreath_verse_of_day($pdo, $locale);
 
-    if (dailybreath_recovery_devotional_for_date(date('Y-m-d'), false) === null) try {
-        $query = $pdo->prepare('SELECT title,excerpt,body,scripture_reference,duration_minutes,prayer,practice FROM devotionals WHERE is_published=1 AND locale=? AND publish_date<=? ORDER BY publish_date DESC,id DESC LIMIT 1');
+    try {
+        $query = $pdo->prepare('SELECT id,title,excerpt,body,scripture_reference,duration_minutes FROM devotionals WHERE is_published=1 AND locale=? AND publish_date=? ORDER BY id DESC LIMIT 1');
         $query->execute([$locale, date('Y-m-d')]);
         $row = $query->fetch(PDO::FETCH_ASSOC);
         if ($row) {
@@ -51,16 +67,39 @@ try {
                 'body' => trim((string)($row['body'] ?? $fallbackDevotional['body'])),
                 'scripture' => trim((string)($row['scripture_reference'] ?? $fallbackDevotional['scripture'])),
                 'minutes' => max(1, (int)($row['duration_minutes'] ?? $fallbackDevotional['minutes'])),
-                'prayer' => trim((string)($row['prayer'] ?? $fallbackDevotional['prayer'])),
-                'practice' => trim((string)($row['practice'] ?? $fallbackDevotional['practice'])),
+                'prayer' => (string)$devotional['prayer'],
+                'practice' => (string)$devotional['practice'],
             ];
         }
     } catch (Throwable $exception) {
-        $devotional = $fallbackDevotional;
+        // Keep the bundled devotional when the database is unavailable.
+    }
+
+    try {
+        $query = $pdo->prepare('SELECT id,slug,title,description,scripture_reference,starts_on,ends_on,target_count FROM weekly_challenges WHERE is_published=1 AND locale=? AND starts_on<=? AND ends_on>=? ORDER BY starts_on DESC,id DESC LIMIT 1');
+        $query->execute([$locale, date('Y-m-d'), date('Y-m-d')]);
+        $row = $query->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            $challenge = [
+                'id' => trim((string)($row['slug'] ?? 'challenge-' . $row['id'])),
+                'title' => trim((string)$row['title']),
+                'description' => trim((string)$row['description']),
+                'scripture_reference' => trim((string)($row['scripture_reference'] ?? '')),
+                'steps' => [
+                    'Choose when and where you will practice this challenge.',
+                    'Complete one intentional step each day.',
+                    'Record what changed and who you can encourage.',
+                ],
+                'target_count' => max(1, (int)$row['target_count']),
+                'starts_on' => (string)$row['starts_on'],
+                'ends_on' => (string)$row['ends_on'],
+            ];
+        }
+    } catch (Throwable $exception) {
+        // Keep the bundled challenge when the database is unavailable.
     }
 } catch (Throwable $exception) {
     $verse = $fallbackVerse;
-    $devotional = $fallbackDevotional;
 }
 
 echo json_encode([
@@ -84,6 +123,16 @@ echo json_encode([
         'minutes' => $devotional['minutes'],
         'prayer' => $devotional['prayer'],
         'practice' => $devotional['practice'],
+    ],
+    'challenge' => [
+        'id' => (string)$challenge['id'],
+        'title' => (string)$challenge['title'],
+        'description' => (string)$challenge['description'],
+        'scripture_reference' => (string)$challenge['scripture_reference'],
+        'steps' => array_values(array_map('strval', (array)$challenge['steps'])),
+        'target_count' => max(1, (int)$challenge['target_count']),
+        'starts_on' => (string)$challenge['starts_on'],
+        'ends_on' => (string)$challenge['ends_on'],
     ],
     'source' => (string)($verse['source'] ?? 'bundled_fallback'),
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

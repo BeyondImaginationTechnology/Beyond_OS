@@ -5,8 +5,9 @@ import Foundation
 final class DailyBreathStore: ObservableObject {
     @Published private(set) var verse = Verse.daily
     @Published private(set) var devotional = Devotional.today
+    @Published private(set) var challenge = RecoveryContent.challengeOfTheDay()
     @Published private(set) var isRefreshing = false
-    @Published private(set) var statusMessage = "Bundled daily verse"
+    @Published private(set) var statusMessage = "Bundled daily content"
     @Published var breathPhase = "Inhale"
     @Published var journalText = ""
     @Published var journalPrompt = DailyBreathStore.promptOfTheDay()
@@ -111,7 +112,9 @@ final class DailyBreathStore: ObservableObject {
         defer { isRefreshing = false }
 
         do {
-            let (data, response) = try await URLSession.shared.data(from: endpoint)
+            var request = URLRequest(url: endpoint)
+            request.cachePolicy = .reloadIgnoringLocalCacheData
+            let (data, response) = try await URLSession.shared.data(for: request)
             guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
                 throw URLError(.badServerResponse)
             }
@@ -119,16 +122,18 @@ final class DailyBreathStore: ObservableObject {
             let today = try JSONDecoder().decode(DailyBreathTodayResponse.self, from: data)
             verse = today.verse
             devotional = today.devotional
-            statusMessage = "Synced admin verse"
+            challenge = today.challenge ?? RecoveryContent.challengeOfTheDay()
+            statusMessage = "Synced daily content"
         } catch {
             loadBundledDailyContent()
-            statusMessage = "Offline verse"
+            statusMessage = "Offline daily content"
         }
     }
 
     private func loadBundledDailyContent() {
         verse = RecoveryContent.verseOfTheDay() ?? .daily
         devotional = RecoveryContent.devotionalOfTheDay() ?? .today
+        challenge = RecoveryContent.challengeOfTheDay()
     }
 
     func speakVerse() {
@@ -280,4 +285,5 @@ final class DailyBreathStore: ObservableObject {
 private struct DailyBreathTodayResponse: Decodable {
     let verse: Verse
     let devotional: Devotional
+    let challenge: RecoveryChallenge?
 }

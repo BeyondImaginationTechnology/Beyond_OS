@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TodayView: View {
     @EnvironmentObject private var store: DailyBreathStore
+    @Environment(\.scenePhase) private var scenePhase
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
     @AppStorage("devotionalReadDayKeys") private var devotionalReadDayKeys = ""
     @AppStorage("completedBreathDayKeys") private var completedBreathDayKeys = ""
@@ -46,6 +47,11 @@ struct TodayView: View {
         .background(DailyBreathThemeBackground(theme: selectedTheme))
         .navigationTitle("Today")
         .navigationBarTitleDisplayMode(.inline)
+        .refreshable { await store.refreshToday() }
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active else { return }
+            Task { await store.refreshToday() }
+        }
     }
 
     private var dailyRhythmCard: some View {
@@ -241,7 +247,7 @@ struct TodayView: View {
             NavigationLink {
                 WeeklyChallengeView()
             } label: {
-                QuickAction(title: "Weekly Challenge", subtitle: "Faith in action", systemImage: "calendar.badge.checkmark")
+                QuickAction(title: "Weekly Challenge", subtitle: store.challenge?.title ?? "Faith in action", systemImage: "calendar.badge.checkmark")
             }
             NavigationLink {
                 AcademyView()
@@ -555,8 +561,10 @@ private struct PrayerPracticeDetailView: View {
 }
 
 private struct WeeklyChallengeView: View {
+    @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
-    private let challenge = RecoveryContent.challengeOfTheDay()
+
+    private var challenge: RecoveryChallenge? { store.challenge }
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)

@@ -27,6 +27,16 @@ final class DailyBreathTests: XCTestCase {
             "minutes": 5,
             "prayer": "Lord, quiet my heart.",
             "practice": "Take three slow breaths."
+          },
+          "challenge": {
+            "id": "week-2026-33",
+            "title": "Seven Days of Encouragement",
+            "description": "Encourage one person each day.",
+            "scripture_reference": "Hebrews 10:24-25",
+            "steps": ["Choose a person.", "Send encouragement.", "Record the result."],
+            "target_count": 7,
+            "starts_on": "2026-08-10",
+            "ends_on": "2026-08-16"
           }
         }
         """.data(using: .utf8)!
@@ -34,12 +44,14 @@ final class DailyBreathTests: XCTestCase {
         struct TodayPayload: Decodable {
             let verse: Verse
             let devotional: Devotional
+            let challenge: RecoveryChallenge
         }
 
         let payload = try JSONDecoder().decode(TodayPayload.self, from: data)
 
         XCTAssertEqual(payload.verse.reference, "Psalm 46:10")
         XCTAssertEqual(payload.devotional.scripture, "Psalm 46:10")
+        XCTAssertEqual(payload.challenge.title, "Seven Days of Encouragement")
     }
 
     func testBibleParserBuildsBooksChaptersAndSearchableVerses() {

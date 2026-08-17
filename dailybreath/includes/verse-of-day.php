@@ -81,7 +81,7 @@ function dailybreath_verse_of_day(PDO $pdo, string $locale = 'en'): array
 }
 
 /** @return array{text:string,reference:string,source:string}|null */
-function dailybreath_web_verse_fallback(): ?array
+function dailybreath_web_verse_fallback(?string $forDate = null): ?array
 {
     $source = dirname(__DIR__) . '/data/engwebp_vpl.txt';
     if (!is_file($source)) return null;
@@ -99,7 +99,10 @@ function dailybreath_web_verse_fallback(): ?array
         'PHM'=>'Philemon','HEB'=>'Hebrews','JAM'=>'James','1PE'=>'1 Peter','2PE'=>'2 Peter','1JO'=>'1 John','2JO'=>'2 John','3JO'=>'3 John','JUD'=>'Jude','REV'=>'Revelation',
     ];
 
-    $start = (int)(abs(crc32(date('Y-m-d'))) % count($lines));
+    $dateKey = $forDate !== null && preg_match('/^\d{4}-\d{2}-\d{2}$/', $forDate)
+        ? $forDate
+        : date('Y-m-d');
+    $start = (int)(abs(crc32($dateKey)) % count($lines));
     for ($offset = 0, $total = count($lines); $offset < $total; $offset++) {
         $line = $lines[($start + $offset) % $total];
         if (!preg_match('/^([1-3]?[A-Z]{2,3})\s+(\d+):(\d+)\s+(.+)$/u', $line, $match)) continue;

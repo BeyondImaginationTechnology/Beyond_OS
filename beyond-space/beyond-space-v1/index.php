@@ -31,14 +31,14 @@ $signs = [
   <meta name="description" content="Explore a complete astronomy academy, interactive space science, daily entertainment horoscopes, and zodiac reflections.">
   <link rel="icon" href="/beyond-space/beyond-space-v1/assets/img/beyond-space-logo.webp">
   <link rel="stylesheet" href="/beyond-space/beyond-space-v1/assets/css/app.css?v=1.0.0">
-  <link rel="stylesheet" href="/beyond-space/beyond-space-v1/assets/css/enhancements.css?v=2.3.3">
+  <link rel="stylesheet" href="/beyond-space/beyond-space-v1/assets/css/enhancements.css?v=2.3.4">
 </head>
 <body>
 <div class="space-dust" aria-hidden="true"></div>
 <header class="topbar">
   <a class="brand" href="#top" aria-label="Beyond Space home">
     <img src="/beyond-space/beyond-space-v1/assets/img/beyond-space-logo.webp" alt="Beyond Space logo">
-    <span><b>Beyond Space</b><small>Explorer + Academy • 2.3.3</small></span>
+    <span><b>Beyond Space</b><small>Explorer + Academy • 2.3.4</small></span>
   </a>
   <button class="menu" id="menuBtn" aria-label="Open menu">☰</button>
   <nav id="nav">
@@ -144,7 +144,7 @@ $signs = [
 </section>
 </main>
 
-<footer><img src="/beyond-space/beyond-space-v1/assets/img/beyond-space-logo.webp" alt=""><p>Beyond Space • Part of Beyond Learn</p><small>Version 2.3.3 — astronomy education with a separate entertainment astrology experience</small></footer>
+<footer><img src="/beyond-space/beyond-space-v1/assets/img/beyond-space-logo.webp" alt=""><p>Beyond Space • Part of Beyond Learn</p><small>Version 2.3.4 — astronomy education with a separate entertainment astrology experience</small></footer>
 
 <div class="modal" id="modal" aria-hidden="true"><div class="modal-card"><button class="close" aria-label="Close">×</button><span id="modalIcon">🪐</span><small id="modalEyebrow"></small><h2 id="modalTitle"></h2><p id="modalCopy"></p><a class="btn primary" href="/beyond-space/academy.php">Study this in Space Academy</a></div></div>
 <div class="modal" id="videoModal" aria-hidden="true"><div class="modal-card video-card"><button class="close" aria-label="Close">×</button><div class="cinema"><div class="cinema-earth"></div><div class="cinema-moon"></div><div class="cinema-rocket">🚀</div></div><h2>Welcome to Beyond Space</h2><p>A lightweight animated launch sequence ready to be replaced by an MP4 or WebM cinematic.</p></div></div>

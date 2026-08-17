@@ -21,8 +21,8 @@ struct ProfileView: View {
     var body: some View {
         MusicScreen(title: "Profile") {
             MusicPanel {
-                MusicEyebrow(text: "Beyond Music 1.1")
-                Text("Personal Music Beta")
+                MusicEyebrow(text: "Beyond Music 1.1.1")
+                Text("Personal Music")
                     .font(.largeTitle.bold())
                 Text("Import your own audio files, download tracks under their source terms, and keep playback running with the screen off.")
                     .foregroundStyle(.secondary)

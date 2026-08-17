@@ -1,6 +1,12 @@
 import SwiftUI
 
 struct RootView: View {
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+
+    private var selectedTheme: DailyBreathTheme {
+        DailyBreathTheme(id: selectedThemeID)
+    }
+
     var body: some View {
         TabView {
             NavigationStack { TodayView() }
@@ -14,11 +20,17 @@ struct RootView: View {
             NavigationStack { JournalView() }
                 .tabItem { Label("Journal", systemImage: "square.and.pencil") }
         }
-        .tint(Color.dailyGold)
+        .tint(selectedTheme.accent)
     }
 }
 
 struct BrandHeader: View {
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+
+    private var selectedTheme: DailyBreathTheme {
+        DailyBreathTheme(id: selectedThemeID)
+    }
+
     var body: some View {
         HStack(spacing: 12) {
             Image("DailyBreathIcon")
@@ -34,11 +46,12 @@ struct BrandHeader: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Text("1.1")
+            Text("1.1.3")
                 .font(.caption.bold())
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
-                .background(Color.dailyGreen.opacity(0.12), in: Capsule())
+                .foregroundStyle(selectedTheme.primary)
+                .background(selectedTheme.primary.opacity(0.12), in: Capsule())
         }
     }
 }

@@ -3327,5 +3327,28 @@
   "source_url": "https://archive.org/details/transformers-2007_202602",
   "thumbnail": "https://archive.org/services/img/transformers-2007_202602",
   "channel_slug": "classic-cinema"
+},
+{
+  "slug": "taking-woodstock",
+  "type": "movie",
+  "title": "Taking Woodstock",
+  "subtitle": "Internet Archive poster source",
+  "description": "A catalogue poster entry backed by the Internet Archive movie poster item supplied by the owner. Playback remains disabled until a verified video source is connected.",
+  "icon": "🎸",
+  "gradient": "linear-gradient(135deg,#263b2b,#7a8f52 55%,#e5b85a)",
+  "rating": "R",
+  "year": "2009",
+  "genre": "Comedy · Drama · Music",
+  "runtime": "Feature film",
+  "source_type": "watchlist",
+  "source_label": "Internet Archive · Poster source",
+  "source_url": "https://archive.org/details/taking-woodstock-ds",
+  "candidate_url": "https://archive.org/details/taking-woodstock-ds",
+  "poster_url": "https://archive.org/download/taking-woodstock-ds/Taking%20Woodstock%20%28DS%29.jpg",
+  "poster_source_label": "Internet Archive · taking-woodstock-ds",
+  "archive_id": "taking-woodstock-ds",
+  "thumbnail": "https://archive.org/services/img/taking-woodstock-ds",
+  "channel_slug": "classic-cinema",
+  "new_addition": true
 }
 ]

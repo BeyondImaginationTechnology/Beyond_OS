@@ -1,0 +1,83 @@
+notify = [ "C:\\Users\\Guestuser\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\1cb4becc994cbb02\\bin\\node_modules\\@oai\\sky\\bin\\windows\\codex-computer-use.exe", "turn-ended" ]
+
+[marketplaces.openai-bundled]
+last_updated = "2026-08-17T12:59:59Z"
+source_type = "local"
+source = '\\?\C:\Users\Guestuser\.codex\.tmp\bundled-marketplaces\openai-bundled'
+
+[marketplaces.openai-primary-runtime]
+last_updated = "2026-08-15T22:45:22Z"
+source_type = "local"
+source = '\\?\C:\Users\Guestuser\.cache\codex-runtimes\codex-primary-runtime\plugins\openai-primary-runtime'
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."visualize@openai-bundled"]
+enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = true
+
+[plugins."google-calendar@openai-curated"]
+enabled = true
+
+[plugins."slack@openai-curated"]
+enabled = true
+
+[features]
+js_repl = false
+
+[mcp_servers.node_repl]
+args = []
+command = 'C:\Users\Guestuser\AppData\Local\OpenAI\Codex\runtimes\cua_node\1cb4becc994cbb02\bin\node_repl.exe'
+startup_timeout_sec = 120
+
+[mcp_servers.node_repl.env]
+NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
+NODE_REPL_NODE_MODULE_DIRS = 'C:\Users\Guestuser\AppData\Local\OpenAI\Codex\runtimes\cua_node\1cb4becc994cbb02\bin\node_modules'
+NODE_REPL_NODE_PATH = 'C:\Users\Guestuser\AppData\Local\OpenAI\Codex\runtimes\cua_node\1cb4becc994cbb02\bin\node.exe'
+NODE_REPL_TRUSTED_CODE_PATHS = 'C:\Users\Guestuser\.codex;C:\Users\Guestuser\AppData\Local\OpenAI\Codex\runtimes\cua_node\1cb4becc994cbb02\bin\node_modules'
+CODEX_HOME = 'C:\Users\Guestuser\.codex'
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "8e172ec9f458f2e636fc69a1b8c68c217f6bb8d10c41f70a05a0878b73863701"
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
+BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
+BROWSER_USE_CODEX_APP_VERSION = "26.810.52044"
+SKY_CUA_NATIVE_PIPE = "1"
+SKY_CUA_NATIVE_PIPE_DIRECTORY = '\\.\pipe\codex-computer-use-d83555a8-356b-4e8a-b2e8-02d1538b4df2'
+CODEX_CLI_PATH = 'C:\Users\Guestuser\AppData\Local\OpenAI\Codex\bin\e305f1c75d8da435\codex.exe'
+
+[shell_environment_policy.set]
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "8e172ec9f458f2e636fc69a1b8c68c217f6bb8d10c41f70a05a0878b73863701"
+NODE_REPL_TRUSTED_CODE_PATHS = 'C:\Users\Guestuser\.codex;C:\Users\Guestuser\AppData\Local\OpenAI\Codex\runtimes\cua_node\1cb4becc994cbb02\bin\node_modules'
+
+[projects.'c:\users\guestuser\documents\codex\2026-08-05\use-the-available-slack-integration-to']
+trust_level = "trusted"
+
+[projects.'c:\users\guestuser\documents\github\site']
+trust_level = "trusted"
+
+[desktop]
+conversationDetailMode = "STEPS_COMMANDS"
+sansFontSize = 14
+codeFontSize = 13
+ambient-suggestions-enabled = true
+followUpQueueMode = "queue"
+
+[windows]
+sandbox = "unelevated"

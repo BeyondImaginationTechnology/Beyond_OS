@@ -11,9 +11,13 @@ $studioGroups = [
         ['/server/admin/daily-studio/french-generator.php', 'French generator', '🇫🇷'],
         ['/server/admin/daily-studio/french-options.php', 'Lesson options', '⚙️'],
     ],
+    'Beyond Space' => [
+        ['/server/admin/daily-studio/space-generator.php', 'Horoscope generator', '🪐'],
+    ],
     'Beyond Tattoo' => [
         ['/server/admin/daily-studio/stencil-packs.php', 'Stencil packs', '🎨'],
         ['/server/admin/daily-studio/stencil-library.php', 'Generate & publish', '📤'],
+        ['/server/admin/daily-studio/daily-stencil-video.php', 'MP4 pushing tool', '🎬'],
     ],
     'Shared tools' => [
         ['/server/admin/daily-studio/voice-settings.php', 'Voice settings', '🎙️'],
@@ -32,7 +36,7 @@ $studioGroups = [
 <body<?= $isStudio ? ' class="studio-body"' : '' ?>>
 <div class="layout<?= $isStudio ? ' studio-layout' : '' ?>">
   <aside class="sidebar<?= $isStudio ? ' studio-sidebar' : '' ?>">
-    <div class="brand"><div class="logo"><?= $isStudio ? 'BS' : 'BI' ?></div><div><strong><?= $isStudio ? 'Beyond Studio' : 'Beyond Imagination' ?></strong><div class="muted"><?= $isStudio ? 'Content workspace' : 'Admin v2.3.3' ?></div></div></div>
+    <div class="brand"><div class="logo"><?= $isStudio ? 'BS' : 'BI' ?></div><div><strong><?= $isStudio ? 'Beyond Studio' : 'Beyond Imagination' ?></strong><div class="muted"><?= $isStudio ? 'Content workspace' : 'Admin v2.3.4' ?></div></div></div>
     <?php if ($isStudio): ?>
       <nav class="nav studio-nav" aria-label="Beyond Studio navigation">
         <?php $homeActive = rtrim($currentPath, '/') === '/server/admin/daily-studio'; ?>

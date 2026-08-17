@@ -1,4 +1,4 @@
-@import url('/beyond-math/academy.css?v=2.3.3');
+@import url('/beyond-math/academy.css?v=2.3.4');
 :root{--math-navy:#3b2618;--math-blue:#a85d27;--math-sky:#fbf1e6;--math-cyan:#c28443;--math-green:#668b62;--math-yellow:#d5a536;--math-coral:#a94f3f;--math-ink:#493426;--math-muted:#796a60;--math-line:#e7dbcf;--math-bg:#f8f4ef;--math-shadow:0 17px 46px rgba(77,48,27,.12)}
 html{background:var(--math-bg)}body{background:radial-gradient(circle at 8% 3%,rgba(194,132,67,.14),transparent 25rem),radial-gradient(circle at 92% 18%,rgba(102,139,98,.11),transparent 23rem),linear-gradient(180deg,#fdfbf8,#f8f4ef 46%,#f1ebe4)}
 .la-brand>span:first-child:not(.la-brand-copy){background:linear-gradient(145deg,#8f4d20,#c48243);color:#fff;font-size:25px;box-shadow:0 8px 22px rgba(143,77,32,.23)}

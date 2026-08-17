@@ -23,7 +23,8 @@
     <section class="group">
       <div class="field"><label for="phrase">Today’s English phrase</label><input id="phrase" type="text" value="Keep going."></div>
       <div class="field"><label for="meaning">What it means</label><textarea id="meaning">A way to encourage someone to continue doing something.</textarea></div>
-      <div class="grid"><div class="field"><label for="weekday">Weekday</label><input id="weekday" type="text" value="TUESDAY"></div><div class="field"><label for="publishDate">Date</label><input id="publishDate" type="date" value="2026-07-14"></div></div>
+      <div class="grid"><div class="field"><label for="weekday">Weekday</label><input id="weekday" type="text" value=""></div><div class="field"><label for="publishDate">Go-live date</label><input id="publishDate" type="date" value=""></div></div>
+      <div class="hint">Save today to publish immediately. A future lesson is scheduled automatically and becomes current at 12:00 AM Pacific on its go-live date—no second push is needed.</div>
     </section>
 
     <section class="group">
@@ -55,7 +56,8 @@
     <section class="group">
       <div class="static-note">Static template protected: Web, iOS, PNG, and browser drafts do not call the narration API.</div>
       <div class="actions">
-        <button id="saveDailyPhrase" class="btn primary wide" type="button">Save daily phrase to Web + iOS</button>
+        <button id="saveDailyPhrase" class="btn primary wide" type="button">Publish / schedule to Web + iOS</button>
+        <button id="pushFrenchIos" class="btn voice-primary wide" type="button">Master push this lesson to iOS now</button>
         <button id="downloadPng" class="btn primary" type="button">Download static PNG</button>
         <button id="saveLocal" class="btn secondary" type="button">Save browser draft</button>
         <button id="saveAndExportVideo" class="btn voice-primary wide" type="button">Save + export animated Remotion MP4</button>
@@ -254,6 +256,16 @@
       await remotionVideo();
     }finally{button.disabled=false}
   }
+  async function pushFrenchIos(){
+    if(!confirm('Push this lesson to the live iOS feed now? It will override today’s scheduled lesson until midnight Pacific.'))return;
+    const button=$('pushFrenchIos');button.disabled=true;
+    try{
+      if(!await saveDailyPhrase())return;
+      setStatus('Pushing the saved lesson to the iOS feed…');
+      const response=await fetch('/server/admin/daily-studio/api/push-ios-content.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({product:'beyond-french',publish_date:v('publishDate')})});
+      const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'The lesson could not be pushed to iOS.');setStatus(data.message);
+    }catch(error){setStatus(error.message||'The lesson could not be pushed to iOS.',true)}finally{button.disabled=false}
+  }
   function remotionPayload(){return{publish_date:v('publishDate'),english:v('phrase'),french:v('french'),kreyol:v('kreyol'),spanish:v('spanish'),patois:v('patois'),category:'Daily Phrase',include_narration:$('includeNarration').checked,narration_provider:selectedProvider(),narration_voice:selectedVoice()}}
   async function browserRemotionVideo(){
     const renderer=window.BeyondFrenchRemotion;
@@ -334,7 +346,7 @@
       setStatus(savedUrl?'MP3 saved to the French audio library and downloaded.':'MP3 generated and downloaded.');
     }catch(error){setStatus(error.message||'MP3 export failed.',true)}finally{button.disabled=false}
   }
-  restore();updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{updateAudioUi(el.id);draw()});el.addEventListener('change',()=>{updateAudioUi(el.id);draw()})});$('saveDailyPhrase').onclick=saveDailyPhrase;$('saveAndExportVideo').onclick=saveAndExportVideo;$('exportRemotionVideo').onclick=remotionVideo;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;var todayPhraseButton=$('generateTodayPhrase');if(todayPhraseButton)todayPhraseButton.addEventListener('click',generateTodayPhrase);draw();
+  restore();if(!v('publishDate')){const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000);$('publishDate').value=local.toISOString().slice(0,10)}if(!v('weekday'))$('weekday').value=new Date(v('publishDate')+'T12:00:00').toLocaleDateString('en-US',{weekday:'long'}).toUpperCase();updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{if(el.id==='publishDate'&&v('publishDate'))$('weekday').value=new Date(v('publishDate')+'T12:00:00').toLocaleDateString('en-US',{weekday:'long'}).toUpperCase();updateAudioUi(el.id);draw()});el.addEventListener('change',()=>{updateAudioUi(el.id);draw()})});$('saveDailyPhrase').onclick=saveDailyPhrase;$('pushFrenchIos').onclick=pushFrenchIos;$('saveAndExportVideo').onclick=saveAndExportVideo;$('exportRemotionVideo').onclick=remotionVideo;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;var todayPhraseButton=$('generateTodayPhrase');if(todayPhraseButton)todayPhraseButton.addEventListener('click',generateTodayPhrase);draw();
 })();
 </script>
 </body>

@@ -37,6 +37,7 @@
         <label class="style-card"><input type="radio" name="style" value="advanced" checked><strong>Living Sanctuary</strong><small>Premium layered editorial artwork</small></label>
         <label class="style-card"><input type="radio" name="style" value="forest"><strong>Modern Aurora</strong><small>Layered glass and forest light</small></label>
         <label class="style-card"><input type="radio" name="style" value="botanical"><strong>Heritage Botanical</strong><small>Museum-grade engraved cannabis study</small></label>
+        <label class="style-card"><input type="radio" name="style" value="olive"><strong>Olive Sanctuary</strong><small>Dark olive branches, gold light, framed Scripture</small></label>
       </div>
     </section>
 
@@ -49,7 +50,7 @@
         <label class="language-option"><input type="radio" name="verseLanguage" value="jm"><span>🇯🇲 Patois</span></label>
         <label class="language-option"><input type="radio" name="verseLanguage" value="ht"><span>🇭🇹 Kreyòl</span></label>
       </div>
-      <div class="hint" style="margin:0 0 16px">English uses KJV. French and Spanish use their matching hardcoded scripture banks.</div>
+      <div class="hint" style="margin:0 0 16px">English uses a recovery-focused WEB bank for cravings, freedom, strength, and self-control. Other languages use their matching hardcoded scripture banks.</div>
       <label>Select a specific Bible verse</label>
       <div class="verse-picker">
         <div class="field"><label for="verseBook">Book</label><select id="verseBook"></select></div>
@@ -167,6 +168,32 @@
     ctx.save();const scale=1+pulse*.16;ctx.translate(x,y);ctx.scale(scale,scale);ctx.translate(-x,-y);ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(x-32,y-10);ctx.lineTo(x-18,y-10);ctx.lineTo(x,y-25);ctx.lineTo(x,y+25);ctx.lineTo(x-18,y+10);ctx.lineTo(x-32,y+10);ctx.closePath();ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=4;ctx.lineCap='round';for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(x+1,y,14+i*12,-.72,.72);ctx.stroke()}ctx.restore();ctx.fillStyle=color;ctx.font='900 17px Inter, Arial, sans-serif';ctx.letterSpacing='2px';ctx.textAlign='left';ctx.fillText(label,x+52,y+6);ctx.letterSpacing='0px'
   }
   function drawNarrationBadge(light=false,pulse=0){if(!$('showBadge').checked)return;const color=light?'#59662f':'#82d6a5';speakerMark(795,88,color,pulse)}
+  function drawOliveBranch(x,y,scale,angle,flip=false){
+    ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(flip?-scale:scale,scale);ctx.strokeStyle='rgba(184,160,98,.62)';ctx.lineWidth=4;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,0);ctx.bezierCurveTo(55,-82,128,-142,212,-184);ctx.stroke();
+    for(let i=0;i<9;i++){
+      const t=i/8,px=18+t*188,py=-22-t*158+Math.sin(i*.9)*12,side=i%2?-1:1;
+      ctx.save();ctx.translate(px,py);ctx.rotate(-.55+side*.68+t*.18);const leaf=ctx.createLinearGradient(-34,0,34,0);leaf.addColorStop(0,'rgba(27,43,31,.96)');leaf.addColorStop(.5,'rgba(105,112,72,.96)');leaf.addColorStop(1,'rgba(218,197,131,.78)');ctx.fillStyle=leaf;ctx.strokeStyle='rgba(235,218,154,.34)';ctx.lineWidth=1.4;ctx.beginPath();ctx.ellipse(0,0,43-10*t,12-2*t,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.restore();
+      if(i%3===1){ctx.fillStyle='rgba(104,94,48,.9)';ctx.beginPath();ctx.ellipse(px+side*17,py+18,10,13,.2,0,Math.PI*2);ctx.fill();}
+    }
+    ctx.restore();
+  }
+  function drawOliveSanctuary(pulse){
+    ctx.clearRect(0,0,1080,1350);
+    const bg=ctx.createLinearGradient(0,0,1080,1350);bg.addColorStop(0,'#07100e');bg.addColorStop(.34,'#17231f');bg.addColorStop(.64,'#202822');bg.addColorStop(1,'#0a0f0d');ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1350);
+    const center=ctx.createRadialGradient(540,610,60,540,610,720);center.addColorStop(0,'rgba(225,214,177,.22)');center.addColorStop(.44,'rgba(99,110,88,.16)');center.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=center;ctx.fillRect(0,0,1080,1350);
+    ctx.save();ctx.globalAlpha=.45;for(let i=0;i<7;i++){const x=315+i*78;const beam=ctx.createLinearGradient(x-95,0,x+95,720);beam.addColorStop(0,'rgba(250,224,156,.05)');beam.addColorStop(.18,'rgba(255,236,181,.24)');beam.addColorStop(.55,'rgba(226,192,118,.07)');beam.addColorStop(1,'rgba(226,192,118,0)');ctx.fillStyle=beam;ctx.beginPath();ctx.moveTo(x-22,0);ctx.lineTo(x+56,0);ctx.lineTo(x-92,740);ctx.lineTo(x-210,740);ctx.closePath();ctx.fill()}ctx.restore();
+    ctx.save();ctx.globalAlpha=.95;drawOliveBranch(35,170,1.05,-.15,false);drawOliveBranch(1045,90,.98,Math.PI+.12,false);drawOliveBranch(26,1030,1.08,-.84,false);drawOliveBranch(1050,760,1.02,Math.PI-.7,false);drawOliveBranch(132,1328,.92,-1.18,false);drawOliveBranch(980,1248,.9,2.42,false);ctx.restore();
+    ctx.save();for(let i=0;i<170;i++){const x=(i*167)%1080,y=(i*211)%1350,r=(i%7===0?2.8:1.2)+(i%3)*.55;ctx.fillStyle=i%5===0?'rgba(244,210,124,.72)':(i%2?'rgba(255,244,210,.32)':'rgba(168,151,98,.28)');ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill()}ctx.restore();
+    const smoke=ctx.createRadialGradient(540,910,60,540,910,520);smoke.addColorStop(0,'rgba(222,226,215,.12)');smoke.addColorStop(.5,'rgba(158,165,154,.08)');smoke.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=smoke;ctx.fillRect(0,480,1080,870);
+    const vignette=ctx.createRadialGradient(540,650,340,540,650,920);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(.72,'rgba(0,0,0,.24)');vignette.addColorStop(1,'rgba(0,0,0,.82)');ctx.fillStyle=vignette;ctx.fillRect(0,0,1080,1350);
+    drawNarrationBadge(false,pulse);
+    ctx.textAlign='center';textShadow('rgba(0,0,0,.8)',16,4);ctx.fillStyle='#efe2b5';ctx.font='500 68px Georgia, Times New Roman, serif';ctx.letterSpacing='14px';ctx.fillText('DAILY BREATH',540,178);ctx.fillStyle='rgba(255,255,255,.82)';ctx.font='700 22px Inter, Arial, sans-serif';ctx.letterSpacing='11px';ctx.fillText('FAITH • GROWTH • PEACE • PURPOSE',540,235);ctx.letterSpacing='0px';clearShadow();
+    if($('showFrame').checked){ctx.save();ctx.shadowColor=narrationPlaying?'rgba(255,228,164,.7)':'rgba(240,195,111,.5)';ctx.shadowBlur=narrationPlaying?42:28;roundedRect(198,430,684,574,38,null,'rgba(239,195,116,.92)',4);roundedRect(216,448,648,538,28,null,'rgba(255,236,174,.5)',1.5);ctx.restore()}
+    ctx.textAlign='center';ctx.fillStyle='#ecd08a';ctx.font='800 25px Inter, Arial, sans-serif';ctx.letterSpacing='10px';ctx.fillText(value('heading'),540,544);ctx.letterSpacing='0px';
+    textShadow('rgba(0,0,0,.82)',18,4);ctx.fillStyle='#fffaf1';const verse=value('verse');ctx.font='600 45px Georgia, Times New Roman, serif';const estimated=Math.max(1,Math.ceil(ctx.measureText(verse).width/600)),fontSize=Math.max(31,45-(estimated-4)*2.5);ctx.font=`600 ${fontSize}px Georgia, Times New Roman, serif`;wrapText('“'+verse+'”',540,662,610,fontSize*1.35,7);
+    ctx.fillStyle='#eecb77';ctx.font='800 25px Inter, Arial, sans-serif';ctx.letterSpacing='9px';ctx.fillText(value('reference'),540,912);ctx.letterSpacing='0px';clearShadow();
+    if($('showFooter').checked){const d=dateInfo();ctx.textAlign='center';ctx.fillStyle='#e8c77a';ctx.font='800 22px Inter, Arial, sans-serif';ctx.letterSpacing='10px';ctx.fillText(`${d.weekday} • ${d.month} ${d.day}`,540,1215);ctx.fillStyle='rgba(255,255,255,.78)';ctx.font='700 19px Inter, Arial, sans-serif';ctx.letterSpacing='8px';wrapText(value('footer').toUpperCase(),540,1264,760,28,2);ctx.letterSpacing='0px'}
+  }
   function drawForest(pulse){
     ctx.clearRect(0,0,1080,1350);if(!coverImage(modernAurora)){const bg=ctx.createLinearGradient(0,0,1080,1350);bg.addColorStop(0,'#061a2b');bg.addColorStop(.38,'#164c55');bg.addColorStop(.72,'#27705b');bg.addColorStop(1,'#d2a45d');ctx.fillStyle=bg;ctx.fillRect(0,0,1080,1350);const sun=ctx.createRadialGradient(790,190,15,790,190,480);sun.addColorStop(0,'rgba(255,236,174,.9)');sun.addColorStop(.28,'rgba(255,203,121,.28)');sun.addColorStop(1,'rgba(255,203,121,0)');ctx.fillStyle=sun;ctx.fillRect(250,0,830,730);ctx.fillStyle='#153f39';ctx.beginPath();ctx.moveTo(0,830);ctx.bezierCurveTo(190,620,350,790,520,610);ctx.bezierCurveTo(710,430,850,690,1080,510);ctx.lineTo(1080,1350);ctx.lineTo(0,1350);ctx.closePath();ctx.fill();ctx.fillStyle='#092d2d';ctx.beginPath();ctx.moveTo(0,950);ctx.bezierCurveTo(210,750,410,920,630,720);ctx.bezierCurveTo(830,545,930,780,1080,690);ctx.lineTo(1080,1350);ctx.lineTo(0,1350);ctx.closePath();ctx.fill();ctx.save();ctx.globalAlpha=.18;ctx.strokeStyle='#e8f4d9';for(let i=0;i<14;i++){ctx.beginPath();ctx.moveTo(720+i*28,-20);ctx.lineTo(250+i*48,760);ctx.stroke()}ctx.restore()}
     ctx.save();ctx.globalAlpha=.22;for(let i=0;i<70;i++){ctx.fillStyle=i%4?'#e7f2d6':'#f4d78e';ctx.beginPath();ctx.arc((i*167)%1080,(i*89)%1280,1+(i%3),0,Math.PI*2);ctx.fill()}ctx.restore();
@@ -212,7 +239,7 @@
     ctx.strokeStyle='rgba(234,203,118,.64)';ctx.beginPath();ctx.moveTo(385,850);ctx.lineTo(695,850);ctx.stroke();ctx.fillStyle='#f0d486';ctx.font='900 31px Inter, Arial';ctx.fillText(value('reference'),540,906);ctx.fillStyle='rgba(255,255,255,.72)';ctx.font='700 17px Inter, Arial';ctx.letterSpacing='4px';ctx.fillText(value('translation'),540,942);ctx.letterSpacing='0px';clearShadow();
     if($('showFooter').checked){const d=dateInfo();textShadow('rgba(0,0,0,.82)',18,4);drawCalendarIcon(112,1095,72,'#f0d486');ctx.textAlign='left';ctx.fillStyle='#f0d486';ctx.font='900 19px Inter, Arial';ctx.letterSpacing='3px';ctx.fillText(`${d.weekday}  /  ${d.month} ${d.day}`,225,1110);ctx.fillStyle='#fffdf5';ctx.font='700 29px Georgia, serif';ctx.letterSpacing='.2px';wrapText(value('footer'),225,1162,700,36,2,'left');ctx.letterSpacing='0px';clearShadow()}
   }
-  function draw(pulse=0){const selected=style();selected==='advanced'?drawAdvanced(pulse):(selected==='botanical'?drawBotanical(pulse):drawForest(pulse))}
+  function draw(pulse=0){const selected=style();selected==='advanced'?drawAdvanced(pulse):(selected==='botanical'?drawBotanical(pulse):(selected==='olive'?drawOliveSanctuary(pulse):drawForest(pulse)))}
 
   function canonicalIdFromReference(reference){
     const clean=String(reference||'').toUpperCase();
@@ -224,6 +251,7 @@
   }
   function applyVerseItem(item,preserveDate=false){
     currentVerseId=item.id||canonicalIdFromReference(item.reference)||currentVerseId;
+    if(item.template_style){const template=document.querySelector(`input[name="style"][value="${item.template_style}"]`);if(template)template.checked=true}
     $('heading').value=localizedHeading();$('verse').value=item.verse;$('reference').value=item.reference;$('translation').value=item.translation||'KJV';$('footer').value=item.footer||'WALK IN FAITH TODAY.';
     if(!preserveDate){const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000);$('publishDate').value=local.toISOString().slice(0,10)}draw();
   }
@@ -269,12 +297,12 @@
   }
 
   async function generateTodayVerse(){
-    const button=$('generateTodayVerse');button.disabled=true;status('Choosing a fresh verse from the full Bible…');
+    const button=$('generateTodayVerse');button.disabled=true;status(verseLanguage()==='en'?'Choosing a fresh recovery-focused verse…':'Choosing a fresh verse…');
     try{
       const response=await fetch(`/server/admin/daily-studio/api/random-content.php?type=bible&language=${encodeURIComponent(verseLanguage())}`,{cache:'no-store'});
       const data=await response.json();if(!response.ok||!data.item)throw new Error(data.error||'No verse was returned.');
       const item=data.item;applyVerseItem(item);
-      status(`Fresh verse selected — ${data.remaining.toLocaleString()} unused verses remain in this cycle.${data.cycle_restarted?' A new Bible cycle just began.':''}`);
+      status(`Fresh verse selected — ${data.remaining.toLocaleString()} unused verses remain in this cycle.${data.cycle_restarted?' A new cycle just began.':''}`);
     }catch(error){status(error.message||'Verse generation failed.',true)}finally{button.disabled=false}
   }
   async function loadFreshVerseForCurrentLanguage(){

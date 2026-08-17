@@ -66,17 +66,51 @@ function fallbackHoroscopes(DateTimeImmutable $date, string $theme): array
             'paragraphs'=>[
                 "Your {$tone} instincts are asking for room today, dear {$sign['name']}. Move slowly enough to notice the opening that has been waiting in plain sight.",
                 'A conversation, small choice, or quiet adjustment can shift the whole rhythm of the day. Protect your focus and let the right people meet you halfway.',
-                'By evening, choose restoration over proving yourself. What settles inside you now becomes tomorrow\'s confidence.',
+                'Choose restoration over proving yourself. What settles inside you now becomes tomorrow\'s confidence.',
             ],
             'mood'=>$moods[$index],
-            'power_hour'=>['Mars AM','Venus PM','Moon Noon','Mercury PM'][$index % 4],
-            'evening'=>['Reset your pace','Protect your peace','Follow the warm signal','Make space for clarity'][$index % 4],
+            'source'=>'Beyond Space original fallback',
+            'source_url'=>'',
         ];
     }
     return $items;
 }
 
-function aiHoroscopes(DateTimeImmutable $date, string $theme): array
+function astrologySourceSeeds(): array
+{
+    if (!function_exists('curl_init')) return [];
+    $seeds = [];
+    foreach (spaceSigns() as $sign) {
+        $url = 'https://www.astrology.com/horoscope/daily/' . $sign['slug'] . '.html';
+        $curl = curl_init($url);
+        curl_setopt_array($curl, [
+            CURLOPT_RETURNTRANSFER=>true,
+            CURLOPT_CONNECTTIMEOUT=>6,
+            CURLOPT_TIMEOUT=>14,
+            CURLOPT_FOLLOWLOCATION=>true,
+            CURLOPT_USERAGENT=>'Beyond-Space-Horoscope-Generator/1.0',
+        ]);
+        $html = curl_exec($curl);
+        $status = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        if (!is_string($html) || $status < 200 || $status >= 300) continue;
+        $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = trim(preg_replace('/\s+/u', ' ', $text) ?? '');
+        $needle = $sign['name'] . ' Daily Horoscope';
+        $position = stripos($text, $needle);
+        if ($position === false) continue;
+        $chunk = mb_substr($text, $position, 1300);
+        $chunk = preg_replace('/Explore More.*$/iu', '', $chunk) ?? $chunk;
+        $chunk = preg_replace('/More Horoscopes.*$/iu', '', $chunk) ?? $chunk;
+        $chunk = cleanText($chunk, 900);
+        if ($chunk !== '') {
+            $seeds[$sign['slug']] = ['source'=>'Astrology.com daily horoscope', 'source_url'=>$url, 'text'=>$chunk];
+        }
+    }
+    return $seeds;
+}
+
+function aiHoroscopes(DateTimeImmutable $date, string $theme, array $sourceSeeds = []): array
 {
     $key = trim((string)beyond_ai_config('api_key', ''));
     if ($key === '' || str_contains($key, 'YOUR_') || !function_exists('curl_init')) {
@@ -88,19 +122,21 @@ function aiHoroscopes(DateTimeImmutable $date, string $theme): array
     }
     $signNames = implode(', ', array_map(fn($sign) => $sign['name'], spaceSigns()));
     $themeLine = $theme !== '' ? "Creative theme: {$theme}." : 'Creative theme: refined daily astrology, hopeful and practical.';
+    $sourceLine = $sourceSeeds ? "Use these source notes only as topical inputs; do not copy their wording:\n" . json_encode($sourceSeeds, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : 'No external source notes are available today.';
     $prompt = <<<PROMPT
 Write original entertainment-only daily astrology copy for Beyond Space.
 Date: {$date->format('l, F j, Y')}.
 Signs: {$signNames}.
 {$themeLine}
+{$sourceLine}
 
 Return strict JSON only:
-{"items":[{"sign":"Aries","paragraphs":["...","...","..."],"mood":"...","power_hour":"...","evening":"..."}]}
+{"items":[{"sign":"Aries","paragraphs":["...","...","..."],"mood":"..."}]}
 
 Rules:
 - Include exactly 12 items, one per sign in the listed order.
 - Three short paragraphs per sign, 18 to 30 words each.
-- Do not copy, quote, or imitate astrology.com or any named publication.
+- Do not copy, quote, or imitate Astrology.com or any named publication.
 - No medical, legal, financial, or deterministic claims.
 - Tone: premium, warm, mystical, grounded, social-media ready.
 PROMPT;
@@ -154,8 +190,8 @@ PROMPT;
             'headline'=>$theme !== '' ? strtoupper($theme) : 'COSMIC WEATHER',
             'paragraphs'=>array_slice($paragraphs, 0, 3),
             'mood'=>cleanText((string)($rawItem['mood'] ?? 'Open & Grounded'), 54),
-            'power_hour'=>cleanText((string)($rawItem['power_hour'] ?? 'Moon PM'), 34),
-            'evening'=>cleanText((string)($rawItem['evening'] ?? 'Restore your center'), 70),
+            'source'=>(string)($sourceSeeds[$sign['slug']]['source'] ?? 'Beyond Space original'),
+            'source_url'=>(string)($sourceSeeds[$sign['slug']]['source_url'] ?? ''),
         ];
     }
     return $items;
@@ -191,15 +227,21 @@ try {
     if (!Auth::check()) {
         spaceJson(['ok'=>false, 'error'=>'Administrator access required.'], 403);
     }
-    if (!Auth::verifyCsrf($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null)) {
-        spaceJson(['ok'=>false, 'error'=>'Invalid security token.'], 403);
+    $csrf = (string)($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+    if (
+        empty($_SESSION['verse_generator_csrf'])
+        || !hash_equals((string)$_SESSION['verse_generator_csrf'], $csrf)
+    ) {
+        spaceJson(['ok'=>false, 'error'=>'Reload the generator and try again.'], 419);
     }
     $input = json_decode((string)file_get_contents('php://input'), true, 16, JSON_THROW_ON_ERROR);
     if (!is_array($input)) throw new RuntimeException('Invalid horoscope request.');
     $date = spaceDate((string)($input['publish_date'] ?? date('Y-m-d')));
     $theme = cleanText((string)($input['theme'] ?? ''), 90);
-    $items = aiHoroscopes($date, $theme);
-    $provider = $items ? 'openai' : 'local-fallback';
+    $sourceMode = cleanText((string)($input['source_mode'] ?? 'astrology-com'), 40);
+    $sourceSeeds = $sourceMode === 'astrology-com' ? astrologySourceSeeds() : [];
+    $items = aiHoroscopes($date, $theme, $sourceSeeds);
+    $provider = $items ? ($sourceSeeds ? 'openai-with-astrology-source' : 'openai') : 'local-fallback';
     if (!$items) $items = fallbackHoroscopes($date, $theme);
     $saved = !empty($input['save_drafts']) ? saveSpaceEvents($items, $date) : 0;
     spaceJson(['ok'=>true, 'provider'=>$provider, 'date'=>$date->format('Y-m-d'), 'items'=>$items, 'saved'=>$saved]);

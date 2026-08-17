@@ -1,4 +1,4 @@
-# Beyond French 2.0.0 — iOS beta assets
+# Beyond French 1.1.1 - iOS beta assets
 
 - `AppIcon-1024.png`: 1024 × 1024 App Store icon source.
 - `AppIcon-180.png`: iPhone 60 pt @3x icon.
@@ -11,7 +11,7 @@ Suggested App Store copy:
 
 - Name: Beyond French
 - Subtitle: One phrase. Four languages.
-- Version: 2.0.0
+- Version: 1.1.1
 - Promotional text: Practice a useful French phrase every day with pronunciation, conversation challenges, and four-language comparisons.
 - Keywords: french,language,learn,phrases,pronunciation,kreyol,patois,spanish
 

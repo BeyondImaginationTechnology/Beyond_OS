@@ -10,7 +10,7 @@ $academyConfig=[
   'adult'=>['Everyday Math','Money, Budgets & Interest','Skill Refresh','Practical Measurement','Personal Learning Plan']
  ]
 ];
-$academyConfig['scripts']='<script src="/beyond-math/assets/js/learning-center.js?v=2.3.3" defer></script><script src="/beyond-math/assets/js/app.js?v=2.3.3" defer></script>';
+$academyConfig['scripts']='<script src="/beyond-math/assets/js/learning-center.js?v=2.3.4" defer></script><script src="/beyond-math/assets/js/app.js?v=2.3.4" defer></script>';
 $academyConfig['rich_lessons']['kids']['number-sense']=[
  ['title'=>'Build Numbers with Place Value','focus'=>'Place value','teaching'=>'A digit’s position tells us how much it is worth. In 347, the 3 means 3 hundreds, the 4 means 4 tens, and the 7 means 7 ones.','concept'=>'Numbers are built from groups of hundreds, tens, and ones. Moving one place left makes a digit ten times as valuable.','example'=>'582 = 5 hundreds + 8 tens + 2 ones = 500 + 80 + 2.','practice'=>'Build the target number by changing its hundreds, tens, and ones.','activity'=>'place-value'],
  ['title'=>'Read and Write Whole Numbers','focus'=>'Number names','teaching'=>'Read the hundreds first, then the tens and ones. A zero holds an empty place.','concept'=>'The written name and the digits describe the same quantity.','example'=>'406 is read “four hundred six.” The zero shows there are no tens.','practice'=>'Match the number to the correct number name.','activity'=>'number-name'],

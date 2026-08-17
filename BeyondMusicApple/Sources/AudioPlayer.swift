@@ -1,10 +1,13 @@
-import AVFoundation
-import Foundation
+@preconcurrency import AVFoundation
+@preconcurrency import Foundation
+@preconcurrency import ObjectiveC
 
 @MainActor
 final class AudioPlayer {
     private var player: AVPlayer?
     private var currentURL: URL?
+    private var endObserver: NSObjectProtocol?
+    var onPlaybackFinished: (() -> Void)?
 
     func configureForBackgroundPlayback() {
         do {
@@ -22,11 +25,30 @@ final class AudioPlayer {
         }
 
         currentURL = url
-        player = AVPlayer(url: url)
+        if let endObserver {
+            NotificationCenter.default.removeObserver(endObserver)
+        }
+        let item = AVPlayerItem(url: url)
+        endObserver = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: item,
+            queue: .main
+        ) { [weak self] _ in
+            Task { @MainActor in
+                self?.onPlaybackFinished?()
+            }
+        }
+        player = AVPlayer(playerItem: item)
         player?.play()
     }
 
     func pause() {
         player?.pause()
+    }
+
+    func stop() {
+        player?.pause()
+        currentURL = nil
+        player = nil
     }
 }

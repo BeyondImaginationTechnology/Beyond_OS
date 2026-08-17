@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/includes/app-layout.php';
-bos_page_start('Beyond OS', '2.3 Release Notes', 'Beyond OS 2.3 Academy and Certificates release notes.');
+bos_page_start('Beyond OS', '2.3.4 Release Notes', 'Beyond OS 2.3.4 Academy and Certificates release notes.');
 ?>
 <main class="bos-main">
   <section class="bos-hero">
-    <span class="bos-kicker">Release 2.3</span>
+    <span class="bos-kicker">Release 2.3.4</span>
     <h1>Learn it.<br>Prove it.</h1>
     <p>Beyond Academy now connects lesson progress, assessments, skills certificates, public verification, and achievement badges through Beyond ID.</p>
     <div class="bos-actions"><a class="bos-btn" href="<?=e(beyond_url('academy/dashboard.php'))?>">Open learner dashboard</a><a class="bos-btn secondary" href="<?=e(beyond_url('academy/verify.php'))?>">Verify a certificate</a></div>

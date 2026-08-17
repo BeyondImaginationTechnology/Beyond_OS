@@ -93,7 +93,7 @@ try {
             }
             require $root . '/beyond-id/includes/db.php';
             $managedLocale = $language;
-            $statement = $pdo->prepare("SELECT publish_date,locale,translation_code,heading,verse_text,scripture_reference,footer_message,status FROM verse_day_posts WHERE publish_date=? AND locale=? ORDER BY CASE WHEN status='published' THEN 0 ELSE 1 END, id DESC LIMIT 1");
+            $statement = $pdo->prepare("SELECT publish_date,locale,translation_code,heading,verse_text,scripture_reference,footer_message,background_asset_url,status FROM verse_day_posts WHERE publish_date=? AND locale=? ORDER BY CASE WHEN status='published' THEN 0 ELSE 1 END, id DESC LIMIT 1");
             $statement->execute([$managedDate, $managedLocale]);
             $managed = $statement->fetch(PDO::FETCH_ASSOC);
             if (!$managed || trim((string)($managed['verse_text'] ?? '')) === '') {
@@ -107,6 +107,11 @@ try {
                     break;
                 }
             }
+            $backgroundAsset = (string)($managed['background_asset_url'] ?? '');
+            $templateStyle = str_contains($backgroundAsset, 'olive-sanctuary') ? 'olive'
+                : (str_contains($backgroundAsset, 'heritage-botanical') ? 'botanical'
+                : (str_contains($backgroundAsset, 'modern-aurora') ? 'forest'
+                : (str_contains($backgroundAsset, 'living-sanctuary') ? 'advanced' : 'forest')));
             jsonOut(['ok'=>true, 'source'=>'content_manager', 'item'=>[
                 'id'=>$managedId,
                 'verse'=>(string)$managed['verse_text'],
@@ -114,6 +119,7 @@ try {
                 'translation'=>(string)($managed['translation_code'] ?: 'KJV'),
                 'heading'=>(string)($managed['heading'] ?: 'VERSE OF THE DAY'),
                 'footer'=>(string)($managed['footer_message'] ?: 'WALK IN FAITH TODAY.'),
+                'template_style'=>$templateStyle,
                 'publish_date'=>(string)$managed['publish_date'],
                 'locale'=>(string)$managed['locale'],
                 'status'=>(string)$managed['status'],
@@ -121,43 +127,47 @@ try {
         }
         $historyFile = $storage . '/bible-history-' . $language . '.json';
         if ($reset) { writeHistory($historyFile, []); jsonOut(['ok'=>true,'reset'=>true,'language'=>$language]); }
-        // Prefer the bundled public-domain World English Bible so the generator
-        // can rotate through the whole local Bible instead of a tiny old bank.
-        $web = loadEnglishBibleBank($root . '/dailybreath/data/engwebp_vpl.txt');
-        $kjvFallback = [
-          ['GEN 1:3','And God said, Let there be light: and there was light.','GENESIS 1:3'],
-          ['GEN 28:15','And, behold, I am with thee, and will keep thee in all places whither thou goest.','GENESIS 28:15'],
-          ['PSA 23:1','The LORD is my shepherd; I shall not want.','PSALM 23:1'],
-          ['PSA 34:8','O taste and see that the LORD is good: blessed is the man that trusteth in him.','PSALM 34:8'],
-          ['PSA 27:1','The LORD is my light and my salvation; whom shall I fear?','PSALM 27:1'],
+        // English generation is intentionally recovery-focused for Daily
+        // Breath users working through cravings, dependence, and habit change.
+        $englishRecovery = [
+          ['PSA 34:17','The righteous cry, and the LORD hears, and delivers them out of all their troubles.','PSALM 34:17'],
+          ['PSA 46:1','God is our refuge and strength, a very present help in trouble.','PSALM 46:1'],
           ['PSA 46:10','Be still, and know that I am God.','PSALM 46:10'],
-          ['PSA 56:3','What time I am afraid, I will trust in thee.','PSALM 56:3'],
-          ['PSA 118:24','This is the day which the LORD hath made; we will rejoice and be glad in it.','PSALM 118:24'],
-          ['PSA 119:105','Thy word is a lamp unto my feet, and a light unto my path.','PSALM 119:105'],
-          ['PRO 3:5','Trust in the LORD with all thine heart; and lean not unto thine own understanding.','PROVERBS 3:5'],
-          ['PRO 16:3','Commit thy works unto the LORD, and thy thoughts shall be established.','PROVERBS 16:3'],
-          ['ISA 40:31','But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles.','ISAIAH 40:31'],
-          ['ISA 41:10','Fear thou not; for I am with thee: be not dismayed; for I am thy God.','ISAIAH 41:10'],
-          ['ISA 43:2','When thou passest through the waters, I will be with thee.','ISAIAH 43:2'],
-          ['MAT 5:16','Let your light so shine before men, that they may see your good works, and glorify your Father which is in heaven.','MATTHEW 5:16'],
-          ['MAT 6:33','But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.','MATTHEW 6:33'],
-          ['MAT 11:28','Come unto me, all ye that labour and are heavy laden, and I will give you rest.','MATTHEW 11:28'],
-          ['MRK 10:27','With men it is impossible, but not with God: for with God all things are possible.','MARK 10:27'],
-          ['JHN 3:16','For God so loved the world, that he gave his only begotten Son.','JOHN 3:16'],
-          ['JHN 8:12','I am the light of the world: he that followeth me shall not walk in darkness, but shall have the light of life.','JOHN 8:12'],
-          ['JHN 14:27','Peace I leave with you, my peace I give unto you: Let not your heart be troubled, neither let it be afraid.','JOHN 14:27'],
-          ['JHN 15:5','I am the vine, ye are the branches: He that abideth in me, and I in him, the same bringeth forth much fruit.','JOHN 15:5'],
-          ['ROM 8:28','And we know that all things work together for good to them that love God.','ROMANS 8:28'],
-          ['ROM 15:13','Now the God of hope fill you with all joy and peace in believing.','ROMANS 15:13'],
-          ['ROM 12:12','Rejoicing in hope; patient in tribulation; continuing instant in prayer.','ROMANS 12:12'],
-          ['1CO 13:13','And now abideth faith, hope, charity, these three; but the greatest of these is charity.','1 CORINTHIANS 13:13'],
-          ['2CO 5:7','For we walk by faith, not by sight.','2 CORINTHIANS 5:7'],
-          ['GAL 6:9','And let us not be weary in well doing: for in due season we shall reap, if we faint not.','GALATIANS 6:9'],
-          ['PHP 4:4','Rejoice in the Lord alway: and again I say, Rejoice.','PHILIPPIANS 4:4'],
-          ['PHP 4:13','I can do all things through Christ which strengtheneth me.','PHILIPPIANS 4:13'],
-          ['COL 3:15','And let the peace of God rule in your hearts.','COLOSSIANS 3:15'],
-          ['1TH 5:17','Pray without ceasing.','1 THESSALONIANS 5:17'],
-          ['HEB 11:1','Now faith is the substance of things hoped for, the evidence of things not seen.','HEBREWS 11:1']
+          ['PSA 50:15','Call on me in the day of trouble. I will deliver you, and you will honor me.','PSALM 50:15'],
+          ['PSA 55:22','Cast your burden on the LORD and he will sustain you.','PSALM 55:22'],
+          ['PSA 107:13','Then they cried to the LORD in their trouble, and he saved them out of their distresses.','PSALM 107:13'],
+          ['PSA 107:14','He brought them out of darkness and the shadow of death, and broke away their chains.','PSALM 107:14'],
+          ['PRO 3:5','Trust in the LORD with all your heart, and don’t lean on your own understanding.','PROVERBS 3:5'],
+          ['PRO 3:6','In all your ways acknowledge him, and he will make your paths straight.','PROVERBS 3:6'],
+          ['ISA 40:29','He gives power to the weak. He increases the strength of him who has no might.','ISAIAH 40:29'],
+          ['ISA 41:10','Don’t you be afraid, for I am with you. Don’t be dismayed, for I am your God. I will strengthen you. Yes, I will help you.','ISAIAH 41:10'],
+          ['ISA 43:2','When you pass through the waters, I will be with you, and through the rivers, they will not overflow you.','ISAIAH 43:2'],
+          ['LAM 3:22','It is because of the LORD’s loving kindnesses that we are not consumed, because his mercies don’t fail.','LAMENTATIONS 3:22'],
+          ['LAM 3:23','They are new every morning. Great is your faithfulness.','LAMENTATIONS 3:23'],
+          ['MAT 11:28','Come to me, all you who labor and are heavily burdened, and I will give you rest.','MATTHEW 11:28'],
+          ['JHN 8:36','If therefore the Son makes you free, you will be free indeed.','JOHN 8:36'],
+          ['ROM 6:14','For sin will not have dominion over you, for you are not under law, but under grace.','ROMANS 6:14'],
+          ['ROM 12:2','Don’t be conformed to this world, but be transformed by the renewing of your mind.','ROMANS 12:2'],
+          ['ROM 12:21','Don’t be overcome by evil, but overcome evil with good.','ROMANS 12:21'],
+          ['1CO 6:19','Don’t you know that your body is a temple of the Holy Spirit who is in you, whom you have from God?','1 CORINTHIANS 6:19'],
+          ['1CO 6:20','For you were bought with a price. Therefore glorify God in your body and in your spirit, which are God’s.','1 CORINTHIANS 6:20'],
+          ['1CO 9:27','I beat my body and bring it into submission.','1 CORINTHIANS 9:27'],
+          ['1CO 10:13','God is faithful, who will not allow you to be tempted above what you are able, but will with the temptation also make the way of escape.','1 CORINTHIANS 10:13'],
+          ['2CO 12:9','My grace is sufficient for you, for my power is made perfect in weakness.','2 CORINTHIANS 12:9'],
+          ['GAL 5:1','Stand firm therefore in the liberty by which Christ has made us free, and don’t be entangled again with a yoke of bondage.','GALATIANS 5:1'],
+          ['GAL 5:16','Walk by the Spirit, and you won’t fulfill the lust of the flesh.','GALATIANS 5:16'],
+          ['GAL 5:22','The fruit of the Spirit is love, joy, peace, patience, kindness, goodness, faith.','GALATIANS 5:22'],
+          ['GAL 5:23','Gentleness, and self-control. Against such things there is no law.','GALATIANS 5:23'],
+          ['EPH 6:11','Put on the whole armor of God, that you may be able to stand against the wiles of the devil.','EPHESIANS 6:11'],
+          ['PHP 4:6','In nothing be anxious, but in everything, by prayer and petition with thanksgiving, let your requests be made known to God.','PHILIPPIANS 4:6'],
+          ['PHP 4:7','And the peace of God, which surpasses all understanding, will guard your hearts and your thoughts in Christ Jesus.','PHILIPPIANS 4:7'],
+          ['PHP 4:13','I can do all things through Christ who strengthens me.','PHILIPPIANS 4:13'],
+          ['2TI 1:7','For God didn’t give us a spirit of fear, but of power, love, and self-control.','2 TIMOTHY 1:7'],
+          ['TIT 2:12','Denying ungodliness and worldly lusts, we would live soberly, righteously, and godly in this present age.','TITUS 2:12'],
+          ['HEB 12:1','Let’s lay aside every weight and the sin which so easily entangles us, and run with perseverance the race that is set before us.','HEBREWS 12:1'],
+          ['JAM 4:7','Be subject therefore to God. Resist the devil, and he will flee from you.','JAMES 4:7'],
+          ['1PE 5:7','Casting all your worries on him, because he cares for you.','1 PETER 5:7'],
+          ['1JO 5:4','This is the victory that has overcome the world: your faith.','1 JOHN 5:4']
         ];
         $englishBank = $web ?: $kjvFallback;
         $french = [
@@ -244,14 +254,14 @@ try {
           ['COL 3:15','Se pou lapè Kris la dirije kè nou.','KOLOSYEN 3:15'],
           ['1TH 5:17','Priye san rete.','1 TESALONISYEN 5:17']
         ];
-        $banks = ['en'=>[$englishBank,$web ? 'WEB' : 'KJV'], 'fr'=>[$french,'LSG'], 'es'=>[$spanish,'RVR'], 'jm'=>[$patois,'PATOIS'], 'ht'=>[$kreyol,'KREYÒL']];
+        $banks = ['en'=>[$englishRecovery,'WEB'], 'fr'=>[$french,'LSG'], 'es'=>[$spanish,'RVR'], 'jm'=>[$patois,'PATOIS'], 'ht'=>[$kreyol,'KREYÒL']];
         [$bank,$translation] = $banks[$language];
         $items = array_map(function ($v) use ($translation) {
             preg_match('/^(.+)\s+(\d+):(\d+)$/u', $v[2], $parts);
             return ['id'=>$v[0], 'verse'=>$v[1], 'reference'=>$v[2], 'translation'=>$translation, 'book'=>$parts[1] ?? $v[2], 'chapter'=>(int)($parts[2] ?? 1), 'verse_number'=>(int)($parts[3] ?? 1)];
         }, $bank);
         $footerBanks = [
-          'en'=>['BREATHE DEEP. GOD IS WITH YOU.','WALK IN FAITH TODAY.','LET PEACE GUIDE YOUR NEXT STEP.','TRUST GOD WITH TODAY.'],
+          'en'=>['BREATHE THROUGH THE CRAVING. GOD IS WITH YOU.','ONE FREE BREATH AT A TIME.','LET PEACE GUIDE YOUR NEXT STEP.','TRUST GOD WITH THIS MOMENT.','GRACE IS STRONGER THAN THE URGE.'],
           'fr'=>['RESPIREZ PROFONDÉMENT. DIEU EST AVEC VOUS.','MARCHEZ DANS LA FOI AUJOURD’HUI.','LAISSEZ LA PAIX GUIDER VOS PAS.','CONFIEZ CETTE JOURNÉE À DIEU.'],
           'es'=>['RESPIRA PROFUNDO. DIOS ESTÁ CONTIGO.','CAMINA EN FE HOY.','DEJA QUE LA PAZ GUÍE TUS PASOS.','CONFÍA ESTE DÍA A DIOS.'],
           'jm'=>['BREATHE DEEP. GOD DEH WID YUH.','WALK INNA FAITH TODAY.','MEK PEACE GUIDE YUH NEXT STEP.','TRUST GOD WID TODAY.'],

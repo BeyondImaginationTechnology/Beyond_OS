@@ -315,7 +315,14 @@ enum DownloadState: Equatable {
 enum MusicProviderFilter: String, CaseIterable, Identifiable, Codable, Hashable {
     case all = "All"
     case youtube = "YouTube"
+    case mixtapes = "Mixtapes"
+    case audius = "Audius"
+    case ccMixter = "ccMixter"
     case internetArchive = "Archive"
+
+    static var allCases: [MusicProviderFilter] {
+        [.all, .mixtapes, .audius, .ccMixter, .internetArchive]
+    }
 
     var id: String { rawValue }
 
@@ -325,6 +332,12 @@ enum MusicProviderFilter: String, CaseIterable, Identifiable, Codable, Hashable 
             true
         case .youtube:
             track.providerName == "YouTube"
+        case .mixtapes:
+            track.providerName == "Mixtape Archive"
+        case .audius:
+            track.providerName == "Audius"
+        case .ccMixter:
+            track.providerName == "ccMixter"
         case .internetArchive:
             track.providerName == "Internet Archive"
         }

@@ -16,9 +16,13 @@ $dateObject = DateTimeImmutable::createFromFormat('!Y-m-d', $date);
 $locale = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($input['locale'] ?? 'en')) ?: 'en';
 $translation = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($input['translation_code'] ?? 'KJV')) ?: 'KJV';
 $templateStyle = (string)($input['template_style'] ?? 'forest');
-$backgroundAsset = $templateStyle === 'botanical'
-  ? '/assets/img/verse-botanical-sketch-bg.webp'
-  : '/assets/dailybreath-login-background.webp';
+$backgroundAssets = [
+  'advanced' => '/assets/img/verse-cannabis-living-sanctuary-v1.png',
+  'forest' => '/assets/img/verse-cannabis-modern-aurora-v1.png',
+  'botanical' => '/assets/img/verse-cannabis-heritage-botanical-v1.png',
+  'olive' => '/assets/dailybreath-login-background.webp?template=olive-sanctuary',
+];
+$backgroundAsset = $backgroundAssets[$templateStyle] ?? $backgroundAssets['forest'];
 $heading = mb_substr(trim((string)($input['heading'] ?? 'VERSE OF THE DAY')), 0, 100);
 $verse = trim((string)($input['verse_text'] ?? ''));
 $reference = mb_substr(trim((string)($input['scripture_reference'] ?? '')), 0, 180);

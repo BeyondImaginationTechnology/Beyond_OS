@@ -1,13 +1,13 @@
 import Foundation
 
-struct Verse: Identifiable, Equatable {
+struct Verse: Identifiable, Codable, Equatable {
     let id: Int
     let text: String
     let reference: String
     let reflection: String
 }
 
-struct Devotional: Identifiable, Equatable {
+struct Devotional: Identifiable, Codable, Equatable {
     let id: Int
     let title: String
     let excerpt: String
@@ -25,18 +25,82 @@ struct PrayerPractice: Identifiable, Equatable {
     let systemImage: String
 }
 
-struct AcademyModule: Identifiable, Equatable {
+struct AcademyLesson: Identifiable, Equatable {
+    let id: Int
+    let title: String
+    let duration: String
+    let scripture: String
+    let summary: String
+    let teaching: String
+    let practice: String
+    let reflectionPrompt: String
+    let checkPrompt: String
+    let checkAnswer: String
+}
+
+struct AcademyPath: Identifiable, Equatable {
     let id: Int
     let title: String
     let subtitle: String
-    let progress: Double
-    let isFree: Bool
+    let systemImage: String
+    let lessons: [AcademyLesson]
+}
+
+struct BreathPattern: Identifiable, Equatable {
+    let id: Int
+    let title: String
+    let intention: String
+    let instruction: String
+    let inhale: Int
+    let hold: Int
+    let exhale: Int
+
+    var rhythmText: String {
+        "Inhale \(inhale) · Hold \(hold) · Exhale \(exhale)"
+    }
+
+    static let dailyPatterns = [
+        BreathPattern(
+            id: 1,
+            title: "Peace Breath",
+            intention: "Settle your pace before the day asks for more.",
+            instruction: "Inhale for four, hold for four, exhale for six.",
+            inhale: 4,
+            hold: 4,
+            exhale: 6
+        ),
+        BreathPattern(
+            id: 2,
+            title: "Mercy Breath",
+            intention: "Make room for patience with yourself and others.",
+            instruction: "Inhale for three, hold for three, exhale for five.",
+            inhale: 3,
+            hold: 3,
+            exhale: 5
+        ),
+        BreathPattern(
+            id: 3,
+            title: "Courage Breath",
+            intention: "Enter the next step with a steady heart.",
+            instruction: "Inhale for four, hold for two, exhale for four.",
+            inhale: 4,
+            hold: 2,
+            exhale: 4
+        )
+    ]
+
+    static func breathOfTheDay(for date: Date = Date(), calendar: Calendar = .current) -> BreathPattern {
+        let day = calendar.ordinality(of: .day, in: .era, for: date) ?? 1
+        return dailyPatterns[(day - 1) % dailyPatterns.count]
+    }
 }
 
 struct JournalEntry: Identifiable, Equatable {
     let id: UUID
     let createdAt: Date
+    let prompt: String
     let text: String
+    let mood: String?
 }
 
 struct BibleVerse: Identifiable, Equatable {
@@ -195,21 +259,21 @@ struct BibleLibrary: Equatable {
 extension Verse {
     static let daily = Verse(
         id: 1,
-        text: "Be still, and know that I am God.",
-        reference: "Psalm 46:10",
-        reflection: "Begin slowly. Make room for quiet, notice your breath, and let the next faithful step be enough for today."
+        text: "If therefore the Son makes you free, you will be free indeed.",
+        reference: "John 8:36",
+        reflection: "When a craving rises, pause before you answer it. Take one honest breath, ask God for help, and choose the next free step."
     )
 }
 
 extension Devotional {
     static let today = Devotional(
         id: 1,
-        title: "Walk in Quiet Confidence",
-        excerpt: "Make room for stillness and remember that God is present before your next step.",
-        body: "Stillness is not empty time. It is a faithful pause where you remember that God is already present, already attentive, and already enough for the road in front of you. Begin today by slowing your pace before you solve everything. Let confidence grow from trust, not hurry.",
-        scripture: "Psalm 46:10",
+        title: "One Free Breath",
+        excerpt: "Meet the next craving with prayer, patience, and one faithful choice.",
+        body: "Freedom often arrives one moment at a time. You do not have to solve every urge at once; you can bring this breath, this craving, and this decision to God. When the pull feels loud, pause long enough to remember that grace is present here too. Choose the next free step, then the next one after that.",
+        scripture: "John 8:36",
         minutes: 5,
-        prayer: "Lord, quiet my heart and steady my thoughts. Help me move through today with trust, patience, and courage.",
-        practice: "Before your next task, take three slow breaths and name one thing you can entrust to God."
+        prayer: "Lord, strengthen me in this moment. Help me breathe through the craving, receive your grace, and choose freedom one step at a time.",
+        practice: "When an urge comes, take three slow breaths, drink water, and pray: Lord, help me choose freedom now."
     )
 }

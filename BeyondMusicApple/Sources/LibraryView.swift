@@ -9,17 +9,28 @@ struct LibraryView: View {
         MusicScreen(title: "Library") {
             MusicPanel {
                 HStack(alignment: .top, spacing: 14) {
-                    Image(systemName: "music.note.house.fill")
-                        .font(.title)
-                        .foregroundStyle(Color.musicAqua)
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(.linearGradient(colors: [.musicAqua.opacity(0.88), .musicRose.opacity(0.82)], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        Image(systemName: "externaldrive.fill.badge.checkmark")
+                            .font(.title2.weight(.black))
+                            .foregroundStyle(.white)
+                    }
+                    .frame(width: 58, height: 58)
                     VStack(alignment: .leading, spacing: 8) {
-                        MusicEyebrow(text: "On this device")
-                        Text("\(store.tracks.count) songs")
+                        MusicEyebrow(text: "Offline Vault")
+                        Text("\(store.localTracks.count) saved songs")
                             .font(.largeTitle.bold())
-                        Text("\(store.downloadedTracks.count) downloaded · \(store.importedTracks.count) imported · \(store.totalLibraryMinutes) minutes indexed")
+                        Text(store.offlineReadinessText)
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
+                }
+
+                HStack(spacing: 10) {
+                    OfflineMetric(title: "Storage", value: store.offlineStorageText, systemImage: "internaldrive.fill")
+                    OfflineMetric(title: "Downloaded", value: "\(store.downloadedTracks.count)", systemImage: "arrow.down.circle.fill")
+                    OfflineMetric(title: "Imported", value: "\(store.importedTracks.count)", systemImage: "folder.fill")
                 }
 
                 Button {
@@ -60,6 +71,15 @@ struct LibraryView: View {
                 }
             }
 
+            MusicPanel {
+                MusicEyebrow(text: "Offline shortcuts")
+                HStack(spacing: 10) {
+                    ShortcutButton(title: "Downloaded", systemImage: "arrow.down.circle.fill", filter: .downloaded)
+                    ShortcutButton(title: "Imported", systemImage: "folder.fill", filter: .imported)
+                    ShortcutButton(title: "Favorites", systemImage: "heart.fill", filter: .favorites)
+                }
+            }
+
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
                     MoodButton(title: "All", mood: nil)
@@ -85,6 +105,49 @@ struct LibraryView: View {
                 Task { await store.importAudioFiles(from: urls) }
             }
         }
+    }
+}
+
+private struct OfflineMetric: View {
+    let title: String
+    let value: String
+    let systemImage: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Image(systemName: systemImage)
+                .foregroundStyle(Color.musicAqua)
+            Text(value)
+                .font(.headline.bold())
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+            Text(title)
+                .font(.caption2.bold())
+                .foregroundStyle(.secondary)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.musicPanelSoft, in: RoundedRectangle(cornerRadius: 8))
+    }
+}
+
+private struct ShortcutButton: View {
+    @EnvironmentObject private var store: MusicStore
+    let title: String
+    let systemImage: String
+    let filter: LibraryFilter
+
+    var body: some View {
+        Button {
+            store.libraryFilter = filter
+        } label: {
+            Label(title, systemImage: systemImage)
+                .font(.caption.bold())
+                .frame(maxWidth: .infinity)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+        }
+        .buttonStyle(.bordered)
     }
 }
 
@@ -133,7 +196,7 @@ struct TrackListView<HeaderAccessory: View>: View {
                 }
             } else {
                 ForEach(tracks) { track in
-                    TrackRow(track: track, showsSource: showsSource)
+                    TrackRow(track: track, queue: tracks, showsSource: showsSource)
                 }
             }
         }
@@ -160,13 +223,19 @@ extension TrackListView where HeaderAccessory == EmptyView {
 struct TrackRow: View {
     @EnvironmentObject private var store: MusicStore
     let track: MusicTrack
+    let queue: [MusicTrack]
     var showsSource = false
+    @State private var showingRemoveConfirmation = false
 
     var body: some View {
         MusicPanel {
             HStack(spacing: 12) {
                 Button {
-                    store.play(track)
+                    if store.currentTrack?.id == track.id {
+                        store.togglePlayback()
+                    } else {
+                        store.play(track, in: queue)
+                    }
                 } label: {
                     Image(systemName: store.currentTrack?.id == track.id && store.isPlaying ? "pause.circle.fill" : "play.circle.fill")
                         .font(.title)
@@ -183,6 +252,12 @@ struct TrackRow: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
+                    if store.isAvailableOffline(track) {
+                        Text(store.localDetailText(for: track))
+                            .font(.caption2.bold())
+                            .foregroundStyle(Color.musicAqua)
+                            .lineLimit(1)
+                    }
                     if showsSource {
                         Text(track.provenanceText)
                             .font(.caption2)
@@ -208,10 +283,34 @@ struct TrackRow: View {
                         .buttonStyle(.plain)
                         .accessibilityLabel(track.isFavorite ? "Remove favorite" : "Save favorite")
 
+                        if store.isAvailableOffline(track) {
+                            Button(role: .destructive) {
+                                showingRemoveConfirmation = true
+                            } label: {
+                                Image(systemName: "trash")
+                                    .font(.title3)
+                            }
+                            .buttonStyle(.plain)
+                            .foregroundStyle(.red)
+                            .accessibilityLabel("Remove \(track.title) from device")
+                        }
+
                         DownloadButton(track: track)
                     }
                 }
             }
+        }
+        .confirmationDialog(
+            "Remove this song from your device?",
+            isPresented: $showingRemoveConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Remove Download", role: .destructive) {
+                store.remove(track)
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This deletes the saved audio file from Beyond Music. You can download or import it again later if the source is still available.")
         }
     }
 }

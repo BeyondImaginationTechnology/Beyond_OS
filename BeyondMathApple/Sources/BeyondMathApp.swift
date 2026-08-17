@@ -19,4 +19,5 @@ extension Color {
     static let mathBlue = Color(red: 0.055, green: 0.647, blue: 1)
     static let mathGreen = Color(red: 0.357, green: 0.859, blue: 0.271)
     static let mathGold = Color(red: 1, green: 0.831, blue: 0.231)
+    static let mathPurple = Color(red: 0.729, green: 0.267, blue: 1)
 }

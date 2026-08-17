@@ -113,7 +113,7 @@ frenchSaveResponse([
     'publish_date' => $date,
     'updated' => $existingIndex !== null,
     'url' => '/beyond-french/',
-    'message' => $date === date('Y-m-d')
+    'message' => $date <= date('Y-m-d')
         ? 'Today’s phrase is now live in Beyond French.'
-        : 'The phrase is saved for ' . $date . '.',
+        : 'The phrase is scheduled for ' . $date . ' at 12:00 AM Pacific.',
 ]);

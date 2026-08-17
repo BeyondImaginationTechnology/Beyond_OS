@@ -92,5 +92,5 @@ $userName = $_SESSION['user_name'] ?? $_SESSION['name'] ?? 'Learner';
   </section>
 </main>
 <footer class="footer"><span>© <?= date('Y') ?> Beyond Imagination Technology</span><a href="/academy/">Beyond Academy</a></footer>
-<script src="/beyond-math/assets/js/app.js?v=2.3.3" defer></script><script src="/assets/js/visitor-analytics.js" defer></script></body>
+<script src="/beyond-math/assets/js/app.js?v=2.3.4" defer></script><script src="/assets/js/visitor-analytics.js" defer></script></body>
 </html>

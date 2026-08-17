@@ -9,7 +9,7 @@ struct DiscoverView: View {
                 MusicEyebrow(text: "Search")
                 Text("Find music")
                     .font(.largeTitle.bold())
-                Text("Search Internet Archive and YouTube from one bar. Internet Archive files download directly; YouTube results use the configured converter API and remain subject to YouTube terms, rights-holder permissions, and applicable law.")
+                Text("Search downloadable archives, mixtapes, Audius, and ccMixter from one bar. Save playable files directly into your offline library when a provider exposes a download.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 HStack {
@@ -54,14 +54,6 @@ struct DiscoverView: View {
                             .foregroundStyle(.secondary)
                     }
                     Spacer()
-                    if store.hasBeyondID {
-                        Text("BETA")
-                            .font(.caption2.bold())
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 5)
-                            .background(Color.musicAqua.opacity(0.16), in: Capsule())
-                            .foregroundStyle(Color.musicAqua)
-                    }
                 }
             }
 
@@ -74,11 +66,32 @@ struct DiscoverView: View {
                 }
             }
 
+            MusicPanel {
+                MusicEyebrow(text: "Mixtape Sources")
+                Text("More places to dig")
+                    .font(.title2.bold())
+                Text("Use these sources for discovery and manual file collecting. In-app downloads stay limited to providers with direct playable files the app can verify.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 10) {
+                    Link(destination: URL(string: "https://mixtapemonkey.com")!) {
+                        Label("MixtapeMonkey", systemImage: "safari")
+                    }
+                    Link(destination: URL(string: "https://datpiff.com/?xs=1")!) {
+                        Label("DatPiff Library", systemImage: "archivebox")
+                    }
+                    Link(destination: URL(string: "https://archive.org/details/hiphopmixtapes")!) {
+                        Label("Internet Archive Hip-Hop Mixtapes", systemImage: "tray.and.arrow.down")
+                    }
+                }
+                .font(.subheadline.weight(.semibold))
+            }
+
             TrackListView(
                 title: "Results",
                 tracks: store.filteredSearchResults,
                 emptyTitle: "No search results loaded",
-                emptyMessage: "Search a song, artist, genre, or YouTube URL. Downloads are saved into your local library.",
+                emptyMessage: "Search a song, artist, mixtape, genre, or lo-fi mood. Downloadable results save into your local library.",
                 showsSource: true,
                 headerAccessory: {
                     Picker("Provider", selection: $store.searchProviderFilter) {

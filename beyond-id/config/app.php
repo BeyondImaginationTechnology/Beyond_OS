@@ -2,7 +2,7 @@
 return [
     'name' => 'Beyond ID',
     'company' => 'Beyond Imagination Technology',
-    'version' => '2.3.3-beta',
+    'version' => '2.3.4-beta',
     'environment' => 'production',
     'debug' => false,
     'url' => 'https://beyondimagination.co.technology/beyond-id',

@@ -21,7 +21,10 @@ function lesson_by_id(int $id): ?array {
 function todays_lesson(): ?array {
     $lessons = all_lessons(); $today = date('Y-m-d');
     foreach ($lessons as $lesson) if (($lesson['date'] ?? '') === $today) return $lesson;
-    return $lessons[0] ?? null;
+    // A dated lesson becomes current at midnight in the configured app
+    // timezone. Never expose a future scheduled lesson before that date.
+    foreach ($lessons as $lesson) if (($lesson['date'] ?? '') < $today) return $lesson;
+    return null;
 }
 function french_modules(): array {
     return [

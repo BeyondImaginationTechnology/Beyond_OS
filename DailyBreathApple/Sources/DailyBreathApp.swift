@@ -8,6 +8,7 @@ struct DailyBreathApp: App {
         WindowGroup {
             RootView()
                 .environmentObject(store)
+                .task { await store.load() }
         }
     }
 }

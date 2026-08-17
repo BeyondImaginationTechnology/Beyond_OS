@@ -97,11 +97,12 @@ final class DailyBreathStore: ObservableObject {
     ]
 
     private let speaker = AVSpeechSynthesizer()
+    private var prerecordedPlayer: AVAudioPlayer?
+    private var streamingPlayer: AVPlayer?
     private let endpoint = URL(string: "https://beyondimagination.co.technology/dailybreath/api/today.php")!
 
     func load() async {
-        verse = .daily
-        devotional = .today
+        loadBundledDailyContent()
         await refreshToday()
     }
 
@@ -120,18 +121,42 @@ final class DailyBreathStore: ObservableObject {
             devotional = today.devotional
             statusMessage = "Synced admin verse"
         } catch {
-            verse = .daily
-            devotional = .today
+            loadBundledDailyContent()
             statusMessage = "Offline verse"
         }
     }
 
+    private func loadBundledDailyContent() {
+        verse = RecoveryContent.verseOfTheDay() ?? .daily
+        devotional = RecoveryContent.devotionalOfTheDay() ?? .today
+    }
+
     func speakVerse() {
+        let referenceKey = verse.reference
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+            .lowercased()
+            .replacingOccurrences(of: "[^a-z0-9]+", with: "-", options: .regularExpression)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+        if playBundledNarration(named: "verse-\(referenceKey)") {
+            statusMessage = "Prerecorded offline verse"
+            return
+        }
+        if let audioURL = verse.audioURL, let url = URL(string: audioURL), url.scheme == "https" {
+            speaker.stopSpeaking(at: .immediate)
+            prerecordedPlayer?.stop()
+            prepareAudioSessionForNarration()
+            streamingPlayer = AVPlayer(url: url)
+            streamingPlayer?.play()
+            statusMessage = "Prerecorded Studio verse"
+            return
+        }
         speakText("\(verse.text) \(verse.reference)")
     }
 
     func speakText(_ text: String) {
         speaker.stopSpeaking(at: .immediate)
+        prerecordedPlayer?.stop()
+        streamingPlayer?.pause()
         prepareAudioSessionForNarration()
 
         let utterance = AVSpeechUtterance(string: text)
@@ -142,6 +167,43 @@ final class DailyBreathStore: ObservableObject {
         utterance.preUtteranceDelay = 0.08
         utterance.postUtteranceDelay = 0.12
         speaker.speak(utterance)
+    }
+
+    func speakAcademyLesson(_ lesson: AcademyLesson) {
+        if playBundledNarration(named: "academy-\(lesson.id)") { return }
+        speakText("\(lesson.title). \(lesson.scripture). \(lesson.teaching) Practice. \(lesson.practice)")
+    }
+
+    func speakBreathPattern(_ pattern: BreathPattern) {
+        if playBundledNarration(named: "breath-pattern-\(pattern.id)") { return }
+        speakText("\(pattern.title). \(pattern.intention) \(pattern.instruction)")
+    }
+
+    func speakBreathCue(_ cue: String) {
+        let key = cue
+            .lowercased()
+            .replacingOccurrences(of: "[^a-z]+", with: "-", options: .regularExpression)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+        if playBundledNarration(named: "breath-\(key)") { return }
+        speakText(cue)
+    }
+
+    @discardableResult
+    private func playBundledNarration(named resource: String) -> Bool {
+        guard let url = Bundle.main.url(
+            forResource: resource,
+            withExtension: "mp3",
+            subdirectory: "Audio/Narration"
+        ), let player = try? AVAudioPlayer(contentsOf: url) else {
+            return false
+        }
+
+        speaker.stopSpeaking(at: .immediate)
+        prerecordedPlayer?.stop()
+        prepareAudioSessionForNarration()
+        player.prepareToPlay()
+        prerecordedPlayer = player
+        return player.play()
     }
 
     private func preferredNarrationVoice() -> AVSpeechSynthesisVoice? {

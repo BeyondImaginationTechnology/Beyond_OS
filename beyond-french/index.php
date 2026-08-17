@@ -10,7 +10,7 @@ $pageTitle = 'Beyond French | Daily Academy';
 require __DIR__ . '/includes/header.php';
 $lesson = todays_lesson();
 $lessonAudio = $lesson ? lesson_audio_map((int)$lesson['id']) : [];
-$frenchAudioUrl = (string)($lessonAudio['fr-FR'] ?? $lessonAudio['fr-CA'] ?? '');
+$frenchAudioUrl = (string)($lessonAudio['fr-FR'] ?? $lessonAudio['fr-CA'] ?? $lesson['audio_url'] ?? '');
 $continueLesson = french_continue_lesson((int)($_SESSION['user_id'] ?? 0));
 $continuePosition = lesson_position((int)($continueLesson['id'] ?? 1));
 $learningProgress = french_progress((int)($_SESSION['user_id'] ?? 0));

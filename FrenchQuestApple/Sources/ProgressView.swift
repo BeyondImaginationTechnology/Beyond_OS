@@ -29,7 +29,7 @@ struct LearningProgressView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Recovery")
                             .font(.title3.weight(.black))
-                        Text("Hearts refill for this local beta build so testers can keep playing.")
+                        Text("Refill your hearts to keep practicing and exploring.")
                             .foregroundStyle(.secondary)
                         HStack {
                             Button {

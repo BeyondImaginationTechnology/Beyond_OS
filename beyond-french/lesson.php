@@ -15,6 +15,7 @@ if (!french_guest_daily_lesson_allowed($lesson)) {
     exit;
 }
 $userId=(int)($_SESSION['user_id']??0);french_mark_started($userId,$id);$position=lesson_position($id);
+$lessonAudio=lesson_audio_map($id);$frenchAudioUrl=(string)($lessonAudio['fr-FR']??$lessonAudio['fr-CA']??$lesson['audio_url']??'');
 $pageTitle = $lesson['english'] . ' | Beyond French';
 require __DIR__ . '/includes/header.php';
 ?>
@@ -30,8 +31,18 @@ require __DIR__ . '/includes/header.php';
             <div class="translation"><span class="flag">🇭🇹</span><small>Kreyòl</small><strong><?= h($lesson['kreyol']) ?></strong></div>
             <div class="translation"><span class="flag">🇪🇸</span><small>Español</small><strong><?= h($lesson['spanish']) ?></strong></div>
         </div>
+        <div class="lesson-actions">
+            <button class="button secondary lesson-audio-button" type="button" data-audio-url="<?= h($frenchAudioUrl) ?>" data-speak="<?= h($lesson['french']) ?>">🔊 Hear the prerecorded French</button>
+        </div>
         <div class="culture-note"><strong>💡 Culture note:</strong> <?= h($lesson['culture_note']) ?></div>
         <a class="button primary" href="challenge.php?id=<?= (int)$lesson['id'] ?>">Take this challenge</a>
     </article>
 </section>
+<script>
+document.querySelector('.lesson-audio-button')?.addEventListener('click',async function(){
+ const button=this,url=button.dataset.audioUrl,text=button.dataset.speak||'';
+ if(url){try{button.textContent='▶ Playing…';const audio=new Audio(url);audio.onended=()=>button.textContent='🔊 Hear the prerecorded French';audio.onerror=()=>button.textContent='Audio unavailable';await audio.play();return}catch(error){}}
+ if('speechSynthesis' in window){speechSynthesis.cancel();const voice=new SpeechSynthesisUtterance(text);voice.lang='fr-FR';voice.rate=.86;speechSynthesis.speak(voice)}
+});
+</script>
 <?php require __DIR__ . '/includes/footer.php'; ?>

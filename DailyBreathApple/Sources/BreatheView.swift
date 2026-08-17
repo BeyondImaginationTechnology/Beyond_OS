@@ -104,6 +104,13 @@ struct BreatheView: View {
             Text(breathPattern.rhythmText)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(selectedTheme.primary)
+            Button {
+                store.speakBreathPattern(breathPattern)
+            } label: {
+                Label("Listen to Guidance", systemImage: "speaker.wave.2.fill")
+            }
+            .buttonStyle(.bordered)
+            .tint(selectedTheme.primary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -241,6 +248,8 @@ struct BreatheView: View {
             remainingSeconds = durationSeconds
             didCompleteSession = false
         }
+        store.breathPhase = "Inhale"
+        store.speakBreathCue("Inhale")
         isBreathing = true
     }
 
@@ -261,12 +270,17 @@ struct BreatheView: View {
     private func updateBreathPhase() {
         let cycleLength = breathPattern.inhale + breathPattern.hold + breathPattern.exhale
         let elapsed = (durationSeconds - remainingSeconds) % cycleLength
+        let nextPhase: String
         if elapsed < breathPattern.inhale {
-            store.breathPhase = "Inhale"
+            nextPhase = "Inhale"
         } else if elapsed < breathPattern.inhale + breathPattern.hold {
-            store.breathPhase = "Hold"
+            nextPhase = "Hold"
         } else {
-            store.breathPhase = "Exhale"
+            nextPhase = "Exhale"
+        }
+        if nextPhase != store.breathPhase {
+            store.breathPhase = nextPhase
+            store.speakBreathCue(nextPhase)
         }
     }
 
@@ -274,6 +288,7 @@ struct BreatheView: View {
         remainingSeconds = 0
         isBreathing = false
         didCompleteSession = true
+        store.speakBreathCue("Complete")
         recordToday()
         UINotificationFeedbackGenerator().notificationOccurred(.success)
     }

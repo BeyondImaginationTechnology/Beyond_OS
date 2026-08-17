@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require dirname(__DIR__) . '/bootstrap.php';
+require_once dirname(__DIR__, 4) . '/includes/narration/StudioNarration.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 
@@ -72,12 +73,58 @@ foreach ($lessons as $index => $lesson) {
     }
 }
 
+if ($existingIndex !== null && empty($input['confirm_overwrite'])) {
+    frenchSaveResponse([
+        'ok' => false,
+        'error' => 'A lesson is already scheduled for this date. Confirm before replacing it.',
+        'requires_confirmation' => true,
+        'publish_date' => $date,
+    ], 409);
+}
+
 $id = $existingIndex === null ? $maxId + 1 : (int)($lessons[$existingIndex]['id'] ?? $maxId + 1);
+$existingLesson = $existingIndex === null ? [] : (array)$lessons[$existingIndex];
+$frenchChanged = $existingLesson && (string)($existingLesson['french'] ?? '') !== $values['french'];
+$audioUrl = trim((string)($existingLesson['audio_url'] ?? ''));
+$audioGenerated = false;
+$audioProvider = trim((string)($existingLesson['generator']['audio_provider'] ?? ''));
+
+if ($audioUrl === '' || $frenchChanged) {
+    $provider = strtolower(trim((string)($input['narration_provider'] ?? '')));
+    if ($provider === '') $provider = 'azure';
+    if (!in_array($provider, ['azure', 'openai', 'elevenlabs'], true)) {
+        frenchSaveResponse(['ok' => false, 'error' => 'Choose a supported narration provider.'], 422);
+    }
+    $voice = trim((string)($input['narration_voice'] ?? ''));
+    if ($voice !== '' && !preg_match('/^[A-Za-z0-9._-]{1,120}$/', $voice)) {
+        frenchSaveResponse(['ok' => false, 'error' => 'Choose a valid narration voice.'], 422);
+    }
+    $narrationText = 'Bienvenue à Français du Jour. La phrase du jour est : ' . $values['french']
+        . '. Prononciation : ' . $values['french_pronunciation']
+        . '. En anglais, cela signifie : ' . $values['english'] . '. ' . $values['culture_note'];
+    try {
+        $generated = studio_narration_generate($narrationText, 'fr-FR', $provider, $voice);
+        $audio = (string)($generated['audio_content'] ?? '');
+        if (strlen($audio) < 128) throw new RuntimeException('The narration provider returned invalid audio.');
+        $stored = studio_store_mp3($audio, 'beyond-french', $date, 'fr-FR', $narrationText);
+        $audioUrl = (string)$stored['url'];
+        $audioProvider = (string)($generated['provider'] ?? $provider);
+        $audioGenerated = true;
+    } catch (Throwable $error) {
+        error_log('Beyond French publish narration failed: ' . $error->getMessage());
+        frenchSaveResponse([
+            'ok' => false,
+            'error' => 'The lesson was not published because its prerecorded audio could not be generated: ' . $error->getMessage(),
+        ], 502);
+    }
+}
+
 $lesson = [
+    ...$existingLesson,
     'id' => $id,
     'date' => $date,
-    'category' => 'Daily Phrase',
-    'module' => (string)($input['module'] ?? 'greetings'),
+    'category' => (string)($existingLesson['category'] ?? 'Daily Phrase'),
+    'module' => (string)($input['module'] ?? $existingLesson['module'] ?? 'greetings'),
     ...$values,
     'challenge' => 'How would you say “' . $values['english'] . '” in French?',
     'answer' => $values['french'],
@@ -87,8 +134,13 @@ $lesson = [
         'saved_at' => date(DATE_ATOM),
         'export_language' => (string)($input['export_language'] ?? 'en'),
         'narrator_locale' => (string)($input['narrator_locale'] ?? 'fr-FR'),
+        'audio_provider' => $audioProvider,
     ],
+    'audio_url' => $audioUrl,
 ];
+if ($frenchChanged) {
+    unset($lesson['generated_batch']);
+}
 
 if ($existingIndex === null) {
     $lessons[] = $lesson;
@@ -112,8 +164,11 @@ frenchSaveResponse([
     'id' => $id,
     'publish_date' => $date,
     'updated' => $existingIndex !== null,
+    'audio_url' => $audioUrl,
+    'audio_generated' => $audioGenerated,
+    'audio_provider' => $audioProvider,
     'url' => '/beyond-french/',
-    'message' => $date <= date('Y-m-d')
+    'message' => $date === date('Y-m-d')
         ? 'Today’s phrase is now live in Beyond French.'
-        : 'The phrase is scheduled for ' . $date . ' at 12:00 AM Pacific.',
+        : 'The phrase is saved for ' . $date . '.',
 ]);

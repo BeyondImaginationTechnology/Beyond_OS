@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);require __DIR__.'/includes/functions.php';require_once __DIR__.'/../includes/ecosystem.php';
 $age=french_valid_age_group((string)($_GET['age']??$_POST['age']??'kids'));$module=french_valid_module((string)($_GET['module']??$_POST['module']??'greetings'));$lessonNumber=max(1,min(10,(int)($_GET['lesson']??$_POST['lesson']??1)));$lesson=french_course_lesson($age,$module,$lessonNumber);
-if(french_is_guest()){http_response_code(403);$pageTitle='Beyond ID required | French Academy';require __DIR__.'/includes/header.php';echo '<div class="academy-wrap"><section class="locked-panel"><h1>Create a free Beyond ID to take tests</h1><p>Your free guest access includes the Lesson of the Day and Academy Module 1, Lesson 1.</p><a class="academy-button" href="../beyond-id/auth/register.php?app=beyond-french">Create Beyond ID</a></section></div>';require __DIR__.'/includes/footer.php';exit;}
 if(!$lesson||!french_academy_lesson_unlocked($age,$module,$lessonNumber)){http_response_code(403);exit('Lesson test is locked.');}
 if(count(french_academy_practice_responses($age,$module,$lessonNumber))<3&&!french_academy_lesson_passed($age,$module,$lessonNumber)){http_response_code(403);header('Location: academy-lesson.php?'.http_build_query(['age'=>$age,'module'=>$module,'lesson'=>$lessonNumber,'practice_required'=>1]).'#practice-path');exit;}
 $questions=french_lesson_test_questions($age,$module,$lessonNumber);$result=null;

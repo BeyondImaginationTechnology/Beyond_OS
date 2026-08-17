@@ -4,11 +4,11 @@ require __DIR__.'/bootstrap.php';
 require dirname(__DIR__).'/_header.php';
 $tabs=[
   'content'=>['DailyBreath','Content','dailybreath-content.php'],
-  'breath'=>['DailyBreath','Generator','breath-generator.php'],
+  'breath'=>['DailyBreath','Scheduled generator','breath-generator.php'],
+  'recovery-newsletter'=>['DailyBreath','Recovery newsletter','recovery-newsletter.php'],
   'french'=>['Beyond French','Generator','french-generator.php'],
   'french-options'=>['Beyond French','Options','french-options.php'],
   'space'=>['Beyond Space','Horoscope generator','space-generator.php'],
-  'tattoo-pack'=>['Beyond Tattoo','Stencil packs','stencil-packs.php'],
   'tattoo-publish'=>['Beyond Tattoo','Publish','stencil-library.php#publish'],
   'voices'=>['Shared','Voices','voice-settings.php'],
 ];

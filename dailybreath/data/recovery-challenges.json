@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "title": "Daily Breath Recovery Challenge Library",
+  "entry_count": 20,
+  "starts_on": "2026-08-16",
+  "ends_on": "2026-11-23",
+  "entries": [
+    {
+      "id": "challenge-01",
+      "title": "Build Your Support Circle",
+      "description": "Move recovery out of isolation by making one intentional connection each day.",
+      "scripture_reference": "Ecclesiastes 4:9",
+      "steps": [
+        "List three safe people or resources.",
+        "Contact one person before a difficult moment.",
+        "End each day by noting where support helped."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-08-16",
+      "ends_on": "2026-08-22",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-02",
+      "title": "Bonus: Ten-Minute Pause",
+      "description": "Practice delaying urges long enough for choice to return.",
+      "scripture_reference": "Psalm 46:10",
+      "steps": [
+        "Set a ten-minute timer when an urge rises.",
+        "Breathe slowly and change your location.",
+        "Choose the next healthy action when the timer ends."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-08-19",
+      "ends_on": "2026-08-25",
+      "schedule_type": "bonus",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-03",
+      "title": "Clear One Trigger",
+      "description": "Reduce one source of easy access to an old pattern and replace it with support.",
+      "scripture_reference": "Proverbs 4:23",
+      "steps": [
+        "Identify one repeat trigger.",
+        "Remove or block its easiest access point.",
+        "Place a healthy alternative in the same path."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-08-23",
+      "ends_on": "2026-08-29",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-04",
+      "title": "Tell the Truth Gently",
+      "description": "Practice one honest recovery conversation without shame or exaggeration.",
+      "scripture_reference": "Ephesians 4:25",
+      "steps": [
+        "Choose a trusted listener.",
+        "Name what happened and what you need.",
+        "Agree on one concrete follow-up."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-08-30",
+      "ends_on": "2026-09-05",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-05",
+      "title": "Morning Before Messages",
+      "description": "Give the first minutes of the day to grounding rather than urgency.",
+      "scripture_reference": "Psalm 143:8",
+      "steps": [
+        "Keep your phone out of reach overnight.",
+        "Read one recovery verse after waking.",
+        "Choose today’s support step before opening messages."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-09-06",
+      "ends_on": "2026-09-12",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-06",
+      "title": "Bonus: Craving Care Kit",
+      "description": "Prepare a small set of tools for high-pressure moments.",
+      "scripture_reference": "1 Corinthians 10:13",
+      "steps": [
+        "Add water and a grounding reminder.",
+        "Save two support contacts.",
+        "Include one activity that changes your environment."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-09-09",
+      "ends_on": "2026-09-15",
+      "schedule_type": "bonus",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-07",
+      "title": "Practice HALT Awareness",
+      "description": "Notice when hunger, anger, loneliness, or tiredness is increasing vulnerability.",
+      "scripture_reference": "1 Peter 5:8",
+      "steps": [
+        "Check HALT at midday and evening.",
+        "Respond to the need before judging it.",
+        "Record which state most affects your choices."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-09-13",
+      "ends_on": "2026-09-19",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-08",
+      "title": "Replace, Don’t Just Remove",
+      "description": "Build a life-giving routine where an old habit used to live.",
+      "scripture_reference": "Romans 12:2",
+      "steps": [
+        "Choose one high-risk time of day.",
+        "Plan a specific healthy replacement.",
+        "Repeat it at the same time for seven days."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-09-20",
+      "ends_on": "2026-09-26",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-09",
+      "title": "One Day of Clean Inputs",
+      "description": "Protect your attention from media or environments that intensify harmful urges.",
+      "scripture_reference": "Philippians 4:8",
+      "steps": [
+        "Identify triggering input.",
+        "Mute, unfollow, or avoid it for one day.",
+        "Fill the space with something peaceful and true."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-09-27",
+      "ends_on": "2026-10-03",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-10",
+      "title": "Bonus: Five Honest Minutes",
+      "description": "Use a short daily journal check-in to catch pressure before it grows.",
+      "scripture_reference": "Psalm 139:23",
+      "steps": [
+        "Name the strongest feeling.",
+        "Name the strongest urge.",
+        "Write the safest next action."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-09-30",
+      "ends_on": "2026-10-06",
+      "schedule_type": "bonus",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-11",
+      "title": "Move Through the Urge",
+      "description": "Use gentle movement to lower stress and interrupt automatic behavior.",
+      "scripture_reference": "Isaiah 40:31",
+      "steps": [
+        "Choose a safe ten-minute movement.",
+        "Begin when pressure rises, not after it peaks.",
+        "Notice how the urge changes before and after."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-10-04",
+      "ends_on": "2026-10-10",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-12",
+      "title": "Repair One Small Thing",
+      "description": "Strengthen recovery by taking one manageable step toward restored trust.",
+      "scripture_reference": "Romans 12:18",
+      "steps": [
+        "Choose a repair that is safe and appropriate.",
+        "Own your part without demanding a response.",
+        "Let consistent action support your words."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-10-11",
+      "ends_on": "2026-10-17",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-13",
+      "title": "Protect Your Evening",
+      "description": "Create a calmer final hour that supports sleep and lowers late-day vulnerability.",
+      "scripture_reference": "Psalm 4:8",
+      "steps": [
+        "Set a stopping time for stimulating media.",
+        "Prepare tomorrow’s first healthy choice.",
+        "End with a brief prayer or breathing practice."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-10-18",
+      "ends_on": "2026-10-24",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-14",
+      "title": "Bonus: Gratitude Without Denial",
+      "description": "Notice what is good while remaining honest about what is hard.",
+      "scripture_reference": "1 Thessalonians 5:18",
+      "steps": [
+        "Name one difficult truth.",
+        "Name three sources of help or goodness.",
+        "Thank someone who supported your recovery."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-10-21",
+      "ends_on": "2026-10-27",
+      "schedule_type": "bonus",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-15",
+      "title": "Ask Before the Crisis",
+      "description": "Reach for support while the pressure is still manageable.",
+      "scripture_reference": "Psalm 50:15",
+      "steps": [
+        "Rate pressure from one to ten each afternoon.",
+        "Contact support at five instead of waiting for nine.",
+        "Write down what made early help useful."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-10-25",
+      "ends_on": "2026-10-31",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-16",
+      "title": "Practice a Clean No",
+      "description": "Use a clear boundary to protect recovery without overexplaining.",
+      "scripture_reference": "Galatians 5:1",
+      "steps": [
+        "Identify one risky invitation or request.",
+        "Prepare a short respectful no.",
+        "Offer a safe alternative only if you want to."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-11-01",
+      "ends_on": "2026-11-07",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-17",
+      "title": "Serve Without Escaping",
+      "description": "Choose one act of service that connects you to purpose while honoring your limits.",
+      "scripture_reference": "Galatians 5:13",
+      "steps": [
+        "Choose a small useful act.",
+        "Keep the commitment realistic.",
+        "Reflect on the difference between service and avoidance."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-11-08",
+      "ends_on": "2026-11-14",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-18",
+      "title": "Bonus: Reset After a Slip",
+      "description": "Respond to a setback quickly with truth, support, and a renewed plan.",
+      "scripture_reference": "Lamentations 3:23",
+      "steps": [
+        "Interrupt shame and tell the truth.",
+        "Contact support and reduce immediate risk.",
+        "Write one lesson and restart today."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-11-11",
+      "ends_on": "2026-11-17",
+      "schedule_type": "bonus",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-19",
+      "title": "Celebrate Real Progress",
+      "description": "Recognize growth without waiting for perfection.",
+      "scripture_reference": "Philippians 1:6",
+      "steps": [
+        "List three changes you have practiced.",
+        "Thank someone who helped.",
+        "Choose the next milestone worth pursuing."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-11-15",
+      "ends_on": "2026-11-21",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "challenge-20",
+      "title": "Carry Hope Forward",
+      "description": "Build a simple plan for continuing recovery beyond this campaign.",
+      "scripture_reference": "Romans 15:13",
+      "steps": [
+        "Keep the three tools that helped most.",
+        "Schedule your next support connection.",
+        "Write a promise to your future self."
+      ],
+      "target_count": 7,
+      "starts_on": "2026-11-22",
+      "ends_on": "2026-11-23",
+      "schedule_type": "weekly",
+      "generated_batch": "recovery-2026-08-16"
+    }
+  ]
+}

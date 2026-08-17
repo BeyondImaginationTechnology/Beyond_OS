@@ -15,9 +15,7 @@ $studioGroups = [
         ['/server/admin/daily-studio/space-generator.php', 'Horoscope generator', '🪐'],
     ],
     'Beyond Tattoo' => [
-        ['/server/admin/daily-studio/stencil-packs.php', 'Stencil packs', '🎨'],
         ['/server/admin/daily-studio/stencil-library.php', 'Generate & publish', '📤'],
-        ['/server/admin/daily-studio/daily-stencil-video.php', 'MP4 pushing tool', '🎬'],
     ],
     'Shared tools' => [
         ['/server/admin/daily-studio/voice-settings.php', 'Voice settings', '🎙️'],

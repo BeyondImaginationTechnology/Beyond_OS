@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../includes/ecosystem.php';
 require_once __DIR__ . '/../includes/verse-of-day.php';
-require_once __DIR__ . '/../../includes/ios-content-override.php';
 
 header('Content-Type: application/json; charset=utf-8');
-header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Cache-Control: public, max-age=300, stale-while-revalidate=3600');
 
 $locale = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($_GET['locale'] ?? 'en')) ?: 'en';
 $fallbackVerse = [
@@ -25,13 +24,23 @@ $fallbackDevotional = [
 ];
 
 $verse = $fallbackVerse;
-$devotional = $fallbackDevotional;
+$bundledDevotional = dailybreath_recovery_devotional_for_date(date('Y-m-d'), false)
+    ?: dailybreath_recovery_devotional_for_date(date('Y-m-d'));
+$devotional = $bundledDevotional ? [
+    'title' => (string)$bundledDevotional['title'],
+    'excerpt' => (string)$bundledDevotional['excerpt'],
+    'body' => (string)$bundledDevotional['body'],
+    'scripture' => (string)$bundledDevotional['scripture_reference'],
+    'minutes' => (int)$bundledDevotional['duration_minutes'],
+    'prayer' => (string)$bundledDevotional['prayer'],
+    'practice' => (string)$bundledDevotional['practice'],
+] : $fallbackDevotional;
 
 try {
     $pdo = beyond_db();
     $verse = dailybreath_verse_of_day($pdo, $locale);
 
-    try {
+    if (dailybreath_recovery_devotional_for_date(date('Y-m-d'), false) === null) try {
         $query = $pdo->prepare('SELECT title,excerpt,body,scripture_reference,duration_minutes,prayer,practice FROM devotionals WHERE is_published=1 AND locale=? AND publish_date<=? ORDER BY publish_date DESC,id DESC LIMIT 1');
         $query->execute([$locale, date('Y-m-d')]);
         $row = $query->fetch(PDO::FETCH_ASSOC);
@@ -53,11 +62,6 @@ try {
     $verse = $fallbackVerse;
     $devotional = $fallbackDevotional;
 }
-$manualPush = beyond_ios_override_read('daily-breath');
-if (is_array($manualPush['content'] ?? null)) {
-    $verse = $manualPush['content'];
-    $verse['source'] = 'manual_ios_push';
-}
 
 echo json_encode([
     'ok' => true,
@@ -67,6 +71,9 @@ echo json_encode([
         'text' => (string)($verse['text'] ?? $fallbackVerse['text']),
         'reference' => (string)($verse['reference'] ?? $fallbackVerse['reference']),
         'reflection' => 'Begin slowly. Make room for quiet, notice your breath, and let the next faithful step be enough for today.',
+        'audio_url' => !empty($verse['audio_file'])
+            ? 'https://beyondimagination.co.technology/dailybreath/assets/audio/verses/' . rawurlencode(basename((string)$verse['audio_file']))
+            : null,
     ],
     'devotional' => [
         'id' => 1,

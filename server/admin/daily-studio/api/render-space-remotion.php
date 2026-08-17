@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 require dirname(__DIR__) . '/bootstrap.php';
 require_once dirname(__DIR__, 4) . '/config/bootstrap.php';
-require_once dirname(__DIR__, 4) . '/includes/narration/StudioNarration.php';
 
 function spaceRemotionError(int $status, string $message): never {
     http_response_code($status);
@@ -74,38 +73,11 @@ $paragraphs = array_values(array_filter(array_map(
 if ($sign === '' || count($paragraphs) < 1) spaceRemotionError(422, 'Choose a sign with horoscope copy before exporting MP4.');
 
 $backgroundPath = spaceLocalImage((string)($input['background_url'] ?? ''), $root);
-$includeNarration = !array_key_exists('includeNarration', $input) || (bool)$input['includeNarration'];
-$audioOnly = !empty($input['audio_only']);
-$provider = spaceClean((string)($input['provider'] ?? ''), 20);
-$voice = spaceClean((string)($input['voice'] ?? ''), 120);
-$script = sprintf(
-    'Beyond Space daily astrology for %s. %s Mood: %s.',
-    $sign,
-    implode(' ', $paragraphs),
-    $mood
-);
-
-if ($audioOnly) {
-    if (!$includeNarration) spaceRemotionError(422, 'Narration was not requested.');
-    try {
-        $narration = studio_narration_generate($script, 'en-US', $provider, $voice);
-        $audio = (string)($narration['audio_content'] ?? '');
-        if (strlen($audio) < 128) throw new RuntimeException('The narration service returned empty audio.');
-        header('Content-Type: audio/mpeg');
-        header('Content-Length: ' . strlen($audio));
-        header('Cache-Control: private, no-store');
-        echo $audio;
-        exit;
-    } catch (Throwable $error) {
-        error_log('Beyond Space narration export: ' . $error->getMessage());
-        spaceRemotionError(503, $error->getMessage());
-    }
-}
+if (!empty($input['audio_only'])) spaceRemotionError(410, 'Beyond Space narration has been removed.');
 
 $job = bin2hex(random_bytes(10));
 $ext = strtolower(pathinfo($backgroundPath, PATHINFO_EXTENSION)) ?: 'jpg';
 $runtimeImage = $runtimeDirectory . '/' . $job . '.' . $ext;
-$runtimeAudio = $runtimeDirectory . '/' . $job . '.mp3';
 $propsFile = sys_get_temp_dir() . '/beyond-space-' . $job . '.json';
 $outputFile = sys_get_temp_dir() . '/beyond-space-' . $job . '.mp4';
 $logFile = sys_get_temp_dir() . '/beyond-space-' . $job . '.log';
@@ -124,14 +96,6 @@ try {
         'backgroundImage'=>'runtime/' . basename($runtimeImage),
         'audioFile'=>'',
     ];
-    if ($includeNarration) {
-        $narration = studio_narration_generate($script, 'en-US', $provider, $voice);
-        $audio = (string)($narration['audio_content'] ?? '');
-        if (strlen($audio) < 128 || file_put_contents($runtimeAudio, $audio, LOCK_EX) === false) {
-            throw new RuntimeException('The narration MP3 could not be prepared.');
-        }
-        $props['audioFile'] = 'runtime/' . basename($runtimeAudio);
-    }
     $encoded = json_encode($props, JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);
     if (!is_string($encoded) || file_put_contents($propsFile, $encoded . PHP_EOL, LOCK_EX) === false) {
         throw new RuntimeException('The Remotion horoscope configuration could not be written.');
@@ -161,7 +125,7 @@ try {
     if ($exitCode !== 0 || !is_file($outputFile) || filesize($outputFile) < 1024) {
         $details = is_file($logFile) ? trim((string)file_get_contents($logFile)) : '';
         error_log('Beyond Space Remotion render failed: '.$details);
-        throw new RuntimeException('The narrated Beyond Space MP4 could not be rendered.');
+        throw new RuntimeException('The Beyond Space MP4 could not be rendered.');
     }
     $safeSign = strtolower(trim((string)preg_replace('/[^a-z0-9]+/i','-', $sign), '-')) ?: 'horoscope';
     header('Content-Type: video/mp4');
@@ -174,5 +138,5 @@ try {
     error_log('Beyond Space Remotion export: '.$error->getMessage());
     spaceRemotionError(503, $error->getMessage());
 } finally {
-    foreach ([$runtimeImage,$runtimeAudio,$propsFile,$outputFile,$logFile] as $file) if (is_file($file)) @unlink($file);
+    foreach ([$runtimeImage,$propsFile,$outputFile,$logFile] as $file) if (is_file($file)) @unlink($file);
 }

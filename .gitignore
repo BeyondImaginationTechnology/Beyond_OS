@@ -24,3 +24,6 @@ Thumbs.db
 *.zip
 /build/
 /dist/
+/.pnpm-store/
+/tmp/
+/output/

@@ -14,7 +14,7 @@ struct LearningProgressView: View {
                     MetricTile(title: "Age Paths", value: "\(store.academy.ageGroups.count)", systemImage: "person.3.fill", color: .green)
                     MetricTile(title: "Practice", value: "\(store.correctPracticeCount)", systemImage: "bolt.fill", color: .orange)
                     MetricTile(title: "Dictionary", value: "\(store.dictionary.count)", systemImage: "character.book.closed.fill", color: .teal)
-                    MetricTile(title: "Access", value: store.hasBeyondID ? "Full" : "Free", systemImage: "person.crop.circle.badge.checkmark", color: store.appTheme.accent)
+                    MetricTile(title: "Academy", value: store.hasFullAcademyAccess ? "Full" : "Greetings", systemImage: "lock.shield.fill", color: store.appTheme.accent)
                 }
 
                 VStack(alignment: .leading, spacing: 12) {

@@ -302,6 +302,8 @@ try {
         $source = $root . '/beyond-french/data/lessons.json';
         $items = json_decode((string)file_get_contents($source), true);
         if (!is_array($items)) throw new RuntimeException('French lesson bank is invalid.');
+        $items = array_values(array_filter($items, static fn($item): bool => trim((string)($item['date'] ?? '')) === ''));
+        if (!$items) throw new RuntimeException('No unscheduled French draft ideas remain. Add an undated lesson before generating another draft.');
         $history = readHistory($historyFile);
         [$item,$history,$cycled,$remaining] = chooseUnused($items,$history,fn($i)=>$i['id'] ?? sha1(json_encode($i)));
         writeHistory($historyFile,$history);

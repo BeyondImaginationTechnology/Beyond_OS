@@ -255,7 +255,7 @@ private struct AcademyLessonView: View {
                 Text(lesson.teaching)
                     .font(.body)
                 Button {
-                    store.speakText("\(lesson.title). \(lesson.scripture). \(lesson.teaching) Practice. \(lesson.practice)")
+                    store.speakAcademyLesson(lesson)
                 } label: {
                     Label("Listen to Lesson", systemImage: "speaker.wave.2.fill")
                 }

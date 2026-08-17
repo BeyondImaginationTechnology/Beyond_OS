@@ -7,9 +7,9 @@ struct AcademyView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 BrandHeader()
-                Text("Quest Map")
+                Text("Realm Map")
                     .font(.largeTitle.weight(.black))
-                Text("Clear each region to unlock the next route.")
+                Text("Follow the glowing trail. Clear every mission to open the next realm.")
                     .foregroundStyle(.secondary)
 
                 ForEach(store.regions) { region in
@@ -19,13 +19,14 @@ struct AcademyView: View {
             .padding()
         }
         .background(store.theme.background)
-        .navigationTitle("Map")
+        .navigationTitle("Realm Map")
         .navigationBarTitleDisplayMode(.inline)
     }
 }
 
 private struct RegionCard: View {
     @EnvironmentObject private var store: QuestStore
+    @Environment(\.dismiss) private var dismiss
     let region: QuestRegion
 
     private var unlocked: Bool { store.isRegionUnlocked(region) }
@@ -41,13 +42,21 @@ private struct RegionCard: View {
                         .frame(width: 48, height: 48)
                         .background(region.color.opacity(0.16), in: RoundedRectangle(cornerRadius: 14))
                     VStack(alignment: .leading, spacing: 3) {
+                        Text(unlocked ? "REALM UNLOCKED" : "SEALED REALM")
+                            .font(.caption2.weight(.black))
+                            .foregroundStyle(unlocked ? region.color : .secondary)
                         Text(region.title).font(.title3.weight(.black))
                         Text(region.subtitle).font(.subheadline).foregroundStyle(.secondary)
                     }
                     Spacer()
-                    Text("\(completed)/\(region.lessonCount)")
-                        .font(.headline.weight(.black))
-                        .foregroundStyle(unlocked ? region.color : .secondary)
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("\(completed)/\(region.lessonCount)")
+                            .font(.headline.weight(.black))
+                        Text("+\(region.reward) XP")
+                            .font(.caption2.weight(.black))
+                            .foregroundStyle(.yellow)
+                    }
+                    .foregroundStyle(unlocked ? region.color : .secondary)
                 }
 
                 SwiftUI.ProgressView(value: Double(completed), total: Double(max(region.lessonCount, 1)))
@@ -67,6 +76,20 @@ private struct RegionCard: View {
                         }
                         .opacity(store.isChallengeUnlocked(challenge, in: region) ? 1 : 0.45)
                     }
+                }
+
+                if unlocked && completed < region.lessonCount {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Label("Enter Realm", systemImage: "figure.run")
+                            .font(.headline.weight(.black))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 13)
+                            .background(region.color, in: RoundedRectangle(cornerRadius: 14))
+                            .foregroundStyle(.black)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
             .opacity(unlocked ? 1 : 0.55)

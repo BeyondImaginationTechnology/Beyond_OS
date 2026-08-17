@@ -4,12 +4,23 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const dictionaryPath = path.join(root, "BeyondFrenchApple", "Resources", "dictionary.json");
-const outputRoot = path.join(root, "BeyondFrenchApple", "Resources", "Audio", "dictionary");
+const targets = [
+  {
+    name: "BeyondFrench",
+    dictionaryPath: path.join(root, "BeyondFrenchApple", "Resources", "dictionary.json"),
+    dictionaryOutputRoot: path.join(root, "BeyondFrenchApple", "Resources", "Audio", "dictionary"),
+  },
+  {
+    name: "FrenchQuest",
+    dictionaryPath: path.join(root, "FrenchQuestApple", "Resources", "dictionary.json"),
+    dictionaryOutputRoot: path.join(root, "FrenchQuestApple", "Resources", "Audio", "dictionary"),
+    questOutputRoot: path.join(root, "FrenchQuestApple", "Resources", "Audio", "quest", "fr-FR"),
+  },
+];
 
 const key = process.env.AZURE_SPEECH_KEY;
 const region = process.env.AZURE_SPEECH_REGION || "canadacentral";
-const voice = process.env.AZURE_SPEECH_VOICE || "en-US-JennyMultilingualNeural";
+const defaultVoice = process.env.AZURE_SPEECH_VOICE || "en-US-JennyMultilingualNeural";
 const outputFormat = process.env.AZURE_SPEECH_OUTPUT_FORMAT || "audio-24khz-48kbitrate-mono-mp3";
 
 const languages = [
@@ -23,8 +34,6 @@ if (!key) {
   console.error("AZURE_SPEECH_KEY is required.");
   process.exit(1);
 }
-
-const dictionary = JSON.parse(await readFile(dictionaryPath, "utf8"));
 
 function slugify(value) {
   return value
@@ -53,7 +62,13 @@ async function existsWithAudio(filePath) {
   }
 }
 
+function voiceForLocale(locale) {
+  const normalized = locale.replace("-", "_");
+  return process.env[`AZURE_SPEECH_VOICE_${normalized}`] || defaultVoice;
+}
+
 async function synthesize(text, locale) {
+  const voice = voiceForLocale(locale);
   const voiceLanguage = voice.match(/^([a-z]{2,3}-[A-Z]{2})-/)?.[1] || locale;
   const ssml = [
     `<speak version="1.0" xml:lang="${voiceLanguage}">`,
@@ -90,22 +105,62 @@ async function synthesize(text, locale) {
 let generated = 0;
 let skipped = 0;
 
-for (const entry of dictionary) {
-  const baseName = slugify(entry.english);
-  for (const [locale, field] of languages) {
-    const text = String(entry[field] || "").trim();
-    if (!text) continue;
-    const directory = path.join(outputRoot, locale);
-    const filePath = path.join(directory, `${baseName}.mp3`);
-    await mkdir(directory, { recursive: true });
-    if (await existsWithAudio(filePath)) {
-      skipped += 1;
-      continue;
+async function synthesizeIfMissing(filePath, text, locale) {
+  await mkdir(path.dirname(filePath), { recursive: true });
+  if (await existsWithAudio(filePath)) {
+    skipped += 1;
+    return;
+  }
+  const audio = await synthesize(text, locale);
+  await writeFile(filePath, audio);
+  generated += 1;
+  console.log(`generated ${path.relative(root, filePath)}`);
+}
+
+for (const target of targets) {
+  const dictionary = JSON.parse(await readFile(target.dictionaryPath, "utf8"));
+  for (const entry of dictionary) {
+    const baseName = slugify(entry.english);
+    for (const [locale, field] of languages) {
+      const text = String(entry[field] || "").trim();
+      if (!text) continue;
+      await synthesizeIfMissing(
+        path.join(target.dictionaryOutputRoot, locale, `${baseName}.mp3`),
+        text,
+        locale
+      );
     }
-    const audio = await synthesize(text, locale);
-    await writeFile(filePath, audio);
-    generated += 1;
-    console.log(`generated ${locale}/${baseName}.mp3`);
+  }
+
+  if (target.questOutputRoot) {
+    const academy = JSON.parse(await readFile(path.join(root, "FrenchQuestApple", "Resources", "academy.json"), "utf8"));
+    const phrases = new Map();
+    for (const module of academy.modules || []) {
+      for (const lesson of module.lessons || []) {
+        const text = String(lesson.french || "").trim();
+        if (text) phrases.set(slugify(text), text);
+      }
+    }
+    for (const text of [
+      "Bonjour !",
+      "Merci.",
+      "S'il vous plait.",
+      "De l'eau, s'il vous plait.",
+      "J'ai faim.",
+      "L'addition, s'il vous plait.",
+      "Ou est la gare ?",
+      "Un billet.",
+      "A gauche.",
+    ]) {
+      phrases.set(slugify(text), text);
+    }
+    for (const [baseName, text] of phrases) {
+      await synthesizeIfMissing(
+        path.join(target.questOutputRoot, `${baseName}.mp3`),
+        text,
+        "fr-FR"
+      );
+    }
   }
 }
 

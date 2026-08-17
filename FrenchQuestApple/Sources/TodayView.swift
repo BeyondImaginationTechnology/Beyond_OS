@@ -20,7 +20,11 @@ struct TodayView: View {
 
                 QuestCard {
                     VStack(alignment: .leading, spacing: 14) {
-                        Text("ACTIVE QUEST")
+                        HStack {
+                            Text("ACTIVE QUEST")
+                            Spacer()
+                            Label("REALM 1", systemImage: "crown.fill")
+                        }
                             .font(.caption.weight(.black))
                             .foregroundStyle(store.theme.accent)
                         Text(nextChallenge?.region.title ?? "All quests cleared")
@@ -32,6 +36,8 @@ struct TodayView: View {
                     }
                 }
 
+                AdventurePortalGrid()
+
                 if let nextChallenge {
                     ChallengePlayer(region: nextChallenge.region, challenge: nextChallenge.challenge)
                 } else {
@@ -40,7 +46,7 @@ struct TodayView: View {
                             Label("Quest complete", systemImage: "checkmark.seal.fill")
                                 .font(.title3.weight(.black))
                                 .foregroundStyle(.green)
-                            Text("You cleared every launch realm in French Quest 1.1.0.")
+                            Text("You cleared every launch realm in French Quest 1.1.1.")
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -49,8 +55,7 @@ struct TodayView: View {
             .padding()
         }
         .background(store.theme.background)
-        .navigationTitle("Quest")
-        .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBar)
     }
 }
 
@@ -79,8 +84,17 @@ struct ChallengePlayer: View {
                     .accessibilityLabel("Listen")
                 }
 
-                Text(challenge.prompt)
-                    .font(.title2.weight(.black))
+                HStack(alignment: .top) {
+                    Text(challenge.prompt)
+                        .font(.title2.weight(.black))
+                    Spacer()
+                    Text("+\(region.reward / max(region.lessonCount, 1)) XP")
+                        .font(.caption.weight(.black))
+                        .foregroundStyle(.yellow)
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 6)
+                        .background(Color.yellow.opacity(0.14), in: Capsule())
+                }
 
                 VStack(alignment: .leading, spacing: 5) {
                     Text(challenge.phrase)
@@ -92,7 +106,7 @@ struct ChallengePlayer: View {
                 }
 
                 VStack(spacing: 10) {
-                    ForEach(challenge.options, id: \.self) { option in
+                    ForEach(Array(challenge.options.enumerated()), id: \.element) { index, option in
                         Button {
                             selected = option
                             withAnimation(.snappy(duration: 0.22)) {
@@ -100,6 +114,10 @@ struct ChallengePlayer: View {
                             }
                         } label: {
                             HStack {
+                                Text(["A", "B", "C", "D"][min(index, 3)])
+                                    .font(.caption.weight(.black))
+                                    .frame(width: 30, height: 30)
+                                    .background(region.color.opacity(0.18), in: Circle())
                                 Text(option).font(.headline)
                                 Spacer()
                                 if selected == option {

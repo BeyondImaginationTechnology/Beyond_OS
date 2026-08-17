@@ -19,7 +19,7 @@ struct TodayView: View {
                     Text(store.lesson.french).font(.system(size: 34, weight: .bold, design: .rounded)).foregroundStyle(store.appTheme.accent)
                     Text(store.lesson.frenchPronunciation).font(.headline).foregroundStyle(.secondary)
                     HStack {
-                        Button { store.speak(store.lesson.french) } label: {
+                        Button { store.speakLesson(store.lesson) } label: {
                             Label("Listen", systemImage: "speaker.wave.2.fill").frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.borderedProminent)
@@ -39,7 +39,7 @@ struct TodayView: View {
 
                 LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 12) {
                     LanguageTile(flag: "FR", name: "Francais", value: store.lesson.french, color: store.appTheme.accent) {
-                        store.speak(store.lesson.french, language: "fr-FR")
+                        store.speakLesson(store.lesson)
                     }
                     LanguageTile(flag: "HT", name: "Kreyòl", value: store.lesson.kreyol, color: .red) {
                         store.speak(store.lesson.kreyol, language: "ht-HT")

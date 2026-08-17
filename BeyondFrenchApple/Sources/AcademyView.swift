@@ -21,7 +21,7 @@ struct AcademyView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 14) {
-                    AccessPill(text: store.hasBeyondID ? "FULL ACADEMY" : "GREETINGS PREVIEW")
+                    AccessPill(text: store.hasFullAcademyAccess ? "FULL ACADEMY" : "GREETINGS FREE")
                     Text("Choose a path and start speaking.")
                         .font(.largeTitle.weight(.black))
                     Text(selectedGroup.guidance)

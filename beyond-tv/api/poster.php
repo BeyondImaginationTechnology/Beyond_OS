@@ -31,6 +31,9 @@ if (!$poster) {
 $host = strtolower((string)parse_url((string)$poster, PHP_URL_HOST));
 $path = (string)parse_url((string)$poster, PHP_URL_PATH);
 $allowedHosts = [
+    'image.tmdb.org',
+    'm.media-amazon.com',
+    'ia.media-imdb.com',
     'api.ratingposterdb.com',
     'archive.org',
     'i.ytimg.com',

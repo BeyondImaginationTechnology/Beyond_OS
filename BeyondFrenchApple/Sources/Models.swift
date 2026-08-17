@@ -37,11 +37,21 @@ struct FrenchLesson: Codable, Identifiable, Hashable {
     let cultureNote: String
     let challenge: String
     let answer: String
+    let audioUrl: String?
+
+    var audioResourceName: String {
+        english
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+            .lowercased()
+            .replacingOccurrences(of: "[^a-z0-9]+", with: "-", options: .regularExpression)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+    }
 
     enum CodingKeys: String, CodingKey {
         case id, date, english, french, patois, kreyol, spanish, meaning, challenge, answer
         case frenchPronunciation = "french_pronunciation"
         case cultureNote = "culture_note"
+        case audioUrl = "audio_url"
     }
 
     static let fallback = FrenchLesson(
@@ -50,7 +60,8 @@ struct FrenchLesson: Codable, Identifiable, Hashable {
         kreyol: "Kontinye.", spanish: "Sigue adelante.",
         meaning: "A way to encourage someone to continue.",
         cultureNote: "A little encouragement can go a long way.",
-        challenge: "How would you say “Keep going.” in French?", answer: "Continue."
+        challenge: "How would you say “Keep going.” in French?", answer: "Continue.",
+        audioUrl: nil
     )
 }
 

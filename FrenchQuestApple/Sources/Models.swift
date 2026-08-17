@@ -28,11 +28,64 @@ struct QuestChallenge: Identifiable, Hashable {
     let answer: String
     let options: [String]
     let tip: String
+
+    var audioResourceName: String {
+        phrase.audioResourceName
+    }
+}
+
+extension String {
+    var audioResourceName: String {
+        folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+            .lowercased()
+            .replacingOccurrences(of: "[^a-z0-9]+", with: "-", options: .regularExpression)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+    }
 }
 
 struct QuestResult: Equatable {
     let correct: Bool
     let message: String
+}
+
+struct DictionaryWord: Codable, Identifiable, Hashable {
+    var id: String { english + french }
+    let english: String
+    let french: String
+    let pronunciation: String
+    let spanish: String
+    let kreyol: String
+    let patois: String
+    let type: String
+
+    var audioResourceName: String {
+        english.audioResourceName
+    }
+
+    func text(for language: DictionaryAudioLanguage) -> String {
+        switch language {
+        case .french: french
+        case .spanish: spanish
+        case .kreyol: kreyol
+        case .patois: patois
+        }
+    }
+}
+
+enum DictionaryAudioLanguage {
+    case french
+    case spanish
+    case kreyol
+    case patois
+
+    var locale: String {
+        switch self {
+        case .french: "fr-FR"
+        case .spanish: "es-ES"
+        case .kreyol: "ht-HT"
+        case .patois: "en-JM"
+        }
+    }
 }
 
 enum QuestTheme: String, CaseIterable, Identifiable, Codable {

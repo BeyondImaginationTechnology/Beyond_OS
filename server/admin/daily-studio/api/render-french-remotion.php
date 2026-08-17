@@ -62,6 +62,10 @@ $publishDate = trim((string)($input['publish_date'] ?? date('Y-m-d')));
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $publishDate)) {
     $publishDate = date('Y-m-d');
 }
+$prerecordedAudioUrl = trim((string)($input['prerecorded_audio_url'] ?? ''));
+if ($prerecordedAudioUrl !== '' && !preg_match('#^/beyond-french/assets/audio/french/[A-Za-z0-9._-]+\.mp3$#', $prerecordedAudioUrl)) {
+    remotion_error(422, 'The prerecorded audio path is invalid.');
+}
 
 $root = dirname(__DIR__, 4);
 $project = $root . '/tools/hello-world-app-preview';
@@ -94,16 +98,27 @@ $logFile = sys_get_temp_dir() . '/beyond-french-' . $token . '.log';
 
 try {
     if ($includeNarration) {
-        $script = sprintf(
-            "Today's phrase: %s French: %s Haitian Creole: %s Spanish: %s Jamaican Patois: %s Go beyond French.",
-            $props['english'],
-            $props['french'],
-            $props['kreyol'],
-            $props['spanish'],
-            $props['patois']
-        );
-        $narration = studio_narration_generate($script, 'en-US', $narrationProvider, $narrationVoice);
-        $audio = (string)($narration['audio_content'] ?? '');
+        $audio = '';
+        if ($prerecordedAudioUrl !== '') {
+            $sourceAudio = $root . str_replace('/', DIRECTORY_SEPARATOR, $prerecordedAudioUrl);
+            $resolvedAudio = realpath($sourceAudio);
+            $allowedAudioRoot = realpath($root . '/beyond-french/assets/audio/french');
+            if ($resolvedAudio === false || $allowedAudioRoot === false || !str_starts_with($resolvedAudio, $allowedAudioRoot . DIRECTORY_SEPARATOR)) {
+                remotion_error(404, 'The scheduled prerecorded audio is unavailable.');
+            }
+            $audio = (string)file_get_contents($resolvedAudio);
+        } else {
+            $script = sprintf(
+                "Today's phrase: %s French: %s Haitian Creole: %s Spanish: %s Jamaican Patois: %s Go beyond French.",
+                $props['english'],
+                $props['french'],
+                $props['kreyol'],
+                $props['spanish'],
+                $props['patois']
+            );
+            $narration = studio_narration_generate($script, 'en-US', $narrationProvider, $narrationVoice);
+            $audio = (string)($narration['audio_content'] ?? '');
+        }
         if (strlen($audio) < 128 || file_put_contents($audioFile, $audio, LOCK_EX) === false) {
             throw new RuntimeException('The narration MP3 could not be prepared.');
         }

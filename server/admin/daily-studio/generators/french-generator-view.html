@@ -8,7 +8,7 @@
   <style>
     :root{color-scheme:light;--navy:#15325c;--panel:#fff;--blue:#1558ce;--gold:#d89a00;--line:rgba(28,65,116,.16);--muted:#65758d}
     *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% 0,#f8fbff 0,#edf4fc 50%,#e7eef8 100%);color:#17243a;font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}
-    .shell{min-height:100vh;display:grid;grid-template-columns:minmax(330px,450px) minmax(0,1fr)}.controls{padding:26px;overflow:auto;background:rgba(255,255,255,.97);border-right:1px solid var(--line);box-shadow:8px 0 30px rgba(28,65,116,.06)}.preview{display:grid;place-items:center;padding:28px;min-width:0}.back{display:inline-block;margin-bottom:15px;color:#315d98;text-decoration:none}h1{margin:0;font-size:28px}.lede,.hint{color:var(--muted)}.lede{margin:5px 0 23px}.group{padding:18px 0;border-top:1px solid var(--line)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field{margin-bottom:13px}label{display:block;font-weight:750;margin-bottom:6px}input[type=text],input[type=date],input[type=file],textarea,select{width:100%;padding:10px 11px;border-radius:10px;border:1px solid var(--line);background:#fff;color:#17243a;outline:none}textarea{min-height:85px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:#3880ef;box-shadow:0 0 0 3px rgba(56,128,239,.15)}.check{display:flex;align-items:center;gap:8px;margin:0}.check input{width:17px;height:17px;accent-color:#e0a20b}.audio-row,.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{border:0;border-radius:11px;padding:12px 13px;font-weight:800;cursor:pointer;background:#edf2f9;color:#17345d}.btn.primary{background:linear-gradient(135deg,#ffd65a,#ffae2e);color:#142744}.btn.secondary{color:#173d70;background:#e7f0fc;border:1px solid var(--line)}.btn.voice-primary{background:linear-gradient(135deg,#1558ce,#7047eb);color:#fff;box-shadow:0 10px 24px rgba(21,88,206,.22)}.btn.wide{grid-column:1/-1}.btn:disabled{opacity:.55;cursor:wait}.voice-integration{margin:0 0 14px;padding:13px 14px;border:1px solid #cbdcf5;border-radius:13px;background:#f3f7ff}.voice-integration strong,.voice-integration span{display:block}.voice-integration strong{color:#173d70}.voice-integration span{margin-top:3px;color:var(--muted);font-size:12px}.voice-integration a{display:inline-block;margin-top:8px;color:#1558ce;font-size:12px;font-weight:800}.voice-state{float:right;padding:4px 7px;border-radius:999px;font-size:10px;text-transform:uppercase}.voice-state.ready{background:#dcf7e5;color:#24723c}.voice-state.needs-config{background:#fff0d5;color:#865700}.static-note{margin:0 0 12px;padding:10px 12px;border-radius:11px;background:#eef8f1;color:#2a6b3d;font-size:12px;font-weight:700}.status{min-height:23px;margin-top:10px;color:#327247}.status.error{color:#b92828}.canvas-wrap{width:min(72vh,680px);max-width:100%;filter:drop-shadow(0 22px 36px rgba(28,65,116,.2))}canvas{display:block;width:100%;height:auto;border-radius:18px;background:#041733}
+    .shell{min-height:100vh;display:grid;grid-template-columns:minmax(330px,450px) minmax(0,1fr)}.controls{padding:26px;overflow:auto;background:rgba(255,255,255,.97);border-right:1px solid var(--line);box-shadow:8px 0 30px rgba(28,65,116,.06)}.preview{display:grid;place-items:center;padding:28px;min-width:0}.back{display:inline-block;margin-bottom:15px;color:#315d98;text-decoration:none}h1{margin:0;font-size:28px}.lede,.hint{color:var(--muted)}.lede{margin:5px 0 18px}.group{padding:18px 0;border-top:1px solid var(--line)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field{margin-bottom:13px}label{display:block;font-weight:750;margin-bottom:6px}input[type=text],input[type=date],input[type=file],textarea,select{width:100%;padding:10px 11px;border-radius:10px;border:1px solid var(--line);background:#fff;color:#17243a;outline:none}textarea{min-height:85px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:#3880ef;box-shadow:0 0 0 3px rgba(56,128,239,.15)}input[readonly],textarea[readonly]{background:#f1f4f8;color:#53627a;cursor:not-allowed}.check{display:flex;align-items:center;gap:8px;margin:0}.check input{width:17px;height:17px;accent-color:#e0a20b}.audio-row,.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{border:0;border-radius:11px;padding:12px 13px;font-weight:800;cursor:pointer;background:#edf2f9;color:#17345d}.btn.primary{background:linear-gradient(135deg,#ffd65a,#ffae2e);color:#142744}.btn.secondary{color:#173d70;background:#e7f0fc;border:1px solid var(--line)}.btn.voice-primary{background:linear-gradient(135deg,#1558ce,#7047eb);color:#fff;box-shadow:0 10px 24px rgba(21,88,206,.22)}.btn.wide{grid-column:1/-1}.btn:disabled{opacity:.55;cursor:wait}.mode-switch,.schedule-nav{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mode-switch{margin-bottom:12px}.schedule-nav{grid-template-columns:auto 1fr auto auto;margin-bottom:14px}.mode-pill{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px;padding:9px 11px;border-radius:11px;background:#edf4ff;color:#184a91;font-size:12px;font-weight:900}.mode-pill.editing{background:#fff0d5;color:#865700}.mode-pill.draft{background:#eee9ff;color:#5e39a5}.draft-tools{display:grid;gap:8px;margin-bottom:14px}.voice-integration{margin:0 0 14px;padding:13px 14px;border:1px solid #cbdcf5;border-radius:13px;background:#f3f7ff}.voice-integration strong,.voice-integration span{display:block}.voice-integration strong{color:#173d70}.voice-integration span{margin-top:3px;color:var(--muted);font-size:12px}.voice-integration a{display:inline-block;margin-top:8px;color:#1558ce;font-size:12px;font-weight:800}.voice-state{float:right;padding:4px 7px;border-radius:999px;font-size:10px;text-transform:uppercase}.voice-state.ready{background:#dcf7e5;color:#24723c}.voice-state.needs-config{background:#fff0d5;color:#865700}.static-note{margin:0 0 12px;padding:10px 12px;border-radius:11px;background:#eef8f1;color:#2a6b3d;font-size:12px;font-weight:700}.status{min-height:23px;margin-top:10px;color:#327247}.status.error{color:#b92828}.canvas-wrap{width:min(72vh,680px);max-width:100%;filter:drop-shadow(0 22px 36px rgba(28,65,116,.2))}canvas{display:block;width:100%;height:auto;border-radius:18px;background:#041733}[hidden]{display:none!important}
     @media(max-width:940px){.shell{display:block}.controls{border-right:0;border-bottom:1px solid var(--line)}.preview{padding:18px}.canvas-wrap{width:min(100%,580px)}}@media(max-width:520px){.controls{padding:20px}.grid,.actions,.audio-row{grid-template-columns:1fr}.btn.wide{grid-column:auto}}
   </style>
 </head>
@@ -17,24 +17,26 @@
   <aside class="controls">
     <a class="back" href="/server/admin/daily-studio/">&larr; Admin dashboard</a>
     <h1>Français du Jour Generator <small style="font-size:12px;color:#1558ce;vertical-align:middle">2.0.0</small></h1>
-    <p class="lede">Build a logo-branded daily four-language lesson and export it as an image or narrated short.</p>
-    <button id="generateTodayPhrase" class="btn primary wide" type="button" style="width:100%;margin:0 0 18px">✨ Generate Today’s Phrase</button>
+    <p class="lede">Open scheduled lessons for export, or create a separate draft for a new publication date.</p>
+    <div class="mode-switch"><button id="scheduledMode" class="btn primary" type="button">Scheduled</button><button id="createDraft" class="btn secondary" type="button">Create Draft</button></div>
+    <div id="modePill" class="mode-pill"><span>SCHEDULED · READ ONLY</span><button id="editScheduled" class="btn secondary" type="button">Edit scheduled</button></div>
+    <div id="scheduleNav" class="schedule-nav"><button id="previousLesson" class="btn secondary" type="button" aria-label="Previous scheduled lesson">←</button><button id="todayLesson" class="btn secondary" type="button">Today</button><button id="nextLesson" class="btn secondary" type="button" aria-label="Next scheduled lesson">→</button><button id="reloadLesson" class="btn secondary" type="button" aria-label="Reload scheduled lesson">↻</button></div>
+    <div id="draftTools" class="draft-tools" hidden><button id="generateTodayPhrase" class="btn primary wide" type="button">✨ Generate Draft Idea</button><span class="hint">Draft ideas come only from the unscheduled lesson pool.</span></div>
 
     <section class="group">
-      <div class="field"><label for="phrase">Today’s English phrase</label><input id="phrase" type="text" value="Keep going."></div>
-      <div class="field"><label for="meaning">What it means</label><textarea id="meaning">A way to encourage someone to continue doing something.</textarea></div>
-      <div class="grid"><div class="field"><label for="weekday">Weekday</label><input id="weekday" type="text" value=""></div><div class="field"><label for="publishDate">Go-live date</label><input id="publishDate" type="date" value=""></div></div>
-      <div class="hint">Save today to publish immediately. A future lesson is scheduled automatically and becomes current at 12:00 AM Pacific on its go-live date—no second push is needed.</div>
+      <div class="field"><label for="phrase">Today’s English phrase</label><input id="phrase" type="text" placeholder="Loading today’s lesson…"></div>
+      <div class="field"><label for="meaning">What it means</label><textarea id="meaning"></textarea></div>
+      <div class="grid"><div class="field"><label for="weekday">Weekday</label><input id="weekday" type="text"></div><div class="field"><label for="publishDate">Date</label><input id="publishDate" type="date"></div></div>
     </section>
 
     <section class="group">
       <div class="grid">
-        <div><div class="field"><label for="french">🇫🇷 Français</label><input id="french" type="text" value="Continue."></div><div class="field"><label for="frenchPron">Pronunciation</label><input id="frenchPron" type="text" value="Kohn-tee-new"></div></div>
-        <div><div class="field"><label for="patois">🇯🇲 Patois</label><input id="patois" type="text" value="Keep on gwaan."></div><div class="field"><label for="patoisPron">Pronunciation</label><input id="patoisPron" type="text" value="Keep on gwaan"></div></div>
-        <div><div class="field"><label for="kreyol">🇭🇹 Kreyòl</label><input id="kreyol" type="text" value="Kontinye."></div><div class="field"><label for="kreyolPron">Pronunciation</label><input id="kreyolPron" type="text" value="Kohn-teen-yeh"></div></div>
-        <div><div class="field"><label for="spanish">🇪🇸 Español</label><input id="spanish" type="text" value="Sigue adelante."></div><div class="field"><label for="spanishPron">Pronunciation</label><input id="spanishPron" type="text" value="See-gweh ah-deh-lahn-teh"></div></div>
+        <div><div class="field"><label for="french">🇫🇷 Français</label><input id="french" type="text"></div><div class="field"><label for="frenchPron">Pronunciation</label><input id="frenchPron" type="text"></div></div>
+        <div><div class="field"><label for="patois">🇯🇲 Patois</label><input id="patois" type="text"></div><div class="field"><label for="patoisPron">Pronunciation</label><input id="patoisPron" type="text"></div></div>
+        <div><div class="field"><label for="kreyol">🇭🇹 Kreyòl</label><input id="kreyol" type="text"></div><div class="field"><label for="kreyolPron">Pronunciation</label><input id="kreyolPron" type="text"></div></div>
+        <div><div class="field"><label for="spanish">🇪🇸 Español</label><input id="spanish" type="text"></div><div class="field"><label for="spanishPron">Pronunciation</label><input id="spanishPron" type="text"></div></div>
       </div>
-      <div class="field"><label for="culture">Culture note</label><textarea id="culture">In every language, a little encouragement can go a long way.</textarea></div>
+      <div class="field"><label for="culture">Culture note</label><textarea id="culture"></textarea></div>
     </section>
 
     <section class="group">
@@ -56,12 +58,11 @@
     <section class="group">
       <div class="static-note">Static template protected: Web, iOS, PNG, and browser drafts do not call the narration API.</div>
       <div class="actions">
-        <button id="saveDailyPhrase" class="btn primary wide" type="button">Publish / schedule to Web + iOS</button>
-        <button id="pushFrenchIos" class="btn voice-primary wide" type="button">Master push this lesson to iOS now</button>
+        <button id="saveDailyPhrase" class="btn primary wide" type="button" hidden>Publish draft with audio</button>
         <button id="downloadPng" class="btn primary" type="button">Download static PNG</button>
-        <button id="saveLocal" class="btn secondary" type="button">Save browser draft</button>
-        <button id="saveAndExportVideo" class="btn voice-primary wide" type="button">Save + export animated Remotion MP4</button>
-        <button id="exportRemotionVideo" class="btn secondary wide" type="button">Export animated Remotion MP4 only</button>
+        <button id="saveLocal" class="btn secondary" type="button" hidden>Save browser draft</button>
+        <button id="saveAndExportVideo" class="btn voice-primary wide" type="button" hidden>Publish + export Instagram MP4</button>
+        <button id="exportRemotionVideo" class="btn voice-primary wide" type="button">Export Instagram MP4</button>
         <button id="exportVideo" class="btn secondary wide" type="button">Export static canvas MP4 fallback</button>
         <button id="exportAllVideo" class="btn secondary wide" type="button">Export all languages as one narrated MP4</button>
         <button id="exportMp3" class="btn secondary wide" type="button">Export MP3 narration</button>
@@ -79,8 +80,9 @@
   'use strict';
   const $=id=>document.getElementById(id),canvas=$('art'),ctx=canvas.getContext('2d',{alpha:false}),csrf=document.querySelector('meta[name="csrf-token"]').content;
   const ids=['phrase','meaning','weekday','publishDate','french','frenchPron','patois','patoisPron','kreyol','kreyolPron','spanish','spanishPron','culture','narrationProvider','exportLanguage','narratorLocale','includeNarration','showBadge'];
+  const contentIds=['phrase','meaning','weekday','french','frenchPron','patois','patoisPron','kreyol','kreyolPron','spanish','spanishPron','culture'];
   ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-  let activeAudio=null,brandReady=false,narrationPlaying=false,previewAnimation=null;const brandLogo=new Image();brandLogo.decoding='async';brandLogo.src='/beyond-french/assets/images/beyond-french-logo.webp';brandLogo.onload=()=>{brandReady=true;draw()};brandLogo.onerror=()=>setStatus('Beyond French logo could not be loaded. Exports will use a text fallback.',true);const v=id=>$(id).value.trim();const setStatus=(m,e=false)=>{$('status').textContent=m;$('status').classList.toggle('error',e)};
+  let activeAudio=null,brandReady=false,narrationPlaying=false,previewAnimation=null,scheduledAudioUrl='',scheduledFrench='',scheduledDate='',contentMode='scheduled',scheduleNavigation={},nextAvailableDate='';const brandLogo=new Image();brandLogo.decoding='async';brandLogo.src='/beyond-french/assets/images/beyond-french-logo.webp';brandLogo.onload=()=>{brandReady=true;draw()};brandLogo.onerror=()=>setStatus('Beyond French logo could not be loaded. Exports will use a text fallback.',true);const v=id=>$(id).value.trim();const setStatus=(m,e=false)=>{$('status').textContent=m;$('status').classList.toggle('error',e)};
   const languageLocales={en:'en-US',fr:'fr-FR',es:'es-ES',jm:'en-JM',ht:'ht-HT'};
   const localeLanguages=Object.fromEntries(Object.entries(languageLocales).map(([language,locale])=>[locale,language]));
   const languageForLocale=locale=>localeLanguages[locale]||'en';
@@ -162,14 +164,23 @@
     const footer=ctx.createLinearGradient(0,1270,1080,1350);footer.addColorStop(0,'#ffbf00');footer.addColorStop(.5,'#ffd65a');footer.addColorStop(1,'#ffae22');ctx.fillStyle=footer;ctx.fillRect(0,1270,1080,80);ctx.fillStyle='#05152f';ctx.textAlign='center';ctx.font='900 17px Arial';ctx.letterSpacing='1px';ctx.fillText('ONE PHRASE  ·  FOUR LANGUAGES  ·  EVERY DAY',540,1306);ctx.font='800 14px Arial';ctx.letterSpacing='.5px';ctx.fillText('BEYONDIMAGINATION.CO.TECHNOLOGY/BEYOND-FRENCH',540,1332);ctx.letterSpacing='0px'
   }
   function localDateParts(){const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000),iso=local.toISOString().slice(0,10);return{date:iso,weekday:now.toLocaleDateString('en-US',{weekday:'long'}).toUpperCase()}}
-  function setFieldValue(id,value){const field=$(id);if(!field)return false;field.value=value==null?'':String(value);field.dispatchEvent(new Event('input',{bubbles:true}));field.dispatchEvent(new Event('change',{bubbles:true}));return true}
+  function weekdayForDate(date){const parsed=new Date(`${date}T12:00:00`);return Number.isNaN(parsed.getTime())?'':parsed.toLocaleDateString('en-US',{weekday:'long'}).toUpperCase()}
+  function setFieldValue(id,value,notify=true){const field=$(id);if(!field)return false;field.value=value==null?'':String(value);if(notify){field.dispatchEvent(new Event('input',{bubbles:true}));field.dispatchEvent(new Event('change',{bubbles:true}))}return true}
+  function populateLesson(item,date){const mapped={phrase:item.english,meaning:item.meaning||'A practical phrase for everyday conversation.',french:item.french,frenchPron:item.french_pronunciation,patois:item.patois,patoisPron:item.patois_pronunciation||item.patois,kreyol:item.kreyol,kreyolPron:item.kreyol_pronunciation||item.kreyol,spanish:item.spanish,spanishPron:item.spanish_pronunciation||item.spanish,culture:item.culture_note};Object.entries(mapped).forEach(([id,value])=>setFieldValue(id,value,false));setFieldValue('publishDate',date,false);setFieldValue('weekday',weekdayForDate(date),false);draw();updateAudioUi()}
+  function clearContent(date=''){contentIds.forEach(id=>setFieldValue(id,'',false));setFieldValue('publishDate',date,false);setFieldValue('weekday',weekdayForDate(date),false);draw()}
+  function setContentLocked(locked){contentIds.forEach(id=>{$(id).readOnly=locked});$('publishDate').disabled=contentMode==='edit'}
+  function updateModeUi(){const scheduled=contentMode==='scheduled',editing=contentMode==='edit',draft=contentMode==='draft',empty=contentMode==='empty',pill=$('modePill');pill.classList.toggle('editing',editing);pill.classList.toggle('draft',draft);pill.querySelector('span').textContent=scheduled?'SCHEDULED · READ ONLY':editing?'SCHEDULED · EDITING':draft?'NEW DRAFT':`NO LESSON ON ${v('publishDate')}`;$('scheduledMode').className=`btn ${scheduled||empty?'primary':'secondary'}`;$('createDraft').className=`btn ${draft||editing?'primary':'secondary'}`;$('editScheduled').hidden=!scheduled;$('draftTools').hidden=!draft;$('saveDailyPhrase').hidden=scheduled||empty;$('saveDailyPhrase').textContent=editing?'Save scheduled changes + audio':'Publish draft + generate audio';$('saveLocal').hidden=!draft;$('saveAndExportVideo').hidden=scheduled||empty;$('saveAndExportVideo').textContent=editing?'Save changes + export Instagram MP4':'Publish draft + export Instagram MP4';$('exportRemotionVideo').hidden=empty;$('downloadPng').disabled=empty;$('exportMp3').disabled=empty;$('previewAudio').disabled=empty;$('exportVideo').disabled=empty;$('exportAllVideo').disabled=empty;$('previousLesson').disabled=!scheduleNavigation.previous;$('nextLesson').disabled=!scheduleNavigation.next;setContentLocked(scheduled||empty)}
+  function scheduledAudioMatches(){return !!scheduledAudioUrl&&v('narratorLocale')==='fr-FR'&&v('publishDate')===scheduledDate&&v('french')===scheduledFrench}
+  async function loadScheduleDate(date=localDateParts().date){setStatus(`Loading the ${date} schedule…`);try{const response=await fetch(`/server/admin/daily-studio/api/french-schedule.php?date=${encodeURIComponent(date)}`,{cache:'no-store'}),data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'The scheduled lesson is unavailable.');scheduleNavigation=data.navigation||{};nextAvailableDate=scheduleNavigation.next_available||'';if(!data.item){contentMode='empty';scheduledAudioUrl='';scheduledFrench='';scheduledDate='';clearContent(date);updateModeUi();setStatus(`No lesson is scheduled for ${date}. Choose Create Draft to use this date.`);return}const item=data.item;contentMode='scheduled';scheduledAudioUrl=item.audio_url?new URL(item.audio_url,location.origin).href:'';scheduledFrench=item.french||'';scheduledDate=data.date;populateLesson(item,data.date);setFieldValue('exportLanguage','fr',false);setFieldValue('narratorLocale','fr-FR',false);$('includeNarration').checked=!!scheduledAudioUrl;updateAudioUi();updateModeUi();draw();setStatus(scheduledAudioUrl?`${data.date} is ready with prerecorded audio.`:`${data.date} is scheduled. Export narration will use the selected provider.`)}catch(error){setStatus(error.message||'The schedule could not be loaded.',true)}}
+  function restoreDraft(){try{const data=JSON.parse(localStorage.getItem('beyondFrenchGeneratorDraft')||'null');if(!data)return false;ids.forEach(id=>{if(!(id in data))return;if($(id).type==='checkbox')$(id).checked=!!data[id];else setFieldValue(id,data[id],false)});return true}catch{return false}}
+  function enterDraftMode(){contentMode='draft';scheduledAudioUrl='';scheduledFrench='';scheduledDate='';if(!restoreDraft()){clearContent(nextAvailableDate||localDateParts().date);setFieldValue('meaning','A practical phrase for everyday conversation.',false);setFieldValue('culture','Practice this phrase aloud, then use it in a short conversation of your own.',false)}setFieldValue('weekday',weekdayForDate(v('publishDate')),false);updateModeUi();updateAudioUi();draw();setStatus('Draft mode is separate from the schedule. Choose a date, enter content, or generate a draft idea.')}
+  function editScheduledLesson(){if(contentMode!=='scheduled')return;if(!confirm(`Edit the scheduled lesson for ${scheduledDate}? Publishing changes will overwrite that date and regenerate audio if the French text changes.`))return;contentMode='edit';updateModeUi();$('saveDailyPhrase').textContent='Save scheduled changes + audio';setStatus('Scheduled editing is enabled. Review every field before saving.')}
   async function generateTodayPhrase(){
     const button=$('generateTodayPhrase');button.disabled=true;setStatus('Choosing a fresh phrase from the lesson bank…');
     try{
       const response=await fetch('/server/admin/daily-studio/api/random-content.php?type=french',{cache:'no-store'});
       const data=await response.json();if(!response.ok||!data.item)throw new Error(data.error||'No phrase was returned.');
-      const item=data.item,d=localDateParts(),mapped={phrase:item.english,meaning:item.meaning||'A practical phrase for everyday conversation.',french:item.french,frenchPron:item.french_pronunciation,patois:item.patois,patoisPron:item.patois_pronunciation||item.patois,kreyol:item.kreyol,kreyolPron:item.kreyol_pronunciation||item.kreyol,spanish:item.spanish,spanishPron:item.spanish_pronunciation||item.spanish,culture:item.culture_note};
-      Object.entries(mapped).forEach(([id,value])=>setFieldValue(id,value));setFieldValue('publishDate',d.date);setFieldValue('weekday',d.weekday);draw();updateAudioUi();
+      const item=data.item,date=v('publishDate')||nextAvailableDate||localDateParts().date;populateLesson(item,date);contentMode='draft';updateModeUi();
       setStatus(`Fresh phrase selected — ${data.remaining} unused lessons remain in this cycle.${data.cycle_restarted?' A new lesson cycle just began.':''}`);
     }catch(error){setStatus(error.message||'Phrase generation failed.',true)}finally{button.disabled=false}
   }
@@ -182,6 +193,7 @@
   }
   async function narrationBlob(){
     const file=$('audioFile').files[0];if(file)return file;
+    if(scheduledAudioMatches()){const response=await fetch(scheduledAudioUrl,{cache:'force-cache'});if(!response.ok)throw new Error('Today’s prerecorded audio could not be loaded.');const blob=await response.blob();if(blob.size<128)throw new Error('Today’s prerecorded audio is empty.');return blob}
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),70000);
     try{
       const response=await fetch('/beyond-id/admin/api/verse-narration.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale:v('narratorLocale'),provider:selectedProvider(),voice:selectedVoice()}),signal:controller.signal});
@@ -237,14 +249,18 @@
       running=false;recorder.stop();await finished;const mime=recorder.mimeType||type||'video/webm',mp4=mime.includes('mp4');download(new Blob(chunks,{type:mime}),`francais-du-jour-all-languages-${v('publishDate')||'post'}${mp4?'.mp4':'.webm'}`);setStatus(mp4?'Narrated language export finished as one MP4.':'Narrated language export finished as one WebM because this browser cannot record MP4.');
     }catch(error){running=false;if(recorder&&recorder.state!=='inactive')recorder.stop();setStatus(error.message||'Batch video export failed.',true)}finally{$('exportLanguage').value=originalLanguage;$('narratorLocale').value=originalLocale;if(audioContext)await audioContext.close().catch(()=>{});draw();updateAudioUi();button.disabled=false}
   }
-  function save(){const data={};ids.forEach(id=>data[id]=$(id).type==='checkbox'?$(id).checked:$(id).value);localStorage.setItem('beyondFrenchGenerator',JSON.stringify(data));setStatus('Generator settings saved in this browser.')}
+  function save(){if(contentMode!=='draft'){setStatus('Only new drafts are stored in the browser.',true);return}const data={};ids.forEach(id=>data[id]=$(id).type==='checkbox'?$(id).checked:$(id).value);localStorage.setItem('beyondFrenchGeneratorDraft',JSON.stringify(data));setStatus('Draft saved in this browser.')}
   async function saveDailyPhrase(){
-    const button=$('saveDailyPhrase');button.disabled=true;setStatus('Saving the daily phrase to Beyond French…');
-    const payload={publish_date:v('publishDate'),english:v('phrase'),meaning:v('meaning'),french:v('french'),french_pronunciation:v('frenchPron'),patois:v('patois'),patois_pronunciation:v('patoisPron'),kreyol:v('kreyol'),kreyol_pronunciation:v('kreyolPron'),spanish:v('spanish'),spanish_pronunciation:v('spanishPron'),culture_note:v('culture'),export_language:v('exportLanguage'),narrator_locale:v('narratorLocale')};
+    if(contentMode!=='draft'&&contentMode!=='edit'){setStatus('Open Create Draft or confirm Edit scheduled before publishing.',true);return false}
+    const button=$('saveDailyPhrase');button.disabled=true;setStatus('Generating French audio and publishing the lesson…');
+    const payload={publish_date:v('publishDate'),english:v('phrase'),meaning:v('meaning'),french:v('french'),french_pronunciation:v('frenchPron'),patois:v('patois'),patois_pronunciation:v('patoisPron'),kreyol:v('kreyol'),kreyol_pronunciation:v('kreyolPron'),spanish:v('spanish'),spanish_pronunciation:v('spanishPron'),culture_note:v('culture'),export_language:v('exportLanguage'),narrator_locale:v('narratorLocale'),narration_provider:selectedProvider(),narration_voice:selectedVoice(),confirm_overwrite:contentMode==='edit'};
     try{
-      const response=await fetch('/server/admin/daily-studio/api/save-french-phrase.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(payload)});
-      const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'The daily phrase could not be saved.');
-      save();setStatus(`${data.message} Web and iOS will use lesson #${data.id}.`);return true;
+      const publish=()=>fetch('/server/admin/daily-studio/api/save-french-phrase.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(payload)});
+      let response=await publish(),data=await response.json();
+      if(response.status===409&&data.requires_confirmation){if(!confirm(`A lesson is already scheduled for ${payload.publish_date}. Replace it and regenerate its audio?`))throw new Error('Publication cancelled. The scheduled lesson was not changed.');payload.confirm_overwrite=true;response=await publish();data=await response.json()}
+      if(!response.ok||!data.ok)throw new Error(data.error||'The daily phrase could not be saved.');
+      if(contentMode==='draft')localStorage.removeItem('beyondFrenchGeneratorDraft');
+      await loadScheduleDate(data.publish_date);setStatus(`${data.message} Web and iOS will use lesson #${data.id} with ${data.audio_generated?'new':'attached'} prerecorded audio.`);return true;
     }catch(error){setStatus(error.message||'The daily phrase could not be saved.',true);return false}finally{button.disabled=false}
   }
   async function saveAndExportVideo(){
@@ -256,17 +272,7 @@
       await remotionVideo();
     }finally{button.disabled=false}
   }
-  async function pushFrenchIos(){
-    if(!confirm('Push this lesson to the live iOS feed now? It will override today’s scheduled lesson until midnight Pacific.'))return;
-    const button=$('pushFrenchIos');button.disabled=true;
-    try{
-      if(!await saveDailyPhrase())return;
-      setStatus('Pushing the saved lesson to the iOS feed…');
-      const response=await fetch('/server/admin/daily-studio/api/push-ios-content.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({product:'beyond-french',publish_date:v('publishDate')})});
-      const data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'The lesson could not be pushed to iOS.');setStatus(data.message);
-    }catch(error){setStatus(error.message||'The lesson could not be pushed to iOS.',true)}finally{button.disabled=false}
-  }
-  function remotionPayload(){return{publish_date:v('publishDate'),english:v('phrase'),french:v('french'),kreyol:v('kreyol'),spanish:v('spanish'),patois:v('patois'),category:'Daily Phrase',include_narration:$('includeNarration').checked,narration_provider:selectedProvider(),narration_voice:selectedVoice()}}
+  function remotionPayload(){return{publish_date:v('publishDate'),english:v('phrase'),french:v('french'),kreyol:v('kreyol'),spanish:v('spanish'),patois:v('patois'),category:'Daily Phrase',include_narration:$('includeNarration').checked,narration_provider:selectedProvider(),narration_voice:selectedVoice(),prerecorded_audio_url:scheduledAudioMatches()?new URL(scheduledAudioUrl).pathname:''}}
   async function browserRemotionVideo(){
     const renderer=window.BeyondFrenchRemotion;
     if(!renderer?.render)throw new Error('The Remotion browser renderer did not load.');
@@ -306,7 +312,6 @@
       else await serverRemotionVideo();
     }catch(error){setStatus(error.message||'The Remotion export failed. The static template remains unchanged.',true)}finally{button.disabled=false}
   }
-  function restore(){try{const data=JSON.parse(localStorage.getItem('beyondFrenchGenerator')||'null');if(!data)return;ids.forEach(id=>{if(!(id in data))return;if($(id).type==='checkbox')$(id).checked=!!data[id];else $(id).value=data[id]})}catch{}}
   function syncVoiceSelection(source){
     if(source==='narratorLocale'){
       const language=languageForLocale(v('narratorLocale'));
@@ -328,6 +333,12 @@
         setStatus('Uploaded MP3 downloaded.');
         return;
       }
+      if(scheduledAudioMatches()){
+        const response=await fetch(scheduledAudioUrl,{cache:'force-cache'});
+        if(!response.ok)throw new Error('Today’s prerecorded audio could not be loaded.');
+        const blob=await response.blob();if(blob.size<128)throw new Error('Today’s prerecorded audio is empty.');
+        download(blob,baseName()+'.mp3');setStatus('Today’s prerecorded Azure MP3 downloaded.');return;
+      }
       const response=await fetch('/beyond-id/admin/api/french-narration-export.php',{
         method:'POST',
         headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
@@ -346,7 +357,7 @@
       setStatus(savedUrl?'MP3 saved to the French audio library and downloaded.':'MP3 generated and downloaded.');
     }catch(error){setStatus(error.message||'MP3 export failed.',true)}finally{button.disabled=false}
   }
-  restore();if(!v('publishDate')){const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000);$('publishDate').value=local.toISOString().slice(0,10)}if(!v('weekday'))$('weekday').value=new Date(v('publishDate')+'T12:00:00').toLocaleDateString('en-US',{weekday:'long'}).toUpperCase();updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{if(el.id==='publishDate'&&v('publishDate'))$('weekday').value=new Date(v('publishDate')+'T12:00:00').toLocaleDateString('en-US',{weekday:'long'}).toUpperCase();updateAudioUi(el.id);draw()});el.addEventListener('change',()=>{updateAudioUi(el.id);draw()})});$('saveDailyPhrase').onclick=saveDailyPhrase;$('pushFrenchIos').onclick=pushFrenchIos;$('saveAndExportVideo').onclick=saveAndExportVideo;$('exportRemotionVideo').onclick=remotionVideo;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;var todayPhraseButton=$('generateTodayPhrase');if(todayPhraseButton)todayPhraseButton.addEventListener('click',generateTodayPhrase);draw();
+  updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{if(el.id==='publishDate')setFieldValue('weekday',weekdayForDate(el.value),false);updateAudioUi(el.id);draw()});el.addEventListener('change',()=>{if(el.id==='publishDate'&&(contentMode==='scheduled'||contentMode==='empty')){loadScheduleDate(el.value);return}updateAudioUi(el.id);draw()})});$('scheduledMode').onclick=()=>loadScheduleDate(contentMode==='draft'?localDateParts().date:(v('publishDate')||localDateParts().date));$('createDraft').onclick=enterDraftMode;$('editScheduled').onclick=editScheduledLesson;$('previousLesson').onclick=()=>scheduleNavigation.previous&&loadScheduleDate(scheduleNavigation.previous);$('todayLesson').onclick=()=>loadScheduleDate(localDateParts().date);$('nextLesson').onclick=()=>scheduleNavigation.next&&loadScheduleDate(scheduleNavigation.next);$('reloadLesson').onclick=()=>loadScheduleDate(v('publishDate')||localDateParts().date);$('saveDailyPhrase').onclick=saveDailyPhrase;$('saveAndExportVideo').onclick=saveAndExportVideo;$('exportRemotionVideo').onclick=remotionVideo;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;$('generateTodayPhrase').onclick=generateTodayPhrase;draw();loadScheduleDate();
 })();
 </script>
 </body>

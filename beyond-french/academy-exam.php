@@ -2,7 +2,7 @@
 declare(strict_types=1);require __DIR__.'/includes/functions.php';require_once __DIR__.'/../includes/ecosystem.php';
 $age=french_valid_age_group((string)($_GET['age']??$_POST['age']??'kids'));$module=french_valid_module((string)($_GET['module']??$_POST['module']??'greetings'));$course=french_academy_modules()[$module];$progress=french_academy_module_progress($age,$module);
 if(french_is_guest()){http_response_code(403);exit('A Beyond ID is required for module exams.');}
-if(!$course||(!$progress['exam_passed']&&$progress['lessons_passed']<10&&!is_admin())){http_response_code(403);exit('Module exam is locked.');}$questions=french_module_exam_questions($age,$module);$result=null;
+if(!$course||!french_academy_module_accessible($module)||(!$progress['exam_passed']&&$progress['lessons_passed']<10&&!is_admin())){http_response_code(403);exit('Module exam is locked.');}$questions=french_module_exam_questions($age,$module);$result=null;
 if($_SERVER['REQUEST_METHOD']==='POST'){if(!french_verify_csrf()){$result=['score'=>0,'passed'=>false];}else{$score=french_score_quiz($questions,(array)($_POST['answers']??[]));$passed=french_record_module_exam($age,$module,$score,count($questions));$reward=$passed?beyond_award_reward((int)($_SESSION['user_id']??0),'beyond-french','module',$age.':'.$module,50,'French Academy module completed — '.$course['title']):null;$result=['score'=>$score,'passed'=>$passed,'reward'=>$reward];}}
 $pageTitle=$course['title'].' Exam | French Academy';require __DIR__.'/includes/header.php';
 ?>

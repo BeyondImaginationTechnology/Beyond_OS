@@ -35,12 +35,12 @@ const mediaSource = (source: string) =>
   /^(blob:|data:|https?:\/\/|\/)/i.test(source) ? source : staticFile(source);
 
 export const defaultBeyondFrenchVideoProps: BeyondFrenchVideoProps = {
-  english: 'Keep going.',
-  french: 'Continue.',
-  kreyol: 'Kontinye.',
-  spanish: 'Sigue adelante.',
-  patois: 'Keep on gwaan.',
-  category: 'Encouragement',
+  english: '',
+  french: '',
+  kreyol: '',
+  spanish: '',
+  patois: '',
+  category: 'Daily Phrase',
   audioFile: '',
   brandIcon: 'beyond-french/app-icon.png',
 };
@@ -386,7 +386,7 @@ export const BeyondFrenchVideo: React.FC<BeyondFrenchVideoProps> = ({
                   fontWeight: 800,
                 }}
               >
-                Download on Beyond Store
+                Download Beyond French
               </div>
               <div
                 style={{
@@ -405,7 +405,7 @@ export const BeyondFrenchVideo: React.FC<BeyondFrenchVideoProps> = ({
                     letterSpacing: 1,
                   }}
                 >
-                  Google Play + App Store
+                  Available now on the App Store
                 </div>
                 <div
                   style={{
@@ -416,7 +416,7 @@ export const BeyondFrenchVideo: React.FC<BeyondFrenchVideoProps> = ({
                     textTransform: 'uppercase',
                   }}
                 >
-                  Coming Fall 2026
+                  Learn daily on iPhone
                 </div>
               </div>
             </div>

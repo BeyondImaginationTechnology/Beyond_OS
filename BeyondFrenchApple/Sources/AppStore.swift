@@ -39,12 +39,14 @@ final class AppStore: ObservableObject {
     @Published private(set) var isRefreshing = false
     @Published private(set) var statusMessage = "Daily lesson"
     @Published var hasBeyondID = false
+    @Published var hasFullAcademyAccess = false
     @Published var appTheme = AppTheme.classic {
         didSet { UserDefaults.standard.set(appTheme.rawValue, forKey: themeKey) }
     }
 
     private let endpoint = URL(string: "https://beyondimagination.co.technology/beyond-french/api/today.php")!
     private let voiceEndpoint = URL(string: "https://beyondimagination.co.technology/beyond-french/api/voice.php")!
+    private let siteEndpoint = URL(string: "https://beyondimagination.co.technology")!
     private let speaker = AVSpeechSynthesizer()
     private var premiumVoicePlayer: AVAudioPlayer?
     private let completedKey = "BeyondFrench.completedLessonIDs"
@@ -113,6 +115,47 @@ final class AppStore: ObservableObject {
                 }
             } catch {
                 speakWithDeviceVoice(text, language: language, fallbackReason: error.localizedDescription)
+            }
+        }
+    }
+
+    func speakLesson(_ lesson: FrenchLesson) {
+        speaker.stopSpeaking(at: .immediate)
+        premiumVoicePlayer?.stop()
+        configureAudioSession()
+        if let url = Bundle.main.url(
+            forResource: lesson.audioResourceName,
+            withExtension: "mp3",
+            subdirectory: "Audio/dictionary/fr-FR"
+        ), let player = try? AVAudioPlayer(contentsOf: url) {
+            player.prepareToPlay()
+            premiumVoicePlayer = player
+            if player.play() {
+                statusMessage = "Prerecorded Azure voice"
+                return
+            }
+        }
+        guard let remoteURL = remoteLessonAudioURL(for: lesson) else {
+            speak(lesson.french, language: "fr-FR")
+            return
+        }
+        statusMessage = "Loading prerecorded lesson voice..."
+        Task {
+            do {
+                let (data, response) = try await URLSession.shared.data(from: remoteURL)
+                guard let http = response as? HTTPURLResponse,
+                      200..<300 ~= http.statusCode,
+                      data.count > 128 else { throw PremiumVoiceError.invalidAudio }
+                let player = try AVAudioPlayer(data: data)
+                player.prepareToPlay()
+                premiumVoicePlayer = player
+                if player.play() {
+                    statusMessage = "Prerecorded lesson voice"
+                } else {
+                    speak(lesson.french, language: "fr-FR")
+                }
+            } catch {
+                speak(lesson.french, language: "fr-FR")
             }
         }
     }
@@ -190,6 +233,13 @@ final class AppStore: ObservableObject {
         )
     }
 
+    private func remoteLessonAudioURL(for lesson: FrenchLesson) -> URL? {
+        guard let value = lesson.audioUrl?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !value.isEmpty else { return nil }
+        if let absolute = URL(string: value), absolute.scheme != nil { return absolute }
+        return URL(string: value, relativeTo: siteEndpoint)?.absoluteURL
+    }
+
     func isLessonCompleted(module: AcademyModule, lessonIndex: Int) -> Bool {
         completedLessonIDs.contains(lessonID(module: module, lessonIndex: lessonIndex))
     }
@@ -199,15 +249,15 @@ final class AppStore: ObservableObject {
     }
 
     func isLessonUnlocked(module: AcademyModule, lessonIndex: Int) -> Bool {
-        guard lessonIndex > 0 else { return module.isFree || hasBeyondID }
-        if !module.isFree && !hasBeyondID { return false }
-        return hasBeyondID || isLessonCompleted(module: module, lessonIndex: lessonIndex - 1)
+        guard lessonIndex > 0 else { return module.isFree || hasFullAcademyAccess }
+        if !module.isFree && !hasFullAcademyAccess { return false }
+        return isLessonCompleted(module: module, lessonIndex: lessonIndex - 1)
     }
 
     func isLessonUnlocked(module: AcademyModule, lessonIndex: Int, ageGroup: AgeGroup) -> Bool {
-        guard lessonIndex > 0 else { return module.isFree || hasBeyondID }
-        if !module.isFree && !hasBeyondID { return false }
-        return hasBeyondID || isLessonCompleted(module: module, lessonIndex: lessonIndex - 1, ageGroup: ageGroup)
+        guard lessonIndex > 0 else { return module.isFree || hasFullAcademyAccess }
+        if !module.isFree && !hasFullAcademyAccess { return false }
+        return isLessonCompleted(module: module, lessonIndex: lessonIndex - 1, ageGroup: ageGroup)
     }
 
     func completeLesson(module: AcademyModule, lessonIndex: Int) {

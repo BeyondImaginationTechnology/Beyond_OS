@@ -9,8 +9,8 @@ settings:
   base:
     DEVELOPMENT_TEAM: FK9QM3VUNH
     CODE_SIGN_STYLE: Automatic
-    CURRENT_PROJECT_VERSION: 1
-    MARKETING_VERSION: 1.1.0
+    CURRENT_PROJECT_VERSION: 2
+    MARKETING_VERSION: 1.1.1
     SWIFT_VERSION: 6.0
 targets:
   FrenchQuest:
@@ -21,6 +21,7 @@ targets:
     resources:
       - path: Resources/academy.json
       - path: Resources/dictionary.json
+      - path: Resources/Audio
       - path: Resources/Assets.xcassets
     settings:
       base:

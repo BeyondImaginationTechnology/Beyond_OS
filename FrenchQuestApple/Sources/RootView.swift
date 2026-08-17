@@ -1,23 +1,44 @@
 import SwiftUI
 
+enum QuestRoute: Hashable {
+    case map
+    case spellbook
+    case training
+    case hero
+}
+
 struct RootView: View {
     @EnvironmentObject private var store: QuestStore
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
-        TabView {
-            NavigationStack { TodayView() }
-                .tabItem { Label("Quest", systemImage: "map.fill") }
-            NavigationStack { AcademyView() }
-                .tabItem { Label("Map", systemImage: "flag.checkered") }
-            NavigationStack { DictionaryView() }
-                .tabItem { Label("Phrases", systemImage: "character.book.closed.fill") }
-            NavigationStack { PracticeView() }
-                .tabItem { Label("Train", systemImage: "bolt.fill") }
-            NavigationStack { LearningProgressView() }
-                .tabItem { Label("Hero", systemImage: "person.crop.circle.fill.badge.checkmark") }
+        NavigationStack {
+            TodayView()
+                .navigationDestination(for: QuestRoute.self) { route in
+                    switch route {
+                    case .map:
+                        AcademyView()
+                    case .spellbook:
+                        DictionaryView()
+                    case .training:
+                        PracticeView()
+                    case .hero:
+                        LearningProgressView()
+                    }
+                }
         }
         .tint(store.theme.accent)
         .preferredColorScheme(.dark)
+        .onAppear {
+            store.startBackgroundMusicIfNeeded()
+        }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                store.startBackgroundMusicIfNeeded()
+            } else {
+                store.pauseBackgroundMusic()
+            }
+        }
     }
 }
 
@@ -26,23 +47,103 @@ struct BrandHeader: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: "sparkles")
-                .font(.title2.weight(.black))
-                .foregroundStyle(.white)
-                .frame(width: 54, height: 54)
-                .background(store.theme.accent, in: RoundedRectangle(cornerRadius: 16))
+            Image("BeyondFrenchLogo")
+                .resizable()
+                .scaledToFill()
+                .frame(width: 58, height: 58)
+                .clipShape(RoundedRectangle(cornerRadius: 17))
+                .overlay(RoundedRectangle(cornerRadius: 17).stroke(.white.opacity(0.28), lineWidth: 1))
+                .shadow(color: store.theme.accent.opacity(0.38), radius: 12)
             VStack(alignment: .leading, spacing: 2) {
                 Text("FRENCH QUEST").font(.headline.weight(.black))
-                Text("Play your way into French").font(.caption).foregroundStyle(.secondary)
+                Text("THE LOST REALMS OF FRANCE").font(.caption2.weight(.black)).foregroundStyle(store.theme.accent)
             }
             Spacer()
-            Image(systemName: store.theme.symbol)
-                .font(.headline)
-                .foregroundStyle(store.theme.accent)
-                .frame(width: 34, height: 34)
-                .background(store.theme.accent.opacity(0.20), in: Circle())
+            Button {
+                store.toggleBackgroundMusic()
+            } label: {
+                Image(systemName: store.musicEnabled ? "music.note" : "speaker.slash.fill")
+                    .font(.headline.weight(.black))
+                    .foregroundStyle(store.musicEnabled ? store.theme.accent : .secondary)
+                    .frame(width: 42, height: 42)
+                    .background(Color.white.opacity(0.08), in: Circle())
+                    .overlay(Circle().stroke(Color.white.opacity(0.12), lineWidth: 1))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(store.musicEnabled ? "Turn music off" : "Turn music on")
+            NavigationLink(value: QuestRoute.hero) {
+                ZStack {
+                    Circle().fill(store.theme.accent.opacity(0.20))
+                    Image(systemName: "person.crop.circle.fill.badge.checkmark")
+                        .font(.title2)
+                        .foregroundStyle(store.theme.accent)
+                }
+                .frame(width: 42, height: 42)
+                .overlay(Circle().stroke(store.theme.accent.opacity(0.35), lineWidth: 1))
+            }
+            .accessibilityLabel("Open hero profile")
         }
         .foregroundStyle(.white)
+    }
+}
+
+struct AdventurePortalGrid: View {
+    @EnvironmentObject private var store: QuestStore
+
+    private let portals: [(QuestRoute, String, String, String, Color)] = [
+        (.map, "Quest Map", "Unlock the next realm", "map.fill", .cyan),
+        (.spellbook, "Spellbook", "158 words and phrases", "book.closed.fill", .purple),
+        (.training, "Training Grounds", "Sharpen your recall", "bolt.fill", .orange),
+        (.hero, "Hero Lodge", "Gear, stats, and themes", "shield.lefthalf.filled", .green)
+    ]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("EXPLORE")
+                    .font(.caption.weight(.black))
+                    .tracking(1.8)
+                    .foregroundStyle(store.theme.accent)
+                Rectangle().fill(store.theme.accent.opacity(0.35)).frame(height: 1)
+            }
+
+            LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 12) {
+                ForEach(Array(portals.enumerated()), id: \.offset) { _, portal in
+                    NavigationLink(value: portal.0) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                Image(systemName: portal.3)
+                                    .font(.title2.weight(.black))
+                                    .foregroundStyle(portal.4)
+                                Spacer()
+                                Image(systemName: "chevron.right")
+                                    .font(.caption.weight(.black))
+                                    .foregroundStyle(.white.opacity(0.55))
+                            }
+                            Text(portal.1)
+                                .font(.headline.weight(.black))
+                                .foregroundStyle(.white)
+                            Text(portal.2)
+                                .font(.caption)
+                                .foregroundStyle(.white.opacity(0.66))
+                                .lineLimit(2)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 104, alignment: .leading)
+                        .padding(15)
+                        .background(
+                            LinearGradient(
+                                colors: [portal.4.opacity(0.25), Color.white.opacity(0.05)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            in: RoundedRectangle(cornerRadius: 20)
+                        )
+                        .overlay(RoundedRectangle(cornerRadius: 20).stroke(portal.4.opacity(0.32), lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
     }
 }
 

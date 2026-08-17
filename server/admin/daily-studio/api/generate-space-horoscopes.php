@@ -71,43 +71,137 @@ function fallbackHoroscopes(DateTimeImmutable $date, string $theme): array
             'mood'=>$moods[$index],
             'source'=>'Beyond Space original fallback',
             'source_url'=>'',
+            'source_date'=>$date->format('Y-m-d'),
+            'source_freshness'=>'original',
         ];
     }
     return $items;
 }
 
-function astrologySourceSeeds(): array
+function spaceFetchSource(string $url): array
 {
-    if (!function_exists('curl_init')) return [];
-    $seeds = [];
-    foreach (spaceSigns() as $sign) {
-        $url = 'https://www.astrology.com/horoscope/daily/' . $sign['slug'] . '.html';
-        $curl = curl_init($url);
-        curl_setopt_array($curl, [
-            CURLOPT_RETURNTRANSFER=>true,
-            CURLOPT_CONNECTTIMEOUT=>6,
-            CURLOPT_TIMEOUT=>14,
-            CURLOPT_FOLLOWLOCATION=>true,
-            CURLOPT_USERAGENT=>'Beyond-Space-Horoscope-Generator/1.0',
-        ]);
-        $html = curl_exec($curl);
-        $status = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        curl_close($curl);
-        if (!is_string($html) || $status < 200 || $status >= 300) continue;
-        $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $text = trim(preg_replace('/\s+/u', ' ', $text) ?? '');
-        $needle = $sign['name'] . ' Daily Horoscope';
-        $position = stripos($text, $needle);
-        if ($position === false) continue;
-        $chunk = mb_substr($text, $position, 1300);
-        $chunk = preg_replace('/Explore More.*$/iu', '', $chunk) ?? $chunk;
-        $chunk = preg_replace('/More Horoscopes.*$/iu', '', $chunk) ?? $chunk;
-        $chunk = cleanText($chunk, 900);
-        if ($chunk !== '') {
-            $seeds[$sign['slug']] = ['source'=>'Astrology.com daily horoscope', 'source_url'=>$url, 'text'=>$chunk];
+    if (!function_exists('curl_init')) return ['ok'=>false, 'reason'=>'curl_unavailable', 'text'=>''];
+    $curl = curl_init($url);
+    curl_setopt_array($curl, [
+        CURLOPT_RETURNTRANSFER=>true,
+        CURLOPT_CONNECTTIMEOUT=>4,
+        CURLOPT_TIMEOUT=>9,
+        CURLOPT_FOLLOWLOCATION=>true,
+        CURLOPT_MAXREDIRS=>3,
+        CURLOPT_USERAGENT=>'Beyond-Space-Horoscope-Generator/2.0 (+https://beyondimagination.co.technology)',
+        CURLOPT_HTTPHEADER=>['Accept: text/html,application/xhtml+xml'],
+    ]);
+    $html = curl_exec($curl);
+    $status = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $error = curl_error($curl);
+    curl_close($curl);
+    if (!is_string($html) || $status < 200 || $status >= 300) {
+        return ['ok'=>false, 'reason'=>$error !== '' ? 'network_error' : 'http_' . $status, 'text'=>''];
+    }
+    $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    return ['ok'=>true, 'reason'=>'', 'text'=>trim(preg_replace('/\s+/u', ' ', $text) ?? '')];
+}
+
+function spaceSourceDateLabels(DateTimeImmutable $date): array
+{
+    return array_values(array_unique([
+        $date->format('F j, Y'),
+        $date->format('M j, Y'),
+    ]));
+}
+
+function spaceExtractFreshSeed(string $provider, string $text, array $sign, DateTimeImmutable $date): array
+{
+    $datePosition = false;
+    $matchedDate = '';
+    foreach (spaceSourceDateLabels($date) as $label) {
+        $position = stripos($text, $label);
+        if ($position !== false && ($datePosition === false || $position < $datePosition)) {
+            $datePosition = $position;
+            $matchedDate = $label;
         }
     }
-    return $seeds;
+    if ($datePosition === false) return ['ok'=>false, 'reason'=>'stale_or_unverifiable_date', 'text'=>''];
+
+    $chunk = mb_substr($text, (int)$datePosition + mb_strlen($matchedDate), 1800);
+    if ($provider === 'astrology.com') {
+        $chunk = preg_replace('/^\s*yesterday\s+today\s+tomorrow\s+Love\s*/iu', '', $chunk) ?? $chunk;
+        $chunk = preg_replace('/\s+Explore More.*$/iu', '', $chunk) ?? $chunk;
+    } elseif ($provider === 'horoscope.com') {
+        $chunk = preg_replace('/^\s*-\s*/u', '', $chunk) ?? $chunk;
+        $chunk = preg_replace('/\s+More Horoscopes for.*$/iu', '', $chunk) ?? $chunk;
+    } else {
+        $chunk = preg_replace('/^\s*:\s*/u', '', $chunk) ?? $chunk;
+        $chunk = preg_replace('/\s+(?:More ' . preg_quote($sign['name'], '/') . ' Insight|Choose Another Sign|More Daily Horoscopes).*$/iu', '', $chunk) ?? $chunk;
+    }
+    $chunk = cleanText($chunk, 900);
+    if (mb_strlen($chunk) < 80) return ['ok'=>false, 'reason'=>'content_too_short', 'text'=>''];
+    return ['ok'=>true, 'reason'=>'', 'text'=>$chunk];
+}
+
+function spaceSourceCandidates(array $sign, int $index, DateTimeImmutable $date): array
+{
+    $today = new DateTimeImmutable('today', new DateTimeZone('America/Vancouver'));
+    $offset = (int)$today->diff($date)->format('%r%a');
+    $astrologyPath = $offset === 1 ? 'daily/tomorrow/' : ($offset === -1 ? 'daily/yesterday/' : 'daily/');
+    $horoscopePath = $offset === 0
+        ? 'horoscope-general-daily-today.aspx?sign=' . ($index + 1)
+        : 'horoscope-archive.aspx?laDate=' . $date->format('Ymd') . '&sign=' . ($index + 1);
+    return [
+        ['provider'=>'astrology.com', 'name'=>'Astrology.com daily horoscope', 'url'=>'https://www.astrology.com/horoscope/' . $astrologyPath . $sign['slug'] . '.html'],
+        ['provider'=>'horoscope.com', 'name'=>'Horoscope.com daily horoscope', 'url'=>'https://www.horoscope.com/us/horoscopes/general/' . $horoscopePath],
+        ['provider'=>'tarot.com', 'name'=>'Tarot.com daily horoscope', 'url'=>'https://www.tarot.com/daily-horoscope/' . $sign['slug']],
+    ];
+}
+
+function freshSourceSeeds(DateTimeImmutable $date): array
+{
+    $seeds = [];
+    $audit = [];
+    foreach (spaceSigns() as $index => $sign) {
+        foreach (spaceSourceCandidates($sign, $index, $date) as $candidate) {
+            $response = spaceFetchSource($candidate['url']);
+            if (!$response['ok']) {
+                $audit[] = ['sign'=>$sign['slug'], 'provider'=>$candidate['provider'], 'accepted'=>false, 'reason'=>$response['reason']];
+                continue;
+            }
+            $parsed = spaceExtractFreshSeed($candidate['provider'], $response['text'], $sign, $date);
+            if (!$parsed['ok']) {
+                $audit[] = ['sign'=>$sign['slug'], 'provider'=>$candidate['provider'], 'accepted'=>false, 'reason'=>$parsed['reason']];
+                continue;
+            }
+            $seeds[$sign['slug']] = [
+                'source'=>$candidate['name'],
+                'source_url'=>$candidate['url'],
+                'source_date'=>$date->format('Y-m-d'),
+                'text'=>$parsed['text'],
+            ];
+            $audit[] = ['sign'=>$sign['slug'], 'provider'=>$candidate['provider'], 'accepted'=>true, 'reason'=>'fresh'];
+            break;
+        }
+        if (!isset($seeds[$sign['slug']])) {
+            $audit[] = ['sign'=>$sign['slug'], 'provider'=>'beyond-space', 'accepted'=>true, 'reason'=>'original_fallback'];
+        }
+    }
+    return ['seeds'=>$seeds, 'audit'=>$audit];
+}
+
+function spaceSourceReport(array $seeds, array $audit): array
+{
+    $providers = [];
+    foreach ($seeds as $seed) {
+        $provider = strtolower(strtok((string)($seed['source'] ?? 'external'), ' ') ?: 'external');
+        $providers[$provider] = ($providers[$provider] ?? 0) + 1;
+    }
+    $original = 12 - count($seeds);
+    if ($original > 0) $providers['beyond-space'] = $original;
+    return [
+        'fresh_external'=>count($seeds),
+        'original_fallback'=>$original,
+        'providers'=>$providers,
+        'rejected'=>count(array_filter($audit, static fn(array $row): bool => !$row['accepted'])),
+        'audit'=>$audit,
+    ];
 }
 
 function aiHoroscopes(DateTimeImmutable $date, string $theme, array $sourceSeeds = []): array
@@ -175,11 +269,13 @@ PROMPT;
         $bySign[strtolower((string)($item['sign'] ?? ''))] = $item;
     }
     $items = [];
+    $localFallbacks = fallbackHoroscopes($date, $theme);
     foreach ($signs as $sign) {
         $rawItem = (array)($bySign[strtolower($sign['name'])] ?? []);
         $paragraphs = array_values(array_filter(array_map(fn($line) => cleanText((string)$line, 220), (array)($rawItem['paragraphs'] ?? []))));
         while (count($paragraphs) < 3) {
-            $paragraphs[] = fallbackHoroscopes($date, $theme)[0]['paragraphs'][count($paragraphs)];
+            $fallbackIndex = count($items);
+            $paragraphs[] = $localFallbacks[$fallbackIndex]['paragraphs'][count($paragraphs)];
         }
         $items[] = [
             'slug'=>$sign['slug'],
@@ -192,6 +288,8 @@ PROMPT;
             'mood'=>cleanText((string)($rawItem['mood'] ?? 'Open & Grounded'), 54),
             'source'=>(string)($sourceSeeds[$sign['slug']]['source'] ?? 'Beyond Space original'),
             'source_url'=>(string)($sourceSeeds[$sign['slug']]['source_url'] ?? ''),
+            'source_date'=>$date->format('Y-m-d'),
+            'source_freshness'=>isset($sourceSeeds[$sign['slug']]) ? 'verified_external' : 'original',
         ];
     }
     return $items;
@@ -238,13 +336,23 @@ try {
     if (!is_array($input)) throw new RuntimeException('Invalid horoscope request.');
     $date = spaceDate((string)($input['publish_date'] ?? date('Y-m-d')));
     $theme = cleanText((string)($input['theme'] ?? ''), 90);
-    $sourceMode = cleanText((string)($input['source_mode'] ?? 'astrology-com'), 40);
-    $sourceSeeds = $sourceMode === 'astrology-com' ? astrologySourceSeeds() : [];
+    $sourceMode = cleanText((string)($input['source_mode'] ?? 'fresh-fallbacks'), 40);
+    $sourceResult = $sourceMode === 'original'
+        ? ['seeds'=>[], 'audit'=>[]]
+        : freshSourceSeeds($date);
+    $sourceSeeds = $sourceResult['seeds'];
     $items = aiHoroscopes($date, $theme, $sourceSeeds);
-    $provider = $items ? ($sourceSeeds ? 'openai-with-astrology-source' : 'openai') : 'local-fallback';
+    $provider = $items ? ($sourceSeeds ? 'openai-with-fresh-source-fallbacks' : 'openai-original') : 'local-fallback';
     if (!$items) $items = fallbackHoroscopes($date, $theme);
     $saved = !empty($input['save_drafts']) ? saveSpaceEvents($items, $date) : 0;
-    spaceJson(['ok'=>true, 'provider'=>$provider, 'date'=>$date->format('Y-m-d'), 'items'=>$items, 'saved'=>$saved]);
+    spaceJson([
+        'ok'=>true,
+        'provider'=>$provider,
+        'date'=>$date->format('Y-m-d'),
+        'items'=>$items,
+        'saved'=>$saved,
+        'source_report'=>spaceSourceReport($sourceSeeds, $sourceResult['audit']),
+    ]);
 } catch (Throwable $error) {
     spaceJson(['ok'=>false, 'error'=>$error->getMessage()], 500);
 }

@@ -19,6 +19,7 @@
     .language-toggle{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}.language-option{position:relative}.language-option input{position:absolute;opacity:0;pointer-events:none}.language-option span{display:flex;align-items:center;justify-content:center;min-height:48px;padding:10px;border:1px solid var(--line);border-radius:12px;background:#f7faf7;color:var(--muted);font-weight:800;cursor:pointer}.language-option input:checked+span{color:#132015;background:linear-gradient(135deg,#f6df9c,#c6d8a2);border-color:#caa13f;box-shadow:0 0 0 3px rgba(202,161,63,.13)}
     .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{border:0;border-radius:12px;padding:12px 14px;font-weight:800;cursor:pointer;background:#e8efe5;color:#152116}.btn.primary{background:linear-gradient(135deg,#e6bd61,#91a65e);color:#10150d}.btn.secondary{background:#e9f1eb;color:#1e3a29;border:1px solid var(--line)}.btn.wide{grid-column:1/-1}.btn:disabled{opacity:.55;cursor:wait}
     .status{min-height:23px;color:#486854;margin-top:10px}.status.error{color:#b92828}.canvas-wrap{width:min(72vh,680px);max-width:100%;filter:drop-shadow(0 22px 35px rgba(34,67,48,.2))}canvas{display:block;width:100%;height:auto;background:#eee;border-radius:18px}.back{display:inline-block;color:#42604d;text-decoration:none;margin-bottom:16px}.audio-row{display:flex;gap:9px}.audio-row .btn{flex:1}
+    .mode-switch,.schedule-nav{display:grid;gap:8px}.mode-switch{grid-template-columns:1fr 1fr;margin-bottom:12px}.schedule-nav{grid-template-columns:auto 1fr auto auto;margin-bottom:14px}.mode-pill{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 10px;padding:9px 11px;border-radius:11px;background:#e9f4eb;color:#28603d;font-size:12px;font-weight:900}.mode-pill.editing{background:#fff0d5;color:#865700}.mode-pill.draft{background:#eee9ff;color:#5e39a5}.draft-tools{display:grid;gap:8px;margin-bottom:14px}input[readonly],textarea[readonly]{background:#f0f4f1;color:#58675e;cursor:not-allowed}.schedule-summary{margin:-4px 0 14px;color:var(--muted);font-size:12px}
     @media(max-width:900px){.shell{display:block}.controls{border-right:0;border-bottom:1px solid var(--line)}.preview{padding:18px}.canvas-wrap{width:min(100%,580px)}}
     @media(max-width:480px){.controls{padding:20px}.styles,.checks,.actions{grid-template-columns:1fr}.btn.wide{grid-column:auto}.language-toggle{grid-template-columns:1fr 1fr 1fr}.language-option span{font-size:13px;padding:8px 4px}}
   </style>
@@ -27,9 +28,13 @@
 <main class="shell">
   <aside class="controls">
     <a class="back" href="/server/admin/daily-studio/">&larr; Admin dashboard</a>
-    <h1>Verse of the Day Generator</h1>
-    <p class="lede">Create a Daily Breath image, preview narration, and export a social-ready video.</p>
-    <button id="generateTodayVerse" class="btn primary" type="button" style="width:100%;margin:0 0 18px">📖 Generate Today’s Bible Verse</button>
+    <h1>Verse of the Day Generator <small style="font:700 12px Inter;color:#557e61">2.0.0</small></h1>
+    <p class="lede">Open scheduled recovery verses for export, or create a separate draft with new prerecorded audio.</p>
+    <div class="mode-switch"><button id="scheduledMode" class="btn primary" type="button">Scheduled</button><button id="createDraft" class="btn secondary" type="button">Create Draft</button></div>
+    <div id="modePill" class="mode-pill"><span>SCHEDULED · READ ONLY</span><button id="editScheduled" class="btn secondary" type="button">Edit scheduled</button></div>
+    <div id="scheduleNav" class="schedule-nav"><button id="previousVerse" class="btn secondary" type="button" aria-label="Previous scheduled verse">←</button><button id="todayVerse" class="btn secondary" type="button">Today</button><button id="nextVerse" class="btn secondary" type="button" aria-label="Next scheduled verse">→</button><button id="reloadVerse" class="btn secondary" type="button" aria-label="Reload scheduled verse">↻</button></div>
+    <div id="scheduleSummary" class="schedule-summary"></div>
+    <div id="draftTools" class="draft-tools" hidden><button id="generateTodayVerse" class="btn primary" type="button">✨ Generate Unscheduled Draft Idea</button><span class="hint">Draft ideas exclude every verse already in the 138-entry recovery library.</span></div>
 
     <section class="group">
       <label>Template style</label>
@@ -95,8 +100,8 @@
     <section class="group">
       <div class="actions">
         <button class="btn primary" id="downloadPng" type="button">Download PNG</button><button class="btn secondary" id="exportMp3" type="button">Download MP3</button>
-        <button class="btn secondary" id="saveDraft" type="button">Save draft</button>
-        <button class="btn primary wide" id="exportVideo" type="button">Export narrated MP4</button>
+        <button class="btn primary wide" id="saveDraft" type="button" hidden>Publish draft + generate audio</button>
+        <button class="btn primary wide" id="exportVideo" type="button">Export Instagram MP4</button>
         <button class="btn secondary wide" id="exportAllVideo" type="button">Export all languages as one narrated MP4</button>
       </div>
       <div id="status" class="status" role="status" aria-live="polite"></div>
@@ -123,7 +128,15 @@
   let previewAnimation = null;
   let verseCatalog = [];
   let currentVerseId = '';
+  let contentMode = 'scheduled';
+  let scheduleNavigation = {};
+  let nextAvailableDate = '';
+  let scheduledAudioUrl = '';
+  let scheduledDate = '';
+  let scheduledVerseText = '';
+  let scheduledReference = '';
   const controls = [...document.querySelectorAll('input,textarea,select')];
+  const contentIds = ['heading','verse','reference','translation','footer'];
 
   const value = id => $(id).value.trim();
   const style = () => document.querySelector('input[name="style"]:checked').value;
@@ -255,19 +268,28 @@
     $('heading').value=localizedHeading();$('verse').value=item.verse;$('reference').value=item.reference;$('translation').value=item.translation||'KJV';$('footer').value=item.footer||'WALK IN FAITH TODAY.';
     if(!preserveDate){const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000);$('publishDate').value=local.toISOString().slice(0,10)}draw();
   }
-  async function loadManagedVerse(showMessage=false){
-    const date=value('publishDate');
-    if(!date)return;
-    try{
-      const params=new URLSearchParams({type:'bible',managed:'1',date,language:verseLanguage()});
-      const response=await fetch(`/server/admin/daily-studio/api/random-content.php?${params}`,{cache:'no-store'});
-      const data=await response.json();
-      if(!response.ok)throw new Error(data.error||'Managed verse could not be loaded.');
-      if(data.item){applyVerseItem(data.item,true);if(showMessage)status(`${data.item.status==='published'?'Published':'Draft'} Content Manager verse loaded for ${date}.`);return true}
-      else if(showMessage)status(`No managed verse for ${date}; the generator placeholder is ready.`);
-    }catch(error){if(showMessage)status(error.message,true)}
-    return false;
+  const localDate=()=>{const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000);return local.toISOString().slice(0,10)};
+  function setContentLocked(locked){contentIds.forEach(id=>{$(id).readOnly=locked});$('publishDate').disabled=contentMode==='edit';['verseBook','verseChapter','verseNumber','loadSelectedVerse','daypart'].forEach(id=>{$(id).disabled=locked});document.querySelectorAll('input[name="verseLanguage"]').forEach(input=>{input.disabled=locked||input.value!=='en'})}
+  function updateModeUi(){
+    const scheduled=contentMode==='scheduled',editing=contentMode==='edit',draft=contentMode==='draft',empty=contentMode==='empty',pill=$('modePill');
+    pill.classList.toggle('editing',editing);pill.classList.toggle('draft',draft);pill.querySelector('span').textContent=scheduled?'SCHEDULED · READ ONLY':editing?'SCHEDULED · EDITING':draft?'NEW DRAFT':`NO VERSE ON ${value('publishDate')}`;
+    $('scheduledMode').className=`btn ${scheduled||empty?'primary':'secondary'}`;$('createDraft').className=`btn ${draft||editing?'primary':'secondary'}`;$('editScheduled').hidden=!scheduled;$('draftTools').hidden=!draft;$('saveDraft').hidden=scheduled||empty;$('saveDraft').textContent=editing?'Replace scheduled verse + audio':'Publish draft + generate audio';
+    ['downloadPng','exportMp3','previewAudio','exportVideo','exportAllVideo'].forEach(id=>{$(id).disabled=empty});$('previousVerse').disabled=!scheduleNavigation.previous;$('nextVerse').disabled=!scheduleNavigation.next;setContentLocked(scheduled||empty);
   }
+  function clearContent(date=''){currentVerseId='';$('heading').value='VERSE OF THE DAY';$('verse').value='';$('reference').value='';$('translation').value='WEB';$('footer').value='BREATHE THROUGH THE CRAVING. GOD IS WITH YOU.';$('publishDate').value=date;draw()}
+  function scheduledAudioMatches(){return !!scheduledAudioUrl&&narrationLocale()==='en-US'&&value('publishDate')===scheduledDate&&value('verse')===scheduledVerseText&&value('reference')===scheduledReference}
+  async function loadScheduleDate(date=localDate()){
+    status(`Loading the ${date} recovery schedule…`);
+    try{
+      const response=await fetch(`/server/admin/daily-studio/api/dailybreath-schedule.php?date=${encodeURIComponent(date)}`,{cache:'no-store'}),data=await response.json();
+      if(!response.ok||!data.ok)throw new Error(data.error||'The Daily Breath schedule is unavailable.');
+      scheduleNavigation=data.navigation||{};nextAvailableDate=scheduleNavigation.next_available||'';$('scheduleSummary').textContent=`${data.counts?.scheduled||0} dated verses · ${data.counts?.with_audio||0} prerecorded MP3s · ${data.counts?.library||0} recovery entries`;
+      if(!data.item){contentMode='empty';scheduledAudioUrl='';scheduledDate='';scheduledVerseText='';scheduledReference='';clearContent(date);updateModeUi();status(`No recovery verse is scheduled for ${date}. Choose Create Draft to use this date.`);return false}
+      const item=data.item;contentMode='scheduled';$('publishDate').value=data.date;document.querySelector('input[name="verseLanguage"][value="en"]').checked=true;document.querySelector('input[name="narrationLanguage"][value="en-US"]').checked=true;$('locale').value='en-US';applyVerseItem({id:item.id,verse:item.verse||item.text,reference:item.reference,translation:item.translation||'WEB',footer:'BREATHE THROUGH THE CRAVING. GOD IS WITH YOU.'},true);scheduledAudioUrl=item.audio_url?new URL(item.audio_url,location.origin).href:'';scheduledDate=data.date;scheduledVerseText=value('verse');scheduledReference=value('reference');$('includeNarration').checked=!!scheduledAudioUrl;updateModeUi();draw();status(scheduledAudioUrl?`${data.date} is ready with prerecorded recovery audio.`:`${data.date} is scheduled. MP3 export will use the selected provider.`);return true;
+    }catch(error){status(error.message||'The recovery schedule could not be loaded.',true);return false}
+  }
+  async function enterDraftMode(){const draftDate=contentMode==='empty'&&value('publishDate')?value('publishDate'):(nextAvailableDate||localDate());contentMode='draft';scheduledAudioUrl='';scheduledDate='';scheduledVerseText='';scheduledReference='';document.querySelector('input[name="verseLanguage"][value="en"]').checked=true;clearContent(draftDate);updateModeUi();draw();status('Draft mode is separate from the schedule. Loading the Bible picker…');await loadVerseCatalog();setContentLocked(false);status('Choose a date, select a verse, or generate an unused recovery verse idea.')}
+  function editScheduledVerse(){if(contentMode!=='scheduled')return;if(!confirm(`Edit the scheduled recovery verse for ${scheduledDate}? Publishing will overwrite that date and regenerate its prerecorded audio.`))return;contentMode='edit';updateModeUi();status('Scheduled editing is enabled. Publishing will use the overwrite permission you just confirmed.')}
   function populateBooks(){
     const books=[...new Set(verseCatalog.map(item=>item.book))];$('verseBook').innerHTML=books.map(book=>`<option value="${book}">${book}</option>`).join('');populateChapters();
   }
@@ -280,7 +302,7 @@
   async function loadVerseCatalog(){
     $('loadSelectedVerse').disabled=true;
     try{const response=await fetch(`/server/admin/daily-studio/api/random-content.php?type=bible&catalog=1&language=${encodeURIComponent(verseLanguage())}`,{cache:'no-store'});const data=await response.json();if(!response.ok||!Array.isArray(data.items))throw new Error(data.error||'Verse list could not be loaded.');verseCatalog=data.items;populateBooks();}
-    catch(error){verseCatalog=[];$('verseBook').innerHTML=$('verseChapter').innerHTML=$('verseNumber').innerHTML='';status(error.message,true)}finally{$('loadSelectedVerse').disabled=false}
+    catch(error){verseCatalog=[];$('verseBook').innerHTML=$('verseChapter').innerHTML=$('verseNumber').innerHTML='';status(error.message,true)}finally{setContentLocked(contentMode==='scheduled'||contentMode==='empty')}
   }
   async function loadVerseTranslation(id){
     if(!id)return false;
@@ -293,16 +315,17 @@
   }
   async function loadSelectedVerse(){
     const button=$('loadSelectedVerse');button.disabled=true;status('Loading selected verse…');
-    try{const params=new URLSearchParams({type:'bible',language:verseLanguage(),book:$('verseBook').value,chapter:$('verseChapter').value,verse:$('verseNumber').value});const response=await fetch(`/server/admin/daily-studio/api/random-content.php?${params}`,{cache:'no-store'});const data=await response.json();if(!response.ok||!data.item)throw new Error(data.error||'The selected verse was not found.');applyVerseItem(data.item);status(`${data.item.reference} loaded in ${data.item.translation}.`)}catch(error){status(error.message,true)}finally{button.disabled=false}
+    try{const params=new URLSearchParams({type:'bible',language:verseLanguage(),book:$('verseBook').value,chapter:$('verseChapter').value,verse:$('verseNumber').value});const response=await fetch(`/server/admin/daily-studio/api/random-content.php?${params}`,{cache:'no-store'});const data=await response.json();if(!response.ok||!data.item)throw new Error(data.error||'The selected verse was not found.');applyVerseItem(data.item,true);status(`${data.item.reference} loaded in ${data.item.translation}. Draft date preserved.`)}catch(error){status(error.message,true)}finally{button.disabled=false}
   }
 
   async function generateTodayVerse(){
-    const button=$('generateTodayVerse');button.disabled=true;status(verseLanguage()==='en'?'Choosing a fresh recovery-focused verse…':'Choosing a fresh verse…');
+    if(contentMode!=='draft'){status('Open Create Draft before generating new content.',true);return}
+    const button=$('generateTodayVerse');button.disabled=true;status('Choosing an unused recovery-focused verse…');
     try{
-      const response=await fetch(`/server/admin/daily-studio/api/random-content.php?type=bible&language=${encodeURIComponent(verseLanguage())}`,{cache:'no-store'});
+      const response=await fetch(`/server/admin/daily-studio/api/dailybreath-schedule.php?draft=1&date=${encodeURIComponent(value('publishDate')||nextAvailableDate||localDate())}`,{cache:'no-store'});
       const data=await response.json();if(!response.ok||!data.item)throw new Error(data.error||'No verse was returned.');
-      const item=data.item;applyVerseItem(item);
-      status(`Fresh verse selected — ${data.remaining.toLocaleString()} unused verses remain in this cycle.${data.cycle_restarted?' A new cycle just began.':''}`);
+      const item=data.item;applyVerseItem(item,true);
+      status(`Unused recovery verse selected — ${data.remaining.toLocaleString()} candidates remain outside the published library.`);
     }catch(error){status(error.message||'Verse generation failed.',true)}finally{button.disabled=false}
   }
   async function loadFreshVerseForCurrentLanguage(){
@@ -326,6 +349,7 @@
   }
   async function narrationBlob(){
     const file=$('audioFile').files[0];if(file)return file;
+    if(scheduledAudioMatches()){const response=await fetch(scheduledAudioUrl,{cache:'force-cache'});if(!response.ok)throw new Error('The prerecorded recovery audio could not be loaded.');const blob=await response.blob();if(blob.size<128)throw new Error('The prerecorded recovery audio is empty.');return blob}
     const response=await fetch('/beyond-id/admin/api/verse-narration.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale:narrationLocale(),provider:selectedProvider(),voice:selectedVoice()})});
     if(!response.ok){let msg='Narration service is unavailable.';try{const data=await response.json();msg=data.error||msg}catch{}throw new Error(msg)}return response.blob();
   }
@@ -371,7 +395,16 @@
   }
 
   async function saveDraft(){
-    const d=dateInfo();status('Saving draft…');try{const response=await fetch('/beyond-id/admin/api/verse-posts.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({publish_date:d.raw,locale:verseLanguage(),translation_code:value('translation'),heading:value('heading'),verse_text:value('verse'),scripture_reference:value('reference'),weekday_label:d.weekday,date_label:`${d.month} ${d.day}`,footer_message:value('footer'),template_style:style(),show_footer:$('showFooter').checked,show_frame:$('showFrame').checked})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Draft could not be saved.');status(`Draft #${data.id} saved.`)}catch(error){status(error.message,true)}}
+    if(contentMode!=='draft'&&contentMode!=='edit'){status('Open Create Draft or confirm Edit scheduled before publishing.',true);return false}
+    const button=$('saveDraft'),payload={publish_date:value('publishDate'),verse_text:value('verse'),scripture_reference:value('reference'),theme:'spiritual support',narration_provider:selectedProvider(),narration_voice:selectedVoice(),confirm_overwrite:contentMode==='edit'};button.disabled=true;status('Generating English audio and publishing the recovery verse…');
+    try{
+      const publish=()=>fetch('/server/admin/daily-studio/api/save-dailybreath-verse.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(payload)});
+      let response=await publish(),data=await response.json();
+      if(response.status===409&&data.requires_confirmation){if(!confirm(`A recovery verse is already scheduled for ${payload.publish_date}. Replace it and regenerate its audio?`))throw new Error('Publication cancelled. The scheduled recovery verse was not changed.');payload.confirm_overwrite=true;response=await publish();data=await response.json()}
+      if(!response.ok||!data.ok)throw new Error(data.error||'The recovery verse could not be published.');
+      await loadScheduleDate(data.publish_date);status(`${data.message} Verse ${data.id} is attached to its prerecorded MP3.`);return true;
+    }catch(error){status(error.message||'The recovery verse could not be published.',true);return false}finally{button.disabled=false}
+  }
 
 
   async function exportMp3(){
@@ -379,6 +412,7 @@
     try{
       const uploaded=$('audioFile').files[0];
       if(uploaded){if(!(uploaded.type||'').includes('mpeg')&&!uploaded.name.toLowerCase().endsWith('.mp3'))throw new Error('Upload an MP3 file for direct download.');downloadBlob(uploaded,safeName()+'.mp3');status('Uploaded MP3 downloaded.');return;}
+      if(scheduledAudioMatches()){const response=await fetch(scheduledAudioUrl,{cache:'force-cache'});if(!response.ok)throw new Error('The scheduled MP3 is unavailable.');downloadBlob(await response.blob(),safeName()+'.mp3');status('Prerecorded scheduled MP3 downloaded without generating new audio.');return;}
       const response=await fetch('/beyond-id/admin/api/studio-narration-export.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale:narrationLocale(),publish_date:value('publishDate'),library:'daily-breath',provider:selectedProvider(),voice:selectedVoice()})});
       if(!response.ok){let m='MP3 generation failed.';try{const d=await response.json();m=d.error||m}catch{m+=` (HTTP ${response.status})`}throw new Error(m)}
       const blob=await response.blob(),disp=response.headers.get('Content-Disposition')||'',match=disp.match(/filename="?([^";]+)"?/i);downloadBlob(blob,match?match[1]:safeName()+'.mp3');status('MP3 saved to the Daily Breath audio library and downloaded.');
@@ -398,17 +432,15 @@
   }
   if('speechSynthesis' in window){window.speechSynthesis.onvoiceschanged=populateVoices;populateVoices()}
   document.querySelectorAll('input[name="narrationLanguage"]').forEach(input=>input.addEventListener('change',()=>{populateVoices();status(`${input.nextElementSibling.textContent.trim()} narrator selected.`);draw()}));
-  document.querySelectorAll('input[name="verseLanguage"]').forEach(input=>input.addEventListener('change',async()=>{const settings=languageSettings[input.value],verseId=currentVerseId;const narration=document.querySelector(`input[name="narrationLanguage"][value="${settings.narration}"]`);if(narration)narration.checked=true;$('locale').value=settings.locale;syncHeading();populateVoices();status(`Loading ${input.nextElementSibling.textContent.trim()} scripture…`);await loadVerseCatalog();const managedLoaded=await loadManagedVerse();const translated=managedLoaded||await loadVerseTranslation(verseId);if(!translated)await generateTodayVerse();status(`${input.nextElementSibling.textContent.trim()} selected for scripture text and audio.`);draw()}));
-  $('daypart').addEventListener('change',async()=>{syncHeading();status(`Loading a ${$('daypart').selectedOptions[0].textContent.toLowerCase()} verse edition…`);await generateTodayVerse();draw()});
-  $('verseBook').addEventListener('change',populateChapters);$('verseChapter').addEventListener('change',populateVerseNumbers);$('loadSelectedVerse').addEventListener('click',loadSelectedVerse);$('publishDate').addEventListener('change',()=>loadManagedVerse(true));
+  document.querySelectorAll('input[name="verseLanguage"]').forEach(input=>input.addEventListener('change',()=>{if(input.value!=='en'){document.querySelector('input[name="verseLanguage"][value="en"]').checked=true;status('The recovery schedule publishes English WEB verses. Use the multilingual Bible generator for localized editions.',true);return}syncHeading();draw()}));
+  $('daypart').addEventListener('change',()=>{syncHeading();draw()});
+  $('verseBook').addEventListener('change',populateChapters);$('verseChapter').addEventListener('change',populateVerseNumbers);$('loadSelectedVerse').addEventListener('click',()=>{if(contentMode==='draft'||contentMode==='edit')loadSelectedVerse()});$('publishDate').addEventListener('change',()=>{if(contentMode==='scheduled'||contentMode==='empty')loadScheduleDate(value('publishDate'));else draw()});
 
   controls.forEach(control=>{control.addEventListener(control.type==='file'?'change':'input',draw);control.addEventListener('change',draw)});
   $('downloadPng').addEventListener('click',downloadPng);$('saveDraft').addEventListener('click',saveDraft);$('previewAudio').addEventListener('click',previewNarration);$('stopAudio').addEventListener('click',()=>{stopNarration();status('Narration stopped.')});$('exportVideo').addEventListener('click',exportVideo);$('exportAllVideo').addEventListener('click',exportAllLanguagesVideo);$('exportMp3').addEventListener('click',exportMp3);$('generateTodayVerse').addEventListener('click',generateTodayVerse);
+  $('scheduledMode').addEventListener('click',()=>loadScheduleDate(contentMode==='draft'?localDate():(value('publishDate')||localDate())));$('createDraft').addEventListener('click',enterDraftMode);$('editScheduled').addEventListener('click',editScheduledVerse);$('previousVerse').addEventListener('click',()=>scheduleNavigation.previous&&loadScheduleDate(scheduleNavigation.previous));$('todayVerse').addEventListener('click',()=>loadScheduleDate(localDate()));$('nextVerse').addEventListener('click',()=>scheduleNavigation.next&&loadScheduleDate(scheduleNavigation.next));$('reloadVerse').addEventListener('click',()=>loadScheduleDate(value('publishDate')||localDate()));
   async function bootGenerator(){
-    setPublishDateToToday();syncHeading();draw();await loadVerseCatalog();
-    const managedLoaded=await loadManagedVerse();
-    if(!managedLoaded)await generateTodayVerse();
-    draw();
+    setPublishDateToToday();syncHeading();draw();await loadScheduleDate(value('publishDate')||localDate());draw();
   }
   livingSanctuary.onload=draw;modernAurora.onload=draw;heritageBotanical.onload=draw;bootGenerator();
 })();

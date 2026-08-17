@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/../includes/ecosystem.php';
+require_once __DIR__ . '/includes/verse-of-day.php';
 $beyondWallet = beyond_app_bootstrap('DailyBreath');
 $pdo = beyond_db();
 $userId = (int)$_SESSION['user_id'];
@@ -57,9 +58,16 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
       if(!$stmt->rowCount())throw new RuntimeException('Journal entry not found.');
       $notice='Journal entry deleted.';
     } elseif ($action==='challenge') {
-      $id=(int)$_POST['challenge_id'];$driver=$pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-      $sql=$driver==='sqlite'?'INSERT INTO weekly_challenge_progress(user_id,challenge_id,completed_count,updated_at) VALUES(?,?,1,CURRENT_TIMESTAMP) ON CONFLICT(user_id,challenge_id) DO UPDATE SET completed_count=MIN(completed_count+1,7),updated_at=CURRENT_TIMESTAMP':'INSERT INTO weekly_challenge_progress(user_id,challenge_id,completed_count) VALUES(?,?,1) ON DUPLICATE KEY UPDATE completed_count=LEAST(completed_count+1,7),updated_at=CURRENT_TIMESTAMP';
-      $pdo->prepare($sql)->execute([$userId,$id]);$notice='Today’s challenge progress recorded.';
+      if(($_POST['challenge_source']??'')==='bundled'){
+        $id=preg_replace('/[^a-z0-9-]/','',(string)($_POST['challenge_id']??''));
+        if($id==='')throw new RuntimeException('Challenge not found.');
+        $_SESSION['recovery_challenge_progress'][$id]=min(7,(int)($_SESSION['recovery_challenge_progress'][$id]??0)+1);
+      }else{
+        $id=(int)$_POST['challenge_id'];$driver=$pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        $sql=$driver==='sqlite'?'INSERT INTO weekly_challenge_progress(user_id,challenge_id,completed_count,updated_at) VALUES(?,?,1,CURRENT_TIMESTAMP) ON CONFLICT(user_id,challenge_id) DO UPDATE SET completed_count=MIN(completed_count+1,7),updated_at=CURRENT_TIMESTAMP':'INSERT INTO weekly_challenge_progress(user_id,challenge_id,completed_count) VALUES(?,?,1) ON DUPLICATE KEY UPDATE completed_count=LEAST(completed_count+1,7),updated_at=CURRENT_TIMESTAMP';
+        $pdo->prepare($sql)->execute([$userId,$id]);
+      }
+      $notice='Today’s challenge progress recorded.';
     }
   } catch(Throwable $e){$error=$e->getMessage();}
 }
@@ -67,8 +75,8 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
 $exercise=$pdo->query("SELECT * FROM breathing_exercises WHERE is_published=1 ORDER BY sort_order,id LIMIT 1")->fetch(PDO::FETCH_ASSOC);
 $prayers=$pdo->query("SELECT * FROM guided_prayers WHERE is_published=1 ORDER BY sort_order,id")->fetchAll(PDO::FETCH_ASSOC);
 $prompt=$pdo->query("SELECT * FROM reflection_prompts WHERE is_published=1 ORDER BY prompt_date DESC,id DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-$challenge=$pdo->query("SELECT * FROM weekly_challenges WHERE is_published=1 AND starts_on<=CURRENT_DATE AND ends_on>=CURRENT_DATE ORDER BY starts_on DESC,id DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-$progress=0;if($challenge){$s=$pdo->prepare('SELECT completed_count FROM weekly_challenge_progress WHERE user_id=? AND challenge_id=?');$s->execute([$userId,$challenge['id']]);$progress=(int)$s->fetchColumn();}
+$challenge=dailybreath_recovery_challenge_for_date(date('Y-m-d'));if(!$challenge)try{$challenge=$pdo->query("SELECT * FROM weekly_challenges WHERE is_published=1 AND starts_on<=CURRENT_DATE AND ends_on>=CURRENT_DATE ORDER BY starts_on DESC,id DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC)?:null;}catch(Throwable $e){}
+$progress=0;if($challenge){if(($challenge['source']??'')==='bundled_recovery_challenge'){$progress=(int)($_SESSION['recovery_challenge_progress'][$challenge['id']]??0);}else{$s=$pdo->prepare('SELECT completed_count FROM weekly_challenge_progress WHERE user_id=? AND challenge_id=?');$s->execute([$userId,$challenge['id']]);$progress=(int)$s->fetchColumn();}}
 $journalEntries=[];
 if($section==='journal'){
   $s=$pdo->prepare('SELECT j.id,j.content_ciphertext,j.mood,j.entry_date,j.created_at,p.prompt_text FROM reflection_journal_entries j LEFT JOIN reflection_prompts p ON p.id=j.prompt_id WHERE j.user_id=? ORDER BY j.created_at DESC LIMIT 25');
@@ -120,4 +128,4 @@ if($section==='journal'){
 <?php endif;?>
 <?php if($section==='prayers'):?><section class="card"><h2>Prayers for this moment</h2><?php foreach($prayers as $prayer):?><article class="prayer"><strong><?= e($prayer['title']) ?></strong><p><?= e($prayer['prayer_text']) ?></p><small><?= e($prayer['scripture_reference']) ?></small></article><?php endforeach;?></section><?php endif;?>
 <?php if($section==='journal'):?><section class="card"><div class="journal-head"><div><h2>Private Reflection Journal</h2><p class="muted">Your entries are encrypted before they are stored.</p></div><span class="journal-count"><?= count($journalEntries) ?> recent</span></div><p><strong>Today’s prompt:</strong> <?= e($prompt['prompt_text']??'What is God inviting you to notice today?') ?></p><form method="post" autocomplete="off"><input type="hidden" name="csrf" value="<?= e($_SESSION['practice_csrf']) ?>"><input type="hidden" name="action" value="journal"><input type="hidden" name="prompt_id" value="<?= (int)($prompt['id']??0) ?>"><label for="journal-mood">Mood</label><input id="journal-mood" class="field" name="mood" maxlength="40" value="<?= e((string)($_POST['mood']??'')) ?>" placeholder="Peaceful, hopeful, uncertain…"><label for="journal-entry">Reflection</label><textarea id="journal-entry" class="field area" name="entry" maxlength="10000" required placeholder="Write privately here…"><?= e((string)($_POST['entry']??'')) ?></textarea><div class="submit-row"><button class="btn" type="submit">Submit private reflection</button><span class="privacy">🔒 Visible only through your Beyond ID</span></div></form></section><section class="card"><h2>Recent reflections</h2><?php if(!$journalEntries):?><p class="muted">Your submitted reflections will appear here.</p><?php endif;?><?php foreach($journalEntries as $entry):?><article class="entry"><div class="entry-top"><div><time><?= e(date('M j, Y · g:i a',strtotime((string)$entry['created_at']))) ?></time><?php if(trim((string)$entry['mood'])!==''):?> <span class="mood"><?= e($entry['mood']) ?></span><?php endif;?></div><form method="post" onsubmit="return confirm('Delete this private journal entry?')"><input type="hidden" name="csrf" value="<?= e($_SESSION['practice_csrf']) ?>"><input type="hidden" name="action" value="delete_journal"><input type="hidden" name="entry_id" value="<?= (int)$entry['id'] ?>"><button class="delete" type="submit">Delete</button></form></div><?php if(!empty($entry['prompt_text'])):?><small class="muted"><?= e($entry['prompt_text']) ?></small><?php endif;?><p><?= e($entry['content_plain']) ?></p></article><?php endforeach;?></section><?php endif;?>
-<?php if($section==='challenge'&&$challenge):?><section class="card"><h2><?= e($challenge['title']) ?></h2><p><?= e($challenge['description']) ?></p><p class="muted"><?= e($challenge['scripture_reference']) ?></p><div class="progress"><span style="width:<?= min(100,round($progress/max(1,(int)$challenge['target_count'])*100)) ?>%"></span></div><p><?= $progress ?> of <?= (int)$challenge['target_count'] ?> days complete</p><form method="post"><input type="hidden" name="csrf" value="<?= e($_SESSION['practice_csrf']) ?>"><input type="hidden" name="action" value="challenge"><input type="hidden" name="challenge_id" value="<?= (int)$challenge['id'] ?>"><button class="btn">Mark today complete</button></form></section><?php endif;?></main><script src="/assets/js/visitor-analytics.js" defer></script></body></html>
+<?php if($section==='challenge'&&$challenge):?><section class="card"><h2><?= e($challenge['title']) ?></h2><p><?= e($challenge['description']) ?></p><p class="muted"><?= e($challenge['scripture_reference']) ?></p><?php if(!empty($challenge['steps'])):?><ol><?php foreach($challenge['steps'] as $step):?><li><?= e($step) ?></li><?php endforeach;?></ol><?php endif;?><div class="progress"><span style="width:<?= min(100,round($progress/max(1,(int)$challenge['target_count'])*100)) ?>%"></span></div><p><?= $progress ?> of <?= (int)$challenge['target_count'] ?> days complete</p><form method="post"><input type="hidden" name="csrf" value="<?= e($_SESSION['practice_csrf']) ?>"><input type="hidden" name="action" value="challenge"><input type="hidden" name="challenge_id" value="<?= e((string)$challenge['id']) ?>"><input type="hidden" name="challenge_source" value="<?= ($challenge['source']??'')==='bundled_recovery_challenge'?'bundled':'database' ?>"><button class="btn">Mark today complete</button></form></section><?php endif;?></main><script src="/assets/js/visitor-analytics.js" defer></script></body></html>

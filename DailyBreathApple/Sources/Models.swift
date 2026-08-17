@@ -5,6 +5,20 @@ struct Verse: Identifiable, Codable, Equatable {
     let text: String
     let reference: String
     let reflection: String
+    let audioURL: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id, text, reference, reflection
+        case audioURL = "audio_url"
+    }
+
+    init(id: Int, text: String, reference: String, reflection: String, audioURL: String? = nil) {
+        self.id = id
+        self.text = text
+        self.reference = reference
+        self.reflection = reflection
+        self.audioURL = audioURL
+    }
 }
 
 struct Devotional: Identifiable, Codable, Equatable {
@@ -16,6 +30,128 @@ struct Devotional: Identifiable, Codable, Equatable {
     let minutes: Int
     let prayer: String
     let practice: String
+}
+
+struct RecoveryChallenge: Identifiable, Codable, Equatable {
+    let id: String
+    let title: String
+    let description: String
+    let scriptureReference: String
+    let steps: [String]
+    let targetCount: Int
+    let startsOn: String
+    let endsOn: String
+
+    enum CodingKeys: String, CodingKey {
+        case id, title, description, steps
+        case scriptureReference = "scripture_reference"
+        case targetCount = "target_count"
+        case startsOn = "starts_on"
+        case endsOn = "ends_on"
+    }
+}
+
+enum RecoveryContent {
+    private struct VerseDocument: Decodable { let entries: [VerseEntry] }
+    private struct VerseEntry: Decodable {
+        let text: String
+        let reference: String
+        let theme: String
+        let scheduleDate: String?
+
+        enum CodingKeys: String, CodingKey {
+            case text, reference, theme
+            case scheduleDate = "schedule_date"
+        }
+    }
+
+    private struct DevotionalDocument: Decodable { let entries: [DevotionalEntry] }
+    private struct DevotionalEntry: Decodable {
+        let title: String
+        let excerpt: String
+        let body: String
+        let scriptureReference: String
+        let prayer: String
+        let practice: String
+        let durationMinutes: Int
+        let scheduleDate: String?
+        let scheduleRole: String?
+
+        enum CodingKeys: String, CodingKey {
+            case title, excerpt, body, prayer, practice
+            case scriptureReference = "scripture_reference"
+            case durationMinutes = "duration_minutes"
+            case scheduleDate = "schedule_date"
+            case scheduleRole = "schedule_role"
+        }
+    }
+
+    private struct ChallengeDocument: Decodable { let entries: [RecoveryChallenge] }
+
+    static func verseOfTheDay(for date: Date = Date(), bundle: Bundle = .main) -> Verse? {
+        guard let document: VerseDocument = decode("daily-verses", bundle: bundle), !document.entries.isEmpty else { return nil }
+        let key = dateKey(date)
+        let index = document.entries.firstIndex { $0.scheduleDate == key }
+            ?? rotationIndex(date, count: document.entries.count)
+        let entry = document.entries[index]
+        return Verse(
+            id: index + 1,
+            text: entry.text,
+            reference: entry.reference,
+            reflection: "Let this (entry.theme) verse guide one honest, healthy choice today."
+        )
+    }
+
+    static func devotionalOfTheDay(for date: Date = Date(), bundle: Bundle = .main) -> Devotional? {
+        guard let document: DevotionalDocument = decode("daily-devotionals", bundle: bundle), !document.entries.isEmpty else { return nil }
+        let key = dateKey(date)
+        let index = document.entries.firstIndex { $0.scheduleDate == key } ?? rotationIndex(date, count: document.entries.count)
+        let entry = document.entries[index]
+        return Devotional(
+            id: index + 1,
+            title: entry.title,
+            excerpt: entry.excerpt,
+            body: entry.body,
+            scripture: entry.scriptureReference,
+            minutes: entry.durationMinutes,
+            prayer: entry.prayer,
+            practice: entry.practice
+        )
+    }
+
+    static func challengeOfTheDay(for date: Date = Date(), bundle: Bundle = .main) -> RecoveryChallenge? {
+        guard let document: ChallengeDocument = decode("recovery-challenges", bundle: bundle), !document.entries.isEmpty else { return nil }
+        let key = dateKey(date)
+        return document.entries
+            .filter { $0.startsOn <= key && $0.endsOn >= key }
+            .sorted { $0.startsOn > $1.startsOn }
+            .first ?? document.entries[rotationIndex(date, count: document.entries.count)]
+    }
+
+    static func resourceCounts(bundle: Bundle = .main) -> (verses: Int, devotionals: Int, challenges: Int) {
+        let verses: VerseDocument? = decode("daily-verses", bundle: bundle)
+        let devotionals: DevotionalDocument? = decode("daily-devotionals", bundle: bundle)
+        let challenges: ChallengeDocument? = decode("recovery-challenges", bundle: bundle)
+        return (verses?.entries.count ?? 0, devotionals?.entries.count ?? 0, challenges?.entries.count ?? 0)
+    }
+
+    private static func decode<T: Decodable>(_ resource: String, bundle: Bundle) -> T? {
+        guard let url = bundle.url(forResource: resource, withExtension: "json"), let data = try? Data(contentsOf: url) else { return nil }
+        return try? JSONDecoder().decode(T.self, from: data)
+    }
+
+    private static func dateKey(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: date)
+    }
+
+    private static func rotationIndex(_ date: Date, count: Int) -> Int {
+        let day = Calendar.current.ordinality(of: .day, in: .era, for: date) ?? 1
+        return (day - 1) % count
+    }
 }
 
 struct PrayerPractice: Identifiable, Equatable {

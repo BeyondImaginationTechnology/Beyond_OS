@@ -74,4 +74,21 @@ final class DailyBreathTests: XCTestCase {
             BreathPattern.breathOfTheDay(for: secondDay, calendar: calendar)
         )
     }
+
+    func testRecoveryResourcesHaveExpectedCounts() {
+        let counts = RecoveryContent.resourceCounts()
+        XCTAssertEqual(counts.verses, 138)
+        XCTAssertEqual(counts.devotionals, 138)
+        XCTAssertEqual(counts.challenges, 20)
+    }
+
+    func testRecoveryScheduleStartsAugustSixteenth() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let date = DateComponents(calendar: calendar, year: 2026, month: 8, day: 16, hour: 12).date!
+
+        XCTAssertEqual(RecoveryContent.verseOfTheDay(for: date)?.reference, "Psalm 3:3")
+        XCTAssertEqual(RecoveryContent.devotionalOfTheDay(for: date)?.scripture, "Psalm 3:3")
+        XCTAssertEqual(RecoveryContent.challengeOfTheDay(for: date)?.title, "Build Your Support Circle")
+    }
 }

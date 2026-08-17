@@ -21,10 +21,11 @@ function lesson_by_id(int $id): ?array {
 function todays_lesson(): ?array {
     $lessons = all_lessons(); $today = date('Y-m-d');
     foreach ($lessons as $lesson) if (($lesson['date'] ?? '') === $today) return $lesson;
-    // A dated lesson becomes current at midnight in the configured app
-    // timezone. Never expose a future scheduled lesson before that date.
-    foreach ($lessons as $lesson) if (($lesson['date'] ?? '') < $today) return $lesson;
-    return null;
+    foreach ($lessons as $lesson) {
+        $date=(string)($lesson['date']??'');
+        if($date!==''&&$date<$today)return $lesson;
+    }
+    return $lessons[count($lessons)-1] ?? null;
 }
 function french_modules(): array {
     return [
@@ -235,7 +236,7 @@ function french_learner_key(): string {
     return 's:'.(string)$_SESSION['french_learner_key'];
 }
 function french_academy_has_full_access(): bool {
-    return is_admin()||!empty($_SESSION['user_id'])||!empty($_SESSION['french_academy_entitled']);
+    return is_admin()||!empty($_SESSION['french_academy_entitled']);
 }
 function french_is_guest(): bool {
     return empty($_SESSION['user_id']) && !is_admin();
@@ -262,7 +263,6 @@ function french_academy_exam_passed(string $age,string $module): bool {
 function french_academy_lesson_unlocked(string $age,string $module,int $lesson): bool {
     $age=french_valid_age_group($age);$module=french_valid_module($module);
     if(is_admin())return true;
-    if(french_is_guest())return $module==='greetings'&&$lesson===1;
     if(!french_academy_module_accessible($module)||$lesson<1||$lesson>10)return false;
     if($lesson>1)return french_academy_lesson_passed($age,$module,$lesson-1);
     $keys=array_keys(french_academy_modules());$index=array_search($module,$keys,true);

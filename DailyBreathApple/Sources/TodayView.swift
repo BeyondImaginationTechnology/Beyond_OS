@@ -556,6 +556,7 @@ private struct PrayerPracticeDetailView: View {
 
 private struct WeeklyChallengeView: View {
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    private let challenge = RecoveryContent.challengeOfTheDay()
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -568,18 +569,29 @@ private struct WeeklyChallengeView: View {
                     Image(systemName: "calendar.badge.checkmark")
                         .font(.largeTitle)
                         .foregroundStyle(selectedTheme.accent)
-                    Text("Faith in Action")
+                    Text(challenge?.title ?? "Faith in Action")
                         .font(.largeTitle.weight(.black))
-                    Text("Choose one quiet act of faith this week and make it concrete.")
+                    Text(challenge?.description ?? "Choose one quiet act of faith this week and make it concrete.")
                         .foregroundStyle(.secondary)
+                    if let challenge {
+                        Text(challenge.scriptureReference)
+                            .font(.caption.bold())
+                            .foregroundStyle(selectedTheme.accent)
+                    }
                 }
                 .padding(.vertical, 8)
             }
 
             Section("This Week") {
-                Label("Encourage someone who needs courage.", systemImage: "message.fill")
-                Label("Give without needing credit.", systemImage: "gift.fill")
-                Label("Return to stillness before reacting.", systemImage: "pause.circle.fill")
+                if let challenge {
+                    ForEach(challenge.steps, id: \.self) { step in
+                        Label(step, systemImage: "checkmark.circle")
+                    }
+                } else {
+                    Label("Encourage someone who needs courage.", systemImage: "message.fill")
+                    Label("Give without needing credit.", systemImage: "gift.fill")
+                    Label("Return to stillness before reacting.", systemImage: "pause.circle.fill")
+                }
             }
 
             Section("Track It") {

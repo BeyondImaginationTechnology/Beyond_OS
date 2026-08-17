@@ -1,0 +1,1395 @@
+{
+  "schema_version": 1,
+  "title": "Daily Breath Recovery Verse Library",
+  "translation": "World English Bible",
+  "separate_from_bible_library": true,
+  "entry_count": 138,
+  "scheduled_batch": {
+    "id": "recovery-2026-08-16",
+    "starts_on": "2026-08-16",
+    "ends_on": "2026-11-23",
+    "entry_count": 100
+  },
+  "entries": [
+    {
+      "id": "recovery-001",
+      "text": "The righteous cry, and the LORD hears, and delivers them out of all their troubles.",
+      "reference": "Psalm 34:17",
+      "theme": "freedom",
+      "schedule_date": null,
+      "audio_file": "verse-psalm-34-17.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-002",
+      "text": "God is our refuge and strength, a very present help in trouble.",
+      "reference": "Psalm 46:1",
+      "theme": "spiritual support",
+      "schedule_date": null,
+      "audio_file": "verse-psalm-46-1.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-003",
+      "text": "Be still, and know that I am God.",
+      "reference": "Psalm 46:10",
+      "theme": "peace",
+      "schedule_date": null,
+      "audio_file": "verse-psalm-46-10.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-004",
+      "text": "Call on me in the day of trouble. I will deliver you, and you will honor me.",
+      "reference": "Psalm 50:15",
+      "theme": "freedom",
+      "schedule_date": null,
+      "audio_file": "verse-psalm-50-15.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-005",
+      "text": "Cast your burden on the LORD and he will sustain you.",
+      "reference": "Psalm 55:22",
+      "theme": "spiritual support",
+      "schedule_date": null,
+      "audio_file": "verse-psalm-55-22.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-006",
+      "text": "Then they cried to the LORD in their trouble, and he saved them out of their distresses.",
+      "reference": "Psalm 107:13",
+      "theme": "spiritual support",
+      "schedule_date": null,
+      "audio_file": "verse-psalm-107-13.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-007",
+      "text": "He brought them out of darkness and the shadow of death, and broke away their chains.",
+      "reference": "Psalm 107:14",
+      "theme": "freedom",
+      "schedule_date": null,
+      "audio_file": "verse-psalm-107-14.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-008",
+      "text": "Trust in the LORD with all your heart, and don’t lean on your own understanding.",
+      "reference": "Proverbs 3:5",
+      "theme": "self-control",
+      "schedule_date": null,
+      "audio_file": "verse-proverbs-3-5.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-009",
+      "text": "In all your ways acknowledge him, and he will make your paths straight.",
+      "reference": "Proverbs 3:6",
+      "theme": "spiritual support",
+      "schedule_date": null,
+      "audio_file": "verse-proverbs-3-6.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-010",
+      "text": "He gives power to the weak. He increases the strength of him who has no might.",
+      "reference": "Isaiah 40:29",
+      "theme": "spiritual support",
+      "schedule_date": null,
+      "audio_file": "verse-isaiah-40-29.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-011",
+      "text": "Don’t you be afraid, for I am with you. Don’t be dismayed, for I am your God. I will strengthen you. Yes, I will help you.",
+      "reference": "Isaiah 41:10",
+      "theme": "courage",
+      "schedule_date": null,
+      "audio_file": "verse-isaiah-41-10.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-012",
+      "text": "When you pass through the waters, I will be with you, and through the rivers, they will not overflow you.",
+      "reference": "Isaiah 43:2",
+      "theme": "spiritual support",
+      "schedule_date": null,
+      "audio_file": "verse-isaiah-43-2.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-013",
+      "text": "It is because of the LORD’s loving kindnesses that we are not consumed, because his mercies don’t fail.",
+      "reference": "Lamentations 3:22",
+      "theme": "spiritual support",
+      "schedule_date": null,
+      "audio_file": "verse-lamentations-3-22.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-014",
+      "text": "They are new every morning. Great is your faithfulness.",
+      "reference": "Lamentations 3:23",
+      "theme": "faith",
+      "schedule_date": null,
+      "audio_file": "verse-lamentations-3-23.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-015",
+      "text": "Come to me, all you who labor and are heavily burdened, and I will give you rest.",
+      "reference": "Matthew 11:28",
+      "theme": "peace",
+      "schedule_date": null,
+      "audio_file": "verse-matthew-11-28.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-016",
+      "text": "If therefore the Son makes you free, you will be free indeed.",
+      "reference": "John 8:36",
+      "theme": "freedom",
+      "schedule_date": null,
+      "audio_file": "verse-john-8-36.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-017",
+      "text": "For sin will not have dominion over you, for you are not under law, but under grace.",
+      "reference": "Romans 6:14",
+      "theme": "freedom",
+      "schedule_date": null,
+      "audio_file": "verse-romans-6-14.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-018",
+      "text": "Don’t be conformed to this world, but be transformed by the renewing of your mind.",
+      "reference": "Romans 12:2",
+      "theme": "self-control",
+      "schedule_date": null,
+      "audio_file": "verse-romans-12-2.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-019",
+      "text": "Don’t be overcome by evil, but overcome evil with good.",
+      "reference": "Romans 12:21",
+      "theme": "spiritual support",
+      "schedule_date": null,
+      "audio_file": "verse-romans-12-21.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-020",
+      "text": "Don’t you know that your body is a temple of the Holy Spirit who is in you, whom you have from God?",
+      "reference": "1 Corinthians 6:19",
+      "theme": "self-control",
+      "schedule_date": null,
+      "audio_file": "verse-1-corinthians-6-19.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-021",
+      "text": "For you were bought with a price. Therefore glorify God in your body and in your spirit, which are God’s.",
+      "reference": "1 Corinthians 6:20",
+      "theme": "self-control",
+      "schedule_date": null,
+      "audio_file": "verse-1-corinthians-6-20.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-022",
+      "text": "I beat my body and bring it into submission.",
+      "reference": "1 Corinthians 9:27",
+      "theme": "self-control",
+      "schedule_date": null,
+      "audio_file": "verse-1-corinthians-9-27.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-023",
+      "text": "God is faithful, who will not allow you to be tempted above what you are able, but will with the temptation also make the way of escape.",
+      "reference": "1 Corinthians 10:13",
+      "theme": "freedom",
+      "schedule_date": null,
+      "audio_file": "verse-1-corinthians-10-13.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-024",
+      "text": "My grace is sufficient for you, for my power is made perfect in weakness.",
+      "reference": "2 Corinthians 12:9",
+      "theme": "perseverance",
+      "schedule_date": null,
+      "audio_file": "verse-2-corinthians-12-9.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-025",
+      "text": "Stand firm therefore in the liberty by which Christ has made us free, and don’t be entangled again with a yoke of bondage.",
+      "reference": "Galatians 5:1",
+      "theme": "freedom",
+      "schedule_date": null,
+      "audio_file": "verse-galatians-5-1.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-026",
+      "text": "Walk by the Spirit, and you won’t fulfill the lust of the flesh.",
+      "reference": "Galatians 5:16",
+      "theme": "spiritual support",
+      "schedule_date": null,
+      "audio_file": "verse-galatians-5-16.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-027",
+      "text": "The fruit of the Spirit is love, joy, peace, patience, kindness, goodness, faith.",
+      "reference": "Galatians 5:22",
+      "theme": "peace",
+      "schedule_date": null,
+      "audio_file": "verse-galatians-5-22.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-028",
+      "text": "Gentleness, and self-control. Against such things there is no law.",
+      "reference": "Galatians 5:23",
+      "theme": "self-control",
+      "schedule_date": null,
+      "audio_file": "verse-galatians-5-23.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-029",
+      "text": "Put on the whole armor of God, that you may be able to stand against the wiles of the devil.",
+      "reference": "Ephesians 6:11",
+      "theme": "spiritual support",
+      "schedule_date": null,
+      "audio_file": "verse-ephesians-6-11.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-030",
+      "text": "In nothing be anxious, but in everything, by prayer and petition with thanksgiving, let your requests be made known to God.",
+      "reference": "Philippians 4:6",
+      "theme": "peace",
+      "schedule_date": null,
+      "audio_file": "verse-philippians-4-6.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-031",
+      "text": "And the peace of God, which surpasses all understanding, will guard your hearts and your thoughts in Christ Jesus.",
+      "reference": "Philippians 4:7",
+      "theme": "peace",
+      "schedule_date": null,
+      "audio_file": "verse-philippians-4-7.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-032",
+      "text": "I can do all things through Christ who strengthens me.",
+      "reference": "Philippians 4:13",
+      "theme": "spiritual support",
+      "schedule_date": null,
+      "audio_file": "verse-philippians-4-13.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-033",
+      "text": "For God didn’t give us a spirit of fear, but of power, love, and self-control.",
+      "reference": "2 Timothy 1:7",
+      "theme": "courage",
+      "schedule_date": null,
+      "audio_file": "verse-2-timothy-1-7.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-034",
+      "text": "Denying ungodliness and worldly lusts, we would live soberly, righteously, and godly in this present age.",
+      "reference": "Titus 2:12",
+      "theme": "self-control",
+      "schedule_date": null,
+      "audio_file": "verse-titus-2-12.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-035",
+      "text": "Let’s lay aside every weight and the sin which so easily entangles us, and run with perseverance the race that is set before us.",
+      "reference": "Hebrews 12:1",
+      "theme": "perseverance",
+      "schedule_date": null,
+      "audio_file": "verse-hebrews-12-1.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-036",
+      "text": "Be subject therefore to God. Resist the devil, and he will flee from you.",
+      "reference": "James 4:7",
+      "theme": "spiritual support",
+      "schedule_date": null,
+      "audio_file": "verse-james-4-7.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-037",
+      "text": "Casting all your worries on him, because he cares for you.",
+      "reference": "1 Peter 5:7",
+      "theme": "peace",
+      "schedule_date": null,
+      "audio_file": "verse-1-peter-5-7.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-038",
+      "text": "This is the victory that has overcome the world: your faith.",
+      "reference": "1 John 5:4",
+      "theme": "faith",
+      "schedule_date": null,
+      "audio_file": "verse-1-john-5-4.mp3",
+      "translation": "WEB",
+      "generated_batch": null
+    },
+    {
+      "id": "recovery-039",
+      "text": "But you, LORD, are a shield around me, my glory, and the one who lifts up my head.",
+      "reference": "Psalm 3:3",
+      "theme": "spiritual support",
+      "schedule_date": "2026-08-16",
+      "audio_file": "verse-psalm-3-3.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-040",
+      "text": "In peace I will both lay myself down and sleep, for you alone, LORD, make me live in safety.",
+      "reference": "Psalm 4:8",
+      "theme": "peace",
+      "schedule_date": "2026-08-17",
+      "audio_file": "verse-psalm-4-8.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-041",
+      "text": "The LORD will also be a high tower for the oppressed; a high tower in times of trouble.",
+      "reference": "Psalm 9:9",
+      "theme": "spiritual support",
+      "schedule_date": "2026-08-18",
+      "audio_file": "verse-psalm-9-9.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-042",
+      "text": "I have set the LORD always before me. Because he is at my right hand, I shall not be moved.",
+      "reference": "Psalm 16:8",
+      "theme": "spiritual support",
+      "schedule_date": "2026-08-19",
+      "audio_file": "verse-psalm-16-8.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-043",
+      "text": "The LORD is my rock, my fortress, and my deliverer; my God, my rock, in whom I take refuge; my shield, and the horn of my salvation, my high tower.",
+      "reference": "Psalm 18:2",
+      "theme": "freedom",
+      "schedule_date": "2026-08-20",
+      "audio_file": "verse-psalm-18-2.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-044",
+      "text": "A Psalm by David. The LORD is my shepherd; I shall lack nothing.",
+      "reference": "Psalm 23:1",
+      "theme": "spiritual support",
+      "schedule_date": "2026-08-21",
+      "audio_file": "verse-psalm-23-1.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-045",
+      "text": "Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me. Your rod and your staff, they comfort me.",
+      "reference": "Psalm 23:4",
+      "theme": "courage",
+      "schedule_date": "2026-08-22",
+      "audio_file": "verse-psalm-23-4.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-046",
+      "text": "By David. The LORD is my light and my salvation. Whom shall I fear? The LORD is the strength of my life. Of whom shall I be afraid?",
+      "reference": "Psalm 27:1",
+      "theme": "courage",
+      "schedule_date": "2026-08-23",
+      "audio_file": "verse-psalm-27-1.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-047",
+      "text": "Wait for the LORD. Be strong, and let your heart take courage. Yes, wait for the LORD.",
+      "reference": "Psalm 27:14",
+      "theme": "courage",
+      "schedule_date": "2026-08-24",
+      "audio_file": "verse-psalm-27-14.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-048",
+      "text": "For his anger is but for a moment. His favor is for a lifetime. Weeping may stay for the night, but joy comes in the morning.",
+      "reference": "Psalm 30:5",
+      "theme": "spiritual support",
+      "schedule_date": "2026-08-25",
+      "audio_file": "verse-psalm-30-5.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-049",
+      "text": "Be strong, and let your heart take courage, all you who hope in the LORD.",
+      "reference": "Psalm 31:24",
+      "theme": "courage",
+      "schedule_date": "2026-08-26",
+      "audio_file": "verse-psalm-31-24.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-050",
+      "text": "You are my hiding place. You will preserve me from trouble. You will surround me with songs of deliverance. Selah.",
+      "reference": "Psalm 32:7",
+      "theme": "freedom",
+      "schedule_date": "2026-08-27",
+      "audio_file": "verse-psalm-32-7.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-051",
+      "text": "I sought the LORD, and he answered me, and delivered me from all my fears.",
+      "reference": "Psalm 34:4",
+      "theme": "freedom",
+      "schedule_date": "2026-08-28",
+      "audio_file": "verse-psalm-34-4.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-052",
+      "text": "Oh taste and see that the LORD is good. Blessed is the man who takes refuge in him.",
+      "reference": "Psalm 34:8",
+      "theme": "spiritual support",
+      "schedule_date": "2026-08-29",
+      "audio_file": "verse-psalm-34-8.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-053",
+      "text": "Commit your way to the LORD. Trust also in him, and he will do this:",
+      "reference": "Psalm 37:5",
+      "theme": "faith",
+      "schedule_date": "2026-08-30",
+      "audio_file": "verse-psalm-37-5.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-054",
+      "text": "For the Chief Musician. A Psalm by David. I waited patiently for the LORD. He turned to me, and heard my cry.",
+      "reference": "Psalm 40:1",
+      "theme": "perseverance",
+      "schedule_date": "2026-08-31",
+      "audio_file": "verse-psalm-40-1.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-055",
+      "text": "Why are you in despair, my soul? Why are you disturbed within me? Hope in God! For I shall still praise him, the saving help of my countenance, and my God.",
+      "reference": "Psalm 42:11",
+      "theme": "peace",
+      "schedule_date": "2026-09-01",
+      "audio_file": "verse-psalm-42-11.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-056",
+      "text": "When I am afraid, I will put my trust in you.",
+      "reference": "Psalm 56:3",
+      "theme": "courage",
+      "schedule_date": "2026-09-02",
+      "audio_file": "verse-psalm-56-3.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-057",
+      "text": "From the end of the earth, I will call to you when my heart is overwhelmed. Lead me to the rock that is higher than I.",
+      "reference": "Psalm 61:2",
+      "theme": "self-control",
+      "schedule_date": "2026-09-03",
+      "audio_file": "verse-psalm-61-2.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-058",
+      "text": "For the Chief Musician. To Jeduthun. A Psalm by David. My soul rests in God alone. My salvation is from him.",
+      "reference": "Psalm 62:1",
+      "theme": "peace",
+      "schedule_date": "2026-09-04",
+      "audio_file": "verse-psalm-62-1.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-059",
+      "text": "My soul, wait in silence for God alone, for my expectation is from him.",
+      "reference": "Psalm 62:5",
+      "theme": "perseverance",
+      "schedule_date": "2026-09-05",
+      "audio_file": "verse-psalm-62-5.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-060",
+      "text": "My soul stays close to you. Your right hand holds me up.",
+      "reference": "Psalm 63:8",
+      "theme": "spiritual support",
+      "schedule_date": "2026-09-06",
+      "audio_file": "verse-psalm-63-8.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-061",
+      "text": "Blessed be the Lord, who daily bears our burdens, even the God who is our salvation. Selah.",
+      "reference": "Psalm 68:19",
+      "theme": "spiritual support",
+      "schedule_date": "2026-09-07",
+      "audio_file": "verse-psalm-68-19.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-062",
+      "text": "My flesh and my heart fails, but God is the strength of my heart and my portion forever.",
+      "reference": "Psalm 73:26",
+      "theme": "self-control",
+      "schedule_date": "2026-09-08",
+      "audio_file": "verse-psalm-73-26.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-063",
+      "text": "For the LORD God is a sun and a shield. The LORD will give grace and glory. He withholds no good thing from those who walk blamelessly.",
+      "reference": "Psalm 84:11",
+      "theme": "perseverance",
+      "schedule_date": "2026-09-09",
+      "audio_file": "verse-psalm-84-11.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-064",
+      "text": "He who dwells in the secret place of the Most High will rest in the shadow of the Almighty.",
+      "reference": "Psalm 91:1",
+      "theme": "peace",
+      "schedule_date": "2026-09-10",
+      "audio_file": "verse-psalm-91-1.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-065",
+      "text": "I will say of the LORD, “He is my refuge and my fortress; my God, in whom I trust.”",
+      "reference": "Psalm 91:2",
+      "theme": "faith",
+      "schedule_date": "2026-09-11",
+      "audio_file": "verse-psalm-91-2.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-066",
+      "text": "In the multitude of my thoughts within me, your comforts delight my soul.",
+      "reference": "Psalm 94:19",
+      "theme": "spiritual support",
+      "schedule_date": "2026-09-12",
+      "audio_file": "verse-psalm-94-19.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-067",
+      "text": "Praise the LORD, my soul, and don’t forget all his benefits,",
+      "reference": "Psalm 103:2",
+      "theme": "spiritual support",
+      "schedule_date": "2026-09-13",
+      "audio_file": "verse-psalm-103-2.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-068",
+      "text": "who satisfies your desire with good things, so that your youth is renewed like the eagle’s.",
+      "reference": "Psalm 103:5",
+      "theme": "spiritual support",
+      "schedule_date": "2026-09-14",
+      "audio_file": "verse-psalm-103-5.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-069",
+      "text": "Out of my distress, I called on the LORD. The LORD answered me with freedom.",
+      "reference": "Psalm 118:5",
+      "theme": "freedom",
+      "schedule_date": "2026-09-15",
+      "audio_file": "verse-psalm-118-5.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-070",
+      "text": "The LORD is my strength and song. He has become my salvation.",
+      "reference": "Psalm 118:14",
+      "theme": "spiritual support",
+      "schedule_date": "2026-09-16",
+      "audio_file": "verse-psalm-118-14.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-071",
+      "text": "This is the day that the LORD has made. We will rejoice and be glad in it!",
+      "reference": "Psalm 118:24",
+      "theme": "spiritual support",
+      "schedule_date": "2026-09-17",
+      "audio_file": "verse-psalm-118-24.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-072",
+      "text": "How can a young man keep his way pure? By living according to your word.",
+      "reference": "Psalm 119:9",
+      "theme": "spiritual support",
+      "schedule_date": "2026-09-18",
+      "audio_file": "verse-psalm-119-9.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-073",
+      "text": "I have hidden your word in my heart, that I might not sin against you.",
+      "reference": "Psalm 119:11",
+      "theme": "self-control",
+      "schedule_date": "2026-09-19",
+      "audio_file": "verse-psalm-119-11.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-074",
+      "text": "My soul is weary with sorrow; strengthen me according to your word.",
+      "reference": "Psalm 119:28",
+      "theme": "spiritual support",
+      "schedule_date": "2026-09-20",
+      "audio_file": "verse-psalm-119-28.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-075",
+      "text": "This is my comfort in my affliction, for your word has revived me.",
+      "reference": "Psalm 119:50",
+      "theme": "spiritual support",
+      "schedule_date": "2026-09-21",
+      "audio_file": "verse-psalm-119-50.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-076",
+      "text": "Your word is a lamp to my feet, and a light for my path.",
+      "reference": "Psalm 119:105",
+      "theme": "spiritual support",
+      "schedule_date": "2026-09-22",
+      "audio_file": "verse-psalm-119-105.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-077",
+      "text": "A Song of Ascents. I will lift up my eyes to the hills. Where does my help come from?",
+      "reference": "Psalm 121:1",
+      "theme": "spiritual support",
+      "schedule_date": "2026-09-23",
+      "audio_file": "verse-psalm-121-1.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-078",
+      "text": "My help comes from the LORD, who made heaven and earth.",
+      "reference": "Psalm 121:2",
+      "theme": "spiritual support",
+      "schedule_date": "2026-09-24",
+      "audio_file": "verse-psalm-121-2.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-079",
+      "text": "The LORD will keep you from all evil. He will keep your soul.",
+      "reference": "Psalm 121:7",
+      "theme": "spiritual support",
+      "schedule_date": "2026-09-25",
+      "audio_file": "verse-psalm-121-7.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-080",
+      "text": "I wait for the LORD. My soul waits. I hope in his word.",
+      "reference": "Psalm 130:5",
+      "theme": "perseverance",
+      "schedule_date": "2026-09-26",
+      "audio_file": "verse-psalm-130-5.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-081",
+      "text": "In the day that I called, you answered me. You encouraged me with strength in my soul.",
+      "reference": "Psalm 138:3",
+      "theme": "courage",
+      "schedule_date": "2026-09-27",
+      "audio_file": "verse-psalm-138-3.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-082",
+      "text": "Search me, God, and know my heart. Try me, and know my thoughts.",
+      "reference": "Psalm 139:23",
+      "theme": "self-control",
+      "schedule_date": "2026-09-28",
+      "audio_file": "verse-psalm-139-23.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-083",
+      "text": "Cause me to hear your loving kindness in the morning, for I trust in you. Cause me to know the way in which I should walk, for I lift up my soul to you.",
+      "reference": "Psalm 143:8",
+      "theme": "faith",
+      "schedule_date": "2026-09-29",
+      "audio_file": "verse-psalm-143-8.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-084",
+      "text": "Keep your heart with all diligence, for out of it is the wellspring of life.",
+      "reference": "Proverbs 4:23",
+      "theme": "self-control",
+      "schedule_date": "2026-09-30",
+      "audio_file": "verse-proverbs-4-23.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-085",
+      "text": "Anxiety in a man’s heart weighs it down, but a kind word makes it glad.",
+      "reference": "Proverbs 12:25",
+      "theme": "self-control",
+      "schedule_date": "2026-10-01",
+      "audio_file": "verse-proverbs-12-25.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-086",
+      "text": "Commit your deeds to the LORD, and your plans shall succeed.",
+      "reference": "Proverbs 16:3",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-02",
+      "audio_file": "verse-proverbs-16-3.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-087",
+      "text": "The LORD’s name is a strong tower: the righteous run to him, and are safe.",
+      "reference": "Proverbs 18:10",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-03",
+      "audio_file": "verse-proverbs-18-10.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-088",
+      "text": "for a righteous man falls seven times and rises up again, but the wicked are overthrown by calamity.",
+      "reference": "Proverbs 24:16",
+      "theme": "perseverance",
+      "schedule_date": "2026-10-04",
+      "audio_file": "verse-proverbs-24-16.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-089",
+      "text": "For everything there is a season, and a time for every purpose under heaven:",
+      "reference": "Ecclesiastes 3:1",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-05",
+      "audio_file": "verse-ecclesiastes-3-1.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-090",
+      "text": "Two are better than one, because they have a good reward for their labor.",
+      "reference": "Ecclesiastes 4:9",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-06",
+      "audio_file": "verse-ecclesiastes-4-9.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-091",
+      "text": "You will keep whoever’s mind is steadfast in perfect peace, because he trusts in you.",
+      "reference": "Isaiah 26:3",
+      "theme": "peace",
+      "schedule_date": "2026-10-07",
+      "audio_file": "verse-isaiah-26-3.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-092",
+      "text": "For thus said the Lord GOD, the Holy One of Israel, “You will be saved in returning and rest. Your strength will be in quietness and in confidence.” You refused,",
+      "reference": "Isaiah 30:15",
+      "theme": "peace",
+      "schedule_date": "2026-10-08",
+      "audio_file": "verse-isaiah-30-15.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-093",
+      "text": "Tell those who have a fearful heart, “Be strong! Don’t be afraid! Behold, your God will come with vengeance, God’s retribution. He will come and save you.",
+      "reference": "Isaiah 35:4",
+      "theme": "courage",
+      "schedule_date": "2026-10-09",
+      "audio_file": "verse-isaiah-35-4.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-094",
+      "text": "but those who wait for the LORD will renew their strength. They will mount up with wings like eagles. They will run, and not be weary. They will walk, and not faint.",
+      "reference": "Isaiah 40:31",
+      "theme": "perseverance",
+      "schedule_date": "2026-10-10",
+      "audio_file": "verse-isaiah-40-31.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-095",
+      "text": "But now the LORD who created you, Jacob, and he who formed you, Israel, says: “Don’t be afraid, for I have redeemed you. I have called you by your name. You are mine.",
+      "reference": "Isaiah 43:1",
+      "theme": "courage",
+      "schedule_date": "2026-10-11",
+      "audio_file": "verse-isaiah-43-1.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-096",
+      "text": "“Don’t remember the former things, and don’t consider the things of old.",
+      "reference": "Isaiah 43:18",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-12",
+      "audio_file": "verse-isaiah-43-18.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-097",
+      "text": "Behold, I will do a new thing. It springs out now. Don’t you know it? I will even make a way in the wilderness, and rivers in the desert.",
+      "reference": "Isaiah 43:19",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-13",
+      "audio_file": "verse-isaiah-43-19.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-098",
+      "text": "I have blotted out, as a thick cloud, your transgressions, and, as a cloud, your sins. Return to me, for I have redeemed you.",
+      "reference": "Isaiah 44:22",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-14",
+      "audio_file": "verse-isaiah-44-22.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-099",
+      "text": "“Can a woman forget her nursing child, that she should not have compassion on the son of her womb? Yes, these may forget, yet I will not forget you!",
+      "reference": "Isaiah 49:15",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-15",
+      "audio_file": "verse-isaiah-49-15.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-100",
+      "text": "For the high and lofty One who inhabits eternity, whose name is Holy, says: “I dwell in the high and holy place, with him also who is of a contrite and humble spirit, to revive the spirit of the humble, and to revive the heart of the contrite.",
+      "reference": "Isaiah 57:15",
+      "theme": "self-control",
+      "schedule_date": "2026-10-16",
+      "audio_file": "verse-isaiah-57-15.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-101",
+      "text": "“Blessed is the man who trusts in the LORD, and whose confidence is in the LORD.",
+      "reference": "Jeremiah 17:7",
+      "theme": "faith",
+      "schedule_date": "2026-10-17",
+      "audio_file": "verse-jeremiah-17-7.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-102",
+      "text": "For I know the thoughts that I think toward you,” says the LORD, “thoughts of peace, and not of evil, to give you hope and a future.",
+      "reference": "Jeremiah 29:11",
+      "theme": "peace",
+      "schedule_date": "2026-10-18",
+      "audio_file": "verse-jeremiah-29-11.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-103",
+      "text": "The LORD appeared of old to me, saying, “Yes, I have loved you with an everlasting love. Therefore I have drawn you with loving kindness.",
+      "reference": "Jeremiah 31:3",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-19",
+      "audio_file": "verse-jeremiah-31-3.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-104",
+      "text": "‘Call to me, and I will answer you, and will show you great and difficult things, which you don’t know.’",
+      "reference": "Jeremiah 33:3",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-20",
+      "audio_file": "verse-jeremiah-33-3.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-105",
+      "text": "I will also give you a new heart, and I will put a new spirit within you. I will take away the stony heart out of your flesh, and I will give you a heart of flesh.",
+      "reference": "Ezekiel 36:26",
+      "theme": "self-control",
+      "schedule_date": "2026-10-21",
+      "audio_file": "verse-ezekiel-36-26.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-106",
+      "text": "Don’t rejoice against me, my enemy. When I fall, I will arise. When I sit in darkness, the LORD will be a light to me.",
+      "reference": "Micah 7:8",
+      "theme": "perseverance",
+      "schedule_date": "2026-10-22",
+      "audio_file": "verse-micah-7-8.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-107",
+      "text": "The LORD is good, a stronghold in the day of trouble; and he knows those who take refuge in him.",
+      "reference": "Nahum 1:7",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-23",
+      "audio_file": "verse-nahum-1-7.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-108",
+      "text": "Blessed are those who mourn, for they shall be comforted.",
+      "reference": "Matthew 5:4",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-24",
+      "audio_file": "verse-matthew-5-4.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-109",
+      "text": "Blessed are those who hunger and thirst for righteousness, for they shall be filled.",
+      "reference": "Matthew 5:6",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-25",
+      "audio_file": "verse-matthew-5-6.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-110",
+      "text": "Bring us not into temptation, but deliver us from the evil one. For yours is the Kingdom, the power, and the glory forever. Amen.’",
+      "reference": "Matthew 6:13",
+      "theme": "freedom",
+      "schedule_date": "2026-10-26",
+      "audio_file": "verse-matthew-6-13.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-111",
+      "text": "Therefore I tell you, don’t be anxious for your life: what you will eat, or what you will drink; nor yet for your body, what you will wear. Isn’t life more than food, and the body more than clothing?",
+      "reference": "Matthew 6:25",
+      "theme": "peace",
+      "schedule_date": "2026-10-27",
+      "audio_file": "verse-matthew-6-25.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-112",
+      "text": "But seek first God’s Kingdom and his righteousness; and all these things will be given to you as well.",
+      "reference": "Matthew 6:33",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-28",
+      "audio_file": "verse-matthew-6-33.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-113",
+      "text": "“Ask, and it will be given you. Seek, and you will find. Knock, and it will be opened for you.",
+      "reference": "Matthew 7:7",
+      "theme": "spiritual support",
+      "schedule_date": "2026-10-29",
+      "audio_file": "verse-matthew-7-7.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-114",
+      "text": "Take my yoke upon you and learn from me, for I am gentle and humble in heart; and you will find rest for your souls.",
+      "reference": "Matthew 11:29",
+      "theme": "peace",
+      "schedule_date": "2026-10-30",
+      "audio_file": "verse-matthew-11-29.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-115",
+      "text": "He said to them, “Because of your unbelief. For most certainly I tell you, if you have faith as a grain of mustard seed, you will tell this mountain, ‘Move from here to there,’ and it will move; and nothing will be impossible for you.",
+      "reference": "Matthew 17:20",
+      "theme": "faith",
+      "schedule_date": "2026-10-31",
+      "audio_file": "verse-matthew-17-20.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-116",
+      "text": "Looking at them, Jesus said, “With men this is impossible, but with God all things are possible.”",
+      "reference": "Matthew 19:26",
+      "theme": "spiritual support",
+      "schedule_date": "2026-11-01",
+      "audio_file": "verse-matthew-19-26.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-117",
+      "text": "Jesus said to him, “If you can believe, all things are possible to him who believes.”",
+      "reference": "Mark 9:23",
+      "theme": "faith",
+      "schedule_date": "2026-11-02",
+      "audio_file": "verse-mark-9-23.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-118",
+      "text": "Jesus, looking at them, said, “With men it is impossible, but not with God, for all things are possible with God.”",
+      "reference": "Mark 10:27",
+      "theme": "spiritual support",
+      "schedule_date": "2026-11-03",
+      "audio_file": "verse-mark-10-27.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-119",
+      "text": "Therefore I tell you, all things whatever you pray and ask for, believe that you have received them, and you shall have them.",
+      "reference": "Mark 11:24",
+      "theme": "faith",
+      "schedule_date": "2026-11-04",
+      "audio_file": "verse-mark-11-24.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-120",
+      "text": "For nothing spoken by God is impossible.”",
+      "reference": "Luke 1:37",
+      "theme": "spiritual support",
+      "schedule_date": "2026-11-05",
+      "audio_file": "verse-luke-1-37.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-121",
+      "text": "“Don’t be afraid, little flock, for it is your Father’s good pleasure to give you the Kingdom.",
+      "reference": "Luke 12:32",
+      "theme": "courage",
+      "schedule_date": "2026-11-06",
+      "audio_file": "verse-luke-12-32.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-122",
+      "text": "But he said, “The things which are impossible with men are possible with God.”",
+      "reference": "Luke 18:27",
+      "theme": "spiritual support",
+      "schedule_date": "2026-11-07",
+      "audio_file": "verse-luke-18-27.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-123",
+      "text": "“Don’t let your heart be troubled. Believe in God. Believe also in me.",
+      "reference": "John 14:1",
+      "theme": "self-control",
+      "schedule_date": "2026-11-08",
+      "audio_file": "verse-john-14-1.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-124",
+      "text": "Peace I leave with you. My peace I give to you; not as the world gives, I give to you. Don’t let your heart be troubled, neither let it be fearful.",
+      "reference": "John 14:27",
+      "theme": "courage",
+      "schedule_date": "2026-11-09",
+      "audio_file": "verse-john-14-27.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-125",
+      "text": "I am the vine. You are the branches. He who remains in me and I in him bears much fruit, for apart from me you can do nothing.",
+      "reference": "John 15:5",
+      "theme": "spiritual support",
+      "schedule_date": "2026-11-10",
+      "audio_file": "verse-john-15-5.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-126",
+      "text": "I have told you these things, that in me you may have peace. In the world you have trouble; but cheer up! I have overcome the world.”",
+      "reference": "John 16:33",
+      "theme": "peace",
+      "schedule_date": "2026-11-11",
+      "audio_file": "verse-john-16-33.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-127",
+      "text": "It will be that whoever will call on the name of the Lord will be saved.’",
+      "reference": "Acts 2:21",
+      "theme": "spiritual support",
+      "schedule_date": "2026-11-12",
+      "audio_file": "verse-acts-2-21.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-128",
+      "text": "They said, “Believe in the Lord Jesus Christ, and you will be saved, you and your household.”",
+      "reference": "Acts 16:31",
+      "theme": "faith",
+      "schedule_date": "2026-11-13",
+      "audio_file": "verse-acts-16-31.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-129",
+      "text": "Not only this, but we also rejoice in our sufferings, knowing that suffering produces perseverance;",
+      "reference": "Romans 5:3",
+      "theme": "perseverance",
+      "schedule_date": "2026-11-14",
+      "audio_file": "verse-romans-5-3.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-130",
+      "text": "and perseverance, proven character; and proven character, hope;",
+      "reference": "Romans 5:4",
+      "theme": "perseverance",
+      "schedule_date": "2026-11-15",
+      "audio_file": "verse-romans-5-4.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-131",
+      "text": "and hope doesn’t disappoint us, because God’s love has been poured into our hearts through the Holy Spirit who was given to us.",
+      "reference": "Romans 5:5",
+      "theme": "perseverance",
+      "schedule_date": "2026-11-16",
+      "audio_file": "verse-romans-5-5.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-132",
+      "text": "There is therefore now no condemnation to those who are in Christ Jesus, who don’t walk according to the flesh, but according to the Spirit.",
+      "reference": "Romans 8:1",
+      "theme": "spiritual support",
+      "schedule_date": "2026-11-17",
+      "audio_file": "verse-romans-8-1.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-133",
+      "text": "For the mind of the flesh is death, but the mind of the Spirit is life and peace;",
+      "reference": "Romans 8:6",
+      "theme": "peace",
+      "schedule_date": "2026-11-18",
+      "audio_file": "verse-romans-8-6.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-134",
+      "text": "We know that all things work together for good for those who love God, for those who are called according to his purpose.",
+      "reference": "Romans 8:28",
+      "theme": "spiritual support",
+      "schedule_date": "2026-11-19",
+      "audio_file": "verse-romans-8-28.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-135",
+      "text": "What then shall we say about these things? If God is for us, who can be against us?",
+      "reference": "Romans 8:31",
+      "theme": "spiritual support",
+      "schedule_date": "2026-11-20",
+      "audio_file": "verse-romans-8-31.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-136",
+      "text": "No, in all these things we are more than conquerors through him who loved us.",
+      "reference": "Romans 8:37",
+      "theme": "spiritual support",
+      "schedule_date": "2026-11-21",
+      "audio_file": "verse-romans-8-37.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-137",
+      "text": "But put on the Lord Jesus Christ, and make no provision for the flesh, for its lusts.",
+      "reference": "Romans 13:14",
+      "theme": "spiritual support",
+      "schedule_date": "2026-11-22",
+      "audio_file": "verse-romans-13-14.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    },
+    {
+      "id": "recovery-138",
+      "text": "Now may the God of hope fill you with all joy and peace in believing, that you may abound in hope in the power of the Holy Spirit.",
+      "reference": "Romans 15:13",
+      "theme": "peace",
+      "schedule_date": "2026-11-23",
+      "audio_file": "verse-romans-15-13.mp3",
+      "translation": "WEB",
+      "generated_batch": "recovery-2026-08-16"
+    }
+  ]
+}

@@ -19,5 +19,5 @@ $csrf=(string)($_SERVER['HTTP_X_CSRF_TOKEN']??'');if(empty($_SESSION['verse_gene
 $in=json_decode((string)file_get_contents('php://input'),true);$text=trim((string)($in['text']??''));$locale=(string)($in['locale']??'en-US');$provider=strtolower(trim((string)($in['provider']??'')));$voice=trim((string)($in['voice']??''));
 if($provider!==''&&!in_array($provider,['openai','elevenlabs','azure'],true)) narration_error(422,'Narration provider is invalid.');
 if($voice!==''&&!preg_match('/^[A-Za-z0-9:_-]+$/',$voice)) narration_error(422,'Narration voice is invalid.');
-if($text===''||strlen($text)>10000||!in_array($locale,['en-US','fr-FR','fr-CA','es-ES','en-JM','ht-HT'],true)) narration_error(422,'Narration text or language is invalid.');
+if($text===''||strlen($text)>10000||!in_array($locale,['en-US','fr-FR','fr-CA','es-ES','it-IT','de-DE','ru-RU','pt-PT','en-JM','ht-HT'],true)) narration_error(422,'Narration text or language is invalid.');
 try{$r=studio_narration_generate($text,$locale,$provider,$voice);$audio=(string)$r['audio_content'];header('Content-Type: audio/mpeg');header('Content-Length: '.strlen($audio));header('Cache-Control: private, no-store');echo $audio;}catch(Throwable $e){error_log('Studio narration: '.$e->getMessage());narration_error(503,$e->getMessage());}

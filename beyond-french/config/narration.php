@@ -10,12 +10,16 @@ $azureVoices = (array)beyond_config('narration.azure.voices', [
     'fr-CA' => [$azureDailyVoice => 'Jenny Multilingual - French fallback'],
     'fr-FR' => [$azureDailyVoice => 'Jenny Multilingual - French'],
     'es-ES' => [$azureDailyVoice => 'Jenny Multilingual - Spanish'],
+    'it-IT' => [$azureDailyVoice => 'Jenny Multilingual - Italian'],
+    'de-DE' => [$azureDailyVoice => 'Jenny Multilingual - German'],
+    'ru-RU' => [$azureDailyVoice => 'Jenny Multilingual - Russian'],
+    'pt-PT' => [$azureDailyVoice => 'Jenny Multilingual - Portuguese'],
     // Azure does not publish dedicated en-JM or ht-HT TTS voices. These
     // controlled fallbacks keep batch exports narrated instead of failing.
     'en-JM' => [$azureDailyVoice => 'Jenny Multilingual - Patois fallback'],
     'ht-HT' => [$azureDailyVoice => 'Jenny Multilingual - Kreyòl fallback'],
 ]);
-foreach (['en-US', 'fr-CA', 'fr-FR', 'es-ES', 'en-JM', 'ht-HT'] as $azureLocale) {
+foreach (['en-US', 'fr-CA', 'fr-FR', 'es-ES', 'it-IT', 'de-DE', 'ru-RU', 'pt-PT', 'en-JM', 'ht-HT'] as $azureLocale) {
     $configuredVoices = $azureVoices[$azureLocale] ?? [];
     if (is_string($configuredVoices) && trim($configuredVoices) !== '') {
         $configuredVoices = [$configuredVoices => $configuredVoices];
@@ -29,7 +33,7 @@ foreach (['en-US', 'fr-CA', 'fr-FR', 'es-ES', 'en-JM', 'ht-HT'] as $azureLocale)
 return [
     'allowed_providers' => ['openai', 'elevenlabs', 'azure'],
     'allowed_formats' => ['mp3'],
-    'allowed_languages' => ['en-US', 'fr-CA', 'fr-FR', 'es-ES', 'ht-HT', 'en-JM'],
+    'allowed_languages' => ['en-US', 'fr-CA', 'fr-FR', 'es-ES', 'it-IT', 'de-DE', 'ru-RU', 'pt-PT', 'ht-HT', 'en-JM'],
     // Azure is the controlled server-side fallback for Studio exports.
     // Do not automatically retry quota-limited OpenAI or ElevenLabs accounts.
     'fallback_providers' => ['azure'],

@@ -20,6 +20,11 @@ final class FrenchQuestTests: XCTestCase {
         XCTAssertEqual(QuestTheme.allCases.map(\.title), ["Night", "Riviera", "Market", "Garden"])
     }
 
+    @MainActor
+    func testWorldTourUsesThreeHearts() {
+        XCTAssertEqual(QuestStore.maxHearts, 3)
+    }
+
     func testCloudSaveUsesServerFieldNames() throws {
         let save = FrenchQuestCloudSave(
             completedChallengeIDs: ["hello", "thanks"],

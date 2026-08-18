@@ -14,6 +14,8 @@ struct ChallengePlayer: View {
     let challenge: QuestChallenge
     @State private var selected: String?
 
+    private var isOutOfHearts: Bool { store.hearts == 0 }
+
     var body: some View {
         QuestCard {
             VStack(alignment: .leading, spacing: 16) {
@@ -33,6 +35,17 @@ struct ChallengePlayer: View {
                     .accessibilityLabel("Listen")
                 }
 
+
+                HStack(spacing: 7) {
+                    ForEach(0..<QuestStore.maxHearts, id: \.self) { index in
+                        Image(systemName: index < store.hearts ? "heart.fill" : "heart")
+                            .foregroundStyle(index < store.hearts ? .red : .white.opacity(0.25))
+                    }
+                    Text("\(store.hearts) attempts left")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.white.opacity(0.65))
+                }
+
                 HStack(alignment: .top) {
                     Text(challenge.prompt)
                         .font(.title2.weight(.black))
@@ -45,22 +58,14 @@ struct ChallengePlayer: View {
                         .background(Color.yellow.opacity(0.14), in: Capsule())
                 }
 
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(challenge.phrase)
-                        .font(.system(size: 32, weight: .black, design: .rounded))
-                        .foregroundStyle(region.color)
-                    Text(challenge.pronunciation)
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                }
-
                 VStack(spacing: 10) {
                     ForEach(Array(challenge.options.enumerated()), id: \.element) { index, option in
                         Button {
                             selected = option
-                            withAnimation(.snappy(duration: 0.22)) {
+                            let isCorrect = withAnimation(.snappy(duration: 0.22)) {
                                 store.submit(option, for: challenge, in: region)
                             }
+                            store.speakFeedback(correct: isCorrect)
                         } label: {
                             HStack {
                                 Text(["A", "B", "C", "D"][min(index, 3)])
@@ -77,8 +82,33 @@ struct ChallengePlayer: View {
                             .background(optionBackground(option), in: RoundedRectangle(cornerRadius: 14))
                         }
                         .buttonStyle(.plain)
-                        .disabled(store.hearts == 0)
+                        .disabled(isOutOfHearts)
                     }
+                }
+
+                if isOutOfHearts {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("OUT OF HEARTS")
+                            .font(.headline.weight(.black))
+                            .foregroundStyle(.red)
+                        Text("Restart with three attempts and try this mission again.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Button {
+                            selected = nil
+                            store.resetResult()
+                            store.refillHearts()
+                        } label: {
+                            Label("Try Again", systemImage: "arrow.clockwise")
+                                .font(.headline.weight(.black))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 13)
+                                .background(region.color, in: Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .padding(14)
+                    .background(Color.red.opacity(0.10), in: RoundedRectangle(cornerRadius: 14))
                 }
 
                 if let result = store.lastResult {
@@ -91,12 +121,12 @@ struct ChallengePlayer: View {
                         .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
-                Text(challenge.tip)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
             }
         }
         .animation(.snappy(duration: 0.22), value: store.lastResult)
+        .onAppear {
+            store.resetResult()
+        }
     }
 
     private func optionBackground(_ option: String) -> Color {

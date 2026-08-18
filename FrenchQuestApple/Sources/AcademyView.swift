@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct WorldTourMapView: View {
     @EnvironmentObject private var store: QuestStore
@@ -146,6 +147,7 @@ private struct WorldStopButton: View {
 
 struct DestinationAdventureView: View {
     @EnvironmentObject private var store: QuestStore
+    @Environment(\.dismiss) private var dismiss
     let region: QuestRegion
 
     private var currentMission: QuestChallenge? {
@@ -157,12 +159,7 @@ struct DestinationAdventureView: View {
     var body: some View {
         ZStack {
             store.theme.background.ignoresSafeArea()
-            Image("WorldTourMap")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-                .blur(radius: 18)
-                .opacity(0.16)
+            DestinationBackdrop(region: region)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
@@ -215,8 +212,21 @@ struct DestinationAdventureView: View {
                                 Text("The next stop on the world tour is now open.")
                                     .multilineTextAlignment(.center)
                                     .foregroundStyle(.secondary)
+                                Button {
+                                    dismiss()
+                                } label: {
+                                    Label("Continue World Tour", systemImage: "map.fill")
+                                        .font(.headline.weight(.black))
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 14)
+                                        .background(region.color, in: Capsule())
+                                }
+                                .buttonStyle(.plain)
                             }
                             .frame(maxWidth: .infinity)
+                        }
+                        .onAppear {
+                            store.speakDestinationCleared()
                         }
                     }
                 }
@@ -226,6 +236,39 @@ struct DestinationAdventureView: View {
         .foregroundStyle(.white)
         .navigationTitle(region.title)
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct DestinationBackdrop: View {
+    let region: QuestRegion
+    @State private var drifting = false
+
+    var body: some View {
+        ZStack {
+            Image("WorldTourMap")
+                .resizable()
+                .scaledToFill()
+                .blur(radius: 18)
+                .opacity(0.16)
+
+            if UIImage(named: "Destination-\(region.id)") != nil {
+                Image("Destination-\(region.id)")
+                    .resizable()
+                    .scaledToFill()
+                    .scaleEffect(drifting ? 1.12 : 1.04)
+                    .offset(x: drifting ? -12 : 12, y: drifting ? 8 : -8)
+                    .opacity(0.42)
+                    .overlay(Color.black.opacity(0.38))
+            }
+        }
+        .ignoresSafeArea()
+        .clipped()
+        .onAppear {
+            withAnimation(.easeInOut(duration: 12).repeatForever(autoreverses: true)) {
+                drifting = true
+            }
+        }
+        .accessibilityHidden(true)
     }
 }
 

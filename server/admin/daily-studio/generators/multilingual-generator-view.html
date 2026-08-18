@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="csrf-token" content="__CSRF_TOKEN__">
+  <title>Beyond French Multilingual Generator</title>
+  <style>
+    :root{color-scheme:light;--navy:#15325c;--panel:#fff;--blue:#1558ce;--gold:#d89a00;--line:rgba(28,65,116,.16);--muted:#65758d}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 70% 0,#f8fbff 0,#edf4fc 50%,#e7eef8 100%);color:#17243a;font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea,select{font:inherit}
+    .shell{min-height:100vh;display:grid;grid-template-columns:minmax(330px,450px) minmax(0,1fr)}.controls{padding:26px;overflow:auto;background:rgba(255,255,255,.97);border-right:1px solid var(--line);box-shadow:8px 0 30px rgba(28,65,116,.06)}.preview{display:grid;place-items:center;padding:28px;min-width:0}.back{display:inline-block;margin-bottom:15px;color:#315d98;text-decoration:none}h1{margin:0;font-size:28px}.lede,.hint{color:var(--muted)}.lede{margin:5px 0 18px}.group{padding:18px 0;border-top:1px solid var(--line)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px}.field{margin-bottom:13px}label{display:block;font-weight:750;margin-bottom:6px}input[type=text],input[type=date],input[type=file],textarea,select{width:100%;padding:10px 11px;border-radius:10px;border:1px solid var(--line);background:#fff;color:#17243a;outline:none}textarea{min-height:85px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:#3880ef;box-shadow:0 0 0 3px rgba(56,128,239,.15)}input[readonly],textarea[readonly]{background:#f1f4f8;color:#53627a;cursor:not-allowed}.check{display:flex;align-items:center;gap:8px;margin:0}.check input{width:17px;height:17px;accent-color:#e0a20b}.audio-row,.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{border:0;border-radius:11px;padding:12px 13px;font-weight:800;cursor:pointer;background:#edf2f9;color:#17345d}.btn.primary{background:linear-gradient(135deg,#ffd65a,#ffae2e);color:#142744}.btn.secondary{color:#173d70;background:#e7f0fc;border:1px solid var(--line)}.btn.voice-primary{background:linear-gradient(135deg,#1558ce,#7047eb);color:#fff;box-shadow:0 10px 24px rgba(21,88,206,.22)}.btn.wide{grid-column:1/-1}.btn:disabled{opacity:.55;cursor:wait}.mode-switch,.schedule-nav{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mode-switch{margin-bottom:12px}.schedule-nav{grid-template-columns:auto 1fr auto auto;margin-bottom:14px}.mode-pill{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px;padding:9px 11px;border-radius:11px;background:#edf4ff;color:#184a91;font-size:12px;font-weight:900}.mode-pill.editing{background:#fff0d5;color:#865700}.mode-pill.draft{background:#eee9ff;color:#5e39a5}.draft-tools{display:grid;gap:8px;margin-bottom:14px}.voice-integration{margin:0 0 14px;padding:13px 14px;border:1px solid #cbdcf5;border-radius:13px;background:#f3f7ff}.voice-integration strong,.voice-integration span{display:block}.voice-integration strong{color:#173d70}.voice-integration span{margin-top:3px;color:var(--muted);font-size:12px}.voice-integration a{display:inline-block;margin-top:8px;color:#1558ce;font-size:12px;font-weight:800}.voice-state{float:right;padding:4px 7px;border-radius:999px;font-size:10px;text-transform:uppercase}.voice-state.ready{background:#dcf7e5;color:#24723c}.voice-state.needs-config{background:#fff0d5;color:#865700}.static-note{margin:0 0 12px;padding:10px 12px;border-radius:11px;background:#eef8f1;color:#2a6b3d;font-size:12px;font-weight:700}.status{min-height:23px;margin-top:10px;color:#327247}.status.error{color:#b92828}.canvas-wrap{width:min(72vh,680px);max-width:100%;filter:drop-shadow(0 22px 36px rgba(28,65,116,.2))}canvas{display:block;width:100%;height:auto;border-radius:18px;background:#041733}[hidden]{display:none!important}
+    @media(max-width:940px){.shell{display:block}.controls{border-right:0;border-bottom:1px solid var(--line)}.preview{padding:18px}.canvas-wrap{width:min(100%,580px)}}@media(max-width:520px){.controls{padding:20px}.grid,.actions,.audio-row{grid-template-columns:1fr}.btn.wide{grid-column:auto}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <aside class="controls">
+    <a class="back" href="/server/admin/daily-studio/">&larr; Admin dashboard</a>
+    <h1>Multilingual Daily Generator <small style="font-size:12px;color:#1558ce;vertical-align:middle">1.2.0</small></h1>
+    <p class="lede">Open scheduled lessons for export, or create a separate draft for a new publication date.</p>
+    <div class="mode-switch"><button id="scheduledMode" class="btn primary" type="button">Scheduled</button><button id="createDraft" class="btn secondary" type="button">Create Draft</button></div>
+    <div id="modePill" class="mode-pill"><span>SCHEDULED · READ ONLY</span><button id="editScheduled" class="btn secondary" type="button">Edit scheduled</button></div>
+    <div id="scheduleNav" class="schedule-nav"><button id="previousLesson" class="btn secondary" type="button" aria-label="Previous scheduled lesson">←</button><button id="todayLesson" class="btn secondary" type="button">Today</button><button id="nextLesson" class="btn secondary" type="button" aria-label="Next scheduled lesson">→</button><button id="reloadLesson" class="btn secondary" type="button" aria-label="Reload scheduled lesson">↻</button></div>
+    <div id="draftTools" class="draft-tools" hidden><button id="generateTodayPhrase" class="btn primary wide" type="button">✨ Choose from prerecorded bank</button><span class="hint">French stays primary. Italian, German, Russian, and Portuguese use the same visual template.</span></div>
+    <div class="voice-integration"><strong>Azure prerecorded bank <span id="bankProgress">Checking…</span></strong><span>Target: 100 complete phrases × 5 languages.</span><button id="buildBank" class="btn secondary" type="button" style="margin-top:8px">Build next Azure batch</button></div>
+
+    <section class="group">
+      <div class="field"><label for="phrase">Today’s English phrase</label><input id="phrase" type="text" placeholder="Loading today’s lesson…"></div>
+      <div class="field"><label for="meaning">What it means</label><textarea id="meaning"></textarea></div>
+      <div class="grid"><div class="field"><label for="weekday">Weekday</label><input id="weekday" type="text"></div><div class="field"><label for="publishDate">Date</label><input id="publishDate" type="date"></div></div>
+    </section>
+
+    <section class="group">
+      <div class="grid">
+        <div><div class="field"><label for="french">🇫🇷 Français</label><input id="french" type="text"></div><div class="field"><label for="frenchPron">Pronunciation</label><input id="frenchPron" type="text"></div></div>
+        <div><div class="field"><label for="italian">🇮🇹 Italian</label><input id="italian" type="text"></div><div class="field"><label for="italianPron">Pronunciation</label><input id="italianPron" type="text"></div></div>
+        <div><div class="field"><label for="german">🇩🇪 German</label><input id="german" type="text"></div><div class="field"><label for="germanPron">Pronunciation</label><input id="germanPron" type="text"></div></div>
+        <div><div class="field"><label for="russian">🇷🇺 Russian</label><input id="russian" type="text"></div><div class="field"><label for="russianPron">Pronunciation</label><input id="russianPron" type="text"></div></div>
+        <div><div class="field"><label for="portuguese">🇵🇹 Portuguese</label><input id="portuguese" type="text"></div><div class="field"><label for="portuguesePron">Pronunciation</label><input id="portuguesePron" type="text"></div></div>
+      </div>
+      <div class="field"><label for="culture">Culture note</label><textarea id="culture"></textarea></div>
+    </section>
+
+    <section class="group">
+      <label>Narration</label>
+      <div class="voice-integration">
+        <span class="voice-state __VOICE_STATUS_CLASS__">__VOICE_STATUS__</span>
+        <strong>__VOICE_PROVIDER__</strong>
+        <span>Scheduled exports reuse prerecorded audio. Azure usage occurs only when building missing bank tracks.</span>
+        <a href="/server/admin/daily-studio/voice-settings.php">Configure premium voices</a>
+      </div>
+      <div class="grid"><label class="check"><input id="includeNarration" type="checkbox"> Include server audio</label><label class="check"><input id="showBadge" type="checkbox" checked> Show playing badge</label></div>
+      <div class="field" style="margin-top:13px"><label for="narrationProvider">Narration provider for export</label><select id="narrationProvider"><option value="azure">Azure Speech</option></select><div class="hint">This language bank uses Azure Speech for previews, MP3s, and narrated video.</div></div>
+      <div class="field" style="margin-top:13px"><label for="exportLanguage">Export version</label><select id="exportLanguage"><option value="fr">French</option><option value="it">Italian</option><option value="de">German</option><option value="ru">Russian</option><option value="pt">Portuguese</option></select></div>
+      <div class="field" style="margin-top:13px"><label for="narratorLocale">Narrator voice</label><select id="narratorLocale"><option value="fr-FR">French</option><option value="it-IT">Italian</option><option value="de-DE">German</option><option value="ru-RU">Russian</option><option value="pt-PT">Portuguese</option></select></div>
+      <div class="field"><label for="audioFile">Optional narration override</label><input id="audioFile" type="file" accept="audio/*"><div class="hint">Scheduled lessons reuse their prerecorded Azure bank audio automatically.</div></div>
+      <div class="audio-row"><button id="previewAudio" class="btn secondary" type="button">Preview narration</button><button id="stopAudio" class="btn secondary" type="button">Stop</button></div>
+    </section>
+
+    <section class="group">
+      <div class="static-note">Static template protected: Web, iOS, PNG, and browser drafts do not call the narration API.</div>
+      <div class="actions">
+        <button id="saveDailyPhrase" class="btn primary wide" type="button" hidden>Publish draft with audio</button>
+        <button id="downloadPng" class="btn primary" type="button">Download static PNG</button>
+        <button id="saveLocal" class="btn secondary" type="button" hidden>Save browser draft</button>
+        <button id="saveAndExportVideo" class="btn voice-primary wide" type="button" hidden>Publish + export Instagram MP4</button>
+        <button id="exportRemotionVideo" type="button" hidden>Unused renderer</button>
+        <button id="exportVideo" class="btn voice-primary wide" type="button">Export Instagram MP4</button>
+        <button id="exportAllVideo" class="btn secondary wide" type="button">Export all languages as one narrated MP4</button>
+        <button id="exportMp3" class="btn secondary wide" type="button">Export MP3 narration</button>
+      </div>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+      <div class="hint">MP4 is used when supported; WebM is the fallback. When no API voice or uploaded file is available, the visual exports without audio instead of failing.</div>
+    </section>
+  </aside>
+  <section class="preview"><div class="canvas-wrap"><canvas id="art" width="1080" height="1350" aria-label="Français du Jour preview"></canvas></div></section>
+</main>
+
+<script src="/server/admin/daily-studio/assets/beyond-french-remotion-renderer.js?v=__FRENCH_RENDERER_VERSION__"></script>
+<script>
+(() => {
+  'use strict';
+  const $=id=>document.getElementById(id),canvas=$('art'),ctx=canvas.getContext('2d',{alpha:false}),csrf=document.querySelector('meta[name="csrf-token"]').content;
+  const ids=['phrase','meaning','weekday','publishDate','french','frenchPron','italian','italianPron','german','germanPron','russian','russianPron','portuguese','portuguesePron','culture','narrationProvider','exportLanguage','narratorLocale','includeNarration','showBadge'];
+  const contentIds=['phrase','meaning','weekday','french','frenchPron','italian','italianPron','german','germanPron','russian','russianPron','portuguese','portuguesePron','culture'];
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  let activeAudio=null,brandReady=false,narrationPlaying=false,previewAnimation=null,scheduledAudioUrls={},scheduledTexts={},scheduledDate='',selectedSourceId='',contentMode='scheduled',scheduleNavigation={},nextAvailableDate='',bankBuilding=false;const brandLogo=new Image();brandLogo.decoding='async';brandLogo.src='/beyond-french/assets/images/beyond-french-logo.webp';brandLogo.onload=()=>{brandReady=true;draw()};brandLogo.onerror=()=>setStatus('Beyond French logo could not be loaded. Exports will use a text fallback.',true);const v=id=>$(id).value.trim();const setStatus=(m,e=false)=>{$('status').textContent=m;$('status').classList.toggle('error',e)};
+  const languageLocales={fr:'fr-FR',it:'it-IT',de:'de-DE',ru:'ru-RU',pt:'pt-PT'};
+  const localeLanguages=Object.fromEntries(Object.entries(languageLocales).map(([language,locale])=>[locale,language]));
+  const languageForLocale=locale=>localeLanguages[locale]||'fr';
+  const selectedLanguage=()=>languageForLocale(v('narratorLocale'))||v('exportLanguage')||'fr';
+  const selectedProvider=()=>v('narrationProvider');
+  const selectedVoice=()=>selectedProvider()==='azure'?'en-US-JennyMultilingualNeural':'';
+  const exportSettings=(language=v('exportLanguage'))=>({
+    fr:{locale:'fr-FR',label:'French',banner:'Phrase Française du Jour',phrase:v('french'),pronunciation:v('frenchPron'),meaningLabel:'Meaning in English'},
+    it:{locale:'it-IT',label:'Italian',banner:'Phrase Française du Jour',phrase:v('italian'),pronunciation:v('italianPron'),meaningLabel:'Meaning in English'},
+    de:{locale:'de-DE',label:'German',banner:'Phrase Française du Jour',phrase:v('german'),pronunciation:v('germanPron'),meaningLabel:'Meaning in English'},
+    ru:{locale:'ru-RU',label:'Russian',banner:'Phrase Française du Jour',phrase:v('russian'),pronunciation:v('russianPron'),meaningLabel:'Meaning in English'},
+    pt:{locale:'pt-PT',label:'Portuguese',banner:'Phrase Française du Jour',phrase:v('portuguese'),pronunciation:v('portuguesePron'),meaningLabel:'Meaning in English'}
+  }[language]||{locale:'fr-FR',label:'French',banner:'Phrase Française du Jour',phrase:v('french'),pronunciation:v('frenchPron'),meaningLabel:'Meaning in English'});
+  function round(x,y,w,h,r,fill,stroke,line=2){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=line;ctx.stroke()}}
+  function wrap(text,x,y,width,height,max=4,align='center'){const words=text.replace(/\s+/g,' ').trim().split(' '),lines=[];let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>width&&line){lines.push(line);line=word}else line=test}if(line)lines.push(line);ctx.textAlign=align;lines.slice(0,max).forEach((l,i)=>ctx.fillText(l,x,y+i*height));return lines.length}
+  function sizeFor(text,width,start,min=18,weight=800){let s=start;for(;s>min;s-=2){ctx.font=`${weight} ${s}px Arial`;if(ctx.measureText(text).width<=width)break}return s}
+  function dateData(){const raw=v('publishDate')||new Date().toISOString().slice(0,10),d=new Date(raw+'T12:00:00');return{raw,month:d.toLocaleDateString('en-US',{month:'long'}).toUpperCase(),day:String(d.getDate())}}
+  function drawBrand(){
+    ctx.save();ctx.beginPath();ctx.arc(78,78,58,0,Math.PI*2);ctx.clip();
+    if(brandReady)ctx.drawImage(brandLogo,20,20,116,116);
+    else{ctx.fillStyle='#071630';ctx.fillRect(20,20,116,116);ctx.fillStyle='#fff';ctx.font='900 34px Arial';ctx.textAlign='center';ctx.fillText('BF',78,90)}
+    ctx.restore();ctx.beginPath();ctx.arc(78,78,59,0,Math.PI*2);ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke()
+  }
+  function drawBadge(pulse){
+    if(!$('showBadge').checked)return;
+    ctx.save();
+    ctx.shadowColor='rgba(0,0,0,.28)';ctx.shadowBlur=22;ctx.shadowOffsetY=8;
+    round(740,28,300,100,24,'rgba(4,20,48,.94)','rgba(84,148,255,.58)',2);
+    ctx.shadowColor='transparent';
+    const glow=ctx.createRadialGradient(786,78,3,786,78,48);glow.addColorStop(0,'rgba(35,117,255,.34)');glow.addColorStop(1,'rgba(35,117,255,0)');ctx.fillStyle=glow;ctx.fillRect(742,30,88,96);
+    ctx.fillStyle='#1768ff';ctx.beginPath();ctx.arc(786,78,29,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(774,72);ctx.lineTo(782,72);ctx.lineTo(793,63);ctx.lineTo(793,93);ctx.lineTo(782,84);ctx.lineTo(774,84);ctx.closePath();ctx.fill();
+    ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.lineCap='round';for(let i=0;i<2;i++){ctx.beginPath();ctx.arc(792,78,10+i*8,-.82,.82);ctx.stroke()}
+    ctx.textAlign='left';ctx.fillStyle='#9ebfff';ctx.font='800 15px Arial';ctx.letterSpacing='2px';ctx.fillText('NARRATION',830,61);ctx.letterSpacing='0px';
+    ctx.fillStyle='#fff';ctx.font='900 26px Arial';ctx.fillText('Voice on',830,88);
+    const levels=[.35,.7,1,.58,.82];levels.forEach((level,i)=>{const animated=10+(level*18)+(pulse*(i%2?8:3));round(831+i*12,100-animated/2,6,animated,3,i===2?'#ffbf00':'#41e28a',null)});
+    ctx.fillStyle='#41e28a';ctx.font='800 13px Arial';ctx.fillText('VOICE ON',902,106);
+    ctx.restore()
+  }
+  function drawCalendar(){
+    const d=dateData(),x=856,y=148,w=158,h=154;
+    ctx.save();ctx.shadowColor='rgba(0,0,0,.30)';ctx.shadowBlur=24;ctx.shadowOffsetY=10;round(x,y,w,h,24,'#fff',null);ctx.shadowColor='transparent';
+    round(x,y,w,52,24,'#e82f3f',null);ctx.fillStyle='#e82f3f';ctx.fillRect(x,y+26,w,26);
+    ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(x+12,y+11,w-24,1);
+    [x+38,x+w-38].forEach(ringX=>{ctx.fillStyle='#061731';ctx.beginPath();ctx.arc(ringX,y+8,8,0,Math.PI*2);ctx.fill();round(ringX-4,y-13,8,25,4,'#dce4f1',null)});
+    ctx.textAlign='center';ctx.fillStyle='#fff';ctx.font='900 18px Arial';ctx.letterSpacing='2px';ctx.fillText(v('weekday').slice(0,3),x+w/2,y+34);ctx.letterSpacing='0px';
+    ctx.fillStyle='#6d7890';ctx.font='900 18px Arial';ctx.fillText(d.month.slice(0,3),x+w/2,y+82);
+    ctx.fillStyle='#071630';ctx.font='900 55px Arial Black, Arial';ctx.fillText(d.day,x+w/2,y+137);
+    ctx.fillStyle='#1768ff';round(x+48,y+143,62,4,2,'#1768ff',null);
+    ctx.restore()
+  }
+  function drawCard(x,language,label,flag,text,pron,color,pulse=0){
+    const matchesVoice=selectedLanguage()===language;
+    const active=$('showBadge').checked&&matchesVoice&&($('includeNarration').checked||narrationPlaying);
+    const speaking=active&&narrationPlaying;
+    const hot=active?'rgba(255,151,35,.92)':null,glow=speaking?.58:.45;
+    ctx.save();ctx.shadowColor=active?`rgba(255,151,35,${glow})`:'rgba(0,7,24,.22)';ctx.shadowBlur=active?44+pulse*20:20;ctx.shadowOffsetY=active?16+pulse*8:9;round(x,755,238,330,24,active?'#fff4d6':'rgba(255,255,255,.98)',hot,active?5:2);ctx.shadowColor='transparent';
+    if(active){ctx.save();ctx.globalAlpha=.18+.18*pulse;round(x-7,748,252,344,28,'rgba(255,191,0,.75)',null);ctx.restore()}
+    const shine=active?ctx.createLinearGradient(x,755,x+238,755):null;if(shine){shine.addColorStop(0,'#ff8a1f');shine.addColorStop(.5,'#ffd447');shine.addColorStop(1,'#ff9e2a')}
+    round(x,755,238,12,6,active?shine:color,null);round(x+18,776,202,44,14,active?'#ffe8a8':'#f0f4fa',null);
+    if(speaking){ctx.save();ctx.globalAlpha=.28+.22*pulse;ctx.strokeStyle='#ff9700';ctx.lineWidth=3;ctx.setLineDash([12,9]);ctx.lineDashOffset=-(pulse*34);ctx.beginPath();ctx.roundRect(x+8,763,222,314,20);ctx.stroke();ctx.restore()}
+    ctx.textAlign='left';ctx.font='31px Arial';ctx.fillText(flag,x+31,808);ctx.fillStyle=color;ctx.font='900 16px Arial';ctx.letterSpacing='1.5px';ctx.fillText(label,x+78,804);ctx.letterSpacing='0px';
+    ctx.textAlign='center';ctx.fillStyle='#071630';const s=sizeFor(text,202,36,24);ctx.font=`900 ${s}px Arial`;wrap(text,x+119,878,202,s*1.14,3);
+    ctx.fillStyle='#66738b';ctx.font='italic 700 16px Arial';wrap(pron?`/${pron}/`:'Written guide',x+119,982,194,21,2);
+    const pulseScale=active?1+pulse*.12:1,iconX=x+119,iconY=1045;
+    round(x+60,1024,118,42,21,active?'#ff8a1f':color,null);ctx.save();ctx.translate(iconX,iconY);ctx.scale(pulseScale,pulseScale);ctx.translate(-iconX,-iconY);ctx.fillStyle='#fff';ctx.beginPath();ctx.moveTo(x+89,1038);ctx.lineTo(x+97,1038);ctx.lineTo(x+107,1030);ctx.lineTo(x+107,1060);ctx.lineTo(x+97,1052);ctx.lineTo(x+89,1052);ctx.closePath();ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.arc(x+106,1045,9,-.8,.8);ctx.stroke();if(active){ctx.beginPath();ctx.arc(x+106,1045,18+pulse*14,-.8,.8);ctx.globalAlpha=.78;ctx.stroke()}ctx.restore();ctx.fillStyle='#fff';ctx.font='900 12px Arial';ctx.textAlign='left';ctx.fillText(speaking?'SPEAKING':active?'VOICE ON':'LISTEN',x+118,1050);ctx.restore()
+  }
+  function draw(pulse=0){
+    const g=ctx.createLinearGradient(0,0,1080,1350);g.addColorStop(0,'#020d20');g.addColorStop(.48,'#05295e');g.addColorStop(1,'#020d22');ctx.fillStyle=g;ctx.fillRect(0,0,1080,1350);
+    const halo=ctx.createRadialGradient(540,270,20,540,270,650);halo.addColorStop(0,'rgba(31,111,255,.24)');halo.addColorStop(.62,'rgba(8,47,104,.08)');halo.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=halo;ctx.fillRect(0,0,1080,850);
+    ctx.save();ctx.globalAlpha=.08;ctx.strokeStyle='#60a5ff';ctx.lineWidth=2;for(let r=170;r<=520;r+=70){ctx.beginPath();ctx.arc(540,330,r,Math.PI*.12,Math.PI*.88);ctx.stroke()}for(let i=0;i<32;i++){ctx.fillStyle=i%4===0?'#ffbf00':'#65a4ff';ctx.beginPath();ctx.arc(40+(i*83)%1020,340+(i*71)%340,2+(i%3),0,Math.PI*2);ctx.fill()}ctx.restore();
+    const output=exportSettings('fr');drawBrand();drawBadge(pulse);ctx.textAlign='left';ctx.fillStyle='#9ebfff';ctx.font='900 15px Arial';ctx.letterSpacing='4px';ctx.fillText('BEYOND FRENCH · DAILY ACADEMY',164,91);ctx.letterSpacing='0px';ctx.fillStyle='#fff';ctx.font='900 77px Arial Black, Impact, Arial';ctx.fillText('FRANÇAIS',164,172);ctx.fillStyle='#ffc018';ctx.font='900 62px Arial Black, Impact, Arial';ctx.fillText('DU JOUR',164,234);round(164,266,520,48,24,'rgba(23,104,255,.92)','rgba(114,170,255,.52)',2);ctx.fillStyle='#fff';ctx.font='800 21px Arial, Helvetica, sans-serif';ctx.textAlign='center';ctx.fillText(output.banner,424,298);
+    drawCalendar();
+    ctx.save();ctx.shadowColor='rgba(0,6,25,.28)';ctx.shadowBlur=28;ctx.shadowOffsetY=12;round(150,350,780,190,28,'rgba(255,255,255,.985)',null);ctx.shadowColor='transparent';round(185,374,160,34,17,'#eaf1ff',null);ctx.fillStyle='#1557c9';ctx.font='900 14px Arial';ctx.letterSpacing='2px';ctx.textAlign='center';ctx.fillText(output.label.toUpperCase(),265,397);ctx.letterSpacing='0px';ctx.fillStyle='#071630';const psize=sizeFor(output.phrase,690,57,29);ctx.font=`900 ${psize}px Arial Black, Arial`;ctx.fillText(output.phrase,540,474);if(output.pronunciation){ctx.fillStyle='#52627b';ctx.font='italic 700 20px Arial';ctx.fillText(`/${output.pronunciation}/`,540,512)}ctx.restore();
+    round(105,574,870,126,22,'rgba(5,25,57,.88)','rgba(112,162,236,.38)',2);ctx.textAlign='left';ctx.fillStyle='#ffca36';ctx.font='900 16px Arial';ctx.letterSpacing='2px';ctx.fillText(output.meaningLabel.toUpperCase(),135,614);ctx.letterSpacing='0px';ctx.fillStyle='#eef5ff';ctx.font='600 22px Arial';wrap(v('meaning'),135,657,800,29,2,'left');
+    const activePulse=narrationPlaying||($('includeNarration').checked&&$('showBadge').checked)?pulse:0;
+    drawCard(52,'it','ITALIAN','🇮🇹',v('italian'),v('italianPron'),'#249c3a',activePulse);drawCard(300,'de','GERMAN','🇩🇪',v('german'),v('germanPron'),'#d2a000',activePulse);drawCard(548,'ru','RUSSIAN','🇷🇺',v('russian'),v('russianPron'),'#24548d',activePulse);drawCard(796,'pt','PORTUGUESE','🇵🇹',v('portuguese'),v('portuguesePron'),'#168b83',activePulse);
+    round(105,1110,870,116,22,'rgba(8,35,78,.96)','rgba(63,132,242,.48)',2);round(126,1129,46,46,14,'#ffbf00',null);ctx.fillStyle='#071630';ctx.font='900 25px Arial';ctx.textAlign='center';ctx.fillText('i',149,1161);ctx.textAlign='left';ctx.fillStyle='#ffc21c';ctx.font='900 17px Arial';ctx.letterSpacing='1.5px';ctx.fillText('CULTURE NOTE',190,1149);ctx.letterSpacing='0px';ctx.fillStyle='#fff';ctx.font='600 19px Arial';wrap(v('culture'),190,1182,745,24,2,'left');
+    const footer=ctx.createLinearGradient(0,1270,1080,1350);footer.addColorStop(0,'#ffbf00');footer.addColorStop(.5,'#ffd65a');footer.addColorStop(1,'#ffae22');ctx.fillStyle=footer;ctx.fillRect(0,1270,1080,80);ctx.fillStyle='#05152f';ctx.textAlign='center';ctx.font='900 17px Arial';ctx.letterSpacing='1px';ctx.fillText('FRENCH FIRST  ·  FOUR MORE LANGUAGES  ·  EVERY DAY',540,1306);ctx.font='800 14px Arial';ctx.letterSpacing='.5px';ctx.fillText('BEYONDIMAGINATION.CO.TECHNOLOGY/BEYOND-FRENCH',540,1332);ctx.letterSpacing='0px'
+  }
+  function localDateParts(){const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000),iso=local.toISOString().slice(0,10);return{date:iso,weekday:now.toLocaleDateString('en-US',{weekday:'long'}).toUpperCase()}}
+  function weekdayForDate(date){const parsed=new Date(`${date}T12:00:00`);return Number.isNaN(parsed.getTime())?'':parsed.toLocaleDateString('en-US',{weekday:'long'}).toUpperCase()}
+  function setFieldValue(id,value,notify=true){const field=$(id);if(!field)return false;field.value=value==null?'':String(value);if(notify){field.dispatchEvent(new Event('input',{bubbles:true}));field.dispatchEvent(new Event('change',{bubbles:true}))}return true}
+  function populateLesson(item,date){selectedSourceId=String(item.source_id||'');const mapped={phrase:item.english,meaning:item.meaning||'A practical phrase for everyday conversation.',french:item.french,frenchPron:item.french_pronunciation,italian:item.italian,italianPron:item.italian_pronunciation||'',german:item.german,germanPron:item.german_pronunciation||'',russian:item.russian,russianPron:item.russian_pronunciation||'',portuguese:item.portuguese,portuguesePron:item.portuguese_pronunciation||'',culture:item.culture_note};Object.entries(mapped).forEach(([id,value])=>setFieldValue(id,value,false));setFieldValue('publishDate',date,false);setFieldValue('weekday',weekdayForDate(date),false);draw();updateAudioUi()}
+  function clearContent(date=''){selectedSourceId='';contentIds.forEach(id=>setFieldValue(id,'',false));setFieldValue('publishDate',date,false);setFieldValue('weekday',weekdayForDate(date),false);draw()}
+  function setContentLocked(locked){contentIds.forEach(id=>{$(id).readOnly=locked});$('publishDate').disabled=contentMode==='edit'}
+  function updateModeUi(){const scheduled=contentMode==='scheduled',editing=contentMode==='edit',draft=contentMode==='draft',empty=contentMode==='empty',pill=$('modePill');pill.classList.toggle('editing',editing);pill.classList.toggle('draft',draft);pill.querySelector('span').textContent=scheduled?'SCHEDULED · READ ONLY':editing?'SCHEDULED · EDITING':draft?'NEW DRAFT':`NO LESSON ON ${v('publishDate')}`;$('scheduledMode').className=`btn ${scheduled||empty?'primary':'secondary'}`;$('createDraft').className=`btn ${draft||editing?'primary':'secondary'}`;$('editScheduled').hidden=!scheduled;$('draftTools').hidden=!draft;$('saveDailyPhrase').hidden=scheduled||empty;$('saveDailyPhrase').textContent=editing?'Save scheduled changes + audio':'Publish draft + generate audio';$('saveLocal').hidden=!draft;$('saveAndExportVideo').hidden=scheduled||empty;$('saveAndExportVideo').textContent=editing?'Save changes + export Instagram MP4':'Publish draft + export Instagram MP4';$('exportRemotionVideo').hidden=true;$('downloadPng').disabled=empty;$('exportMp3').disabled=empty;$('previewAudio').disabled=empty;$('exportVideo').disabled=empty;$('exportAllVideo').disabled=empty;$('previousLesson').disabled=!scheduleNavigation.previous;$('nextLesson').disabled=!scheduleNavigation.next;setContentLocked(scheduled||empty)}
+  function scheduledAudioMatches(){const language=v('exportLanguage'),settings=exportSettings(language);return !!scheduledAudioUrls[language]&&v('narratorLocale')===settings.locale&&v('publishDate')===scheduledDate&&settings.phrase===scheduledTexts[language]}
+  async function loadScheduleDate(date=localDateParts().date){setStatus(`Loading the ${date} schedule…`);try{const response=await fetch(`/server/admin/daily-studio/api/multilingual-schedule.php?date=${encodeURIComponent(date)}`,{cache:'no-store'}),data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'The scheduled lesson is unavailable.');scheduleNavigation=data.navigation||{};nextAvailableDate=scheduleNavigation.next_available||'';if(!data.item){contentMode='empty';scheduledAudioUrls={};scheduledTexts={};scheduledDate='';clearContent(date);updateModeUi();setStatus(`No lesson is scheduled for ${date}. Choose Create Draft to use this date.`);return}const item=data.item;contentMode='scheduled';scheduledAudioUrls={};Object.entries(item.audio_urls||{}).forEach(([key,url])=>scheduledAudioUrls[key]=new URL(url,location.origin).href);scheduledTexts={fr:item.french,it:item.italian,de:item.german,ru:item.russian,pt:item.portuguese};scheduledDate=data.date;populateLesson(item,data.date);setFieldValue('exportLanguage','fr',false);setFieldValue('narratorLocale','fr-FR',false);$('includeNarration').checked=Object.keys(scheduledAudioUrls).length===5;updateAudioUi();updateModeUi();draw();setStatus($('includeNarration').checked?`${data.date} is ready with five prerecorded tracks.`:`${data.date} is scheduled but its audio bank is incomplete.`)}catch(error){setStatus(error.message||'The schedule could not be loaded.',true)}}
+  function restoreDraft(){try{const data=JSON.parse(localStorage.getItem('beyondMultilingualGeneratorDraft')||'null');if(!data)return false;selectedSourceId=String(data.source_id||'');ids.forEach(id=>{if(!(id in data))return;if($(id).type==='checkbox')$(id).checked=!!data[id];else setFieldValue(id,data[id],false)});return true}catch{return false}}
+  function enterDraftMode(){contentMode='draft';scheduledAudioUrls={};scheduledTexts={};scheduledDate='';if(!restoreDraft()){clearContent(nextAvailableDate||localDateParts().date);setFieldValue('meaning','A practical phrase for everyday conversation.',false);setFieldValue('culture','Practice this phrase aloud, then use it in a short conversation of your own.',false)}setFieldValue('weekday',weekdayForDate(v('publishDate')),false);updateModeUi();updateAudioUi();draw();setStatus('Draft mode is separate from the schedule. Choose a prerecorded bank phrase.')}
+  function editScheduledLesson(){if(contentMode!=='scheduled')return;if(!confirm(`Edit the scheduled lesson for ${scheduledDate}? Publishing changes will overwrite that date and regenerate audio if the French text changes.`))return;contentMode='edit';updateModeUi();$('saveDailyPhrase').textContent='Save scheduled changes + audio';setStatus('Scheduled editing is enabled. Review every field before saving.')}
+  async function generateTodayPhrase(){
+    const button=$('generateTodayPhrase');button.disabled=true;setStatus('Choosing a fresh phrase from the lesson bank…');
+    try{
+      const response=await fetch('/server/admin/daily-studio/api/build-multilingual-bank.php?action=random',{cache:'no-store'});
+      const data=await response.json();if(!response.ok||!data.item)throw new Error(data.error||'No phrase was returned.');
+      const item=data.item,date=v('publishDate')||nextAvailableDate||localDateParts().date;populateLesson(item,date);contentMode='draft';updateModeUi();
+      setStatus(`Prerecorded phrase selected — ${data.remaining} unused bank phrases remain.`);
+    }catch(error){setStatus(error.message||'Phrase generation failed.',true)}finally{button.disabled=false}
+  }
+  async function refreshBankProgress(){
+    try{
+      const response=await fetch('/server/admin/daily-studio/api/build-multilingual-bank.php',{cache:'no-store'}),data=await response.json();
+      if(!response.ok||!data.ok)throw new Error(data.error||'Bank status is unavailable.');
+      $('bankProgress').textContent=`${data.ready} / ${data.target} ready`;
+      return data;
+    }catch(error){$('bankProgress').textContent='unavailable';throw error}
+  }
+  async function buildAzureBank(){
+    if(bankBuilding){bankBuilding=false;$('buildBank').textContent='Resume Azure bank build';return}
+    bankBuilding=true;const button=$('buildBank');button.textContent='Stop after current phrase';
+    try{
+      let progress=await refreshBankProgress();
+      while(bankBuilding&&progress.ready<progress.target){
+        setStatus(`Generating prerecorded Azure phrase ${progress.ready+1} of ${progress.target}…`);
+        const response=await fetch('/server/admin/daily-studio/api/build-multilingual-bank.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:'{}'}),data=await response.json();
+        if(!response.ok||!data.ok)throw new Error(data.error||'The Azure bank build stopped.');
+        progress={ready:data.ready,target:data.target};$('bankProgress').textContent=`${progress.ready} / ${progress.target} ready`;
+      }
+      setStatus(progress.ready>=progress.target?'The 100-phrase Azure bank is complete: 500 prerecorded MP3 tracks are ready.':'Azure bank build paused. You can resume without losing completed phrases.');
+    }catch(error){setStatus(error.message||'The Azure bank build stopped.',true)}finally{bankBuilding=false;button.textContent='Build / resume Azure bank'}
+  }
+  function narrationText(locale=v('narratorLocale')){
+    if(locale==='fr-FR')return v('french');
+    if(locale==='it-IT')return v('italian');
+    if(locale==='de-DE')return v('german');
+    if(locale==='ru-RU')return v('russian');
+    if(locale==='pt-PT')return v('portuguese');
+    return v('french');
+  }
+  async function narrationBlob(){
+    const file=$('audioFile').files[0];if(file)return file;
+    if(scheduledAudioMatches()){const response=await fetch(scheduledAudioUrls[v('exportLanguage')],{cache:'force-cache'});if(!response.ok)throw new Error('Today’s prerecorded audio could not be loaded.');const blob=await response.blob();if(blob.size<128)throw new Error('Today’s prerecorded audio is empty.');return blob}
+    const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),70000);
+    try{
+      const response=await fetch('/beyond-id/admin/api/verse-narration.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale:v('narratorLocale'),provider:selectedProvider(),voice:selectedVoice()}),signal:controller.signal});
+      if(!response.ok){let message='Narration service is unavailable.';try{const data=await response.json();message=data.error||message}catch{}throw new Error(message)}
+      const blob=await response.blob();if(blob.size<128)throw new Error('The narration service returned empty audio.');return blob;
+    }catch(error){if(error.name==='AbortError')throw new Error('French narration timed out after 70 seconds. Check the configured French voice or upload an MP3.');throw error}finally{clearTimeout(timer)}
+  }
+  function startNarrationPulse(){narrationPlaying=true;if(previewAnimation)cancelAnimationFrame(previewAnimation);const started=performance.now(),tick=now=>{if(!narrationPlaying)return;draw((Math.sin((now-started)/420)+1)/2);previewAnimation=requestAnimationFrame(tick)};previewAnimation=requestAnimationFrame(tick)}
+  function stopNarrationPulse(){narrationPlaying=false;if(previewAnimation)cancelAnimationFrame(previewAnimation);previewAnimation=null;draw()}
+  function stop(){if(activeAudio){activeAudio.pause();URL.revokeObjectURL(activeAudio.src);activeAudio=null}window.speechSynthesis?.cancel();stopNarrationPulse()}
+  async function preview(){stop();if(!$('includeNarration').checked&&'speechSynthesis'in window){const utterance=new SpeechSynthesisUtterance(narrationText());utterance.lang=v('narratorLocale');utterance.onstart=startNarrationPulse;utterance.onend=()=>{stopNarrationPulse();setStatus('Browser voice preview finished.')};speechSynthesis.speak(utterance);setStatus(`Using this device’s ${exportSettings().label} voice for preview. Enable server audio to spend narration credits.`);return}setStatus('Preparing server narration…');try{const blob=await narrationBlob(),url=URL.createObjectURL(blob);activeAudio=new Audio(url);activeAudio.onended=()=>{URL.revokeObjectURL(url);activeAudio=null;stopNarrationPulse();setStatus('Narration finished.')};startNarrationPulse();await activeAudio.play();setStatus('Server narration playing.')}catch(error){stopNarrationPulse();if('speechSynthesis'in window){const utterance=new SpeechSynthesisUtterance(narrationText());utterance.lang=v('narratorLocale');utterance.onstart=startNarrationPulse;utterance.onend=()=>{stopNarrationPulse();setStatus('Browser voice preview finished.')};speechSynthesis.speak(utterance);setStatus(`Using this device’s ${exportSettings().label} voice for preview.`)}else setStatus('No audio voice is configured. Upload a narration file or export the visual without audio.',false)}}
+  function download(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}
+  const baseName=()=>`francais-du-jour-${v('exportLanguage')}-${v('publishDate')||'post'}`;
+  async function ensureBrand(){if(brandReady)return;try{await brandLogo.decode();brandReady=true}catch{}}
+  async function png(){await ensureBrand();draw();canvas.toBlob(blob=>blob&&download(blob,baseName()+'.png'),'image/png')}
+  function mimeType(){return['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus'].find(t=>MediaRecorder.isTypeSupported(t))||''}
+  async function video(){
+    if(!window.MediaRecorder||!canvas.captureStream){setStatus('Video export is not supported by this browser.',true);return}await ensureBrand();
+    const button=$('exportVideo');button.disabled=true;stop();setStatus(`Generating ${exportSettings().label} narration…`);
+    let url='',ac=null,audioNotice='';
+    try{
+      const stream=canvas.captureStream(30);let audio=null,duration=8;
+      if($('includeNarration').checked){
+        try{
+          const blob=await narrationBlob();url=URL.createObjectURL(blob);audio=new Audio(url);audio.preload='auto';
+          await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('Narration audio metadata timed out. Upload an MP3 or try another voice.')),15000);audio.onloadedmetadata=()=>{clearTimeout(timer);resolve()};audio.onerror=()=>{clearTimeout(timer);reject(new Error('Narration audio could not be loaded.'))}});
+          duration=Math.max(4,Math.min(90,(Number.isFinite(audio.duration)?audio.duration:8)+1));
+          ac=new (window.AudioContext||window.webkitAudioContext)();await ac.resume();
+          const source=ac.createMediaElementSource(audio),dest=ac.createMediaStreamDestination();source.connect(dest);dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));
+        }catch(error){audioNotice=' Audio was unavailable, so the visual was exported silently. Upload an MP3/M4A/WAV to include narration.'}
+      }
+      setStatus(audio?`Recording narrated video — about ${Math.ceil(duration)} seconds remaining…`:'Recording visual video without narration…');
+      const type=mimeType(),rec=new MediaRecorder(stream,type?{mimeType:type,videobit$PerSecond:6500000}:undefined),chunks=[];
+      rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+      const finished=new Promise((resolve,reject)=>{rec.onstop=resolve;rec.onerror=()=>reject(rec.error||new Error('Video export failed.'))});
+      let running=true,start=performance.now();const animate=now=>{if(!running)return;draw((Math.sin((now-start)/420)+1)/2);requestAnimationFrame(animate)};
+      requestAnimationFrame(animate);rec.start(250);if(audio)await audio.play();await new Promise(r=>setTimeout(r,duration*1000));running=false;rec.stop();await finished;draw();
+      const mime=rec.mimeType||type||'video/webm',mp4=mime.includes('mp4');download(new Blob(chunks,{type:mime}),baseName()+(mp4?'.mp4':'.webm'));
+      setStatus((mp4?'MP4 exported.':'WebM exported because this browser cannot record MP4.')+audioNotice);
+    }catch(error){setStatus(error.message||'Video export failed.',true)}finally{if(url)URL.revokeObjectURL(url);if(ac)ac.close();button.disabled=false}
+  }
+  async function exportAllLanguagesVideo(){
+    if(!window.MediaRecorder||!canvas.captureStream){setStatus('Batch video export is not supported by this browser.',true);return}await ensureBrand();
+    const usingBank=Object.keys(scheduledAudioUrls).length===5;
+    if(!usingBank&&!confirm('The prerecorded bank is incomplete. Export may call Azure Speech five times. Continue?'))return;
+    const button=$('exportAllVideo'),originalLanguage=v('exportLanguage'),originalLocale=v('narratorLocale'),languages=[['fr','fr-FR','French'],['it','it-IT','Italian'],['de','de-DE','German'],['ru','ru-RU','Russian'],['pt','pt-PT','Portuguese']];button.disabled=true;stop();let audioContext=null,running=true,recorder=null;
+    try{
+      setStatus('Preparing the narrated language video…');const stream=canvas.captureStream(30);audioContext=new (window.AudioContext||window.webkitAudioContext)();await audioContext.resume();const destination=audioContext.createMediaStreamDestination();destination.stream.getAudioTracks().forEach(track=>stream.addTrack(track));
+      const type=mimeType(),chunks=[];recorder=new MediaRecorder(stream,type?{mimeType:type,videoBitsPerSecond:6500000}:undefined);recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};const finished=new Promise((resolve,reject)=>{recorder.onstop=resolve;recorder.onerror=()=>reject(recorder.error||new Error('Batch video export failed.'))});const started=performance.now(),animate=now=>{if(!running)return;draw((Math.sin((now-started)/420)+1)/2);requestAnimationFrame(animate)};requestAnimationFrame(animate);recorder.start(250);recorder.pause();
+      for(let index=0;index<languages.length;index++){
+        const [language,locale,label]=languages[index];$('exportLanguage').value=language;$('narratorLocale').value=locale;draw();setStatus(`Recording ${label} narration (${index+1} of ${languages.length})…`);
+        const blob=await narrationBlob(),buffer=await audioContext.decodeAudioData(await blob.arrayBuffer()),source=audioContext.createBufferSource();source.buffer=buffer;source.connect(destination);recorder.resume();source.start(0);await new Promise(resolve=>{source.onended=resolve});recorder.pause();source.disconnect();
+      }
+      running=false;recorder.stop();await finished;const mime=recorder.mimeType||type||'video/webm',mp4=mime.includes('mp4');download(new Blob(chunks,{type:mime}),`francais-du-jour-all-languages-${v('publishDate')||'post'}${mp4?'.mp4':'.webm'}`);setStatus(mp4?'Narrated language export finished as one MP4.':'Narrated language export finished as one WebM because this browser cannot record MP4.');
+    }catch(error){running=false;if(recorder&&recorder.state!=='inactive')recorder.stop();setStatus(error.message||'Batch video export failed.',true)}finally{$('exportLanguage').value=originalLanguage;$('narratorLocale').value=originalLocale;if(audioContext)await audioContext.close().catch(()=>{});draw();updateAudioUi();button.disabled=false}
+  }
+  function save(){if(contentMode!=='draft'){setStatus('Only new drafts are stored in the browser.',true);return}const data={source_id:selectedSourceId};ids.forEach(id=>data[id]=$(id).type==='checkbox'?$(id).checked:$(id).value);localStorage.setItem('beyondMultilingualGeneratorDraft',JSON.stringify(data));setStatus('Draft saved in this browser.')}
+  async function saveDailyPhrase(){
+    if(contentMode!=='draft'&&contentMode!=='edit'){setStatus('Open Create Draft or confirm Edit scheduled before publishing.',true);return false}
+    const button=$('saveDailyPhrase');button.disabled=true;setStatus('Saving the lesson and verifying five prerecorded tracks…');
+    const payload={source_id:selectedSourceId,publish_date:v('publishDate'),english:v('phrase'),meaning:v('meaning'),french:v('french'),french_pronunciation:v('frenchPron'),italian:v('italian'),italian_pronunciation:v('italianPron'),german:v('german'),german_pronunciation:v('germanPron'),russian:v('russian'),russian_pronunciation:v('russianPron'),portuguese:v('portuguese'),portuguese_pronunciation:v('portuguesePron'),culture_note:v('culture'),narration_provider:'azure',confirm_overwrite:contentMode==='edit'};
+    try{
+      const publish=()=>fetch('/server/admin/daily-studio/api/save-multilingual-phrase.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(payload)});
+      let response=await publish(),data=await response.json();
+      if(response.status===409&&data.requires_confirmation){if(!confirm(`A lesson is already scheduled for ${payload.publish_date}. Replace it and regenerate its audio?`))throw new Error('Publication cancelled. The scheduled lesson was not changed.');payload.confirm_overwrite=true;response=await publish();data=await response.json()}
+      if(!response.ok||!data.ok)throw new Error(data.error||'The daily phrase could not be saved.');
+      if(contentMode==='draft')localStorage.removeItem('beyondMultilingualGeneratorDraft');
+      await loadScheduleDate(data.publish_date);setStatus(`${data.message} Lesson #${data.id} uses ${data.audio_generated?'new':'attached'} prerecorded audio.`);return true;
+    }catch(error){setStatus(error.message||'The daily phrase could not be saved.',true);return false}finally{button.disabled=false}
+  }
+  async function saveAndExportVideo(){
+    const button=$('saveAndExportVideo');button.disabled=true;
+    try{
+      const saved=await saveDailyPhrase();
+      if(!saved)return;
+      setStatus('Daily phrase saved. Rendering the animated Remotion video…');
+      await video();
+    }finally{button.disabled=false}
+  }
+  function remotionPayload(){return{publish_date:v('publishDate'),english:v('phrase'),french:v('french'),german:v('german'),russian:v('russian'),italian:v('italian'),category:'Daily Phrase',include_narration:$('includeNarration').checked,narration_provider:selectedProvider(),narration_voice:selectedVoice(),prerecorded_audio_url:''}}
+  async function browserRemotionVideo(){
+    const renderer=window.BeyondFrenchRemotion;
+    if(!renderer?.render)throw new Error('The Remotion browser renderer did not load.');
+    let audioUrl='';
+    try{
+      if($('includeNarration').checked){
+        setStatus('Generating narration for the Remotion video…');
+        const audio=await narrationBlob();
+        audioUrl=URL.createObjectURL(audio);
+      }
+      const support=await renderer.canRender(!!audioUrl);
+      if(!support.supported)throw new Error(support.message);
+      const blob=await renderer.render({
+        props:{english:v('phrase'),french:v('french'),german:v('german'),russian:v('russian'),italian:v('italian'),category:'Daily Phrase',audioFile:''},
+        audioUrl,
+        onProgress:progress=>setStatus(`Rendering animated Remotion MP4 in this browser… ${Math.round(progress*100)}%`)
+      });
+      if(blob.size<1024)throw new Error('The Remotion browser renderer returned an empty video.');
+      download(blob,`beyond-french-${v('publishDate')||'daily'}-remotion.mp4`);
+      setStatus('Animated Remotion MP4 exported in your browser.');
+    }finally{
+      if(audioUrl)URL.revokeObjectURL(audioUrl);
+    }
+  }
+  async function serverRemotionVideo(){
+    const response=await fetch('/server/admin/daily-studio/api/render-french-remotion.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(remotionPayload())});
+    if(!response.ok){let message='The Remotion export failed.';try{const data=await response.json();message=data.error||message}catch{}throw new Error(message)}
+    if(response.headers.get('X-Video-Renderer')!=='Remotion')throw new Error('The server did not return a Remotion video.');
+    const blob=await response.blob();download(blob,`beyond-french-${v('publishDate')||'daily'}-remotion.mp4`);
+    setStatus('Animated Remotion MP4 exported by the server.');
+  }
+  async function remotionVideo(){
+    if(location.protocol==='file:'){setStatus('Remotion rendering requires the served generator URL, not the raw file:// template. Open /server/admin/daily-studio/french-generator.php.',true);return}
+    const button=$('exportRemotionVideo');button.disabled=true;setStatus('Starting the animated Remotion render…');
+    try{
+      if(window.BeyondFrenchRemotion?.render)await browserRemotionVideo();
+      else await serverRemotionVideo();
+    }catch(error){setStatus(error.message||'The Remotion export failed. The static template remains unchanged.',true)}finally{button.disabled=false}
+  }
+  function syncVoiceSelection(source){
+    if(source==='narratorLocale'){
+      const language=languageForLocale(v('narratorLocale'));
+      if(language&&$('exportLanguage').value!==language)$('exportLanguage').value=language;
+      return;
+    }
+    const locale=languageLocales[v('exportLanguage')]||'en-US';
+    if(v('narratorLocale')!==locale)$('narratorLocale').value=locale;
+  }
+  function updateAudioUi(source){syncVoiceSelection(source);const output=exportSettings();$('previewAudio').textContent=`Preview ${output.label} audio`;$('exportVideo').textContent=$('includeNarration').checked?`Export ${output.label} narrated MP4`:`Export ${output.label} visual MP4`;$('exportMp3').textContent=`Export ${output.label} MP3 Narration`;}
+  async function exportMp3(){
+    const button=$('exportMp3');button.disabled=true;stop();setStatus('Generating and saving MP3…');
+    try{
+      const uploaded=$('audioFile').files[0];
+      if(uploaded){
+        const type=(uploaded.type||'').toLowerCase(),name=(uploaded.name||'').toLowerCase();
+        if(type!=='audio/mpeg'&&!name.endsWith('.mp3'))throw new Error('Uploaded audio must be an MP3 to use Export MP3.');
+        download(uploaded,baseName()+'.mp3');
+        setStatus('Uploaded MP3 downloaded.');
+        return;
+      }
+      if(scheduledAudioMatches()){
+        const response=await fetch(scheduledAudioUrls[v('exportLanguage')],{cache:'force-cache'});
+        if(!response.ok)throw new Error('Today’s prerecorded audio could not be loaded.');
+        const blob=await response.blob();if(blob.size<128)throw new Error('Today’s prerecorded audio is empty.');
+        download(blob,baseName()+'.mp3');setStatus('Today’s prerecorded Azure MP3 downloaded.');return;
+      }
+      const response=await fetch('/beyond-id/admin/api/french-narration-export.php',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+        body:JSON.stringify({text:narrationText(),locale:v('narratorLocale'),publish_date:v('publishDate'),provider:selectedProvider(),voice:selectedVoice()})
+      });
+      if(!response.ok){
+        let message='MP3 generation failed.';
+        try{const data=await response.json();message=data.error||data.message||message}catch{message+=` (HTTP ${response.status})`}
+        throw new Error(message);
+      }
+      const blob=await response.blob();
+      const disposition=response.headers.get('Content-Disposition')||'';
+      const match=disposition.match(/filename=\"?([^\";]+)\"?/i);
+      download(blob,match?match[1]:baseName()+'.mp3');
+      const savedUrl=response.headers.get('X-Saved-Audio-Url');
+      setStatus(savedUrl?'MP3 saved to the French audio library and downloaded.':'MP3 generated and downloaded.');
+    }catch(error){setStatus(error.message||'MP3 export failed.',true)}finally{button.disabled=false}
+  }
+  updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{if(el.id==='publishDate')setFieldValue('weekday',weekdayForDate(el.value),false);updateAudioUi(el.id);draw()});el.addEventListener('change',()=>{if(el.id==='publishDate'&&(contentMode==='scheduled'||contentMode==='empty')){loadScheduleDate(el.value);return}updateAudioUi(el.id);draw()})});$('scheduledMode').onclick=()=>loadScheduleDate(contentMode==='draft'?localDateParts().date:(v('publishDate')||localDateParts().date));$('createDraft').onclick=enterDraftMode;$('editScheduled').onclick=editScheduledLesson;$('previousLesson').onclick=()=>scheduleNavigation.previous&&loadScheduleDate(scheduleNavigation.previous);$('todayLesson').onclick=()=>loadScheduleDate(localDateParts().date);$('nextLesson').onclick=()=>scheduleNavigation.next&&loadScheduleDate(scheduleNavigation.next);$('reloadLesson').onclick=()=>loadScheduleDate(v('publishDate')||localDateParts().date);$('saveDailyPhrase').onclick=saveDailyPhrase;$('saveAndExportVideo').onclick=saveAndExportVideo;$('exportRemotionVideo').onclick=remotionVideo;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;$('generateTodayPhrase').onclick=generateTodayPhrase;$('buildBank').onclick=buildAzureBank;draw();refreshBankProgress().catch(()=>{});loadScheduleDate();
+})();
+</script>
+</body>
+</html>
+
+
+

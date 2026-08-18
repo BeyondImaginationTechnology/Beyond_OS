@@ -13,7 +13,7 @@ $academyCssVersion = (string)(@filemtime(__DIR__ . '/../assets/css/academy.css')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= h($pageTitle) ?></title>
-    <meta name="description" content="One phrase. Four languages. Every day.">
+    <meta name="description" content="French first. Five languages. Every day.">
     <link rel="stylesheet" href="<?= h($frenchBase) ?>assets/css/style.css?v=<?= h($frenchCssVersion) ?>">
     <link rel="stylesheet" href="<?= h($frenchBase) ?>assets/css/academy.css?v=<?= h($academyCssVersion) ?>">
 </head>

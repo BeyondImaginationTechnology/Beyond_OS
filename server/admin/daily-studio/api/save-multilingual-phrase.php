@@ -1,0 +1,24 @@
+<?php
+declare(strict_types=1);
+require dirname(__DIR__) . '/bootstrap.php';
+require_once dirname(__DIR__, 4) . '/includes/narration/StudioNarration.php';
+header('Content-Type: application/json; charset=UTF-8');
+header('Cache-Control: no-store');
+function multilingualSaveResponse(array $payload,int $status=200):never{http_response_code($status);echo json_encode($payload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);exit;}
+if($_SERVER['REQUEST_METHOD']!=='POST')multilingualSaveResponse(['ok'=>false,'error'=>'POST required.'],405);
+if(empty($_SESSION['verse_generator_csrf'])||!hash_equals((string)$_SESSION['verse_generator_csrf'],(string)($_SERVER['HTTP_X_CSRF_TOKEN']??'')))multilingualSaveResponse(['ok'=>false,'error'=>'Reload the generator and try again.'],419);
+$input=json_decode((string)file_get_contents('php://input'),true);if(!is_array($input))multilingualSaveResponse(['ok'=>false,'error'=>'Invalid request.'],400);
+$date=trim((string)($input['publish_date']??''));$parsed=DateTimeImmutable::createFromFormat('!Y-m-d',$date);if(!$parsed||$parsed->format('Y-m-d')!==$date)multilingualSaveResponse(['ok'=>false,'error'=>'Choose a valid publication date.'],422);
+$required=['english'=>180,'meaning'=>500,'french'=>220,'french_pronunciation'=>220,'italian'=>220,'german'=>220,'russian'=>220,'portuguese'=>220,'culture_note'=>600];$values=[];
+foreach($required as $field=>$limit){$value=trim((string)($input[$field]??''));if($value===''||mb_strlen($value)>$limit)multilingualSaveResponse(['ok'=>false,'error'=>'Complete every required phrase field before saving.'],422);$values[$field]=$value;}
+foreach(['italian_pronunciation','german_pronunciation','russian_pronunciation','portuguese_pronunciation'] as $field)$values[$field]=mb_substr(trim((string)($input[$field]??'')),0,220);
+$root=dirname(__DIR__,4);$scheduleFile=$root.'/beyond-french/data/multilingual-lessons.json';$bankFile=$root.'/beyond-french/data/multilingual-bank.json';
+$lessons=is_file($scheduleFile)?json_decode((string)file_get_contents($scheduleFile),true):[];if(!is_array($lessons))$lessons=[];$existingIndex=null;$maxId=0;
+foreach($lessons as $index=>$lesson){$maxId=max($maxId,(int)($lesson['id']??0));if(($lesson['date']??'')===$date)$existingIndex=$index;}
+if($existingIndex!==null&&empty($input['confirm_overwrite']))multilingualSaveResponse(['ok'=>false,'error'=>'A multilingual lesson already uses this date.','requires_confirmation'=>true],409);
+$sourceId=trim((string)($input['source_id']??''));$audioUrls=[];$bank=is_file($bankFile)?json_decode((string)file_get_contents($bankFile),true):[];
+foreach(is_array($bank)?$bank:[] as $record){if((string)($record['source_id']??'')!==$sourceId)continue;$matches=true;foreach(['french','italian','german','russian','portuguese'] as $field){if((string)($record[$field]??'')!==$values[$field]){$matches=false;break;}}if($matches&&count((array)($record['audio_urls']??[]))===5)$audioUrls=(array)$record['audio_urls'];break;}
+$generated=false;if(count($audioUrls)!==5){$locales=['fr'=>'fr-FR','it'=>'it-IT','de'=>'de-DE','ru'=>'ru-RU','pt'=>'pt-PT'];$texts=['fr'=>$values['french'],'it'=>$values['italian'],'de'=>$values['german'],'ru'=>$values['russian'],'pt'=>$values['portuguese']];try{foreach($texts as $language=>$text){$result=studio_narration_generate($text,$locales[$language],'azure');$stored=studio_store_mp3((string)$result['audio_content'],'beyond-french',$date,$locales[$language],$text);$audioUrls[$language]=(string)$stored['url'];}$generated=true;}catch(Throwable $error){error_log('Multilingual publish narration: '.$error->getMessage());multilingualSaveResponse(['ok'=>false,'error'=>'The lesson was not saved because all five Azure tracks are required: '.$error->getMessage()],502);}}
+$existing=$existingIndex===null?[]:(array)$lessons[$existingIndex];$lesson=[...$existing,...$values,'id'=>$existingIndex===null?$maxId+1:(int)($existing['id']??$maxId+1),'source_id'=>$sourceId,'date'=>$date,'audio_urls'=>$audioUrls,'generator'=>['version'=>'1.2.0','provider'=>'azure','saved_by'=>(int)($_SESSION['user_id']??0),'saved_at'=>date(DATE_ATOM)]];
+if($existingIndex===null)$lessons[]=$lesson;else$lessons[$existingIndex]=$lesson;$json=json_encode($lessons,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);$temporary=$scheduleFile.'.tmp';if($json===false||file_put_contents($temporary,$json.PHP_EOL,LOCK_EX)===false||!rename($temporary,$scheduleFile)){@unlink($temporary);multilingualSaveResponse(['ok'=>false,'error'=>'The multilingual schedule could not be saved.'],500);}
+multilingualSaveResponse(['ok'=>true,'id'=>$lesson['id'],'publish_date'=>$date,'audio_generated'=>$generated,'audio_urls'=>$audioUrls,'message'=>'The French-first multilingual lesson is scheduled with five prerecorded tracks.']);

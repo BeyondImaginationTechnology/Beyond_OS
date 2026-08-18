@@ -7,9 +7,11 @@ import UIKit
 
 @MainActor
 final class QuestStore: ObservableObject {
+    static let maxHearts = 3
+
     @Published private(set) var completedChallengeIDs: Set<String> = []
     @Published private(set) var xp = 0
-    @Published private(set) var hearts = 5
+    @Published private(set) var hearts = QuestStore.maxHearts
     @Published private(set) var streak = 0
     @Published private(set) var lastResult: QuestResult?
     @Published private(set) var dictionary: [DictionaryWord] = []
@@ -80,13 +82,14 @@ final class QuestStore: ObservableObject {
         return completedChallengeIDs.contains(region.challenges[index - 1].id)
     }
 
-    func submit(_ choice: String, for challenge: QuestChallenge, in region: QuestRegion) {
-        if normalized(choice) == normalized(challenge.answer) {
+    @discardableResult
+    func submit(_ choice: String, for challenge: QuestChallenge, in region: QuestRegion) -> Bool {
+        let isCorrect = normalized(choice) == normalized(challenge.answer)
+        if isCorrect {
             let isFirstClear = !completedChallengeIDs.contains(challenge.id)
             completedChallengeIDs.insert(challenge.id)
             xp += isFirstClear ? region.reward / max(region.lessonCount, 1) : 5
             streak += 1
-            hearts = min(5, hearts + 1)
             lastResult = QuestResult(correct: true, message: isFirstClear ? "Quest cleared. +XP" : "Perfect recall. +5 XP")
         } else {
             hearts = max(0, hearts - 1)
@@ -95,6 +98,7 @@ final class QuestStore: ObservableObject {
         }
         save()
         scheduleCloudSave()
+        return isCorrect
     }
 
     func resetResult() {
@@ -102,7 +106,7 @@ final class QuestStore: ObservableObject {
     }
 
     func refillHearts() {
-        hearts = 5
+        hearts = Self.maxHearts
         save()
         scheduleCloudSave()
     }
@@ -110,7 +114,7 @@ final class QuestStore: ObservableObject {
     func resetProgress() {
         completedChallengeIDs = []
         xp = 0
-        hearts = 5
+        hearts = Self.maxHearts
         streak = 0
         lastResult = nil
         save()
@@ -178,7 +182,7 @@ final class QuestStore: ObservableObject {
             isApplyingCloudSave = true
             completedChallengeIDs = Set(snapshot.completedChallengeIDs)
             xp = max(0, snapshot.xp)
-            hearts = min(5, max(0, snapshot.hearts))
+            hearts = min(Self.maxHearts, max(0, snapshot.hearts))
             streak = max(0, snapshot.streak)
             if let savedTheme = QuestTheme(rawValue: snapshot.theme) { theme = savedTheme }
             lastResult = nil
@@ -204,6 +208,17 @@ final class QuestStore: ObservableObject {
         }
 
         speakWithDeviceVoice(text, language: "fr-FR")
+    }
+
+    func speakFeedback(correct: Bool) {
+        playFeedback(
+            named: correct ? "good-job" : "try-again",
+            fallback: correct ? "Good job!" : "Try again!"
+        )
+    }
+
+    func speakDestinationCleared() {
+        playFeedback(named: "destination-cleared", fallback: "Congratulations! Destination cleared!")
     }
 
     private func speakWithDeviceVoice(_ text: String, language: String) {
@@ -277,7 +292,7 @@ final class QuestStore: ObservableObject {
         completedChallengeIDs = Set(UserDefaults.standard.stringArray(forKey: completedKey) ?? [])
         xp = UserDefaults.standard.integer(forKey: xpKey)
         let savedHearts = UserDefaults.standard.object(forKey: heartsKey) as? Int
-        hearts = savedHearts ?? 5
+        hearts = min(Self.maxHearts, max(0, savedHearts ?? Self.maxHearts))
         streak = UserDefaults.standard.integer(forKey: streakKey)
         theme = UserDefaults.standard.string(forKey: themeKey).flatMap(QuestTheme.init(rawValue:)) ?? .riviera
         if UserDefaults.standard.object(forKey: musicKey) != nil {
@@ -360,6 +375,22 @@ final class QuestStore: ObservableObject {
             withExtension: "mp3",
             subdirectory: "Audio/quest/fr-FR"
         )
+    }
+
+    private func playFeedback(named resourceName: String, fallback: String) {
+        speaker.stopSpeaking(at: .immediate)
+        prerecordedPlayer?.stop()
+        configureAudioSession()
+        if let url = Bundle.main.url(
+            forResource: resourceName,
+            withExtension: "mp3",
+            subdirectory: "Audio/Feedback"
+        ), let player = try? AVAudioPlayer(contentsOf: url) {
+            player.prepareToPlay()
+            prerecordedPlayer = player
+            if player.play() { return }
+        }
+        speakWithDeviceVoice(fallback, language: "en-US")
     }
 
     private func bundledDictionaryAudioURL(for word: DictionaryWord, language: DictionaryAudioLanguage) -> URL? {

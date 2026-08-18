@@ -16,18 +16,34 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="BeyondFrenchLogo" translatesAutoresizingMaskIntoConstraints="NO" id="launch-logo">
-                                <rect key="frame" x="61.5" y="291" width="270" height="270"/>
+                                <rect key="frame" x="106.5" y="252" width="180" height="180"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="270" id="logo-width"/>
-                                    <constraint firstAttribute="height" constant="270" id="logo-height"/>
+                                    <constraint firstAttribute="width" constant="180" id="logo-width"/>
+                                    <constraint firstAttribute="height" constant="180" id="logo-height"/>
                                 </constraints>
                             </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="FRENCH QUEST" textAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="launch-title">
+                                <rect key="frame" x="45" y="462" width="303" height="43"/>
+                                <fontDescription key="fontDescription" type="system" weight="heavy" pointSize="36"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="THE WORLD TOUR" textAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="launch-subtitle">
+                                <rect key="frame" x="45" y="518" width="303" height="20"/>
+                                <fontDescription key="fontDescription" type="system" weight="bold" pointSize="14"/>
+                                <color key="textColor" red="0.0" green="0.82" blue="0.94" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="launch-safe-area"/>
-                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.0" green="0.07058823529" blue="0.1098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="launch-logo" firstAttribute="centerX" secondItem="launch-view" secondAttribute="centerX" id="logo-center-x"/>
-                            <constraint firstItem="launch-logo" firstAttribute="centerY" secondItem="launch-view" secondAttribute="centerY" id="logo-center-y"/>
+                            <constraint firstItem="launch-logo" firstAttribute="centerY" secondItem="launch-view" secondAttribute="centerY" constant="-80" id="logo-center-y"/>
+                            <constraint firstItem="launch-title" firstAttribute="top" secondItem="launch-logo" secondAttribute="bottom" constant="30" id="title-top"/>
+                            <constraint firstItem="launch-title" firstAttribute="leading" secondItem="launch-safe-area" secondAttribute="leading" constant="32" id="title-leading"/>
+                            <constraint firstItem="launch-safe-area" firstAttribute="trailing" secondItem="launch-title" secondAttribute="trailing" constant="32" id="title-trailing"/>
+                            <constraint firstItem="launch-subtitle" firstAttribute="top" secondItem="launch-title" secondAttribute="bottom" constant="9" id="subtitle-top"/>
+                            <constraint firstItem="launch-subtitle" firstAttribute="leading" secondItem="launch-safe-area" secondAttribute="leading" constant="32" id="subtitle-leading"/>
+                            <constraint firstItem="launch-safe-area" firstAttribute="trailing" secondItem="launch-subtitle" secondAttribute="trailing" constant="32" id="subtitle-trailing"/>
                         </constraints>
                     </view>
                 </viewController>

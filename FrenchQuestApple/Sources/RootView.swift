@@ -5,6 +5,7 @@ enum QuestRoute: Hashable {
 }
 
 private enum FrenchQuestScreen: Equatable {
+    case splash
     case mainMenu
     case game
     case settings
@@ -13,11 +14,13 @@ private enum FrenchQuestScreen: Equatable {
 struct RootView: View {
     @EnvironmentObject private var store: QuestStore
     @Environment(\.scenePhase) private var scenePhase
-    @State private var screen = FrenchQuestScreen.mainMenu
+    @State private var screen = FrenchQuestScreen.splash
 
     var body: some View {
         Group {
             switch screen {
+            case .splash:
+                FrenchQuestSplashView()
             case .mainMenu:
                 MainMenuView(
                     onNewGame: {
@@ -46,6 +49,14 @@ struct RootView: View {
         .animation(.easeInOut(duration: 0.25), value: screen)
         .tint(store.theme.accent)
         .preferredColorScheme(.dark)
+        .task {
+            guard screen == .splash else { return }
+            try? await Task.sleep(for: .milliseconds(900))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeOut(duration: 0.35)) {
+                screen = .mainMenu
+            }
+        }
         .onAppear {
             store.startBackgroundMusicIfNeeded()
         }
@@ -56,6 +67,62 @@ struct RootView: View {
                 store.pauseBackgroundMusic()
             }
         }
+    }
+}
+
+private struct FrenchQuestSplashView: View {
+    @State private var glowing = false
+
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [
+                    Color(red: 0.00, green: 0.07, blue: 0.11),
+                    Color(red: 0.00, green: 0.19, blue: 0.24),
+                    Color(red: 0.01, green: 0.05, blue: 0.09)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            Circle()
+                .fill(Color.cyan.opacity(glowing ? 0.20 : 0.10))
+                .frame(width: 330, height: 330)
+                .blur(radius: 62)
+                .scaleEffect(glowing ? 1.08 : 0.94)
+
+            VStack(spacing: 20) {
+                Image("BeyondFrenchLogo")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 174, height: 174)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(.white.opacity(0.28), lineWidth: 2))
+                    .shadow(color: .cyan.opacity(0.35), radius: 30)
+
+                VStack(spacing: 7) {
+                    Text("FRENCH QUEST")
+                        .font(.system(size: 38, weight: .black, design: .rounded))
+                    Text("THE WORLD TOUR")
+                        .font(.caption.weight(.black))
+                        .tracking(3)
+                        .foregroundStyle(.cyan)
+                }
+
+                ProgressView()
+                    .tint(.orange)
+                    .padding(.top, 14)
+            }
+            .foregroundStyle(.white)
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
+                glowing = true
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("French Quest. The World Tour. Loading.")
     }
 }
 

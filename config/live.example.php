@@ -39,6 +39,17 @@ return [
         'openai' => [
             'api_key' => '',
         ],
+        'azure' => [
+            'api_key' => '',
+            'region' => 'canadacentral',
+            'voices' => [
+                'fr-FR' => 'en-US-JennyMultilingualNeural',
+                'it-IT' => 'en-US-JennyMultilingualNeural',
+                'de-DE' => 'en-US-JennyMultilingualNeural',
+                'ru-RU' => 'en-US-JennyMultilingualNeural',
+                'pt-PT' => 'en-US-JennyMultilingualNeural',
+            ],
+        ],
     ],
     'ai' => [
         'azure_image' => [
@@ -47,6 +58,11 @@ return [
             'model' => 'MAI-Image-2.5',
             'width' => 768,
             'height' => 1365,
+        ],
+        'azure_translator' => [
+            'api_key' => '',
+            'endpoint' => 'https://api.cognitive.microsofttranslator.com',
+            'region' => 'canadacentral',
         ],
     ],
     'music' => [

@@ -180,8 +180,15 @@
   async function generateTodayPhrase(){
     const button=$('generateTodayPhrase');button.disabled=true;setStatus('Choosing a fresh phrase from the lesson bank…');
     try{
-      const response=await fetch('/server/admin/daily-studio/api/build-multilingual-bank.php?action=random',{cache:'no-store'});
-      const data=await response.json();if(!response.ok||!data.item)throw new Error(data.error||'No phrase was returned.');
+      let response=await fetch('/server/admin/daily-studio/api/build-multilingual-bank.php?action=random',{cache:'no-store'});
+      let data=await response.json();
+      if(response.status===404){
+        setStatus('The prerecorded bank is empty. Generating the first French-first phrase and five Azure tracks…');
+        response=await fetch('/server/admin/daily-studio/api/build-multilingual-bank.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:'{}'});
+        data=await response.json();
+        if(response.ok&&data.built)data={...data,item:data.built,remaining:Math.max(0,(data.ready||1)-1)};
+      }
+      if(!response.ok||!data.item)throw new Error(data.error||'No prerecorded phrase was returned. Check the Azure settings and build the bank.');
       const item=data.item,date=v('publishDate')||nextAvailableDate||localDateParts().date;populateLesson(item,date);contentMode='draft';updateModeUi();
       setStatus(`Prerecorded phrase selected — ${data.remaining} unused bank phrases remain.`);
     }catch(error){setStatus(error.message||'Phrase generation failed.',true)}finally{button.disabled=false}

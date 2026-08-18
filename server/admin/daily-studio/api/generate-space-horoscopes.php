@@ -53,9 +53,60 @@ function fallbackHoroscopes(DateTimeImmutable $date, string $theme): array
     $signs = spaceSigns();
     $tones = ['steady','magnetic','clear','restorative','bold','patient','creative','grounded','curious','focused','open-hearted','disciplined'];
     $moods = ['Centered & Brave','Grounded & Receptive','Bright & Curious','Tender & Clear','Inspired & Bold','Precise & Calm','Balanced & Magnetic','Deep & Renewed','Adventurous & Honest','Focused & Patient','Original & Awake','Dreamy & Guided'];
+    $openings = [
+        'Your %s instincts deserve room today, dear %s. Move slowly enough to notice the opportunity that has been waiting in plain sight.',
+        'A %s current surrounds you today, %s. Begin with the choice that feels honest, even if it is quieter than expected.',
+        'Today rewards the %s side of your nature, %s. Let one clear priority guide you before the noise of the day gathers.',
+        'Your %s energy is easier to trust today, dear %s. Follow the idea that keeps returning without forcing an immediate outcome.',
+        'A subtle shift invites your %s wisdom forward, %s. Give yourself enough space to recognize what is ready to change.',
+        'The day opens through your %s attention, dear %s. Notice where curiosity feels lighter than obligation and begin there.',
+        'Your %s presence carries extra weight today, %s. Use it to name what matters and release what only creates distraction.',
+        'A fresh rhythm meets your %s nature today, dear %s. Take the first practical step before asking for the entire map.',
+        'Today highlights your %s gifts, %s. Trust the small signal that brings relief, clarity, or a renewed sense of direction.',
+        'Your %s side knows how to meet this day, dear %s. Choose steady movement over urgency and let confidence build naturally.',
+        'A new perspective activates your %s instincts today, %s. Make room for an answer that looks different from the original plan.',
+        'The cosmic weather favors your %s approach, dear %s. Lead with intention, then allow the next useful detail to reveal itself.',
+    ];
+    $middles = [
+        'A thoughtful conversation can reset the pace. Listen for what is being offered beneath the words, then respond without abandoning your own needs.',
+        'One unfinished detail may ask for attention. Handle it simply, and the energy you recover can support something more meaningful.',
+        'Collaboration works best when expectations are spoken clearly. Invite the right person closer instead of carrying every decision alone.',
+        'A small boundary can protect a larger dream. Say yes with purpose, say no without drama, and keep your attention near what matters.',
+        'An unexpected message may change the order of the day. Stay flexible enough to receive the insight without surrendering your priorities.',
+        'Your environment is giving you useful feedback. Adjust one habit, surface, or schedule so your outer rhythm supports your inner focus.',
+        'There is momentum inside a task you have been postponing. Ten honest minutes can turn pressure into progress and uncertainty into information.',
+        'Someone may meet you with more openness than expected. Let sincerity set the tone, and leave unnecessary assumptions outside the conversation.',
+        'The practical answer and the inspired answer can work together. Build a simple structure that gives your imagination somewhere safe to expand.',
+        'A familiar situation looks different from this angle. Pause before repeating an old response; today offers space for a more useful choice.',
+        'Protect a pocket of uninterrupted time. What feels complicated in a crowded moment may become obvious once your attention has room to settle.',
+        'A decision gains clarity when you separate desire from urgency. Honor what you want, then choose the timing that keeps you grounded.',
+    ];
+    $closings = [
+        'Choose restoration over proving yourself. The steadiness you create now becomes useful confidence for tomorrow.',
+        'Let progress be measured by alignment rather than speed. One choice that feels true is enough to change the direction of the day.',
+        'Keep the evening gentle and uncluttered. Your best insight may arrive after you stop demanding an answer from yourself.',
+        'Celebrate the movement that is already happening. Gratitude can strengthen your next step without asking you to ignore what still needs care.',
+        'Return to the promise you made to yourself. A small act of follow-through will feel more powerful than a dramatic announcement.',
+        'Leave room for pleasure without turning it into another assignment. Something simple and beautiful can restore your sense of proportion.',
+        'Trust what becomes clearer when your body relaxes. Rest is not a detour today; it is part of how the right direction appears.',
+        'Close the day by releasing one expectation that no longer fits. The space it leaves behind can hold a more honest intention.',
+        'Offer yourself the patience you would give someone you love. Growth becomes easier to recognize when criticism is not controlling the view.',
+        'Carry only the lesson forward, not the tension. Tomorrow benefits most from the wisdom you keep and the weight you set down.',
+        'Make one choice that your future self will appreciate. It does not need to be impressive; it only needs to be kind and consistent.',
+        'End with a quiet check-in: what gave energy, what drained it, and what deserves a different approach when the sun rises again?',
+    ];
+    $epoch = new DateTimeImmutable('2000-01-01', $date->getTimezone());
+    $dayNumber = (int)$epoch->diff($date)->format('%r%a');
+    $dailyIndex = static function (int $signIndex, int $section, int $count) use ($dayNumber): int {
+        $index = ($dayNumber + ($signIndex * 5) + ($section * 7)) % $count;
+        return $index < 0 ? $index + $count : $index;
+    };
     $items = [];
     foreach ($signs as $index => $sign) {
         $tone = $tones[$index % count($tones)];
+        $opening = $openings[$dailyIndex($index, 0, count($openings))];
+        $middle = $middles[$dailyIndex($index, 1, count($middles))];
+        $closing = $closings[$dailyIndex($index, 2, count($closings))];
         $items[] = [
             'slug'=>$sign['slug'],
             'sign'=>$sign['name'],
@@ -64,11 +115,11 @@ function fallbackHoroscopes(DateTimeImmutable $date, string $theme): array
             'date'=>$date->format('Y-m-d'),
             'headline'=>$theme !== '' ? strtoupper($theme) : 'COSMIC WEATHER',
             'paragraphs'=>[
-                "Your {$tone} instincts are asking for room today, dear {$sign['name']}. Move slowly enough to notice the opening that has been waiting in plain sight.",
-                'A conversation, small choice, or quiet adjustment can shift the whole rhythm of the day. Protect your focus and let the right people meet you halfway.',
-                'Choose restoration over proving yourself. What settles inside you now becomes tomorrow\'s confidence.',
+                sprintf($opening, $tone, $sign['name']),
+                $middle,
+                $closing,
             ],
-            'mood'=>$moods[$index],
+            'mood'=>$moods[$dailyIndex($index, 3, count($moods))],
             'source'=>'Beyond Space original fallback',
             'source_url'=>'',
             'source_date'=>$date->format('Y-m-d'),

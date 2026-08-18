@@ -4,8 +4,8 @@ import XCTest
 
 final class FrenchQuestTests: XCTestCase {
     func testLaunchContentHasPlayableRegions() {
-        XCTAssertEqual(QuestContent.regions.count, 3)
-        XCTAssertEqual(QuestContent.regions.reduce(0) { $0 + $1.challenges.count }, 9)
+        XCTAssertEqual(QuestContent.regions.count, 5)
+        XCTAssertEqual(QuestContent.regions.reduce(0) { $0 + $1.challenges.count }, 15)
     }
 
     func testEachChallengeHasAnswerInOptions() {
@@ -39,7 +39,7 @@ final class FrenchQuestTests: XCTestCase {
     func testInitialStoreState() {
         let store = QuestStore()
 
-        XCTAssertEqual(store.totalChallenges, 9)
+        XCTAssertEqual(store.totalChallenges, 15)
         XCTAssertGreaterThanOrEqual(store.hearts, 0)
     }
 }

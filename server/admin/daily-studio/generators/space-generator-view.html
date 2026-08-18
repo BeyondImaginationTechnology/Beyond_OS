@@ -57,9 +57,7 @@
     <section class="group">
       <div class="actions">
         <button class="btn primary" id="downloadPng" type="button">Download PNG</button>
-        <button class="btn primary" id="downloadAllPng" type="button">Download all 12 PNGs</button>
-        <button class="btn primary wide" id="exportMp4" type="button">Export sign MP4</button>
-        <button class="btn primary wide" id="exportAllMp4" type="button">Export MP4s for all 12</button>
+        <button class="btn primary" id="downloadAllPng" type="button">Download all 12 PNGs (.zip)</button>
       </div>
       <div id="status" class="status" role="status" aria-live="polite"></div>
     </section>
@@ -96,8 +94,6 @@
   const today=()=>{const n=new Date(),d=new Date(n.getTime()-n.getTimezoneOffset()*60000);return d.toISOString().slice(0,10)};
   $('publishDate').value=today();
   function itemFor(slug=current){return items[slug]||{slug,sign:signs.find(s=>s[0]===slug)[1],symbol:signs.find(s=>s[0]===slug)[2],season:signs.find(s=>s[0]===slug)[3],headline:'',paragraphs:[],mood:'',source:'',source_url:'',generated:false};}
-  function hasHoroscopeCopy(slug=current){const item=itemFor(slug);return (item.paragraphs||[]).some(p=>p.trim().length>20)}
-  function requireHoroscopeCopy(slug=current){if(!hasHoroscopeCopy(slug))throw new Error(`Generate or enter horoscope copy for ${itemFor(slug).sign} first.`)}
   function syncButtons(){document.querySelectorAll('#signGrid button').forEach(b=>b.classList.toggle('active',b.dataset.sign===current))}
   function loadCurrent(){const item=itemFor();$('headline').value=item.headline||'';$('bodyText').value=(item.paragraphs||[]).join('\n\n');$('bodyText').placeholder='Generate all 12 horoscopes, or enter this sign copy here.';$('mood').value=item.mood||'';$('backgroundUrl').value=backgrounds[current]||item.background_url||'';syncButtons();draw()}
   function saveCurrent(){const item=itemFor();item.headline=value('headline');item.paragraphs=value('bodyText').split(/\n\s*\n/).map(s=>s.trim()).filter(Boolean);item.mood=value('mood');item.background_url=value('backgroundUrl');items[current]=item;if(item.background_url)backgrounds[current]=item.background_url}
@@ -123,14 +119,23 @@
     roundRect(250,892,580,52,26,'rgba(233,198,117,.12)','rgba(233,198,117,.45)');ctx.fillStyle='#e9c675';ctx.font='800 17px Georgia,serif';ctx.fillText(`MOOD  ·  ${item.mood||'Open & Grounded'}`,540,925);ctx.fillStyle='#cdbb8e';ctx.font='700 16px Georgia,serif';ctx.letterSpacing='4px';ctx.fillText(`BEYOND SPACE  ·  ${dateLabel().replace(' • ',' · ')}`,540,1032);ctx.letterSpacing='0px';
   }
   function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1600)}
+  const zipCrcTable=(()=>{const table=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=(c&1)?0xedb88320^(c>>>1):c>>>1;table[n]=c>>>0}return table})();
+  function zipCrc32(bytes){let crc=0xffffffff;for(const byte of bytes)crc=zipCrcTable[(crc^byte)&255]^(crc>>>8);return(crc^0xffffffff)>>>0}
+  function zipDateTime(date=new Date()){const year=Math.max(1980,date.getFullYear());return{time:(date.getHours()<<11)|(date.getMinutes()<<5)|(date.getSeconds()>>1),date:((year-1980)<<9)|((date.getMonth()+1)<<5)|date.getDate()}}
+  async function zipBlob(entries){
+    const encoder=new TextEncoder(),stamp=zipDateTime(),localParts=[],centralParts=[];let offset=0;
+    for(const entry of entries){
+      const name=encoder.encode(entry.name),bytes=new Uint8Array(await entry.blob.arrayBuffer()),crc=zipCrc32(bytes);
+      const local=new Uint8Array(30+name.length),lv=new DataView(local.buffer);lv.setUint32(0,0x04034b50,true);lv.setUint16(4,20,true);lv.setUint16(6,0,true);lv.setUint16(8,0,true);lv.setUint16(10,stamp.time,true);lv.setUint16(12,stamp.date,true);lv.setUint32(14,crc,true);lv.setUint32(18,bytes.length,true);lv.setUint32(22,bytes.length,true);lv.setUint16(26,name.length,true);lv.setUint16(28,0,true);local.set(name,30);localParts.push(local,bytes);
+      const central=new Uint8Array(46+name.length),cv=new DataView(central.buffer);cv.setUint32(0,0x02014b50,true);cv.setUint16(4,20,true);cv.setUint16(6,20,true);cv.setUint16(8,0,true);cv.setUint16(10,0,true);cv.setUint16(12,stamp.time,true);cv.setUint16(14,stamp.date,true);cv.setUint32(16,crc,true);cv.setUint32(20,bytes.length,true);cv.setUint32(24,bytes.length,true);cv.setUint16(28,name.length,true);cv.setUint16(30,0,true);cv.setUint16(32,0,true);cv.setUint16(34,0,true);cv.setUint16(36,0,true);cv.setUint32(38,0,true);cv.setUint32(42,offset,true);central.set(name,46);centralParts.push(central);offset+=local.length+bytes.length;
+    }
+    const centralSize=centralParts.reduce((sum,part)=>sum+part.length,0),end=new Uint8Array(22),ev=new DataView(end.buffer);ev.setUint32(0,0x06054b50,true);ev.setUint16(4,0,true);ev.setUint16(6,0,true);ev.setUint16(8,entries.length,true);ev.setUint16(10,entries.length,true);ev.setUint32(12,centralSize,true);ev.setUint32(16,offset,true);ev.setUint16(20,0,true);return new Blob([...localParts,...centralParts,end],{type:'application/zip'});
+  }
   async function pngBlob(slug){saveCurrent();await draw(slug);await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return new Promise(resolve=>canvas.toBlob(resolve,'image/png'))}
   async function downloadPng(){const blob=await pngBlob(current);if(blob)downloadBlob(blob,`beyond-space-${value('publishDate')}-${current}.png`);status('PNG downloaded.')}
-  async function downloadAllPng(){saveCurrent();$('downloadAllPng').disabled=true;try{for(const [slug] of signs){const blob=await pngBlob(slug);if(blob)downloadBlob(blob,`beyond-space-${value('publishDate')}-${slug}.png`);await new Promise(r=>setTimeout(r,350))}loadCurrent();status('All 12 PNGs downloaded.')}catch(e){status(e.message||'Batch PNG export failed.',true)}finally{$('downloadAllPng').disabled=false}}
+  async function downloadAllPng(){saveCurrent();$('downloadAllPng').disabled=true;try{const date=value('publishDate'),entries=[];for(const [slug,name] of signs){status(`Preparing ${name} PNG…`);const blob=await pngBlob(slug);if(blob)entries.push({name:`beyond-space-${date}-${slug}.png`,blob})}if(entries.length!==signs.length)throw new Error(`Only ${entries.length} of 12 PNGs could be prepared.`);status('Packaging 12 PNGs into one ZIP…');downloadBlob(await zipBlob(entries),`beyond-space-${date}-all-signs-png.zip`);loadCurrent();status('One ZIP containing all 12 PNGs downloaded.')}catch(e){status(e.message||'Batch PNG ZIP export failed.',true)}finally{$('downloadAllPng').disabled=false}}
   async function generateAll(){saveCurrent();const b=$('generateAll');b.disabled=true;status('Checking fresh sources and generating all 12 horoscope texts…');try{const r=await fetch('/server/admin/daily-studio/api/generate-space-horoscopes.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({publish_date:value('publishDate'),theme:value('theme'),source_mode:value('sourceMode'),save_drafts:$('saveDrafts').checked})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||'Horoscope generation failed.');items={};d.items.forEach(item=>{items[item.slug]=item;if(item.background_url)backgrounds[item.slug]=item.background_url});loadCurrent();const report=d.source_report||{},providers=Object.entries(report.providers||{}).map(([name,count])=>`${count} ${name}`).join(', ');status(`Generated ${d.items.length} date-checked signs${providers?` (${providers})`:''}${report.rejected?`; rejected ${report.rejected} stale or unavailable source attempts`:''}${d.saved?`; saved ${d.saved} drafts`:''}.`)}catch(e){status(e.message,true)}finally{b.disabled=false}}
-  function mp4Payload(slug=current){requireHoroscopeCopy(slug);const item=itemFor(slug);return {sign:item.sign,symbol:item.symbol,season:item.season,date_label:dateLabel().replace(' • ',', '),headline:item.headline,paragraphs:item.paragraphs||[],mood:item.mood,source:item.source||'Beyond Space',background_url:backgrounds[slug]||item.background_url||''}}
-  async function exportMp4(slug=current){const item=itemFor(slug),r=await fetch('/server/admin/daily-studio/api/render-space-remotion.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(mp4Payload(slug))});if(!r.ok){let message=`${item.sign} MP4 failed.`;try{const d=await r.json();message=d.error||message}catch(e){}throw new Error(message)}downloadBlob(await r.blob(),`beyond-space-${value('publishDate')}-${slug}.mp4`)}
-  async function exportAllMp4(){if(!confirm('Render MP4s for all 12 signs? This may take several minutes.'))return;const b=$('exportAllMp4');b.disabled=true;try{for(const [slug,name] of signs){status(`Rendering ${name} MP4…`);await exportMp4(slug);await new Promise(r=>setTimeout(r,600))}status('All 12 MP4s downloaded.')}catch(e){status(e.message,true)}finally{b.disabled=false}}
-  $('generateAll').addEventListener('click',generateAll);$('downloadPng').addEventListener('click',downloadPng);$('downloadAllPng').addEventListener('click',downloadAllPng);$('exportMp4').addEventListener('click',()=>{const b=$('exportMp4');b.disabled=true;status('Rendering MP4…');exportMp4().then(()=>status('MP4 downloaded.')).catch(e=>status(e.message,true)).finally(()=>{b.disabled=false})});$('exportAllMp4').addEventListener('click',exportAllMp4);
+  $('generateAll').addEventListener('click',generateAll);$('downloadPng').addEventListener('click',downloadPng);$('downloadAllPng').addEventListener('click',downloadAllPng);
   loadCurrent();
 })();
 </script>

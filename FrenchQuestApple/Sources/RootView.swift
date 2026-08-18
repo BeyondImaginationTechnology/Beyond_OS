@@ -1,10 +1,7 @@
 import SwiftUI
 
 enum QuestRoute: Hashable {
-    case map
-    case spellbook
-    case training
-    case hero
+    case destination(String)
 }
 
 private enum FrenchQuestScreen: Equatable {
@@ -32,17 +29,13 @@ struct RootView: View {
                 )
             case .game:
                 NavigationStack {
-                    TodayView(onMenu: { screen = .mainMenu })
+                    WorldTourMapView(onMenu: { screen = .mainMenu })
                         .navigationDestination(for: QuestRoute.self) { route in
                             switch route {
-                            case .map:
-                                AcademyView()
-                            case .spellbook:
-                                DictionaryView()
-                            case .training:
-                                PracticeView()
-                            case .hero:
-                                LearningProgressView()
+                            case .destination(let regionID):
+                                if let region = store.regions.first(where: { $0.id == regionID }) {
+                                    DestinationAdventureView(region: region)
+                                }
                             }
                         }
                 }
@@ -77,31 +70,44 @@ private struct MainMenuView: View {
         ZStack {
             store.theme.background.ignoresSafeArea()
 
+            Circle()
+                .fill(store.theme.accent.opacity(0.16))
+                .frame(width: 420, height: 420)
+                .blur(radius: 70)
+                .offset(x: -170, y: -310)
+
+            Circle()
+                .fill(Color.orange.opacity(0.10))
+                .frame(width: 360, height: 360)
+                .blur(radius: 80)
+                .offset(x: 190, y: 330)
+
             ScrollView {
-                VStack(spacing: 24) {
-                    Spacer(minLength: 36)
+                VStack(spacing: 0) {
+                    Spacer(minLength: 54)
 
                     Image("BeyondFrenchLogo")
                         .resizable()
                         .scaledToFill()
-                        .frame(width: 132, height: 132)
-                        .clipShape(RoundedRectangle(cornerRadius: 34))
-                        .overlay(RoundedRectangle(cornerRadius: 34).stroke(.white.opacity(0.28), lineWidth: 1))
-                        .shadow(color: store.theme.accent.opacity(0.5), radius: 28)
+                        .frame(width: 154, height: 154)
+                        .clipShape(Circle())
+                        .overlay(Circle().stroke(.white.opacity(0.24), lineWidth: 2))
+                        .shadow(color: store.theme.accent.opacity(0.52), radius: 32)
 
-                    VStack(spacing: 7) {
+                    VStack(spacing: 8) {
                         Text("FRENCH QUEST")
-                            .font(.system(size: 42, weight: .black, design: .rounded))
+                            .font(.system(size: 46, weight: .black, design: .rounded))
                             .minimumScaleFactor(0.75)
                             .lineLimit(1)
-                        Text("THE LOST REALMS OF FRANCE")
+                        Text("THE WORLD TOUR")
                             .font(.caption.weight(.black))
                             .tracking(2.2)
                             .foregroundStyle(store.theme.accent)
                     }
+                    .padding(.top, 22)
 
-                    VStack(spacing: 14) {
-                        MenuActionButton(title: "New Game", systemImage: "play.fill", color: store.theme.accent) {
+                    VStack(spacing: 12) {
+                        MenuActionButton(title: "New Game", systemImage: "play.fill", color: store.theme.accent, isPrimary: true) {
                             confirmingNewGame = true
                         }
 
@@ -116,14 +122,15 @@ private struct MainMenuView: View {
 
                         MenuActionButton(title: "Settings", systemImage: "gearshape.fill", color: .purple, action: onSettings)
                     }
-                    .frame(maxWidth: 520)
+                    .frame(maxWidth: 390)
+                    .padding(.top, 48)
 
                     Text("Version 1.1.1 · Build 3")
                         .font(.caption2.weight(.bold))
-                        .foregroundStyle(.white.opacity(0.48))
-                        .padding(.top, 8)
+                        .foregroundStyle(.white.opacity(0.38))
+                        .padding(.top, 34)
 
-                    Spacer(minLength: 28)
+                    Spacer(minLength: 40)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 24)
@@ -145,38 +152,49 @@ private struct MenuActionButton: View {
     let systemImage: String
     let color: Color
     var isEnabled = true
+    var isPrimary = false
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 16) {
+            HStack(spacing: 14) {
                 Image(systemName: systemImage)
-                    .font(.title2.weight(.black))
-                    .foregroundStyle(color)
-                    .frame(width: 48, height: 48)
-                    .background(color.opacity(0.18), in: RoundedRectangle(cornerRadius: 14))
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(title).font(.title3.weight(.black))
+                    .font(.title3.weight(.black))
+                    .foregroundStyle(isPrimary ? .white : color)
+                    .frame(width: 34)
+                VStack(spacing: 2) {
+                    Text(title.uppercased())
+                        .font(.headline.weight(.black))
+                        .tracking(0.8)
                     if let subtitle {
-                        Text(subtitle).font(.caption).foregroundStyle(.white.opacity(0.62))
+                        Text(subtitle)
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.white.opacity(0.58))
                     }
                 }
                 Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.headline.weight(.black))
-                    .foregroundStyle(.white.opacity(0.55))
+                Color.clear.frame(width: 34, height: 1)
             }
-            .padding(16)
-            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 20)
+            .frame(maxWidth: .infinity, minHeight: isPrimary ? 72 : 62)
             .background(
-                LinearGradient(colors: [color.opacity(0.25), Color.white.opacity(0.06)], startPoint: .topLeading, endPoint: .bottomTrailing),
-                in: RoundedRectangle(cornerRadius: 22)
+                LinearGradient(
+                    colors: isPrimary ? [storePrimaryColor, Color(red: 0.92, green: 0.22, blue: 0.17)] : [Color.white.opacity(0.12), Color.white.opacity(0.06)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: Capsule()
             )
-            .overlay(RoundedRectangle(cornerRadius: 22).stroke(color.opacity(0.3), lineWidth: 1))
+            .overlay(Capsule().stroke(isPrimary ? Color.white.opacity(0.30) : Color.white.opacity(0.14), lineWidth: 1))
+            .shadow(color: isPrimary ? Color.orange.opacity(0.28) : .clear, radius: 18, y: 8)
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)
         .opacity(isEnabled ? 1 : 0.46)
+    }
+
+    private var storePrimaryColor: Color {
+        Color(red: 1.0, green: 0.62, blue: 0.10)
     }
 }
 
@@ -255,7 +273,7 @@ struct BrandHeader: View {
                 .shadow(color: store.theme.accent.opacity(0.38), radius: 12)
             VStack(alignment: .leading, spacing: 2) {
                 Text("FRENCH QUEST").font(.headline.weight(.black))
-                Text("THE LOST REALMS OF FRANCE").font(.caption2.weight(.black)).foregroundStyle(store.theme.accent)
+                Text("THE WORLD TOUR").font(.caption2.weight(.black)).foregroundStyle(store.theme.accent)
             }
             Spacer()
             if let onMenu {
@@ -282,79 +300,8 @@ struct BrandHeader: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(store.musicEnabled ? "Turn music off" : "Turn music on")
-            NavigationLink(value: QuestRoute.hero) {
-                ZStack {
-                    Circle().fill(store.theme.accent.opacity(0.20))
-                    Image(systemName: "person.crop.circle.fill.badge.checkmark")
-                        .font(.title2)
-                        .foregroundStyle(store.theme.accent)
-                }
-                .frame(width: 42, height: 42)
-                .overlay(Circle().stroke(store.theme.accent.opacity(0.35), lineWidth: 1))
-            }
-            .accessibilityLabel("Open hero profile")
         }
         .foregroundStyle(.white)
-    }
-}
-
-struct AdventurePortalGrid: View {
-    @EnvironmentObject private var store: QuestStore
-
-    private let portals: [(QuestRoute, String, String, String, Color)] = [
-        (.map, "Quest Map", "Unlock the next realm", "map.fill", .cyan),
-        (.spellbook, "Spellbook", "158 words and phrases", "book.closed.fill", .purple),
-        (.training, "Training Grounds", "Sharpen your recall", "bolt.fill", .orange),
-        (.hero, "Hero Lodge", "Gear, stats, and themes", "shield.lefthalf.filled", .green)
-    ]
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("EXPLORE")
-                    .font(.caption.weight(.black))
-                    .tracking(1.8)
-                    .foregroundStyle(store.theme.accent)
-                Rectangle().fill(store.theme.accent.opacity(0.35)).frame(height: 1)
-            }
-
-            LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 12) {
-                ForEach(Array(portals.enumerated()), id: \.offset) { _, portal in
-                    NavigationLink(value: portal.0) {
-                        VStack(alignment: .leading, spacing: 10) {
-                            HStack {
-                                Image(systemName: portal.3)
-                                    .font(.title2.weight(.black))
-                                    .foregroundStyle(portal.4)
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.caption.weight(.black))
-                                    .foregroundStyle(.white.opacity(0.55))
-                            }
-                            Text(portal.1)
-                                .font(.headline.weight(.black))
-                                .foregroundStyle(.white)
-                            Text(portal.2)
-                                .font(.caption)
-                                .foregroundStyle(.white.opacity(0.66))
-                                .lineLimit(2)
-                        }
-                        .frame(maxWidth: .infinity, minHeight: 104, alignment: .leading)
-                        .padding(15)
-                        .background(
-                            LinearGradient(
-                                colors: [portal.4.opacity(0.25), Color.white.opacity(0.05)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            in: RoundedRectangle(cornerRadius: 20)
-                        )
-                        .overlay(RoundedRectangle(cornerRadius: 20).stroke(portal.4.opacity(0.32), lineWidth: 1))
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
     }
 }
 

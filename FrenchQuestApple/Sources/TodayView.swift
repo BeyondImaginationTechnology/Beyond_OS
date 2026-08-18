@@ -1,62 +1,10 @@
 import SwiftUI
 
 struct TodayView: View {
-    @EnvironmentObject private var store: QuestStore
     let onMenu: () -> Void
 
-    private var nextChallenge: (region: QuestRegion, challenge: QuestChallenge)? {
-        for region in store.regions where store.isRegionUnlocked(region) {
-            if let challenge = region.challenges.first(where: { !store.completedChallengeIDs.contains($0.id) && store.isChallengeUnlocked($0, in: region) }) {
-                return (region, challenge)
-            }
-        }
-        return nil
-    }
-
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
-                BrandHeader(onMenu: onMenu)
-                QuestStatBar()
-
-                QuestCard {
-                    VStack(alignment: .leading, spacing: 14) {
-                        HStack {
-                            Text("ACTIVE QUEST")
-                            Spacer()
-                            Label("REALM 1", systemImage: "crown.fill")
-                        }
-                            .font(.caption.weight(.black))
-                            .foregroundStyle(store.theme.accent)
-                        Text(nextChallenge?.region.title ?? "All quests cleared")
-                            .font(.system(size: 34, weight: .black, design: .rounded))
-                        Text(nextChallenge?.region.subtitle ?? "Review phrases in training to keep your streak warm.")
-                            .foregroundStyle(.secondary)
-                        SwiftUI.ProgressView(value: store.progress)
-                            .tint(store.theme.accent)
-                    }
-                }
-
-                AdventurePortalGrid()
-
-                if let nextChallenge {
-                    ChallengePlayer(region: nextChallenge.region, challenge: nextChallenge.challenge)
-                } else {
-                    QuestCard {
-                        VStack(alignment: .leading, spacing: 10) {
-                            Label("Quest complete", systemImage: "checkmark.seal.fill")
-                                .font(.title3.weight(.black))
-                                .foregroundStyle(.green)
-                            Text("You cleared every launch realm in French Quest 1.1.1.")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
-            }
-            .padding()
-        }
-        .background(store.theme.background)
-        .toolbar(.hidden, for: .navigationBar)
+        WorldTourMapView(onMenu: onMenu)
     }
 }
 

@@ -125,9 +125,7 @@ private struct MainMenuView: View {
                     .frame(maxWidth: 390)
                     .padding(.top, 48)
 
-                    Text("Version 1.1.1 · Build 3")
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(.white.opacity(0.38))
+                    AppVersionLabel()
                         .padding(.top, 34)
 
                     Spacer(minLength: 40)
@@ -243,9 +241,7 @@ private struct GameSettingsView: View {
                     QuestCard {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("French Quest").font(.headline.weight(.black))
-                            Text("Version 1.1.1 · Build 3")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                            AppVersionLabel()
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -255,6 +251,23 @@ private struct GameSettingsView: View {
             }
         }
         .foregroundStyle(.white)
+    }
+}
+
+private struct AppVersionLabel: View {
+    private var version: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "Unknown"
+    }
+
+    private var build: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "Unknown"
+    }
+
+    var body: some View {
+        Text("Version \(version) · Build \(build)")
+            .font(.caption.weight(.bold))
+            .foregroundStyle(.white.opacity(0.55))
+            .accessibilityLabel("French Quest version \(version), build \(build)")
     }
 }
 

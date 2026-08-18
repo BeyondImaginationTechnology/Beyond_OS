@@ -21,7 +21,7 @@ $userName = $_SESSION['user_name'] ?? $_SESSION['name'] ?? 'Learner';
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/beyond-splash.css?v=20260802-1">
-  <script src="/assets/js/beyond-splash.js?v=20260802-1" defer></script>
+  <script src="/assets/js/beyond-splash.js?v=20260818-2" defer></script>
   <link rel="stylesheet" href="/beyond-math/assets/css/style.css?v=2.1">
 </head>
 <body class="math-entry">

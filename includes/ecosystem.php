@@ -90,7 +90,7 @@ function beyond_app_icon(string $appName): string {
 }
 function beyond_splash_assets_markup(): string {
     return '<link rel="stylesheet" href="' . e(beyond_url('assets/css/beyond-splash.css?v=20260802-1')) . '">'
-        . '<script src="' . e(beyond_url('assets/js/beyond-splash.js?v=20260802-1')) . '" defer></script>';
+        . '<script src="' . e(beyond_url('assets/js/beyond-splash.js?v=20260818-2')) . '" defer></script>';
 }
 function beyond_inject_splash_assets(string $html): string {
     if (stripos($html, '</head>') === false || str_contains($html, 'beyond-splash.js')) {

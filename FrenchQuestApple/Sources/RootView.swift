@@ -7,26 +7,50 @@ enum QuestRoute: Hashable {
     case hero
 }
 
+private enum FrenchQuestScreen: Equatable {
+    case mainMenu
+    case game
+    case settings
+}
+
 struct RootView: View {
     @EnvironmentObject private var store: QuestStore
     @Environment(\.scenePhase) private var scenePhase
+    @State private var screen = FrenchQuestScreen.mainMenu
 
     var body: some View {
-        NavigationStack {
-            TodayView()
-                .navigationDestination(for: QuestRoute.self) { route in
-                    switch route {
-                    case .map:
-                        AcademyView()
-                    case .spellbook:
-                        DictionaryView()
-                    case .training:
-                        PracticeView()
-                    case .hero:
-                        LearningProgressView()
-                    }
+        Group {
+            switch screen {
+            case .mainMenu:
+                MainMenuView(
+                    onNewGame: {
+                        store.resetProgress()
+                        screen = .game
+                    },
+                    onLoadGame: { screen = .game },
+                    onSettings: { screen = .settings }
+                )
+            case .game:
+                NavigationStack {
+                    TodayView(onMenu: { screen = .mainMenu })
+                        .navigationDestination(for: QuestRoute.self) { route in
+                            switch route {
+                            case .map:
+                                AcademyView()
+                            case .spellbook:
+                                DictionaryView()
+                            case .training:
+                                PracticeView()
+                            case .hero:
+                                LearningProgressView()
+                            }
+                        }
                 }
+            case .settings:
+                GameSettingsView(onBack: { screen = .mainMenu })
+            }
         }
+        .animation(.easeInOut(duration: 0.25), value: screen)
         .tint(store.theme.accent)
         .preferredColorScheme(.dark)
         .onAppear {
@@ -42,8 +66,183 @@ struct RootView: View {
     }
 }
 
+private struct MainMenuView: View {
+    @EnvironmentObject private var store: QuestStore
+    let onNewGame: () -> Void
+    let onLoadGame: () -> Void
+    let onSettings: () -> Void
+    @State private var confirmingNewGame = false
+
+    var body: some View {
+        ZStack {
+            store.theme.background.ignoresSafeArea()
+
+            ScrollView {
+                VStack(spacing: 24) {
+                    Spacer(minLength: 36)
+
+                    Image("BeyondFrenchLogo")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 132, height: 132)
+                        .clipShape(RoundedRectangle(cornerRadius: 34))
+                        .overlay(RoundedRectangle(cornerRadius: 34).stroke(.white.opacity(0.28), lineWidth: 1))
+                        .shadow(color: store.theme.accent.opacity(0.5), radius: 28)
+
+                    VStack(spacing: 7) {
+                        Text("FRENCH QUEST")
+                            .font(.system(size: 42, weight: .black, design: .rounded))
+                            .minimumScaleFactor(0.75)
+                            .lineLimit(1)
+                        Text("THE LOST REALMS OF FRANCE")
+                            .font(.caption.weight(.black))
+                            .tracking(2.2)
+                            .foregroundStyle(store.theme.accent)
+                    }
+
+                    VStack(spacing: 14) {
+                        MenuActionButton(title: "New Game", systemImage: "play.fill", color: store.theme.accent) {
+                            confirmingNewGame = true
+                        }
+
+                        MenuActionButton(
+                            title: "Load Game",
+                            subtitle: store.hasSavedGame ? "Continue with \(store.xp) XP" : "No saved game found",
+                            systemImage: "folder.fill",
+                            color: .orange,
+                            isEnabled: store.hasSavedGame,
+                            action: onLoadGame
+                        )
+
+                        MenuActionButton(title: "Settings", systemImage: "gearshape.fill", color: .purple, action: onSettings)
+                    }
+                    .frame(maxWidth: 520)
+
+                    Text("Version 1.1.1 · Build 3")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.white.opacity(0.48))
+                        .padding(.top, 8)
+
+                    Spacer(minLength: 28)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 24)
+            }
+        }
+        .foregroundStyle(.white)
+        .alert("Start a new game?", isPresented: $confirmingNewGame) {
+            Button("Cancel", role: .cancel) {}
+            Button("New Game", role: .destructive, action: onNewGame)
+        } message: {
+            Text(store.hasSavedGame ? "This will erase the current local quest progress and begin again." : "Your adventure will begin from the first quest.")
+        }
+    }
+}
+
+private struct MenuActionButton: View {
+    let title: String
+    var subtitle: String? = nil
+    let systemImage: String
+    let color: Color
+    var isEnabled = true
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 16) {
+                Image(systemName: systemImage)
+                    .font(.title2.weight(.black))
+                    .foregroundStyle(color)
+                    .frame(width: 48, height: 48)
+                    .background(color.opacity(0.18), in: RoundedRectangle(cornerRadius: 14))
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title).font(.title3.weight(.black))
+                    if let subtitle {
+                        Text(subtitle).font(.caption).foregroundStyle(.white.opacity(0.62))
+                    }
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.headline.weight(.black))
+                    .foregroundStyle(.white.opacity(0.55))
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity)
+            .background(
+                LinearGradient(colors: [color.opacity(0.25), Color.white.opacity(0.06)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                in: RoundedRectangle(cornerRadius: 22)
+            )
+            .overlay(RoundedRectangle(cornerRadius: 22).stroke(color.opacity(0.3), lineWidth: 1))
+        }
+        .buttonStyle(.plain)
+        .disabled(!isEnabled)
+        .opacity(isEnabled ? 1 : 0.46)
+    }
+}
+
+private struct GameSettingsView: View {
+    @EnvironmentObject private var store: QuestStore
+    let onBack: () -> Void
+
+    var body: some View {
+        ZStack {
+            store.theme.background.ignoresSafeArea()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    Button(action: onBack) {
+                        Label("Main Menu", systemImage: "chevron.left")
+                            .font(.headline.weight(.black))
+                    }
+                    .buttonStyle(.plain)
+
+                    Text("SETTINGS")
+                        .font(.system(size: 40, weight: .black, design: .rounded))
+
+                    QuestCard {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Music").font(.title3.weight(.black))
+                                Text("French accordion soundtrack")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Button {
+                                store.toggleBackgroundMusic()
+                            } label: {
+                                Label(store.musicEnabled ? "On" : "Off", systemImage: store.musicEnabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                                    .font(.headline.weight(.black))
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 10)
+                                    .background(store.theme.accent.opacity(0.2), in: Capsule())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+
+                    ThemePicker()
+
+                    QuestCard {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("French Quest").font(.headline.weight(.black))
+                            Text("Version 1.1.1 · Build 3")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .frame(maxWidth: 620)
+                .padding(24)
+            }
+        }
+        .foregroundStyle(.white)
+    }
+}
+
 struct BrandHeader: View {
     @EnvironmentObject private var store: QuestStore
+    var onMenu: (() -> Void)?
 
     var body: some View {
         HStack(spacing: 12) {
@@ -59,6 +258,18 @@ struct BrandHeader: View {
                 Text("THE LOST REALMS OF FRANCE").font(.caption2.weight(.black)).foregroundStyle(store.theme.accent)
             }
             Spacer()
+            if let onMenu {
+                Button(action: onMenu) {
+                    Image(systemName: "house.fill")
+                        .font(.headline.weight(.black))
+                        .foregroundStyle(store.theme.accent)
+                        .frame(width: 42, height: 42)
+                        .background(Color.white.opacity(0.08), in: Circle())
+                        .overlay(Circle().stroke(Color.white.opacity(0.12), lineWidth: 1))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Return to main menu")
+            }
             Button {
                 store.toggleBackgroundMusic()
             } label: {

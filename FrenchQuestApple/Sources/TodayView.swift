@@ -2,6 +2,7 @@ import SwiftUI
 
 struct TodayView: View {
     @EnvironmentObject private var store: QuestStore
+    let onMenu: () -> Void
 
     private var nextChallenge: (region: QuestRegion, challenge: QuestChallenge)? {
         for region in store.regions where store.isRegionUnlocked(region) {
@@ -15,7 +16,7 @@ struct TodayView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                BrandHeader()
+                BrandHeader(onMenu: onMenu)
                 QuestStatBar()
 
                 QuestCard {

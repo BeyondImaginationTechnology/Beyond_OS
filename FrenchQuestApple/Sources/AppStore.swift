@@ -17,6 +17,7 @@ final class QuestStore: ObservableObject {
     @Published private(set) var beyondIDAccount: BeyondIDAccount?
     @Published private(set) var cloudMessage = "Sign in to save this quest across devices."
     @Published private(set) var isCloudBusy = false
+    @Published private(set) var hasSavedGame = false
     @Published var theme = QuestTheme.riviera {
         didSet {
             UserDefaults.standard.set(theme.rawValue, forKey: themeKey)
@@ -35,6 +36,7 @@ final class QuestStore: ObservableObject {
     private let streakKey = "FrenchQuest.streak"
     private let themeKey = "FrenchQuest.theme"
     private let musicKey = "FrenchQuest.musicEnabled"
+    private let saveExistsKey = "FrenchQuest.hasSavedGame"
     private let beyondID = FrenchQuestBeyondIDService()
     private let webAuthenticator = FrenchQuestWebAuthenticator()
     private var mobileToken: String?
@@ -267,6 +269,11 @@ final class QuestStore: ObservableObject {
     }
 
     private func load() {
+        hasSavedGame = UserDefaults.standard.bool(forKey: saveExistsKey)
+            || UserDefaults.standard.object(forKey: completedKey) != nil
+            || UserDefaults.standard.object(forKey: xpKey) != nil
+            || UserDefaults.standard.object(forKey: heartsKey) != nil
+            || UserDefaults.standard.object(forKey: streakKey) != nil
         completedChallengeIDs = Set(UserDefaults.standard.stringArray(forKey: completedKey) ?? [])
         xp = UserDefaults.standard.integer(forKey: xpKey)
         let savedHearts = UserDefaults.standard.object(forKey: heartsKey) as? Int
@@ -290,6 +297,8 @@ final class QuestStore: ObservableObject {
         UserDefaults.standard.set(xp, forKey: xpKey)
         UserDefaults.standard.set(hearts, forKey: heartsKey)
         UserDefaults.standard.set(streak, forKey: streakKey)
+        UserDefaults.standard.set(true, forKey: saveExistsKey)
+        hasSavedGame = true
     }
 
     private var cloudSnapshot: FrenchQuestCloudSave {

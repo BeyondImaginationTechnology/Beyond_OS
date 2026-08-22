@@ -4,7 +4,7 @@ $wallet = bos_page_start('Beyond OS', 'Privacy Policy', 'Privacy practices for B
 ?>
 <main class="bos-main">
     <section class="bos-hero">
-        <span class="bos-kicker">Effective August 1, 2026</span>
+        <span class="bos-kicker">Effective August 22, 2026</span>
         <h1>Privacy Policy</h1>
         <p>This Privacy Policy explains how Beyond Imagination Technology collects, uses, shares, protects, and lets you manage information connected to Beyond OS, Beyond ID, Beyond Wallet, and connected apps.</p>
         <div class="bos-actions">
@@ -28,6 +28,9 @@ $wallet = bos_page_start('Beyond OS', 'Privacy Policy', 'Privacy practices for B
 
         <h2>Cookies and local storage</h2>
         <p>We use cookies, sessions, and local storage for sign-in, security, app preferences, theme and currency choices, analytics, cart or checkout flows, and remembering settings. Some features may not work properly if these technologies are disabled.</p>
+
+        <h2>Daily Breath iOS local data and optional iCloud sync</h2>
+        <p>The Daily Breath iOS app stores journal entries, Bible notes, highlights, favorite collections, challenge progress, and daily history in protected local app storage. If you explicitly enable encrypted iCloud sync, the app encrypts that private data on your device before placing it in your Apple iCloud key-value store. The encryption key is stored through iCloud Keychain. Beyond Imagination Technology does not receive the unencrypted journal or Bible-note content through this sync feature. You may turn sync off without deleting the local copy.</p>
 
         <h2>How we use information</h2>
         <p>We use information to authenticate users, operate connected apps, sync progress, process purchases, manage rewards and wallet activity, provide support, send service notices, personalize experiences, maintain security, prevent fraud and abuse, comply with legal obligations, debug issues, analyze performance, and improve products.</p>

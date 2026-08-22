@@ -4,6 +4,7 @@ struct JournalView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
     @State private var editingEntry: JournalEntry?
+    @FocusState private var isReflectionFocused: Bool
 
     private let moods = ["Peaceful", "Grateful", "Heavy", "Hopeful"]
 
@@ -32,6 +33,7 @@ struct JournalView: View {
                         .font(.title3.weight(.bold))
                     moodPicker
                     TextEditor(text: $store.journalText)
+                        .focused($isReflectionFocused)
                         .frame(minHeight: 140)
                         .scrollContentBackground(.hidden)
                         .padding(8)
@@ -89,12 +91,21 @@ struct JournalView: View {
                 }
             }
         }
+        .scrollDismissesKeyboard(.interactively)
         .scrollContentBackground(.hidden)
         .background(DailyBreathThemeBackground(theme: selectedTheme))
         .navigationTitle("Journal")
         .sheet(item: $editingEntry) { entry in
             JournalEntryEditor(entry: entry)
                 .environmentObject(store)
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Done") {
+                    isReflectionFocused = false
+                }
+            }
         }
     }
 
@@ -123,6 +134,7 @@ private struct JournalEntryEditor: View {
 
     @State private var text: String
     @State private var mood: String
+    @FocusState private var isReflectionFocused: Bool
 
     private let moods = ["Peaceful", "Grateful", "Heavy", "Hopeful"]
 
@@ -150,9 +162,11 @@ private struct JournalEntryEditor: View {
 
                 Section("Reflection") {
                     TextEditor(text: $text)
+                        .focused($isReflectionFocused)
                         .frame(minHeight: 180)
                 }
             }
+            .scrollDismissesKeyboard(.interactively)
             .navigationTitle("Edit Reflection")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -167,6 +181,12 @@ private struct JournalEntryEditor: View {
                         dismiss()
                     }
                     .disabled(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        isReflectionFocused = false
+                    }
                 }
             }
         }

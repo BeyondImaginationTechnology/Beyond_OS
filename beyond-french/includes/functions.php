@@ -165,10 +165,20 @@ function sqlite_db(): PDO {
 
 function lesson_audio_map(int $lessonId): array {
     if ($lessonId < 1) return [];
+    $audio = [];
+    foreach (french_lessons() as $lesson) {
+        if ((int)($lesson['id'] ?? 0) !== $lessonId) continue;
+        foreach ((array)($lesson['audio_urls'] ?? []) as $language => $path) {
+            if ((string)$path !== '') $audio[(string)$language] = (string)$path;
+        }
+        if (!isset($audio['fr-FR']) && (string)($lesson['audio_url'] ?? '') !== '') {
+            $audio['fr-FR'] = (string)$lesson['audio_url'];
+        }
+        break;
+    }
     try {
         $stmt = sqlite_db()->prepare("SELECT language, audio_path FROM french_lesson_audio WHERE lesson_id=? AND generation_status='ready' AND audio_path<>'' ORDER BY id DESC");
         $stmt->execute([$lessonId]);
-        $audio = [];
         foreach ($stmt->fetchAll() as $row) {
             $language = (string)($row['language'] ?? '');
             if ($language !== '' && !isset($audio[$language])) $audio[$language] = (string)$row['audio_path'];
@@ -176,7 +186,7 @@ function lesson_audio_map(int $lessonId): array {
         return $audio;
     } catch (Throwable $error) {
         error_log('Lesson audio lookup failed: ' . $error->getMessage());
-        return [];
+        return $audio;
     }
 }
 function login_blocked(string $ip): bool {

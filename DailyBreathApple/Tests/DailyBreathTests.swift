@@ -1,3 +1,4 @@
+import Foundation
 import XCTest
 @testable import DailyBreath
 
@@ -103,4 +104,232 @@ final class DailyBreathTests: XCTestCase {
         XCTAssertEqual(RecoveryContent.devotionalOfTheDay(for: date)?.scripture, "Psalm 3:3")
         XCTAssertEqual(RecoveryContent.challengeOfTheDay(for: date)?.title, "Build Your Support Circle")
     }
+
+    func testReviewDateUsesScheduledVerseInsteadOfHardcodedFallback() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let date = DateComponents(calendar: calendar, year: 2026, month: 8, day: 22, hour: 12).date!
+
+        let verse = RecoveryContent.verseOfTheDay(for: date)
+
+        XCTAssertEqual(verse?.reference, "Psalm 23:4")
+        XCTAssertEqual(verse?.reflection, "Carry this verse with you today, and let it guide your next faithful step.")
+        XCTAssertFalse(verse?.reflection.contains("entry.theme") ?? true)
+        XCTAssertNotEqual(verse, Verse.daily)
+    }
+
+    func testUserDataStorePersistsJournalAndChallengeProgress() throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let store = DailyBreathUserDataStore(fileURL: directory.appendingPathComponent("user-data.json"))
+        addTeardownBlock { try? FileManager.default.removeItem(at: directory) }
+        let entry = JournalEntry(
+            id: UUID(),
+            createdAt: Date(timeIntervalSince1970: 1_786_838_400),
+            prompt: "What is one faithful next step?",
+            text: "Ask for support.",
+            mood: "Hopeful"
+        )
+        let expected = DailyBreathUserData(
+            journalEntries: [entry],
+            challengeCompletionDayKeys: ["challenge-01": ["2026-08-22"]],
+            bibleAnnotations: [
+                "JHN-3-16": BibleAnnotation(
+                    verseID: "JHN-3-16",
+                    isFavorite: true,
+                    collections: ["Hope"],
+                    highlightColor: "yellow",
+                    note: "Carry this today.",
+                    updatedAt: Date(timeIntervalSince1970: 1_786_838_400)
+                )
+            ],
+            dailyHistory: [
+                "2026-08-22": DailyHistoryRecord(
+                    dayKey: "2026-08-22",
+                    verseReference: "Psalm 23:4",
+                    verseText: "I will fear no evil.",
+                    devotionalTitle: "Walk With Courage",
+                    updatedAt: Date(timeIntervalSince1970: 1_786_838_400)
+                )
+            ],
+            modifiedAt: Date(timeIntervalSince1970: 1_786_838_400)
+        )
+
+        try store.save(expected)
+
+        XCTAssertEqual(try store.load(), expected)
+    }
+
+    func testUserDataDecoderMigratesVersionOneLocalFile() throws {
+        let legacy = Data("""
+        {
+          "journalEntries": [],
+          "challengeCompletionDayKeys": {"challenge-01": ["2026-08-22"]}
+        }
+        """.utf8)
+
+        let decoded = try DailyBreathUserDataStore.makeDecoder().decode(DailyBreathUserData.self, from: legacy)
+
+        XCTAssertEqual(decoded.challengeCompletionDayKeys["challenge-01"], ["2026-08-22"])
+        XCTAssertTrue(decoded.bibleAnnotations.isEmpty)
+        XCTAssertTrue(decoded.dailyHistory.isEmpty)
+        XCTAssertEqual(decoded.modifiedAt, .distantPast)
+    }
+
+    func testEncryptedSyncMergeHonorsEditsAndDeletionTombstones() {
+        let first = Date(timeIntervalSince1970: 100)
+        let second = Date(timeIntervalSince1970: 200)
+        let third = Date(timeIntervalSince1970: 300)
+        let journalID = UUID()
+        let local = DailyBreathUserData(
+            journalEntries: [JournalEntry(id: journalID, createdAt: first, prompt: "Prompt", text: "Local", mood: nil, updatedAt: first)],
+            challengeCompletionDayKeys: ["challenge": ["2026-08-21"]],
+            bibleAnnotations: [
+                "JHN-3-16": BibleAnnotation(verseID: "JHN-3-16", isFavorite: true, collections: ["Hope"], highlightColor: "yellow", note: "Local", updatedAt: first)
+            ],
+            modifiedAt: first
+        )
+        let cloud = DailyBreathUserData(
+            journalEntries: [JournalEntry(id: journalID, createdAt: first, prompt: "Prompt", text: "Cloud edit", mood: nil, updatedAt: second)],
+            challengeCompletionDayKeys: ["challenge": ["2026-08-22"]],
+            bibleAnnotations: [
+                "JHN-3-16": BibleAnnotation(verseID: "JHN-3-16", isFavorite: false, collections: [], highlightColor: nil, note: "", updatedAt: second)
+            ],
+            deletedJournalEntryIDs: [journalID: third],
+            modifiedAt: third
+        )
+
+        let merged = DailyBreathStore.mergeUserData(local, with: cloud)
+
+        XCTAssertTrue(merged.journalEntries.isEmpty)
+        XCTAssertEqual(merged.challengeCompletionDayKeys["challenge"], ["2026-08-21", "2026-08-22"])
+        XCTAssertEqual(merged.bibleAnnotations["JHN-3-16"]?.isFavorite, false)
+        XCTAssertEqual(merged.deletedJournalEntryIDs[journalID], third)
+    }
+
+    func testTodayClientRejectsMalformedPayload() async {
+        let client = makeClient { request in
+            (try Self.response(for: request), Data("{".utf8))
+        }
+
+        do {
+            _ = try await client.fetch(dateKey: "2026-08-22")
+            XCTFail("Malformed JSON should not decode.")
+        } catch is DecodingError {
+            // Expected.
+        } catch {
+            XCTFail("Expected DecodingError, received \(error).")
+        }
+    }
+
+    func testTodayClientRejectsStaleDate() async {
+        let client = makeClient { request in
+            (try Self.response(for: request), Self.todayPayload(date: "2026-08-21"))
+        }
+
+        do {
+            _ = try await client.fetch(dateKey: "2026-08-22")
+            XCTFail("A stale daily response should not be accepted.")
+        } catch let error as DailyBreathAPIError {
+            XCTAssertEqual(error, .staleDate(expected: "2026-08-22", received: "2026-08-21"))
+        } catch {
+            XCTFail("Expected staleDate, received \(error).")
+        }
+    }
+
+    func testTodayClientSurfacesOfflineFailure() async {
+        let client = makeClient { _ in throw URLError(.notConnectedToInternet) }
+
+        do {
+            _ = try await client.fetch(dateKey: "2026-08-22")
+            XCTFail("An offline request should fail.")
+        } catch let error as URLError {
+            XCTAssertEqual(error.code, .notConnectedToInternet)
+        } catch {
+            XCTFail("Expected notConnectedToInternet, received \(error).")
+        }
+    }
+
+    func testTodayClientUsesExplicitTimeoutAndSurfacesSlowFailure() async {
+        let client = makeClient(timeout: 0.25) { request in
+            XCTAssertEqual(request.timeoutInterval, 0.25, accuracy: 0.001)
+            throw URLError(.timedOut)
+        }
+
+        do {
+            _ = try await client.fetch(dateKey: "2026-08-22")
+            XCTFail("A timed-out request should fail.")
+        } catch let error as URLError {
+            XCTAssertEqual(error.code, .timedOut)
+        } catch {
+            XCTFail("Expected timedOut, received \(error).")
+        }
+    }
+
+    private func makeClient(
+        timeout: TimeInterval = 10,
+        handler: @escaping (URLRequest) throws -> (HTTPURLResponse, Data)
+    ) -> DailyBreathAPIClient {
+        MockURLProtocol.handler = handler
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.protocolClasses = [MockURLProtocol.self]
+        return DailyBreathAPIClient(
+            endpoint: URL(string: "https://example.com/today.php")!,
+            session: URLSession(configuration: configuration),
+            timeoutInterval: timeout
+        )
+    }
+
+    private static func response(for request: URLRequest) throws -> HTTPURLResponse {
+        try XCTUnwrap(HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil))
+    }
+
+    private static func todayPayload(date: String) -> Data {
+        Data("""
+        {
+          "date": "\(date)",
+          "verse": {
+            "id": 1,
+            "text": "Be still, and know that I am God.",
+            "reference": "Psalm 46:10",
+            "reflection": "Begin slowly."
+          },
+          "devotional": {
+            "id": 1,
+            "title": "Walk in Quiet Confidence",
+            "excerpt": "Make room for stillness.",
+            "body": "Stillness is not empty time.",
+            "scripture": "Psalm 46:10",
+            "minutes": 5,
+            "prayer": "Lord, quiet my heart.",
+            "practice": "Take three slow breaths."
+          },
+          "challenge": null
+        }
+        """.utf8)
+    }
+}
+
+private final class MockURLProtocol: URLProtocol {
+    nonisolated(unsafe) static var handler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
+
+    override class func canInit(with request: URLRequest) -> Bool { true }
+
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        guard let handler = Self.handler else {
+            client?.urlProtocol(self, didFailWithError: URLError(.unknown))
+            return
+        }
+        do {
+            let (response, data) = try handler(request)
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: data)
+            client?.urlProtocolDidFinishLoading(self)
+        } catch {
+            client?.urlProtocol(self, didFailWithError: error)
+        }
+    }
+
+    override func stopLoading() {}
 }

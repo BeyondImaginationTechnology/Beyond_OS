@@ -30,6 +30,13 @@
 		300000000000000000000022 /* daily-verses.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000023 /* daily-verses.json */; };
 		300000000000000000000023 /* daily-devotionals.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000024 /* daily-devotionals.json */; };
 		300000000000000000000024 /* recovery-challenges.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000025 /* recovery-challenges.json */; };
+		300000000000000000000025 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000026 /* PrivacyInfo.xcprivacy */; };
+		300000000000000000000026 /* daily-verses.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000023 /* daily-verses.json */; };
+		300000000000000000000027 /* FeatureViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000028 /* FeatureViews.swift */; };
+		300000000000000000000028 /* DailyBreathWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000030 /* DailyBreathWidget.swift */; };
+		300000000000000000000029 /* daily-verses.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000023 /* daily-verses.json */; };
+		300000000000000000000030 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000033 /* PrivacyInfo.xcprivacy */; };
+		300000000000000000000031 /* Daily Breath Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 100000000000000000000032 /* Daily Breath Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +54,13 @@
 			remoteGlobalIDString = 333333333333333333333333;
 			remoteInfo = TheDailyBreathClip;
 		};
+		400000000000000000000005 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 000000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 444444444444444444444444;
+			remoteInfo = DailyBreathWidget;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -59,6 +73,17 @@
 				300000000000000000000015 /* The Daily Breath Clip.app in Embed App Clips */,
 			);
 			name = "Embed App Clips";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		600000000000000000000009 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				300000000000000000000031 /* Daily Breath Widget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -89,6 +114,15 @@
 		100000000000000000000023 /* daily-verses.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "daily-verses.json"; sourceTree = "<group>"; };
 		100000000000000000000024 /* daily-devotionals.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "daily-devotionals.json"; sourceTree = "<group>"; };
 		100000000000000000000025 /* recovery-challenges.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "recovery-challenges.json"; sourceTree = "<group>"; };
+		100000000000000000000026 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		100000000000000000000027 /* TheDailyBreath.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TheDailyBreath.entitlements; sourceTree = "<group>"; };
+		100000000000000000000028 /* FeatureViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureViews.swift; sourceTree = "<group>"; };
+		100000000000000000000029 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		100000000000000000000030 /* DailyBreathWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyBreathWidget.swift; sourceTree = "<group>"; };
+		100000000000000000000031 /* DailyBreathWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DailyBreathWidget.entitlements; sourceTree = "<group>"; };
+		100000000000000000000032 /* Daily Breath Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Daily Breath Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		100000000000000000000033 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		100000000000000000000034 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +147,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		500000000000000000000004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -121,6 +162,7 @@
 			children = (
 				200000000000000000000002 /* Sources */,
 				200000000000000000000006 /* AppClip */,
+				200000000000000000000007 /* Widget */,
 				200000000000000000000003 /* Resources */,
 				200000000000000000000004 /* Tests */,
 				200000000000000000000005 /* Products */,
@@ -136,12 +178,15 @@
 				100000000000000000000004 /* DailyBreathApp.swift */,
 				100000000000000000000005 /* DailyBreathStore.swift */,
 				100000000000000000000017 /* DailyBreathTheme.swift */,
+				100000000000000000000028 /* FeatureViews.swift */,
+				100000000000000000000029 /* Info.plist */,
 				100000000000000000000006 /* JournalView.swift */,
 				100000000000000000000007 /* Models.swift */,
 				100000000000000000000020 /* NotificationService.swift */,
 				100000000000000000000021 /* ReminderSettingsView.swift */,
 				100000000000000000000008 /* RootView.swift */,
 				100000000000000000000009 /* TodayView.swift */,
+				100000000000000000000027 /* TheDailyBreath.entitlements */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -156,6 +201,7 @@
 				100000000000000000000023 /* daily-verses.json */,
 				100000000000000000000024 /* daily-devotionals.json */,
 				100000000000000000000025 /* recovery-challenges.json */,
+				100000000000000000000026 /* PrivacyInfo.xcprivacy */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -173,6 +219,7 @@
 			children = (
 				100000000000000000000012 /* The Daily Breath.app */,
 				100000000000000000000016 /* The Daily Breath Clip.app */,
+				100000000000000000000032 /* Daily Breath Widget.appex */,
 				100000000000000000000013 /* TheDailyBreathTests.xctest */,
 			);
 			name = Products;
@@ -187,6 +234,17 @@
 			path = AppClip;
 			sourceTree = "<group>";
 		};
+		200000000000000000000007 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				100000000000000000000030 /* DailyBreathWidget.swift */,
+				100000000000000000000031 /* DailyBreathWidget.entitlements */,
+				100000000000000000000034 /* Info.plist */,
+				100000000000000000000033 /* PrivacyInfo.xcprivacy */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -198,11 +256,13 @@
 				500000000000000000000001 /* Frameworks */,
 				600000000000000000000002 /* Resources */,
 				600000000000000000000006 /* Embed App Clips */,
+				600000000000000000000009 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				400000000000000000000004 /* PBXTargetDependency */,
+				400000000000000000000006 /* PBXTargetDependency */,
 			);
 			name = TheDailyBreath;
 			packageProductDependencies = (
@@ -249,6 +309,25 @@
 			productReference = 100000000000000000000016 /* The Daily Breath Clip.app */;
 			productType = "com.apple.product-type.application.on-demand-install-capable";
 		};
+		444444444444444444444444 /* DailyBreathWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 700000000000000000000005 /* Build configuration list for PBXNativeTarget "DailyBreathWidget" */;
+			buildPhases = (
+				600000000000000000000007 /* Sources */,
+				500000000000000000000004 /* Frameworks */,
+				600000000000000000000008 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DailyBreathWidget;
+			packageProductDependencies = (
+			);
+			productName = "Daily Breath Widget";
+			productReference = 100000000000000000000032 /* Daily Breath Widget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -259,6 +338,10 @@
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					222222222222222222222222 = {
+						DevelopmentTeam = FK9QM3VUNH;
+						ProvisioningStyle = Automatic;
+					};
+					444444444444444444444444 = {
 						DevelopmentTeam = FK9QM3VUNH;
 						ProvisioningStyle = Automatic;
 					};
@@ -280,6 +363,7 @@
 			targets = (
 				111111111111111111111111 /* TheDailyBreath */,
 				333333333333333333333333 /* TheDailyBreathClip */,
+				444444444444444444444444 /* DailyBreathWidget */,
 				222222222222222222222222 /* TheDailyBreathTests */,
 			);
 		};
@@ -297,6 +381,7 @@
 				300000000000000000000022 /* daily-verses.json in Resources */,
 				300000000000000000000023 /* daily-devotionals.json in Resources */,
 				300000000000000000000024 /* recovery-challenges.json in Resources */,
+				300000000000000000000025 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -305,6 +390,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				300000000000000000000014 /* Assets.xcassets in Resources */,
+				300000000000000000000026 /* daily-verses.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		600000000000000000000008 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				300000000000000000000029 /* daily-verses.json in Resources */,
+				300000000000000000000030 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -321,6 +416,7 @@
 				300000000000000000000004 /* DailyBreathApp.swift in Sources */,
 				300000000000000000000005 /* DailyBreathStore.swift in Sources */,
 				300000000000000000000016 /* DailyBreathTheme.swift in Sources */,
+				300000000000000000000027 /* FeatureViews.swift in Sources */,
 				300000000000000000000006 /* JournalView.swift in Sources */,
 				300000000000000000000007 /* Models.swift in Sources */,
 				300000000000000000000019 /* NotificationService.swift in Sources */,
@@ -346,6 +442,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		600000000000000000000007 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				300000000000000000000028 /* DailyBreathWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -359,6 +463,11 @@
 			target = 333333333333333333333333 /* TheDailyBreathClip */;
 			targetProxy = 400000000000000000000003 /* PBXContainerItemProxy */;
 		};
+		400000000000000000000006 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 444444444444444444444444 /* DailyBreathWidget */;
+			targetProxy = 400000000000000000000005 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -368,13 +477,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_ENTITLEMENTS = Sources/TheDailyBreath.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "The Daily Breath";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -396,16 +507,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = FK9QM3VUNH;
+				CODE_SIGN_ENTITLEMENTS = Sources/TheDailyBreath.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = FK9QM3VUNH;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Sources/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "The Daily Breath";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -415,9 +526,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.thedailybreath;
 				PRODUCT_MODULE_NAME = DailyBreath;
 				PRODUCT_NAME = "The Daily Breath";
-				PROVISIONING_PROFILE = "6183f7f2-d0c2-44a0-a6eb-478e47f58eb9";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = GGOG;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -497,7 +606,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -519,7 +628,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -564,7 +673,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -580,7 +689,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.1.4;
+				MARKETING_VERSION = 1.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -624,7 +733,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "Apple Distribution";
 				CODE_SIGN_ENTITLEMENTS = AppClip/TheDailyBreathClip.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
@@ -645,6 +754,52 @@
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		800000000000000000000009 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = Widget/DailyBreathWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = FK9QM3VUNH;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.thedailybreath.widget;
+				PRODUCT_MODULE_NAME = DailyBreathWidget;
+				PRODUCT_NAME = "Daily Breath Widget";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		800000000000000000000010 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = Widget/DailyBreathWidget.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = FK9QM3VUNH;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.thedailybreath.widget;
+				PRODUCT_MODULE_NAME = DailyBreathWidget;
+				PRODUCT_NAME = "Daily Breath Widget";
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -683,6 +838,15 @@
 			buildConfigurations = (
 				800000000000000000000007 /* Debug */,
 				800000000000000000000008 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		700000000000000000000005 /* Build configuration list for PBXNativeTarget "DailyBreathWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				800000000000000000000009 /* Debug */,
+				800000000000000000000010 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

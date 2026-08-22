@@ -9,9 +9,8 @@ if($_SERVER['REQUEST_METHOD']!=='POST')multilingualSaveResponse(['ok'=>false,'er
 if(empty($_SESSION['verse_generator_csrf'])||!hash_equals((string)$_SESSION['verse_generator_csrf'],(string)($_SERVER['HTTP_X_CSRF_TOKEN']??'')))multilingualSaveResponse(['ok'=>false,'error'=>'Reload the generator and try again.'],419);
 $input=json_decode((string)file_get_contents('php://input'),true);if(!is_array($input))multilingualSaveResponse(['ok'=>false,'error'=>'Invalid request.'],400);
 $date=trim((string)($input['publish_date']??''));$parsed=DateTimeImmutable::createFromFormat('!Y-m-d',$date);if(!$parsed||$parsed->format('Y-m-d')!==$date)multilingualSaveResponse(['ok'=>false,'error'=>'Choose a valid publication date.'],422);
-$required=['english'=>180,'meaning'=>500,'french'=>220,'french_pronunciation'=>220,'italian'=>220,'german'=>220,'russian'=>220,'portuguese'=>220,'culture_note'=>600];$values=[];
+$required=['english'=>180,'meaning'=>500,'french'=>220,'french_pronunciation'=>220,'italian'=>220,'italian_pronunciation'=>220,'german'=>220,'german_pronunciation'=>220,'russian'=>220,'russian_pronunciation'=>220,'portuguese'=>220,'portuguese_pronunciation'=>220,'culture_note'=>600];$values=[];
 foreach($required as $field=>$limit){$value=trim((string)($input[$field]??''));if($value===''||mb_strlen($value)>$limit)multilingualSaveResponse(['ok'=>false,'error'=>'Complete every required phrase field before saving.'],422);$values[$field]=$value;}
-foreach(['italian_pronunciation','german_pronunciation','russian_pronunciation','portuguese_pronunciation'] as $field)$values[$field]=mb_substr(trim((string)($input[$field]??'')),0,220);
 $root=dirname(__DIR__,4);$scheduleFile=$root.'/beyond-french/data/multilingual-lessons.json';$bankFile=$root.'/beyond-french/data/multilingual-bank.json';
 $lessons=is_file($scheduleFile)?json_decode((string)file_get_contents($scheduleFile),true):[];if(!is_array($lessons))$lessons=[];$existingIndex=null;$maxId=0;
 foreach($lessons as $index=>$lesson){$maxId=max($maxId,(int)($lesson['id']??0));if(($lesson['date']??'')===$date)$existingIndex=$index;}

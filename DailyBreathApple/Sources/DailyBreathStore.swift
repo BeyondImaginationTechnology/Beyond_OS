@@ -1,10 +1,64 @@
 import AVFoundation
 import Foundation
+#if canImport(WidgetKit)
+import WidgetKit
+#endif
+
+enum DailyBreathAPIError: Error, Equatable {
+    case invalidURL
+    case badResponse
+    case staleDate(expected: String, received: String)
+}
+
+struct DailyBreathTodayResponse: Decodable, Equatable, Sendable {
+    let date: String
+    let verse: Verse
+    let devotional: Devotional
+    let challenge: RecoveryChallenge?
+}
+
+struct DailyBreathAPIClient: Sendable {
+    let endpoint: URL
+    let session: URLSession
+    let timeoutInterval: TimeInterval
+
+    init(
+        endpoint: URL = URL(string: "https://beyondimagination.co.technology/dailybreath/api/today.php")!,
+        session: URLSession = .shared,
+        timeoutInterval: TimeInterval = 10
+    ) {
+        self.endpoint = endpoint
+        self.session = session
+        self.timeoutInterval = timeoutInterval
+    }
+
+    func fetch(dateKey: String) async throws -> DailyBreathTodayResponse {
+        guard var components = URLComponents(url: endpoint, resolvingAgainstBaseURL: false) else {
+            throw DailyBreathAPIError.invalidURL
+        }
+        components.queryItems = [URLQueryItem(name: "date", value: dateKey)]
+        guard let requestURL = components.url else { throw DailyBreathAPIError.invalidURL }
+
+        var request = URLRequest(url: requestURL)
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        request.timeoutInterval = timeoutInterval
+        let (data, response) = try await session.data(for: request)
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            throw DailyBreathAPIError.badResponse
+        }
+
+        let today = try JSONDecoder().decode(DailyBreathTodayResponse.self, from: data)
+        guard today.date == dateKey else {
+            throw DailyBreathAPIError.staleDate(expected: dateKey, received: today.date)
+        }
+        return today
+    }
+}
 
 @MainActor
 final class DailyBreathStore: ObservableObject {
-    @Published private(set) var verse = Verse.daily
-    @Published private(set) var devotional = Devotional.today
+    @Published private(set) var verse = RecoveryContent.verseOfTheDay() ?? .daily
+    @Published private(set) var devotional = RecoveryContent.devotionalOfTheDay() ?? .today
     @Published private(set) var challenge = RecoveryContent.challengeOfTheDay()
     @Published private(set) var isRefreshing = false
     @Published private(set) var statusMessage = "Bundled daily content"
@@ -13,7 +67,12 @@ final class DailyBreathStore: ObservableObject {
     @Published var journalPrompt = DailyBreathStore.promptOfTheDay()
     @Published var journalMood = "Peaceful"
     @Published private(set) var entries: [JournalEntry] = []
-    @Published private(set) var bibleLibrary = BibleLibrary.loadWorldEnglishBible()
+    @Published private(set) var bibleLibrary = BibleLibrary(translation: "World English Bible", books: [])
+    @Published private(set) var isBibleLoading = true
+    @Published private(set) var challengeCompletedDayKeys: [String] = []
+    @Published private(set) var bibleAnnotations: [String: BibleAnnotation] = [:]
+    @Published private(set) var dailyHistory: [String: DailyHistoryRecord] = [:]
+    @Published private(set) var iCloudStatusMessage = "iCloud sync is off"
 
     let practices = [
         PrayerPractice(id: 1, title: "Peace Breath", subtitle: "A four-count rhythm for calm and focus.", systemImage: "wind"),
@@ -100,40 +159,80 @@ final class DailyBreathStore: ObservableObject {
     private let speaker = AVSpeechSynthesizer()
     private var prerecordedPlayer: AVAudioPlayer?
     private var streamingPlayer: AVPlayer?
-    private let endpoint = URL(string: "https://beyondimagination.co.technology/dailybreath/api/today.php")!
+    private let apiClient: DailyBreathAPIClient
+    private let userDataStore: DailyBreathUserDataStore
+    private var challengeCompletionDayKeys: [String: [String]] = [:]
+    private var localModifiedAt = Date.distantPast
+    private var deletedJournalEntryIDs: [UUID: Date] = [:]
+
+    init(
+        apiClient: DailyBreathAPIClient = DailyBreathAPIClient(),
+        userDataStore: DailyBreathUserDataStore = .live
+    ) {
+        self.apiClient = apiClient
+        self.userDataStore = userDataStore
+        if let userData = try? userDataStore.load() {
+            entries = userData.journalEntries.sorted { $0.createdAt > $1.createdAt }
+            challengeCompletionDayKeys = userData.challengeCompletionDayKeys
+            bibleAnnotations = userData.bibleAnnotations
+            dailyHistory = userData.dailyHistory
+            deletedJournalEntryIDs = userData.deletedJournalEntryIDs
+            localModifiedAt = userData.modifiedAt
+        }
+        migrateLegacyFavorites()
+        updateCurrentChallengeProgress()
+    }
 
     func load() async {
-        loadBundledDailyContent()
+        if UserDefaults.standard.bool(forKey: "encryptedICloudSyncEnabled") {
+            await refreshFromICloud()
+        }
+        loadBundledDailyContent(for: Date())
+        isBibleLoading = true
+        defer { isBibleLoading = false }
+        let bibleTask = Task.detached(priority: .userInitiated) {
+            BibleLibrary.loadWorldEnglishBible()
+        }
         await refreshToday()
+        bibleLibrary = await bibleTask.value
     }
 
     func refreshToday() async {
         isRefreshing = true
         defer { isRefreshing = false }
+        let requestedDate = Date()
+        let requestedDateKey = Self.dateKey(requestedDate)
 
         do {
-            var request = URLRequest(url: endpoint)
-            request.cachePolicy = .reloadIgnoringLocalCacheData
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
-                throw URLError(.badServerResponse)
-            }
-
-            let today = try JSONDecoder().decode(DailyBreathTodayResponse.self, from: data)
+            let today = try await apiClient.fetch(dateKey: requestedDateKey)
             verse = today.verse
             devotional = today.devotional
-            challenge = today.challenge ?? RecoveryContent.challengeOfTheDay()
+            challenge = today.challenge ?? RecoveryContent.challengeOfTheDay(for: requestedDate)
+            updateCurrentChallengeProgress()
+            recordDailyContent(for: requestedDate)
             statusMessage = "Synced daily content"
         } catch {
-            loadBundledDailyContent()
+            loadBundledDailyContent(for: requestedDate)
             statusMessage = "Offline daily content"
         }
     }
 
-    private func loadBundledDailyContent() {
-        verse = RecoveryContent.verseOfTheDay() ?? .daily
-        devotional = RecoveryContent.devotionalOfTheDay() ?? .today
-        challenge = RecoveryContent.challengeOfTheDay()
+    private func loadBundledDailyContent(for date: Date) {
+        verse = RecoveryContent.verseOfTheDay(for: date) ?? .daily
+        devotional = RecoveryContent.devotionalOfTheDay(for: date) ?? .today
+        challenge = RecoveryContent.challengeOfTheDay(for: date)
+        updateCurrentChallengeProgress()
+        journalPrompt = Self.promptOfTheDay(for: date)
+        recordDailyContent(for: date)
+    }
+
+    private static func dateKey(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = .current
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: date)
     }
 
     func speakVerse() {
@@ -166,7 +265,11 @@ final class DailyBreathStore: ObservableObject {
 
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = preferredNarrationVoice()
-        utterance.rate = 0.38
+        let savedRate = UserDefaults.standard.double(forKey: "narrationRate")
+        utterance.rate = Float(savedRate == 0 ? 0.38 : savedRate)
+        if let language = UserDefaults.standard.string(forKey: "narrationVoiceLanguage"), !language.isEmpty {
+            utterance.voice = AVSpeechSynthesisVoice(language: language) ?? utterance.voice
+        }
         utterance.pitchMultiplier = 0.96
         utterance.volume = 0.92
         utterance.preUtteranceDelay = 0.08
@@ -177,6 +280,21 @@ final class DailyBreathStore: ObservableObject {
     func speakAcademyLesson(_ lesson: AcademyLesson) {
         if playBundledNarration(named: "academy-\(lesson.id)") { return }
         speakText("\(lesson.title). \(lesson.scripture). \(lesson.teaching) Practice. \(lesson.practice)")
+    }
+
+    func speakBibleVerse(_ verse: BibleVerse) {
+        speakText("\(verse.reference). \(verse.text)")
+    }
+
+    func speakBibleChapter(_ chapter: BibleChapter) {
+        let verses = chapter.verses.map { "Verse \($0.verse). \($0.text)" }.joined(separator: " ")
+        speakText("\(chapter.title). \(verses)")
+    }
+
+    func stopNarration() {
+        speaker.stopSpeaking(at: .immediate)
+        prerecordedPlayer?.stop()
+        streamingPlayer?.pause()
     }
 
     func speakBreathPattern(_ pattern: BreathPattern) {
@@ -238,11 +356,13 @@ final class DailyBreathStore: ObservableObject {
                 createdAt: Date(),
                 prompt: journalPrompt,
                 text: trimmed,
-                mood: journalMood
+                mood: journalMood,
+                updatedAt: Date()
             ),
             at: 0
         )
         journalText = ""
+        persistUserData()
     }
 
     func prepareJournalReflection(prompt: String, text: String = "", mood: String? = nil) {
@@ -261,12 +381,295 @@ final class DailyBreathStore: ObservableObject {
             createdAt: entry.createdAt,
             prompt: entry.prompt,
             text: trimmed,
-            mood: mood
+            mood: mood,
+            updatedAt: Date()
         )
+        persistUserData()
     }
 
     func deleteJournalEntries(at offsets: IndexSet) {
+        for index in offsets where entries.indices.contains(index) {
+            deletedJournalEntryIDs[entries[index].id] = Date()
+        }
         entries.remove(atOffsets: offsets)
+        persistUserData()
+    }
+
+    var challengeProgressCount: Int {
+        challengeCompletedDayKeys.count
+    }
+
+    var isChallengeCompleteToday: Bool {
+        challengeCompletedDayKeys.contains(Self.dateKey(Date()))
+    }
+
+    func completeChallengeToday() {
+        guard let challenge else { return }
+        let todayKey = Self.dateKey(Date())
+        var keys = challengeCompletionDayKeys[challenge.id, default: []]
+        guard !keys.contains(todayKey) else { return }
+        keys.append(todayKey)
+        challengeCompletionDayKeys[challenge.id] = Array(keys.suffix(max(challenge.targetCount, 14)))
+        updateCurrentChallengeProgress()
+        persistUserData()
+    }
+
+    func annotation(for verse: BibleVerse) -> BibleAnnotation? {
+        bibleAnnotations[verse.id]
+    }
+
+    func toggleFavorite(_ verse: BibleVerse) {
+        var annotation = editableAnnotation(for: verse)
+        annotation.isFavorite.toggle()
+        if annotation.isFavorite, annotation.collections.isEmpty {
+            annotation.collections = ["Favorites"]
+        } else if !annotation.isFavorite {
+            annotation.collections = []
+        }
+        saveAnnotation(annotation)
+    }
+
+    func toggleVerse(_ verse: BibleVerse, inCollection collection: String) {
+        let cleanName = collection.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanName.isEmpty else { return }
+        var annotation = editableAnnotation(for: verse)
+        if annotation.collections.contains(cleanName) {
+            annotation.collections.removeAll { $0 == cleanName }
+        } else {
+            annotation.collections.append(cleanName)
+            annotation.collections.sort()
+        }
+        annotation.isFavorite = !annotation.collections.isEmpty
+        saveAnnotation(annotation)
+    }
+
+    func setHighlight(_ color: String?, for verse: BibleVerse) {
+        var annotation = editableAnnotation(for: verse)
+        annotation.highlightColor = color
+        saveAnnotation(annotation)
+    }
+
+    func setNote(_ note: String, for verse: BibleVerse) {
+        var annotation = editableAnnotation(for: verse)
+        annotation.note = note.trimmingCharacters(in: .whitespacesAndNewlines)
+        saveAnnotation(annotation)
+    }
+
+    var favoriteCollections: [String] {
+        Array(Set(bibleAnnotations.values.flatMap(\.collections))).sorted()
+    }
+
+    private func editableAnnotation(for verse: BibleVerse) -> BibleAnnotation {
+        bibleAnnotations[verse.id] ?? BibleAnnotation(
+            verseID: verse.id,
+            isFavorite: false,
+            collections: [],
+            highlightColor: nil,
+            note: "",
+            updatedAt: Date()
+        )
+    }
+
+    private func saveAnnotation(_ value: BibleAnnotation) {
+        var annotation = value
+        annotation.updatedAt = Date()
+        bibleAnnotations[annotation.verseID] = annotation
+        persistUserData()
+    }
+
+    private func migrateLegacyFavorites() {
+        let defaults = UserDefaults.standard
+        let legacyIDs = defaults.string(forKey: "favoriteVerseIDs")?
+            .split(separator: ",").map(String.init) ?? []
+        guard !legacyIDs.isEmpty else { return }
+        for id in legacyIDs where bibleAnnotations[id] == nil {
+            bibleAnnotations[id] = BibleAnnotation(
+                verseID: id,
+                isFavorite: true,
+                collections: ["Favorites"],
+                highlightColor: nil,
+                note: "",
+                updatedAt: Date()
+            )
+        }
+        defaults.removeObject(forKey: "favoriteVerseIDs")
+        persistUserData(syncToICloud: false)
+    }
+
+    private func recordDailyContent(for date: Date) {
+        let key = Self.dateKey(date)
+        dailyHistory[key] = DailyHistoryRecord(
+            dayKey: key,
+            verseReference: verse.reference,
+            verseText: verse.text,
+            devotionalTitle: devotional.title,
+            updatedAt: Date()
+        )
+        publishWidgetVerse(dateKey: key)
+        persistUserData()
+    }
+
+    private func publishWidgetVerse(dateKey: String) {
+        let defaults = UserDefaults(suiteName: "group.technology.co.beyondimagination.thedailybreath")
+        defaults?.set(dateKey, forKey: "widgetVerseDate")
+        defaults?.set(verse.text, forKey: "widgetVerseText")
+        defaults?.set(verse.reference, forKey: "widgetVerseReference")
+        _ = defaults?.synchronize()
+#if canImport(WidgetKit)
+        WidgetCenter.shared.reloadAllTimelines()
+#endif
+    }
+
+    var recoveryNewsletterShareText: String {
+        let challengeCopy = challenge.map { item in
+            "Weekly challenge: \(item.title). \(item.description) \(item.scriptureReference)"
+        } ?? ""
+        return "Recovery Newsletter\n\n\(verse.reference)\n\(verse.text)\n\n\(devotional.title)\n\(devotional.body)\n\n\(challengeCopy)"
+    }
+
+    func setICloudSyncEnabled(_ enabled: Bool) async {
+        guard enabled else {
+            UserDefaults.standard.set(false, forKey: "encryptedICloudSyncEnabled")
+            iCloudStatusMessage = "iCloud sync is off. Local data remains on this device."
+            return
+        }
+        do {
+            if let cloudData = try EncryptedICloudSyncService.download() {
+                let combined = Self.mergeUserData(currentUserData(modifiedAt: localModifiedAt), with: cloudData)
+                apply(combined)
+                try userDataStore.save(combined)
+                try EncryptedICloudSyncService.upload(combined)
+            } else {
+                let snapshot = currentUserData()
+                try userDataStore.save(snapshot)
+                try EncryptedICloudSyncService.upload(snapshot)
+                localModifiedAt = snapshot.modifiedAt
+            }
+            UserDefaults.standard.set(true, forKey: "encryptedICloudSyncEnabled")
+            iCloudStatusMessage = "Encrypted iCloud sync is on"
+        } catch {
+            UserDefaults.standard.set(false, forKey: "encryptedICloudSyncEnabled")
+            iCloudStatusMessage = error.localizedDescription
+        }
+    }
+
+    func syncICloudNow() async {
+        guard UserDefaults.standard.bool(forKey: "encryptedICloudSyncEnabled") else { return }
+        await refreshFromICloud()
+    }
+
+    private func refreshFromICloud() async {
+        do {
+            guard let cloudData = try EncryptedICloudSyncService.download() else {
+                let snapshot = currentUserData()
+                try userDataStore.save(snapshot)
+                try EncryptedICloudSyncService.upload(snapshot)
+                localModifiedAt = snapshot.modifiedAt
+                iCloudStatusMessage = "Encrypted iCloud sync is on"
+                return
+            }
+            let combined = Self.mergeUserData(currentUserData(modifiedAt: localModifiedAt), with: cloudData)
+            apply(combined)
+            try userDataStore.save(combined)
+            try EncryptedICloudSyncService.upload(combined)
+            iCloudStatusMessage = "Encrypted iCloud sync is on"
+        } catch {
+            iCloudStatusMessage = error.localizedDescription
+        }
+    }
+
+    private func apply(_ userData: DailyBreathUserData) {
+        entries = userData.journalEntries.sorted { $0.createdAt > $1.createdAt }
+        challengeCompletionDayKeys = userData.challengeCompletionDayKeys
+        bibleAnnotations = userData.bibleAnnotations
+        dailyHistory = userData.dailyHistory
+        deletedJournalEntryIDs = userData.deletedJournalEntryIDs
+        localModifiedAt = userData.modifiedAt
+        updateCurrentChallengeProgress()
+    }
+
+    private func currentUserData(modifiedAt: Date = Date()) -> DailyBreathUserData {
+        DailyBreathUserData(
+            journalEntries: entries,
+            challengeCompletionDayKeys: challengeCompletionDayKeys,
+            bibleAnnotations: bibleAnnotations,
+            dailyHistory: dailyHistory,
+            deletedJournalEntryIDs: deletedJournalEntryIDs,
+            modifiedAt: modifiedAt
+        )
+    }
+
+    nonisolated static func mergeUserData(_ local: DailyBreathUserData, with cloud: DailyBreathUserData) -> DailyBreathUserData {
+        var tombstones = local.deletedJournalEntryIDs
+        for (id, date) in cloud.deletedJournalEntryIDs where date > tombstones[id, default: .distantPast] {
+            tombstones[id] = date
+        }
+
+        var journals = Dictionary(uniqueKeysWithValues: local.journalEntries.map { ($0.id, $0) })
+        for entry in cloud.journalEntries where entry.updatedAt > (journals[entry.id]?.updatedAt ?? .distantPast) {
+            journals[entry.id] = entry
+        }
+        for (id, deletionDate) in tombstones {
+            if let entry = journals[id], deletionDate >= entry.updatedAt { journals.removeValue(forKey: id) }
+        }
+
+        var annotations = local.bibleAnnotations
+        for (id, annotation) in cloud.bibleAnnotations where annotation.updatedAt > (annotations[id]?.updatedAt ?? .distantPast) {
+            annotations[id] = annotation
+        }
+
+        var history = local.dailyHistory
+        for (key, record) in cloud.dailyHistory where record.updatedAt > (history[key]?.updatedAt ?? .distantPast) {
+            history[key] = record
+        }
+
+        var challengeKeys = local.challengeCompletionDayKeys
+        for (id, keys) in cloud.challengeCompletionDayKeys {
+            challengeKeys[id] = Array(Set(challengeKeys[id, default: []]).union(keys)).sorted()
+        }
+
+        return DailyBreathUserData(
+            journalEntries: journals.values.sorted { $0.createdAt > $1.createdAt },
+            challengeCompletionDayKeys: challengeKeys,
+            bibleAnnotations: annotations,
+            dailyHistory: history,
+            deletedJournalEntryIDs: tombstones,
+            modifiedAt: Date()
+        )
+    }
+
+    private func updateCurrentChallengeProgress() {
+        guard let challenge else {
+            challengeCompletedDayKeys = []
+            return
+        }
+        challengeCompletedDayKeys = challengeCompletionDayKeys[challenge.id, default: []].sorted()
+    }
+
+    private func persistUserData(syncToICloud: Bool = true) {
+        let userData = currentUserData()
+        do {
+            try userDataStore.save(userData)
+            localModifiedAt = userData.modifiedAt
+            if syncToICloud, UserDefaults.standard.bool(forKey: "encryptedICloudSyncEnabled") {
+                do {
+                    let synchronizedData: DailyBreathUserData
+                    if let cloudData = try EncryptedICloudSyncService.download() {
+                        synchronizedData = Self.mergeUserData(userData, with: cloudData)
+                        apply(synchronizedData)
+                        try userDataStore.save(synchronizedData)
+                    } else {
+                        synchronizedData = userData
+                    }
+                    try EncryptedICloudSyncService.upload(synchronizedData)
+                    iCloudStatusMessage = "Encrypted iCloud sync is on"
+                } catch {
+                    iCloudStatusMessage = error.localizedDescription
+                }
+            }
+        } catch {
+            statusMessage = "Local data could not be saved"
+        }
     }
 
     static func promptOfTheDay(for date: Date = Date(), calendar: Calendar = .current) -> String {
@@ -280,10 +683,4 @@ final class DailyBreathStore: ObservableObject {
         let day = calendar.ordinality(of: .day, in: .era, for: date) ?? 1
         return prompts[(day - 1) % prompts.count]
     }
-}
-
-private struct DailyBreathTodayResponse: Decodable {
-    let verse: Verse
-    let devotional: Devotional
-    let challenge: RecoveryChallenge?
 }

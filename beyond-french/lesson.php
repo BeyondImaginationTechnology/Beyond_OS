@@ -32,17 +32,24 @@ require __DIR__ . '/includes/header.php';
             <div class="translation"><span class="flag">🇪🇸</span><small>Español</small><strong><?= h($lesson['spanish']) ?></strong></div>
         </div>
         <div class="lesson-actions">
-            <button class="button secondary lesson-audio-button" type="button" data-audio-url="<?= h($frenchAudioUrl) ?>" data-speak="<?= h($lesson['french']) ?>">🔊 Hear the prerecorded French</button>
+            <?php foreach ([
+                ['French', 'fr-FR', $lesson['french'], $frenchAudioUrl],
+                ['Spanish', 'es-ES', $lesson['spanish'], (string)($lessonAudio['es-ES'] ?? '')],
+                ['Kreyòl', 'ht-HT', $lesson['kreyol'], (string)($lessonAudio['ht-HT'] ?? '')],
+                ['Patois', 'en-JM', $lesson['patois'], (string)($lessonAudio['en-JM'] ?? '')],
+            ] as [$audioLabel, $audioLocale, $audioText, $audioUrl]): ?>
+                <button class="button secondary lesson-audio-button" type="button" data-label="<?= h($audioLabel) ?>" data-locale="<?= h($audioLocale) ?>" data-audio-url="<?= h($audioUrl) ?>" data-speak="<?= h($audioText) ?>">🔊 Hear <?= h($audioLabel) ?></button>
+            <?php endforeach; ?>
         </div>
         <div class="culture-note"><strong>💡 Culture note:</strong> <?= h($lesson['culture_note']) ?></div>
         <a class="button primary" href="challenge.php?id=<?= (int)$lesson['id'] ?>">Take this challenge</a>
     </article>
 </section>
 <script>
-document.querySelector('.lesson-audio-button')?.addEventListener('click',async function(){
- const button=this,url=button.dataset.audioUrl,text=button.dataset.speak||'';
- if(url){try{button.textContent='▶ Playing…';const audio=new Audio(url);audio.onended=()=>button.textContent='🔊 Hear the prerecorded French';audio.onerror=()=>button.textContent='Audio unavailable';await audio.play();return}catch(error){}}
- if('speechSynthesis' in window){speechSynthesis.cancel();const voice=new SpeechSynthesisUtterance(text);voice.lang='fr-FR';voice.rate=.86;speechSynthesis.speak(voice)}
-});
+document.querySelectorAll('.lesson-audio-button').forEach(button=>button.addEventListener('click',async function(){
+ const url=button.dataset.audioUrl,text=button.dataset.speak||'',locale=button.dataset.locale||'fr-FR',label=button.dataset.label||'lesson';
+ if(url){try{button.textContent='▶ Playing…';const audio=new Audio(url);audio.onended=()=>button.textContent='🔊 Hear '+label;audio.onerror=()=>button.textContent='Audio unavailable';await audio.play();return}catch(error){}}
+ if('speechSynthesis' in window){speechSynthesis.cancel();const voice=new SpeechSynthesisUtterance(text);voice.lang=locale;voice.rate=.86;speechSynthesis.speak(voice)}
+}));
 </script>
 <?php require __DIR__ . '/includes/footer.php'; ?>

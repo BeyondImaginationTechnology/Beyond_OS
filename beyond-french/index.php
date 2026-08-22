@@ -70,7 +70,7 @@ $isReturningLearner = !empty($learningProgress['last_lesson_id']);
                 <div>
                     <span class="eyebrow">LESSON AUDIO</span>
                     <h3 id="voice-lab-title">Listen to today’s phrase</h3>
-                    <p>French and Spanish audio are available when supported. Kreyòl and Patois remain clear written language guides.</p>
+                    <p>Prerecorded daily-lesson audio is available in French, Spanish, Kreyòl, and Patois.</p>
                 </div>
                 <button class="voice-stop" type="button" aria-label="Stop audio">■ Stop</button>
             </div>
@@ -80,6 +80,12 @@ $isReturningLearner = !empty($learningProgress['last_lesson_id']);
                 </button>
                 <button class="voice-card" type="button" data-locale="es-ES" data-language="Spanish" data-label="Spanish · Spain" data-speak="<?= h($lesson['spanish']) ?>" data-audio-url="<?= h((string)($lessonAudio['es-ES'] ?? '')) ?>">
                     <span class="voice-flag">🇪🇸</span><span><strong>Español</strong><small>Spanish voice</small></span><i>▶</i>
+                </button>
+                <button class="voice-card" type="button" data-locale="ht-HT" data-language="Kreyòl" data-label="Haitian Creole" data-speak="<?= h($lesson['kreyol']) ?>" data-audio-url="<?= h((string)($lessonAudio['ht-HT'] ?? '')) ?>">
+                    <span class="voice-flag">🇭🇹</span><span><strong>Kreyòl</strong><small>Haitian voice</small></span><i>▶</i>
+                </button>
+                <button class="voice-card" type="button" data-locale="en-JM" data-language="Patois" data-label="Jamaican Patois" data-speak="<?= h($lesson['patois']) ?>" data-audio-url="<?= h((string)($lessonAudio['en-JM'] ?? '')) ?>">
+                    <span class="voice-flag">🇯🇲</span><span><strong>Patois</strong><small>Jamaican voice</small></span><i>▶</i>
                 </button>
             </div>
             <div class="voice-controls">

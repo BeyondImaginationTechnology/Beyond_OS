@@ -302,7 +302,7 @@ struct BreatheView: View {
         if !keys.contains(todayKey) {
             keys.append(todayKey)
         }
-        completedBreathDayKeys = keys.suffix(14).joined(separator: ",")
+        completedBreathDayKeys = keys.suffix(366).joined(separator: ",")
     }
 
     private func handleScenePhase(_ phase: ScenePhase) {

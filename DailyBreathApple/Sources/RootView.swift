@@ -1,26 +1,64 @@
 import SwiftUI
 
+enum DailyBreathTab: String, Hashable {
+    case today, bible, academy, breathe, journal
+}
+
 struct RootView: View {
+    @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @State private var selectedTab = DailyBreathTab.today
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
     }
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             NavigationStack { TodayView() }
                 .tabItem { Label("Today", systemImage: "sun.max.fill") }
+                .tag(DailyBreathTab.today)
             NavigationStack { BibleView() }
                 .tabItem { Label("Bible", systemImage: "book.closed.fill") }
+                .tag(DailyBreathTab.bible)
             NavigationStack { AcademyView() }
                 .tabItem { Label("Academy", systemImage: "graduationcap.fill") }
+                .tag(DailyBreathTab.academy)
             NavigationStack { BreatheView() }
                 .tabItem { Label("Breathe", systemImage: "wind") }
+                .tag(DailyBreathTab.breathe)
             NavigationStack { JournalView() }
                 .tabItem { Label("Journal", systemImage: "square.and.pencil") }
+                .tag(DailyBreathTab.journal)
         }
         .tint(selectedTheme.accent)
+        .onOpenURL(perform: openDeepLink)
+        .onAppear {
+            guard let value = UserDefaults.standard.string(forKey: "pendingDailyBreathDeepLink"),
+                  let url = URL(string: value) else { return }
+            UserDefaults.standard.removeObject(forKey: "pendingDailyBreathDeepLink")
+            openDeepLink(url)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .dailyBreathOpenRoute)) { notification in
+            guard let value = notification.object as? String, let url = URL(string: value) else { return }
+            UserDefaults.standard.removeObject(forKey: "pendingDailyBreathDeepLink")
+            openDeepLink(url)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSUbiquitousKeyValueStore.didChangeExternallyNotification)) { _ in
+            Task { await store.syncICloudNow() }
+        }
+    }
+
+    private func openDeepLink(_ url: URL) {
+        guard url.scheme == "dailybreath" else { return }
+        let route = (url.host ?? url.pathComponents.last ?? "today").lowercased()
+        switch route {
+        case "breathe": selectedTab = .breathe
+        case "journal": selectedTab = .journal
+        case "bible": selectedTab = .bible
+        case "academy": selectedTab = .academy
+        default: selectedTab = .today
+        }
     }
 }
 
@@ -46,7 +84,7 @@ struct BrandHeader: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Text("1.1.4")
+            Text(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "")
                 .font(.caption.bold())
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)

@@ -1,5 +1,38 @@
 import Foundation
+import UIKit
 import UserNotifications
+
+extension Notification.Name {
+    static let dailyBreathOpenRoute = Notification.Name("dailyBreathOpenRoute")
+}
+
+@MainActor
+final class DailyBreathAppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
+        UNUserNotificationCenter.current().delegate = self
+        return true
+    }
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
+        [.banner, .sound]
+    }
+
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse
+    ) async {
+        let value = response.notification.request.content.userInfo["deepLink"] as? String
+            ?? "dailybreath://today"
+        UserDefaults.standard.set(value, forKey: "pendingDailyBreathDeepLink")
+        NotificationCenter.default.post(name: .dailyBreathOpenRoute, object: value)
+    }
+}
 
 enum DailyBreathNotificationService {
     private static let reminderPrefix = "dailybreath.daily-reminder"
@@ -44,6 +77,8 @@ enum DailyBreathNotificationService {
             content.body = message.1
             content.sound = .default
             content.threadIdentifier = "dailybreath"
+            let destinations = ["today", "breathe", "journal"]
+            content.userInfo = ["deepLink": "dailybreath://\(destinations[(weekday - 1) % destinations.count])"]
 
             var components = DateComponents()
             components.calendar = Calendar.current
@@ -63,6 +98,16 @@ enum DailyBreathNotificationService {
 
     static func cancelDailyReminder() {
         UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: reminderIdentifiers)
+    }
+
+    static func refreshScheduledReminderIfEnabled() async {
+        let defaults = UserDefaults.standard
+        guard defaults.bool(forKey: "dailyReminderEnabled") else { return }
+        let status = await authorizationStatus()
+        guard status == .authorized || status == .provisional || status == .ephemeral else { return }
+        let hour = defaults.object(forKey: "dailyReminderHour") == nil ? 8 : defaults.integer(forKey: "dailyReminderHour")
+        let minute = defaults.integer(forKey: "dailyReminderMinute")
+        try? await scheduleDailyReminder(hour: hour, minute: minute)
     }
 
     private static var reminderIdentifiers: [String] {

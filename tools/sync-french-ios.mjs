@@ -13,12 +13,27 @@ const portableDictionary = webDictionary.map(({ english, french, pronunciation, 
 for (const app of apps) {
   const resources = resolve(root, app, 'Resources');
   await writeFile(resolve(resources, 'dictionary.json'), `${JSON.stringify(portableDictionary, null, 2)}\n`, 'utf8');
-  const audioDir = resolve(resources, 'Audio/dictionary/fr-FR');
-  await mkdir(audioDir, { recursive: true });
+  if (app !== 'BeyondFrenchApple') continue;
+  const locales = ['fr-FR', 'es-ES', 'ht-HT', 'en-JM'];
   for (const lesson of lessons.filter((item) => item.generated_batch === 'azure-2026-08' && item.audio_url)) {
-    const source = resolve(root, 'beyond-french/assets/audio/french', basename(lesson.audio_url));
-    await copyFile(source, resolve(audioDir, `${slug(lesson.english)}.mp3`));
+    for (const locale of locales) {
+      const publicUrl = lesson.audio_urls?.[locale] || (locale === 'fr-FR' ? lesson.audio_url : '');
+      if (!publicUrl) continue;
+      const source = resolve(root, 'beyond-french/assets/audio/lessons', locale, basename(publicUrl));
+      const legacyFrenchSource = resolve(root, 'beyond-french/assets/audio/french', basename(publicUrl));
+      const audioDir = resolve(resources, 'Audio/lessons', locale);
+      await mkdir(audioDir, { recursive: true });
+      try {
+        await copyFile(source, resolve(audioDir, `${slug(lesson.english)}.mp3`));
+      } catch (error) {
+        if (locale !== 'fr-FR' || error?.code !== 'ENOENT') throw error;
+        await copyFile(legacyFrenchSource, resolve(audioDir, `${slug(lesson.english)}.mp3`));
+      }
+    }
   }
 }
 
-console.log(JSON.stringify({ dictionaryEntries: portableDictionary.length, prerecordedFrenchClipsPerApp: lessons.filter((item) => item.generated_batch === 'azure-2026-08' && item.audio_url).length, apps }));
+const lessonClipsPerApp = lessons
+  .filter((item) => item.generated_batch === 'azure-2026-08')
+  .reduce((count, item) => count + ['fr-FR', 'es-ES', 'ht-HT', 'en-JM'].filter((locale) => item.audio_urls?.[locale] || (locale === 'fr-FR' && item.audio_url)).length, 0);
+console.log(JSON.stringify({ dictionaryEntries: portableDictionary.length, prerecordedLessonClipsPerApp: lessonClipsPerApp, apps }));

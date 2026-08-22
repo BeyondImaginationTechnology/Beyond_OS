@@ -12,6 +12,15 @@ DirectoryIndex index.php index.html
   AddEncoding gzip .svgz
 </IfModule>
 
+<Files "apple-app-site-association">
+  <IfModule mod_mime.c>
+    ForceType application/json
+  </IfModule>
+  <IfModule mod_headers.c>
+    Header set Cache-Control "no-cache, must-revalidate, max-age=0"
+  </IfModule>
+</Files>
+
 <IfModule mod_headers.c>
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"

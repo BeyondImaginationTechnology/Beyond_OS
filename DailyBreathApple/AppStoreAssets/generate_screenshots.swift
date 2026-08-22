@@ -195,7 +195,7 @@ func drawAppContent(_ screen: StoreScreen, format: ScreenshotFormat) {
     paragraph("DAILYBREATH", font: .systemFont(ofSize: 28, weight: .black), color: green, rect: CGRect(x: x, y: content.minY + 118, width: 330, height: 40))
     paragraph("Faith-centered wellness", font: .systemFont(ofSize: 22, weight: .medium), color: muted, rect: CGRect(x: x, y: content.minY + 156, width: 340, height: 32))
     roundedRect(CGRect(x: content.maxX - margin - 96, y: content.minY + 118, width: 96, height: 42), radius: 21, fill: green.withAlphaComponent(0.12))
-    paragraph("1.1", font: .systemFont(ofSize: 20, weight: .bold), color: green, rect: CGRect(x: content.maxX - margin - 96, y: content.minY + 128, width: 96, height: 24), alignment: .center)
+    paragraph("1.2", font: .systemFont(ofSize: 20, weight: .bold), color: green, rect: CGRect(x: content.maxX - margin - 96, y: content.minY + 128, width: 96, height: 24), alignment: .center)
 
     let heroHeight: CGFloat = format.folder == "iPad-13" ? 590 : 650
     roundedRect(CGRect(x: x, y: content.minY + 232, width: maxWidth, height: heroHeight), radius: 34, fill: green)

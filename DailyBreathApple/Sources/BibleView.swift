@@ -5,21 +5,23 @@ struct BibleView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("bibleLastBookCode") private var lastBookCode = "GEN"
     @AppStorage("bibleLastChapter") private var lastChapter = 1
-    @AppStorage("favoriteVerseIDs") private var favoriteVerseIDs = ""
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
     @State private var searchText = ""
+    @State private var searchResults: [BibleVerse] = []
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
     }
 
-    private var searchResults: [BibleVerse] {
-        store.bibleLibrary.search(searchText)
-    }
-
     var body: some View {
         List {
-            if store.bibleLibrary.books.isEmpty {
+            if store.isBibleLoading {
+                HStack {
+                    Spacer()
+                    ProgressView("Loading Bible…")
+                    Spacer()
+                }
+            } else if store.bibleLibrary.books.isEmpty {
                 ContentUnavailableView(
                     "Bible Unavailable",
                     systemImage: "book.closed",
@@ -36,6 +38,21 @@ struct BibleView: View {
         }
         .navigationTitle("Bible")
         .searchable(text: $searchText, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search verses")
+        .task(id: searchText) {
+            let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !query.isEmpty else {
+                searchResults = []
+                return
+            }
+            try? await Task.sleep(for: .milliseconds(250))
+            guard !Task.isCancelled else { return }
+            let library = store.bibleLibrary
+            let results = await Task.detached(priority: .userInitiated) {
+                library.search(query)
+            }.value
+            guard !Task.isCancelled else { return }
+            searchResults = results
+        }
         .scrollContentBackground(.hidden)
         .background(DailyBreathThemeBackground(theme: selectedTheme))
     }
@@ -69,7 +86,7 @@ struct BibleView: View {
     }
 
     private var favoriteVerses: [BibleVerse] {
-        let ids = Set(favoriteVerseIDs.split(separator: ",").map(String.init))
+        let ids = Set(store.bibleAnnotations.values.filter(\.isFavorite).map(\.verseID))
         guard !ids.isEmpty else { return [] }
         return store.bibleLibrary.books.flatMap { book in
             book.chapters.flatMap { chapter in
@@ -124,6 +141,13 @@ struct BibleView: View {
                         }
                     }
                 }
+                ForEach(store.favoriteCollections, id: \.self) { collection in
+                    NavigationLink {
+                        FavoriteCollectionView(name: collection)
+                    } label: {
+                        Label(collection, systemImage: "folder.fill")
+                    }
+                }
             }
         }
     }
@@ -159,6 +183,34 @@ struct BibleView: View {
                 Text("Showing the first 80 matches.")
             }
         }
+    }
+}
+
+private struct FavoriteCollectionView: View {
+    @EnvironmentObject private var store: DailyBreathStore
+    let name: String
+
+    private var verses: [BibleVerse] {
+        let ids = Set(store.bibleAnnotations.values.filter { $0.collections.contains(name) }.map(\.verseID))
+        return store.bibleLibrary.books.flatMap { book in
+            book.chapters.flatMap { chapter in chapter.verses.filter { ids.contains($0.id) } }
+        }
+    }
+
+    var body: some View {
+        List(verses) { verse in
+            NavigationLink {
+                if let chapter = store.bibleLibrary.chapter(bookCode: verse.bookCode, number: verse.chapter) {
+                    BibleChapterView(chapter: chapter, highlightedVerseID: verse.id)
+                }
+            } label: {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(verse.reference).font(.headline)
+                    Text(verse.text).font(.caption).foregroundStyle(.secondary).lineLimit(3)
+                }
+            }
+        }
+        .navigationTitle(name)
     }
 }
 
@@ -208,12 +260,16 @@ private struct BibleBookView: View {
 }
 
 private struct BibleChapterView: View {
+    @EnvironmentObject private var store: DailyBreathStore
     let chapter: BibleChapter
     var highlightedVerseID: BibleVerse.ID?
     @AppStorage("bibleLastBookCode") private var lastBookCode = "GEN"
     @AppStorage("bibleLastChapter") private var lastChapter = 1
-    @AppStorage("favoriteVerseIDs") private var favoriteVerseIDs = ""
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @State private var noteVerse: BibleVerse?
+    @State private var noteDraft = ""
+    @State private var collectionVerse: BibleVerse?
+    @State private var newCollectionName = ""
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -251,15 +307,46 @@ private struct BibleChapterView: View {
                                     .font(.caption)
                                     .foregroundStyle(selectedTheme.accent)
                             }
+                            if !(store.annotation(for: verse)?.note.isEmpty ?? true) {
+                                Image(systemName: "note.text")
+                                    .font(.caption)
+                                    .foregroundStyle(selectedTheme.primary)
+                            }
                         }
                         .padding(.vertical, 5)
-                        .listRowBackground(verse.id == highlightedVerseID ? selectedTheme.accent.opacity(0.16) : nil)
+                        .listRowBackground(rowBackground(for: verse))
                         .id(verse.id)
                         .contextMenu {
                             Button {
-                                toggleFavorite(verse)
+                                store.speakBibleVerse(verse)
+                            } label: {
+                                Label("Listen to Verse", systemImage: "speaker.wave.2")
+                            }
+                            Button {
+                                store.toggleFavorite(verse)
                             } label: {
                                 Label(isFavorite(verse) ? "Remove Favorite" : "Favorite Verse", systemImage: isFavorite(verse) ? "star.slash" : "star")
+                            }
+                            Menu("Highlight", systemImage: "highlighter") {
+                                Button("Sunlight") { store.setHighlight("yellow", for: verse) }
+                                Button("Sage") { store.setHighlight("green", for: verse) }
+                                Button("Sky") { store.setHighlight("blue", for: verse) }
+                                Button("Rose") { store.setHighlight("pink", for: verse) }
+                                Button("Remove Highlight", role: .destructive) { store.setHighlight(nil, for: verse) }
+                            }
+                            Menu("Collections", systemImage: "folder") {
+                                ForEach(store.favoriteCollections, id: \.self) { collection in
+                                    Button(collection) { store.toggleVerse(verse, inCollection: collection) }
+                                }
+                                Button("New Collection…") {
+                                    collectionVerse = verse
+                                }
+                            }
+                            Button {
+                                noteDraft = store.annotation(for: verse)?.note ?? ""
+                                noteVerse = verse
+                            } label: {
+                                Label("Private Note", systemImage: "note.text")
                             }
                             Button {
                                 UIPasteboard.general.string = shareText(for: verse)
@@ -274,6 +361,16 @@ private struct BibleChapterView: View {
                 }
             }
             .navigationTitle(chapter.title)
+            .toolbar {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    Button { store.speakBibleChapter(chapter) } label: {
+                        Label("Listen to Chapter", systemImage: "speaker.wave.2.fill")
+                    }
+                    Button { store.stopNarration() } label: {
+                        Label("Stop Narration", systemImage: "stop.fill")
+                    }
+                }
+            }
             .scrollContentBackground(.hidden)
             .background(DailyBreathThemeBackground(theme: selectedTheme))
             .onAppear {
@@ -282,24 +379,54 @@ private struct BibleChapterView: View {
                 guard let highlightedVerseID else { return }
                 proxy.scrollTo(highlightedVerseID, anchor: .center)
             }
+            .sheet(item: $noteVerse) { verse in
+                NavigationStack {
+                    Form {
+                        Section(verse.reference) { Text(verse.text).font(.system(.body, design: .serif)) }
+                        Section("Private Note") { TextEditor(text: $noteDraft).frame(minHeight: 180) }
+                    }
+                    .navigationTitle("Verse Note")
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) { Button("Cancel") { noteVerse = nil } }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Save") {
+                                store.setNote(noteDraft, for: verse)
+                                noteVerse = nil
+                            }
+                        }
+                    }
+                }
+            }
+            .alert("New Favorite Collection", isPresented: Binding(
+                get: { collectionVerse != nil },
+                set: { if !$0 { collectionVerse = nil } }
+            )) {
+                TextField("Collection name", text: $newCollectionName)
+                Button("Cancel", role: .cancel) { collectionVerse = nil }
+                Button("Add") {
+                    if let verse = collectionVerse { store.toggleVerse(verse, inCollection: newCollectionName) }
+                    newCollectionName = ""
+                    collectionVerse = nil
+                }
+            } message: {
+                Text("Collections and notes stay private in your protected Daily Breath data.")
+            }
         }
     }
 
     private func isFavorite(_ verse: BibleVerse) -> Bool {
-        favoriteVerseIDs.split(separator: ",").contains(Substring(verse.id))
+        store.annotation(for: verse)?.isFavorite == true
     }
 
-    private func toggleFavorite(_ verse: BibleVerse) {
-        var ids = favoriteVerseIDs
-            .split(separator: ",")
-            .map(String.init)
-            .filter { !$0.isEmpty }
-        if ids.contains(verse.id) {
-            ids.removeAll { $0 == verse.id }
-        } else {
-            ids.append(verse.id)
+    private func rowBackground(for verse: BibleVerse) -> Color? {
+        if verse.id == highlightedVerseID { return selectedTheme.accent.opacity(0.18) }
+        switch store.annotation(for: verse)?.highlightColor {
+        case "yellow": return Color.yellow.opacity(0.20)
+        case "green": return Color.green.opacity(0.16)
+        case "blue": return Color.blue.opacity(0.14)
+        case "pink": return Color.pink.opacity(0.16)
+        default: return nil
         }
-        favoriteVerseIDs = ids.joined(separator: ",")
     }
 
     private func shareText(for verse: BibleVerse) -> String {

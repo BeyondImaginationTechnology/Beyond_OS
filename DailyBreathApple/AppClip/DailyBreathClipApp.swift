@@ -1,3 +1,5 @@
+import Foundation
+import StoreKit
 import SwiftUI
 
 @main
@@ -10,6 +12,9 @@ struct DailyBreathClipApp: App {
 }
 
 private struct DailyBreathClipView: View {
+    @State private var showFullAppOverlay = false
+    private let verse = ClipVerse.ofTheDay()
+
     var body: some View {
         VStack(spacing: 22) {
             Spacer()
@@ -29,9 +34,9 @@ private struct DailyBreathClipView: View {
             }
 
             VStack(alignment: .leading, spacing: 14) {
-                Text("Be still, and know that I am God.")
+                Text(verse.text)
                     .font(.system(.title2, design: .serif).weight(.semibold))
-                Text("Psalm 46:10")
+                Text(verse.reference)
                     .font(.headline.weight(.black))
                     .foregroundStyle(Color.clipGreen)
                 Divider()
@@ -41,8 +46,10 @@ private struct DailyBreathClipView: View {
             .padding(20)
             .background(.background, in: RoundedRectangle(cornerRadius: 22))
 
-            Link(destination: URL(string: "https://beyondimagination.co.technology/dailybreath/")!) {
-                Label("Open Full App", systemImage: "arrow.down.app.fill")
+            Button {
+                showFullAppOverlay = true
+            } label: {
+                Label("Get the Full App", systemImage: "arrow.down.app.fill")
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -53,6 +60,47 @@ private struct DailyBreathClipView: View {
         }
         .padding()
         .background(ClipThemeBackground())
+        .appStoreOverlay(isPresented: $showFullAppOverlay) {
+            SKOverlay.AppClipConfiguration(position: .bottom)
+        }
+    }
+}
+
+private struct ClipVerse {
+    let text: String
+    let reference: String
+
+    private struct Document: Decodable { let entries: [Entry] }
+    private struct Entry: Decodable {
+        let text: String
+        let reference: String
+        let scheduleDate: String?
+
+        enum CodingKeys: String, CodingKey {
+            case text, reference
+            case scheduleDate = "schedule_date"
+        }
+    }
+
+    static func ofTheDay(for date: Date = Date(), bundle: Bundle = .main) -> ClipVerse {
+        guard
+            let url = bundle.url(forResource: "daily-verses", withExtension: "json"),
+            let data = try? Data(contentsOf: url),
+            let entries = try? JSONDecoder().decode(Document.self, from: data).entries,
+            !entries.isEmpty
+        else {
+            return ClipVerse(text: "Be still, and know that I am God.", reference: "Psalm 46:10")
+        }
+
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = .current
+        formatter.dateFormat = "yyyy-MM-dd"
+        let dateKey = formatter.string(from: date)
+        let day = Calendar.current.ordinality(of: .day, in: .era, for: date) ?? 1
+        let entry = entries.first(where: { $0.scheduleDate == dateKey }) ?? entries[(day - 1) % entries.count]
+        return ClipVerse(text: entry.text, reference: entry.reference)
     }
 }
 

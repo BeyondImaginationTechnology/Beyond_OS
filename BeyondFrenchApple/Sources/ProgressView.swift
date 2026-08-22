@@ -28,22 +28,6 @@ struct LearningProgressView: View {
                 .background(store.appTheme.cardFill, in: RoundedRectangle(cornerRadius: 22))
                 .overlay(RoundedRectangle(cornerRadius: 22).stroke(store.appTheme.accent.opacity(0.18), lineWidth: 1))
 
-                if !store.hasBeyondID {
-                    VStack(alignment: .leading, spacing: 12) {
-                        Label("Continue with Beyond ID", systemImage: "lock.open.fill")
-                            .font(.headline)
-                        Text("Sign in to save cloud progress, lesson tests, Academy exams, and bit$ rewards.")
-                            .foregroundStyle(.secondary)
-                        Link(destination: URL(string: "https://beyondimagination.co.technology/beyond-id/auth/login.php?app=beyond-french")!) {
-                            Label("Create or sign in", systemImage: "person.crop.circle.fill.badge.plus")
-                                .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.large)
-                    }
-                    .padding(18)
-                    .background(store.appTheme.accent.opacity(0.08), in: RoundedRectangle(cornerRadius: 22))
-                }
             }
             .padding()
         }

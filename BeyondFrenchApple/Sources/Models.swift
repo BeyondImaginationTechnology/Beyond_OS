@@ -38,6 +38,7 @@ struct FrenchLesson: Codable, Identifiable, Hashable {
     let challenge: String
     let answer: String
     let audioUrl: String?
+    let audioUrls: [String: String]?
 
     var audioResourceName: String {
         english
@@ -52,6 +53,7 @@ struct FrenchLesson: Codable, Identifiable, Hashable {
         case frenchPronunciation = "french_pronunciation"
         case cultureNote = "culture_note"
         case audioUrl = "audio_url"
+        case audioUrls = "audio_urls"
     }
 
     static let fallback = FrenchLesson(
@@ -61,8 +63,22 @@ struct FrenchLesson: Codable, Identifiable, Hashable {
         meaning: "A way to encourage someone to continue.",
         cultureNote: "A little encouragement can go a long way.",
         challenge: "How would you say “Keep going.” in French?", answer: "Continue.",
-        audioUrl: nil
+        audioUrl: nil, audioUrls: nil
     )
+
+    func text(for language: DictionaryAudioLanguage) -> String {
+        switch language {
+        case .french: french
+        case .spanish: spanish
+        case .kreyol: kreyol
+        case .patois: patois
+        }
+    }
+
+    func remoteAudioPath(for language: DictionaryAudioLanguage) -> String? {
+        if let value = audioUrls?[language.locale], !value.isEmpty { return value }
+        return language == .french ? audioUrl : nil
+    }
 }
 
 struct DictionaryWord: Codable, Identifiable, Hashable {
@@ -93,7 +109,7 @@ struct DictionaryWord: Codable, Identifiable, Hashable {
     }
 }
 
-enum DictionaryAudioLanguage {
+enum DictionaryAudioLanguage: Equatable {
     case french
     case spanish
     case kreyol

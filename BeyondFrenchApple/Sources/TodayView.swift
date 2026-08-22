@@ -42,13 +42,13 @@ struct TodayView: View {
                         store.speakLesson(store.lesson)
                     }
                     LanguageTile(flag: "HT", name: "Kreyòl", value: store.lesson.kreyol, color: .red) {
-                        store.speak(store.lesson.kreyol, language: "ht-HT")
+                        store.speakLesson(store.lesson, language: .kreyol)
                     }
                     LanguageTile(flag: "JM", name: "Patois", value: store.lesson.patois, color: .green) {
-                        store.speak(store.lesson.patois, language: "en-JM")
+                        store.speakLesson(store.lesson, language: .patois)
                     }
                     LanguageTile(flag: "ES", name: "Espanol", value: store.lesson.spanish, color: .orange) {
-                        store.speak(store.lesson.spanish, language: "es-ES")
+                        store.speakLesson(store.lesson, language: .spanish)
                     }
                 }
                 VStack(alignment: .leading, spacing: 8) {

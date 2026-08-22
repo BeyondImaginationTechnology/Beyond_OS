@@ -26,8 +26,12 @@ struct TodayView: View {
         completedBreathDayKeys.split(separator: ",").contains(Substring(todayKey))
     }
 
+    private var didReflectToday: Bool {
+        store.entries.contains { Calendar.current.isDateInToday($0.createdAt) }
+    }
+
     private var dailyProgressCount: Int {
-        [true, didReadDevotionalToday, didBreatheToday, !store.entries.isEmpty].filter(\.self).count
+        [true, didReadDevotionalToday, didBreatheToday, didReflectToday].filter(\.self).count
     }
 
     var body: some View {
@@ -39,6 +43,7 @@ struct TodayView: View {
                 reminderCard
                 verseCard
                 devotionalCard
+                recoveryNewsletterCard
                 journalCard
                 quickActions
             }
@@ -47,9 +52,22 @@ struct TodayView: View {
         .background(DailyBreathThemeBackground(theme: selectedTheme))
         .navigationTitle("Today")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink { SettingsAboutView() } label: {
+                    Label("Settings", systemImage: "gearshape.fill")
+                }
+            }
+        }
         .refreshable { await store.refreshToday() }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }
+            Task {
+                await store.syncICloudNow()
+                await store.refreshToday()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
             Task { await store.refreshToday() }
         }
     }
@@ -68,7 +86,7 @@ struct TodayView: View {
                 RhythmPill(title: "Read", isComplete: true, theme: selectedTheme)
                 RhythmPill(title: "Devote", isComplete: didReadDevotionalToday, theme: selectedTheme)
                 RhythmPill(title: "Breathe", isComplete: didBreatheToday, theme: selectedTheme)
-                RhythmPill(title: "Reflect", isComplete: !store.entries.isEmpty, theme: selectedTheme)
+                RhythmPill(title: "Reflect", isComplete: didReflectToday, theme: selectedTheme)
             }
             Text("Small faithful steps count. Come back tomorrow, not because you broke a streak, but because peace is worth returning to.")
                 .font(.caption)
@@ -219,6 +237,37 @@ struct TodayView: View {
                 Spacer()
                 Image(systemName: "chevron.right")
                     .font(.footnote.weight(.bold))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(16)
+            .background(.background.opacity(0.9), in: RoundedRectangle(cornerRadius: 8))
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var recoveryNewsletterCard: some View {
+        NavigationLink {
+            RecoveryNewsletterView()
+        } label: {
+            HStack(alignment: .top, spacing: 14) {
+                Image(systemName: "newspaper.fill")
+                    .font(.title2)
+                    .foregroundStyle(selectedTheme.accent)
+                    .frame(width: 44, height: 44)
+                    .background(selectedTheme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("RECOVERY NEWSLETTER")
+                        .font(.caption.bold())
+                        .tracking(1.4)
+                        .foregroundStyle(selectedTheme.primary)
+                    Text("One verse, one reflection, and this week’s recovery practice.")
+                        .font(.headline)
+                    Text("Automatically refreshed with today’s Daily Breath content.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
                     .foregroundStyle(.tertiary)
             }
             .padding(16)
@@ -460,7 +509,7 @@ private struct DevotionalDetailView: View {
         if !keys.contains(todayKey) {
             keys.append(todayKey)
         }
-        devotionalReadDayKeys = keys.suffix(14).joined(separator: ",")
+        devotionalReadDayKeys = keys.suffix(366).joined(separator: ",")
     }
 
     private static let dayFormatter: DateFormatter = {
@@ -470,6 +519,91 @@ private struct DevotionalDetailView: View {
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
+}
+
+private struct RecoveryNewsletterView: View {
+    @EnvironmentObject private var store: DailyBreathStore
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+
+    private var selectedTheme: DailyBreathTheme {
+        DailyBreathTheme(id: selectedThemeID)
+    }
+
+    var body: some View {
+        List {
+            Section {
+                VStack(alignment: .leading, spacing: 10) {
+                    Label("Recovery Newsletter", systemImage: "newspaper.fill")
+                        .font(.caption.bold())
+                        .foregroundStyle(selectedTheme.accent)
+                    Text("Grace for the next faithful step.")
+                        .font(.largeTitle.weight(.black))
+                    Text(Date(), format: .dateTime.weekday(.wide).month(.wide).day().year())
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.vertical, 8)
+            }
+
+            Section("Today’s Scripture") {
+                Text("“\(store.verse.text)”")
+                    .font(.system(.title3, design: .serif).weight(.semibold))
+                Text(store.verse.reference)
+                    .font(.headline)
+                    .foregroundStyle(selectedTheme.primary)
+                Text(store.verse.reflection)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section(store.devotional.title) {
+                Text(store.devotional.body)
+                Label(store.devotional.scripture, systemImage: "book.closed.fill")
+                    .foregroundStyle(selectedTheme.primary)
+            }
+
+            Section("Prayer") {
+                Text(store.devotional.prayer)
+            }
+
+            Section("Practice") {
+                Text(store.devotional.practice)
+            }
+
+            if let challenge = store.challenge {
+                Section("This Week: \(challenge.title)") {
+                    Text(challenge.description)
+                    ForEach(challenge.steps, id: \.self) { step in
+                        Label(step, systemImage: "checkmark.circle")
+                    }
+                    ProgressView(
+                        value: Double(store.challengeProgressCount),
+                        total: Double(max(challenge.targetCount, 1))
+                    )
+                    Text("\(store.challengeProgressCount) of \(challenge.targetCount) days complete")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Section("Support") {
+                NavigationLink { RecoverySupportView() } label: {
+                    Label("Professional and crisis resources", systemImage: "lifepreserver")
+                }
+                Text("Daily Breath is not medical care or emergency support.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section {
+                ShareLink(item: store.recoveryNewsletterShareText) {
+                    Label("Share Recovery Newsletter", systemImage: "square.and.arrow.up")
+                }
+            }
+        }
+        .navigationTitle("Recovery Newsletter")
+        .navigationBarTitleDisplayMode(.inline)
+        .scrollContentBackground(.hidden)
+        .background(DailyBreathThemeBackground(theme: selectedTheme))
+    }
 }
 
 private struct PrayerPracticesView: View {
@@ -603,6 +737,27 @@ private struct WeeklyChallengeView: View {
             }
 
             Section("Track It") {
+                if let challenge {
+                    ProgressView(
+                        value: Double(store.challengeProgressCount),
+                        total: Double(max(challenge.targetCount, 1))
+                    )
+                    Text("\(store.challengeProgressCount) of \(challenge.targetCount) days complete")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Button {
+                        store.completeChallengeToday()
+                    } label: {
+                        Label(
+                            store.isChallengeCompleteToday ? "Completed Today" : "Mark Today Complete",
+                            systemImage: store.isChallengeCompleteToday ? "checkmark.circle.fill" : "circle"
+                        )
+                    }
+                    .disabled(store.isChallengeCompleteToday)
+                }
+                NavigationLink { RecoverySupportView() } label: {
+                    Label("Recovery Support Resources", systemImage: "lifepreserver")
+                }
                 NavigationLink {
                     JournalView()
                 } label: {

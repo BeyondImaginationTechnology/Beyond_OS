@@ -119,11 +119,23 @@ final class AppStore: ObservableObject {
         }
     }
 
-    func speakLesson(_ lesson: FrenchLesson) {
+    func speakLesson(_ lesson: FrenchLesson, language: DictionaryAudioLanguage = .french) {
         speaker.stopSpeaking(at: .immediate)
         premiumVoicePlayer?.stop()
         configureAudioSession()
-        if let url = Bundle.main.url(
+        let text = lesson.text(for: language)
+        if let url = bundledLessonAudioURL(for: lesson, language: language),
+           let player = try? AVAudioPlayer(contentsOf: url) {
+            player.prepareToPlay()
+            premiumVoicePlayer = player
+            if player.play() {
+                statusMessage = "Prerecorded \(language.title) lesson"
+                return
+            }
+        }
+        // Keep compatibility with apps built before lesson audio was separated
+        // from the dictionary resource tree.
+        if language == .french, let url = Bundle.main.url(
             forResource: lesson.audioResourceName,
             withExtension: "mp3",
             subdirectory: "Audio/dictionary/fr-FR"
@@ -135,11 +147,11 @@ final class AppStore: ObservableObject {
                 return
             }
         }
-        guard let remoteURL = remoteLessonAudioURL(for: lesson) else {
-            speak(lesson.french, language: "fr-FR")
+        guard let remoteURL = remoteLessonAudioURL(for: lesson, language: language) else {
+            speak(text, language: language.locale)
             return
         }
-        statusMessage = "Loading prerecorded lesson voice..."
+        statusMessage = "Loading prerecorded \(language.title) lesson..."
         Task {
             do {
                 let (data, response) = try await URLSession.shared.data(from: remoteURL)
@@ -150,12 +162,12 @@ final class AppStore: ObservableObject {
                 player.prepareToPlay()
                 premiumVoicePlayer = player
                 if player.play() {
-                    statusMessage = "Prerecorded lesson voice"
+                    statusMessage = "Prerecorded \(language.title) lesson"
                 } else {
-                    speak(lesson.french, language: "fr-FR")
+                    speak(text, language: language.locale)
                 }
             } catch {
-                speak(lesson.french, language: "fr-FR")
+                speak(text, language: language.locale)
             }
         }
     }
@@ -233,8 +245,16 @@ final class AppStore: ObservableObject {
         )
     }
 
-    private func remoteLessonAudioURL(for lesson: FrenchLesson) -> URL? {
-        guard let value = lesson.audioUrl?.trimmingCharacters(in: .whitespacesAndNewlines),
+    private func bundledLessonAudioURL(for lesson: FrenchLesson, language: DictionaryAudioLanguage) -> URL? {
+        Bundle.main.url(
+            forResource: lesson.audioResourceName,
+            withExtension: "mp3",
+            subdirectory: "Audio/lessons/\(language.locale)"
+        )
+    }
+
+    private func remoteLessonAudioURL(for lesson: FrenchLesson, language: DictionaryAudioLanguage) -> URL? {
+        guard let value = lesson.remoteAudioPath(for: language)?.trimmingCharacters(in: .whitespacesAndNewlines),
               !value.isEmpty else { return nil }
         if let absolute = URL(string: value), absolute.scheme != nil { return absolute }
         return URL(string: value, relativeTo: siteEndpoint)?.absoluteURL

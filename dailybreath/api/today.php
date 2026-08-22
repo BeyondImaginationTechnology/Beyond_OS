@@ -9,11 +9,18 @@ header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 
 $locale = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($_GET['locale'] ?? 'en')) ?: 'en';
-$fallbackVerse = [
+$contentDate = (string)($_GET['date'] ?? date('Y-m-d'));
+$parsedDate = DateTimeImmutable::createFromFormat('!Y-m-d', $contentDate);
+if (!$parsedDate || $parsedDate->format('Y-m-d') !== $contentDate) {
+    $contentDate = date('Y-m-d');
+}
+
+$emergencyVerse = [
     'text' => 'Be still, and know that I am God.',
     'reference' => 'Psalm 46:10',
-    'source' => 'bundled_fallback',
+    'source' => 'emergency_fallback',
 ] + dailybreath_reference_location('Psalm 46:10');
+$fallbackVerse = dailybreath_recovery_verse_for_date($contentDate) ?: $emergencyVerse;
 $fallbackDevotional = [
     'title' => 'Walk in Quiet Confidence',
     'excerpt' => 'Make room for stillness and remember that God is present before your next step.',
@@ -25,8 +32,8 @@ $fallbackDevotional = [
 ];
 
 $verse = $fallbackVerse;
-$bundledDevotional = dailybreath_recovery_devotional_for_date(date('Y-m-d'), false)
-    ?: dailybreath_recovery_devotional_for_date(date('Y-m-d'));
+$bundledDevotional = dailybreath_recovery_devotional_for_date($contentDate, false)
+    ?: dailybreath_recovery_devotional_for_date($contentDate);
 $devotional = $bundledDevotional ? [
     'title' => (string)$bundledDevotional['title'],
     'excerpt' => (string)$bundledDevotional['excerpt'],
@@ -36,7 +43,7 @@ $devotional = $bundledDevotional ? [
     'prayer' => (string)$bundledDevotional['prayer'],
     'practice' => (string)$bundledDevotional['practice'],
 ] : $fallbackDevotional;
-$bundledChallenge = dailybreath_recovery_challenge_for_date(date('Y-m-d'));
+$bundledChallenge = dailybreath_recovery_challenge_for_date($contentDate);
 $challenge = $bundledChallenge ?: [
     'id' => 'weekly-faith-in-action',
     'title' => 'Faith in Action',
@@ -48,17 +55,17 @@ $challenge = $bundledChallenge ?: [
         'Record what changed and who you can encourage.',
     ],
     'target_count' => 7,
-    'starts_on' => date('Y-m-d', strtotime('monday this week')),
-    'ends_on' => date('Y-m-d', strtotime('sunday this week')),
+    'starts_on' => date('Y-m-d', strtotime('monday this week', strtotime($contentDate))),
+    'ends_on' => date('Y-m-d', strtotime('sunday this week', strtotime($contentDate))),
 ];
 
 try {
     $pdo = beyond_db();
-    $verse = dailybreath_verse_of_day($pdo, $locale);
+    $verse = dailybreath_verse_of_day($pdo, $locale, $contentDate);
 
     try {
         $query = $pdo->prepare('SELECT id,title,excerpt,body,scripture_reference,duration_minutes FROM devotionals WHERE is_published=1 AND locale=? AND publish_date=? ORDER BY id DESC LIMIT 1');
-        $query->execute([$locale, date('Y-m-d')]);
+        $query->execute([$locale, $contentDate]);
         $row = $query->fetch(PDO::FETCH_ASSOC);
         if ($row) {
             $devotional = [
@@ -77,7 +84,7 @@ try {
 
     try {
         $query = $pdo->prepare('SELECT id,slug,title,description,scripture_reference,starts_on,ends_on,target_count FROM weekly_challenges WHERE is_published=1 AND locale=? AND starts_on<=? AND ends_on>=? ORDER BY starts_on DESC,id DESC LIMIT 1');
-        $query->execute([$locale, date('Y-m-d'), date('Y-m-d')]);
+        $query->execute([$locale, $contentDate, $contentDate]);
         $row = $query->fetch(PDO::FETCH_ASSOC);
         if ($row) {
             $challenge = [
@@ -104,7 +111,7 @@ try {
 
 echo json_encode([
     'ok' => true,
-    'date' => date('Y-m-d'),
+    'date' => $contentDate,
     'verse' => [
         'id' => 1,
         'text' => (string)($verse['text'] ?? $fallbackVerse['text']),
@@ -134,5 +141,5 @@ echo json_encode([
         'starts_on' => (string)$challenge['starts_on'],
         'ends_on' => (string)$challenge['ends_on'],
     ],
-    'source' => (string)($verse['source'] ?? 'bundled_fallback'),
+    'source' => (string)($verse['source'] ?? 'emergency_fallback'),
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

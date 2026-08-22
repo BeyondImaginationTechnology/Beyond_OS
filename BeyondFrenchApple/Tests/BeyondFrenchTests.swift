@@ -7,6 +7,14 @@ final class BeyondFrenchTests: XCTestCase {
         XCTAssertEqual(FrenchLesson.fallback.id, 1)
     }
 
+    func testDailyLessonLanguageTextUsesLessonTranslations() {
+        let lesson = FrenchLesson.fallback
+        XCTAssertEqual(lesson.text(for: .french), lesson.french)
+        XCTAssertEqual(lesson.text(for: .spanish), lesson.spanish)
+        XCTAssertEqual(lesson.text(for: .kreyol), lesson.kreyol)
+        XCTAssertEqual(lesson.text(for: .patois), lesson.patois)
+    }
+
     func testFallbackAcademyHasFreeGreetingLesson() {
         let module = AcademyCatalog.fallback.modules[0]
 

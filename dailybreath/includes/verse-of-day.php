@@ -8,8 +8,9 @@ declare(strict_types=1);
  *
  * @return array{text:string,reference:string,book:string,chapter:int,verse:int,source:string}
  */
-function dailybreath_verse_of_day(PDO $pdo, string $locale = 'en'): array
+function dailybreath_verse_of_day(PDO $pdo, string $locale = 'en', ?string $date = null): array
 {
+    $date = $date ?: date('Y-m-d');
     $fallbacks = [
         ['Be still, and know that I am God.', 'Psalm 46:10'],
         ['Yahweh is my shepherd: I shall lack nothing.', 'Psalm 23:1'],
@@ -27,12 +28,12 @@ function dailybreath_verse_of_day(PDO $pdo, string $locale = 'en'): array
         ['We know that all things work together for good for those who love God.', 'Romans 8:28'],
     ];
 
-    $result = dailybreath_recovery_verse_for_date(date('Y-m-d'), false);
+    $result = dailybreath_recovery_verse_for_date($date, false);
     try {
         // Prefer the visitor's language, then use the managed English edition
         // until a localized post has been published for the same experience.
         $query = $pdo->prepare("SELECT verse_text, scripture_reference FROM verse_day_posts WHERE status='published' AND publish_date<=? AND locale IN (?, 'en') ORDER BY CASE WHEN locale=? THEN 0 ELSE 1 END, publish_date DESC, id DESC LIMIT 1");
-        $query->execute([date('Y-m-d'), $locale, $locale]);
+        $query->execute([$date, $locale, $locale]);
         $row = $query->fetch(PDO::FETCH_ASSOC);
         if ($row && trim((string)($row['verse_text'] ?? '')) !== '') {
             $result = [
@@ -48,7 +49,7 @@ function dailybreath_verse_of_day(PDO $pdo, string $locale = 'en'): array
     if ($result === null) {
         try {
             $query = $pdo->prepare("SELECT title, body FROM beyond_content WHERE product='dailybreath' AND status='published' AND scheduled_for<=? ORDER BY scheduled_for DESC, id DESC LIMIT 1");
-            $query->execute([date('Y-m-d')]);
+            $query->execute([$date]);
             $row = $query->fetch(PDO::FETCH_ASSOC);
             if ($row && trim((string)($row['title'] ?? '')) !== '') {
                 $result = [
@@ -63,15 +64,15 @@ function dailybreath_verse_of_day(PDO $pdo, string $locale = 'en'): array
     }
 
     if ($result === null) {
-        $result = dailybreath_recovery_verse_for_date(date('Y-m-d'));
+        $result = dailybreath_recovery_verse_for_date($date);
     }
 
     if ($result === null) {
-        $webFallback = dailybreath_web_verse_fallback();
+        $webFallback = dailybreath_web_verse_fallback($date);
         if ($webFallback !== null) {
             $result = $webFallback;
         } else {
-            $index = (int)(abs(crc32(date('Y-m-d'))) % count($fallbacks));
+            $index = (int)(abs(crc32($date)) % count($fallbacks));
             $result = [
                 'text' => $fallbacks[$index][0],
                 'reference' => $fallbacks[$index][1],
@@ -144,7 +145,7 @@ function dailybreath_recovery_challenge_for_date(string $date): ?array
 }
 
 /** @return array{text:string,reference:string,source:string}|null */
-function dailybreath_web_verse_fallback(): ?array
+function dailybreath_web_verse_fallback(?string $date = null): ?array
 {
     $source = dirname(__DIR__) . '/data/engwebp_vpl.txt';
     if (!is_file($source)) return null;
@@ -162,7 +163,8 @@ function dailybreath_web_verse_fallback(): ?array
         'PHM'=>'Philemon','HEB'=>'Hebrews','JAM'=>'James','1PE'=>'1 Peter','2PE'=>'2 Peter','1JO'=>'1 John','2JO'=>'2 John','3JO'=>'3 John','JUD'=>'Jude','REV'=>'Revelation',
     ];
 
-    $start = (int)(abs(crc32(date('Y-m-d'))) % count($lines));
+    $date = $date ?: date('Y-m-d');
+    $start = (int)(abs(crc32($date)) % count($lines));
     for ($offset = 0, $total = count($lines); $offset < $total; $offset++) {
         $line = $lines[($start + $offset) % $total];
         if (!preg_match('/^([1-3]?[A-Z]{2,3})\s+(\d+):(\d+)\s+(.+)$/u', $line, $match)) continue;

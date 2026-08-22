@@ -18,6 +18,30 @@ function multilingualBankWrite(string $file, array $records): void {
         throw new RuntimeException('The multilingual bank could not be saved.');
     }
 }
+function multilingualRussianPronunciation(string $text): string {
+    return strtr($text, [
+        'А'=>'A','Б'=>'B','В'=>'V','Г'=>'G','Д'=>'D','Е'=>'Ye','Ё'=>'Yo','Ж'=>'Zh','З'=>'Z','И'=>'I','Й'=>'Y','К'=>'K','Л'=>'L','М'=>'M','Н'=>'N','О'=>'O','П'=>'P','Р'=>'R','С'=>'S','Т'=>'T','У'=>'U','Ф'=>'F','Х'=>'Kh','Ц'=>'Ts','Ч'=>'Ch','Ш'=>'Sh','Щ'=>'Shch','Ъ'=>'','Ы'=>'Y','Ь'=>'','Э'=>'E','Ю'=>'Yu','Я'=>'Ya',
+        'а'=>'a','б'=>'b','в'=>'v','г'=>'g','д'=>'d','е'=>'ye','ё'=>'yo','ж'=>'zh','з'=>'z','и'=>'i','й'=>'y','к'=>'k','л'=>'l','м'=>'m','н'=>'n','о'=>'o','п'=>'p','р'=>'r','с'=>'s','т'=>'t','у'=>'u','ф'=>'f','х'=>'kh','ц'=>'ts','ч'=>'ch','ш'=>'sh','щ'=>'shch','ъ'=>'','ы'=>'y','ь'=>'','э'=>'e','ю'=>'yu','я'=>'ya',
+    ]);
+}
+function multilingualScheduleBuiltItem(string $scheduleFile, array $item): string {
+    $scheduled = is_file($scheduleFile) ? json_decode((string)file_get_contents($scheduleFile), true) : [];
+    if (!is_array($scheduled)) $scheduled = [];
+    foreach ($scheduled as $lesson) {
+        if ((string)($lesson['source_id'] ?? '') === (string)($item['source_id'] ?? '')) return (string)($lesson['date'] ?? '');
+    }
+    $dates = array_values(array_filter(array_map(static fn(array $lesson): string => (string)($lesson['date'] ?? ''), $scheduled), static fn(string $date): bool => preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) === 1));
+    sort($dates);
+    $today = new DateTimeImmutable('today');
+    $next = $dates ? (new DateTimeImmutable((string)end($dates)))->modify('+1 day') : $today;
+    if ($next < $today) $next = $today;
+    $maxId = 0;
+    foreach ($scheduled as $lesson) $maxId = max($maxId, (int)($lesson['id'] ?? 0));
+    $date = $next->format('Y-m-d');
+    $scheduled[] = [...$item, 'id'=>$maxId+1, 'date'=>$date, 'generator'=>['version'=>'1.3.0','provider'=>'azure','schedule'=>'automatic-bank','scheduled_at'=>date(DATE_ATOM)]];
+    multilingualBankWrite($scheduleFile, $scheduled);
+    return $date;
+}
 function azureTranslatePhrase(string $english): array {
     $key = trim((string)beyond_config('ai.azure_translator.api_key', ''));
     $region = trim((string)beyond_config('ai.azure_translator.region', ''));
@@ -109,16 +133,17 @@ try {
             'english'=>(string)$lesson['english'],
             'meaning'=>(string)($lesson['meaning'] ?? 'A practical phrase for everyday conversation.'),
             'french'=>$texts['fr'], 'french_pronunciation'=>(string)($lesson['french_pronunciation'] ?? ''),
-            'italian'=>$texts['it'], 'italian_pronunciation'=>'',
-            'german'=>$texts['de'], 'german_pronunciation'=>'',
-            'russian'=>$texts['ru'], 'russian_pronunciation'=>'',
-            'portuguese'=>$texts['pt'], 'portuguese_pronunciation'=>'',
+            'italian'=>$texts['it'], 'italian_pronunciation'=>$texts['it'],
+            'german'=>$texts['de'], 'german_pronunciation'=>$texts['de'],
+            'russian'=>$texts['ru'], 'russian_pronunciation'=>multilingualRussianPronunciation($texts['ru']),
+            'portuguese'=>$texts['pt'], 'portuguese_pronunciation'=>$texts['pt'],
             'culture_note'=>(string)($lesson['culture_note'] ?? 'Practice this phrase aloud in a short conversation.'),
             'audio_urls'=>$audioUrls,
             'generated_at'=>date(DATE_ATOM),
         ];
         $bank[] = $built;
         multilingualBankWrite($bankFile, $bank);
+        $built['scheduled_date'] = multilingualScheduleBuiltItem($scheduleFile, $built);
         break;
     }
     $ready = count(array_filter($bank, static fn(array $item): bool => count((array)($item['audio_urls'] ?? [])) === 5));

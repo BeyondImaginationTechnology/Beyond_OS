@@ -1,6 +1,8 @@
+import CryptoKit
 import Foundation
+import Security
 
-struct Verse: Identifiable, Codable, Equatable {
+struct Verse: Identifiable, Codable, Equatable, Sendable {
     let id: Int
     let text: String
     let reference: String
@@ -21,7 +23,7 @@ struct Verse: Identifiable, Codable, Equatable {
     }
 }
 
-struct Devotional: Identifiable, Codable, Equatable {
+struct Devotional: Identifiable, Codable, Equatable, Sendable {
     let id: Int
     let title: String
     let excerpt: String
@@ -32,7 +34,7 @@ struct Devotional: Identifiable, Codable, Equatable {
     let practice: String
 }
 
-struct RecoveryChallenge: Identifiable, Codable, Equatable {
+struct RecoveryChallenge: Identifiable, Codable, Equatable, Sendable {
     let id: String
     let title: String
     let description: String
@@ -98,7 +100,7 @@ enum RecoveryContent {
             id: index + 1,
             text: entry.text,
             reference: entry.reference,
-            reflection: "Let this (entry.theme) verse guide one honest, healthy choice today."
+            reflection: "Carry this verse with you today, and let it guide your next faithful step."
         )
     }
 
@@ -231,15 +233,56 @@ struct BreathPattern: Identifiable, Equatable {
     }
 }
 
-struct JournalEntry: Identifiable, Equatable {
+struct JournalEntry: Identifiable, Codable, Equatable, Sendable {
     let id: UUID
     let createdAt: Date
     let prompt: String
     let text: String
     let mood: String?
+    let updatedAt: Date
+
+    init(id: UUID, createdAt: Date, prompt: String, text: String, mood: String?, updatedAt: Date? = nil) {
+        self.id = id
+        self.createdAt = createdAt
+        self.prompt = prompt
+        self.text = text
+        self.mood = mood
+        self.updatedAt = updatedAt ?? createdAt
+    }
+
+    private enum CodingKeys: String, CodingKey { case id, createdAt, prompt, text, mood, updatedAt }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        id = try values.decode(UUID.self, forKey: .id)
+        createdAt = try values.decode(Date.self, forKey: .createdAt)
+        prompt = try values.decode(String.self, forKey: .prompt)
+        text = try values.decode(String.self, forKey: .text)
+        mood = try values.decodeIfPresent(String.self, forKey: .mood)
+        updatedAt = try values.decodeIfPresent(Date.self, forKey: .updatedAt) ?? createdAt
+    }
 }
 
-struct BibleVerse: Identifiable, Equatable {
+struct BibleAnnotation: Identifiable, Codable, Equatable, Sendable {
+    var id: String { verseID }
+    let verseID: String
+    var isFavorite: Bool
+    var collections: [String]
+    var highlightColor: String?
+    var note: String
+    var updatedAt: Date
+}
+
+struct DailyHistoryRecord: Identifiable, Codable, Equatable, Sendable {
+    var id: String { dayKey }
+    let dayKey: String
+    var verseReference: String
+    var verseText: String
+    var devotionalTitle: String
+    var updatedAt: Date
+}
+
+struct BibleVerse: Identifiable, Equatable, Sendable {
     let bookCode: String
     let bookName: String
     let chapter: Int
@@ -250,7 +293,7 @@ struct BibleVerse: Identifiable, Equatable {
     var reference: String { "\(bookName) \(chapter):\(verse)" }
 }
 
-struct BibleChapter: Identifiable, Equatable {
+struct BibleChapter: Identifiable, Equatable, Sendable {
     let bookCode: String
     let bookName: String
     let number: Int
@@ -260,7 +303,7 @@ struct BibleChapter: Identifiable, Equatable {
     var title: String { "\(bookName) \(number)" }
 }
 
-struct BibleBook: Identifiable, Equatable {
+struct BibleBook: Identifiable, Equatable, Sendable {
     let code: String
     let name: String
     let testament: String
@@ -270,7 +313,7 @@ struct BibleBook: Identifiable, Equatable {
     var verseCount: Int { chapters.reduce(0) { $0 + $1.verses.count } }
 }
 
-struct BibleLibrary: Equatable {
+struct BibleLibrary: Equatable, Sendable {
     let translation: String
     let books: [BibleBook]
 
@@ -390,6 +433,198 @@ struct BibleLibrary: Equatable {
         "JHN", "ACT", "ROM", "1CO", "2CO", "GAL", "EPH", "PHP", "COL", "1TH", "2TH", "1TI", "2TI", "TIT",
         "PHM", "HEB", "JAS", "1PE", "2PE", "1JN", "2JN", "3JN", "JUD", "REV"
     ]
+}
+
+struct DailyBreathUserData: Codable, Equatable, Sendable {
+    var journalEntries: [JournalEntry]
+    var challengeCompletionDayKeys: [String: [String]]
+    var bibleAnnotations: [String: BibleAnnotation]
+    var dailyHistory: [String: DailyHistoryRecord]
+    var deletedJournalEntryIDs: [UUID: Date]
+    var modifiedAt: Date
+
+    static let empty = DailyBreathUserData(
+        journalEntries: [],
+        challengeCompletionDayKeys: [:],
+        bibleAnnotations: [:],
+        dailyHistory: [:],
+        deletedJournalEntryIDs: [:],
+        modifiedAt: .distantPast
+    )
+
+    init(
+        journalEntries: [JournalEntry],
+        challengeCompletionDayKeys: [String: [String]],
+        bibleAnnotations: [String: BibleAnnotation] = [:],
+        dailyHistory: [String: DailyHistoryRecord] = [:],
+        deletedJournalEntryIDs: [UUID: Date] = [:],
+        modifiedAt: Date = Date()
+    ) {
+        self.journalEntries = journalEntries
+        self.challengeCompletionDayKeys = challengeCompletionDayKeys
+        self.bibleAnnotations = bibleAnnotations
+        self.dailyHistory = dailyHistory
+        self.deletedJournalEntryIDs = deletedJournalEntryIDs
+        self.modifiedAt = modifiedAt
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case journalEntries, challengeCompletionDayKeys, bibleAnnotations, dailyHistory, deletedJournalEntryIDs, modifiedAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        journalEntries = try values.decodeIfPresent([JournalEntry].self, forKey: .journalEntries) ?? []
+        challengeCompletionDayKeys = try values.decodeIfPresent([String: [String]].self, forKey: .challengeCompletionDayKeys) ?? [:]
+        bibleAnnotations = try values.decodeIfPresent([String: BibleAnnotation].self, forKey: .bibleAnnotations) ?? [:]
+        dailyHistory = try values.decodeIfPresent([String: DailyHistoryRecord].self, forKey: .dailyHistory) ?? [:]
+        deletedJournalEntryIDs = try values.decodeIfPresent([UUID: Date].self, forKey: .deletedJournalEntryIDs) ?? [:]
+        modifiedAt = try values.decodeIfPresent(Date.self, forKey: .modifiedAt) ?? .distantPast
+    }
+}
+
+struct DailyBreathUserDataStore: Sendable {
+    let fileURL: URL
+
+    static var live: DailyBreathUserDataStore {
+        let supportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        return DailyBreathUserDataStore(fileURL: supportDirectory.appendingPathComponent("DailyBreath/user-data.json"))
+    }
+
+    func load() throws -> DailyBreathUserData {
+        guard FileManager.default.fileExists(atPath: fileURL.path) else { return .empty }
+        return try Self.makeDecoder().decode(DailyBreathUserData.self, from: Data(contentsOf: fileURL))
+    }
+
+    func save(_ userData: DailyBreathUserData) throws {
+        let directory = fileURL.deletingLastPathComponent()
+        try FileManager.default.createDirectory(
+            at: directory,
+            withIntermediateDirectories: true,
+            attributes: [.protectionKey: FileProtectionType.complete]
+        )
+        let encoder = Self.makeEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        try encoder.encode(userData).write(to: fileURL, options: [.atomic, .completeFileProtection])
+    }
+
+    static func makeEncoder() -> JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .secondsSince1970
+        return encoder
+    }
+
+    static func makeDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .custom { value in
+            let container = try value.singleValueContainer()
+            if let seconds = try? container.decode(Double.self) {
+                return Date(timeIntervalSince1970: seconds)
+            }
+            let string = try container.decode(String.self)
+            let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            if let date = formatter.date(from: string) { return date }
+            formatter.formatOptions = [.withInternetDateTime]
+            if let date = formatter.date(from: string) { return date }
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Invalid date value")
+        }
+        return decoder
+    }
+}
+
+enum EncryptedICloudSyncError: LocalizedError {
+    case keyUnavailable(OSStatus)
+    case encryptionFailed
+    case unavailable
+    case payloadTooLarge
+
+    var errorDescription: String? {
+        switch self {
+        case .keyUnavailable: return "The encrypted iCloud key is unavailable. Check iCloud Keychain."
+        case .encryptionFailed: return "The encrypted iCloud data could not be opened."
+        case .unavailable: return "iCloud data is not available on this device."
+        case .payloadTooLarge: return "Your private data is too large for iCloud key-value sync. It remains safely stored on this device."
+        }
+    }
+}
+
+struct EncryptedICloudSyncService {
+    private static let payloadKey = "encryptedDailyBreathUserData.v1"
+    private static let keyService = "technology.co.beyondimagination.thedailybreath.sync"
+    private static let keyAccount = "daily-breath-user-data-key-v1"
+
+    static func upload(_ userData: DailyBreathUserData) throws {
+        guard FileManager.default.ubiquityIdentityToken != nil else { throw EncryptedICloudSyncError.unavailable }
+        let encoder = DailyBreathUserDataStore.makeEncoder()
+        let clearData = try encoder.encode(userData)
+        let sealed = try AES.GCM.seal(clearData, using: symmetricKey(createIfMissing: true))
+        guard let combined = sealed.combined else { throw EncryptedICloudSyncError.encryptionFailed }
+        guard combined.count < 900_000 else { throw EncryptedICloudSyncError.payloadTooLarge }
+        let store = NSUbiquitousKeyValueStore.default
+        store.set(combined, forKey: payloadKey)
+        _ = store.synchronize()
+    }
+
+    static func download() throws -> DailyBreathUserData? {
+        guard FileManager.default.ubiquityIdentityToken != nil else { throw EncryptedICloudSyncError.unavailable }
+        let store = NSUbiquitousKeyValueStore.default
+        _ = store.synchronize()
+        guard let encrypted = store.data(forKey: payloadKey) else { return nil }
+        do {
+            let box = try AES.GCM.SealedBox(combined: encrypted)
+            let clearData = try AES.GCM.open(box, using: symmetricKey(createIfMissing: false))
+            let decoder = DailyBreathUserDataStore.makeDecoder()
+            return try decoder.decode(DailyBreathUserData.self, from: clearData)
+        } catch let error as EncryptedICloudSyncError {
+            throw error
+        } catch {
+            throw EncryptedICloudSyncError.encryptionFailed
+        }
+    }
+
+    private static func symmetricKey(createIfMissing: Bool) throws -> SymmetricKey {
+        var query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: keyService,
+            kSecAttrAccount as String: keyAccount,
+            kSecAttrSynchronizable as String: true,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        var item: CFTypeRef?
+        let lookupStatus = SecItemCopyMatching(query as CFDictionary, &item)
+        if lookupStatus == errSecSuccess, let data = item as? Data {
+            return SymmetricKey(data: data)
+        }
+        guard lookupStatus == errSecItemNotFound else {
+            throw EncryptedICloudSyncError.keyUnavailable(lookupStatus)
+        }
+        guard createIfMissing else {
+            throw EncryptedICloudSyncError.keyUnavailable(errSecItemNotFound)
+        }
+
+        var bytes = [UInt8](repeating: 0, count: 32)
+        let randomStatus = bytes.withUnsafeMutableBytes { buffer in
+            SecRandomCopyBytes(kSecRandomDefault, buffer.count, buffer.baseAddress!)
+        }
+        guard randomStatus == errSecSuccess else {
+            throw EncryptedICloudSyncError.keyUnavailable(randomStatus)
+        }
+        let data = Data(bytes)
+        query.removeValue(forKey: kSecReturnData as String)
+        query.removeValue(forKey: kSecMatchLimit as String)
+        query[kSecValueData as String] = data
+        query[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
+        let addStatus = SecItemAdd(query as CFDictionary, nil)
+        if addStatus == errSecDuplicateItem {
+            return try symmetricKey(createIfMissing: false)
+        }
+        guard addStatus == errSecSuccess else {
+            throw EncryptedICloudSyncError.keyUnavailable(addStatus)
+        }
+        return SymmetricKey(data: data)
+    }
 }
 
 extension Verse {

@@ -1,10 +1,13 @@
 <?php
-require __DIR__ . '/config/database.php';
+require_once __DIR__ . '/../includes/ecosystem.php';
 
 $returnToLogin = ($_POST['return_to'] ?? '') === 'dailybreath_login';
-$redirect = static function (string $status, string $message = '') use ($returnToLogin): never {
+$returnToSettings = ($_POST['return_to'] ?? '') === 'settings';
+$redirect = static function (string $status, string $message = '') use ($returnToLogin, $returnToSettings): never {
     if ($returnToLogin) {
         header('Location: ../beyond-id/auth/login.php?newsletter=' . $status);
+    } elseif ($returnToSettings) {
+        header('Location: settings.php?newsletter=' . $status . ($message !== '' ? '&message=' . urlencode($message) : ''));
     } else {
         header('Location: index.php?' . ($status === 'success' ? 'success=1' : 'error=' . urlencode($message)));
     }
@@ -29,7 +32,15 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 try {
-    $stmt = db()->prepare("INSERT INTO dailybreath_subscribers (name, email, ip_address, user_agent) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), status='active'");
+    $pdo = beyond_db();
+    if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS dailybreath_subscribers (id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NULL,email TEXT NOT NULL UNIQUE,source TEXT NOT NULL DEFAULT 'dailybreath_web',status TEXT NOT NULL DEFAULT 'active',ip_address TEXT NULL,user_agent TEXT NULL,created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+        $sql = "INSERT INTO dailybreath_subscribers (name,email,source,ip_address,user_agent) VALUES (?,?,'dailybreath_web',?,?) ON CONFLICT(email) DO UPDATE SET name=excluded.name,status='active'";
+    } else {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS dailybreath_subscribers (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,name VARCHAR(120) NULL,email VARCHAR(190) NOT NULL UNIQUE,source VARCHAR(80) DEFAULT 'dailybreath_web',status ENUM('active','unsubscribed') DEFAULT 'active',ip_address VARCHAR(45) NULL,user_agent VARCHAR(255) NULL,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        $sql = "INSERT INTO dailybreath_subscribers (name,email,source,ip_address,user_agent) VALUES (?,?,'dailybreath_web',?,?) ON DUPLICATE KEY UPDATE name=VALUES(name),status='active'";
+    }
+    $stmt = $pdo->prepare($sql);
     $stmt->execute([
         $name ?: null,
         $email,
@@ -38,7 +49,7 @@ try {
     ]);
 
     $subject = 'Welcome to DailyBreath';
-    $message = "Welcome to DailyBreath!\n\nThanks for joining our faith-centered wellness newsletter.\n\nBreathe. Pray. Reflect.\n\nLaunching October 2026.";
+    $message = "Welcome to DailyBreath!\n\nThanks for joining our faith-centered wellness and recovery-support newsletter.\n\nBreathe. Pray. Reflect.\n\nYou can unsubscribe at any time.";
     $headers = "From: DailyBreath <no-reply@" . ($_SERVER['HTTP_HOST'] ?? 'dailybreath.app') . ">\r\n";
     @mail($email, $subject, $message, $headers);
 

@@ -21,7 +21,7 @@ function bt_library_collections(): array
             'image' => 'assets/img/storefront/collection-ancient.webp',
             'description' => 'Egyptian gods, royal portraits and sacred symbols framed with ornamental hieroglyphic detail.',
             'stencils' => [
-                ['Anubis', '2026-07-27'], ['Eye of Horus', '2026-07-28'], ['Pharaoh Portrait', '2026-07-29'], ['Sacred Scarab', '2026-07-30'],
+                ['Ancient Sentinel', '2026-07-27'], ['Solar Eye Motif', '2026-07-28'], ['Pharaoh Portrait', '2026-07-29'], ['Sacred Scarab', '2026-07-30'],
                 ['Sekhmet', '2026-07-31'], ['Isis', '2026-08-01'], ['Pyramid Gateway', '2026-08-02'], ['Osiris', '2026-08-03'],
                 ['Bastet', '2026-08-04'], ['Egyptian Sacred Symbols', '2026-08-05'], ['Hieroglyphic Guardian', '2026-08-06'], ['Ornamental Egyptian Frame', '2026-08-07'],
             ],
@@ -34,7 +34,7 @@ function bt_library_collections(): array
                 ['Hannya Mask', '2026-08-08'], ['Oni Warrior', '2026-08-09'], ['Japanese Dragon', '2026-08-10'], ['Koi & Lotus', '2026-08-11'],
                 ['Samurai Portrait', '2026-08-12'], ['Geisha & Fan', '2026-08-13'], ['Japanese Tiger', '2026-08-14'], ['Snake & Chrysanthemum', '2026-08-15'],
                 ['Peony Arrangement', '2026-08-16'], ['Great Wave', '2026-08-17'], ['Temple Guardian', '2026-08-18'], ['Kitsune Mask', '2026-08-19'],
-                ['Phoenix', '2026-08-20'], ['Raijin', '2026-08-21'], ['Mythical Guardian', '2026-08-22'],
+                ['Phoenix', '2026-08-20'], ['Raijin', '2026-08-21'], ['Nio Guardians', '2026-08-22'],
             ],
         ],
         'dark-realism' => [

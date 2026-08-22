@@ -15,17 +15,22 @@ try {
         $mime = 'application/zip'; $name = 'beyond-tattoo-' . trim((string)$slug, '-') . '.zip';
     } else {
         $map = [
-            'preview' => ['preview_url', 'image/webp', 'preview.webp'],
+            'preview' => ['preview_url', 'auto', 'preview'],
             'png' => ['transfer_png_url', 'image/png', 'studio-transfer.png'],
             'pdf' => ['transfer_pdf_url', 'application/pdf', 'studio-transfer.pdf'],
             'editable' => ['editable_url', 'image/svg+xml; charset=UTF-8', 'editable-master.svg'],
             'placement' => ['placement_guide_url', 'application/pdf', 'placement-guide.pdf'],
-            'ig' => ['ig_post_url', 'image/webp', 'social-preview.webp'],
+            'ig' => ['ig_post_url', 'auto', 'social-preview'],
         ];
         if (!isset($map[$type])) { http_response_code(400); exit('Unknown stencil asset type.'); }
         [$field,$mime,$suffix] = $map[$type];
         $relative = (string)($stencil[$field] ?? '');
         $file = bt_stencil_asset_path($relative);
+        if ($mime === 'auto') {
+            $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            $mime = ['png' => 'image/png', 'webp' => 'image/webp', 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg'][$extension] ?? 'application/octet-stream';
+            $suffix .= '.' . ($extension ?: 'bin');
+        }
         $name = 'beyond-tattoo-' . trim((string)$slug, '-') . '-' . $suffix;
     }
 } catch (Throwable $e) {

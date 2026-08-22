@@ -72,7 +72,7 @@ function beyond_marqeta_request(string $method, string $path, ?array $payload = 
     $url = rtrim((string)$config['base_url'], '/') . $path;
     $body = $payload === null ? null : json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     if ($payload !== null && !is_string($body)) throw new RuntimeException('Unable to encode Marqeta request.');
-    $headers = ['Accept: application/json', 'Content-Type: application/json', 'User-Agent: Beyond-Wallet/2.3.4'];
+    $headers = ['Accept: application/json', 'Content-Type: application/json', 'User-Agent: Beyond-Wallet/2.4'];
     $status = 0;
     $raw = false;
     $transportError = '';

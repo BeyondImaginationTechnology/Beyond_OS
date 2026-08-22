@@ -64,11 +64,11 @@ function bt_list_studios(string $query = ''): array
         . "FROM tattoo_studios s WHERE s.status='active'";
     $params = [];
     if ($query !== '') {
-        $sql .= ' AND (LOWER(s.name) LIKE ? OR LOWER(s.city) LIKE ? OR LOWER(s.services) LIKE ?)';
+        $sql .= ' AND (LOWER(s.name) LIKE ? OR LOWER(s.city) LIKE ? OR LOWER(s.province) LIKE ? OR LOWER(s.country) LIKE ? OR LOWER(s.services) LIKE ?)';
         $needle = '%' . strtolower($query) . '%';
-        $params = [$needle, $needle, $needle];
+        $params = [$needle, $needle, $needle, $needle, $needle];
     }
-    $sql .= ' ORDER BY s.name';
+    $sql .= " ORDER BY CASE WHEN s.city='Ottawa' THEN 0 ELSE 1 END,s.city,s.name";
     $stmt = bt_db()->prepare($sql);
     $stmt->execute($params);
     return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];

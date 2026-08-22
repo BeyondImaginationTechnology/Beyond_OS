@@ -3,6 +3,10 @@ import SwiftUI
 struct TodayStencilView: View {
     @EnvironmentObject private var store: TattooStore
 
+    private var packFileCount: Int {
+        2 + [store.dailyDrop.transferURL, store.dailyDrop.transferPDFURL, store.dailyDrop.referenceURL, store.dailyDrop.placementImageURL, store.dailyDrop.packURL, store.dailyDrop.loreURL, store.dailyDrop.styleCardURL].compactMap { $0 }.count
+    }
+
     var body: some View {
         TattooScreen(title: "Today") {
             HeroStencilCard(stencil: store.dailyDrop, isSaved: store.savedStencilIDs.contains(store.dailyDrop.id)) {
@@ -11,8 +15,8 @@ struct TodayStencilView: View {
 
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 12)], spacing: 12) {
                 MetricTile(value: "\(store.dailyDrop.rewardBits)", label: "Reward bits", icon: "bitcoinsign.circle.fill")
-                MetricTile(value: "4", label: "Pack files", icon: "tray.full.fill")
-                MetricTile(value: "PDF", label: "Transfer ready", icon: "doc.richtext.fill")
+                MetricTile(value: "\(packFileCount)", label: "Actual files", icon: "tray.full.fill")
+                MetricTile(value: store.dailyDrop.transferPDFURL == nil ? "PNG" : "PDF", label: "Transfer ready", icon: "doc.richtext.fill")
             }
 
             VStack(alignment: .leading, spacing: 12) {
@@ -25,14 +29,22 @@ struct TodayStencilView: View {
                 .controlSize(.large)
 
                 HStack(spacing: 10) {
-                    Link(destination: store.dailyDrop.transferPDFURL) {
-                        Label("Transfer PDF", systemImage: "doc.fill")
+                    Link(destination: store.dailyDrop.stencilURL) {
+                        Label("Print master", systemImage: "photo.fill")
                     }
                     .buttonStyle(.bordered)
-                    Link(destination: store.dailyDrop.editableURL) {
-                        Label("Editable", systemImage: "slider.horizontal.3")
+                    if let transferURL = store.dailyDrop.transferURL {
+                        Link(destination: transferURL) {
+                            Label("Transfer", systemImage: "square.and.arrow.down")
+                        }
+                        .buttonStyle(.bordered)
                     }
-                    .buttonStyle(.bordered)
+                    if let transferPDFURL = store.dailyDrop.transferPDFURL {
+                        Link(destination: transferPDFURL) {
+                            Label("PDF", systemImage: "doc.fill")
+                        }
+                        .buttonStyle(.bordered)
+                    }
                 }
             }
             .padding()

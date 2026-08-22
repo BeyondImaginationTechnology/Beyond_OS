@@ -1,17 +1,61 @@
 import Foundation
 import CoreLocation
+import Combine
 
 @MainActor
 final class TattooStore: ObservableObject {
     @Published var activeRole: UserRole = .collector
-    @Published var savedStencilIDs: Set<String> = [StencilDrop.daily.id]
+    @Published var savedStencilIDs: Set<String>
     @Published var healingPhotoCount = 2
     @Published var hasBeyondID = false
     @Published var userLocation: CLLocation?
+    @Published private(set) var dailyDrop: StencilDrop
+    @Published private(set) var collections: [TattooCollection]
+    @Published private(set) var libraryVersion: String
 
-    let dailyDrop = StencilDrop.daily
-    let collections = TattooCollection.seed
-    let studios = StudioLead.seed
+    @Published private(set) var studios = StudioLead.seed
+
+    init() {
+        let manifest = TattooLibraryManifest.bundled()
+        let daily = manifest.dailyAsset.dailyDrop
+        dailyDrop = daily
+        collections = manifest.tattooCollections
+        libraryVersion = manifest.version
+        savedStencilIDs = [daily.id]
+        Task {
+            await refreshLibrary()
+            await refreshStudios()
+        }
+    }
+
+    func refreshLibrary() async {
+        do {
+            let (data, response) = try await URLSession.shared.data(from: TattooLibraryManifest.endpoint)
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else { return }
+            let manifest = try JSONDecoder().decode(TattooLibraryManifest.self, from: data)
+            guard manifest.version == "1.2", !manifest.assets.isEmpty else { return }
+            let updatedCollections = manifest.tattooCollections
+            guard !updatedCollections.isEmpty else { return }
+            dailyDrop = manifest.dailyAsset.dailyDrop
+            collections = updatedCollections
+            libraryVersion = manifest.version
+        } catch {
+            // The bundled 1.2 manifest remains the offline source of truth.
+        }
+    }
+
+    func refreshStudios() async {
+        do {
+            let (data, response) = try await URLSession.shared.data(from: StudioDirectoryResponse.endpoint)
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else { return }
+            let directory = try JSONDecoder().decode(StudioDirectoryResponse.self, from: data)
+            let updatedStudios = directory.studios.compactMap(\.studioLead)
+            guard directory.version == "1.2", !updatedStudios.isEmpty else { return }
+            studios = updatedStudios
+        } catch {
+            // The verified Canadian seed remains available offline.
+        }
+    }
 
     var totalStencilCount: Int {
         collections.reduce(0) { $0 + $1.stencils.count }
@@ -24,7 +68,7 @@ final class TattooStore: ObservableObject {
     var nearestStudios: [StudioLead] {
         studios
             .sorted { left, right in
-                switch (left.distanceMiles(from: userLocation), right.distanceMiles(from: userLocation)) {
+                switch (left.distanceKilometres(from: userLocation), right.distanceKilometres(from: userLocation)) {
                 case let (leftDistance?, rightDistance?):
                     leftDistance < rightDistance
                 case (_?, nil):
@@ -73,142 +117,28 @@ enum UserRole: String, CaseIterable, Identifiable {
     }
 }
 
-extension TattooCollection {
-    static let seed: [TattooCollection] = [
-        TattooCollection(
-            id: "divine-realism",
-            name: "Divine Realism",
-            dates: "Jul 17-26, 2026",
-            description: "Biblical portraiture, angels, and sacred iconography composed for black-and-grey realism.",
-            dropCount: 10,
-            stencils: [
-                .stencil("Biblical Realism", "2026-07-17", "Black-and-grey realism", "Upper arm portrait", "Advanced", true),
-                .stencil("Archangel Michael", "2026-07-18", "Sacred realism", "Chest or shoulder", "Advanced", false),
-                .stencil("Sacred Heart", "2026-07-19", "Fine-line sacred", "Sternum or forearm", "Intermediate", false),
-                .stencil("Praying Hands & Rosary", "2026-07-20", "Black-and-grey", "Outer forearm", "Intermediate", false),
-                .stencil("Guardian Angel", "2026-07-21", "Realism", "Upper arm", "Advanced", false),
-                .stencil("Dove & Radiant Cross", "2026-07-22", "Linework", "Inner forearm", "Beginner", false),
-                .stencil("Cherub & Clouds", "2026-07-23", "Soft realism", "Shoulder cap", "Intermediate", false),
-                .stencil("Gates of Heaven", "2026-07-24", "Architectural realism", "Back panel", "Advanced", false),
-                .stencil("Crown & Cross", "2026-07-25", "Ornamental", "Calf or forearm", "Intermediate", false),
-                .stencil("Angel of Light", "2026-07-26", "High-contrast realism", "Rib or thigh", "Advanced", false)
-            ]
-        ),
-        TattooCollection(
-            id: "beyond-ancient",
-            name: "Beyond Ancient",
-            dates: "Jul 27-Aug 7, 2026",
-            description: "Egyptian gods, royal portraits, and sacred symbols framed with ornamental hieroglyphic detail.",
-            dropCount: 12,
-            stencils: [
-                .stencil("Anubis", "2026-07-27", "Egyptian realism", "Outer forearm", "Advanced", true),
-                .stencil("Eye of Horus", "2026-07-28", "Symbolic blackwork", "Inner forearm", "Beginner", true),
-                .stencil("Pharaoh Portrait", "2026-07-29", "Portrait realism", "Upper arm", "Advanced", false),
-                .stencil("Sacred Scarab", "2026-07-30", "Ornamental blackwork", "Hand or sternum", "Intermediate", false),
-                .stencil("Sekhmet", "2026-07-31", "Mythic realism", "Thigh panel", "Advanced", false),
-                .stencil("Isis", "2026-08-01", "Fine-line goddess", "Back shoulder", "Intermediate", false),
-                .stencil("Pyramid Gateway", "2026-08-02", "Geometric realism", "Back or calf", "Intermediate", false),
-                .stencil("Osiris", "2026-08-03", "Sacred portrait", "Upper arm", "Advanced", false),
-                .stencil("Bastet", "2026-08-04", "Blackwork deity", "Forearm", "Intermediate", false),
-                .stencil("Egyptian Sacred Symbols", "2026-08-05", "Flash set", "Wrist, hand, neck", "Beginner", false),
-                .stencil("Hieroglyphic Guardian", "2026-08-06", "Ornamental", "Calf band", "Intermediate", false),
-                .stencil("Ornamental Egyptian Frame", "2026-08-07", "Framework", "Chest or back", "Advanced", false)
-            ]
-        ),
-        TattooCollection(
-            id: "japanese-legends",
-            name: "Japanese Legends",
-            dates: "Aug 8-22, 2026",
-            description: "Masks, warriors, animals, and mythological figures shaped for flowing Japanese compositions.",
-            dropCount: 15,
-            stencils: [
-                .stencil("Hannya Mask", "2026-08-08", "Japanese traditional", "Shoulder cap", "Intermediate", false),
-                .stencil("Oni Warrior", "2026-08-09", "Neo-traditional", "Thigh panel", "Advanced", false),
-                .stencil("Japanese Dragon", "2026-08-10", "Large-scale flow", "Sleeve starter", "Advanced", false),
-                .stencil("Koi & Lotus", "2026-08-11", "Japanese color", "Forearm wrap", "Intermediate", false),
-                .stencil("Samurai Portrait", "2026-08-12", "Portrait realism", "Upper arm", "Advanced", false),
-                .stencil("Geisha & Fan", "2026-08-13", "Illustrative", "Outer forearm", "Advanced", false),
-                .stencil("Japanese Tiger", "2026-08-14", "Traditional animal", "Chest or thigh", "Advanced", false),
-                .stencil("Snake & Chrysanthemum", "2026-08-15", "Botanical flow", "Forearm wrap", "Intermediate", false),
-                .stencil("Peony Arrangement", "2026-08-16", "Floral", "Shoulder or calf", "Beginner", false),
-                .stencil("Great Wave", "2026-08-17", "Water study", "Forearm", "Intermediate", false),
-                .stencil("Temple Guardian", "2026-08-18", "Mythic realism", "Back panel", "Advanced", false),
-                .stencil("Kitsune Mask", "2026-08-19", "Mask study", "Upper arm", "Intermediate", false),
-                .stencil("Phoenix", "2026-08-20", "Large-scale flow", "Rib or back", "Advanced", false),
-                .stencil("Raijin", "2026-08-21", "Mythological", "Thigh panel", "Advanced", false),
-                .stencil("Mythical Guardian", "2026-08-22", "Japanese realism", "Sleeve cap", "Advanced", false)
-            ]
-        ),
-        TattooCollection(
-            id: "dark-realism",
-            name: "Dark Realism",
-            dates: "Aug 23-Sep 9, 2026",
-            description: "Gothic portraiture, skulls, ravens, and dramatic high-contrast compositions.",
-            dropCount: 18,
-            stencils: [
-                .stencil("Gothic Skull", "2026-08-23", "Dark realism", "Hand or forearm", "Intermediate", false),
-                .stencil("Raven & Moon", "2026-08-24", "Blackwork realism", "Upper arm", "Intermediate", false),
-                .stencil("Hooded Reaper", "2026-08-25", "High-contrast realism", "Calf or forearm", "Advanced", false),
-                .stencil("Broken Angel Statue", "2026-08-26", "Stone realism", "Back shoulder", "Advanced", false),
-                .stencil("Demon Portrait", "2026-08-27", "Horror realism", "Thigh panel", "Advanced", false),
-                .stencil("Gothic Cathedral", "2026-08-28", "Architectural", "Forearm panel", "Advanced", false),
-                .stencil("Skull in Smoke", "2026-08-29", "Soft black-and-grey", "Upper arm", "Intermediate", false),
-                .stencil("Chained Soul", "2026-08-30", "Dark illustrative", "Rib panel", "Advanced", false),
-                .stencil("Broken Clock", "2026-08-31", "Surreal realism", "Forearm", "Intermediate", false),
-                .stencil("Plague Doctor", "2026-09-01", "Gothic portrait", "Calf", "Advanced", false),
-                .stencil("Weeping Stone Face", "2026-09-02", "Statue realism", "Upper arm", "Advanced", false),
-                .stencil("Grim Knight", "2026-09-03", "Dark fantasy", "Thigh", "Advanced", false),
-                .stencil("Raven Skull", "2026-09-04", "Blackwork", "Outer forearm", "Intermediate", false),
-                .stencil("Haunted Gate", "2026-09-05", "Gothic frame", "Back panel", "Advanced", false),
-                .stencil("Death & Hourglass", "2026-09-06", "Symbolic realism", "Forearm", "Intermediate", false),
-                .stencil("Dark Seraph", "2026-09-07", "Sacred horror", "Chest", "Advanced", false),
-                .stencil("Possessed Statue", "2026-09-08", "Horror realism", "Upper arm", "Advanced", false),
-                .stencil("Final Judgment", "2026-09-09", "Large-scale realism", "Back panel", "Advanced", false)
-            ]
-        )
-    ]
-}
-
 extension StudioLead {
     static let seed: [StudioLead] = [
-        .studio("StonerInkk", "Ottawa", "Ontario", "234 Dalhousie Street", ["Realism", "Fine line", "Piercing"], "Same day", true, true, 45.4294, -75.6904, "stonerinkk-ottawa"),
-        .studio("North Star Ink", "Toronto", "Ontario", "Queen West", ["Realism", "Fine line", "Coverups"], "2 hr", true, false, 43.6487, -79.3980, "north-star-ink"),
-        .studio("Crown & Needle", "Los Angeles", "California", "Arts District", ["Blackwork", "Sacred", "Sleeves"], "Same day", true, true, 34.0407, -118.2354, "crown-needle"),
-        .studio("Harbor Light Studio", "Vancouver", "British Columbia", "Gastown", ["Japanese", "Color", "Large scale"], "1 day", false, false, 49.2829, -123.1114, "harbor-light-studio"),
-        .studio("East River Tattoo Co.", "New York", "New York", "Brooklyn", ["Traditional", "Blackwork", "Flash"], "4 hr", true, true, 40.7162, -73.9557, "east-river-tattoo"),
-        .studio("Good Form Tattoo", "Chicago", "Illinois", "West Loop", ["Fine line", "Ornamental", "Florals"], "6 hr", true, false, 41.8836, -87.6485, "good-form-tattoo"),
-        .studio("Rose City Electric", "Portland", "Oregon", "Burnside", ["Botanical", "Blackwork", "Custom"], "1 day", true, true, 45.5231, -122.6765, "rose-city-electric"),
-        .studio("Mission Needle House", "San Francisco", "California", "Mission District", ["Japanese", "Geometric", "Color"], "3 hr", false, false, 37.7599, -122.4148, "mission-needle-house"),
-        .studio("Lone Star Lines", "Austin", "Texas", "East Austin", ["Neo-traditional", "Script", "Blackwork"], "Same day", true, true, 30.2638, -97.7278, "lone-star-lines"),
-        .studio("Canal Street Tattoo", "New Orleans", "Louisiana", "French Quarter", ["Ornamental", "Sacred", "Coverups"], "1 day", false, true, 29.9584, -90.0644, "canal-street-tattoo"),
-        .studio("Mile High Mark", "Denver", "Colorado", "RiNo", ["Realism", "Nature", "Black-and-grey"], "5 hr", true, false, 39.7589, -104.9864, "mile-high-mark"),
-        .studio("Peachtree Ink Lab", "Atlanta", "Georgia", "Old Fourth Ward", ["Portraits", "Fine line", "Lettering"], "2 hr", true, false, 33.7550, -84.3733, "peachtree-ink-lab"),
-        .studio("South Beach Stencil", "Miami", "Florida", "Wynwood", ["Color", "Micro realism", "Flash"], "Same day", false, true, 25.8011, -80.1996, "south-beach-stencil"),
-        .studio("Capitol Blackwork", "Washington", "District of Columbia", "Shaw", ["Blackwork", "Sacred", "Geometric"], "4 hr", true, false, 38.9121, -77.0219, "capitol-blackwork"),
-        .studio("Emerald City Tattoo", "Seattle", "Washington", "Capitol Hill", ["Japanese", "Botanical", "Sleeves"], "1 day", true, false, 47.6230, -122.3207, "emerald-city-tattoo")
+        .studio("StonerInkk", "Ottawa", "Ontario", "234 Dalhousie Street", ["Realism", "Fine line", "Piercing"], "Call ahead", true, true, 45.4294, -75.6904, "stonerinkk-ottawa"),
+        .studio("Obscura Tattoo", "Ottawa", "Ontario", "320 Catherine Street, Suite 22", ["Custom", "Blackwork", "Fine line"], "Book online", true, false, 45.4097, -75.6949, "obscura-tattoo-ottawa"),
+        .studio("The 18th Ink", "Ottawa", "Ontario", "250 Greenbank Road, Unit 14", ["Colour realism", "Japanese", "Anime"], "Book online", true, false, 45.3340, -75.7790, "the-18th-ink-ottawa"),
+        .studio("Sting Studio", "Ottawa", "Ontario", "1076 Ogilvie Road, Unit 2", ["Blackwork", "Neo-traditional", "Piercing"], "Book online", true, false, 45.4340, -75.6220, "sting-studio-ottawa"),
+        .studio("Sunken Star Tattoo", "Ottawa", "Ontario", "288 Dalhousie Street, Unit 100", ["Custom", "Black-and-grey", "Colour"], "Call ahead", true, true, 45.4291, -75.6914, "sunken-star-tattoo-ottawa"),
+        .studio("Two 0 Six Tattoo", "Ottawa", "Ontario", "1066 Somerset Street West, Unit 206", ["Fine line", "Realism", "Japanese"], "Appointment", true, false, 45.4045, -75.7240, "two-0-six-tattoo-ottawa"),
+        .studio("Relic Piercing and Tattoo", "Ottawa", "Ontario", "379 Danforth Avenue", ["Neo-traditional", "Illustrative", "Piercing"], "Appointment", true, false, 45.3910, -75.7530, "relic-ottawa"),
+        .studio("Sage Tattoo and Art Gallery", "Ottawa", "Ontario", "2286 Carling Avenue", ["Realism", "Colour", "Piercing"], "Book online", true, false, 45.3610, -75.7830, "sage-tattoo-ottawa"),
+        .studio("Barnstormer Studio", "Ottawa", "Ontario", "591 Bank Street", ["Traditional", "Japanese", "Black-and-grey"], "Call ahead", true, true, 45.4080, -75.6920, "barnstormer-studio-ottawa"),
+        .studio("Adrenaline Toronto — Queen West", "Toronto", "Ontario", "239 Queen Street West", ["Custom", "Walk-ins", "Piercing"], "Walk-ins", true, true, 43.6508, -79.3898, "adrenaline-toronto-queen-west"),
+        .studio("Adrenaline Montréal", "Montréal", "Quebec", "1541 Sherbrooke Street West", ["Custom", "Walk-ins", "Piercing"], "Walk-ins", true, true, 45.4960, -73.5790, "adrenaline-montreal"),
+        .studio("Prana Tattoo and Piercing", "Montréal", "Quebec", "17 Sainte-Catherine Street East", ["Fine line", "Realism", "Traditional"], "Walk-ins", true, true, 45.5116, -73.5614, "prana-tattoo-montreal"),
+        .studio("Adrenaline Vancouver — Granville", "Vancouver", "British Columbia", "1014 Granville Street", ["Custom", "Walk-ins", "Piercing"], "Walk-ins", true, true, 49.2785, -123.1225, "adrenaline-vancouver-granville"),
+        .studio("Ambassador Tattoo", "Calgary", "Alberta", "908 17 Avenue SW, Suite 312", ["Custom", "Traditional", "Neo-traditional"], "Book online", true, false, 51.0373, -114.0820, "ambassador-tattoo-calgary"),
+        .studio("Calgary Tattoo Company", "Calgary", "Alberta", "7144 Fisher Street SE", ["Custom", "Black-and-grey", "Colour"], "Call ahead", true, false, 50.9900, -114.0700, "calgary-tattoo-company"),
+        .studio("Got Ink? Tattoo Studio", "Edmonton", "Alberta", "14716 Stony Plain Road", ["Black-and-grey", "Custom", "Realism"], "Walk-ins", true, true, 53.5410, -113.5740, "got-ink-edmonton"),
+        .studio("Tattoos for the Individual", "Winnipeg", "Manitoba", "1767 Portage Avenue, Unit 1", ["Custom", "Consultation", "Appointment"], "Call ahead", true, true, 49.8810, -97.2120, "winnipeg-tattoo"),
+        .studio("Rites of Passage Tattoo", "Saskatoon", "Saskatchewan", "634 10th Street East", ["Custom", "Walk-ins", "Piercing"], "Walk-ins", true, true, 52.1200, -106.6500, "rites-of-passage-saskatoon"),
+        .studio("Sin on Skin Tattoo Studio", "Halifax", "Nova Scotia", "5239 Blowers Street, 3rd Floor", ["Custom", "Black-and-grey", "Cover-ups"], "Call ahead", true, true, 44.6446, -63.5750, "sin-on-skin-halifax")
     ]
-}
-
-private extension ScheduledStencil {
-    static func stencil(
-        _ name: String,
-        _ isoDate: String,
-        _ style: String,
-        _ placement: String,
-        _ difficulty: String,
-        _ hasTransferAsset: Bool,
-        hasEditableAsset: Bool = false
-    ) -> ScheduledStencil {
-        ScheduledStencil(
-            name: name,
-            isoDate: isoDate,
-            style: style,
-            placement: placement,
-            difficulty: difficulty,
-            hasTransferAsset: hasTransferAsset,
-            hasEditableAsset: hasEditableAsset || hasTransferAsset
-        )
-    }
 }
 
 private extension StudioLead {

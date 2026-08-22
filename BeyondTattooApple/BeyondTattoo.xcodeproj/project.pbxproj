@@ -28,6 +28,8 @@
 		300000000000000000000019 /* TodayStencilView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000009 /* TodayStencilView.swift */; };
 		300000000000000000000020 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000010 /* Assets.xcassets */; };
 		300000000000000000000021 /* BeyondTattooTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000011 /* BeyondTattooTests.swift */; };
+		300000000000000000000022 /* tattoo-library-v1.2.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000015 /* tattoo-library-v1.2.json */; };
+		300000000000000000000023 /* tattoo-library-v1.2.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000015 /* tattoo-library-v1.2.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +57,7 @@
 		100000000000000000000012 /* BeyondTattoo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeyondTattoo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		100000000000000000000013 /* Beyond Tattoo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Beyond Tattoo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		100000000000000000000014 /* BeyondTattooTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeyondTattooTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		100000000000000000000015 /* tattoo-library-v1.2.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "tattoo-library-v1.2.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +115,7 @@
 			isa = PBXGroup;
 			children = (
 				100000000000000000000010 /* Assets.xcassets */,
+				100000000000000000000015 /* tattoo-library-v1.2.json */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -240,6 +244,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				300000000000000000000010 /* Assets.xcassets in Resources */,
+				300000000000000000000022 /* tattoo-library-v1.2.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -248,6 +253,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				300000000000000000000020 /* Assets.xcassets in Resources */,
+				300000000000000000000023 /* tattoo-library-v1.2.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -480,7 +486,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -503,7 +509,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -548,7 +554,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -565,7 +571,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

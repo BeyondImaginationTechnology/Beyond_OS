@@ -36,7 +36,7 @@ struct StudiosView: View {
                 StudioCard(
                     rank: index + 1,
                     studio: studio,
-                    distanceMiles: studio.distanceMiles(from: store.userLocation)
+                    distanceKilometres: studio.distanceKilometres(from: store.userLocation)
                 )
             }
         }
@@ -49,7 +49,7 @@ struct StudiosView: View {
 private struct StudioCard: View {
     let rank: Int
     let studio: StudioLead
-    let distanceMiles: Double?
+    let distanceKilometres: Double?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -76,18 +76,20 @@ private struct StudioCard: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            HStack(spacing: 8) {
-                ForEach(studio.specialties, id: \.self) { specialty in
-                    Text(specialty)
-                        .font(.caption.weight(.semibold))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 5)
-                        .background(Color.tattooViolet.opacity(0.15), in: Capsule())
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(studio.specialties, id: \.self) { specialty in
+                        Text(specialty)
+                            .font(.caption.weight(.semibold))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 5)
+                            .background(Color.tattooViolet.opacity(0.15), in: Capsule())
+                    }
                 }
             }
 
             HStack {
-                Label(distanceText, systemImage: distanceMiles == nil ? "location.slash.fill" : "location.fill")
+                Label(distanceText, systemImage: distanceKilometres == nil ? "location.slash.fill" : "location.fill")
                 Spacer()
                 Label(studio.acceptsWalkIns ? "Walk-ins" : "Booking", systemImage: studio.acceptsWalkIns ? "figure.walk" : "calendar")
                 Spacer()
@@ -107,8 +109,8 @@ private struct StudioCard: View {
     }
 
     private var distanceText: String {
-        guard let distanceMiles else { return "Enable location" }
-        return "\(distanceMiles.formatted(.number.precision(.fractionLength(1)))) mi"
+        guard let distanceKilometres else { return "Enable location" }
+        return "\(distanceKilometres.formatted(.number.precision(.fractionLength(1)))) km"
     }
 }
 

@@ -28,22 +28,108 @@
 }
 
 .market-page .market-showcase {
-  border-color: rgba(232, 183, 90, .4);
-  background: radial-gradient(circle, rgba(102, 199, 182, .14), rgba(18, 28, 36, .4) 50%, transparent 70%);
-  box-shadow: inset 0 0 70px rgba(232, 183, 90, .09), 0 0 80px rgba(0, 0, 0, .2);
+  box-sizing: border-box;
+  width: min(35vw, 430px);
+  aspect-ratio: auto;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 26px;
+  background: rgba(8, 14, 20, .78);
+  box-shadow: 0 28px 70px rgba(0, 0, 0, .3);
+  transform: rotate(1.25deg);
 }
 
-.market-page .market-bag {
-  border-color: rgba(255, 255, 255, .2);
-  background: linear-gradient(145deg, #273643, #101820);
-  box-shadow: 0 22px 48px rgba(0, 0, 0, .42);
+.market-page .market-showcase::before,
+.market-page .market-showcase::after { content: none; }
+
+.market-page .market-showcase-top,
+.market-page .market-showcase-copy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
 }
 
-.market-page .market-bag span,
-.market-page .market-orbit.three { color: #f0c66d; }
-.market-page .market-orbit.one { color: #79d5c2; }
-.market-page .market-orbit.two { color: #ef9b78; }
-.market-page .market-orbit { background: #10171e; }
+.market-page .market-showcase-top { padding: 2px 3px 12px; }
+.market-page .market-showcase-top span {
+  color: #e8edf0;
+  font-size: .68rem;
+  font-weight: 950;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.market-page .market-showcase-top b {
+  padding: 5px 8px;
+  border: 1px solid rgba(232, 183, 90, .36);
+  border-radius: 999px;
+  color: #f0c66d;
+  font-size: .62rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.market-page .market-featured-art {
+  position: relative;
+  min-height: 255px;
+  overflow: hidden;
+  border-radius: 18px;
+  background-color: #e9e0d6;
+  background-image: url("../images/beyond-product-categories.png");
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 400% 200%;
+}
+.market-page .market-featured-art span {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: rgba(9, 16, 22, .84);
+  color: #fff;
+  font-size: .62rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+}
+
+.market-page .market-showcase-copy { padding: 13px 3px 10px; }
+.market-page .market-showcase-copy small,
+.market-page .market-showcase-copy strong { display: block; }
+.market-page .market-showcase-copy small {
+  margin-bottom: 3px;
+  color: var(--market-muted);
+  font-size: .66rem;
+  text-transform: uppercase;
+}
+.market-page .market-showcase-copy strong { font-size: 1.05rem; }
+.market-page .market-showcase-copy > span {
+  color: var(--market-accent);
+  font-size: .72rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.market-page .market-showcase-rail {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+}
+.market-page .market-showcase-rail i {
+  display: block;
+  aspect-ratio: 1.45;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 9px;
+  background-color: #e9e0d6;
+  background-image: url("../images/beyond-product-categories.png");
+  background-repeat: no-repeat;
+  background-size: 400% 200%;
+}
+.market-page .market-showcase-rail .hoodie { border-color: var(--market-accent); background-position: 0 0; }
+.market-page .market-showcase-rail .home { background-position: 33.333% 0; }
+.market-page .market-showcase-rail .prints { background-position: 66.667% 0; }
+.market-page .market-showcase-rail .carry { background-position: 100% 0; }
 
 .market-page .market-search {
   border-color: var(--market-line);
@@ -132,7 +218,7 @@
 
 .market-page .product-visual {
   background-color: #e9e0d6;
-  background-image: url("../images/beyond-product-categories.png");
+  background-image: url("../images/beyond-original-artworks.png");
   background-repeat: no-repeat;
   background-size: 400% 200%;
 }
@@ -146,24 +232,33 @@
 }
 
 .market-page .product-visual > b { z-index: 2; }
-.market-page .product-mugs .product-visual { background-position: 33.333% 0; }
-.market-page .product-posters .product-visual,
-.market-page .product-wall-art .product-visual { background-position: 66.667% 0; }
-.market-page .product-stickers .product-visual { background-position: 66.667% 100%; }
-.market-page .product-t-shirts .product-visual,
+.market-page .product-mugs .product-visual { background-position: 100% 100%; }
+.market-page .product-posters .product-visual { background-position: 33.333% 0; }
+.market-page .product-stickers .product-visual { background-position: 66.667% 0; }
+.market-page .product-t-shirts .product-visual { background-position: 100% 0; }
 .market-page .product-hoodies .product-visual { background-position: 0 0; }
 .market-page .product-phone-cases .product-visual { background-position: 0 100%; }
-.market-page .product-tote-bags .product-visual { background-position: 100% 0; }
+.market-page .product-tote-bags .product-visual { background-position: 33.333% 100%; }
+.market-page .product-wall-art .product-visual { background-position: 66.667% 100%; }
 
-.market-page .product-wallpapers .product-visual,
-.market-page .product-digital-svg .product-visual,
-.market-page .product-tattoo-prints .product-visual {
-  background-image: url("../images/beyond-original-artworks.png");
-}
-
-.market-page .product-wallpapers .product-visual { background-position: 0 0; }
+.market-page .product-wallpapers .product-visual { background-position: 100% 0; }
 .market-page .product-digital-svg .product-visual { background-position: 66.667% 100%; }
 .market-page .product-tattoo-prints .product-visual { background-position: 66.667% 0; }
+
+.market-page .product-wallpapers .product-visual::before,
+.market-page .product-digital-svg .product-visual::before,
+.market-page .product-tattoo-prints .product-visual::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 52%;
+  border-left: 3px solid rgba(255, 255, 255, .72);
+  background-image: url("../images/beyond-original-artworks.png");
+  background-repeat: no-repeat;
+  background-size: 400% 200%;
+}
+.market-page .product-wallpapers .product-visual::before { background-position: 0 100%; }
+.market-page .product-digital-svg .product-visual::before { background-position: 33.333% 100%; }
+.market-page .product-tattoo-prints .product-visual::before { background-position: 100% 100%; }
 
 .market-page .starter-art {
   margin: 18px 0;
@@ -394,10 +489,17 @@ html[data-theme="forest"] .market-page .market-jump a:first-child {
 }
 
 @media (max-width: 900px) {
+  .market-page .market-showcase {
+    width: min(76vw, 430px);
+    transform: none;
+  }
   .market-page .artwork-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 640px) {
+  .market-page .market-showcase { width: min(100%, 360px); padding: 11px; border-radius: 21px; }
+  .market-page .market-featured-art { min-height: 220px; border-radius: 14px; }
+  .market-page .market-showcase-copy strong { font-size: .95rem; }
   .market-page .artwork-grid { grid-template-columns: 1fr; }
   .market-page .creator-discovery .bos-card,
   .market-page #seller-tools .bos-card { grid-template-columns: 1fr; }

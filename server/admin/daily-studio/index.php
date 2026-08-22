@@ -12,6 +12,8 @@ $tabs=[
   'quest-assets'=>['FrenchQuest','Azure assets','frenchquest-assets.php'],
   'space'=>['Beyond Space','Horoscope generator','space-generator.php'],
   'tattoo-publish'=>['Beyond Tattoo','Publish','stencil-library.php#publish'],
+  'tattoo-assets'=>['Beyond Tattoo','55-drop assets','tattoo-asset-import.php'],
+  'remotion'=>['Video','Remotion renderer','remotion-renderer.php'],
   'voices'=>['Shared','Voices','voice-settings.php'],
 ];
 ?>

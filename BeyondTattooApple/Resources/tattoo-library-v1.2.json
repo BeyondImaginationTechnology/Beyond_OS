@@ -1,0 +1,71 @@
+{
+  "version": "1.2",
+  "season_total": 55,
+  "asset_count": 2,
+  "daily_id": "nio-guardians-2026-08-22",
+  "generated_at": "2026-08-22T00:00:00Z",
+  "collections": [
+    {
+      "id": "divine-realism",
+      "name": "Divine Realism",
+      "description": "Biblical portraiture, angels and sacred iconography composed for black-and-grey realism.",
+      "assets": ["biblical-realism-2026-07-17"]
+    },
+    {
+      "id": "japanese-legends",
+      "name": "Japanese Legends",
+      "description": "Masks, warriors, animals and mythological figures shaped for flowing Japanese compositions.",
+      "assets": ["nio-guardians-2026-08-22"]
+    }
+  ],
+  "assets": [
+    {
+      "id": "biblical-realism-2026-07-17",
+      "title": "Biblical Realism",
+      "sequence": 1,
+      "collection_id": "divine-realism",
+      "collection": "Divine Realism",
+      "release_date": "2026-07-17",
+      "display_date": "Friday, July 17, 2026",
+      "summary": "Christ portrait with crown of thorns, dove, cross, praying hands and ornamental framing.",
+      "style": "Black-and-grey realism",
+      "placement": "Upper arm, forearm, calf or upper back · 7–10 inches tall",
+      "difficulty": "Advanced",
+      "reward_bits": 25,
+      "is_released": true,
+      "preview_url": "https://beyondimagination.co.technology/beyond-tattoo/assets/stencils/divine-realism/01-biblical-realism/preview-watermarked.png",
+      "stencil_url": "https://beyondimagination.co.technology/beyond-tattoo/assets/stencils/divine-realism/01-biblical-realism/stencil-print-ready.png",
+      "transfer_url": "https://beyondimagination.co.technology/beyond-tattoo/assets/stencils/divine-realism/01-biblical-realism/studio-transfer-template.png",
+      "pdf_url": "https://beyondimagination.co.technology/beyond-tattoo/assets/stencils/divine-realism/01-biblical-realism/stencil-print-ready.pdf",
+      "reference_url": null,
+      "placement_image_url": null,
+      "pack_url": null,
+      "lore_url": null,
+      "style_card_url": null
+    },
+    {
+      "id": "nio-guardians-2026-08-22",
+      "title": "Nio Guardians",
+      "sequence": 37,
+      "collection_id": "japanese-legends",
+      "collection": "Japanese Legends",
+      "release_date": "2026-08-22",
+      "display_date": "Saturday, August 22, 2026",
+      "summary": "Agyo and Ungyo framed by peony, chrysanthemum, clouds and wind bars in a vertical sleeve composition.",
+      "style": "Japanese-inspired flow",
+      "placement": "Full sleeve focal panel",
+      "difficulty": "Advanced",
+      "reward_bits": 25,
+      "is_released": true,
+      "preview_url": "https://beyondimagination.co.technology/beyond-tattoo/assets/stencils/japanese-legends/15-nio-guardians/preview-watermarked.png",
+      "stencil_url": "https://beyondimagination.co.technology/beyond-tattoo/assets/stencils/japanese-legends/15-nio-guardians/stencil-print-ready.png",
+      "transfer_url": "https://beyondimagination.co.technology/beyond-tattoo/assets/stencils/japanese-legends/15-nio-guardians/studio-transfer-template.png",
+      "pdf_url": null,
+      "reference_url": "https://beyondimagination.co.technology/beyond-tattoo/assets/stencils/japanese-legends/15-nio-guardians/reference-artwork.webp",
+      "placement_image_url": "https://beyondimagination.co.technology/beyond-tattoo/assets/stencils/japanese-legends/15-nio-guardians/placement-mockup.webp",
+      "pack_url": "https://beyondimagination.co.technology/beyond-tattoo/assets/stencils/japanese-legends/15-nio-guardians/premium-packaging.webp",
+      "lore_url": "https://beyondimagination.co.technology/beyond-tattoo/assets/stencils/japanese-legends/15-nio-guardians/lore-card.webp",
+      "style_card_url": "https://beyondimagination.co.technology/beyond-tattoo/assets/stencils/japanese-legends/15-nio-guardians/style-card.webp"
+    }
+  ]
+}

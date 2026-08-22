@@ -4,10 +4,10 @@ Native SwiftUI companion app for Beyond Tattoo on iOS and macOS.
 
 ## Includes
 
-- Daily stencil drop with preview, save state, reward bits, and download links.
-- Collection browser seeded with all 55 storefront stencil drops, search, availability, and asset badges.
+- Version 1.2 asset-backed daily stencil with preview, save state, reward bits, and real download links.
+- Collection browser populated from the shared library manifest; only drops with actual preview and print-ready files appear.
 - Healing tracker timeline for photo logs and care milestones.
-- Location-aware studio directory showing the nearest 10 studios when location access is enabled.
+- Location-aware Canadian studio directory with nine Ottawa listings and national coverage, showing the nearest 10 in kilometres.
 - Beyond ID beta/profile shell with role switching for collectors, artists, and studios.
 
 ## Build

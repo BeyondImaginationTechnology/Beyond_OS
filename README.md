@@ -4,6 +4,30 @@ Beyond OS is a PHP-based web platform for the Beyond ecosystem: learning academi
 certificates, Beyond ID profiles, media experiences, marketplaces, and internal
 operations tools.
 
+Current release: **Beyond OS 2.4**
+
+## What's New in 2.4
+
+- A new public **What's New** destination in the main navigation brings current
+  app and project updates together in one release view.
+- **DailyBreath Web 1.2** is now an installable PWA with narrated Scripture,
+  encrypted reflection journaling, weekly challenges, activity history, and
+  recovery support.
+- **DailyBreath for Apple** adds richer offline content, Bible narration and
+  search, widgets, an App Clip, private history, and optional encrypted iCloud
+  sync.
+- **Beyond Tattoo Apple 1.2** adds asset-backed daily stencils, real downloads,
+  healing milestones, bit$ rewards, and a location-aware Canadian studio
+  directory.
+- **Beyond Studio + Remotion** adds a local trusted-project preview and H.264
+  rendering bridge, while the **Beyond French African Expansion** project adds
+  reusable vertical and feed campaign compositions.
+- Marketplace and seller work continues with connected listings, checkout,
+  fulfillment, and creator tooling.
+
+The user-facing summary lives in `release-notes.php`. Detailed implementation
+and operating notes remain in each app or project's own `README.md`.
+
 This repository contains the public application source, SQL migrations, docs,
 and Apple app project folders used across the Beyond product family. Runtime
 data, credentials, uploads, logs, generated media, local databases, dependencies,

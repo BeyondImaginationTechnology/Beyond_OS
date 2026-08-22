@@ -2,7 +2,7 @@ import SwiftUI
 
 struct LibraryView: View {
     @EnvironmentObject private var store: TattooStore
-    @State private var selectedCollectionID = "beyond-ancient"
+    @State private var selectedCollectionID = "divine-realism"
     @State private var searchText = ""
 
     private var selectedCollection: TattooCollection {
@@ -93,6 +93,20 @@ private struct ScheduleCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
+            AsyncImage(url: stencil.previewURL) { phase in
+                if case .success(let image) = phase {
+                    image.resizable().scaledToFill()
+                } else {
+                    ZStack {
+                        Color.tattooBackground
+                        Image(systemName: "photo.artframe").font(.largeTitle).foregroundStyle(Color.tattooGold)
+                    }
+                }
+            }
+            .frame(height: 210)
+            .clipped()
+            .clipShape(RoundedRectangle(cornerRadius: 7))
+
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(stencil.isoDate)

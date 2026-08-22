@@ -26,6 +26,7 @@ $isReturningLearner = !empty($learningProgress['last_lesson_id']);
         <p>Learn the phrase, hear the supported voices, then practice it.</p>
     </div>
     <div class="app-today-actions">
+        <button class="button secondary install-app" id="install-beyond-french" type="button" hidden>Install app</button>
         <a class="button secondary" href="<?= h($frenchBase) ?>archive.php">Past lessons</a>
         <a class="button primary" href="<?= h($frenchBase) ?>challenge.php<?= $lesson ? '?id=' . (int)$lesson['id'] : '' ?>">Start practice</a>
     </div>

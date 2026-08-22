@@ -23,7 +23,7 @@ function beyond_crypto_valid_address(string $network, string $address): bool
 
 function beyond_crypto_http(string $url, ?array $payload = null): array
 {
-    $headers = ['Accept: application/json', 'User-Agent: Beyond-Wallet/2.3.4'];
+    $headers = ['Accept: application/json', 'User-Agent: Beyond-Wallet/2.4'];
     $body = $payload === null ? null : json_encode($payload, JSON_UNESCAPED_SLASHES);
     if ($payload !== null) $headers[] = 'Content-Type: application/json';
     if (function_exists('curl_init')) {

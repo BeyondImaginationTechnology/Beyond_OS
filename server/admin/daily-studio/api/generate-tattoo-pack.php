@@ -67,6 +67,8 @@ try {
     $packStyle = tattooPackText($input, 'pack_style', 100, 'Premium retail hanging pack');
     $concept = tattooPackText($input, 'concept', 700);
     $placement = tattooPackText($input, 'placement', 100, 'Artist-selected placement');
+    $style = tattooPackText($input, 'style', 100, 'Black-and-grey realism');
+    $detail = tattooPackText($input, 'detail', 160, 'High realism with controlled skin breaks');
     if ($title === '' || $collection === '' || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $releaseDate)) {
         throw new RuntimeException('Choose a scheduled drop before generating its artwork.');
     }
@@ -84,6 +86,8 @@ DROP METADATA
 - Release date: {$releaseDate}
 - Season sequence: {$sequence} of 55
 - Creative context: {$concept}
+- Tattoo style: {$style}
+- Realism detail: {$detail}
 - Package format: {$packStyle}
 
 ART DIRECTION
@@ -102,9 +106,11 @@ DROP DIRECTION
 - Collection: {$collection}
 - Scheduled sequence: {$sequence} of 55
 - Creative context: {$concept}
+- Tattoo style: {$style}
+- Realism detail: {$detail}
 
 ART DIRECTION
-Build a dramatic collection-appropriate environment around the subject with dimensional lighting, realistic materials, antique gold detail, deep obsidian shadows and a restrained collection accent color. The result should look like luxury tattoo reference art: centered, symmetrical where the source is symmetrical, highly legible and rich enough to guide an artist while remaining faithful to the stencil.
+Build a dramatic collection-appropriate environment around the subject with coherent directional lighting, realistic anatomy, physically believable materials, fine surface texture, antique gold detail, deep obsidian shadows and a restrained collection accent color. Establish clear foreground, midground and background depth and resolve the focal subject more sharply than supporting elements. The result should look like luxury tattoo reference art: centered, symmetrical where the source is symmetrical, highly legible and rich enough to guide an artist while remaining faithful to the stencil.
 
 CONSTRAINTS
 No packaging, cards, mockups, people, body parts, readable text, letters, dates, numbers, logos or watermarks. Do not crop the subject. Do not add unrelated figures or replace the source design. Return one finished vertical reference artwork with safe margins.
@@ -119,9 +125,11 @@ PLACEMENT
 - Requested body placement: {$placement}
 - Collection: {$collection}
 - Creative context: {$concept}
+- Tattoo style: {$style}
+- Realism detail: {$detail}
 
 ART DIRECTION
-Show one consenting adult model in a tasteful, non-sexual, modest crop that clearly demonstrates scale and anatomical flow at the requested placement. Use a dark neutral studio background, directional rim light and natural skin texture. Keep the tattoo fully visible, undistorted and the clear focal point. Faces are unnecessary and should be outside the frame when possible.
+Show one consenting adult model in a tasteful, non-sexual, modest crop that clearly demonstrates scale and anatomical flow at the requested placement. Match the design's perspective, wrap, foreshortening and scale to the named body area. Use a dark neutral studio background, directional rim light, natural skin texture, healed ink edges and subtle ink-under-skin integration. Preserve fine realism texture, deep value separation and a crisp focal area without making the tattoo look pasted on. Keep the tattoo fully visible, undistorted and the clear focal point. Faces are unnecessary and should be outside the frame when possible.
 
 CONSTRAINTS
 Adults only. No nudity, lingerie, sexualized pose, blood, needles, active tattooing, packaging, cards, readable text, letters, dates, numbers, logos or watermarks. Do not change or mirror the design. Return one finished vertical placement mockup with safe margins.

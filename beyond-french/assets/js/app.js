@@ -12,6 +12,28 @@ document.querySelectorAll(".copy-phrase").forEach(function (button) {
   });
 });
 
+(function installBeyondFrenchWebApp() {
+  const button = document.querySelector("#install-beyond-french");
+  if (!button || window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true) return;
+  let installPrompt = null;
+  window.addEventListener("beforeinstallprompt", function (event) {
+    event.preventDefault();
+    installPrompt = event;
+    button.hidden = false;
+    button.classList.add("ready");
+  });
+  button.addEventListener("click", async function () {
+    if (!installPrompt) return;
+    button.disabled = true;
+    await installPrompt.prompt();
+    const choice = await installPrompt.userChoice;
+    installPrompt = null;
+    button.disabled = false;
+    if (choice.outcome === "accepted") button.hidden = true;
+  });
+  window.addEventListener("appinstalled", function () { button.hidden = true; });
+})();
+
 class BeyondLocalVoiceAPI {
   constructor() {
     this.synth = window.speechSynthesis;

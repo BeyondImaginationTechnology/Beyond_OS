@@ -29,8 +29,10 @@ The app works offline with bundled content and refreshes the verse, devotional, 
 
 ## Release checks
 
-- Enable the App Group and iCloud key-value-store capabilities for all required identifiers in the Apple Developer portal.
-- Archive the parent app, widget, and embedded App Clip on macOS using automatic signing.
+- In Apple Developer Certificates, Identifiers & Profiles, enable Associated Domains, App Groups, and iCloud key-value storage for `technology.co.beyondimagination.thedailybreath`; enable App Groups for `technology.co.beyondimagination.thedailybreath.widget`; and enable Associated Domains/App Clip for `technology.co.beyondimagination.thedailybreath.Clip`.
+- Attach the app and widget identifiers to `group.technology.co.beyondimagination.thedailybreath`, then allow Xcode to regenerate all three provisioning profiles.
+- Keep **Automatically manage signing** enabled for the parent app, widget, and App Clip. Do not pass a global `PROVISIONING_PROFILE_SPECIFIER` to `xcodebuild`; each bundled target requires its own profile.
+- Archive the parent app on macOS. Xcode will select distribution identities and embed the separately signed widget and App Clip.
 - Confirm the App Clip AASA file is deployed at `/.well-known/apple-app-site-association` with `application/json` content type and no redirect.
 - Generate an Xcode privacy report from the archive and keep App Store Connect privacy answers aligned with `PrivacyInfo.xcprivacy`.
 - Exercise online, offline, stale-response, malformed-response, and timeout paths before submission.

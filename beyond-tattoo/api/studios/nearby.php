@@ -12,10 +12,16 @@ $studios = array_map(static function(array $studio): array {
         'province' => $studio['province'],
         'address' => trim($studio['address_line1'] . ', ' . $studio['city'] . ', ' . $studio['province'] . ' ' . $studio['postal_code']),
         'phone' => $studio['phone'],
+        'description' => $studio['description'],
+        'services' => array_values(array_filter(array_map('trim', explode(',', (string)$studio['services'])))),
         'walk_ins' => (bool)$studio['walk_ins'],
+        'is_verified' => ($studio['verification_status'] ?? '') === 'verified',
+        'latitude' => isset($studio['latitude']) ? (float)$studio['latitude'] : null,
+        'longitude' => isset($studio['longitude']) ? (float)$studio['longitude'] : null,
         'artist_count' => (int)$studio['artist_count'],
         'profile_url' => beyond_url('beyond-tattoo/studio-profile.php?slug=' . rawurlencode($studio['slug'])),
-        'instagram_url' => $studio['instagram_url'],
+        'website_url' => $studio['website_url'] ?? $studio['instagram_url'],
+        'booking_url' => $studio['booking_url'] ?? $studio['instagram_url'],
     ];
 }, bt_list_studios($query));
-echo json_encode(['provider'=>'beyond-tattoo-directory','query'=>$query,'studios'=>$studios], JSON_UNESCAPED_SLASHES);
+echo json_encode(['version'=>'1.2','provider'=>'beyond-tattoo-directory','query'=>$query,'count'=>count($studios),'studios'=>$studios], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

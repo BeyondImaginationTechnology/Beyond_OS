@@ -1,0 +1,37 @@
+{
+  "sequence": 37,
+  "season_total": 55,
+  "title": "Nio Guardians",
+  "slug": "nio-guardians",
+  "collection": "Japanese Legends",
+  "collection_slug": "japanese-legends",
+  "release_date": "2026-08-22",
+  "status": "published",
+  "rights_confirmed": true,
+  "description": "Agyo and Ungyo framed by peony, chrysanthemum, clouds and wind bars in a vertical sleeve composition.",
+  "style": "Japanese-inspired flow",
+  "placement": "Full sleeve focal panel",
+  "composition": "Organic vertical flow",
+  "detail": "High detail with controlled open skin breaks",
+  "subjects": [
+    "Agyo",
+    "Ungyo",
+    "peony",
+    "chrysanthemum",
+    "clouds",
+    "wind bars"
+  ],
+  "assets": {
+    "preview": "preview-watermarked.png",
+    "print_ready_stencil": "stencil-print-ready.png",
+    "studio_transfer": "studio-transfer-template.png",
+    "reference_artwork": "reference-artwork.webp",
+    "placement_mockup": "placement-mockup.webp",
+    "premium_packaging": "premium-packaging.webp",
+    "lore_card": "lore-card.webp",
+    "style_card": "style-card.webp",
+    "source_stencil": "stencil-master.webp",
+    "source_transfer": "studio-transfer-source.jpeg"
+  },
+  "source": "Recovered from the Store Tattoo Assets task attachment set and integrated into Beyond OS."
+}

@@ -61,7 +61,7 @@
   };
 
   Object.assign(commonTranslations.fr, {
-    'Academy':'Académie','TV':'Télé','Games':'Jeux','Marketplace':'Marché','Beyond Academy':'Académie Beyond',
+    'Academy':'Académie','TV':'Télé','Games':'Jeux','Marketplace':'Marché','What’s New':'Nouveautés','Beyond Academy':'Académie Beyond',
     'Open learner dashboard':'Ouvrir le tableau de bord','Verify a certificate':'Vérifier un certificat','Browse academies':'Parcourir les académies',
     'Learn it.':'Apprenez.','Prove it.':'Démontrez-le.','Build real skills, complete guided lessons, pass assessments and earn verifiable Beyond-issued certificates.':'Développez de vraies compétences, suivez des leçons guidées, réussissez les évaluations et obtenez des certificats Beyond vérifiables.',
     'Beyond Certificates':'Certificats Beyond','Three pathways. Real evidence of learning.':'Trois parcours. Des preuves concrètes d’apprentissage.',
@@ -76,7 +76,7 @@
     'Every Beyond app.':'Toutes les apps Beyond.','One store.':'Une seule boutique.','List something new.':'Publiez une nouveauté.','Publish through Beyond Sell':'Publier avec Beyond Sell'
   });
   Object.assign(commonTranslations.ht, {
-    'Academy':'Akademi','TV':'Televizyon','Games':'Jwèt','Marketplace':'Mache','Beyond Academy':'Akademi Beyond',
+    'Academy':'Akademi','TV':'Televizyon','Games':'Jwèt','Marketplace':'Mache','What’s New':'Sa ki nouvo','Beyond Academy':'Akademi Beyond',
     'Open learner dashboard':'Louvri tablo elèv la','Verify a certificate':'Verifye yon sètifika','Browse academies':'Gade akademi yo',
     'Learn it.':'Aprann li.','Prove it.':'Pwouve li.','Build real skills, complete guided lessons, pass assessments and earn verifiable Beyond-issued certificates.':'Devlope bonjan ladrès, fini leson gide yo, pase evalyasyon epi resevwa sètifika Beyond ki ka verifye.',
     'Beyond Certificates':'Sètifika Beyond','Three pathways. Real evidence of learning.':'Twa chemen. Prèv reyèl ou aprann.',
@@ -91,7 +91,7 @@
     'Every Beyond app.':'Tout aplikasyon Beyond.','One store.':'Yon sèl magazen.','List something new.':'Mete yon nouvo bagay.','Publish through Beyond Sell':'Pibliye ak Beyond Sell'
   });
   Object.assign(commonTranslations.es, {
-    'Academy':'Academia','TV':'TV','Games':'Juegos','Marketplace':'Mercado','Beyond Academy':'Academia Beyond',
+    'Academy':'Academia','TV':'TV','Games':'Juegos','Marketplace':'Mercado','What’s New':'Novedades','Beyond Academy':'Academia Beyond',
     'Open learner dashboard':'Abrir panel del estudiante','Verify a certificate':'Verificar un certificado','Browse academies':'Explorar academias',
     'Learn it.':'Apréndelo.','Prove it.':'Demuéstralo.','Build real skills, complete guided lessons, pass assessments and earn verifiable Beyond-issued certificates.':'Desarrolla habilidades reales, completa lecciones guiadas, aprueba evaluaciones y obtén certificados Beyond verificables.',
     'Beyond Certificates':'Certificados Beyond','Three pathways. Real evidence of learning.':'Tres rutas. Evidencia real de aprendizaje.',
@@ -159,7 +159,7 @@
     document.querySelectorAll('#localePicker').forEach(function (picker) { picker.setAttribute('aria-label', dictionary.language); });
     document.querySelectorAll('.bos-app-store-label-full').forEach(function (label) { var value = appStoreLabels[locale] || appStoreLabels.en; if (label.textContent !== value) label.textContent = value; });
     document.querySelectorAll('.hero-actions .ghost').forEach(function (link) { var value = appStoreCtas[locale] || appStoreCtas.en; if (link.textContent !== value) link.textContent = value; });
-    document.querySelectorAll('#beyond-os-shell .bos-home-label').forEach(function (label) { if (label.textContent !== 'BEYOND OS 2.3.4') label.textContent = 'BEYOND OS 2.3.4'; });
+    document.querySelectorAll('#beyond-os-shell .bos-home-label').forEach(function (label) { if (label.textContent !== 'BEYOND OS 2.4') label.textContent = 'BEYOND OS 2.4'; });
     document.querySelectorAll('.bos-kicker,.bos-hero h1,.os,.logo').forEach(function (label) {
       var nextText = label.textContent
         .replace(/Beyond OS 2\.1 Beta/gi, 'Beyond OS · Beta Build 2.1.1')

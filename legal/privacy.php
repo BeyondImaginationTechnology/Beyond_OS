@@ -32,6 +32,9 @@ $wallet = bos_page_start('Beyond OS', 'Privacy Policy', 'Privacy practices for B
         <h2>Daily Breath iOS local data and optional iCloud sync</h2>
         <p>The Daily Breath iOS app stores journal entries, Bible notes, highlights, favorite collections, challenge progress, and daily history in protected local app storage. If you explicitly enable encrypted iCloud sync, the app encrypts that private data on your device before placing it in your Apple iCloud key-value store. The encryption key is stored through iCloud Keychain. Beyond Imagination Technology does not receive the unencrypted journal or Bible-note content through this sync feature. You may turn sync off without deleting the local copy.</p>
 
+        <h2>DailyBreath web app data</h2>
+        <p>The DailyBreath web app associates saved breathing sessions, encrypted reflection journal entries, and weekly challenge progress with your Beyond ID. Journal content is encrypted before database storage. Bible highlights, favorite collections, private Bible notes, theme, narration speed, and reduced-motion preferences are stored locally in your browser and do not automatically transfer to another device. Your browser manages the installed app and offline shell. Optional newsletter signup stores the name and email address you submit so we can deliver those messages.</p>
+
         <h2>How we use information</h2>
         <p>We use information to authenticate users, operate connected apps, sync progress, process purchases, manage rewards and wallet activity, provide support, send service notices, personalize experiences, maintain security, prevent fraud and abuse, comply with legal obligations, debug issues, analyze performance, and improve products.</p>
 

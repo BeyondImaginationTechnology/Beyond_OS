@@ -1,11 +1,11 @@
 {
-  "name": "Beyond OS 2.3.4",
+  "name": "Beyond OS 2.4",
   "short_name": "Beyond OS",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#050817",
   "theme_color": "#050817",
-  "description": "Live. Learn. Earn. Explore. Beyond OS 2.3.4.",
+  "description": "Live. Learn. Earn. Explore. Beyond OS 2.4.",
   "icons": [
     {
       "src": "assets/icons/beyond-os-192.webp",

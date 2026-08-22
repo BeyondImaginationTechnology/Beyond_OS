@@ -21,7 +21,12 @@ function bt_stencil_content(): array
     $file = bt_stencil_data_file();
     if (is_file($file)) {
         $decoded = json_decode((string)file_get_contents($file), true);
-        if (is_array($decoded)) $data = array_replace($data, $decoded);
+        $approvedIDs = array_column(bt_asset_library(), 'id');
+        if (is_array($decoded)
+            && ($decoded['library_version'] ?? '') === '1.2'
+            && in_array((string)($decoded['slug'] ?? ''), $approvedIDs, true)) {
+            $data = array_replace($data, $decoded);
+        }
     }
     return $data;
 }
@@ -32,8 +37,8 @@ function bt_stencil_save(array $data): void
     $dir = dirname($file);
     if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) throw new RuntimeException('Could not create the stencil data directory.');
     $payload = array_replace(bt_stencil_defaults(), $data);
+    $payload['library_version'] = '1.2';
     $payload['updated_at'] = gmdate('c');
     $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
     if ($json === false || file_put_contents($file, $json, LOCK_EX) === false) throw new RuntimeException('Could not save stencil settings. Check private data permissions.');
 }
-

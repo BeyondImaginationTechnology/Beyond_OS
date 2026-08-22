@@ -16,6 +16,14 @@ require __DIR__ . '/includes/header.php';
 $stencilDay = bt_stencil_content();
 $downloadFile = $stencilDay['package_url'];
 $packImage = trim((string)($stencilDay['pack_image_url'] ?? '')) ?: $stencilDay['preview_url'];
+$libraryAssets = bt_asset_library();
+$libraryCatalog = bt_library_collections();
+$libraryCounts = [];
+$libraryPreviews = [];
+foreach ($libraryAssets as $asset) {
+    $libraryCounts[$asset['collection_slug']] = ($libraryCounts[$asset['collection_slug']] ?? 0) + 1;
+    $libraryPreviews[$asset['collection_slug']] ??= $asset['preview_url'];
+}
 
 $featuredDateBadge = strtoupper($stencilDay['display_date'] ?? '');
 if (!empty($stencilDay['iso_date'])) {
@@ -29,7 +37,7 @@ if (!empty($stencilDay['iso_date'])) {
 <main class="bt-storefront" id="top">
   <div class="bt-announcement" aria-label="Store highlights">
     <div class="bt-wrap bt-announcement-inner">
-      <span>✦ Free stencils every day</span>
+      <span>✦ Asset library 1.2</span>
       <span>◆ Premium quality</span>
       <span>Studio ready</span>
       <a href="<?= e($downloadFile) ?>" download>Free stencil packs →</a>
@@ -128,10 +136,10 @@ if (!empty($stencilDay['iso_date'])) {
         <div class="bt-daily-features">
           <span>◇ <?= e($stencilDay['description']) ?></span>
           <span>✦ Easy-transfer clean lines</span>
-          <span>▣ Printer-ready PDF &amp; PNG</span>
+          <span>▣ Verified print-ready master</span>
         </div>
         <a class="bt-glow-button bt-full-button" href="<?= e($downloadFile) ?>" download>↓ Download free stencil pack</a>
-        <small>New stencil every day · 100% free · No login required</small>
+        <small>Actual approved asset · 100% free · No login required</small>
       </div>
     </div>
   </section>
@@ -143,27 +151,13 @@ if (!empty($stencilDay['iso_date'])) {
         <a href="stencils.php">View all →</a>
       </div>
       <div class="bt-collection-grid-new">
-        <a class="bt-collection-tile" href="collections.php#beyond-ancient" aria-label="Explore the Beyond Ancient collection">
-          <img src="assets/img/storefront/collection-ancient.webp" alt="Beyond Ancient collection">
-          <span class="bt-collection-date">JUL 27–AUG 7</span>
-          <div><h3>Beyond Ancient</h3><p>12 stencils</p></div>
-        </a>
-        <a class="bt-collection-tile" href="collections.php#dark-realism" aria-label="Explore the Dark Realism collection">
-          <img src="assets/img/storefront/collection-dark.webp" alt="Dark Realism collection">
-          <span class="bt-card-badge">Popular</span>
-          <span class="bt-collection-date">AUG 23–SEP 9</span>
-          <div><h3>Dark Realism</h3><p>18 stencils</p></div>
-        </a>
-        <a class="bt-collection-tile" href="collections.php#japanese-legends" aria-label="Explore the Japanese Legends collection">
-          <img src="assets/img/storefront/collection-japanese.webp" alt="Japanese Legends collection">
-          <span class="bt-collection-date">AUG 8–22</span>
-          <div><h3>Japanese Legends</h3><p>15 stencils</p></div>
-        </a>
-        <a class="bt-collection-tile" href="collections.php#divine-realism" aria-label="Explore the Divine Realism collection">
-          <img src="assets/img/storefront/collection-divine.webp" alt="Divine Realism collection">
-          <span class="bt-collection-date">JUL 17–26</span>
-          <div><h3>Divine Realism</h3><p>10 stencils</p></div>
-        </a>
+        <?php foreach ($libraryCatalog as $slug => $collection): $actualCount = $libraryCounts[$slug] ?? 0; if ($actualCount === 0) { continue; } ?>
+          <a class="bt-collection-tile" href="collections.php#<?= e($slug) ?>" aria-label="Explore the <?= e($collection['name']) ?> collection">
+            <img src="<?= e($libraryPreviews[$slug]) ?>" alt="<?= e($collection['name']) ?> verified stencil preview">
+            <span class="bt-collection-date"><?= e($collection['dates']) ?></span>
+            <div><h3><?= e($collection['name']) ?></h3><p><?= e((string)$actualCount) ?> verified <?= $actualCount === 1 ? 'asset' : 'assets' ?></p></div>
+          </a>
+        <?php endforeach; ?>
       </div>
     </div>
   </section>

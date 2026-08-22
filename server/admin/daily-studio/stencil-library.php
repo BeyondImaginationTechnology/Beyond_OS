@@ -11,7 +11,7 @@ $collectionPresets = [
     'divine-realism' => [
         'label' => 'Divine Realism Collection',
         'style' => 'Engraving realism',
-        'placement' => 'Upper arm',
+        'placement' => 'Outer upper arm',
         'composition' => 'Centered vertical emblem',
         'accent' => 'antique gold and restrained royal purple',
         'concept' => 'sacred realism, radiant geometry, devotional ornament and a strong protective silhouette',
@@ -37,11 +37,11 @@ $collectionPresets = [
     ],
     'dark-realism' => [
         'label' => 'Dark Realism Collection',
-        'style' => 'Dark illustrative blackwork',
+        'style' => 'Dark realism · Season recommended',
         'placement' => 'Calf',
         'composition' => 'Full-panel narrative composition',
         'accent' => 'burnished silver, antique gold and restrained crimson',
-        'concept' => 'gothic architecture, dramatic negative space, weathered symbolism and a cinematic high-contrast silhouette',
+        'concept' => 'cinematic dark realism, believable anatomy, dimensional gothic architecture, weathered materials, controlled micro-texture and dramatic high-contrast depth',
         'lore' => 'a visual reminder that mortality, time and shadow can sharpen purpose rather than erase it',
     ],
 ];
@@ -129,14 +129,14 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
         <small>Describe an original concept. The API prompt automatically enforces clean, transfer-ready black linework.</small>
       </div>
       <div class="row">
-        <div class="field"><label for="style">Tattoo style</label><select id="style"><option>Fine-line blackwork</option><option>Neo-traditional linework</option><option>Geometric ornamental</option><option>Engraving realism</option><option>Japanese-inspired flow</option><option>Dark illustrative blackwork</option><option>Minimalist single-line</option></select></div>
-        <div class="field"><label for="placement">Body placement</label><select id="placement"><option>Outer forearm</option><option>Upper arm</option><option>Calf</option><option>Thigh</option><option>Back panel</option><option>Sternum</option><option>Full sleeve focal panel</option></select></div>
+        <div class="field"><label for="style">Tattoo style</label><select id="style"><optgroup label="Season recommendation"><option>Dark realism · Season recommended</option></optgroup><optgroup label="Realism"><option>Black-and-grey realism</option><option>Hyperrealism</option><option>Portrait realism</option><option>Engraving realism</option><option>Surreal realism</option><option>Micro realism</option></optgroup><optgroup label="Other styles"><option>Fine-line blackwork</option><option>Neo-traditional linework</option><option>Geometric ornamental</option><option>Japanese-inspired flow</option><option>Dark illustrative blackwork</option><option>Minimalist single-line</option></optgroup></select><small>Dark Realism drops automatically use the Season One recommended style.</small></div>
+        <div class="field"><label for="placement">Body placement</label><select id="placement"><optgroup label="Arms"><option>Inner forearm</option><option>Outer forearm</option><option>Full forearm wrap</option><option>Inner bicep</option><option>Outer upper arm</option><option>Shoulder cap</option><option>Elbow panel</option><option>Wrist</option><option>Full sleeve focal panel</option><option>Half sleeve</option></optgroup><optgroup label="Torso"><option>Upper chest</option><option>Full chest panel</option><option>Sternum</option><option>Ribs / side torso</option><option>Upper back</option><option>Full back panel</option><option>Spine</option><option>Shoulder blade</option><option>Abdomen</option></optgroup><optgroup label="Legs"><option>Front thigh</option><option>Outer thigh</option><option>Inner thigh</option><option>Calf</option><option>Shin</option><option>Knee panel</option><option>Full leg sleeve focal panel</option><option>Ankle</option></optgroup><optgroup label="Other"><option>Nape / back of neck</option><option>Side of neck</option><option>Hand</option><option>Foot</option></optgroup></select><small>Choose the exact anatomy so the composition and placement mockup follow the body’s flow.</small></div>
       </div>
       <div class="row">
         <div class="field"><label for="composition">Composition</label><select id="composition"><option>Centered vertical emblem</option><option>Organic vertical flow</option><option>Symmetrical ornamental crest</option><option>Diagonal anatomical sweep</option><option>Full-panel narrative composition</option></select></div>
         <div class="field"><label for="lineWeight">Line-weight plan</label><select id="lineWeight"><option>Balanced transfer-ready hierarchy</option><option>Bold structural contours</option><option>Fine-line dominant with bold anchors</option><option>Graphic blackwork contrast</option></select></div>
       </div>
-      <div class="field"><label for="detail">Detail density</label><select id="detail"><option>High detail with controlled open skin breaks</option><option>Medium detail with generous negative space</option><option>Intricate ornamental detail</option><option>Minimal, iconic and highly readable</option></select></div>
+      <div class="field"><label for="detail">Realism detail</label><select id="detail"><optgroup label="Realism-focused"><option>High realism · anatomical accuracy, material texture and controlled skin breaks</option><option>Hyperreal detail · pores, weathering, reflections and crisp depth cues</option><option>Portrait realism · accurate features, expression, hair and fabric texture</option><option>Dark realism · deep value separation, aged texture and cinematic focal detail</option><option>Micro realism · selective fine texture with durable open space</option></optgroup><optgroup label="General"><option>High detail with controlled open skin breaks</option><option>Medium detail with generous negative space</option><option>Intricate ornamental detail</option><option>Minimal, iconic and highly readable</option></optgroup></select><small>Realism presets prioritize believable anatomy, surface texture, light direction and dimensional depth.</small></div>
       <div class="row">
         <div class="field"><label for="title">Stencil title</label><input id="title" maxlength="100" placeholder="Celestial Lion"></div>
         <div class="field"><label for="collection">Collection</label><select id="collection"><option>Divine Realism Collection</option><option>Beyond Ancient Collection</option><option>Japanese Legends Collection</option><option>Dark Realism Collection</option></select></div>
@@ -145,6 +145,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       <div class="actions"><button class="btn secondary" id="generateLore" type="button">Generate scheduled lore</button><button class="btn secondary" id="copyCaption" type="button">Copy drop caption</button></div>
       <label class="check"><input id="includeNarration" type="checkbox"> Include server narration in the Remotion video</label>
       <div class="field"><label for="stencilUpload">Or upload the approved stencil</label><input id="stencilUpload" type="file" accept="image/png,image/jpeg,image/webp"><small>The selected schedule supplies the title, collection, date, sequence and lore automatically.</small></div>
+      <div class="actions" style="margin-bottom:15px"><a class="btn secondary" href="tattoo-asset-import.php" style="text-decoration:none">Upload the complete 55-drop asset collection →</a></div>
       <label class="check"><input id="preferFreeFallback" type="checkbox" checked> Use free image source before paid API</label>
       <div class="actions"><button class="btn" id="generate" type="button">✦ Prepare free prompt</button><button class="btn secondary" id="generatePaidFallback" type="button">Use paid API fallback</button><button class="btn secondary" id="clear" type="button">Clear</button></div>
       <p class="status" id="status" role="status" aria-live="polite"></p>
@@ -267,6 +268,9 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   };
   const buildMetaStencilPrompt = () => {
     const payload = generationPayload();
+    const realismDirection = payload.style.toLowerCase().includes('realism')
+      ? ['', 'REALISM DIRECTION', 'Prioritize believable anatomy and proportions, coherent lighting, convincing material and surface texture, dimensional foreground/midground/background separation, and a sharply resolved focal area. Translate values into tattooable contour, hatching, stipple and deliberate black shapes instead of muddy gray shading.']
+      : [];
     return [
       'Create one original, premium tattoo stencil master suitable for a professional artist.',
       '',
@@ -277,6 +281,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       `- Composition: ${payload.composition}`,
       `- Line-weight plan: ${payload.line_weight}`,
       `- Detail density: ${payload.detail}`,
+      ...realismDirection,
       '',
       'OUTPUT REQUIREMENTS',
       'Return a single isolated vertical stencil on a pure white background. Crisp black linework only. No skin, body, person, studio scene, paper texture, mockup, frame, border, crop marks, typography, letters, numbers, signature, logo, watermark, color, gray wash, soft shading, drop shadow, glow, or photographic rendering. Keep the entire design inside the canvas with comfortable white margins.',
@@ -290,6 +295,8 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       `Release date: ${drop.release_date}`,
       `Season sequence: ${drop.sequence} of 55`,
       `Creative context: ${$('idea').value.trim()}`,
+      `Tattoo style: ${$('style').value}`,
+      `Realism detail: ${$('detail').value}`,
     ].join('\n');
     const lead = {
       reference: `Create a museum-quality, high-detail 2:3 vertical reference artwork for the Beyond Tattoo daily stencil "${drop.title}". Use the uploaded black-and-white stencil as the exact design blueprint. Preserve the central subject, pose, silhouette, major symbols, framing and proportions.`,
@@ -402,7 +409,11 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     $('placement').value = drop.placement;
     $('composition').value = drop.composition;
     $('lineWeight').value = 'Balanced transfer-ready hierarchy';
-    $('detail').value = 'High detail with controlled open skin breaks';
+    $('detail').value = drop.collection_slug === 'dark-realism'
+      ? 'Dark realism · deep value separation, aged texture and cinematic focal detail'
+      : drop.style.toLowerCase().includes('realism')
+        ? 'High realism · anatomical accuracy, material texture and controlled skin breaks'
+        : 'High detail with controlled open skin breaks';
     $('lore').value = drop.lore;
     $('dropNumber').textContent = `Drop ${drop.sequence} / 55`;
     $('dropDate').textContent = drop.display_date;
@@ -846,6 +857,8 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
         pack_style: $('packStyle').value,
         concept: $('idea').value.trim(),
         placement: $('placement').value,
+        style: $('style').value,
+        detail: $('detail').value,
       }),
     });
     const data = await response.json();

@@ -12,23 +12,14 @@ struct StencilDrop: Identifiable, Hashable {
     let rewardBits: Int
     let packageURL: URL
     let previewURL: URL
-    let editableURL: URL
-    let transferPDFURL: URL
-
-    static let daily = StencilDrop(
-        id: "eye-of-horus-anubis-july-27-2026",
-        title: "Eye of Horus Anubis",
-        collection: "Beyond Ancient Collection",
-        displayDate: "Monday, July 27, 2026",
-        isoDate: "2026-07-27",
-        summary: "Premium Egyptian-inspired realism with clean, transfer-ready line work.",
-        placement: "Outer forearm, 6.5-8.5 inches tall",
-        rewardBits: 25,
-        packageURL: URL(string: "https://beyondimagination.co.technology/beyond-tattoo/api/stencil-download.php?type=package")!,
-        previewURL: URL(string: "https://beyondimagination.co.technology/beyond-tattoo/assets/stencils/eye-of-horus-anubis-preview.webp")!,
-        editableURL: URL(string: "https://beyondimagination.co.technology/beyond-tattoo/api/stencil-download.php?type=editable")!,
-        transferPDFURL: URL(string: "https://beyondimagination.co.technology/beyond-tattoo/api/stencil-download.php?type=pdf")!
-    )
+    let stencilURL: URL
+    let transferURL: URL?
+    let transferPDFURL: URL?
+    let referenceURL: URL?
+    let placementImageURL: URL?
+    let packURL: URL?
+    let loreURL: URL?
+    let styleCardURL: URL?
 }
 
 struct TattooCollection: Identifiable, Hashable {
@@ -52,6 +43,9 @@ struct ScheduledStencil: Identifiable, Hashable {
     let difficulty: String
     let hasTransferAsset: Bool
     let hasEditableAsset: Bool
+    let previewURL: URL
+    let stencilURL: URL
+    let transferURL: URL?
     var id: String { name + isoDate }
 
     var isAvailable: Bool {
@@ -66,6 +60,142 @@ struct ScheduledStencil: Identifiable, Hashable {
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
+}
+
+struct TattooLibraryManifest: Decodable {
+    let version: String
+    let seasonTotal: Int
+    let assetCount: Int
+    let dailyID: String
+    let collections: [ManifestCollection]
+    let assets: [LibraryAsset]
+
+    enum CodingKeys: String, CodingKey {
+        case version, collections, assets
+        case seasonTotal = "season_total"
+        case assetCount = "asset_count"
+        case dailyID = "daily_id"
+    }
+
+    static let endpoint = URL(string: "https://beyondimagination.co.technology/beyond-tattoo/api/library.php")!
+
+    static func bundled() -> TattooLibraryManifest {
+        guard let url = Bundle.main.url(forResource: "tattoo-library-v1.2", withExtension: "json") else {
+            preconditionFailure("Beyond Tattoo 1.2 asset manifest is missing.")
+        }
+        do { return try JSONDecoder().decode(TattooLibraryManifest.self, from: Data(contentsOf: url)) }
+        catch { preconditionFailure("Beyond Tattoo 1.2 asset manifest is invalid: \(error)") }
+    }
+
+    var dailyAsset: LibraryAsset {
+        assets.first { $0.id == dailyID } ?? assets.max { $0.sequence < $1.sequence }!
+    }
+
+    var tattooCollections: [TattooCollection] {
+        collections.compactMap { collection in
+            let collectionAssets = collection.assets.compactMap { id in assets.first { $0.id == id } }.sorted { $0.sequence < $1.sequence }
+            guard !collectionAssets.isEmpty else { return nil }
+            let dates = collectionAssets.count == 1
+                ? collectionAssets[0].displayDate
+                : "\(collectionAssets.first!.releaseDate) – \(collectionAssets.last!.releaseDate)"
+            return TattooCollection(
+                id: collection.id,
+                name: collection.name,
+                dates: dates,
+                description: collection.description,
+                dropCount: collectionAssets.count,
+                stencils: collectionAssets.map(\.scheduledStencil)
+            )
+        }
+    }
+}
+
+struct ManifestCollection: Decodable {
+    let id: String
+    let name: String
+    let description: String
+    let assets: [String]
+}
+
+struct LibraryAsset: Decodable, Identifiable, Hashable {
+    let id: String
+    let title: String
+    let sequence: Int
+    let collectionID: String
+    let collection: String
+    let releaseDate: String
+    let displayDate: String
+    let summary: String
+    let style: String
+    let placement: String
+    let difficulty: String
+    let rewardBits: Int
+    let isReleased: Bool
+    let previewURL: URL
+    let stencilURL: URL
+    let transferURL: URL?
+    let pdfURL: URL?
+    let referenceURL: URL?
+    let placementImageURL: URL?
+    let packURL: URL?
+    let loreURL: URL?
+    let styleCardURL: URL?
+
+    enum CodingKeys: String, CodingKey {
+        case id, title, sequence, collection, summary, style, placement, difficulty
+        case collectionID = "collection_id"
+        case releaseDate = "release_date"
+        case displayDate = "display_date"
+        case rewardBits = "reward_bits"
+        case isReleased = "is_released"
+        case previewURL = "preview_url"
+        case stencilURL = "stencil_url"
+        case transferURL = "transfer_url"
+        case pdfURL = "pdf_url"
+        case referenceURL = "reference_url"
+        case placementImageURL = "placement_image_url"
+        case packURL = "pack_url"
+        case loreURL = "lore_url"
+        case styleCardURL = "style_card_url"
+    }
+
+    var dailyDrop: StencilDrop {
+        StencilDrop(
+            id: id,
+            title: title,
+            collection: collection,
+            displayDate: displayDate,
+            isoDate: releaseDate,
+            summary: summary,
+            placement: placement,
+            rewardBits: rewardBits,
+            packageURL: URL(string: "https://beyondimagination.co.technology/beyond-tattoo/api/stencil-download.php?type=package")!,
+            previewURL: previewURL,
+            stencilURL: stencilURL,
+            transferURL: transferURL,
+            transferPDFURL: pdfURL,
+            referenceURL: referenceURL,
+            placementImageURL: placementImageURL,
+            packURL: packURL,
+            loreURL: loreURL,
+            styleCardURL: styleCardURL
+        )
+    }
+
+    var scheduledStencil: ScheduledStencil {
+        ScheduledStencil(
+            name: title,
+            isoDate: releaseDate,
+            style: style,
+            placement: placement,
+            difficulty: difficulty,
+            hasTransferAsset: transferURL != nil,
+            hasEditableAsset: false,
+            previewURL: previewURL,
+            stencilURL: stencilURL,
+            transferURL: transferURL
+        )
+    }
 }
 
 struct HealingMilestone: Identifiable, Hashable {
@@ -90,10 +220,55 @@ struct StudioLead: Identifiable, Hashable {
     let profileURL: URL
     var id: String { name + city }
 
-    func distanceMiles(from location: CLLocation?) -> Double? {
+    func distanceKilometres(from location: CLLocation?) -> Double? {
         guard let location else { return nil }
         let studioLocation = CLLocation(latitude: latitude, longitude: longitude)
-        return location.distance(from: studioLocation) / 1_609.344
+        return location.distance(from: studioLocation) / 1_000
+    }
+}
+
+struct StudioDirectoryResponse: Decodable {
+    let version: String
+    let studios: [StudioDirectoryItem]
+
+    static let endpoint = URL(string: "https://beyondimagination.co.technology/beyond-tattoo/api/studios/nearby.php")!
+}
+
+struct StudioDirectoryItem: Decodable {
+    let slug: String
+    let name: String
+    let city: String
+    let province: String?
+    let address: String
+    let services: [String]
+    let walkIns: Bool
+    let isVerified: Bool
+    let latitude: Double?
+    let longitude: Double?
+    let profileURL: URL
+
+    enum CodingKeys: String, CodingKey {
+        case slug, name, city, province, address, services, latitude, longitude
+        case walkIns = "walk_ins"
+        case isVerified = "is_verified"
+        case profileURL = "profile_url"
+    }
+
+    var studioLead: StudioLead? {
+        guard let latitude, let longitude else { return nil }
+        return StudioLead(
+            name: name,
+            city: city,
+            region: province ?? "Canada",
+            address: address,
+            specialties: Array(services.prefix(3)),
+            responseTime: walkIns ? "Walk-ins" : "Book online",
+            isVerified: isVerified,
+            acceptsWalkIns: walkIns,
+            latitude: latitude,
+            longitude: longitude,
+            profileURL: profileURL
+        )
     }
 }
 

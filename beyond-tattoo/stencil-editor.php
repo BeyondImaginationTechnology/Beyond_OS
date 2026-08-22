@@ -2,6 +2,9 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../includes/ecosystem.php';
 $stencilMeta = require __DIR__ . '/config/stencil-day.php';
+$stencilTitle = (string)$stencilMeta['title'];
+$stencilSource = (string)$stencilMeta['transfer_png_url'];
+$stencilSlug = trim((string)(preg_replace('/[^a-z0-9]+/i', '-', $stencilTitle) ?? ''), '-');
 beyond_nav_bootstrap('Beyond Tattoo', beyond_wallet());
 ?><!doctype html>
 <html lang="en">
@@ -21,7 +24,7 @@ beyond_nav_bootstrap('Beyond Tattoo', beyond_wallet());
 <div class="app">
 <aside>
   <div class="brand">Advanced Stencil Editor</div>
-  <p class="muted">Edit, position and prepare the Celestial Rose for transfer printing or PDF export.</p>
+  <p class="muted">Edit, position and prepare <?=htmlspecialchars($stencilTitle, ENT_QUOTES, 'UTF-8')?> from the asset-backed 1.2 library.</p>
 
   <div class="toolbar" role="toolbar" aria-label="Editing tools">
     <button class="tool active" data-tool="move"><span>↔</span>Move</button>
@@ -75,7 +78,7 @@ beyond_nav_bootstrap('Beyond Tattoo', beyond_wallet());
       <div style="display:grid;gap:8px;margin-top:8px">
         <button class="btn primary" id="savePng">Save high-res PNG</button>
         <button class="btn primary" onclick="window.print()">Print / Save PDF</button>
-        <a class="btn" href="/beyond-tattoo/assets/stencils/celestial-rose-editable.svg" download="beyond-tattoo-celestial-rose-editable.svg">Download SVG source</a>
+        <a class="btn" href="/beyond-tattoo/<?=htmlspecialchars($stencilSource, ENT_QUOTES, 'UTF-8')?>" download="beyond-tattoo-<?=htmlspecialchars($stencilSlug, ENT_QUOTES, 'UTF-8')?>-source.png">Download source PNG</a>
         <button class="btn" id="reset">Reset editor</button>
       </div>
       <p class="muted">iPhone PDF: Print → pinch out preview → Share → Save to Files.</p>
@@ -91,7 +94,7 @@ beyond_nav_bootstrap('Beyond Tattoo', beyond_wallet());
       <div id="paper" class="paper letter">
         <canvas id="canvas" width="1700" height="2200" aria-label="Stencil editing canvas"></canvas>
         <div id="guideLayer" class="guide-layer"></div>
-        <div class="caption">Beyond Tattoo · Celestial Rose · <?=htmlspecialchars((string)$stencilMeta['display_date'], ENT_QUOTES, 'UTF-8')?></div>
+        <div class="caption">Beyond Tattoo · <?=htmlspecialchars($stencilTitle, ENT_QUOTES, 'UTF-8')?> · <?=htmlspecialchars((string)$stencilMeta['display_date'], ENT_QUOTES, 'UTF-8')?></div>
       </div>
     </div>
   </div>
@@ -100,7 +103,7 @@ beyond_nav_bootstrap('Beyond Tattoo', beyond_wallet());
 <script>
 'use strict';
 const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true}),paper=document.getElementById('paper'),guideLayer=document.getElementById('guideLayer'),statusEl=document.getElementById('status');
-const source=new Image(); source.src='/beyond-tattoo/assets/stencils/celestial-rose-editable.svg';
+const source=new Image(); source.src=<?=json_encode('/beyond-tattoo/' . $stencilSource)?>;
 const state={tool:'move',scale:1,rotation:0,flipX:1,flipY:1,x:0,y:0,contrast:1,brightness:1,invert:false,gray:true,weight:0,brushSize:4,zoom:1,dragging:false,lastX:0,lastY:0,marks:[],currentPath:null,guide:'off',safeMargin:false,paper:'letter',landscape:false};
 let history=[],future=[];
 function snapshot(){history.push(JSON.stringify({marks:state.marks,scale:state.scale,rotation:state.rotation,flipX:state.flipX,flipY:state.flipY,x:state.x,y:state.y,contrast:state.contrast,brightness:state.brightness,invert:state.invert,gray:state.gray,weight:state.weight}));if(history.length>40)history.shift();future=[]}
@@ -139,7 +142,7 @@ document.querySelectorAll('.shapeBtn').forEach(b=>b.onclick=()=>{snapshot();stat
 undo.onclick=()=>{if(history.length<2)return;future.push(history.pop());restore(history[history.length-1])};redo.onclick=()=>{const n=future.pop();if(!n)return;history.push(n);restore(n)};
 clearMarks.onclick=()=>{snapshot();state.marks=[];render()};reset.onclick=()=>{if(confirm('Reset all stencil edits?'))location.reload()};
 zoomIn.onclick=()=>{state.zoom=Math.min(1.5,state.zoom+.1);paper.style.transform=`scale(${state.zoom})`;zoomReset.textContent=Math.round(state.zoom*100)+'%'};zoomOut.onclick=()=>{state.zoom=Math.max(.6,state.zoom-.1);paper.style.transform=`scale(${state.zoom})`;zoomReset.textContent=Math.round(state.zoom*100)+'%'};zoomReset.onclick=()=>{state.zoom=1;paper.style.transform='scale(1)';zoomReset.textContent='100%'};
-savePng.onclick=()=>{render();const a=document.createElement('a');a.download='beyond-tattoo-celestial-rose-edited.png';a.href=canvas.toDataURL('image/png',1);a.click();setStatus('High-resolution PNG saved.')};
+savePng.onclick=()=>{render();const a=document.createElement('a');a.download=<?=json_encode('beyond-tattoo-' . $stencilSlug . '-edited.png')?>;a.href=canvas.toDataURL('image/png',1);a.click();setStatus('High-resolution PNG saved.')};
 window.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();e.shiftKey?redo.click():undo.click()}});
 </script>
 <script src="/assets/js/visitor-analytics.js" defer></script></body>

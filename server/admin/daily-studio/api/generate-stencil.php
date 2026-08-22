@@ -41,6 +41,9 @@ try {
     $composition = mb_substr(trim((string)($input['composition'] ?? 'Centered vertical emblem')), 0, 100);
     $lineWeight = mb_substr(trim((string)($input['line_weight'] ?? 'Balanced transfer-ready hierarchy')), 0, 100);
     $detail = mb_substr(trim((string)($input['detail'] ?? 'High detail with controlled open skin breaks')), 0, 120);
+    $realismDirection = str_contains(mb_strtolower($style), 'realism')
+        ? "\nREALISM DIRECTION\nPrioritize believable anatomy and proportions, coherent lighting, convincing material and surface texture, dimensional foreground/midground/background separation, and a sharply resolved focal area. Translate tonal values into tattooable contour, cross-hatching, stipple, texture marks and deliberate black shapes. Retain tiny details only where they support the focal point and will remain legible at the selected body placement; avoid muddy midtones and detail noise."
+        : '';
     $uploadedImage = trim((string)($input['stencil_image'] ?? ''));
     if ($uploadedImage !== '') {
         if (!preg_match('#^data:(image/(?:png|jpeg|webp));base64,(.+)$#s', $uploadedImage, $uploadMatch)) {
@@ -87,6 +90,7 @@ DESIGN BRIEF
 - Composition: {$composition}
 - Line-weight plan: {$lineWeight}
 - Detail density: {$detail}
+{$realismDirection}
 
 ART DIRECTION
 Build a strong readable silhouette first, then intentional internal detail. Follow the natural anatomy and visual flow of the stated placement. Use confident black transfer lines with a deliberate hierarchy: bold structural contours, medium secondary forms, and restrained fine detail. Preserve generous, purposeful negative space and open skin breaks so the design remains readable after transfer and aging. Keep the focal point unmistakable. Make every ornamental element structurally connected and tattooable. Use clean symmetry only when the concept calls for it; otherwise use balanced organic flow.

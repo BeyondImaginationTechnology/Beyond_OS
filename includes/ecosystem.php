@@ -206,7 +206,7 @@ function beyond_app_bootstrap(string $appName): array {
     require_beyond_id();
     beyond_track_app($appName);
     $wallet = beyond_wallet();
-    header('X-Beyond-OS-Version: 2.3.4');
+    header('X-Beyond-OS-Version: 2.4');
     header('X-Beyond-App: ' . preg_replace('/[^A-Za-z0-9 -]/', '', $appName));
     return beyond_nav_bootstrap($appName, $wallet);
 }
@@ -284,7 +284,7 @@ html[data-theme="sunset"] #beyond-os-shell{background:rgba(57,20,47,.95);border-
 @media(max-width:760px){#beyond-os-shell{width:100%;max-width:100vw;padding-left:7px;padding-right:7px}#beyond-os-shell .bos-row{gap:5px}#beyond-os-shell .bos-home-label,#beyond-os-shell .bos-app-label,#beyond-os-shell .bos-app,#beyond-os-shell .bos-app-store-label{display:none}#beyond-os-shell .bos-current-icon{display:block;flex:0 0 30px}#beyond-os-shell .bos-action{min-height:38px;padding:6px 8px}#beyond-os-shell .bos-actions{gap:5px}#beyond-os-shell .bos-app-store{width:40px;justify-content:center;padding:0}#beyond-os-shell .bos-account summary{padding-right:2px}}
 @media(max-width:520px){#beyond-os-shell .bos-bits{display:none}#beyond-os-shell .bos-tool-cluster,#beyond-os-shell .bos-account-cluster{gap:2px;padding:2px}}
 @media(max-width:430px){#beyond-os-shell .bos-row{gap:4px}#beyond-os-shell .bos-current-icon{display:none}#beyond-os-shell .bos-home img{width:28px;height:28px}#beyond-os-shell .bos-locale,#beyond-os-shell .bos-theme-toggle{display:grid;width:34px;height:34px;flex-basis:34px}#beyond-os-shell .bos-app-store{width:auto;min-width:58px;min-height:36px;padding:6px 9px;justify-content:center}#beyond-os-shell .bos-app-store-label-full{display:none}#beyond-os-shell .bos-app-store-label-mobile{display:inline;font-size:11px}#beyond-os-shell .bos-avatar{width:32px;height:32px;flex-basis:32px}}
-</style><nav id="beyond-os-shell" aria-label="Beyond OS navigation"><div class="bos-row"><a class="bos-home" href="' . $home . '" aria-label="Beyond OS 2.3.4" title="Beyond OS 2.3.4">' . $homeIcon . '<span class="bos-home-label">BEYOND OS 2.3.4</span></a>' . $appIdentity . '<div class="bos-actions">' . $appStoreAction . $navTools . $accountActions . '</div></div></nav>';
+</style><nav id="beyond-os-shell" aria-label="Beyond OS navigation"><div class="bos-row"><a class="bos-home" href="' . $home . '" aria-label="Beyond OS 2.4" title="Beyond OS 2.4">' . $homeIcon . '<span class="bos-home-label">BEYOND OS 2.4</span></a>' . $appIdentity . '<div class="bos-actions">' . $appStoreAction . $navTools . $accountActions . '</div></div></nav>';
 }
 
 function render_beyond_bar(string $appName, array $wallet = []): void { echo beyond_shell_markup($appName, $wallet ?: beyond_wallet()); }

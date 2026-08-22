@@ -16,6 +16,10 @@ $studioGroups = [
     ],
     'Beyond Tattoo' => [
         ['/server/admin/daily-studio/stencil-library.php', 'Generate & publish', '📤'],
+        ['/server/admin/daily-studio/tattoo-asset-import.php', '55-drop asset importer', '🖼️'],
+    ],
+    'Video' => [
+        ['/server/admin/daily-studio/remotion-renderer.php', 'Remotion renderer', '🎬'],
     ],
     'Shared tools' => [
         ['/server/admin/daily-studio/voice-settings.php', 'Voice settings', '🎙️'],
@@ -34,7 +38,7 @@ $studioGroups = [
 <body<?= $isStudio ? ' class="studio-body"' : '' ?>>
 <div class="layout<?= $isStudio ? ' studio-layout' : '' ?>">
   <aside class="sidebar<?= $isStudio ? ' studio-sidebar' : '' ?>">
-    <div class="brand"><div class="logo"><?= $isStudio ? 'BS' : 'BI' ?></div><div><strong><?= $isStudio ? 'Beyond Studio' : 'Beyond Imagination' ?></strong><div class="muted"><?= $isStudio ? 'Content workspace' : 'Admin v2.3.4' ?></div></div></div>
+    <div class="brand"><div class="logo"><?= $isStudio ? 'BS' : 'BI' ?></div><div><strong><?= $isStudio ? 'Beyond Studio' : 'Beyond Imagination' ?></strong><div class="muted"><?= $isStudio ? 'Content workspace' : 'Admin v2.4' ?></div></div></div>
     <?php if ($isStudio): ?>
       <nav class="nav studio-nav" aria-label="Beyond Studio navigation">
         <?php $homeActive = rtrim($currentPath, '/') === '/server/admin/daily-studio'; ?>

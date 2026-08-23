@@ -70,7 +70,11 @@ function africaConvertArabicDialects(string $english,string $standardArabic): ar
     curl_setopt_array($curl,[CURLOPT_POST=>true,CURLOPT_RETURNTRANSFER=>true,CURLOPT_CONNECTTIMEOUT=>15,CURLOPT_TIMEOUT=>75,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$key,'Content-Type: application/json'],CURLOPT_POSTFIELDS=>$body]);
     $raw=curl_exec($curl);$error=curl_error($curl);$status=(int)curl_getinfo($curl,CURLINFO_HTTP_CODE);curl_close($curl);
     $response=is_string($raw)?json_decode($raw,true):null;
-    if($status<200||$status>=300||!is_array($response))throw new RuntimeException($error?:'OpenAI Arabic dialect conversion failed.');
+    if($status<200||$status>=300||!is_array($response)){
+        $detail=$error;
+        if($detail===''&&is_array($response))$detail=trim((string)($response['error']['message']??$response['error']['code']??''));
+        throw new RuntimeException('OpenAI Arabic dialect conversion failed'.($detail!==''?': '.$detail:'.'));
+    }
     $text=beyond_ai_extract_text($response);$decoded=$text!==''?json_decode($text,true):null;
     if(!is_array($decoded))throw new RuntimeException('OpenAI Arabic dialect conversion returned invalid JSON.');
     $result=[

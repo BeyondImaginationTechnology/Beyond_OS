@@ -88,7 +88,7 @@
   const languageForLocale=locale=>localeLanguages[locale]||'en';
   const selectedLanguage=()=>languageForLocale(v('narratorLocale'))||v('exportLanguage')||'en';
   const selectedProvider=()=>v('narrationProvider');
-  const selectedVoice=()=>selectedProvider()==='azure'?'en-US-JennyMultilingualNeural':'';
+  const selectedVoice=()=>selectedProvider()==='azure'?({'fr-FR':'fr-FR-DeniseNeural','fr-CA':'fr-CA-SylvieNeural','es-ES':'es-ES-ElviraNeural'}[v('narratorLocale')]||''):'';
   const exportSettings=()=>({
     en:{locale:'en-US',label:'English',banner:'Today’s English Phrase',phrase:v('phrase'),pronunciation:'',meaningLabel:'What it means'},
     fr:{locale:'fr-FR',label:'French',banner:'Phrase Française du Jour',phrase:v('french'),pronunciation:v('frenchPron'),meaningLabel:'Meaning in English'},

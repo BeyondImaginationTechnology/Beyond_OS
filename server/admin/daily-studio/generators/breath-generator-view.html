@@ -338,7 +338,7 @@
   const nextFrame=()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
   const narrationLocale = () => document.querySelector('input[name="narrationLanguage"]:checked')?.value || 'en-US';
   const selectedProvider = () => value('narrationProvider');
-  const selectedVoice = () => selectedProvider()==='azure' ? 'en-US-JennyMultilingualNeural' : '';
+  const selectedVoice = () => selectedProvider()==='azure' ? 'en-US-JennyNeural' : '';
   function narrationText(){
     const locale=narrationLocale();
     if(locale==='fr-FR')return `Bienvenue au Souffle du Jour. ${value('heading')}. ${value('verse')} ${value('reference')}. ${value('footer')}`;

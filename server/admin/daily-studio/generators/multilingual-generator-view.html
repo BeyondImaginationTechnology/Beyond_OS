@@ -90,7 +90,7 @@
   const languageForLocale=locale=>localeLanguages[locale]||'fr';
   const selectedLanguage=()=>languageForLocale(v('narratorLocale'))||v('exportLanguage')||'fr';
   const selectedProvider=()=>v('narrationProvider');
-  const selectedVoice=()=>selectedProvider()==='azure'?'en-US-JennyMultilingualNeural':'';
+  const selectedVoice=()=>selectedProvider()==='azure'?({'fr-FR':'fr-FR-DeniseNeural','it-IT':'it-IT-IsabellaNeural','de-DE':'de-DE-KatjaNeural','ru-RU':'ru-RU-SvetlanaNeural','pt-PT':'pt-PT-RaquelNeural'}[v('narratorLocale')]||''):'';
   const exportSettings=(language=v('exportLanguage'))=>({
     fr:{locale:'fr-FR',label:'French',banner:'Phrase Française du Jour',phrase:v('french'),pronunciation:v('frenchPron'),meaningLabel:'Meaning in English'},
     it:{locale:'it-IT',label:'Italian',banner:'Phrase Française du Jour',phrase:v('italian'),pronunciation:v('italianPron'),meaningLabel:'Meaning in English'},
@@ -395,5 +395,4 @@
 </script>
 </body>
 </html>
-
 

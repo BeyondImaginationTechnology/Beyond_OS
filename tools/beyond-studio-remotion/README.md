@@ -46,10 +46,33 @@ The cloud bridge supports these environment variables:
   `0.0.0.0` only inside a secured container network.
 - `PORT` or `BEYOND_STUDIO_REMOTION_PORT` — defaults to `4317`.
 - `BEYOND_STUDIO_REMOTION_TOKEN` — required bearer token for cloud API calls.
+- `BEYOND_STUDIO_REMOTION_AI_TOKEN` — separate bearer token for AI tool calls.
+  It can list trusted imports and render them, but cannot upload or execute new code.
 - `BEYOND_STUDIO_REMOTION_ORIGINS` — optional comma-separated HTTPS origins.
 
 Cloud hosts must have the `unzip` command installed so uploaded Remotion ZIP
 projects can be inspected and extracted safely.
+
+## Meta AI / model tool calls
+
+Meta's model API can request tool calls, while your calling application executes
+them. Register the bridge's OpenAPI document as the tool contract:
+
+```text
+https://render.beyondimagination.co.technology/api/ai/openapi.json
+```
+
+Send `BEYOND_STUDIO_REMOTION_AI_TOKEN` as a bearer token. The scoped API can:
+
+1. `GET /api/ai/artifacts` — list projects already imported and trusted by a
+   Beyond Studio administrator.
+2. `POST /api/ai/renders` — start a render with an `artifactId` and
+   `compositionId`.
+3. `GET /api/ai/jobs/{jobId}` — poll status and receive the download path.
+
+The AI API intentionally cannot upload a ZIP or HTML artifact. This prevents a
+prompt or external model from introducing arbitrary executable code to the
+renderer. Import and approve projects through the Studio UI first.
 
 ## AWS EC2
 

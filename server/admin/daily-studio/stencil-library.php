@@ -145,7 +145,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       <div class="actions"><button class="btn secondary" id="generateLore" type="button">Generate scheduled lore</button><button class="btn secondary" id="copyCaption" type="button">Copy drop caption</button></div>
       <label class="check"><input id="includeNarration" type="checkbox"> Include server narration in the Remotion video</label>
       <div class="field"><label for="stencilUpload">Or upload the approved stencil</label><input id="stencilUpload" type="file" accept="image/png,image/jpeg,image/webp"><small>The selected schedule supplies the title, collection, date, sequence and lore automatically.</small></div>
-      <div class="actions" style="margin-bottom:15px"><a class="btn secondary" href="tattoo-asset-import.php" style="text-decoration:none">Upload the complete 55-drop asset collection →</a></div>
+      <div class="actions" style="margin-bottom:15px"><a class="btn secondary" href="tattoo-asset-import.php" style="text-decoration:none">Upload assets to the private inbox →</a></div>
       <label class="check"><input id="preferFreeFallback" type="checkbox" checked> Use free image source before paid API</label>
       <div class="actions"><button class="btn" id="generate" type="button">✦ Prepare free prompt</button><button class="btn secondary" id="generatePaidFallback" type="button">Use paid API fallback</button><button class="btn secondary" id="clear" type="button">Clear</button></div>
       <p class="status" id="status" role="status" aria-live="polite"></p>

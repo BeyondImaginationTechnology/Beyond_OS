@@ -45,7 +45,7 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Beyond Tattoo · 55-drop asset importer</title>
+<title>Beyond Tattoo · Asset inbox</title>
 <style>
 :root{--ink:#08090b;--panel:#121214;--line:#303034;--gold:#d8ab52;--muted:#99958d;--green:#78d49a;--red:#ff9ba0}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 90% 0,#392419 0,transparent 34rem),var(--ink);color:#fff;font:15px/1.5 Inter,system-ui,sans-serif}button,input,select{font:inherit}.wrap{width:min(1320px,calc(100% - 36px));margin:auto;padding:34px 0 60px}.top{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:24px}.eyebrow{color:var(--gold);font-size:11px;font-weight:950;letter-spacing:.17em;text-transform:uppercase}h1{margin:7px 0;font:700 clamp(36px,6vw,66px)/.96 Georgia,serif}.lead{max-width:780px;margin:0;color:#bbb5ab}.back{color:#e7ca8f;text-decoration:none;font-weight:900}.grid{display:grid;grid-template-columns:minmax(310px,.72fr) minmax(560px,1.28fr);gap:20px}.panel{padding:22px;border:1px solid var(--line);border-radius:22px;background:rgba(18,18,20,.95);box-shadow:0 24px 70px #0008}.panel h2{margin:0 0 15px}.field{margin-bottom:14px}.field[hidden]{display:none}.field label{display:block;margin-bottom:6px;font-weight:850}.field small{display:block;margin-top:5px;color:var(--muted)}.field input,.field select{width:100%;padding:12px;border:1px solid #3a3a3e;border-radius:11px;background:#0c0d0f;color:#fff}.check{display:flex;align-items:center;gap:9px;margin:10px 0;color:#ddd8ce;font-weight:800}.check input{width:18px;height:18px;accent-color:var(--gold)}.btn{width:100%;padding:13px 16px;border:0;border-radius:12px;background:linear-gradient(135deg,#d8ab52,#b78027);color:#090a0b;font-weight:950;cursor:pointer}.btn:disabled{opacity:.45;cursor:wait}.note{margin:15px 0;padding:12px;border:1px solid #594725;border-radius:12px;background:#211a10;color:#dec48d}.note strong{color:#fff}.progress{height:10px;margin-top:15px;overflow:hidden;border-radius:999px;background:#29292d}.progress span{display:block;width:0;height:100%;background:linear-gradient(90deg,#b78027,#f0cf87);transition:width .18s}.status{min-height:46px;margin:10px 0 0;color:#d9bd83;font-weight:750}.status.error{color:var(--red)}.summary{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}.summary div{padding:12px;border:1px solid #343438;border-radius:12px;background:#0d0e10}.summary b{display:block;color:var(--gold);font-size:22px}.summary span{color:var(--muted);font-size:11px;text-transform:uppercase}.table-wrap{max-height:760px;overflow:auto;border:1px solid #303034;border-radius:14px}table{width:100%;border-collapse:collapse}th,td{padding:10px 11px;border-bottom:1px solid #29292d;text-align:left;vertical-align:top}th{position:sticky;top:0;z-index:2;background:#1c1c1f;color:#d9c28f;font-size:11px;text-transform:uppercase}td:first-child{color:var(--gold);font-weight:950}.drop-title{font-weight:850}.drop-meta,.file-name{color:#8f8d88;font-size:12px}.mapped-file{display:block;margin-bottom:4px;color:#cbc6bd}.mapped-file b{color:#e7ca8f}.asset-state{display:inline-flex;padding:4px 7px;border-radius:999px;background:#252529;color:#aaa;font-size:11px;font-weight:900}.asset-state.ready{background:#183221;color:var(--green)}.asset-state.queued{background:#352a17;color:#e7c778}.asset-state.failed{background:#3b1c20;color:var(--red)}.approve-btn{display:block;margin-top:6px;padding:5px 8px;border:1px solid #69552d;border-radius:8px;background:#211b10;color:#e8ca8c;font-size:10px;font-weight:900;cursor:pointer}.approve-btn:disabled{opacity:.38;cursor:not-allowed}.approve-btn.published{border-color:#285b39;background:#14271a;color:var(--green)}@media(max-width:900px){.top{display:block}.back{display:inline-block;margin-top:14px}.grid{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.wrap{width:min(100% - 22px,700px);padding-top:22px}}
 </style>
@@ -55,21 +55,21 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
 </head>
 <body>
 <main class="wrap">
-  <header class="top"><div><div class="eyebrow">Beyond Studio · Beyond Tattoo</div><h1>55-drop asset importer</h1><p class="lead">Upload approved previews, print-ready stencils, or transfer templates and map them directly onto the complete Season One schedule. Future drops remain hidden until their release date.</p></div><a class="back" href="stencil-library.php">← Generator &amp; publisher</a></header>
+  <header class="top"><div><div class="eyebrow">Beyond Studio · Beyond Tattoo</div><h1>Asset inbox</h1><p class="lead">Upload everything you have now, keep every original private, and sort it into drops, packs, roles, and categories later.</p></div><a class="back" href="stencil-library.php">← Generator &amp; publisher</a></header>
   <section class="panel inbox">
-    <h2>Unsorted 55-stencil inbox</h2>
-    <p class="lead">Stage one private batch of exactly 55 original stencil images. Nothing is assigned or published; a manifest is prepared for the later GPT sorting pass.</p>
+    <h2>Unsorted asset inbox</h2>
+    <p class="lead">Stage any number of mixed tattoo assets—50, 100, or more. Nothing is assigned or published; filenames and originals are preserved for a later sorting pass.</p>
     <div class="inbox-grid">
-      <div class="field"><label for="inboxFiles">Choose 55 unsorted stencils</label><input id="inboxFiles" type="file" accept="image/png,image/jpeg,image/webp" multiple><small>PNG, JPG, or WebP · 20 MB maximum each · originals are preserved.</small></div>
-      <button class="btn" id="uploadInbox" type="button" disabled>Stage batch for GPT</button>
+      <div class="field"><label for="inboxFiles">Choose unsorted assets</label><input id="inboxFiles" type="file" accept=".png,.jpg,.jpeg,.webp,.gif,.heic,.heif,.svg,.pdf,.zip,.mp4,.mov,image/*,video/mp4,video/quicktime,application/pdf,application/zip" multiple><small>iPhone photos and videos, other images, SVG, PDF, or ZIP · up to 500 files per batch (repeat anytime) · 100 MB maximum each.</small></div>
+      <button class="btn" id="uploadInbox" type="button" disabled>Upload to private inbox</button>
     </div>
     <div class="progress" aria-hidden="true"><span id="inboxProgress"></span></div>
-    <p class="status" id="inboxStatus" role="status" aria-live="polite">Choose exactly 55 stencil images.</p>
+    <p class="status" id="inboxStatus" role="status" aria-live="polite">Choose any assets you have so far. You can organize them later.</p>
     <p class="batch-id" id="inboxBatchId"></p>
   </section>
   <section class="grid">
     <article class="panel">
-      <h2>Upload tattoo assets</h2>
+      <h2>Optional: organize assets now</h2>
       <div class="field"><label for="mode">How should assets be assigned?</label><select id="mode"><option value="roleBatch">Numbered files (recommended)</option><option value="exact">Choose one numbered drop</option><option value="auto">Upload organized asset folders</option></select><small>Files named 01, 02, … 55 map directly to the matching drop.</small></div>
       <div class="field" id="dropField" hidden><label for="drop">Numbered drop</label><select id="drop"><?php foreach ($drops as $drop): ?><option value="<?= (int)$drop['sequence'] ?>"><?= str_pad((string)$drop['sequence'], 2, '0', STR_PAD_LEFT) ?> · <?= htmlspecialchars($drop['title']) ?> — <?= htmlspecialchars($drop['collection']) ?></option><?php endforeach; ?></select><small>This is the safest option when a filename is unclear.</small></div>
       <div class="field" id="roleField" hidden><label for="role">Asset type</label><select id="role"><option value="preview">Public preview</option><option value="stencil">Print-ready stencil</option><option value="transfer">Studio transfer template</option><option value="pdf">Printable PDF</option><option value="reference">Reference artwork</option><option value="placement">Placement mockup</option><option value="pack">Premium packaging</option><option value="lore">Lore card</option><option value="style">Style card</option></select></div>
@@ -110,9 +110,12 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
   let inboxCompleted = 0;
   const syncInbox = () => {
     const count = $('inboxFiles').files.length;
-    $('uploadInbox').disabled = count !== 55;
-    $('inboxStatus').textContent = count === 55 ? '55 stencils selected. Ready to stage the private batch.' : `${count} selected · choose exactly 55.`;
-    $('inboxStatus').classList.toggle('error', count > 0 && count !== 55);
+    const valid = count > 0 && count <= 500;
+    $('uploadInbox').disabled = !valid;
+    $('inboxStatus').textContent = count === 0
+      ? 'Choose any assets you have so far. You can organize them later.'
+      : (valid ? `${count} asset${count === 1 ? '' : 's'} selected. Ready for the private inbox.` : `${count} selected · upload at most 500 files in one batch.`);
+    $('inboxStatus').classList.toggle('error', count > 500);
     $('inboxProgress').style.width = '0%';
     $('inboxBatchId').textContent = '';
     inboxBatchId = '';
@@ -121,26 +124,27 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
   $('inboxFiles').addEventListener('change', syncInbox);
   $('uploadInbox').addEventListener('click', async () => {
     const files = [...$('inboxFiles').files];
-    if (files.length !== 55) return syncInbox();
+    if (files.length < 1 || files.length > 500) return syncInbox();
+    const total = files.length;
     $('uploadInbox').disabled = true;
     try {
       for (const [index, file] of files.entries()) {
         if (index < inboxCompleted) continue;
-        $('inboxStatus').textContent = `Staging ${index + 1} of 55 · ${file.name}…`;
+        $('inboxStatus').textContent = `Uploading ${index + 1} of ${total} · ${file.name}…`;
         const body = new FormData();
-        body.append('stencil', file, file.name);
+        body.append('asset', file, file.name);
         body.append('position', String(index + 1));
-        body.append('expected_count', '55');
+        body.append('total_count', String(total));
         if (inboxBatchId) body.append('batch_id', inboxBatchId);
         const response = await fetch('api/upload-tattoo-stencil-batch.php', {method: 'POST', headers: {'X-CSRF-Token': csrf}, body});
         const data = await response.json();
-        if (!response.ok || !data.ok) throw new Error(data.error || `Stencil ${index + 1} failed.`);
+        if (!response.ok || !data.ok) throw new Error(data.error || `Asset ${index + 1} failed.`);
         inboxBatchId = data.batch_id;
         inboxCompleted++;
-        $('inboxProgress').style.width = `${Math.round((inboxCompleted / 55) * 100)}%`;
+        $('inboxProgress').style.width = `${Math.round((inboxCompleted / total) * 100)}%`;
         $('inboxBatchId').textContent = `Batch: ${inboxBatchId}`;
       }
-      $('inboxStatus').textContent = 'All 55 stencils are staged privately and ready for GPT sorting.';
+      $('inboxStatus').textContent = `${inboxCompleted} asset${inboxCompleted === 1 ? '' : 's'} safely uploaded. Leave them unsorted or organize them later.`;
       $('inboxStatus').classList.remove('error');
     } catch (error) {
       $('inboxStatus').textContent = `${inboxCompleted} staged. ${error.message || 'Batch upload failed.'} Keep this selection and retry after checking the server.`;

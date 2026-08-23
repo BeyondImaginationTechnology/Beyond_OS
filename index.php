@@ -89,12 +89,9 @@ $homeMarketUrl = (int)$homeMarketListing['id'] > 0
     ? '/beyond-sell/listing.php?id=' . (int)$homeMarketListing['id']
     : '/beyond-market/#shop';
 $homeMarketFeedIsPublished = $homeMarketListings !== [];
-$homeMarketFeed = $homeMarketFeedIsPublished ? $homeMarketListings : [
-    ['id'=>0,'title'=>'Midnight Horizon Premium Hoodie','item_type'=>'physical','listing_type'=>'buy_now','price_cash'=>63.59,'price_bits'=>null,'currency'=>'USD','seller'=>'Beyond Studio','visual'=>'hoodie','market_url'=>'/beyond-tattoo/stencil-editor.php?source=market&product=hoodies&art=atom-gateway'],
-    ['id'=>0,'title'=>'Caribbean Sunrise Art Print','item_type'=>'physical','listing_type'=>'buy_now','price_cash'=>27.87,'price_bits'=>null,'currency'=>'USD','seller'=>'Beyond Studio','visual'=>'art-print','market_url'=>'/beyond-tattoo/stencil-editor.php?source=market&product=posters&art=caribbean-sunrise'],
-    ['id'=>0,'title'=>'Celestial Moth Holographic Sticker','item_type'=>'physical','listing_type'=>'buy_now','price_cash'=>7.57,'price_bits'=>null,'currency'=>'USD','seller'=>'Beyond Studio','visual'=>'sticker','market_url'=>'/beyond-tattoo/stencil-editor.php?source=market&product=stickers&art=celestial-moth'],
-    ['id'=>0,'title'=>'Atom Gateway Hardcover Journal','item_type'=>'physical','listing_type'=>'buy_now','price_cash'=>25.90,'price_bits'=>null,'currency'=>'USD','seller'=>'Beyond Studio','visual'=>'journal','market_url'=>'/beyond-tattoo/stencil-editor.php?source=market&product=stationery&art=atom-gateway'],
-];
+$homeMarketFeed = $homeMarketFeedIsPublished
+    ? $homeMarketListings
+    : require __DIR__ . '/beyond-market/data/redbubble-featured.php';
 $homeGameDemos = [];
 try {
     $homeGamesJson = file_get_contents(__DIR__ . '/beyond-games/data/games.json');
@@ -384,7 +381,7 @@ $homeLiveControls = [
     <div>
       <span class="home-market__kicker"><i></i> LIVE MARKETPLACE</span>
       <h2 id="homeMarketTitle">Fresh from Beyond Market.</h2>
-      <p><?=$homeMarketFeedIsPublished ? 'New active listings flow here automatically from Beyond Sell.' : 'The Beyond Studio launch collection is live. Community listings join this carousel automatically.'?></p>
+      <p><?=$homeMarketFeedIsPublished ? 'New active listings flow here automatically from Beyond Sell.' : 'Shop real products from independent artists. Checkout and fulfillment happen securely on Redbubble.'?></p>
     </div>
     <div class="home-market__heading-actions">
       <a class="home-market__sell" href="/beyond-sell/">Start selling</a>
@@ -404,21 +401,24 @@ $homeLiveControls = [
       if ((float)($marketItem['price_cash'] ?? 0) > 0) {
           $marketPriceParts[] = '$' . number_format((float)$marketItem['price_cash'], 2) . ' ' . (string)($marketItem['currency'] ?? 'CAD');
       }
-      $marketPriceLabel = $marketPriceParts ? implode(' or ', $marketPriceParts) : 'Free';
+      $marketPriceLabel = isset($marketItem['price_label'])
+          ? (string)$marketItem['price_label']
+          : ($marketPriceParts ? implode(' or ', $marketPriceParts) : 'Free');
       $marketItemUrl = (string)($marketItem['market_url'] ?? ('/beyond-sell/listing.php?id=' . (int)($marketItem['id'] ?? 0)));
+      $marketItemExternal = !empty($marketItem['external']);
       $marketItemType = (string)($marketItem['item_type'] ?? 'digital');
       $marketVisualOptions = ['hoodie','art-print','sticker','journal'];
       $marketVisual = (string)($marketItem['visual'] ?? $marketVisualOptions[$marketIndex % count($marketVisualOptions)]);
       $marketSeller = (string)($marketItem['seller'] ?? 'Live listing');
     ?>
     <article class="home-market-card" data-market-slide>
-      <a class="home-market-card__visual home-market-card__visual--<?=e($marketVisual)?>" href="<?=e($marketItemUrl)?>">
+      <a class="home-market-card__visual home-market-card__visual--<?=e($marketVisual)?>" href="<?=e($marketItemUrl)?>"<?=$marketItemExternal ? ' target="_blank" rel="external noopener"' : ''?>>
         <span class="home-market-card__badge"><?=e(ucwords(str_replace('_', ' ', (string)($marketItem['listing_type'] ?? 'listing'))))?></span>
-        <span class="home-market-card__preview">BEYOND MARKET</span>
+        <span class="home-market-card__preview"><?=$marketItemExternal ? 'SOLD ON REDBUBBLE' : 'BEYOND MARKET'?></span>
       </a>
       <div class="home-market-card__copy">
         <small><?=e(ucfirst($marketItemType))?> · <?=e($marketSeller)?></small>
-        <h3><a href="<?=e($marketItemUrl)?>"><?=e((string)($marketItem['title'] ?? 'Marketplace listing'))?></a></h3>
+        <h3><a href="<?=e($marketItemUrl)?>"<?=$marketItemExternal ? ' target="_blank" rel="external noopener"' : ''?>><?=e((string)($marketItem['title'] ?? 'Marketplace listing'))?></a></h3>
         <div><strong><?=e($marketPriceLabel)?></strong><button type="button" data-market-save aria-label="Save <?=e((string)($marketItem['title'] ?? 'listing'))?>" aria-pressed="false">♡</button></div>
       </div>
     </article>

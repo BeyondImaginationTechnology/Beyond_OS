@@ -16,6 +16,7 @@ const imports = new Map();
 const port = Number(process.env.PORT || process.env.BEYOND_STUDIO_REMOTION_PORT || 4317);
 const host = process.env.BEYOND_STUDIO_REMOTION_HOST || '127.0.0.1';
 const accessToken = process.env.BEYOND_STUDIO_REMOTION_TOKEN || '';
+const aiAccessToken = process.env.BEYOND_STUDIO_REMOTION_AI_TOKEN || '';
 const configuredOrigins = (process.env.BEYOND_STUDIO_REMOTION_ORIGINS || '')
   .split(',')
   .map((origin) => origin.trim().replace(/\/$/, ''))
@@ -54,13 +55,28 @@ const allowedOrigin = (origin) => {
     return null;
   }
 };
-const tokenMatches = (request) => {
-  if (!accessToken) return true;
+const tokenMatches = (request, expectedToken = accessToken) => {
+  if (!expectedToken) return true;
   const header = String(request.headers.authorization || '');
   const supplied = header.startsWith('Bearer ') ? header.slice(7) : '';
-  const expectedBuffer = Buffer.from(accessToken);
+  const expectedBuffer = Buffer.from(expectedToken);
   const suppliedBuffer = Buffer.from(supplied);
   return expectedBuffer.length === suppliedBuffer.length && timingSafeEqual(expectedBuffer, suppliedBuffer);
+};
+const aiTokenMatches = (request) => aiAccessToken !== '' && tokenMatches(request, aiAccessToken);
+const readJsonBody = async (request, maxBytes = 64 * 1024) => {
+  const chunks = [];
+  let bytes = 0;
+  for await (const chunk of request) {
+    bytes += chunk.length;
+    if (bytes > maxBytes) throw new Error('JSON request is too large.');
+    chunks.push(chunk);
+  }
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
+  } catch (_) {
+    throw new Error('Request body must be valid JSON.');
+  }
 };
 const exists = async (path) => access(path).then(() => true).catch(() => false);
 const run = (command, args, options = {}) => new Promise((resolvePromise, reject) => {
@@ -340,6 +356,81 @@ const startRender = async (artifact, compositionId) => {
   return job;
 };
 
+const publicArtifact = (artifact) => ({
+  id: artifact.id,
+  name: artifact.name,
+  type: artifact.type,
+  createdAt: new Date(artifact.createdAt).toISOString(),
+  compositions: artifact.compositions,
+});
+
+const publicJob = (job) => ({
+  id: job.id,
+  artifactId: job.artifactId,
+  compositionId: job.compositionId,
+  status: job.status,
+  progress: job.progress,
+  error: job.error,
+  downloadPath: job.status === 'complete' ? `/api/ai/jobs/${job.id}/download` : null,
+});
+
+const requestBaseUrl = (request) => {
+  const forwardedProtocol = String(request.headers['x-forwarded-proto'] || '').split(',')[0].trim().toLowerCase();
+  const protocol = ['http', 'https'].includes(forwardedProtocol) ? forwardedProtocol : 'http';
+  const forwardedHost = String(request.headers['x-forwarded-host'] || '').split(',')[0].trim();
+  const candidateHost = forwardedHost || String(request.headers.host || `127.0.0.1:${port}`);
+  const safeHost = /^[a-z0-9.-]+(?::\d+)?$/i.test(candidateHost) ? candidateHost : `127.0.0.1:${port}`;
+  return `${protocol}://${safeHost}`;
+};
+
+const aiOpenApi = (request) => ({
+  openapi: '3.1.0',
+  info: {
+    title: 'Beyond Studio Remotion AI API',
+    version: '1.0.0',
+    description: 'Render only trusted artifacts that an administrator has already imported into Beyond Studio. This API cannot upload or execute new source code.',
+  },
+  servers: [{url: requestBaseUrl(request)}],
+  security: [{bearerAuth: []}],
+  paths: {
+    '/api/ai/artifacts': {
+      get: {
+        operationId: 'listBeyondStudioArtifacts',
+        summary: 'List trusted artifacts and their renderable compositions',
+        responses: {'200': {description: 'Trusted artifacts currently available in the renderer'}},
+      },
+    },
+    '/api/ai/renders': {
+      post: {
+        operationId: 'createBeyondStudioRender',
+        summary: 'Start an H.264 render from a trusted artifact',
+        requestBody: {
+          required: true,
+          content: {'application/json': {schema: {
+            type: 'object',
+            additionalProperties: false,
+            required: ['artifactId', 'compositionId'],
+            properties: {
+              artifactId: {type: 'string', format: 'uuid', description: 'ID returned by listBeyondStudioArtifacts'},
+              compositionId: {type: 'string', minLength: 1, maxLength: 160},
+            },
+          }}},
+        },
+        responses: {'202': {description: 'Render accepted'}, '404': {description: 'Artifact or composition not found'}},
+      },
+    },
+    '/api/ai/jobs/{jobId}': {
+      get: {
+        operationId: 'getBeyondStudioRender',
+        summary: 'Read render progress and the download path when complete',
+        parameters: [{name: 'jobId', in: 'path', required: true, schema: {type: 'string', format: 'uuid'}}],
+        responses: {'200': {description: 'Current render status'}, '404': {description: 'Render job not found'}},
+      },
+    },
+  },
+  components: {securitySchemes: {bearerAuth: {type: 'http', scheme: 'bearer'}}},
+});
+
 const sendDownload = async (response, job) => {
   if (job.status !== 'complete' || !await exists(job.output)) return json(response, 404, {ok: false, error: 'Render output is not ready.'});
   const info = await stat(job.output);
@@ -353,6 +444,7 @@ const sendDownload = async (response, job) => {
 };
 
 const server = createServer(async (request, response) => {
+  const url = new URL(request.url || '/', `http://127.0.0.1:${port}`);
   const origin = allowedOrigin(request.headers.origin);
   response.beyondOrigin = origin || 'null';
   if (request.headers.origin && !origin) {
@@ -362,11 +454,14 @@ const server = createServer(async (request, response) => {
     response.writeHead(204, corsHeaders(response.beyondOrigin));
     return response.end();
   }
-  const isCapabilityDownload = /^\/api\/jobs\/[a-f0-9-]+\/download(?:\?|$)/.test(request.url || '');
-  if (request.url?.startsWith('/api/') && !isCapabilityDownload && !tokenMatches(request)) {
-    return json(response, 401, {ok: false, error: 'A valid render bridge token is required.'});
+  const isCapabilityDownload = /^\/api\/jobs\/[a-f0-9-]+\/download$/.test(url.pathname);
+  const isPublicHealth = request.method === 'GET' && url.pathname === '/api/health';
+  const isPublicAiSchema = request.method === 'GET' && url.pathname === '/api/ai/openapi.json';
+  const isAiApi = url.pathname.startsWith('/api/ai/');
+  if (url.pathname.startsWith('/api/') && !isCapabilityDownload && !isPublicHealth && !isPublicAiSchema) {
+    const validToken = isAiApi ? aiTokenMatches(request) : tokenMatches(request, accessToken);
+    if (!validToken) return json(response, 401, {ok: false, error: 'A valid render bridge token is required.'});
   }
-  const url = new URL(request.url || '/', `http://127.0.0.1:${port}`);
   try {
     if (request.method === 'GET' && (url.pathname === '/' || url.pathname === '/studio')) {
       const studioPath = join(repositoryRoot, 'server', 'admin', 'daily-studio', 'remotion-renderer.php');
@@ -389,8 +484,36 @@ const server = createServer(async (request, response) => {
         version: 2,
         runtime: process.version,
         remotionReady: await exists(remotionCli),
+        aiApiReady: Boolean(aiAccessToken),
         maxUploadBytes,
       });
+    }
+    if (request.method === 'GET' && url.pathname === '/api/ai/openapi.json') {
+      return json(response, 200, aiOpenApi(request));
+    }
+    if (request.method === 'GET' && (url.pathname === '/api/artifacts' || url.pathname === '/api/ai/artifacts')) {
+      return json(response, 200, {ok: true, artifacts: [...imports.values()].map(publicArtifact)});
+    }
+    if (request.method === 'POST' && url.pathname === '/api/ai/renders') {
+      const options = await readJsonBody(request);
+      const artifactId = String(options.artifactId || '');
+      const compositionId = String(options.compositionId || '');
+      const artifact = imports.get(artifactId);
+      if (!artifact) return json(response, 404, {ok: false, error: 'Trusted artifact not found. Import it in Beyond Studio first.'});
+      const job = await startRender(artifact, compositionId);
+      return json(response, 202, {ok: true, job: publicJob(job)});
+    }
+    const aiJobMatch = url.pathname.match(/^\/api\/ai\/jobs\/([a-f0-9-]+)$/);
+    if (request.method === 'GET' && aiJobMatch) {
+      const job = jobs.get(aiJobMatch[1]);
+      if (!job) return json(response, 404, {ok: false, error: 'Render job was not found.'});
+      return json(response, 200, {ok: true, job: publicJob(job)});
+    }
+    const aiDownloadMatch = url.pathname.match(/^\/api\/ai\/jobs\/([a-f0-9-]+)\/download$/);
+    if (request.method === 'GET' && aiDownloadMatch) {
+      const job = jobs.get(aiDownloadMatch[1]);
+      if (!job) return json(response, 404, {ok: false, error: 'Render job was not found.'});
+      return sendDownload(response, job);
     }
     if (request.method === 'POST' && url.pathname === '/api/import') {
       const name = decodeURIComponent(request.headers['x-artifact-name'] || 'artifact');
@@ -410,9 +533,7 @@ const server = createServer(async (request, response) => {
     if (request.method === 'POST' && renderMatch) {
       const artifact = imports.get(renderMatch[1]);
       if (!artifact) return json(response, 404, {ok: false, error: 'Import expired. Import the artifact again.'});
-      const body = [];
-      for await (const chunk of request) body.push(chunk);
-      const options = JSON.parse(Buffer.concat(body).toString('utf8') || '{}');
+      const options = await readJsonBody(request);
       const job = await startRender(artifact, options.compositionId);
       return json(response, 202, {ok: true, job: {id: job.id, status: job.status, progress: job.progress}});
     }

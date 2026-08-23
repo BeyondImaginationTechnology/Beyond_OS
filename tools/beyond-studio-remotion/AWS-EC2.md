@@ -52,6 +52,7 @@ Generate a token with `openssl rand -hex 32`. Create
 BEYOND_STUDIO_REMOTION_HOST=127.0.0.1
 BEYOND_STUDIO_REMOTION_PORT=4317
 BEYOND_STUDIO_REMOTION_TOKEN=replace-with-the-generated-token
+BEYOND_STUDIO_REMOTION_AI_TOKEN=replace-with-a-different-generated-token
 BEYOND_STUDIO_REMOTION_ORIGINS=https://beyondimagination.co.technology
 ```
 

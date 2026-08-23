@@ -27,3 +27,4 @@ Thumbs.db
 /.pnpm-store/
 /tmp/
 /output/
+/.local/

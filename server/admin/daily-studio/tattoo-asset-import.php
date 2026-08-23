@@ -47,7 +47,7 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Beyond Tattoo · 55-drop asset importer</title>
 <style>
-:root{--ink:#08090b;--panel:#121214;--line:#303034;--gold:#d8ab52;--muted:#99958d;--green:#78d49a;--red:#ff9ba0}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 90% 0,#392419 0,transparent 34rem),var(--ink);color:#fff;font:15px/1.5 Inter,system-ui,sans-serif}button,input,select{font:inherit}.wrap{width:min(1320px,calc(100% - 36px));margin:auto;padding:34px 0 60px}.top{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:24px}.eyebrow{color:var(--gold);font-size:11px;font-weight:950;letter-spacing:.17em;text-transform:uppercase}h1{margin:7px 0;font:700 clamp(36px,6vw,66px)/.96 Georgia,serif}.lead{max-width:780px;margin:0;color:#bbb5ab}.back{color:#e7ca8f;text-decoration:none;font-weight:900}.grid{display:grid;grid-template-columns:minmax(310px,.72fr) minmax(560px,1.28fr);gap:20px}.panel{padding:22px;border:1px solid var(--line);border-radius:22px;background:rgba(18,18,20,.95);box-shadow:0 24px 70px #0008}.panel h2{margin:0 0 15px}.field{margin-bottom:14px}.field label{display:block;margin-bottom:6px;font-weight:850}.field small{display:block;margin-top:5px;color:var(--muted)}.field input,.field select{width:100%;padding:12px;border:1px solid #3a3a3e;border-radius:11px;background:#0c0d0f;color:#fff}.check{display:flex;align-items:center;gap:9px;margin:10px 0;color:#ddd8ce;font-weight:800}.check input{width:18px;height:18px;accent-color:var(--gold)}.btn{width:100%;padding:13px 16px;border:0;border-radius:12px;background:linear-gradient(135deg,#d8ab52,#b78027);color:#090a0b;font-weight:950;cursor:pointer}.btn:disabled{opacity:.45;cursor:wait}.note{margin:15px 0;padding:12px;border:1px solid #594725;border-radius:12px;background:#211a10;color:#dec48d}.note strong{color:#fff}.progress{height:10px;margin-top:15px;overflow:hidden;border-radius:999px;background:#29292d}.progress span{display:block;width:0;height:100%;background:linear-gradient(90deg,#b78027,#f0cf87);transition:width .18s}.status{min-height:46px;margin:10px 0 0;color:#d9bd83;font-weight:750}.status.error{color:var(--red)}.summary{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}.summary div{padding:12px;border:1px solid #343438;border-radius:12px;background:#0d0e10}.summary b{display:block;color:var(--gold);font-size:22px}.summary span{color:var(--muted);font-size:11px;text-transform:uppercase}.table-wrap{max-height:760px;overflow:auto;border:1px solid #303034;border-radius:14px}table{width:100%;border-collapse:collapse}th,td{padding:10px 11px;border-bottom:1px solid #29292d;text-align:left;vertical-align:top}th{position:sticky;top:0;z-index:2;background:#1c1c1f;color:#d9c28f;font-size:11px;text-transform:uppercase}td:first-child{color:var(--gold);font-weight:950}.drop-title{font-weight:850}.drop-meta,.file-name{color:#8f8d88;font-size:12px}.asset-state{display:inline-flex;padding:4px 7px;border-radius:999px;background:#252529;color:#aaa;font-size:11px;font-weight:900}.asset-state.ready{background:#183221;color:var(--green)}.asset-state.queued{background:#352a17;color:#e7c778}.asset-state.failed{background:#3b1c20;color:var(--red)}.approve-btn{display:block;margin-top:6px;padding:5px 8px;border:1px solid #69552d;border-radius:8px;background:#211b10;color:#e8ca8c;font-size:10px;font-weight:900;cursor:pointer}.approve-btn:disabled{opacity:.38;cursor:not-allowed}.approve-btn.published{border-color:#285b39;background:#14271a;color:var(--green)}@media(max-width:900px){.top{display:block}.back{display:inline-block;margin-top:14px}.grid{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.wrap{width:min(100% - 22px,700px);padding-top:22px}}
+:root{--ink:#08090b;--panel:#121214;--line:#303034;--gold:#d8ab52;--muted:#99958d;--green:#78d49a;--red:#ff9ba0}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 90% 0,#392419 0,transparent 34rem),var(--ink);color:#fff;font:15px/1.5 Inter,system-ui,sans-serif}button,input,select{font:inherit}.wrap{width:min(1320px,calc(100% - 36px));margin:auto;padding:34px 0 60px}.top{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:24px}.eyebrow{color:var(--gold);font-size:11px;font-weight:950;letter-spacing:.17em;text-transform:uppercase}h1{margin:7px 0;font:700 clamp(36px,6vw,66px)/.96 Georgia,serif}.lead{max-width:780px;margin:0;color:#bbb5ab}.back{color:#e7ca8f;text-decoration:none;font-weight:900}.grid{display:grid;grid-template-columns:minmax(310px,.72fr) minmax(560px,1.28fr);gap:20px}.panel{padding:22px;border:1px solid var(--line);border-radius:22px;background:rgba(18,18,20,.95);box-shadow:0 24px 70px #0008}.panel h2{margin:0 0 15px}.field{margin-bottom:14px}.field[hidden]{display:none}.field label{display:block;margin-bottom:6px;font-weight:850}.field small{display:block;margin-top:5px;color:var(--muted)}.field input,.field select{width:100%;padding:12px;border:1px solid #3a3a3e;border-radius:11px;background:#0c0d0f;color:#fff}.check{display:flex;align-items:center;gap:9px;margin:10px 0;color:#ddd8ce;font-weight:800}.check input{width:18px;height:18px;accent-color:var(--gold)}.btn{width:100%;padding:13px 16px;border:0;border-radius:12px;background:linear-gradient(135deg,#d8ab52,#b78027);color:#090a0b;font-weight:950;cursor:pointer}.btn:disabled{opacity:.45;cursor:wait}.note{margin:15px 0;padding:12px;border:1px solid #594725;border-radius:12px;background:#211a10;color:#dec48d}.note strong{color:#fff}.progress{height:10px;margin-top:15px;overflow:hidden;border-radius:999px;background:#29292d}.progress span{display:block;width:0;height:100%;background:linear-gradient(90deg,#b78027,#f0cf87);transition:width .18s}.status{min-height:46px;margin:10px 0 0;color:#d9bd83;font-weight:750}.status.error{color:var(--red)}.summary{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}.summary div{padding:12px;border:1px solid #343438;border-radius:12px;background:#0d0e10}.summary b{display:block;color:var(--gold);font-size:22px}.summary span{color:var(--muted);font-size:11px;text-transform:uppercase}.table-wrap{max-height:760px;overflow:auto;border:1px solid #303034;border-radius:14px}table{width:100%;border-collapse:collapse}th,td{padding:10px 11px;border-bottom:1px solid #29292d;text-align:left;vertical-align:top}th{position:sticky;top:0;z-index:2;background:#1c1c1f;color:#d9c28f;font-size:11px;text-transform:uppercase}td:first-child{color:var(--gold);font-weight:950}.drop-title{font-weight:850}.drop-meta,.file-name{color:#8f8d88;font-size:12px}.mapped-file{display:block;margin-bottom:4px;color:#cbc6bd}.mapped-file b{color:#e7ca8f}.asset-state{display:inline-flex;padding:4px 7px;border-radius:999px;background:#252529;color:#aaa;font-size:11px;font-weight:900}.asset-state.ready{background:#183221;color:var(--green)}.asset-state.queued{background:#352a17;color:#e7c778}.asset-state.failed{background:#3b1c20;color:var(--red)}.approve-btn{display:block;margin-top:6px;padding:5px 8px;border:1px solid #69552d;border-radius:8px;background:#211b10;color:#e8ca8c;font-size:10px;font-weight:900;cursor:pointer}.approve-btn:disabled{opacity:.38;cursor:not-allowed}.approve-btn.published{border-color:#285b39;background:#14271a;color:var(--green)}@media(max-width:900px){.top{display:block}.back{display:inline-block;margin-top:14px}.grid{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.wrap{width:min(100% - 22px,700px);padding-top:22px}}
 </style>
 </head>
 <body>
@@ -56,17 +56,19 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
   <section class="grid">
     <article class="panel">
       <h2>Upload tattoo assets</h2>
-      <div class="field"><label for="role">Asset type</label><select id="role"><option value="preview">Public preview</option><option value="stencil">Print-ready stencil</option><option value="transfer">Studio transfer template</option><option value="pdf">Printable PDF</option><option value="reference">Reference artwork</option><option value="placement">Placement mockup</option><option value="pack">Premium packaging</option><option value="lore">Lore card</option><option value="style">Style card</option></select><small>Upload one asset type at a time. Repeat the batch for additional asset types.</small></div>
-      <div class="field"><label for="mapping">File mapping</label><select id="mapping"><option value="smart">Smart filename + schedule fallback</option><option value="order">Selection order (Drop 01 onward)</option></select><small>For exact mapping, begin filenames with 01–55. Scheduled title names are also recognized.</small></div>
-      <div class="field"><label for="files">Choose up to 55 assets</label><input id="files" type="file" accept="image/png,image/jpeg,image/webp" multiple><small>Images or PDF according to the selected role · 20 MB maximum each.</small></div>
+      <div class="field"><label for="mode">How should assets be assigned?</label><select id="mode"><option value="roleBatch">Numbered files (recommended)</option><option value="exact">Choose one numbered drop</option><option value="auto">Upload organized asset folders</option></select><small>Files named 01, 02, … 55 map directly to the matching drop.</small></div>
+      <div class="field" id="dropField" hidden><label for="drop">Numbered drop</label><select id="drop"><?php foreach ($drops as $drop): ?><option value="<?= (int)$drop['sequence'] ?>"><?= str_pad((string)$drop['sequence'], 2, '0', STR_PAD_LEFT) ?> · <?= htmlspecialchars($drop['title']) ?> — <?= htmlspecialchars($drop['collection']) ?></option><?php endforeach; ?></select><small>This is the safest option when a filename is unclear.</small></div>
+      <div class="field" id="roleField" hidden><label for="role">Asset type</label><select id="role"><option value="preview">Public preview</option><option value="stencil">Print-ready stencil</option><option value="transfer">Studio transfer template</option><option value="pdf">Printable PDF</option><option value="reference">Reference artwork</option><option value="placement">Placement mockup</option><option value="pack">Premium packaging</option><option value="lore">Lore card</option><option value="style">Style card</option></select></div>
+      <div class="field" id="mappingField"><label for="mapping">Number mapping</label><select id="mapping"><option value="smart">Use each filename's number</option><option value="order">Use selection order (Drop 01 onward)</option></select><small>Leading zeros are optional: 1, 01, and 001 all map to Drop 01.</small></div>
+      <div class="field"><label for="files" id="filesLabel">Batch upload all assets</label><input id="files" type="file" accept="image/png,image/jpeg,image/webp,application/pdf" multiple><small id="filesHelp">Select previews, stencils, transfers, PDFs, and cards together · 20 MB maximum each.</small></div>
       <label class="check"><input id="watermark" type="checkbox" checked> Apply Beyond Tattoo footer watermark to previews</label>
-      <label class="check"><input id="replace" type="checkbox"> Replace assets already uploaded for this role</label>
+      <label class="check"><input id="replace" type="checkbox"> Replace assets already uploaded in the selected slots</label>
       <label class="check"><input id="rights" type="checkbox"> I confirm Beyond Tattoo has permission to publish these assets</label>
       <div class="field"><label for="description">Approval description</label><input id="description" maxlength="1200" placeholder="Subject, composition, and realism details"><small>Optional. Applied to the drop whose Approve button you select.</small></div>
       <div class="field"><label for="styleMeta">Style</label><input id="styleMeta" maxlength="180" placeholder="Dark realism, black-and-grey realism…"></div>
       <div class="field"><label for="placementMeta">Recommended placements</label><input id="placementMeta" maxlength="240" placeholder="Upper arm, forearm, calf, back…"></div>
       <div class="field"><label for="difficultyMeta">Difficulty</label><select id="difficultyMeta"><option value="">Use collection default</option><option>Intermediate</option><option>Advanced</option><option>Expert</option></select></div>
-      <div class="note"><strong>Nio Guardian matching is enabled.</strong> A file containing “nio guardian” maps to Japanese Legends · Nio Guardians (Drop 37), including the recovered memory assets now bundled with Beyond OS.</div>
+      <div class="note"><strong>Mixed assets?</strong> Choose “Upload organized asset folders,” then select one parent folder containing folders such as Previews, Stencils, Transfers, Placement, Lore, and Style. The numbered filename picks the drop; its folder picks the asset type.</div>
       <button class="btn" id="upload" type="button" disabled>Upload mapped assets</button>
       <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
       <p class="status" id="status" role="status" aria-live="polite">Choose images to preview their scheduled mapping.</p>
@@ -84,6 +86,7 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
   'use strict';
   const csrf = <?= json_encode($csrf) ?>;
   const drops = <?= json_encode($drops, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+  const roleLabels = {preview:'Preview',stencil:'Stencil',transfer:'Transfer',pdf:'PDF',reference:'Reference',placement:'Placement',pack:'Packaging',lore:'Lore',style:'Style'};
   const $ = (id) => document.getElementById(id);
   const rows = new Map([...document.querySelectorAll('[data-sequence]')].map((row) => [Number(row.dataset.sequence), row]));
   const runtimeAssets = Object.fromEntries(drops.map((drop) => [drop.sequence, {...drop.assets}]));
@@ -98,9 +101,13 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
       const ready = !!runtimeAssets[drop.sequence]?.[role];
       if (ready) count++;
       const state = rows.get(drop.sequence).querySelector('[data-state]');
-      if (!queue.some((item) => item.drop.sequence === drop.sequence)) {
+      const queued = queue.filter((item) => item.drop.sequence === drop.sequence);
+      if (!queued.length) {
         state.textContent = ready ? 'Ready' : 'Missing';
         state.className = `asset-state${ready ? ' ready' : ''}`;
+      } else {
+        state.textContent = `${queued.length} queued`;
+        state.className = 'asset-state queued';
       }
       const approve = rows.get(drop.sequence).querySelector('[data-approve]');
       const approved = runtimeStatus[drop.sequence] === 'approved';
@@ -110,64 +117,121 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
     });
     $('readyCount').textContent = String(count);
     $('approvedCount').textContent = String(Object.values(runtimeStatus).filter((value) => value === 'approved').length);
-    $('watermark').disabled = role !== 'preview';
-    $('files').accept = role === 'pdf' ? 'application/pdf' : 'image/png,image/jpeg,image/webp';
+    $('watermark').disabled = $('mode').value !== 'auto' && role !== 'preview';
   };
-  const findSmartDrop = (fileName, used) => {
+  const recognizeDrop = (fileName) => {
     const name = normalize(fileName);
-    const sequenceMatch = name.match(/(?:^|\s)(\d{1,2})(?:\s|$)/);
+    const sequenceMatch = name.match(/(?:^|\s)0*(\d{1,2})(?:\s|$)/);
     if (sequenceMatch) {
       const candidate = drops.find((drop) => drop.sequence === Number(sequenceMatch[1]));
-      if (candidate && !used.has(candidate.sequence)) return candidate;
+      if (candidate) return candidate;
     }
     if (/\bnio\s+guardian\b/.test(name)) {
       const guardian = drops.find((drop) => drop.title === 'Nio Guardians');
-      if (guardian && !used.has(guardian.sequence)) return guardian;
+      if (guardian) return guardian;
     }
-    const titleMatch = [...drops]
+    return [...drops]
       .sort((a, b) => normalize(b.title).length - normalize(a.title).length)
-      .find((drop) => !used.has(drop.sequence) && (name.includes(normalize(drop.title)) || normalize(drop.title).includes(name)));
-    return titleMatch || drops.find((drop) => !used.has(drop.sequence)) || null;
+      .find((drop) => name.includes(normalize(drop.title)) || normalize(drop.title).includes(name)) || null;
   };
-  const mapFiles = () => {
-    const files = [...$('files').files].slice(0, 55);
-    queue = [];
-    const used = new Set();
-    files.forEach((file, index) => {
-      const drop = $('mapping').value === 'order'
-        ? drops.find((item) => item.sequence === index + 1)
-        : findSmartDrop(file.name, used);
-      if (drop) { used.add(drop.sequence); queue.push({drop, file}); }
-    });
+  const recognizeRole = (fileName) => {
+    const name = normalize(fileName);
+    if (/\.pdf$/i.test(fileName)) return 'pdf';
+    const rules = [
+      ['transfer', /\b(transfers?|thermal|thermofax)\b/],
+      ['placement', /\b(placements?|mockups?|mock up|on skin)\b/],
+      ['reference', /\b(references?|source artworks?|original artworks?|reference artworks?)\b/],
+      ['pack', /\b(packs?|packages?|packaging|premium packaging)\b/],
+      ['lore', /\b(lore|story cards?|history cards?)\b/],
+      ['style', /\b(styles?|style cards?|style guides?)\b/],
+      ['preview', /\b(previews?|watermarks?|watermarked|public)\b/],
+      ['stencil', /\b(stencils?|print ready|linework|line art)\b/],
+    ];
+    return rules.find(([, pattern]) => pattern.test(name))?.[0] || null;
+  };
+  const findRoleBatchDrop = (fileName, used) => {
+    const recognized = recognizeDrop(fileName);
+    return recognized && !used.has(recognized.sequence) ? recognized : null;
+  };
+  const renderQueue = () => {
     drops.forEach((drop) => {
-      const row = rows.get(drop.sequence);
-      const item = queue.find((candidate) => candidate.drop.sequence === drop.sequence);
-      row.querySelector('[data-file]').textContent = item ? item.file.name : '—';
-      const state = row.querySelector('[data-state]');
-      if (item) { state.textContent = 'Queued'; state.className = 'asset-state queued'; }
+      const items = queue.filter((item) => item.drop.sequence === drop.sequence);
+      rows.get(drop.sequence).querySelector('[data-file]').innerHTML = items.length
+        ? items.map((item) => `<span class="mapped-file"><b>${roleLabels[item.role]}:</b> ${escapeHtml(item.file.name)}</span>`).join('')
+        : '—';
     });
-    $('selectedCount').textContent = String(files.length);
     $('mappedCount').textContent = String(queue.length);
     $('upload').disabled = queue.length === 0;
     $('progressBar').style.width = '0%';
     updateRoleStates();
-    if ([...$('files').files].length > 55) status('Only the first 55 selected assets can be mapped.', true);
-    else status(queue.length ? `${queue.length} asset${queue.length === 1 ? '' : 's'} mapped. Review the table, then upload.` : 'Choose images to preview their scheduled mapping.');
+  };
+  const escapeHtml = (value) => String(value).replace(/[&<>'"]/g, (character) => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[character]));
+  const syncMode = (clearFiles = true) => {
+    const mode = $('mode').value;
+    $('dropField').hidden = mode !== 'exact';
+    $('roleField').hidden = mode === 'auto';
+    $('mappingField').hidden = mode !== 'roleBatch';
+    $('files').multiple = mode !== 'exact';
+    $('files').webkitdirectory = mode === 'auto';
+    if (mode === 'auto') $('files').setAttribute('webkitdirectory', '');
+    else $('files').removeAttribute('webkitdirectory');
+    $('files').accept = mode === 'auto' ? 'image/png,image/jpeg,image/webp,application/pdf' : ($('role').value === 'pdf' ? 'application/pdf' : 'image/png,image/jpeg,image/webp');
+    $('filesLabel').textContent = mode === 'auto' ? 'Choose the parent asset folder' : (mode === 'exact' ? 'Choose one asset' : 'Choose numbered files');
+    $('filesHelp').textContent = mode === 'auto'
+      ? 'Numbered filenames determine drops; folder names determine asset types.'
+      : (mode === 'exact' ? 'The selected numbered drop and asset type are used exactly.' : 'Choose the asset type once; each file number determines its drop.');
+    if (clearFiles) {
+      $('files').value = '';
+      queue = [];
+      $('selectedCount').textContent = '0';
+      renderQueue();
+    }
+  };
+  const mapFiles = () => {
+    const mode = $('mode').value;
+    const limit = mode === 'auto' ? 495 : (mode === 'exact' ? 1 : 55);
+    const allFiles = [...$('files').files];
+    const files = allFiles.slice(0, limit);
+    queue = [];
+    const used = new Set();
+    let unrecognized = 0;
+    files.forEach((file, index) => {
+      let drop = null;
+      let role = $('role').value;
+      if (mode === 'exact') {
+        drop = drops.find((item) => item.sequence === Number($('drop').value)) || null;
+      } else if (mode === 'auto') {
+        const path = file.webkitRelativePath || file.name;
+        drop = recognizeDrop(file.name);
+        role = recognizeRole(path);
+      } else {
+        drop = $('mapping').value === 'order' ? drops[index] : findRoleBatchDrop(file.name, used);
+      }
+      const slot = drop && role ? `${drop.sequence}:${role}` : '';
+      if (!drop || !role || used.has(slot)) {
+        unrecognized++;
+        return;
+      }
+      used.add(mode === 'roleBatch' ? drop.sequence : slot);
+      queue.push({drop, file, role});
+    });
+    $('selectedCount').textContent = String(files.length);
+    renderQueue();
+    if (allFiles.length > limit) status(`Only the first ${limit} selected assets can be mapped.`, true);
+    else if (unrecognized) status(`${queue.length} mapped; ${unrecognized} could not be confidently assigned. Check the file number, choose the right asset type, or place mixed files in named asset folders.`, true);
+    else status(queue.length ? `${queue.length} asset${queue.length === 1 ? '' : 's'} mapped. Review the table, then upload.` : 'Choose assets to preview their assignments.');
   };
   $('files').addEventListener('change', mapFiles);
   $('mapping').addEventListener('change', mapFiles);
+  $('drop').addEventListener('change', mapFiles);
+  $('mode').addEventListener('change', () => syncMode());
   $('role').addEventListener('change', () => {
-    $('files').value = '';
-    queue = [];
-    $('selectedCount').textContent = '0';
-    $('mappedCount').textContent = '0';
-    updateRoleStates();
-    status('Choose assets for the selected role.');
+    syncMode();
+    status($('mode').value === 'exact' ? 'Choose one asset for the numbered drop.' : 'Choose assets for the selected role.');
   });
   $('upload').addEventListener('click', async () => {
     if (!queue.length) return;
     $('upload').disabled = true;
-    const role = $('role').value;
     let completed = 0;
     let failed = 0;
     for (const item of queue) {
@@ -175,18 +239,18 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
       const state = row.querySelector('[data-state]');
       state.textContent = 'Uploading…';
       state.className = 'asset-state queued';
-      status(`Uploading Drop ${String(item.drop.sequence).padStart(2, '0')} · ${item.drop.title}…`);
+      status(`Uploading Drop ${String(item.drop.sequence).padStart(2, '0')} · ${item.drop.title} · ${roleLabels[item.role]}…`);
       const body = new FormData();
       body.append('asset', item.file, item.file.name);
       body.append('sequence', String(item.drop.sequence));
-      body.append('role', role);
-      body.append('watermark', $('watermark').checked ? '1' : '0');
+      body.append('role', item.role);
+      body.append('watermark', item.role === 'preview' && $('watermark').checked ? '1' : '0');
       body.append('replace', $('replace').checked ? '1' : '0');
       try {
         const response = await fetch('api/upload-tattoo-library-asset.php', {method: 'POST', headers: {'X-CSRF-Token': csrf}, body});
         const data = await response.json();
         if (!response.ok || !data.ok) throw new Error(data.error || 'Upload failed.');
-        runtimeAssets[item.drop.sequence][role] = true;
+        runtimeAssets[item.drop.sequence][item.role] = true;
         runtimeStatus[item.drop.sequence] = 'draft';
         state.textContent = 'Uploaded';
         state.className = 'asset-state ready';
@@ -203,7 +267,7 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
     updateRoleStates();
     $('mappedCount').textContent = '0';
     $('upload').disabled = true;
-    status(failed ? `${completed} uploaded; ${failed} failed. Hover failed filenames for details.` : `${completed} ${role} asset${completed === 1 ? '' : 's'} uploaded and connected to the Beyond Tattoo library.`, failed > 0);
+    status(failed ? `${completed} uploaded; ${failed} failed. Hover failed filenames for details.` : `${completed} asset${completed === 1 ? '' : 's'} uploaded and connected to the Beyond Tattoo library.`, failed > 0);
   });
   document.querySelectorAll('[data-approve]').forEach((button) => button.addEventListener('click', async () => {
     const sequence = Number(button.closest('[data-sequence]').dataset.sequence);
@@ -233,6 +297,7 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
     }
     updateRoleStates();
   }));
+  syncMode(false);
   updateRoleStates();
 })();
 </script>

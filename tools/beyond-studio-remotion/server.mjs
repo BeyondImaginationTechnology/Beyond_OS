@@ -2,7 +2,7 @@ import {createServer} from 'node:http';
 import {createReadStream, createWriteStream} from 'node:fs';
 import {access, mkdir, readFile, readdir, rename, stat, writeFile} from 'node:fs/promises';
 import {basename, dirname, extname, join, resolve, sep} from 'node:path';
-import {randomUUID} from 'node:crypto';
+import {randomUUID, timingSafeEqual} from 'node:crypto';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
 
@@ -13,7 +13,13 @@ const importsDirectory = join(workspace, 'imports');
 const outputsDirectory = join(workspace, 'outputs');
 const jobs = new Map();
 const imports = new Map();
-const port = Number(process.env.BEYOND_STUDIO_REMOTION_PORT || 4317);
+const port = Number(process.env.PORT || process.env.BEYOND_STUDIO_REMOTION_PORT || 4317);
+const host = process.env.BEYOND_STUDIO_REMOTION_HOST || '127.0.0.1';
+const accessToken = process.env.BEYOND_STUDIO_REMOTION_TOKEN || '';
+const configuredOrigins = (process.env.BEYOND_STUDIO_REMOTION_ORIGINS || '')
+  .split(',')
+  .map((origin) => origin.trim().replace(/\/$/, ''))
+  .filter(Boolean);
 const maxUploadBytes = 100 * 1024 * 1024;
 
 await mkdir(importsDirectory, {recursive: true});
@@ -31,7 +37,7 @@ const json = (response, status, payload) => {
 const corsHeaders = (origin = 'null') => ({
   'Access-Control-Allow-Origin': origin,
   'Vary': 'Origin',
-  'Access-Control-Allow-Headers': 'Content-Type, X-Artifact-Name',
+  'Access-Control-Allow-Headers': 'Authorization, Content-Type, X-Artifact-Name',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 });
 
@@ -42,10 +48,19 @@ const allowedOrigin = (origin) => {
     const url = new URL(origin);
     const local = ['localhost', '127.0.0.1', '::1'].includes(url.hostname);
     const beyond = url.protocol === 'https:' && (url.hostname === 'beyondimagination.co.technology' || url.hostname.endsWith('.beyondimagination.co.technology'));
-    return local || beyond ? origin : null;
+    const configured = configuredOrigins.includes(url.origin);
+    return local || beyond || configured ? origin : null;
   } catch (_) {
     return null;
   }
+};
+const tokenMatches = (request) => {
+  if (!accessToken) return true;
+  const header = String(request.headers.authorization || '');
+  const supplied = header.startsWith('Bearer ') ? header.slice(7) : '';
+  const expectedBuffer = Buffer.from(accessToken);
+  const suppliedBuffer = Buffer.from(supplied);
+  return expectedBuffer.length === suppliedBuffer.length && timingSafeEqual(expectedBuffer, suppliedBuffer);
 };
 const exists = async (path) => access(path).then(() => true).catch(() => false);
 const run = (command, args, options = {}) => new Promise((resolvePromise, reject) => {
@@ -347,11 +362,23 @@ const server = createServer(async (request, response) => {
     response.writeHead(204, corsHeaders(response.beyondOrigin));
     return response.end();
   }
+  const isCapabilityDownload = /^\/api\/jobs\/[a-f0-9-]+\/download(?:\?|$)/.test(request.url || '');
+  if (request.url?.startsWith('/api/') && !isCapabilityDownload && !tokenMatches(request)) {
+    return json(response, 401, {ok: false, error: 'A valid render bridge token is required.'});
+  }
   const url = new URL(request.url || '/', `http://127.0.0.1:${port}`);
   try {
     if (request.method === 'GET' && (url.pathname === '/' || url.pathname === '/studio')) {
-      const php = await readFile(join(repositoryRoot, 'server', 'admin', 'daily-studio', 'remotion-renderer.php'), 'utf8');
-      const html = php.replace(/^<\?php[\s\S]*?\?>\s*/, '');
+      const studioPath = join(repositoryRoot, 'server', 'admin', 'daily-studio', 'remotion-renderer.php');
+      if (!(await exists(studioPath))) {
+        response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', ...corsHeaders(response.beyondOrigin)});
+        return response.end('<!doctype html><meta charset="utf-8"><title>Beyond Remotion</title><h1>Beyond Studio Remotion bridge</h1><p>The renderer is online.</p>');
+      }
+      const php = await readFile(studioPath, 'utf8');
+      const html = php
+        .replace(/^<\?php[\s\S]*?\?>\s*/, '')
+        .replace(/<\?=json_encode\(\$bridgeUrl,[\s\S]*?\)\?>/, JSON.stringify(`http://127.0.0.1:${port}`))
+        .replace(/<\?=json_encode\(\$bridgeToken,[\s\S]*?\)\?>/, JSON.stringify(accessToken));
       response.writeHead(200, {'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', ...corsHeaders(response.beyondOrigin)});
       return response.end(html);
     }
@@ -400,8 +427,9 @@ const server = createServer(async (request, response) => {
   }
 });
 
-server.listen(port, '127.0.0.1', () => {
-  console.log(`Beyond Studio Remotion bridge ready at http://127.0.0.1:${port}`);
+server.listen(port, host, () => {
+  console.log(`Beyond Studio Remotion bridge ready on ${host}:${port}`);
+  if (host !== '127.0.0.1' && !accessToken) console.warn('WARNING: Set BEYOND_STUDIO_REMOTION_TOKEN before exposing this service to a network.');
   console.log('Keep this terminal open while importing or rendering trusted artifacts.');
 });
 

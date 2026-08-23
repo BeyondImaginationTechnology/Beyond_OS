@@ -1,0 +1,21 @@
+[Unit]
+Description=Beyond Studio Remotion renderer
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=beyond-remotion
+Group=beyond-remotion
+WorkingDirectory=/opt/beyond-remotion
+EnvironmentFile=/etc/beyond-remotion.env
+Environment=NODE_ENV=production
+Environment=HOME=/var/lib/beyond-remotion
+ExecStart=/usr/local/bin/node /opt/beyond-remotion/server.mjs
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

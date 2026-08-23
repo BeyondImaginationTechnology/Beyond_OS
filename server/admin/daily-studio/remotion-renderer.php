@@ -6,6 +6,9 @@ if (!Auth::check()) {
     http_response_code(403);
     exit('Administrator access required.');
 }
+header('Cache-Control: no-store');
+$bridgeUrl = rtrim((string)beyond_config('remotion.bridge_url', 'http://127.0.0.1:4317'), '/');
+$bridgeToken = (string)beyond_config('remotion.bridge_token', '');
 ?>
 <!doctype html>
 <html lang="en">
@@ -56,11 +59,15 @@ if (!Auth::check()) {
 </main>
 <script>
 (() => {
-  const bridgeUrl='http://127.0.0.1:4317';
+  const bridgeUrl=<?=json_encode($bridgeUrl, JSON_UNESCAPED_SLASHES)?>;
+  const bridgeToken=<?=json_encode($bridgeToken, JSON_UNESCAPED_SLASHES)?>;
+  const nativeFetch=window.fetch.bind(window);
+  window.fetch=(input,options={})=>nativeFetch(input,{...options,headers:{...(options.headers||{}),...(bridgeToken?{Authorization:'Bearer '+bridgeToken}:{})}});
+  const apiFetch=(path,options={})=>window.fetch(bridgeUrl+path,options);
   const $=(id)=>document.getElementById(id);
   let file=null,artifact=null,previewUrl=null;
   const setMessage=(text,error=false)=>{$('message').textContent=text;$('message').classList.toggle('error',error)};
-  const checkBridge=async()=>{try{const response=await fetch(bridgeUrl+'/api/health');if(!response.ok)throw new Error();$('bridge').classList.add('online');$('bridgeText').textContent='Render bridge online';$('inspect').disabled=!file;$('recordFallback').disabled=!file||/\.zip$/i.test(file?.name||'');setMessage('Bridge ready. Choose a ZIP or HTML artifact.')}catch(error){$('bridge').classList.remove('online');$('bridgeText').textContent='Bridge offline';setMessage('Start tools/beyond-studio-remotion/start.ps1, then keep that terminal open.',true)}};
+  const checkBridge=async()=>{try{const response=await apiFetch('/api/health');if(!response.ok)throw new Error();$('bridge').classList.add('online');$('bridgeText').textContent='Render bridge online';$('inspect').disabled=!file;$('recordFallback').disabled=!file||/\.zip$/i.test(file?.name||'');setMessage('Bridge ready. Choose a ZIP or HTML artifact.')}catch(error){$('bridge').classList.remove('online');$('bridgeText').textContent='Bridge offline';setMessage(bridgeUrl.includes('127.0.0.1')?'Start tools/beyond-studio-remotion/start.ps1, then keep that terminal open.':'The Azure render bridge is unavailable or its credentials are invalid.',true)}};
   const choose=(next)=>{if(!next)return;if(!/\.(zip|html?)$/i.test(next.name)){setMessage('Choose a .zip, .html, or .htm artifact.',true);return}file=next;artifact=null;$('fileName').textContent=file.name;$('fileSize').textContent=(file.size/1024/1024).toFixed(2)+' MB';$('filePill').classList.add('show');$('kindLabel').textContent=/\.zip$/i.test(file.name)?'REMOTION ZIP':'REACT HTML';$('htmlSettings').style.display=/\.zip$/i.test(file.name)?'none':'grid';$('inspect').disabled=!$('bridge').classList.contains('online');$('recordFallback').disabled=/\.zip$/i.test(file.name)||!$('bridge').classList.contains('online');$('render').disabled=true;$('compositionBox').hidden=true;setMessage('Ready to inspect '+file.name+'.');if(previewUrl)URL.revokeObjectURL(previewUrl);if(/\.html?$/i.test(file.name)){previewUrl=URL.createObjectURL(file);$('preview').innerHTML='<iframe title="Artifact preview" sandbox="allow-scripts allow-same-origin"></iframe>';$('preview').querySelector('iframe').src=previewUrl}else{$('preview').innerHTML='<div class="empty"><b>Remotion project ZIP</b>Inspect to discover registered compositions.</div>'}};
   $('artifact').addEventListener('change',(event)=>choose(event.target.files[0]));
   $('drop').addEventListener('dragover',(event)=>{event.preventDefault();$('drop').classList.add('drag')});

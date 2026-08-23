@@ -15,6 +15,8 @@ pnpm start
 The bridge listens on `http://127.0.0.1:4317`. Keep the terminal open while
 using **Beyond Studio → Video → Remotion renderer**.
 
+The script is named `start.ps1` (singular), not `starts.ps1`.
+
 If the PHP admin is not running locally, open `http://127.0.0.1:4317/studio`
 for the same renderer as a standalone local workspace.
 
@@ -34,3 +36,14 @@ bridge transcodes that capture to an H.264 MP4 through Remotion.
 
 Imported JavaScript executes locally during bundling/rendering. Only import
 artifacts you trust.
+
+## Azure VM
+
+For the production, token-protected HTTPS setup, follow [AZURE-VM.md](./AZURE-VM.md).
+The cloud bridge supports these environment variables:
+
+- `BEYOND_STUDIO_REMOTION_HOST` — keep `127.0.0.1` behind Nginx; use
+  `0.0.0.0` only inside a secured container network.
+- `PORT` or `BEYOND_STUDIO_REMOTION_PORT` — defaults to `4317`.
+- `BEYOND_STUDIO_REMOTION_TOKEN` — required bearer token for cloud API calls.
+- `BEYOND_STUDIO_REMOTION_ORIGINS` — optional comma-separated HTTPS origins.

@@ -14,7 +14,7 @@ $azureDefaults = [
     'ru-RU' => ['ru-RU-SvetlanaNeural', 'Svetlana - Russian (Russia)'],
     'pt-PT' => ['pt-PT-RaquelNeural', 'Raquel - Portuguese (Portugal)'],
     'ar-MA' => ['ar-MA-MounaNeural', 'Mouna - Moroccan Arabic (Darija)'],
-    'ar-EG' => ['ar-EG-SalmaNeural', 'Salma - Egyptian Arabic'],
+    'ar-EG' => ['ar-EG-ShakirNeural', 'Shakir - Egyptian Arabic'],
     'sw-KE' => ['sw-KE-ZuriNeural', 'Zuri - Kiswahili (Kenya)'],
 ];
 $configuredAzureVoices = (array)beyond_config('narration.azure.voices', []);

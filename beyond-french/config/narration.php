@@ -4,30 +4,33 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/includes/config.php';
 
 $elevenVoices = (array)beyond_config('narration.elevenlabs.voices', beyond_config('voice.voices', []));
-$azureDailyVoice = 'en-US-JennyMultilingualNeural';
-$azureVoices = (array)beyond_config('narration.azure.voices', [
-    'en-US' => [$azureDailyVoice => 'Jenny Multilingual - English/French/Spanish'],
-    'fr-CA' => [$azureDailyVoice => 'Jenny Multilingual - French fallback'],
-    'fr-FR' => [$azureDailyVoice => 'Jenny Multilingual - French'],
-    'es-ES' => [$azureDailyVoice => 'Jenny Multilingual - Spanish'],
-    'it-IT' => [$azureDailyVoice => 'Jenny Multilingual - Italian'],
-    'de-DE' => [$azureDailyVoice => 'Jenny Multilingual - German'],
-    'ru-RU' => [$azureDailyVoice => 'Jenny Multilingual - Russian'],
-    'pt-PT' => [$azureDailyVoice => 'Jenny Multilingual - Portuguese'],
-    // Azure does not publish dedicated en-JM or ht-HT TTS voices. These
-    // controlled fallbacks keep batch exports narrated instead of failing.
-    'en-JM' => [$azureDailyVoice => 'Jenny Multilingual - Patois fallback'],
-    'ht-HT' => [$azureDailyVoice => 'Jenny Multilingual - Kreyòl fallback'],
-]);
-foreach (['en-US', 'fr-CA', 'fr-FR', 'es-ES', 'it-IT', 'de-DE', 'ru-RU', 'pt-PT', 'en-JM', 'ht-HT'] as $azureLocale) {
-    $configuredVoices = $azureVoices[$azureLocale] ?? [];
+$azureDefaults = [
+    'en-US' => ['en-US-JennyNeural', 'Jenny - English (United States)'],
+    'fr-CA' => ['fr-CA-SylvieNeural', 'Sylvie - French (Canada)'],
+    'fr-FR' => ['fr-FR-DeniseNeural', 'Denise - French (France)'],
+    'es-ES' => ['es-ES-ElviraNeural', 'Elvira - Spanish (Spain)'],
+    'it-IT' => ['it-IT-IsabellaNeural', 'Isabella - Italian (Italy)'],
+    'de-DE' => ['de-DE-KatjaNeural', 'Katja - German (Germany)'],
+    'ru-RU' => ['ru-RU-SvetlanaNeural', 'Svetlana - Russian (Russia)'],
+    'pt-PT' => ['pt-PT-RaquelNeural', 'Raquel - Portuguese (Portugal)'],
+];
+$configuredAzureVoices = (array)beyond_config('narration.azure.voices', []);
+$azureVoices = [];
+foreach ($azureDefaults as $azureLocale => [$defaultVoice, $defaultLabel]) {
+    $configuredVoices = $configuredAzureVoices[$azureLocale] ?? [];
     if (is_string($configuredVoices) && trim($configuredVoices) !== '') {
         $configuredVoices = [$configuredVoices => $configuredVoices];
     }
     if (!is_array($configuredVoices)) {
         $configuredVoices = [];
     }
-    $azureVoices[$azureLocale] = [$azureDailyVoice => 'Jenny Multilingual - English/French/Spanish'] + $configuredVoices;
+    // Retire the old one-speaker multilingual mapping for non-English locales.
+    // It produced valid audio, but the accent and speaker did not match the
+    // language shown in the dictionary.
+    if ($azureLocale !== 'en-US') {
+        unset($configuredVoices['en-US-JennyMultilingualNeural']);
+    }
+    $azureVoices[$azureLocale] = $configuredVoices + [$defaultVoice => $defaultLabel];
 }
 
 return [

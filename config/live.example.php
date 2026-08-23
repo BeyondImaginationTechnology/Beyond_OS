@@ -35,6 +35,10 @@ return [
     'security' => [
         'jwt_secret' => 'replace-with-a-long-random-local-secret',
     ],
+    'remotion' => [
+        'bridge_url' => 'https://render.beyondimagination.co.technology',
+        'bridge_token' => 'replace-with-the-render-bridge-token',
+    ],
     'narration' => [
         'openai' => [
             'api_key' => '',
@@ -43,11 +47,23 @@ return [
             'api_key' => '',
             'region' => 'canadacentral',
             'voices' => [
-                'fr-FR' => 'en-US-JennyMultilingualNeural',
-                'it-IT' => 'en-US-JennyMultilingualNeural',
-                'de-DE' => 'en-US-JennyMultilingualNeural',
-                'ru-RU' => 'en-US-JennyMultilingualNeural',
-                'pt-PT' => 'en-US-JennyMultilingualNeural',
+                'en-US' => 'en-US-JennyNeural',
+                'fr-FR' => 'fr-FR-DeniseNeural',
+                'fr-CA' => 'fr-CA-SylvieNeural',
+                'es-ES' => 'es-ES-ElviraNeural',
+                'it-IT' => 'it-IT-IsabellaNeural',
+                'de-DE' => 'de-DE-KatjaNeural',
+                'ru-RU' => 'ru-RU-SvetlanaNeural',
+                'pt-PT' => 'pt-PT-RaquelNeural',
+            ],
+        ],
+        'elevenlabs' => [
+            'api_key' => '',
+            'model' => 'eleven_multilingual_v2',
+            'voices' => [
+                // Azure does not offer native ht-HT or en-JM voices.
+                'ht-HT' => '',
+                'en-JM' => '',
             ],
         ],
     ],

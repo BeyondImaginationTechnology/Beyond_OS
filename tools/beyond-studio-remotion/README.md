@@ -47,3 +47,12 @@ The cloud bridge supports these environment variables:
 - `PORT` or `BEYOND_STUDIO_REMOTION_PORT` — defaults to `4317`.
 - `BEYOND_STUDIO_REMOTION_TOKEN` — required bearer token for cloud API calls.
 - `BEYOND_STUDIO_REMOTION_ORIGINS` — optional comma-separated HTTPS origins.
+
+Cloud hosts must have the `unzip` command installed so uploaded Remotion ZIP
+projects can be inspected and extracted safely.
+
+## AWS EC2
+
+For an AWS deployment using the same bridge, systemd unit, and Nginx proxy, see
+[AWS-EC2.md](./AWS-EC2.md). The bridge does not need AWS credentials for this
+first setup; artifacts and MP4 outputs remain on the encrypted instance volume.

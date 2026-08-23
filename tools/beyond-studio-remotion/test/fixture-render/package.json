@@ -1,0 +1,7 @@
+{
+  "name": "beyond-remotion-smoke-fixture",
+  "private": true,
+  "scripts": {
+    "render": "remotion render src/index.tsx SmokeVideo out.mp4"
+  }
+}

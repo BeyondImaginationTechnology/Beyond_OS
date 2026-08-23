@@ -255,9 +255,9 @@ const importArtifact = async (request, name, searchParams) => {
     type = 'remotion';
     const extracted = join(importRoot, 'project');
     await mkdir(extracted, {recursive: true});
-    const listing = await run('tar', ['-tf', uploadPath]);
+    const listing = await run('unzip', ['-Z1', uploadPath]);
     validateArchiveEntries(listing.stdout);
-    await run('tar', ['-xf', uploadPath, '-C', extracted]);
+    await run('unzip', ['-q', uploadPath, '-d', extracted]);
     projectRoot = await findProjectRoot(extracted);
     if (!projectRoot) throw new Error('ZIP does not contain a package.json file.');
     entry = await findEntry(projectRoot);
@@ -383,7 +383,14 @@ const server = createServer(async (request, response) => {
       return response.end(html);
     }
     if (request.method === 'GET' && url.pathname === '/api/health') {
-      return json(response, 200, {ok: true, service: 'Beyond Studio Remotion bridge', version: 1});
+      return json(response, 200, {
+        ok: true,
+        service: 'Beyond Studio Remotion bridge',
+        version: 2,
+        runtime: process.version,
+        remotionReady: await exists(remotionCli),
+        maxUploadBytes,
+      });
     }
     if (request.method === 'POST' && url.pathname === '/api/import') {
       const name = decodeURIComponent(request.headers['x-artifact-name'] || 'artifact');

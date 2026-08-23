@@ -24,11 +24,13 @@ function studio_elevenlabs_first_voice(array $providerConfig): string {
 function studio_narration_provider(): string { return strtolower((string)beyond_config('voice.provider','openai')); }
 function studio_narration_voice(string $provider,string $locale): string {
   if($provider==='openai') return (string)beyond_config('narration.openai.voices.'.$locale,beyond_config('voice.openai_voice','coral'));
-  $azureDefaults=['en-US'=>'en-US-JennyMultilingualNeural','fr-FR'=>'en-US-JennyMultilingualNeural','fr-CA'=>'en-US-JennyMultilingualNeural','es-ES'=>'en-US-JennyMultilingualNeural','it-IT'=>'en-US-JennyMultilingualNeural','de-DE'=>'en-US-JennyMultilingualNeural','ru-RU'=>'en-US-JennyMultilingualNeural','pt-PT'=>'en-US-JennyMultilingualNeural','en-JM'=>'en-US-JennyMultilingualNeural','ht-HT'=>'en-US-JennyMultilingualNeural'];
+  $azureDefaults=['en-US'=>'en-US-JennyNeural','fr-FR'=>'fr-FR-DeniseNeural','fr-CA'=>'fr-CA-SylvieNeural','es-ES'=>'es-ES-ElviraNeural','it-IT'=>'it-IT-IsabellaNeural','de-DE'=>'de-DE-KatjaNeural','ru-RU'=>'ru-RU-SvetlanaNeural','pt-PT'=>'pt-PT-RaquelNeural'];
   $fallback=$provider==='azure'?($azureDefaults[$locale]??''):beyond_config('voice.voices.'.$locale,'');
   $v=beyond_config('narration.'.$provider.'.voices.'.$locale,$fallback);
-  if(is_array($v)) { foreach($v as $k=>$label){ return is_string($k)?$k:(string)$label; } return ''; }
-  return (string)$v;
+  if(is_array($v)) { foreach($v as $k=>$label){ $v=is_string($k)?$k:(string)$label; break; } }
+  $v=trim((string)$v);
+  if($provider==='azure' && $locale!=='en-US' && $v==='en-US-JennyMultilingualNeural') return $fallback;
+  return $v;
 }
 function studio_narration_generate(string $text,string $locale,string $preferredProvider='',string $preferredVoice=''): array {
   $cfg=studio_narration_config();
@@ -52,6 +54,10 @@ function studio_narration_generate(string $text,string $locale,string $preferred
     if($provider==='azure' && (trim((string)($providerCfg['api_key']??''))===''||trim((string)($providerCfg['region']??''))==='')) continue;
     $voice=trim($preferredVoice)!==''?trim($preferredVoice):studio_narration_voice($provider,$locale);
     if($provider==='openai' && $voice==='') $voice='coral';
+    if($provider==='azure' && $voice==='') {
+      $lastError=new RuntimeException('Azure has no native voice selected for '.$locale.'. Use a matching ElevenLabs voice for Haitian Kreyol or Jamaican Patois.');
+      continue;
+    }
     if($provider==='elevenlabs' && $voice==='') {
       $lastError=new RuntimeException('No ElevenLabs voice is selected for '.$locale.'. Choose the original speaker in Premium Voices.');
       continue;

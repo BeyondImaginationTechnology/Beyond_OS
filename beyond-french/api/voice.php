@@ -24,7 +24,9 @@ try {
 
     $cacheDir = beyond_private_root() . '/cache/voices';
     if (!is_dir($cacheDir)) mkdir($cacheDir, 0700, true);
-    $providerOrder = ['azure', 'openai', 'elevenlabs'];
+    $providerOrder = in_array($locale, ['ht-HT', 'en-JM'], true)
+        ? ['elevenlabs', 'openai']
+        : ['azure', 'openai', 'elevenlabs'];
     $voicePlan = [];
     foreach ($providerOrder as $providerName) {
         try {
@@ -101,8 +103,5 @@ function public_voice_id(string $provider, string $locale, array $voices): strin
     }
     $first = trim((string)($voices[0]['id'] ?? ''));
     if ($first !== '') return $first;
-    if ($provider === 'azure') {
-        return 'en-US-JennyMultilingualNeural';
-    }
     return '';
 }

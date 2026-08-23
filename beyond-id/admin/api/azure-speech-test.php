@@ -43,7 +43,7 @@ if ($status < 200 || $status >= 300) {
 }
 $voices = json_decode((string)$body, true);
 if (!is_array($voices)) azure_test_out(502, ['ok' => false, 'error' => 'Azure returned an invalid voice list.']);
-$required = ['en-US-JennyNeural', 'fr-FR-DeniseNeural', 'fr-CA-SylvieNeural', 'es-ES-ElviraNeural'];
+$required = ['en-US-JennyNeural', 'fr-FR-DeniseNeural', 'fr-CA-SylvieNeural', 'es-ES-ElviraNeural', 'it-IT-IsabellaNeural', 'de-DE-KatjaNeural', 'ru-RU-SvetlanaNeural', 'pt-PT-RaquelNeural'];
 $available = array_fill_keys(array_filter(array_map(static fn($voice) => is_array($voice) ? (string)($voice['ShortName'] ?? '') : '', $voices)), true);
 $missing = array_values(array_filter($required, static fn($voice) => !isset($available[$voice])));
 $message = 'Azure Speech connected in ' . $region . '. ' . count($voices) . ' voices available.';

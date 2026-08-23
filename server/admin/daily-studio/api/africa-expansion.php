@@ -36,11 +36,35 @@ function africaAzureRequest(string $path, array $body): array {
 }
 function africaDialectText(array $values, string $field): string {
     $value=trim((string)($values[$field]??''));
-    if($value===''||mb_strlen($value)>240)throw new RuntimeException('GPT did not return a usable Arabic dialect field.');
+    if($value===''||mb_strlen($value)>240)throw new RuntimeException('The dialect bank did not return a usable Arabic field.');
     return $value;
 }
 function africaArabicKey(string $value): string {
     return preg_replace('/[\p{P}\p{Z}\p{M}]+/u','',mb_strtolower($value))??'';
+}
+function africaMetaDialectFor(string $english, ?string $sourceId=null): array {
+    static $dialects=null,$sourceIdsByEnglish=null;
+    if($dialects===null){
+        $dialectFile=dirname(__DIR__,4).'/beyond-french/data/africa-meta-dialects.json';
+        $rows=is_file($dialectFile)?json_decode((string)file_get_contents($dialectFile),true):null;
+        if(!is_array($rows))throw new RuntimeException('The Meta AI Arabic dialect bank is unavailable.');
+        $dialects=[];foreach($rows as $row){$id=(string)($row['id']??'');if($id!=='')$dialects[$id]=(array)$row;}
+        $sourceFile=dirname(__DIR__,4).'/beyond-french/data/lessons.json';
+        $sourceRows=is_file($sourceFile)?json_decode((string)file_get_contents($sourceFile),true):null;
+        $sourceIdsByEnglish=[];if(is_array($sourceRows))foreach($sourceRows as $row){$text=trim((string)($row['english']??''));if($text!=='')$sourceIdsByEnglish[mb_strtolower($text)]=(string)($row['id']??'');}
+    }
+    $id=trim((string)$sourceId);if($id==='')$id=(string)($sourceIdsByEnglish[mb_strtolower(trim($english))]??'');
+    $row=(array)($dialects[$id]??[]);
+    if(!$row)throw new RuntimeException('This phrase is not in the validated Meta AI dialect bank. Use one of the prepared source lessons.');
+    $result=[
+        'darija'=>africaDialectText($row,'darija'),
+        'darija_transliteration'=>africaDialectText($row,'darija_transliteration'),
+        'egyptian_arabic'=>africaDialectText($row,'egyptian_arabic'),
+        'egyptian_transliteration'=>africaDialectText($row,'egyptian_transliteration'),
+        'dialect_model'=>'meta-ai-batch-2026-08-23',
+    ];
+    if(africaArabicKey($result['darija'])===africaArabicKey($result['egyptian_arabic']))throw new RuntimeException('The Meta AI dialect bank contains identical regional wording.');
+    return $result;
 }
 function africaConvertArabicDialects(string $english,string $standardArabic): array {
     $key=trim((string)beyond_ai_config('api_key',''));
@@ -88,11 +112,11 @@ function africaConvertArabicDialects(string $english,string $standardArabic): ar
     $usage=(array)($response['usage']??[]);if($usage)beyond_ai_record_usage((int)($usage['input_tokens']??0),(int)($usage['output_tokens']??0),beyond_ai_estimate_cost('quick',(int)($usage['input_tokens']??0),(int)($usage['output_tokens']??0)));
     return $result;
 }
-function africaAzureTranslate(string $english): array {
+function africaAzureTranslate(string $english, ?string $sourceId=null): array {
     $translated=africaAzureRequest('/translate?api-version=3.0&from=en&to=ln&to=ar&to=sw',[['Text'=>$english]]);$values=[];
     foreach((array)($translated[0]['translations']??[]) as $item)$values[(string)($item['to']??'')]=trim((string)($item['text']??''));
     foreach(['ln','ar','sw'] as $language)if(($values[$language]??'')==='')throw new RuntimeException('Azure did not return every Africa expansion language.');
-    $dialects=africaConvertArabicDialects($english,$values['ar']);
+    $dialects=africaMetaDialectFor($english,$sourceId);
     return ['lingala'=>$values['ln'],'lingala_pronunciation'=>$values['ln'],...$dialects,'swahili'=>$values['sw'],'swahili_pronunciation'=>$values['sw']];
 }
 function africaGenerateTracks(array $values,string $date): array {
@@ -123,20 +147,20 @@ $input=json_decode((string)file_get_contents('php://input'),true);if(!is_array($
 try{
     if(strtolower((string)($input['action']??''))==='translate'){
         $english=africaText($input,'english',220);$translations=africaAzureTranslate($english);
-        africaResponse(['ok'=>true,'translations'=>$translations,'review_required'=>false,'message'=>'Azure base translation and GPT Arabic dialect conversion are ready to prerecord.']);
+        africaResponse(['ok'=>true,'translations'=>$translations,'review_required'=>false,'message'=>'Azure translations and the validated Meta AI Arabic dialects are ready to prerecord.']);
     }
     if(strtolower((string)($input['action']??''))==='build'){
         @set_time_limit(240);$source=json_decode((string)file_get_contents(dirname(__DIR__,4).'/beyond-french/data/lessons.json'),true);if(!is_array($source))throw new RuntimeException('The source phrase bank is unavailable.');
-        if(count($items)>=100)africaResponse(['ok'=>true,'complete'=>true,'ready'=>count($items),'target'=>100,'message'=>'The Azure + GPT dialect phrase bank is complete.']);
+        if(count($items)>=100)africaResponse(['ok'=>true,'complete'=>true,'ready'=>count($items),'target'=>100,'message'=>'The Azure + Meta AI dialect phrase bank is complete.']);
         $used=array_fill_keys(array_map(static fn(array $item):string=>(string)($item['source_id']??''),$items),true);$lesson=null;
         foreach($source as $candidate){$sourceId=(string)($candidate['id']??sha1((string)($candidate['english']??'')));if(trim((string)($candidate['english']??''))!==''&&!isset($used[$sourceId])){$lesson=$candidate;break;}}
-        if($lesson===null)africaResponse(['ok'=>true,'complete'=>true,'ready'=>count($items),'target'=>100,'message'=>'The Azure + GPT dialect phrase bank is complete.']);
+        if($lesson===null)africaResponse(['ok'=>true,'complete'=>true,'ready'=>count($items),'target'=>100,'message'=>'The Azure + Meta AI dialect phrase bank is complete.']);
         $sourceId=(string)($lesson['id']??sha1((string)$lesson['english']));$date=(string)($lesson['date']??'');if(!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date))$date=(new DateTimeImmutable('today'))->modify('+'.count($items).' days')->format('Y-m-d');
-        $translated=africaAzureTranslate((string)$lesson['english']);if(($translated['darija_transliteration']??'')==='')$translated['darija_transliteration']=$translated['darija'];if(($translated['egyptian_transliteration']??'')==='')$translated['egyptian_transliteration']=$translated['egyptian_arabic'];
+        $translated=africaAzureTranslate((string)$lesson['english'],$sourceId);if(($translated['darija_transliteration']??'')==='')$translated['darija_transliteration']=$translated['darija'];if(($translated['egyptian_transliteration']??'')==='')$translated['egyptian_transliteration']=$translated['egyptian_arabic'];
         $values=['english'=>(string)$lesson['english'],'french_bridge'=>(string)($lesson['french']??''),'meaning'=>(string)($lesson['meaning']??'A practical phrase for everyday conversation.'),...$translated,'culture_note'=>(string)($lesson['culture_note']??'Practice this phrase aloud in an everyday conversation.')];
         $maxId=0;foreach($items as $existingItem)$maxId=max($maxId,(int)($existingItem['id']??0));
-        $audio=africaGenerateTracks($values,$date);$item=[...$values,'id'=>$maxId+1,'source_id'=>$sourceId,'pack'=>'africa-v1','publish_date'=>$date,'translation_policy'=>'azure-plus-gpt-dialects-v1','azure_translation_accepted'=>true,'native_reviewed'=>false,'audio_urls'=>$audio['urls'],'audio_voices'=>$audio['voices'],'audio_providers'=>$audio['providers'],'generator'=>['version'=>'1.2.0','translation'=>'azure-plus-gpt-dialects','saved_at'=>date(DATE_ATOM)]];$items[]=$item;africaWrite($file,$items);
-        africaResponse(['ok'=>true,'built'=>$item,'ready'=>count($items),'target'=>100,'complete'=>count($items)>=100,'message'=>'Azure translated, GPT localized both Arabic dialects, and prerecorded phrase '.count($items).' of 100.']);
+        $audio=africaGenerateTracks($values,$date);$item=[...$values,'id'=>$maxId+1,'source_id'=>$sourceId,'pack'=>'africa-v1','publish_date'=>$date,'translation_policy'=>'azure-plus-meta-dialects-v1','azure_translation_accepted'=>true,'native_reviewed'=>false,'audio_urls'=>$audio['urls'],'audio_voices'=>$audio['voices'],'audio_providers'=>$audio['providers'],'generator'=>['version'=>'1.3.0','translation'=>'azure-plus-meta-dialects','saved_at'=>date(DATE_ATOM)]];$items[]=$item;africaWrite($file,$items);
+        africaResponse(['ok'=>true,'built'=>$item,'ready'=>count($items),'target'=>100,'complete'=>count($items)>=100,'message'=>'Azure translated, Meta AI localized both Arabic dialects, and prerecorded phrase '.count($items).' of 100.']);
     }
     $date=trim((string)($input['publish_date']??''));$parsed=DateTimeImmutable::createFromFormat('!Y-m-d',$date);
     if(!$parsed||$parsed->format('Y-m-d')!==$date)throw new InvalidArgumentException('Choose a valid publication date.');
@@ -146,7 +170,7 @@ try{
         'darija'=>africaText($input,'darija',240),'darija_transliteration'=>africaText($input,'darija_transliteration',240),
         'egyptian_arabic'=>africaText($input,'egyptian_arabic',240),'egyptian_transliteration'=>africaText($input,'egyptian_transliteration',240),
         'swahili'=>africaText($input,'swahili',240),'swahili_pronunciation'=>africaText($input,'swahili_pronunciation',240),
-        'culture_note'=>africaText($input,'culture_note',800),'dialect_model'=>trim((string)beyond_ai_config('quick_model','gpt-4o-mini'))?:'gpt-4o-mini',
+        'culture_note'=>africaText($input,'culture_note',800),'dialect_model'=>'meta-ai-batch-2026-08-23',
     ];
     $prerecord=!empty($input['prerecord']);
     $existingIndex=null;$maxId=0;
@@ -161,7 +185,7 @@ try{
         @set_time_limit(240);
         $audio=africaGenerateTracks($values,$date);$audioUrls=$audio['urls'];$audioVoices=$audio['voices'];$audioProviders=$audio['providers'];
     }
-    $item=[...$existing,...$values,'id'=>$existingIndex===null?$maxId+1:(int)($existing['id']??$maxId+1),'pack'=>'africa-v1','publish_date'=>$date,'translation_policy'=>'azure-plus-gpt-dialects-v1','azure_translation_accepted'=>true,'native_reviewed'=>false,'audio_urls'=>$audioUrls,'audio_voices'=>$audioVoices,'audio_providers'=>$audioProviders,'generator'=>['version'=>'1.2.0','translation'=>'azure-plus-gpt-dialects','saved_by'=>(int)($_SESSION['user_id']??0),'saved_at'=>date(DATE_ATOM)]];
+    $item=[...$existing,...$values,'id'=>$existingIndex===null?$maxId+1:(int)($existing['id']??$maxId+1),'pack'=>'africa-v1','publish_date'=>$date,'translation_policy'=>'azure-plus-meta-dialects-v1','azure_translation_accepted'=>true,'native_reviewed'=>false,'audio_urls'=>$audioUrls,'audio_voices'=>$audioVoices,'audio_providers'=>$audioProviders,'generator'=>['version'=>'1.3.0','translation'=>'azure-plus-meta-dialects','saved_by'=>(int)($_SESSION['user_id']??0),'saved_at'=>date(DATE_ATOM)]];
     if($existingIndex===null)$items[]=$item;else$items[$existingIndex]=$item;africaWrite($file,$items);
-    africaResponse(['ok'=>true,'item'=>$item,'audio_generated'=>$prerecord&&count($audioUrls)===4,'message'=>$prerecord?'Africa phrase saved with four prerecorded MP3 tracks.':'Africa phrase saved under the Azure + GPT dialect policy.']);
+    africaResponse(['ok'=>true,'item'=>$item,'audio_generated'=>$prerecord&&count($audioUrls)===4,'message'=>$prerecord?'Africa phrase saved with four prerecorded MP3 tracks.':'Africa phrase saved under the Azure + Meta AI dialect policy.']);
 }catch(InvalidArgumentException $error){africaResponse(['ok'=>false,'error'=>$error->getMessage()],422);}catch(Throwable $error){error_log('Africa expansion generator: '.$error->getMessage());africaResponse(['ok'=>false,'error'=>'The phrase or one of its audio tracks could not be saved: '.$error->getMessage()],502);}

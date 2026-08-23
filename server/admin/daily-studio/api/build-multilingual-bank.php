@@ -44,25 +44,24 @@ function multilingualScheduleBuiltItem(string $scheduleFile, array $item): strin
 }
 function azureTranslatePhrase(string $english): array {
     $key = trim((string)beyond_config('ai.azure_translator.api_key', ''));
+    $usingSpeechFallback = $key === '';
     $region = trim((string)beyond_config('ai.azure_translator.region', ''));
     if ($key === '') $key = trim((string)beyond_config('narration.azure.api_key', ''));
-    if ($region === '') $region = trim((string)beyond_config('narration.azure.region', ''));
+    if ($region === '' && $usingSpeechFallback) $region = trim((string)beyond_config('narration.azure.region', ''));
     $endpoint = rtrim(trim((string)beyond_config('ai.azure_translator.endpoint', 'https://api.cognitive.microsofttranslator.com')), '/');
-    if ($key === '' || $region === '') throw new RuntimeException('Configure the Azure Speech or Translator key and region in Premium Voices.');
+    if ($key === '' || ($usingSpeechFallback && $region === '')) throw new RuntimeException('Configure the Azure Translator key, or the Azure Speech key and region, in Premium Voices.');
     if (!preg_match('#^https://[a-z0-9.-]+$#i', $endpoint)) throw new RuntimeException('The Azure Translator endpoint is invalid.');
     $path = str_contains($endpoint, 'cognitive.microsofttranslator.com') ? '/translate' : '/translator/text/v3.0/translate';
     $url = $endpoint . $path . '?api-version=3.0&from=en&to=it&to=de&to=ru&to=pt';
     $curl = curl_init($url);
+    $headers = ['Ocp-Apim-Subscription-Key: ' . $key, 'Content-Type: application/json'];
+    if ($region !== '' && strtolower($region) !== 'global') $headers[] = 'Ocp-Apim-Subscription-Region: ' . $region;
     curl_setopt_array($curl, [
         CURLOPT_POST=>true,
         CURLOPT_RETURNTRANSFER=>true,
         CURLOPT_CONNECTTIMEOUT=>15,
         CURLOPT_TIMEOUT=>60,
-        CURLOPT_HTTPHEADER=>[
-            'Ocp-Apim-Subscription-Key: ' . $key,
-            'Ocp-Apim-Subscription-Region: ' . $region,
-            'Content-Type: application/json',
-        ],
+        CURLOPT_HTTPHEADER=>$headers,
         CURLOPT_POSTFIELDS=>json_encode([['Text'=>$english]], JSON_THROW_ON_ERROR),
     ]);
     $raw = curl_exec($curl); $error = curl_error($curl); $status = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE); curl_close($curl);

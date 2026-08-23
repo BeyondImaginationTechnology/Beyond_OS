@@ -13,6 +13,9 @@ $azureDefaults = [
     'de-DE' => ['de-DE-KatjaNeural', 'Katja - German (Germany)'],
     'ru-RU' => ['ru-RU-SvetlanaNeural', 'Svetlana - Russian (Russia)'],
     'pt-PT' => ['pt-PT-RaquelNeural', 'Raquel - Portuguese (Portugal)'],
+    'ar-MA' => ['ar-MA-MounaNeural', 'Mouna - Moroccan Arabic (Darija)'],
+    'ar-EG' => ['ar-EG-SalmaNeural', 'Salma - Egyptian Arabic'],
+    'sw-KE' => ['sw-KE-ZuriNeural', 'Zuri - Kiswahili (Kenya)'],
 ];
 $configuredAzureVoices = (array)beyond_config('narration.azure.voices', []);
 $azureVoices = [];
@@ -36,7 +39,7 @@ foreach ($azureDefaults as $azureLocale => [$defaultVoice, $defaultLabel]) {
 return [
     'allowed_providers' => ['openai', 'elevenlabs', 'azure'],
     'allowed_formats' => ['mp3'],
-    'allowed_languages' => ['en-US', 'fr-CA', 'fr-FR', 'es-ES', 'it-IT', 'de-DE', 'ru-RU', 'pt-PT', 'ht-HT', 'en-JM'],
+    'allowed_languages' => ['en-US', 'fr-CA', 'fr-FR', 'es-ES', 'it-IT', 'de-DE', 'ru-RU', 'pt-PT', 'ht-HT', 'en-JM', 'ln-CD', 'ar-MA', 'ar-EG', 'sw-KE'],
     // Azure is the controlled server-side fallback for Studio exports.
     // Do not automatically retry quota-limited OpenAI or ElevenLabs accounts.
     'fallback_providers' => ['azure'],

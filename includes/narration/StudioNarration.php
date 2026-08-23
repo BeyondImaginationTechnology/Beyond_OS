@@ -24,10 +24,10 @@ function studio_elevenlabs_first_voice(array $providerConfig): string {
 function studio_narration_provider(): string { return strtolower((string)beyond_config('voice.provider','openai')); }
 function studio_narration_voice(string $provider,string $locale): string {
   if($provider==='openai') return (string)beyond_config('narration.openai.voices.'.$locale,beyond_config('voice.openai_voice','coral'));
-  $azureDefaults=['en-US'=>'en-US-JennyNeural','fr-FR'=>'fr-FR-DeniseNeural','fr-CA'=>'fr-CA-SylvieNeural','es-ES'=>'es-ES-ElviraNeural','it-IT'=>'it-IT-IsabellaNeural','de-DE'=>'de-DE-KatjaNeural','ru-RU'=>'ru-RU-SvetlanaNeural','pt-PT'=>'pt-PT-RaquelNeural'];
+  $azureDefaults=['en-US'=>'en-US-JennyNeural','fr-FR'=>'fr-FR-DeniseNeural','fr-CA'=>'fr-CA-SylvieNeural','es-ES'=>'es-ES-ElviraNeural','it-IT'=>'it-IT-IsabellaNeural','de-DE'=>'de-DE-KatjaNeural','ru-RU'=>'ru-RU-SvetlanaNeural','pt-PT'=>'pt-PT-RaquelNeural','ar-MA'=>'ar-MA-MounaNeural','ar-EG'=>'ar-EG-SalmaNeural','sw-KE'=>'sw-KE-ZuriNeural'];
   $fallback=$provider==='azure'?($azureDefaults[$locale]??''):beyond_config('voice.voices.'.$locale,'');
   $v=beyond_config('narration.'.$provider.'.voices.'.$locale,$fallback);
-  if(is_array($v)) { foreach($v as $k=>$label){ $v=is_string($k)?$k:(string)$label; break; } }
+  if(is_array($v)) { $selected=''; foreach($v as $k=>$label){ $selected=is_string($k)?$k:(string)$label; break; } $v=$selected; }
   $v=trim((string)$v);
   if($provider==='azure' && $locale!=='en-US' && $v==='en-US-JennyMultilingualNeural') return $fallback;
   return $v;

@@ -55,6 +55,9 @@ return [
                 'de-DE' => 'de-DE-KatjaNeural',
                 'ru-RU' => 'ru-RU-SvetlanaNeural',
                 'pt-PT' => 'pt-PT-RaquelNeural',
+                'ar-MA' => 'ar-MA-MounaNeural',
+                'ar-EG' => 'ar-EG-SalmaNeural',
+                'sw-KE' => 'sw-KE-ZuriNeural',
             ],
         ],
         'elevenlabs' => [
@@ -64,6 +67,7 @@ return [
                 // Azure does not offer native ht-HT or en-JM voices.
                 'ht-HT' => '',
                 'en-JM' => '',
+                'ln-CD' => '',
             ],
         ],
     ],

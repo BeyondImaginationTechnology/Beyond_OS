@@ -152,8 +152,9 @@ try{
     if(strtolower((string)($input['action']??''))==='build'){
         @set_time_limit(240);$source=json_decode((string)file_get_contents(dirname(__DIR__,4).'/beyond-french/data/lessons.json'),true);if(!is_array($source))throw new RuntimeException('The source phrase bank is unavailable.');
         if(count($items)>=100)africaResponse(['ok'=>true,'complete'=>true,'ready'=>count($items),'target'=>100,'message'=>'The Azure + Meta AI dialect phrase bank is complete.']);
-        $used=array_fill_keys(array_map(static fn(array $item):string=>(string)($item['source_id']??''),$items),true);$lesson=null;
-        foreach($source as $candidate){$sourceId=(string)($candidate['id']??sha1((string)($candidate['english']??'')));if(trim((string)($candidate['english']??''))!==''&&!isset($used[$sourceId])){$lesson=$candidate;break;}}
+        $used=array_fill_keys(array_filter(array_map(static fn(array $item):string=>(string)($item['source_id']??''),$items)),true);
+        $usedEnglish=array_fill_keys(array_filter(array_map(static fn(array $item):string=>mb_strtolower(trim((string)($item['english']??''))),$items)),true);$lesson=null;
+        foreach($source as $candidate){$sourceText=trim((string)($candidate['english']??''));$sourceId=(string)($candidate['id']??sha1($sourceText));if($sourceText!==''&&!isset($used[$sourceId])&&!isset($usedEnglish[mb_strtolower($sourceText)])){$lesson=$candidate;break;}}
         if($lesson===null)africaResponse(['ok'=>true,'complete'=>true,'ready'=>count($items),'target'=>100,'message'=>'The Azure + Meta AI dialect phrase bank is complete.']);
         $sourceId=(string)($lesson['id']??sha1((string)$lesson['english']));$date=(string)($lesson['date']??'');if(!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date))$date=(new DateTimeImmutable('today'))->modify('+'.count($items).' days')->format('Y-m-d');
         $translated=africaAzureTranslate((string)$lesson['english'],$sourceId);if(($translated['darija_transliteration']??'')==='')$translated['darija_transliteration']=$translated['darija'];if(($translated['egyptian_transliteration']??'')==='')$translated['egyptian_transliteration']=$translated['egyptian_arabic'];

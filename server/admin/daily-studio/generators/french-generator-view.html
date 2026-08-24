@@ -268,6 +268,15 @@
       }
     }catch(error){setStatus(`${error.message||'Native audio regeneration failed.'} Progress is saved at ${lastReady}/300; click again to resume.`,true)}finally{button.disabled=false}
   }
+  async function refreshNativeAudioProgress(){
+    try{
+      const response=await fetch('/server/admin/daily-studio/api/regenerate-french-native-audio.php',{cache:'no-store'}),data=await response.json();
+      if(!response.ok||!data.ok)return;
+      const ready=Number(data.ready||0),target=Number(data.target||300),button=$('regenerateNativeAudio');
+      if(ready>0)button.textContent=`Native MP3 batch ${ready}/${target}`;
+      if(data.complete)setStatus(`Native-speaker audio regeneration finished: ${ready} Spanish, Kreyòl, and Patois tracks are ready.`);
+    }catch(_error){}
+  }
   function save(){if(contentMode!=='draft'){setStatus('Only new drafts are stored in the browser.',true);return}const data={};ids.forEach(id=>data[id]=$(id).type==='checkbox'?$(id).checked:$(id).value);localStorage.setItem('beyondFrenchGeneratorDraft',JSON.stringify(data));setStatus('Draft saved in this browser.')}
   async function saveDailyPhrase(){
     if(contentMode!=='draft'&&contentMode!=='edit'){setStatus('Open Create Draft or confirm Edit scheduled before publishing.',true);return false}
@@ -376,7 +385,7 @@
       setStatus(savedUrl?'MP3 saved to the French audio library and downloaded.':'MP3 generated and downloaded.');
     }catch(error){setStatus(error.message||'MP3 export failed.',true)}finally{button.disabled=false}
   }
-  updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{if(el.id==='publishDate')setFieldValue('weekday',weekdayForDate(el.value),false);updateAudioUi(el.id);draw()});el.addEventListener('change',()=>{if(el.id==='publishDate'&&(contentMode==='scheduled'||contentMode==='empty')){loadScheduleDate(el.value);return}updateAudioUi(el.id);draw()})});$('scheduledMode').onclick=()=>loadScheduleDate(contentMode==='draft'?localDateParts().date:(v('publishDate')||localDateParts().date));$('createDraft').onclick=enterDraftMode;$('editScheduled').onclick=editScheduledLesson;$('previousLesson').onclick=()=>scheduleNavigation.previous&&loadScheduleDate(scheduleNavigation.previous);$('todayLesson').onclick=()=>loadScheduleDate(localDateParts().date);$('nextLesson').onclick=()=>scheduleNavigation.next&&loadScheduleDate(scheduleNavigation.next);$('reloadLesson').onclick=()=>loadScheduleDate(v('publishDate')||localDateParts().date);$('saveDailyPhrase').onclick=saveDailyPhrase;$('saveAndExportVideo').onclick=saveAndExportVideo;$('exportRemotionVideo').onclick=remotionVideo;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;$('generateTodayPhrase').onclick=generateTodayPhrase;$('regenerateNativeAudio').onclick=regenerateNativeAudio;draw();loadScheduleDate();
+  updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{if(el.id==='publishDate')setFieldValue('weekday',weekdayForDate(el.value),false);updateAudioUi(el.id);draw()});el.addEventListener('change',()=>{if(el.id==='publishDate'&&(contentMode==='scheduled'||contentMode==='empty')){loadScheduleDate(el.value);return}updateAudioUi(el.id);draw()})});$('scheduledMode').onclick=()=>loadScheduleDate(contentMode==='draft'?localDateParts().date:(v('publishDate')||localDateParts().date));$('createDraft').onclick=enterDraftMode;$('editScheduled').onclick=editScheduledLesson;$('previousLesson').onclick=()=>scheduleNavigation.previous&&loadScheduleDate(scheduleNavigation.previous);$('todayLesson').onclick=()=>loadScheduleDate(localDateParts().date);$('nextLesson').onclick=()=>scheduleNavigation.next&&loadScheduleDate(scheduleNavigation.next);$('reloadLesson').onclick=()=>loadScheduleDate(v('publishDate')||localDateParts().date);$('saveDailyPhrase').onclick=saveDailyPhrase;$('saveAndExportVideo').onclick=saveAndExportVideo;$('exportRemotionVideo').onclick=remotionVideo;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;$('generateTodayPhrase').onclick=generateTodayPhrase;$('regenerateNativeAudio').onclick=regenerateNativeAudio;draw();loadScheduleDate();refreshNativeAudioProgress();
 })();
 </script>
 </body>

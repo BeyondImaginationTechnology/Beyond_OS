@@ -41,6 +41,14 @@ function studio_narration_generate(string $text,string $locale,string $preferred
   ]);
   $preferredProvider=strtolower(trim($preferredProvider));
   $primary=in_array($preferredProvider,['openai','elevenlabs','azure'],true)?$preferredProvider:studio_narration_provider();
+  // Azure has no native Haitian Kreyòl or Jamaican Patois voice. When Studio
+  // default routing is used, prefer each locale's configured ElevenLabs
+  // speaker instead of trying the active Azure provider and reporting that the
+  // language is no longer configured.
+  if($preferredProvider==='' && in_array($locale,['ht-HT','en-JM'],true)){
+    $elevenConfig=(array)($cfg['providers']['elevenlabs']??[]);
+    if(trim((string)($elevenConfig['api_key']??''))!=='' && studio_narration_voice('elevenlabs',$locale)!=='') $primary='elevenlabs';
+  }
   // Only use the selected provider and explicitly configured fallbacks. OpenAI
   // used to be appended unconditionally, which made an Azure export end with a
   // misleading OpenAI quota error whenever Azure also needed attention.

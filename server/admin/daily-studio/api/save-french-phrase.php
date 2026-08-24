@@ -85,6 +85,13 @@ if ($existingIndex !== null && empty($input['confirm_overwrite'])) {
 $id = $existingIndex === null ? $maxId + 1 : (int)($lessons[$existingIndex]['id'] ?? $maxId + 1);
 $existingLesson = $existingIndex === null ? [] : (array)$lessons[$existingIndex];
 $frenchChanged = $existingLesson && (string)($existingLesson['french'] ?? '') !== $values['french'];
+$audioFieldLocales = ['french' => 'fr-FR', 'spanish' => 'es-ES', 'patois' => 'en-JM', 'kreyol' => 'ht-HT'];
+$audioUrls = (array)($existingLesson['audio_urls'] ?? []);
+foreach ($audioFieldLocales as $field => $locale) {
+    if ($existingLesson && (string)($existingLesson[$field] ?? '') !== $values[$field]) {
+        unset($audioUrls[$locale]);
+    }
+}
 $audioUrl = trim((string)($existingLesson['audio_url'] ?? ''));
 $audioGenerated = false;
 $audioProvider = trim((string)($existingLesson['generator']['audio_provider'] ?? ''));
@@ -137,6 +144,7 @@ $lesson = [
         'audio_provider' => $audioProvider,
     ],
     'audio_url' => $audioUrl,
+    'audio_urls' => [...$audioUrls, 'fr-FR' => $audioUrl],
 ];
 if ($frenchChanged) {
     unset($lesson['generated_batch']);

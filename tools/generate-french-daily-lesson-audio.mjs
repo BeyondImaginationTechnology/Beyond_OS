@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+// Native-speaker regeneration example (PowerShell):
+// $env:BEYOND_FRENCH_AUDIO_FORCE_LOCALES='es-ES,ht-HT,en-JM'
+// Set AZURE_SPEECH_KEY/REGION plus ELEVENLABS_API_KEY,
+// ELEVENLABS_VOICE_HT_HT, and ELEVENLABS_VOICE_EN_JM before running.
 import { access, copyFile, mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { constants } from 'node:fs';
 import { resolve } from 'node:path';
@@ -7,21 +11,31 @@ const root = resolve(import.meta.dirname, '..');
 const lessonsPath = resolve(root, 'beyond-french/data/lessons.json');
 const outputRoot = resolve(root, 'beyond-french/assets/audio/lessons');
 const legacyFrenchRoot = resolve(root, 'beyond-french/assets/audio/french');
-const key = String(process.env.AZURE_SPEECH_KEY || '').trim();
+const azureKey = String(process.env.AZURE_SPEECH_KEY || '').trim();
 const region = String(process.env.AZURE_SPEECH_REGION || 'canadacentral').trim().toLowerCase();
 const endpoint = String(process.env.AZURE_SPEECH_ENDPOINT || `https://${region}.tts.speech.microsoft.com`).trim().replace(/\/$/, '');
+const elevenLabsKey = String(process.env.ELEVENLABS_API_KEY || '').trim();
+const elevenLabsEndpoint = String(process.env.ELEVENLABS_ENDPOINT || 'https://api.elevenlabs.io/v1/text-to-speech').trim().replace(/\/$/, '');
+const elevenLabsModel = String(process.env.ELEVENLABS_MODEL || 'eleven_multilingual_v2').trim();
 const batch = String(process.env.BEYOND_FRENCH_AUDIO_BATCH || 'azure-2026-08').trim();
 const outputFormat = process.env.AZURE_SPEECH_OUTPUT_FORMAT || 'audio-24khz-48kbitrate-mono-mp3';
+const forceLocales = new Set(String(process.env.BEYOND_FRENCH_AUDIO_FORCE_LOCALES || '').split(',').map((locale) => locale.trim()).filter(Boolean));
 
-if (!key) throw new Error('AZURE_SPEECH_KEY is required.');
 if (!/^https:\/\//i.test(endpoint)) throw new Error('AZURE_SPEECH_ENDPOINT must be an HTTPS URL.');
+if (!/^https:\/\//i.test(elevenLabsEndpoint)) throw new Error('ELEVENLABS_ENDPOINT must be an HTTPS URL.');
 
 const languages = [
-  ['fr-FR', 'french', 'fr-CA-SylvieNeural'],
-  ['es-ES', 'spanish', 'en-US-JennyMultilingualNeural'],
-  ['ht-HT', 'kreyol', 'en-US-JennyMultilingualNeural'],
-  ['en-JM', 'patois', 'en-US-JennyMultilingualNeural'],
+  { locale: 'fr-FR', field: 'french', provider: 'azure', defaultVoice: 'fr-FR-DeniseNeural' },
+  { locale: 'es-ES', field: 'spanish', provider: 'azure', defaultVoice: 'es-ES-ElviraNeural' },
+  { locale: 'ht-HT', field: 'kreyol', provider: 'elevenlabs', voiceEnv: 'ELEVENLABS_VOICE_HT_HT' },
+  { locale: 'en-JM', field: 'patois', provider: 'elevenlabs', voiceEnv: 'ELEVENLABS_VOICE_EN_JM' },
 ];
+
+const kreyolVoice = String(process.env.ELEVENLABS_VOICE_HT_HT || '').trim();
+const patoisVoice = String(process.env.ELEVENLABS_VOICE_EN_JM || '').trim();
+if (kreyolVoice && patoisVoice && kreyolVoice === patoisVoice) {
+  throw new Error('Kreyòl and Jamaican Patois must use different native-speaker ElevenLabs voice IDs.');
+}
 
 const lessons = JSON.parse(await readFile(lessonsPath, 'utf8'));
 const targets = lessons.filter((lesson) => lesson.generated_batch === batch);
@@ -41,19 +55,21 @@ async function existsWithAudio(file) {
   }
 }
 
-function voiceFor(locale, fallback) {
+function azureVoiceFor(locale, fallback) {
   return String(process.env[`AZURE_SPEECH_VOICE_${locale.replace('-', '_')}`] || fallback).trim();
 }
 
-async function synthesize(text, locale, fallbackVoice) {
-  const voice = voiceFor(locale, fallbackVoice);
+async function synthesizeAzure(text, locale, fallbackVoice) {
+  if (!azureKey) throw new Error(`AZURE_SPEECH_KEY is required to generate ${locale} audio.`);
+  const voice = azureVoiceFor(locale, fallbackVoice);
+  if (voice === 'en-US-JennyMultilingualNeural') throw new Error(`${locale} must use a native ${locale} Azure voice, not Jenny Multilingual.`);
   const ssml = `<speak version="1.0" xml:lang="${xml(locale)}"><voice name="${xml(voice)}"><prosody rate="-5%">${xml(text)}</prosody></voice></speak>`;
   let response;
   for (let attempt = 1; attempt <= 5; attempt += 1) {
     response = await fetch(`${endpoint}/cognitiveservices/v1`, {
       method: 'POST',
       headers: {
-        'Ocp-Apim-Subscription-Key': key,
+        'Ocp-Apim-Subscription-Key': azureKey,
         'Content-Type': 'application/ssml+xml',
         'X-Microsoft-OutputFormat': outputFormat,
         'User-Agent': 'BeyondFrenchDailyLessonBatch',
@@ -73,7 +89,42 @@ async function synthesize(text, locale, fallbackVoice) {
   if (audio.length < 128 || (!audio.subarray(0, 3).equals(Buffer.from('ID3')) && audio[0] !== 0xff)) {
     throw new Error(`Azure returned invalid MP3 data for ${locale}.`);
   }
-  return audio;
+  return { audio, voice };
+}
+
+async function synthesizeElevenLabs(text, locale, voiceEnv) {
+  if (!elevenLabsKey) throw new Error(`ELEVENLABS_API_KEY is required to generate native ${locale} audio.`);
+  const voice = String(process.env[voiceEnv] || '').trim();
+  if (!voice) throw new Error(`${voiceEnv} is required and must identify a native ${locale} speaker.`);
+  let response;
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    response = await fetch(`${elevenLabsEndpoint}/${encodeURIComponent(voice)}?output_format=mp3_44100_128`, {
+      method: 'POST',
+      headers: {
+        'xi-api-key': elevenLabsKey,
+        'Content-Type': 'application/json',
+        Accept: 'audio/mpeg',
+      },
+      body: JSON.stringify({ text, model_id: elevenLabsModel }),
+    });
+    if (response.ok) break;
+    const retryable = [408, 409, 425, 429, 500, 502, 503, 504].includes(response.status);
+    if (!retryable || attempt === 5) {
+      const detail = await response.text().catch(() => '');
+      throw new Error(`ElevenLabs request failed (${locale}) with HTTP ${response.status}: ${detail.slice(0, 180)}`);
+    }
+    await sleep(attempt * 1200);
+  }
+  const audio = Buffer.from(await response.arrayBuffer());
+  if (audio.length < 128 || (!audio.subarray(0, 3).equals(Buffer.from('ID3')) && audio[0] !== 0xff)) {
+    throw new Error(`ElevenLabs returned invalid MP3 data for ${locale}.`);
+  }
+  return { audio, voice };
+}
+
+async function synthesize(text, language) {
+  if (language.provider === 'azure') return synthesizeAzure(text, language.locale, language.defaultVoice);
+  return synthesizeElevenLabs(text, language.locale, language.voiceEnv);
 }
 
 let generated = 0;
@@ -81,19 +132,27 @@ let reused = 0;
 for (const [lessonIndex, lesson] of targets.entries()) {
   lesson.audio_urls ||= {};
   const filename = `${String(lesson.id).padStart(3, '0')}-${slug(lesson.english)}.mp3`;
-  for (const [locale, field, fallbackVoice] of languages) {
+  for (const language of languages) {
+    const { locale, field, provider } = language;
     const directory = resolve(outputRoot, locale);
     const file = resolve(directory, filename);
     await mkdir(directory, { recursive: true });
-    if (!(await existsWithAudio(file))) {
+    if (forceLocales.has(locale) || !(await existsWithAudio(file))) {
       const legacyFrench = resolve(legacyFrenchRoot, filename);
-      if (locale === 'fr-FR' && await existsWithAudio(legacyFrench)) {
+      if (!forceLocales.has(locale) && locale === 'fr-FR' && await existsWithAudio(legacyFrench)) {
         await copyFile(legacyFrench, file);
         reused += 1;
       } else {
         const text = String(lesson[field] || '').trim();
         if (!text) throw new Error(`Lesson ${lesson.id} has no ${field} text.`);
-        await writeFile(file, await synthesize(text, locale, fallbackVoice));
+        const generatedAudio = await synthesize(text, language);
+        await writeFile(file, generatedAudio.audio);
+        lesson.audio_generation ||= {};
+        lesson.audio_generation[locale] = {
+          provider,
+          voice: generatedAudio.voice,
+          generated_at: new Date().toISOString(),
+        };
         generated += 1;
         await sleep(140);
       }

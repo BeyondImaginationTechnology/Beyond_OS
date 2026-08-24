@@ -13,7 +13,7 @@ if (empty($_SESSION['verse_generator_csrf'])) {
 $view = file_get_contents(__DIR__ . '/generators/multilingual-generator-view.html');
 if ($view === false) {
     http_response_code(500);
-    exit('Multilingual daily generator view is unavailable.');
+    exit('Euro Expansion generator view is unavailable.');
 }
 
 $view = str_replace('</head>', '<link rel="stylesheet" href="/server/admin/daily-studio/studio-sunset.css"></head>', $view);
@@ -26,7 +26,7 @@ try {
     $azureReady = trim((string)beyond_config('narration.azure.api_key', '')) !== ''
         && trim((string)beyond_config('narration.azure.region', '')) !== '';
 } catch (Throwable $error) {
-    error_log('Multilingual generator Azure status unavailable: ' . $error->getMessage());
+    error_log('Euro Expansion generator Azure status unavailable: ' . $error->getMessage());
 }
 
 $view = str_replace(

@@ -3,12 +3,14 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../includes/ecosystem.php';
 require_once __DIR__ . '/../includes/verse-of-day.php';
+require_once __DIR__ . '/../includes/sacred-text.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 
 $locale = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($_GET['locale'] ?? 'en')) ?: 'en';
+$tradition = dailybreath_faith_tradition((string)($_GET['tradition'] ?? 'bible'));
 $contentDate = (string)($_GET['date'] ?? date('Y-m-d'));
 $parsedDate = DateTimeImmutable::createFromFormat('!Y-m-d', $contentDate);
 if (!$parsedDate || $parsedDate->format('Y-m-d') !== $contentDate) {
@@ -61,7 +63,7 @@ $challenge = $bundledChallenge ?: [
 
 try {
     $pdo = beyond_db();
-    $verse = dailybreath_verse_of_day($pdo, $locale, $contentDate);
+    $verse = dailybreath_interfaith_verse_of_day($pdo, $tradition, $locale, $contentDate);
 
     try {
         $query = $pdo->prepare('SELECT id,title,excerpt,body,scripture_reference,duration_minutes FROM devotionals WHERE is_published=1 AND locale=? AND publish_date=? ORDER BY id DESC LIMIT 1');
@@ -112,12 +114,14 @@ try {
 echo json_encode([
     'ok' => true,
     'date' => $contentDate,
+    'tradition' => $tradition,
     'verse' => [
         'id' => 1,
         'text' => (string)($verse['text'] ?? $fallbackVerse['text']),
         'reference' => (string)($verse['reference'] ?? $fallbackVerse['reference']),
         'reflection' => 'Begin slowly. Make room for quiet, notice your breath, and let the next faithful step be enough for today.',
-        'audio_url' => !empty($verse['audio_file'])
+        'reader_url' => dailybreath_scripture_url($verse, 'https://beyondimagination.co.technology'),
+        'audio_url' => $tradition === 'bible' && !empty($verse['audio_file'])
             ? 'https://beyondimagination.co.technology/dailybreath/assets/audio/verses/' . rawurlencode(basename((string)$verse['audio_file']))
             : null,
     ],

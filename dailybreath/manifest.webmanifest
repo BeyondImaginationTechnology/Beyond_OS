@@ -1,8 +1,8 @@
 {
   "id": "/dailybreath/",
-  "name": "DailyBreath 1.2",
+  "name": "DailyBreath 1.5",
   "short_name": "DailyBreath",
-  "description": "Scripture, devotionals, guided breathing, private reflection, and gentle recovery support.",
+  "description": "Bible, Torah, and Quran daily readings, complete local sacred-text libraries, devotionals, breathing, reflection, and recovery support.",
   "start_url": "/dailybreath/?source=pwa",
   "scope": "/dailybreath/",
   "display": "standalone",
@@ -16,9 +16,9 @@
   ],
   "shortcuts": [
     {"name":"Verse of the Day","short_name":"Today","url":"/dailybreath/?source=shortcut"},
+    {"name":"Sacred Text Library","short_name":"Scripture","url":"/dailybreath/scripture.php?source=shortcut"},
     {"name":"Breathe","short_name":"Breathe","url":"/dailybreath/practices.php?section=breathing&source=shortcut"},
     {"name":"Journal","short_name":"Journal","url":"/dailybreath/practices.php?section=journal&source=shortcut"},
     {"name":"Weekly Challenge","short_name":"Challenge","url":"/dailybreath/practices.php?section=challenge&source=shortcut"}
   ]
 }
-

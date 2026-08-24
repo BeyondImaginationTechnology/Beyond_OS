@@ -69,6 +69,15 @@ final class DailyBreathTests: XCTestCase {
         XCTAssertEqual(library.search("loved world").first?.reference, "John 3:16")
     }
 
+    func testBundledBibleIncludesEveryBookAndVerse() {
+        let library = BibleLibrary.loadWorldEnglishBible()
+
+        XCTAssertEqual(library.books.count, 66)
+        XCTAssertEqual(library.verseCount, 31_103)
+        XCTAssertEqual(library.books.first?.name, "Genesis")
+        XCTAssertEqual(library.books.last?.name, "Revelation")
+    }
+
     func testBreathPatternIncludesReadableRhythm() {
         let pattern = BreathPattern.dailyPatterns[0]
 
@@ -105,6 +114,48 @@ final class DailyBreathTests: XCTestCase {
         XCTAssertEqual(RecoveryContent.challengeOfTheDay(for: date)?.title, "Build Your Support Circle")
     }
 
+    func testCompleteQuranLibraryHasAllSurahsAndVerses() {
+        let quran = SacredTextLibrary.loadPickthallQuran()
+
+        XCTAssertEqual(quran.books.count, 114)
+        XCTAssertEqual(quran.chapterCount, 114)
+        XCTAssertEqual(quran.verseCount, 6_236)
+        XCTAssertEqual(quran.books.first?.chapters.first?.verses.first?.text, "In the name of Allah, the Beneficent, the Merciful.")
+    }
+
+    func testFaithTraditionsUseConsistentRecommendedThemes() {
+        XCTAssertEqual(DailyBreathTheme.recommended(for: .bible), .forest)
+        XCTAssertEqual(DailyBreathTheme.recommended(for: .torah), .torahLight)
+        XCTAssertEqual(DailyBreathTheme.recommended(for: .quran), .quranMoon)
+    }
+
+    func testTorahEditionIncludesCompleteHebrewScriptures() {
+        let bible = BibleLibrary.loadWorldEnglishBible()
+        let torah = SacredTextLibrary.torah(from: bible)
+
+        XCTAssertEqual(torah.books.count, 39)
+        XCTAssertEqual(torah.books.first?.name, "Genesis")
+        XCTAssertEqual(torah.books.last?.name, "Malachi")
+        XCTAssertNotNil(torah.books.first { $0.name == "Psalms" })
+    }
+
+    func testAugustTwentyFourthInterfaithVersesMatchCourageTheme() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let date = DateComponents(calendar: calendar, year: 2026, month: 8, day: 24, hour: 12).date!
+        let bibleLibrary = BibleLibrary.loadWorldEnglishBible()
+        let bible = SacredTextLibrary.bible(from: bibleLibrary)
+        let torah = SacredTextLibrary.torah(from: bibleLibrary)
+        let quran = SacredTextLibrary.loadPickthallQuran()
+        let daily = RecoveryContent.verseOfTheDay(for: date)!
+
+        let jewishVerse = InterfaithDailyContent.verse(for: .torah, date: date, bibleVerse: daily, bible: bible, torah: torah, quran: quran)
+        let muslimVerse = InterfaithDailyContent.verse(for: .quran, date: date, bibleVerse: daily, bible: bible, torah: torah, quran: quran)
+
+        XCTAssertEqual(jewishVerse.reference, "Psalms 27:14")
+        XCTAssertEqual(muslimVerse.reference, "Al-Imran 3:200")
+    }
+
     func testReviewDateUsesScheduledVerseInsteadOfHardcodedFallback() {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
@@ -113,9 +164,49 @@ final class DailyBreathTests: XCTestCase {
         let verse = RecoveryContent.verseOfTheDay(for: date)
 
         XCTAssertEqual(verse?.reference, "Psalm 23:4")
-        XCTAssertEqual(verse?.reflection, "Carry this verse with you today, and let it guide your next faithful step.")
+        XCTAssertEqual(verse?.reflection, "Let this recovery verse guide your next faithful step.")
         XCTAssertFalse(verse?.reflection.contains("entry.theme") ?? true)
         XCTAssertNotEqual(verse, Verse.daily)
+    }
+
+    func testScheduledVerseCannotBeOverwrittenByRemoteCovenantFallback() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let date = DateComponents(calendar: calendar, year: 2026, month: 8, day: 24, hour: 12).date!
+        let remoteFallback = Verse(
+            id: 999,
+            text: "A generic covenant fallback.",
+            reference: "Covenant 1:1",
+            reflection: "Let this entry.theme verse guide your day."
+        )
+
+        let resolved = RecoveryContent.resolvedVerseOfTheDay(for: date, remoteVerse: remoteFallback)
+
+        XCTAssertEqual(resolved.reference, "Psalm 27:14")
+        XCTAssertNotEqual(resolved.text, remoteFallback.text)
+        XCTAssertEqual(resolved.reflection, RecoveryContent.recoveryVerseReflection)
+        XCTAssertFalse(resolved.reflection.contains("entry.theme"))
+    }
+
+    func testMatchingRemoteVerseCanOnlyContributeItsAudioURL() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let date = DateComponents(calendar: calendar, year: 2026, month: 8, day: 24, hour: 12).date!
+        let scheduled = RecoveryContent.verseOfTheDay(for: date)!
+        let matchingRemote = Verse(
+            id: 500,
+            text: scheduled.text,
+            reference: scheduled.reference,
+            reflection: "Let this entry.theme verse guide your day.",
+            audioURL: "https://example.com/verse.mp3"
+        )
+
+        let resolved = RecoveryContent.resolvedVerseOfTheDay(for: date, remoteVerse: matchingRemote)
+
+        XCTAssertEqual(resolved.id, scheduled.id)
+        XCTAssertEqual(resolved.text, scheduled.text)
+        XCTAssertEqual(resolved.reflection, RecoveryContent.recoveryVerseReflection)
+        XCTAssertEqual(resolved.audioURL, matchingRemote.audioURL)
     }
 
     func testUserDataStorePersistsJournalAndChallengeProgress() throws {

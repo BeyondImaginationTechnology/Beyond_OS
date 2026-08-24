@@ -37,6 +37,9 @@
 		300000000000000000000029 /* daily-verses.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000023 /* daily-verses.json */; };
 		300000000000000000000030 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000033 /* PrivacyInfo.xcprivacy */; };
 		300000000000000000000031 /* Daily Breath Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 100000000000000000000032 /* Daily Breath Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		300000000000000000000032 /* InterfaithScripture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000035 /* InterfaithScripture.swift */; };
+		300000000000000000000033 /* ScriptureLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000036 /* ScriptureLibraryView.swift */; };
+		300000000000000000000034 /* quran-pickthall-vpl.txt in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000037 /* quran-pickthall-vpl.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -123,6 +126,9 @@
 		100000000000000000000032 /* Daily Breath Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Daily Breath Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		100000000000000000000033 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		100000000000000000000034 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		100000000000000000000035 /* InterfaithScripture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterfaithScripture.swift; sourceTree = "<group>"; };
+		100000000000000000000036 /* ScriptureLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptureLibraryView.swift; sourceTree = "<group>"; };
+		100000000000000000000037 /* quran-pickthall-vpl.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "quran-pickthall-vpl.txt"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,11 +186,13 @@
 				100000000000000000000017 /* DailyBreathTheme.swift */,
 				100000000000000000000028 /* FeatureViews.swift */,
 				100000000000000000000029 /* Info.plist */,
+				100000000000000000000035 /* InterfaithScripture.swift */,
 				100000000000000000000006 /* JournalView.swift */,
 				100000000000000000000007 /* Models.swift */,
 				100000000000000000000020 /* NotificationService.swift */,
 				100000000000000000000021 /* ReminderSettingsView.swift */,
 				100000000000000000000008 /* RootView.swift */,
+				100000000000000000000036 /* ScriptureLibraryView.swift */,
 				100000000000000000000009 /* TodayView.swift */,
 				100000000000000000000027 /* TheDailyBreath.entitlements */,
 			);
@@ -202,6 +210,7 @@
 				100000000000000000000024 /* daily-devotionals.json */,
 				100000000000000000000025 /* recovery-challenges.json */,
 				100000000000000000000026 /* PrivacyInfo.xcprivacy */,
+				100000000000000000000037 /* quran-pickthall-vpl.txt */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -402,6 +411,7 @@
 				300000000000000000000023 /* daily-devotionals.json in Resources */,
 				300000000000000000000024 /* recovery-challenges.json in Resources */,
 				300000000000000000000025 /* PrivacyInfo.xcprivacy in Resources */,
+				300000000000000000000034 /* quran-pickthall-vpl.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -437,11 +447,13 @@
 				300000000000000000000005 /* DailyBreathStore.swift in Sources */,
 				300000000000000000000016 /* DailyBreathTheme.swift in Sources */,
 				300000000000000000000027 /* FeatureViews.swift in Sources */,
+				300000000000000000000032 /* InterfaithScripture.swift in Sources */,
 				300000000000000000000006 /* JournalView.swift in Sources */,
 				300000000000000000000007 /* Models.swift in Sources */,
 				300000000000000000000019 /* NotificationService.swift in Sources */,
 				300000000000000000000020 /* ReminderSettingsView.swift in Sources */,
 				300000000000000000000008 /* RootView.swift in Sources */,
+				300000000000000000000033 /* ScriptureLibraryView.swift in Sources */,
 				300000000000000000000009 /* TodayView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -644,7 +656,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -705,7 +717,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.2;
+				MARKETING_VERSION = 1.5;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

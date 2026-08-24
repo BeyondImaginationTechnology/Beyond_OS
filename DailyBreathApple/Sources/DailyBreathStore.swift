@@ -68,6 +68,9 @@ final class DailyBreathStore: ObservableObject {
     @Published var journalMood = "Peaceful"
     @Published private(set) var entries: [JournalEntry] = []
     @Published private(set) var bibleLibrary = BibleLibrary(translation: "World English Bible", books: [])
+    @Published private(set) var bibleScriptureLibrary = SacredTextLibrary(tradition: .bible, translation: "World English Bible", books: [])
+    @Published private(set) var torahScriptureLibrary = SacredTextLibrary(tradition: .torah, translation: "World English Bible — Hebrew Scriptures", books: [])
+    @Published private(set) var quranScriptureLibrary = SacredTextLibrary(tradition: .quran, translation: "Pickthall English Meaning", books: [])
     @Published private(set) var isBibleLoading = true
     @Published private(set) var challengeCompletedDayKeys: [String] = []
     @Published private(set) var bibleAnnotations: [String: BibleAnnotation] = [:]
@@ -84,8 +87,8 @@ final class DailyBreathStore: ObservableObject {
     let academyPaths = [
         AcademyPath(
             id: 1,
-            title: "Foundations of Faith",
-            subtitle: "A practical starter path for Scripture, prayer, and daily practice.",
+            title: "Joining the Christian Faith with Chris",
+            subtitle: "A starter journey for following Jesus through Scripture, prayer, baptism, and church community.",
             systemImage: "book.pages.fill",
             lessons: [
                 AcademyLesson(
@@ -111,15 +114,19 @@ final class DailyBreathStore: ObservableObject {
                     reflectionPrompt: "What situation today needs listening before speaking?",
                     checkPrompt: "James 1:19 names quick listening, slow speaking, and slow what?",
                     checkAnswer: "anger"
-                )
-            ]
-        ),
-        AcademyPath(
-            id: 2,
-            title: "Life of Jesus",
-            subtitle: "Short lessons from the Gospels for attention, compassion, and courage.",
-            systemImage: "figure.walk",
-            lessons: [
+                ),
+                AcademyLesson(
+                    id: 103,
+                    title: "Exploring the Christian Path",
+                    duration: "7 min",
+                    scripture: "Romans 10:9-10",
+                    summary: "Learn a starter path of trust in Jesus, prayer, Scripture, baptism, and church community.",
+                    teaching: "Christian faith centers on trusting and following Jesus Christ. Begin with honest prayer, read one Gospel, and connect with a healthy local church where questions are welcome. Christians commonly mark entry into the faith through baptism, with preparation varying by tradition. Daily Breath can support learning and recovery, but a pastor, priest, or mature local community should guide sacramental and membership steps.",
+                    practice: "Write what you believe and what you are unsure about. Read Mark 1 this week and identify a trustworthy local Christian community for a conversation.",
+                    reflectionPrompt: "What draws me toward following Jesus, and what question do I want to explore honestly?",
+                    checkPrompt: "Who should help guide baptism and church belonging?",
+                    checkAnswer: "local church"
+                ),
                 AcademyLesson(
                     id: 201,
                     title: "The Pace of Jesus",
@@ -136,8 +143,8 @@ final class DailyBreathStore: ObservableObject {
         ),
         AcademyPath(
             id: 3,
-            title: "Wisdom and Prayer",
-            subtitle: "Simple practices from Psalms and Proverbs for everyday devotion.",
+            title: "Christian Recovery with Chris",
+            subtitle: "Grace-centered practices for cravings, support, prayer, and the next healthy step.",
             systemImage: "hands.sparkles.fill",
             lessons: [
                 AcademyLesson(
@@ -151,8 +158,160 @@ final class DailyBreathStore: ObservableObject {
                     reflectionPrompt: "What decision can I place before God in one sentence today?",
                     checkPrompt: "This lesson turns Proverbs 3:5-6 into what kind of prayer?",
                     checkAnswer: "carryable"
+                ),
+                AcademyLesson(
+                    id: 302,
+                    title: "Cravings, Community, and Grace",
+                    duration: "6 min",
+                    scripture: "Galatians 6:2",
+                    summary: "Interrupt isolation by carrying recovery with trusted people and practical support.",
+                    teaching: "Recovery is not a test of whether you can carry everything alone. Galatians calls believers to carry one another’s burdens. Grace makes honesty possible, while wise support turns honesty into action. A pastor or trusted Christian community can walk with you, and licensed treatment or a recovery group may be essential. Asking for help is a faithful step, not a failure of faith.",
+                    practice: "Choose one trusted person or recovery resource. Send a simple message that names what support you need today.",
+                    reflectionPrompt: "What burden have I been trying to carry alone?",
+                    checkPrompt: "According to Galatians 6:2, whose burdens should believers carry?",
+                    checkAnswer: "one another's"
                 )
             ]
+        ),
+        AcademyPath(
+            id: 4,
+            title: "Joining the Jewish Faith with Dovi",
+            subtitle: "A respectful starter journey through Torah, mitzvot, prayer, community, and Jewish life.",
+            systemImage: "star.of.david",
+            lessons: [
+                AcademyLesson(
+                    id: 401,
+                    title: "Begin with Shema",
+                    duration: "5 min",
+                    scripture: "Deuteronomy 6:4-5",
+                    summary: "Start with Jewish faith’s call to listen, love God, and live attentively.",
+                    teaching: "Shema means listen. Deuteronomy joins listening to love and daily action: faith is carried into ordinary choices, relationships, and habits. Dovi’s first invitation is simple—listen before reacting, remember that your life has sacred direction, and let one action embody what you are learning.",
+                    practice: "Read Deuteronomy 6:4-5 slowly. Take one quiet breath after each line and name one loving action for today.",
+                    reflectionPrompt: "What would attentive listening change in my next decision?",
+                    checkPrompt: "What does the word Shema invite you to do?",
+                    checkAnswer: "listen"
+                ),
+                AcademyLesson(
+                    id: 402,
+                    title: "Exploring Jewish Life Respectfully",
+                    duration: "7 min",
+                    scripture: "Ruth 1:16",
+                    summary: "Learn a respectful first path for community, study, and possible conversion.",
+                    teaching: "Jewish life is lived in community, not assembled from an app. Begin by learning, visiting a welcoming synagogue, and speaking with a rabbi about practice, belonging, and conversion if that is your sincere direction. Different Jewish movements guide conversion differently. Daily Breath can support reflection, but it cannot replace a rabbi, congregation, or formal process.",
+                    practice: "Write down two questions, research a nearby welcoming congregation, and plan a respectful conversation with a rabbi.",
+                    reflectionPrompt: "What draws me toward Jewish life, and what am I ready to learn with humility?",
+                    checkPrompt: "Who should guide a formal Jewish conversion path?",
+                    checkAnswer: "rabbi"
+                )
+            ],
+            tradition: .torah,
+            guideName: "Dovi",
+            guideAssetName: "DoviGuide"
+        ),
+        AcademyPath(
+            id: 5,
+            title: "Jewish Recovery with Dovi",
+            subtitle: "Teshuvah, community, honest repair, and daily choices for recovery.",
+            systemImage: "arrow.uturn.backward.circle.fill",
+            lessons: [
+                AcademyLesson(
+                    id: 501,
+                    title: "Teshuvah: Return, Don’t Disappear",
+                    duration: "6 min",
+                    scripture: "Psalm 51:12",
+                    summary: "Approach a setback as a call to return, repair, and reconnect.",
+                    teaching: "Teshuvah is often translated as repentance, but its movement is return. Recovery grows when shame no longer drives isolation. Name what happened truthfully, return to God and your supports, repair what you safely can, and take the next concrete step. A lapse is serious, but it does not erase your capacity to return.",
+                    practice: "Use four lines: what happened, who can support me, what needs repair, and what is my next safe action?",
+                    reflectionPrompt: "Where can I choose return instead of hiding today?",
+                    checkPrompt: "What movement is at the heart of teshuvah?",
+                    checkAnswer: "return"
+                ),
+                AcademyLesson(
+                    id: 502,
+                    title: "Choose Life with Support",
+                    duration: "6 min",
+                    scripture: "Deuteronomy 30:19",
+                    summary: "Build recovery around life-giving choices, community, and a concrete safety plan.",
+                    teaching: "The Torah’s call to choose life can guide one decision at a time. Recovery becomes more durable when a life-giving choice is made easier before a difficult moment arrives. Trusted community, professional care, and peer support can stand alongside prayer and teshuvah. Prepare the next right choice by reducing access to harm and increasing access to people who know how to help.",
+                    practice: "Write one safeguard, one person to contact, and one life-giving action you can take when risk rises.",
+                    reflectionPrompt: "What practical choice would make the path toward life easier today?",
+                    checkPrompt: "What does Deuteronomy 30:19 call you to choose?",
+                    checkAnswer: "life"
+                )
+            ],
+            tradition: .torah,
+            guideName: "Dovi",
+            guideAssetName: "DoviGuide"
+        ),
+        AcademyPath(
+            id: 6,
+            title: "Joining the Muslim Faith with Moe",
+            subtitle: "A starter journey through tawhid, prayer, Quran, community, and becoming Muslim.",
+            systemImage: "moon.stars.fill",
+            lessons: [
+                AcademyLesson(
+                    id: 601,
+                    title: "Begin with Intention",
+                    duration: "5 min",
+                    scripture: "Quran 1:1-7",
+                    summary: "Begin with sincere intention, mercy, worship, and the straight path.",
+                    teaching: "Islam begins with surrender to the One God and a sincere intention to seek what is right. Al-Fatiha centers praise, mercy, accountability, worship, help, and guidance. Moe’s invitation is to slow down, ask Allah for guidance, and let intention become action rather than pressure for instant perfection.",
+                    practice: "Read Al-Fatiha in translation, pause for three breaths, and name one action that aligns with a sincere intention today.",
+                    reflectionPrompt: "What guidance am I asking Allah for in this season?",
+                    checkPrompt: "What should turn a sincere intention into lived faith?",
+                    checkAnswer: "action"
+                ),
+                AcademyLesson(
+                    id: 602,
+                    title: "A Respectful Path to Islam",
+                    duration: "7 min",
+                    scripture: "Quran 2:256",
+                    summary: "Learn the starter steps of belief, shahada, prayer, study, and community.",
+                    teaching: "Becoming Muslim begins with sincere belief in Allah and acceptance of Muhammad as His messenger, expressed in the shahada. Learn its meaning rather than rushing the words. Connect with a trustworthy local mosque or imam, ask questions, begin learning salah, and build community. Daily Breath can help you reflect, but it does not replace qualified local guidance.",
+                    practice: "Write your questions about belief and practice, then identify a welcoming mosque or imam for a conversation.",
+                    reflectionPrompt: "What do I believe, and what questions do I want to explore honestly?",
+                    checkPrompt: "Who can provide trustworthy local guidance as you explore Islam?",
+                    checkAnswer: "imam"
+                )
+            ],
+            tradition: .quran,
+            guideName: "Moe",
+            guideAssetName: "MoeGuide"
+        ),
+        AcademyPath(
+            id: 7,
+            title: "Muslim Recovery with Moe",
+            subtitle: "Mercy, tawbah, prayer, support, and practical safeguards for recovery.",
+            systemImage: "shield.lefthalf.filled",
+            lessons: [
+                AcademyLesson(
+                    id: 701,
+                    title: "Never Despair of Mercy",
+                    duration: "6 min",
+                    scripture: "Quran 39:53",
+                    summary: "Meet shame with Allah’s mercy, honest repentance, and a supported next step.",
+                    teaching: "Quran 39:53 warns against despairing of Allah’s mercy. Recovery still asks for honesty, safeguards, treatment when needed, and repair—but despair is not the guide. Tawbah turns you back toward Allah. Reach out early, remove immediate access to the harmful pattern, and choose the next safe action with support.",
+                    practice: "Make a three-part plan: who I will contact, what access I will remove, and what healthy action I will take in the next ten minutes.",
+                    reflectionPrompt: "What would returning to mercy change about my next recovery choice?",
+                    checkPrompt: "What should a believer not despair of in Quran 39:53?",
+                    checkAnswer: "mercy"
+                ),
+                AcademyLesson(
+                    id: 702,
+                    title: "Patience, Prayer, and Safeguards",
+                    duration: "6 min",
+                    scripture: "Quran 2:153",
+                    summary: "Pair spiritual steadiness with people and safeguards that protect recovery.",
+                    teaching: "The Quran teaches believers to seek help through patience and prayer. Patience is active steadiness, not silent isolation. Recovery may also require professional treatment, a peer group, an imam who understands the situation, and firm limits around access to harm. Spiritual practice and practical care can reinforce one another as you take the next safe step.",
+                    practice: "Pray for steadiness, contact one trustworthy support, and remove one immediate pathway back to the harmful pattern.",
+                    reflectionPrompt: "Which support or safeguard would strengthen my patience today?",
+                    checkPrompt: "Quran 2:153 says to seek help through patience and what?",
+                    checkAnswer: "prayer"
+                )
+            ],
+            tradition: .quran,
+            guideName: "Moe",
+            guideAssetName: "MoeGuide"
         )
     ]
 
@@ -193,8 +352,33 @@ final class DailyBreathStore: ObservableObject {
         let bibleTask = Task.detached(priority: .userInitiated) {
             BibleLibrary.loadWorldEnglishBible()
         }
+        let quranTask = Task.detached(priority: .userInitiated) {
+            SacredTextLibrary.loadPickthallQuran()
+        }
         await refreshToday()
         bibleLibrary = await bibleTask.value
+        bibleScriptureLibrary = SacredTextLibrary.bible(from: bibleLibrary)
+        torahScriptureLibrary = SacredTextLibrary.torah(from: bibleLibrary)
+        quranScriptureLibrary = await quranTask.value
+    }
+
+    func scriptureLibrary(for tradition: FaithTradition) -> SacredTextLibrary {
+        switch tradition {
+        case .bible: bibleScriptureLibrary
+        case .torah: torahScriptureLibrary
+        case .quran: quranScriptureLibrary
+        }
+    }
+
+    func dailyVerse(for tradition: FaithTradition, date: Date = Date()) -> Verse {
+        InterfaithDailyContent.verse(
+            for: tradition,
+            date: date,
+            bibleVerse: verse,
+            bible: bibleScriptureLibrary,
+            torah: torahScriptureLibrary,
+            quran: quranScriptureLibrary
+        )
     }
 
     func refreshToday() async {
@@ -205,7 +389,7 @@ final class DailyBreathStore: ObservableObject {
 
         do {
             let today = try await apiClient.fetch(dateKey: requestedDateKey)
-            verse = today.verse
+            verse = RecoveryContent.resolvedVerseOfTheDay(for: requestedDate, remoteVerse: today.verse)
             devotional = today.devotional
             challenge = today.challenge ?? RecoveryContent.challengeOfTheDay(for: requestedDate)
             updateCurrentChallengeProgress()
@@ -521,10 +705,12 @@ final class DailyBreathStore: ObservableObject {
     }
 
     var recoveryNewsletterShareText: String {
+        let tradition = FaithTradition(rawValue: UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "") ?? .bible
+        let sharedVerse = dailyVerse(for: tradition)
         let challengeCopy = challenge.map { item in
             "Weekly challenge: \(item.title). \(item.description) \(item.scriptureReference)"
         } ?? ""
-        return "Recovery Newsletter\n\n\(verse.reference)\n\(verse.text)\n\n\(devotional.title)\n\(devotional.body)\n\n\(challengeCopy)"
+        return "Recovery Newsletter\n\n\(sharedVerse.reference)\n\(sharedVerse.text)\n\n\(devotional.title)\n\(devotional.body)\n\n\(challengeCopy)"
     }
 
     func setICloudSyncEnabled(_ enabled: Bool) async {

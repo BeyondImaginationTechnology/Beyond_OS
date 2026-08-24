@@ -79,6 +79,9 @@ struct SettingsAboutView: View {
                 Link(destination: URL(string: "https://ebible.org/web/")!) {
                     Label("World English Bible attribution", systemImage: "book.closed")
                 }
+                Link(destination: URL(string: "https://www.gutenberg.org/ebooks/16955")!) {
+                    Label("Pickthall Quran translation source", systemImage: "moon.stars")
+                }
                 Link(destination: URL(string: "https://beyondimagination.co.technology/legal/privacy.php")!) {
                     Label("Privacy Policy", systemImage: "hand.raised")
                 }
@@ -86,7 +89,7 @@ struct SettingsAboutView: View {
                     Label("Support", systemImage: "envelope")
                 }
             } footer: {
-                Text("Scripture text: World English Bible, Public Domain.")
+                Text("Bible and Torah/Tanakh text: World English Bible, Public Domain. Quran English meaning: Marmaduke Pickthall, Project Gutenberg eBook 16955, Public Domain in the USA.")
             }
         }
         .navigationTitle("Settings & About")

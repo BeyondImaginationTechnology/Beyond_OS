@@ -37,7 +37,7 @@ foreach($courses as $course){
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7faf6"><title>Bible Academy | DailyBreath</title><meta name="description" content="Professional Bible learning pathways for teens and adults."><link rel="stylesheet" href="/dailybreath/academy.css?v=20260730-1"></head><body>
 <header class="ba-nav">
   <a class="ba-brand" href="/dailybreath/"><span class="ba-mark">DB</span><span><strong>DailyBreath</strong><small>Bible Academy</small></span></a>
-  <nav aria-label="Bible Academy navigation"><a class="active" href="/dailybreath/academy.php">Academy</a><a href="/dailybreath/bible.php">Bible Library</a><a href="/dailybreath/">DailyBreath home</a></nav>
+  <nav aria-label="Bible Academy navigation"><a class="active" href="/dailybreath/academy.php">Academy</a><a href="/dailybreath/scripture.php">Sacred Text Library</a><a href="/dailybreath/">DailyBreath home</a></nav>
 </header>
 <main class="ba-main">
   <section class="ba-hero">

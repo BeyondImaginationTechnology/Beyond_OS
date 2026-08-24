@@ -4,6 +4,8 @@ struct AcademyView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
     @AppStorage("completedAcademyLessonIDs") private var completedLessonIDs = ""
+    @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
+    @State private var certificateDate = Date()
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -14,24 +16,27 @@ struct AcademyView: View {
     }
 
     private var completedCount: Int {
-        completedIDs.count
+        selectedPaths.flatMap(\.lessons).filter { completedIDs.contains("\($0.id)") }.count
     }
+
+    private var selectedTradition: FaithTradition { FaithTradition(rawValue: traditionID) ?? .bible }
+    private var selectedPaths: [AcademyPath] { store.academyPaths.filter { $0.tradition == selectedTradition } }
 
     private var totalLessonCount: Int {
-        store.academyPaths.reduce(0) { $0 + $1.lessons.count }
+        selectedPaths.reduce(0) { $0 + $1.lessons.count }
     }
 
-    private var openLessonCount: Int {
-        totalLessonCount
+    private var isAcademyComplete: Bool {
+        totalLessonCount > 0 && completedCount == totalLessonCount
     }
 
     private var nextLesson: (path: AcademyPath, lesson: AcademyLesson, index: Int)? {
-        for path in store.academyPaths {
+        for path in selectedPaths {
             for index in path.lessons.indices where !completedIDs.contains("\(path.lessons[index].id)") {
                 return (path, path.lessons[index], index)
             }
         }
-        guard let path = store.academyPaths.first, let lesson = path.lessons.first else { return nil }
+        guard let path = selectedPaths.first, let lesson = path.lessons.first else { return nil }
         return (path, lesson, 0)
     }
 
@@ -39,17 +44,35 @@ struct AcademyView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 hero
+                traditionPicker
                 metricGrid
                 continueCard
-                ForEach(store.academyPaths) { path in
-                    AcademyModuleCard(path: path, completedIDs: completedIDs, theme: selectedTheme)
+                ForEach(Array(selectedPaths.enumerated()), id: \.element.id) { index, path in
+                    AcademyModuleCard(pathNumber: index + 1, path: path, completedIDs: completedIDs, theme: selectedTheme)
                 }
+                certificationCard
             }
             .padding()
         }
         .background(DailyBreathThemeBackground(theme: selectedTheme))
         .navigationTitle("Academy")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear(perform: refreshCertificate)
+        .onChange(of: completedLessonIDs) { _ in refreshCertificate() }
+        .onChange(of: traditionID) { _, value in
+            let tradition = FaithTradition(rawValue: value) ?? .bible
+            selectedThemeID = DailyBreathTheme.recommended(for: tradition).id
+            refreshCertificate()
+        }
+    }
+
+    private var traditionPicker: some View {
+        Picker("Academy path", selection: $traditionID) {
+            ForEach(FaithTradition.allCases) { tradition in
+                Label(tradition.name, systemImage: tradition.symbolName).tag(tradition.id)
+            }
+        }
+        .pickerStyle(.segmented)
     }
 
     private var hero: some View {
@@ -59,8 +82,22 @@ struct AcademyView: View {
                 .foregroundStyle(selectedTheme.accent)
             Text("Learn the rhythm behind the practice.")
                 .font(.largeTitle.weight(.black))
-            Text("Short local lessons for Scripture, prayer, breathing, and reflection. Everything here is available inside Daily Breath.")
+            Text("Choose one of two journeys for each faith: join and learn the tradition, or build a faith-centered recovery practice.")
                 .foregroundStyle(.secondary)
+            HStack(spacing: 10) {
+                ForEach(FaithTradition.allCases) { tradition in
+                    VStack(spacing: 5) {
+                        Image(tradition.guideAssetName)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 72, height: 82)
+                            .clipShape(RoundedRectangle(cornerRadius: 14))
+                        Text(tradition.guideName)
+                            .font(.caption.bold())
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
         }
         .padding(20)
         .background(.background.opacity(0.9), in: RoundedRectangle(cornerRadius: 8))
@@ -69,7 +106,7 @@ struct AcademyView: View {
     private var metricGrid: some View {
         LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 12) {
             AcademyMetricTile(title: "Lessons Complete", value: "\(completedCount)", systemImage: "checkmark.seal.fill", color: selectedTheme.primary)
-            AcademyMetricTile(title: "Open Lessons", value: "\(openLessonCount)", systemImage: "lock.open.fill", color: selectedTheme.accent)
+            AcademyMetricTile(title: "Journey Paths", value: "\(selectedPaths.count)", systemImage: "rectangle.stack.fill", color: selectedTheme.accent)
         }
     }
 
@@ -104,6 +141,75 @@ struct AcademyView: View {
             .buttonStyle(.plain)
         }
     }
+
+    @ViewBuilder
+    private var certificationCard: some View {
+        if isAcademyComplete {
+            NavigationLink {
+                AcademyCertificateView(tradition: selectedTradition, issuedOn: certificateDate)
+            } label: {
+                certificateLabel(
+                    eyebrow: "BEYOND IMAGINATION",
+                    title: "Certification Unlocked",
+                    detail: "Both \(selectedTradition.name) journeys are complete. View and share your Academy certificate.",
+                    systemImage: "checkmark.seal.fill"
+                )
+            }
+            .buttonStyle(.plain)
+        } else {
+            certificateLabel(
+                eyebrow: "FINAL MILESTONE",
+                title: "Beyond Imagination Certification",
+                detail: "Complete all \(totalLessonCount) lessons across both paths to unlock your certificate.",
+                systemImage: "lock.fill"
+            )
+        }
+    }
+
+    private func certificateLabel(eyebrow: String, title: String, detail: String, systemImage: String) -> some View {
+        HStack(spacing: 16) {
+            Image(systemName: systemImage)
+                .font(.title)
+                .foregroundStyle(isAcademyComplete ? selectedTheme.primary : .secondary)
+                .frame(width: 52, height: 52)
+                .background(selectedTheme.primary.opacity(0.12), in: Circle())
+            VStack(alignment: .leading, spacing: 4) {
+                Text(eyebrow)
+                    .font(.caption2.weight(.black))
+                    .tracking(1.2)
+                    .foregroundStyle(selectedTheme.accent)
+                Text(title)
+                    .font(.headline.weight(.black))
+                Text(detail)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 0)
+            if isAcademyComplete {
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(18)
+        .background(.background.opacity(0.94), in: RoundedRectangle(cornerRadius: 8))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(selectedTheme.primary.opacity(isAcademyComplete ? 0.55 : 0.18), lineWidth: 1)
+        }
+    }
+
+    private func refreshCertificate() {
+        guard isAcademyComplete else { return }
+        let key = "academyCertificateDate.\(selectedTradition.rawValue)"
+        let storedTimestamp = UserDefaults.standard.double(forKey: key)
+        if storedTimestamp > 0 {
+            certificateDate = Date(timeIntervalSince1970: storedTimestamp)
+        } else {
+            let issuedOn = Date()
+            UserDefaults.standard.set(issuedOn.timeIntervalSince1970, forKey: key)
+            certificateDate = issuedOn
+        }
+    }
 }
 
 private struct AcademyMetricTile: View {
@@ -129,6 +235,7 @@ private struct AcademyMetricTile: View {
 }
 
 private struct AcademyModuleCard: View {
+    let pathNumber: Int
     let path: AcademyPath
     let completedIDs: Set<String>
     let theme: DailyBreathTheme
@@ -140,12 +247,15 @@ private struct AcademyModuleCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top, spacing: 14) {
-                Image(systemName: path.systemImage)
-                    .font(.title2)
-                    .foregroundStyle(theme.accent)
-                    .frame(width: 48, height: 48)
-                    .background(theme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
+                Image(path.guideAssetName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 72, height: 88)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 VStack(alignment: .leading, spacing: 5) {
+                    Label("Path \(pathNumber) · Guide: \(path.guideName)", systemImage: path.systemImage)
+                        .font(.caption.bold())
+                        .foregroundStyle(theme.accent)
                     Text(path.title)
                         .font(.title3.weight(.black))
                     Text(path.subtitle)
@@ -165,6 +275,112 @@ private struct AcademyModuleCard: View {
         }
         .padding(18)
         .background(.background.opacity(0.9), in: RoundedRectangle(cornerRadius: 8))
+    }
+}
+
+private struct AcademyCertificateView: View {
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("academyCertificateName") private var learnerName = ""
+
+    let tradition: FaithTradition
+    let issuedOn: Date
+
+    private var selectedTheme: DailyBreathTheme {
+        DailyBreathTheme(id: selectedThemeID)
+    }
+
+    private var displayedName: String {
+        let trimmed = learnerName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "Daily Breath Learner" : trimmed
+    }
+
+    private var certificateID: String {
+        let date = issuedOn.formatted(.dateTime.year().month().day())
+            .replacingOccurrences(of: "[^0-9]", with: "", options: .regularExpression)
+        return "BI-DB-\(tradition.rawValue.uppercased())-\(date)"
+    }
+
+    private var shareText: String {
+        "\(displayedName) completed both Daily Breath \(tradition.name) Academy journeys—Joining the Faith and Recovery—and earned a Beyond Imagination Certificate of Completion on \(issuedOn.formatted(date: .long, time: .omitted)). Certificate ID: \(certificateID)"
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 22) {
+                Image("DailyBreathIcon")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 86, height: 86)
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+
+                VStack(spacing: 6) {
+                    Text("BEYOND IMAGINATION")
+                        .font(.caption.weight(.black))
+                        .tracking(2)
+                        .foregroundStyle(selectedTheme.accent)
+                    Text("Certificate of Completion")
+                        .font(.largeTitle.weight(.black))
+                        .multilineTextAlignment(.center)
+                    Text("Daily Breath \(tradition.name) Academy")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+                }
+
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.system(size: 64))
+                    .foregroundStyle(selectedTheme.primary)
+
+                VStack(spacing: 10) {
+                    Text("Presented to")
+                        .font(.caption.bold())
+                        .foregroundStyle(.secondary)
+                    TextField("Your name", text: $learnerName)
+                        .font(.title2.weight(.bold))
+                        .multilineTextAlignment(.center)
+                        .textInputAutocapitalization(.words)
+                        .padding(12)
+                        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
+                    Text("for completing both Academy journeys")
+                        .foregroundStyle(.secondary)
+                    Text("Joining the Faith + Recovery")
+                        .font(.headline.weight(.black))
+                        .foregroundStyle(selectedTheme.primary)
+                }
+
+                Divider()
+
+                VStack(spacing: 5) {
+                    Text("Issued \(issuedOn.formatted(date: .long, time: .omitted))")
+                        .font(.subheadline.bold())
+                    Text(certificateID)
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                }
+
+                ShareLink(item: shareText) {
+                    Label("Share Achievement", systemImage: "square.and.arrow.up")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(selectedTheme.primary)
+                .controlSize(.large)
+
+                Text("This certificate recognizes completion of Daily Breath educational lessons. It is not ordination, conversion documentation, clinical certification, or an accredited credential.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(28)
+            .background(.background.opacity(0.95), in: RoundedRectangle(cornerRadius: 14))
+            .overlay {
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(selectedTheme.primary.opacity(0.45), lineWidth: 2)
+            }
+            .padding()
+        }
+        .background(DailyBreathThemeBackground(theme: selectedTheme))
+        .navigationTitle("Certificate")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

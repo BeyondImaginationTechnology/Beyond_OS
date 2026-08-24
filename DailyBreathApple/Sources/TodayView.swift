@@ -4,6 +4,7 @@ struct TodayView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
     @AppStorage("devotionalReadDayKeys") private var devotionalReadDayKeys = ""
     @AppStorage("completedBreathDayKeys") private var completedBreathDayKeys = ""
     @AppStorage("dailyReminderEnabled") private var reminderEnabled = false
@@ -12,6 +13,14 @@ struct TodayView: View {
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
+    }
+
+    private var selectedTradition: FaithTradition {
+        FaithTradition(rawValue: traditionID) ?? .bible
+    }
+
+    private var todayVerse: Verse {
+        store.dailyVerse(for: selectedTradition)
     }
 
     private var todayKey: String {
@@ -41,6 +50,7 @@ struct TodayView: View {
                 themePicker
                 dailyRhythmCard
                 reminderCard
+                traditionPicker
                 verseCard
                 devotionalCard
                 recoveryNewsletterCard
@@ -143,25 +153,38 @@ struct TodayView: View {
         .tint(selectedTheme.primary)
     }
 
+    private var traditionPicker: some View {
+        Picker("Verse tradition", selection: $traditionID) {
+            ForEach(FaithTradition.allCases) { tradition in
+                Label(tradition.name, systemImage: tradition.symbolName).tag(tradition.id)
+            }
+        }
+        .pickerStyle(.segmented)
+        .onChange(of: traditionID) { _, value in
+            let tradition = FaithTradition(rawValue: value) ?? .bible
+            selectedThemeID = DailyBreathTheme.recommended(for: tradition).id
+        }
+    }
+
     private var verseCard: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Label("Verse of the Day", systemImage: "sun.max.fill")
+            Label("\(selectedTradition.name) Verse of the Day", systemImage: selectedTradition.symbolName)
                 .font(.caption.bold())
                 .tracking(1.4)
                 .foregroundStyle(selectedTheme.accent)
-            Text("\"\(store.verse.text)\"")
+            Text("\"\(todayVerse.text)\"")
                 .font(.system(size: 36, weight: .semibold, design: .serif))
                 .foregroundStyle(.white)
                 .fixedSize(horizontal: false, vertical: true)
-            Text(store.verse.reference)
+            Text(todayVerse.reference)
                 .font(.headline.weight(.black))
                 .foregroundStyle(selectedTheme.accent)
             Divider().overlay(.white.opacity(0.22))
-            Text(store.verse.reflection)
+            Text(todayVerse.reflection)
                 .font(.body)
                 .foregroundStyle(.white.opacity(0.82))
             HStack(spacing: 10) {
-                Button { store.speakVerse() } label: {
+                Button { store.speakText("\(todayVerse.text) \(todayVerse.reference)") } label: {
                     Label("Listen", systemImage: "speaker.wave.2.fill")
                         .frame(maxWidth: .infinity)
                 }
@@ -169,7 +192,7 @@ struct TodayView: View {
                 .tint(selectedTheme.accent)
 
                 NavigationLink {
-                    VerseDetailView(verse: store.verse)
+                    VerseDetailView(verse: todayVerse)
                 } label: {
                     Label("Open", systemImage: "book.fill")
                         .frame(maxWidth: .infinity)
@@ -524,10 +547,17 @@ private struct DevotionalDetailView: View {
 private struct RecoveryNewsletterView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
     }
+
+    private var selectedTradition: FaithTradition {
+        FaithTradition(rawValue: traditionID) ?? .bible
+    }
+
+    private var dailyVerse: Verse { store.dailyVerse(for: selectedTradition) }
 
     var body: some View {
         List {
@@ -545,12 +575,12 @@ private struct RecoveryNewsletterView: View {
             }
 
             Section("Today’s Scripture") {
-                Text("“\(store.verse.text)”")
+                Text("“\(dailyVerse.text)”")
                     .font(.system(.title3, design: .serif).weight(.semibold))
-                Text(store.verse.reference)
+                Text(dailyVerse.reference)
                     .font(.headline)
                     .foregroundStyle(selectedTheme.primary)
-                Text(store.verse.reflection)
+                Text(dailyVerse.reflection)
                     .foregroundStyle(.secondary)
             }
 

@@ -1,6 +1,6 @@
 # DailyBreath for iOS
 
-Native SwiftUI app for DailyBreath 1.2 (build 1).
+Native SwiftUI app for DailyBreath 1.5 (build 1).
 
 ## Included in this build
 
@@ -8,7 +8,12 @@ Native SwiftUI app for DailyBreath 1.2 (build 1).
 - Bundled offline recovery verse, devotional, and challenge libraries
 - Recovery Newsletter digest built from the current synced content
 - Full local World English Bible with background loading and search
-- Bible Academy starter lessons with narration and saved progress
+- Full Torah/Tanakh edition with every bundled Hebrew Scripture book, chapter, and verse
+- Full Pickthall Quran English meaning with all 114 surahs and 6,236 ayahs
+- Matched Bible, Torah, and Quran Verse of the Day themes
+- Exactly two Christian, Jewish, and Muslim Academy journeys—Joining the Faith and Recovery—with narration, saved progress, and a Beyond Imagination completion certificate
+- Chris, Dovi, and Moe illustrated Academy guides
+- Olive-era logo plus Torah Light and Quran Moon themes
 - Guided breathing practices and optional daily reminders
 - Private, file-protected reflection journal stored on device
 - Persistent weekly challenge completion tracking

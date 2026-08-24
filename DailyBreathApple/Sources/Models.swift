@@ -54,6 +54,8 @@ struct RecoveryChallenge: Identifiable, Codable, Equatable, Sendable {
 }
 
 enum RecoveryContent {
+    static let recoveryVerseReflection = "Let this recovery verse guide your next faithful step."
+
     private struct VerseDocument: Decodable { let entries: [VerseEntry] }
     private struct VerseEntry: Decodable {
         let text: String
@@ -100,8 +102,45 @@ enum RecoveryContent {
             id: index + 1,
             text: entry.text,
             reference: entry.reference,
-            reflection: "Carry this verse with you today, and let it guide your next faithful step."
+            reflection: recoveryVerseReflection
         )
+    }
+
+    static func resolvedVerseOfTheDay(
+        for date: Date = Date(),
+        remoteVerse: Verse?,
+        bundle: Bundle = .main
+    ) -> Verse {
+        guard let document: VerseDocument = decode("daily-verses", bundle: bundle), !document.entries.isEmpty else {
+            return sanitizedRemoteVerse(remoteVerse) ?? .daily
+        }
+
+        let key = dateKey(date)
+        if let index = document.entries.firstIndex(where: { $0.scheduleDate == key }) {
+            let entry = document.entries[index]
+            let scheduled = Verse(
+                id: index + 1,
+                text: entry.text,
+                reference: entry.reference,
+                reflection: recoveryVerseReflection
+            )
+            guard
+                let remoteVerse,
+                normalizedReference(remoteVerse.reference) == normalizedReference(scheduled.reference),
+                normalizedText(remoteVerse.text) == normalizedText(scheduled.text)
+            else {
+                return scheduled
+            }
+            return Verse(
+                id: scheduled.id,
+                text: scheduled.text,
+                reference: scheduled.reference,
+                reflection: scheduled.reflection,
+                audioURL: remoteVerse.audioURL
+            )
+        }
+
+        return sanitizedRemoteVerse(remoteVerse) ?? verseOfTheDay(for: date, bundle: bundle) ?? .daily
     }
 
     static func devotionalOfTheDay(for date: Date = Date(), bundle: Bundle = .main) -> Devotional? {
@@ -154,6 +193,35 @@ enum RecoveryContent {
         let day = Calendar.current.ordinality(of: .day, in: .era, for: date) ?? 1
         return (day - 1) % count
     }
+
+    private static func sanitizedRemoteVerse(_ verse: Verse?) -> Verse? {
+        guard let verse else { return nil }
+        let text = verse.text.trimmingCharacters(in: .whitespacesAndNewlines)
+        let reference = verse.reference.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty, !reference.isEmpty else { return nil }
+        let reflection = verse.reflection.trimmingCharacters(in: .whitespacesAndNewlines)
+        let containsTemplateToken = reflection.localizedCaseInsensitiveContains("entry.theme")
+            || reflection.contains("{{")
+            || reflection.contains("${")
+        return Verse(
+            id: verse.id,
+            text: text,
+            reference: reference,
+            reflection: reflection.isEmpty || containsTemplateToken ? recoveryVerseReflection : reflection,
+            audioURL: verse.audioURL
+        )
+    }
+
+    private static func normalizedReference(_ value: String) -> String {
+        value.lowercased().replacingOccurrences(of: "[^a-z0-9]", with: "", options: .regularExpression)
+    }
+
+    private static func normalizedText(_ value: String) -> String {
+        value.lowercased()
+            .replacingOccurrences(of: "[^a-z0-9 ]", with: "", options: .regularExpression)
+            .split(whereSeparator: \.isWhitespace)
+            .joined(separator: " ")
+    }
 }
 
 struct PrayerPractice: Identifiable, Equatable {
@@ -182,6 +250,29 @@ struct AcademyPath: Identifiable, Equatable {
     let subtitle: String
     let systemImage: String
     let lessons: [AcademyLesson]
+    let tradition: FaithTradition
+    let guideName: String
+    let guideAssetName: String
+
+    init(
+        id: Int,
+        title: String,
+        subtitle: String,
+        systemImage: String,
+        lessons: [AcademyLesson],
+        tradition: FaithTradition = .bible,
+        guideName: String = "Chris",
+        guideAssetName: String = "ChrisGuide"
+    ) {
+        self.id = id
+        self.title = title
+        self.subtitle = subtitle
+        self.systemImage = systemImage
+        self.lessons = lessons
+        self.tradition = tradition
+        self.guideName = guideName
+        self.guideAssetName = guideAssetName
+    }
 }
 
 struct BreathPattern: Identifiable, Equatable {
@@ -361,7 +452,8 @@ struct BibleLibrary: Equatable, Sendable {
         for line in source.split(whereSeparator: \.isNewline) {
             let parts = line.split(separator: " ", maxSplits: 2, omittingEmptySubsequences: true)
             guard parts.count == 3 else { continue }
-            let code = String(parts[0])
+            let sourceCode = String(parts[0])
+            let code = codeAliases[sourceCode] ?? sourceCode
             let chapterVerse = parts[1].split(separator: ":", maxSplits: 1)
             guard
                 chapterVerse.count == 2,
@@ -424,6 +516,14 @@ struct BibleLibrary: Equatable, Sendable {
         "HEB": ("Hebrews", "New Testament"), "JAS": ("James", "New Testament"), "1PE": ("1 Peter", "New Testament"),
         "2PE": ("2 Peter", "New Testament"), "1JN": ("1 John", "New Testament"), "2JN": ("2 John", "New Testament"),
         "3JN": ("3 John", "New Testament"), "JUD": ("Jude", "New Testament"), "REV": ("Revelation", "New Testament")
+    ]
+
+    // The bundled WEB VPL file uses a few legacy Paratext abbreviations.
+    // Normalize them to the canonical codes used by navigation, annotations, and tests.
+    private static let codeAliases: [String: String] = [
+        "EZE": "EZK", "JOE": "JOL", "NAH": "NAM", "SOL": "SNG",
+        "MAR": "MRK", "JOH": "JHN", "PHI": "PHP", "JAM": "JAS",
+        "1JO": "1JN", "2JO": "2JN", "3JO": "3JN"
     ]
 
     private static let bookOrder = [

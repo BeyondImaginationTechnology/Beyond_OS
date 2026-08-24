@@ -1,6 +1,6 @@
 import Foundation
 import UIKit
-import UserNotifications
+@preconcurrency import UserNotifications
 
 extension Notification.Name {
     static let dailyBreathOpenRoute = Notification.Name("dailyBreathOpenRoute")

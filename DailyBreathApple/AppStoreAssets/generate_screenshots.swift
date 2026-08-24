@@ -56,13 +56,13 @@ let screens = [
     StoreScreen(
         file: "03-bible-academy.png",
         eyebrow: "BIBLE ACADEMY",
-        title: "Grow with guided lessons.",
-        subtitle: "Foundations, Gospel study, wisdom books, and saved progress.",
+        title: "Choose your Academy journey.",
+        subtitle: "Joining the Christian Faith or Christian Recovery, guided by Chris.",
         tab: "Academy",
         cards: [
-            ("Free Starter", "Foundations of Faith", "Prayer, Scripture, reflection, and daily practice."),
-            ("Guided Path", "Life of Jesus", "A clear learning route through the Gospels."),
-            ("Progress", "42% complete", "See where you are and return without losing momentum.")
+            ("Path 1", "Joining the Faith", "Scripture, prayer, baptism, and healthy church community."),
+            ("Path 2", "Recovery", "Grace, support, safeguards, and the next healthy step."),
+            ("Final Milestone", "Beyond Imagination Certificate", "Unlock after completing both Academy journeys.")
         ]
     ),
     StoreScreen(

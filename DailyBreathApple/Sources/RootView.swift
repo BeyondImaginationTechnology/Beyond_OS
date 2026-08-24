@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum DailyBreathTab: String, Hashable {
-    case today, bible, academy, breathe, journal
+    case today, scripture, academy, breathe, journal
 }
 
 struct RootView: View {
@@ -13,14 +13,22 @@ struct RootView: View {
         DailyBreathTheme(id: selectedThemeID)
     }
 
+    private var preferredScheme: ColorScheme? {
+        switch selectedTheme {
+        case .torahLight: .light
+        case .quranMoon: .dark
+        default: nil
+        }
+    }
+
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack { TodayView() }
                 .tabItem { Label("Today", systemImage: "sun.max.fill") }
                 .tag(DailyBreathTab.today)
-            NavigationStack { BibleView() }
-                .tabItem { Label("Bible", systemImage: "book.closed.fill") }
-                .tag(DailyBreathTab.bible)
+            NavigationStack { ScriptureLibraryView() }
+                .tabItem { Label("Scripture", systemImage: "book.closed.fill") }
+                .tag(DailyBreathTab.scripture)
             NavigationStack { AcademyView() }
                 .tabItem { Label("Academy", systemImage: "graduationcap.fill") }
                 .tag(DailyBreathTab.academy)
@@ -32,6 +40,7 @@ struct RootView: View {
                 .tag(DailyBreathTab.journal)
         }
         .tint(selectedTheme.accent)
+        .preferredColorScheme(preferredScheme)
         .onOpenURL(perform: openDeepLink)
         .onAppear {
             guard let value = UserDefaults.standard.string(forKey: "pendingDailyBreathDeepLink"),
@@ -55,7 +64,15 @@ struct RootView: View {
         switch route {
         case "breathe": selectedTab = .breathe
         case "journal": selectedTab = .journal
-        case "bible": selectedTab = .bible
+        case "bible":
+            UserDefaults.standard.set(FaithTradition.bible.id, forKey: "selectedFaithTradition")
+            selectedTab = .scripture
+        case "torah":
+            UserDefaults.standard.set(FaithTradition.torah.id, forKey: "selectedFaithTradition")
+            selectedTab = .scripture
+        case "quran":
+            UserDefaults.standard.set(FaithTradition.quran.id, forKey: "selectedFaithTradition")
+            selectedTab = .scripture
         case "academy": selectedTab = .academy
         default: selectedTab = .today
         }

@@ -23,6 +23,10 @@ struct TodayView: View {
         store.dailyVerse(for: selectedTradition)
     }
 
+    private var todayDevotional: Devotional {
+        InterfaithDailyContent.devotional(for: selectedTradition, base: store.devotional, verse: todayVerse)
+    }
+
     private var todayKey: String {
         Self.dayFormatter.string(from: Date())
     }
@@ -94,7 +98,7 @@ struct TodayView: View {
             }
             HStack(spacing: 8) {
                 RhythmPill(title: "Read", isComplete: true, theme: selectedTheme)
-                RhythmPill(title: "Devote", isComplete: didReadDevotionalToday, theme: selectedTheme)
+                RhythmPill(title: "Study", isComplete: didReadDevotionalToday, theme: selectedTheme)
                 RhythmPill(title: "Breathe", isComplete: didBreatheToday, theme: selectedTheme)
                 RhythmPill(title: "Reflect", isComplete: didReflectToday, theme: selectedTheme)
             }
@@ -168,7 +172,7 @@ struct TodayView: View {
 
     private var verseCard: some View {
         VStack(alignment: .leading, spacing: 18) {
-            Label("\(selectedTradition.name) Verse of the Day", systemImage: selectedTradition.symbolName)
+            Label("\(selectedTradition.dailyReadingName) of the Day", systemImage: selectedTradition.symbolName)
                 .font(.caption.bold())
                 .tracking(1.4)
                 .foregroundStyle(selectedTheme.accent)
@@ -211,19 +215,19 @@ struct TodayView: View {
 
     private var devotionalCard: some View {
         NavigationLink {
-            DevotionalDetailView(devotional: store.devotional)
+            DevotionalDetailView(devotional: todayDevotional, tradition: selectedTradition)
         } label: {
             HStack(alignment: .top, spacing: 14) {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("TODAY'S DEVOTIONAL")
+                    Text("TODAY'S \(selectedTradition.devotionalName.uppercased())")
                         .font(.caption.bold())
                         .tracking(1.6)
                         .foregroundStyle(selectedTheme.primary)
-                    Text(store.devotional.title)
+                    Text(todayDevotional.title)
                         .font(.title2.weight(.bold))
-                    Text(store.devotional.excerpt)
+                    Text(todayDevotional.excerpt)
                         .foregroundStyle(.secondary)
-                    Label("\(store.devotional.scripture) · \(store.devotional.minutes) minute read", systemImage: "clock.fill")
+                    Label("\(todayDevotional.scripture) · \(todayDevotional.minutes) minute read", systemImage: "clock.fill")
                         .font(.caption.bold())
                         .foregroundStyle(selectedTheme.accent)
                 }
@@ -302,9 +306,9 @@ struct TodayView: View {
     private var quickActions: some View {
         LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 12) {
             NavigationLink {
-                BibleView()
+                ScriptureLibraryView()
             } label: {
-                QuickAction(title: "Bible Library", subtitle: "Read and reflect", systemImage: "book.closed.fill")
+                QuickAction(title: selectedTradition.libraryName, subtitle: "Read and reflect", systemImage: "book.closed.fill")
             }
             NavigationLink {
                 BreatheView()
@@ -312,9 +316,9 @@ struct TodayView: View {
                 QuickAction(title: "Breath of the Day", subtitle: BreathPattern.breathOfTheDay().title, systemImage: "wind")
             }
             NavigationLink {
-                PrayerPracticesView()
+                PrayerPracticesView(tradition: selectedTradition)
             } label: {
-                QuickAction(title: "Specific Prayers", subtitle: "Guidance and healing", systemImage: "hands.sparkles.fill")
+                QuickAction(title: selectedTradition.prayerCollectionName, subtitle: "Guidance and healing", systemImage: "hands.sparkles.fill")
             }
             NavigationLink {
                 WeeklyChallengeView()
@@ -324,7 +328,7 @@ struct TodayView: View {
             NavigationLink {
                 AcademyView()
             } label: {
-                QuickAction(title: "Bible Academy", subtitle: "Starter lessons", systemImage: "graduationcap.fill")
+                QuickAction(title: selectedTradition.academyName, subtitle: "Starter lessons", systemImage: "graduationcap.fill")
             }
             NavigationLink {
                 JournalView()
@@ -406,15 +410,20 @@ private struct QuickAction: View {
 private struct VerseDetailView: View {
     let verse: Verse
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
     }
 
+    private var tradition: FaithTradition {
+        FaithTradition(rawValue: traditionID) ?? .bible
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                Label("Verse of the Day", systemImage: "sun.max.fill")
+                Label("\(tradition.dailyReadingName) of the Day", systemImage: tradition.symbolName)
                     .font(.caption.bold())
                     .tracking(1.4)
                     .foregroundStyle(selectedTheme.accent)
@@ -429,9 +438,9 @@ private struct VerseDetailView: View {
                     .font(.body)
                     .foregroundStyle(.secondary)
                 NavigationLink {
-                    BibleView()
+                    ScriptureLibraryView()
                 } label: {
-                    Label("Open Bible Library", systemImage: "book.closed.fill")
+                    Label("Open \(tradition.libraryName)", systemImage: "book.closed.fill")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
@@ -449,6 +458,7 @@ private struct VerseDetailView: View {
 private struct DevotionalDetailView: View {
     @EnvironmentObject private var store: DailyBreathStore
     let devotional: Devotional
+    let tradition: FaithTradition
     @AppStorage("devotionalReadDayKeys") private var devotionalReadDayKeys = ""
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
 
@@ -485,18 +495,18 @@ private struct DevotionalDetailView: View {
                     .font(.body)
             }
 
-            Section("Prayer") {
+            Section(tradition.prayerName) {
                 Text(devotional.prayer)
                     .font(.body)
                 Button {
                     markRead()
                     store.prepareJournalReflection(
-                        prompt: "Prayer from \(devotional.title)",
+                        prompt: "\(tradition.prayerName) from \(devotional.title)",
                         text: devotional.prayer,
                         mood: "Hopeful"
                     )
                 } label: {
-                    Label("Pray This in Journal", systemImage: "hands.sparkles.fill")
+                    Label("Save This \(tradition.prayerName)", systemImage: "hands.sparkles.fill")
                 }
             }
 
@@ -519,7 +529,7 @@ private struct DevotionalDetailView: View {
                 .foregroundStyle(selectedTheme.primary)
             }
         }
-        .navigationTitle("Devotional")
+        .navigationTitle(tradition.devotionalName)
         .scrollContentBackground(.hidden)
         .background(DailyBreathThemeBackground(theme: selectedTheme))
     }
@@ -558,6 +568,9 @@ private struct RecoveryNewsletterView: View {
     }
 
     private var dailyVerse: Verse { store.dailyVerse(for: selectedTradition) }
+    private var dailyDevotional: Devotional {
+        InterfaithDailyContent.devotional(for: selectedTradition, base: store.devotional, verse: dailyVerse)
+    }
 
     var body: some View {
         List {
@@ -566,7 +579,7 @@ private struct RecoveryNewsletterView: View {
                     Label("Recovery Newsletter", systemImage: "newspaper.fill")
                         .font(.caption.bold())
                         .foregroundStyle(selectedTheme.accent)
-                    Text("Grace for the next faithful step.")
+                    Text(selectedTradition.newsletterTagline)
                         .font(.largeTitle.weight(.black))
                     Text(Date(), format: .dateTime.weekday(.wide).month(.wide).day().year())
                         .foregroundStyle(.secondary)
@@ -574,7 +587,7 @@ private struct RecoveryNewsletterView: View {
                 .padding(.vertical, 8)
             }
 
-            Section("Today’s Scripture") {
+            Section("Today’s \(selectedTradition.dailyReadingName)") {
                 Text("“\(dailyVerse.text)”")
                     .font(.system(.title3, design: .serif).weight(.semibold))
                 Text(dailyVerse.reference)
@@ -584,18 +597,18 @@ private struct RecoveryNewsletterView: View {
                     .foregroundStyle(.secondary)
             }
 
-            Section(store.devotional.title) {
-                Text(store.devotional.body)
-                Label(store.devotional.scripture, systemImage: "book.closed.fill")
+            Section(dailyDevotional.title) {
+                Text(dailyDevotional.body)
+                Label(dailyDevotional.scripture, systemImage: "book.closed.fill")
                     .foregroundStyle(selectedTheme.primary)
             }
 
-            Section("Prayer") {
-                Text(store.devotional.prayer)
+            Section(selectedTradition.prayerName) {
+                Text(dailyDevotional.prayer)
             }
 
             Section("Practice") {
-                Text(store.devotional.practice)
+                Text(dailyDevotional.practice)
             }
 
             if let challenge = store.challenge {
@@ -639,6 +652,7 @@ private struct RecoveryNewsletterView: View {
 private struct PrayerPracticesView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    let tradition: FaithTradition
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -649,7 +663,7 @@ private struct PrayerPracticesView: View {
             Section {
                 ForEach(store.practices.filter { $0.title != "Peace Breath" && $0.title != "Weekly Challenge" }) { practice in
                     NavigationLink {
-                        PrayerPracticeDetailView(practice: practice)
+                        PrayerPracticeDetailView(practice: practice, tradition: tradition)
                     } label: {
                         Label {
                             VStack(alignment: .leading, spacing: 3) {
@@ -666,7 +680,7 @@ private struct PrayerPracticesView: View {
                 }
             }
         }
-        .navigationTitle("Specific Prayers")
+        .navigationTitle(tradition.prayerCollectionName)
         .scrollContentBackground(.hidden)
         .background(DailyBreathThemeBackground(theme: selectedTheme))
     }
@@ -674,6 +688,7 @@ private struct PrayerPracticesView: View {
 
 private struct PrayerPracticeDetailView: View {
     let practice: PrayerPractice
+    let tradition: FaithTradition
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
 
     private var selectedTheme: DailyBreathTheme {
@@ -695,7 +710,7 @@ private struct PrayerPracticeDetailView: View {
                 .padding(.vertical, 8)
             }
 
-            Section("Prayer") {
+            Section(tradition.prayerName) {
                 Text(prayerText)
             }
 
@@ -713,13 +728,25 @@ private struct PrayerPracticeDetailView: View {
     }
 
     private var prayerText: String {
-        switch practice.title {
-        case "Guidance Prayer":
-            return "Lord, give me wisdom for the decision in front of me. Help me listen before I move and choose what brings peace, truth, and love."
-        case "Gratitude Reset":
-            return "Lord, open my eyes to what is good. Teach me to receive today with humility and respond with generosity."
-        default:
-            return "Lord, meet me in this practice and shape my next step with grace."
+        switch (tradition, practice.title) {
+        case (.bible, "Guidance Prayer"):
+            "Lord, give me wisdom for the decision in front of me. Help me listen before I move and choose what brings peace, truth, and love."
+        case (.bible, "Gratitude Reset"):
+            "Lord, open my eyes to what is good. Teach me to receive today with humility and respond with generosity."
+        case (.torah, "Guidance Prayer"):
+            "Source of wisdom, help me listen honestly and choose the path of truth, responsibility, and life. Guide my next step and help me seek wise counsel."
+        case (.torah, "Gratitude Reset"):
+            "Holy One, help me notice the gifts, people, and responsibilities entrusted to me today. May gratitude lead me toward generosity and acts of lovingkindness."
+        case (.quran, "Guidance Prayer"):
+            "Allah, guide me to what is right, grant me clear judgment, and keep me away from what causes harm. Help me trust You and seek wise counsel. Amin."
+        case (.quran, "Gratitude Reset"):
+            "Alhamdulillah for every blessing I recognize and every blessing I overlook. Allah, make me grateful in heart, word, and action. Amin."
+        case (.bible, _):
+            "Lord, meet me in this practice and shape my next step with grace."
+        case (.torah, _):
+            "Holy One, meet me in this practice and guide my next step toward truth, repair, and peace."
+        case (.quran, _):
+            "Allah, meet me with mercy, guide my next step, and strengthen me to do what is right. Amin."
         }
     }
 }

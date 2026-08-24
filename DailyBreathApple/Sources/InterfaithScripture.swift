@@ -26,8 +26,56 @@ enum FaithTradition: String, CaseIterable, Identifiable, Codable, Sendable {
     var symbolName: String {
         switch self {
         case .bible: "cross.fill"
-        case .torah: "star.of.david"
+        case .torah: "star.circle.fill"
         case .quran: "moon.stars.fill"
+        }
+    }
+
+    var dailyReadingName: String {
+        switch self {
+        case .bible: "Bible Verse"
+        case .torah: "Torah & Tanakh Passage"
+        case .quran: "Quran Ayah"
+        }
+    }
+
+    var devotionalName: String {
+        switch self {
+        case .bible: "Christian Devotional"
+        case .torah: "Jewish Daily Reflection"
+        case .quran: "Quran Reflection"
+        }
+    }
+
+    var prayerName: String {
+        switch self {
+        case .bible: "Prayer"
+        case .torah: "Tefillah"
+        case .quran: "Du’a"
+        }
+    }
+
+    var prayerCollectionName: String {
+        switch self {
+        case .bible: "Specific Prayers"
+        case .torah: "Jewish Tefillah"
+        case .quran: "Du’a & Dhikr"
+        }
+    }
+
+    var academyName: String {
+        switch self {
+        case .bible: "Christian Academy"
+        case .torah: "Jewish Academy"
+        case .quran: "Islamic Academy"
+        }
+    }
+
+    var newsletterTagline: String {
+        switch self {
+        case .bible: "Grace for the next faithful step."
+        case .torah: "Return, courage, and care for the next step."
+        case .quran: "Mercy, remembrance, and the next right step."
         }
     }
 
@@ -250,6 +298,75 @@ enum InterfaithDailyContent {
                 displayVerse($0, reflection: "Moe pairs this ayah with today’s recovery theme: pause, seek Allah’s help, and choose the next right step.")
             } ?? bibleVerse
         }
+    }
+
+    static func devotional(for tradition: FaithTradition, base: Devotional, verse: Verse) -> Devotional {
+        guard tradition != .bible else { return base }
+
+        let content: (title: String, excerpt: String, body: String, prayer: String, practice: String)
+        switch (tradition, theme(for: verse)) {
+        case (.torah, .courage):
+            content = (
+                "Chizuk for the Next Step",
+                "Receive chizuk—strength and encouragement—for one honest choice today.",
+                "This passage from the Tanakh joins courage with responsibility. Teshuvah is a return: not pretending the past did not happen, but turning toward God, truth, repair, and life. You do not need to finish the whole journey in this moment. Take the next faithful step and let trusted community help you keep returning.",
+                "Source of strength, steady my heart and help me choose what leads toward truth, repair, and life. Give me courage to ask for help and wisdom to take the next right step.",
+                "Read (verse.reference) slowly. Name one act of teshuvah—return or repair—you can begin today, then share it with someone trustworthy."
+            )
+        case (.torah, .peace):
+            content = (
+                "A Quiet Moment of Tefillah",
+                "Let sacred reading, honest self-reckoning, and a quiet breath make room for peace.",
+                "Jewish tefillah is more than asking for something; it is also connection and honest self-examination before God. Let this passage slow the urgency of the moment. Breathe, notice what is true, and choose a response shaped by wisdom rather than impulse.",
+                "Holy One, quiet what is restless in me. Help me listen honestly, receive support, and act with patience, compassion, and good judgment.",
+                "Take three slow breaths after reading (verse.reference). Sit in silence for one minute, then write one truthful sentence about what you need now."
+            )
+        case (.torah, .recovery):
+            content = (
+                "Teshuvah, One Step at a Time",
+                "Recovery can be a practice of return, repair, and renewed responsibility.",
+                "Teshuvah means return. In recovery, return may look like telling the truth, making repair where it is safe, accepting help, and choosing life again after a setback. This Tanakh passage does not ask for perfection. It invites a sincere turn toward God and toward the next action that protects healing.",
+                "God of our ancestors, help me return to what is true and life-giving. Give me humility to repair what I can, courage to seek help, and strength for today’s next step.",
+                "Choose one concrete act of teshuvah today: tell the truth, contact support, remove a trigger, or make a safe plan for repair."
+            )
+        case (.quran, .courage):
+            content = (
+                "Sabr for the Next Step",
+                "Practice sabr—steadfast patience—without facing the struggle alone.",
+                "This ayah calls you toward sabr: patient perseverance rooted in trust in Allah. Sabr is not passive resignation. It can mean pausing before harm, seeking wise support, and continuing with the next right action even when the path feels difficult.",
+                "Allah, grant me sabr, clear judgment, and courage. Protect me from choices that cause harm, guide me toward trustworthy support, and strengthen me for the next right step. Amin.",
+                "Read (verse.reference) slowly, pause for three breaths, and say: Hasbunallahu wa ni‘mal-wakil—Allah is sufficient for us and the best disposer of affairs. Then contact one safe support person."
+            )
+        case (.quran, .peace):
+            content = (
+                "Peace Through Dhikr",
+                "Return your attention to Allah through remembrance, breath, and a grounded next action.",
+                "This ayah points toward remembrance of Allah. Dhikr can interrupt the rush of fear or craving and reorient the heart. Let remembrance accompany practical care: slow down, seek help when needed, and choose what protects your wellbeing and responsibilities.",
+                "Allah, steady my heart in Your remembrance. Grant me calm without denial, wisdom without fear, and the willingness to receive the help I need. Amin.",
+                "Breathe gently and repeat SubhanAllah, Alhamdulillah, and Allahu Akbar at a comfortable pace. Then write the safest next action you can take."
+            )
+        case (.quran, .recovery):
+            content = (
+                "Tawbah and Hope",
+                "Turn back to Allah with honesty, hope, and a concrete commitment to change.",
+                "Tawbah is a sincere return to Allah. It includes leaving harm, regretting it, asking forgiveness, and resolving to change; repair is also due when another person’s rights were harmed. A setback does not place you beyond Allah’s mercy. Begin again with honesty and seek the human support that recovery requires.",
+                "Allah, You are merciful and accepting of repentance. Help me leave what harms me, make amends where I safely can, and remain firm in recovery. Guide me to people and choices that support what is good. Amin.",
+                "Say Astaghfirullah with attention, then take one concrete step: remove access to a trigger, contact support, or renew today’s recovery plan."
+            )
+        case (.bible, _):
+            return base
+        }
+
+        return Devotional(
+            id: base.id + (tradition == .torah ? 10_000 : 20_000),
+            title: content.title,
+            excerpt: content.excerpt,
+            body: content.body,
+            scripture: verse.reference,
+            minutes: base.minutes,
+            prayer: content.prayer,
+            practice: content.practice
+        )
     }
 
     private static func displayVerse(_ verse: SacredTextVerse, reflection: String) -> Verse {

@@ -39,7 +39,7 @@ enum DailyBreathTheme: String, CaseIterable, Identifiable {
         case .botanical: return "camera.macro"
         case .dawn: return "sunrise.fill"
         case .rose: return "heart.fill"
-        case .torahLight: return "star.of.david"
+        case .torahLight: return "star.circle.fill"
         case .quranMoon: return "moon.stars.fill"
         }
     }

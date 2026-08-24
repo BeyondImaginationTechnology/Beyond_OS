@@ -177,7 +177,7 @@ final class DailyBreathStore: ObservableObject {
             id: 4,
             title: "Joining the Jewish Faith with Dovi",
             subtitle: "A respectful starter journey through Torah, mitzvot, prayer, community, and Jewish life.",
-            systemImage: "star.of.david",
+            systemImage: "star.circle.fill",
             lessons: [
                 AcademyLesson(
                     id: 401,
@@ -707,10 +707,11 @@ final class DailyBreathStore: ObservableObject {
     var recoveryNewsletterShareText: String {
         let tradition = FaithTradition(rawValue: UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "") ?? .bible
         let sharedVerse = dailyVerse(for: tradition)
+        let sharedDevotional = InterfaithDailyContent.devotional(for: tradition, base: devotional, verse: sharedVerse)
         let challengeCopy = challenge.map { item in
             "Weekly challenge: \(item.title). \(item.description) \(item.scriptureReference)"
         } ?? ""
-        return "Recovery Newsletter\n\n\(sharedVerse.reference)\n\(sharedVerse.text)\n\n\(devotional.title)\n\(devotional.body)\n\n\(challengeCopy)"
+        return "Recovery Newsletter\n\n\(sharedVerse.reference)\n\(sharedVerse.text)\n\n\(sharedDevotional.title)\n\(sharedDevotional.body)\n\n\(tradition.prayerName)\n\(sharedDevotional.prayer)\n\n\(challengeCopy)"
     }
 
     func setICloudSyncEnabled(_ enabled: Bool) async {

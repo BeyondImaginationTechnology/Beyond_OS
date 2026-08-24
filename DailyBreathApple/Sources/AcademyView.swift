@@ -461,7 +461,7 @@ private struct AcademyLessonView: View {
                 .padding(.vertical, 8)
             }
 
-            Section("Scripture") {
+            Section(path.tradition.libraryName) {
                 Text(lesson.scripture)
                     .font(.headline)
                     .foregroundStyle(selectedTheme.primary)

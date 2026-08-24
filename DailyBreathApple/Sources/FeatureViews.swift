@@ -53,7 +53,7 @@ struct SettingsAboutView: View {
                 Button("Stop Narration") { store.stopNarration() }
             }
 
-            Section("Private Sync") {
+            Section {
                 Toggle("Encrypted iCloud Sync", isOn: Binding(
                     get: { encryptedICloudSyncEnabled },
                     set: { value in
@@ -70,11 +70,13 @@ struct SettingsAboutView: View {
                 if encryptedICloudSyncEnabled {
                     Button("Sync Now") { Task { await store.syncICloudNow() } }
                 }
+            } header: {
+                Text("Private Sync")
             } footer: {
                 Text("Optional. Your protected local data is encrypted before upload. The encryption key uses iCloud Keychain. Turning sync off leaves local data intact.")
             }
 
-            Section("About") {
+            Section {
                 LabeledContent("The Daily Breath", value: versionText)
                 Link(destination: URL(string: "https://ebible.org/web/")!) {
                     Label("World English Bible attribution", systemImage: "book.closed")
@@ -88,6 +90,8 @@ struct SettingsAboutView: View {
                 Link(destination: URL(string: "https://beyondimagination.co.technology/contact.php")!) {
                     Label("Support", systemImage: "envelope")
                 }
+            } header: {
+                Text("About")
             } footer: {
                 Text("Bible and Torah/Tanakh text: World English Bible, Public Domain. Quran English meaning: Marmaduke Pickthall, Project Gutenberg eBook 16955, Public Domain in the USA.")
             }
@@ -282,7 +286,7 @@ struct RecoverySupportView: View {
                     .foregroundStyle(.secondary)
             }
 
-            Section("If you may be in immediate danger") {
+            Section {
                 Link(destination: URL(string: "tel:911")!) {
                     Label("Call local emergency services (U.S. 911)", systemImage: "phone.fill")
                 }
@@ -295,17 +299,21 @@ struct RecoverySupportView: View {
                 Link(destination: URL(string: "https://988lifeline.org/get-help/")!) {
                     Label("988 chat and accessibility options", systemImage: "safari")
                 }
+            } header: {
+                Text("If you may be in immediate danger")
             } footer: {
                 Text("988 services listed here are for the United States and its territories. Elsewhere, contact your local emergency or crisis service.")
             }
 
-            Section("Treatment and recovery resources") {
+            Section {
                 Link(destination: URL(string: "tel:18006624357")!) {
                     Label("SAMHSA National Helpline", systemImage: "phone")
                 }
                 Link(destination: URL(string: "https://www.samhsa.gov/find-help/locators")!) {
                     Label("FindTreatment.gov and treatment locators", systemImage: "map")
                 }
+            } header: {
+                Text("Treatment and recovery resources")
             } footer: {
                 Text("SAMHSA: 1-800-662-HELP (4357), free and confidential treatment referral and information in the U.S.")
             }

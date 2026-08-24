@@ -16,21 +16,23 @@ final class DailyBreathAppDelegate: NSObject, UIApplicationDelegate, UNUserNotif
         return true
     }
 
-    func userNotificationCenter(
+    nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
         [.banner, .sound]
     }
 
-    func userNotificationCenter(
+    nonisolated func userNotificationCenter(
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse
     ) async {
         let value = response.notification.request.content.userInfo["deepLink"] as? String
             ?? "dailybreath://today"
-        UserDefaults.standard.set(value, forKey: "pendingDailyBreathDeepLink")
-        NotificationCenter.default.post(name: .dailyBreathOpenRoute, object: value)
+        await MainActor.run {
+            UserDefaults.standard.set(value, forKey: "pendingDailyBreathDeepLink")
+            NotificationCenter.default.post(name: .dailyBreathOpenRoute, object: value)
+        }
     }
 }
 

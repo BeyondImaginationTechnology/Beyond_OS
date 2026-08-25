@@ -102,12 +102,17 @@ struct SettingsAboutView: View {
 
 struct DailyHistoryView: View {
     @EnvironmentObject private var store: DailyBreathStore
+    @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
     @AppStorage("devotionalReadDayKeys") private var devotionalReadDayKeys = ""
     @AppStorage("completedBreathDayKeys") private var completedBreathDayKeys = ""
     @State private var displayedMonth = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: Date())) ?? Date()
     @State private var selectedDate = Date()
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 5), count: 7)
+
+    private var selectedTradition: FaithTradition {
+        FaithTradition(rawValue: traditionID) ?? .bible
+    }
 
     var body: some View {
         ScrollView {
@@ -211,14 +216,15 @@ struct DailyHistoryView: View {
     }
 
     private func verse(for date: Date) -> (reference: String, text: String)? {
-        let record = store.dailyHistory[Self.dayKey(date)]
-        if let record { return (record.verseReference, record.verseText) }
-        return RecoveryContent.verseOfTheDay(for: date).map { ($0.reference, $0.text) }
+        let verse = store.dailyVerse(for: selectedTradition, date: date)
+        return (verse.reference, verse.text)
     }
 
     private func devotionalTitle(for date: Date) -> String? {
-        store.dailyHistory[Self.dayKey(date)]?.devotionalTitle
-            ?? RecoveryContent.devotionalOfTheDay(for: date)?.title
+        if selectedTradition == .bible, let storedTitle = store.dailyHistory[Self.dayKey(date)]?.devotionalTitle {
+            return storedTitle
+        }
+        return store.dailyDevotional(for: selectedTradition, date: date).title
     }
 
     private func hasReflection(on date: Date) -> Bool {

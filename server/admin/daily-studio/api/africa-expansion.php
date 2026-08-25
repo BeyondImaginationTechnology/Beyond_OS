@@ -12,6 +12,21 @@ function africaWrite(string $file, array $items): void {
     $tmp=$file.'.tmp';
     if($json===false||file_put_contents($tmp,$json.PHP_EOL,LOCK_EX)===false||!rename($tmp,$file)){@unlink($tmp);throw new RuntimeException('The Africa expansion library could not be saved.');}
 }
+function africaScheduledItems(array $items): array {
+    $scheduled=[];
+    foreach($items as $item){
+        $date=trim((string)($item['publish_date']??''));
+        if(preg_match('/^\d{4}-\d{2}-\d{2}$/',$date))$scheduled[$date]=$item;
+    }
+    ksort($scheduled);
+    return $scheduled;
+}
+function africaNextAvailableDate(array $items, ?string $from=null): string {
+    $occupied=array_fill_keys(array_keys(africaScheduledItems($items)),true);
+    $candidate=new DateTimeImmutable($from?:'today');
+    while(isset($occupied[$candidate->format('Y-m-d')]))$candidate=$candidate->modify('+1 day');
+    return $candidate->format('Y-m-d');
+}
 function africaText(array $input,string $field,int $max): string {
     $value=trim((string)($input[$field]??''));
     if($value===''||mb_strlen($value)>$max) throw new InvalidArgumentException('Complete every required phrase field before saving.');
@@ -136,9 +151,12 @@ if(!is_file($file)&&is_file($legacyFile)){
 $items=is_file($file)?json_decode((string)file_get_contents($file),true):[];
 if(!is_array($items))$items=[];
 if(($_SERVER['REQUEST_METHOD']??'GET')==='GET'){
-    usort($items,static fn(array $a,array $b):int=>strcmp((string)($b['publish_date']??''),(string)($a['publish_date']??'')));
+    $date=trim((string)($_GET['date']??date('Y-m-d')));$parsed=DateTimeImmutable::createFromFormat('!Y-m-d',$date);
+    if(!$parsed||$parsed->format('Y-m-d')!==$date)africaResponse(['ok'=>false,'error'=>'Choose a valid schedule date.'],422);
+    $scheduled=africaScheduledItems($items);$dates=array_keys($scheduled);$previous=null;$next=null;
+    foreach($dates as $scheduledDate){if($scheduledDate<$date)$previous=$scheduledDate;if($scheduledDate>$date){$next=$scheduledDate;break;}}
     $complete=count(array_filter($items,static fn(array $item):bool=>count((array)($item['audio_urls']??[]))===4));
-    africaResponse(['ok'=>true,'items'=>array_slice($items,0,50),'counts'=>['total'=>count($items),'accepted'=>count(array_filter($items,static fn(array $item):bool=>!empty($item['azure_translation_accepted']))),'prerecorded'=>$complete],'target'=>100]);
+    africaResponse(['ok'=>true,'date'=>$date,'item'=>$scheduled[$date]??null,'items'=>array_values($scheduled),'navigation'=>['previous'=>$previous,'today'=>date('Y-m-d'),'next'=>$next,'first'=>$dates[0]??null,'last'=>$dates?(string)end($dates):null,'next_available'=>africaNextAvailableDate($items)],'counts'=>['total'=>count($items),'scheduled'=>count($scheduled),'accepted'=>count(array_filter($items,static fn(array $item):bool=>!empty($item['azure_translation_accepted']))),'prerecorded'=>$complete]]);
 }
 if(($_SERVER['REQUEST_METHOD']??'')!=='POST')africaResponse(['ok'=>false,'error'=>'Unsupported request.'],405);
 if(empty($_SESSION['verse_generator_csrf'])||!hash_equals((string)$_SESSION['verse_generator_csrf'],(string)($_SERVER['HTTP_X_CSRF_TOKEN']??'')))africaResponse(['ok'=>false,'error'=>'Reload the generator and try again.'],419);
@@ -148,20 +166,6 @@ try{
     if(strtolower((string)($input['action']??''))==='translate'){
         $english=africaText($input,'english',220);$translations=africaAzureTranslate($english);
         africaResponse(['ok'=>true,'translations'=>$translations,'review_required'=>false,'message'=>'Azure translations and the validated Meta AI Arabic dialects are ready to prerecord.']);
-    }
-    if(strtolower((string)($input['action']??''))==='build'){
-        @set_time_limit(240);$source=json_decode((string)file_get_contents(dirname(__DIR__,4).'/beyond-french/data/lessons.json'),true);if(!is_array($source))throw new RuntimeException('The source phrase bank is unavailable.');
-        if(count($items)>=100)africaResponse(['ok'=>true,'complete'=>true,'ready'=>count($items),'target'=>100,'message'=>'The Azure + Meta AI dialect phrase bank is complete.']);
-        $used=array_fill_keys(array_filter(array_map(static fn(array $item):string=>(string)($item['source_id']??''),$items)),true);
-        $usedEnglish=array_fill_keys(array_filter(array_map(static fn(array $item):string=>mb_strtolower(trim((string)($item['english']??''))),$items)),true);$lesson=null;
-        foreach($source as $candidate){$sourceText=trim((string)($candidate['english']??''));$sourceId=(string)($candidate['id']??sha1($sourceText));if($sourceText!==''&&!isset($used[$sourceId])&&!isset($usedEnglish[mb_strtolower($sourceText)])){$lesson=$candidate;break;}}
-        if($lesson===null)africaResponse(['ok'=>true,'complete'=>true,'ready'=>count($items),'target'=>100,'message'=>'The Azure + Meta AI dialect phrase bank is complete.']);
-        $sourceId=(string)($lesson['id']??sha1((string)$lesson['english']));$date=(string)($lesson['date']??'');if(!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date))$date=(new DateTimeImmutable('today'))->modify('+'.count($items).' days')->format('Y-m-d');
-        $translated=africaAzureTranslate((string)$lesson['english'],$sourceId);if(($translated['darija_transliteration']??'')==='')$translated['darija_transliteration']=$translated['darija'];if(($translated['egyptian_transliteration']??'')==='')$translated['egyptian_transliteration']=$translated['egyptian_arabic'];
-        $values=['english'=>(string)$lesson['english'],'french_bridge'=>(string)($lesson['french']??''),'meaning'=>(string)($lesson['meaning']??'A practical phrase for everyday conversation.'),...$translated,'culture_note'=>(string)($lesson['culture_note']??'Practice this phrase aloud in an everyday conversation.')];
-        $maxId=0;foreach($items as $existingItem)$maxId=max($maxId,(int)($existingItem['id']??0));
-        $audio=africaGenerateTracks($values,$date);$item=[...$values,'id'=>$maxId+1,'source_id'=>$sourceId,'pack'=>'africa-v1','publish_date'=>$date,'translation_policy'=>'azure-plus-meta-dialects-v1','azure_translation_accepted'=>true,'native_reviewed'=>false,'audio_urls'=>$audio['urls'],'audio_voices'=>$audio['voices'],'audio_providers'=>$audio['providers'],'generator'=>['version'=>'1.3.0','translation'=>'azure-plus-meta-dialects','saved_at'=>date(DATE_ATOM)]];$items[]=$item;africaWrite($file,$items);
-        africaResponse(['ok'=>true,'built'=>$item,'ready'=>count($items),'target'=>100,'complete'=>count($items)>=100,'message'=>'Azure translated, Meta AI localized both Arabic dialects, and prerecorded phrase '.count($items).' of 100.']);
     }
     $date=trim((string)($input['publish_date']??''));$parsed=DateTimeImmutable::createFromFormat('!Y-m-d',$date);
     if(!$parsed||$parsed->format('Y-m-d')!==$date)throw new InvalidArgumentException('Choose a valid publication date.');

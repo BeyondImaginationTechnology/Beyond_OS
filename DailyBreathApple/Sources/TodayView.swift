@@ -24,7 +24,7 @@ struct TodayView: View {
     }
 
     private var todayDevotional: Devotional {
-        InterfaithDailyContent.devotional(for: selectedTradition, base: store.devotional, verse: todayVerse)
+        store.dailyDevotional(for: selectedTradition)
     }
 
     private var todayKey: String {
@@ -167,6 +167,7 @@ struct TodayView: View {
         .onChange(of: traditionID) { _, value in
             let tradition = FaithTradition(rawValue: value) ?? .bible
             selectedThemeID = DailyBreathTheme.recommended(for: tradition).id
+            store.publishSelectedFaithContent()
         }
     }
 
@@ -196,7 +197,7 @@ struct TodayView: View {
                 .tint(selectedTheme.accent)
 
                 NavigationLink {
-                    VerseDetailView(verse: todayVerse)
+                    VerseDetailView(verse: todayVerse, tradition: selectedTradition)
                 } label: {
                     Label("Open", systemImage: "book.fill")
                         .frame(maxWidth: .infinity)
@@ -232,10 +233,12 @@ struct TodayView: View {
                         .foregroundStyle(selectedTheme.accent)
                 }
                 Spacer(minLength: 8)
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.bold))
-                    .foregroundStyle(.tertiary)
-                    .padding(.top, 6)
+                VStack(spacing: 8) {
+                    FaithGuidePortrait(tradition: selectedTradition, width: 54, height: 64, cornerRadius: 11)
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.bold))
+                        .foregroundStyle(.tertiary)
+                }
             }
             .padding(20)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -328,7 +331,12 @@ struct TodayView: View {
             NavigationLink {
                 AcademyView()
             } label: {
-                QuickAction(title: selectedTradition.academyName, subtitle: "Starter lessons", systemImage: "graduationcap.fill")
+                QuickAction(
+                    title: selectedTradition.academyName,
+                    subtitle: "Learn with \(selectedTradition.guideName)",
+                    systemImage: "graduationcap.fill",
+                    guide: selectedTradition
+                )
             }
             NavigationLink {
                 JournalView()
@@ -384,6 +392,7 @@ private struct QuickAction: View {
     let title: String
     let subtitle: String
     let systemImage: String
+    var guide: FaithTradition? = nil
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
 
     private var selectedTheme: DailyBreathTheme {
@@ -392,9 +401,13 @@ private struct QuickAction: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
-            Image(systemName: systemImage)
-                .font(.title2)
-                .foregroundStyle(selectedTheme.accent)
+            if let guide {
+                FaithGuidePortrait(tradition: guide, width: 44, height: 50, cornerRadius: 9)
+            } else {
+                Image(systemName: systemImage)
+                    .font(.title2)
+                    .foregroundStyle(selectedTheme.accent)
+            }
             Text(title)
                 .font(.headline)
             Text(subtitle)
@@ -409,24 +422,27 @@ private struct QuickAction: View {
 
 private struct VerseDetailView: View {
     let verse: Verse
+    let tradition: FaithTradition
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
-    @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
     }
 
-    private var tradition: FaithTradition {
-        FaithTradition(rawValue: traditionID) ?? .bible
-    }
-
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                Label("\(tradition.dailyReadingName) of the Day", systemImage: tradition.symbolName)
-                    .font(.caption.bold())
-                    .tracking(1.4)
-                    .foregroundStyle(selectedTheme.accent)
+                HStack(spacing: 12) {
+                    FaithGuidePortrait(tradition: tradition, width: 56, height: 68, cornerRadius: 12)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Label("\(tradition.dailyReadingName) of the Day", systemImage: tradition.symbolName)
+                            .font(.caption.bold())
+                            .tracking(1.4)
+                            .foregroundStyle(selectedTheme.accent)
+                        Text("Read with \(tradition.guideName)")
+                            .font(.headline)
+                    }
+                }
                 Text("\"\(verse.text)\"")
                     .font(.system(size: 38, weight: .semibold, design: .serif))
                     .fixedSize(horizontal: false, vertical: true)
@@ -477,15 +493,19 @@ private struct DevotionalDetailView: View {
     var body: some View {
         List {
             Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    Text(devotional.scripture)
-                        .font(.caption.bold())
-                        .foregroundStyle(selectedTheme.accent)
-                    Text(devotional.title)
-                        .font(.largeTitle.weight(.black))
-                    Label("\(devotional.minutes) minute read", systemImage: "clock.fill")
-                        .font(.caption.bold())
-                        .foregroundStyle(.secondary)
+                HStack(alignment: .top, spacing: 14) {
+                    FaithGuidePortrait(tradition: tradition, width: 76, height: 94, cornerRadius: 15)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("WITH \(tradition.guideName.uppercased()) · \(devotional.scripture)")
+                            .font(.caption2.bold())
+                            .foregroundStyle(selectedTheme.accent)
+                        Text(devotional.title)
+                            .font(.largeTitle.weight(.black))
+                            .minimumScaleFactor(0.75)
+                        Label("\(devotional.minutes) minute read", systemImage: "clock.fill")
+                            .font(.caption.bold())
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 .padding(.vertical, 8)
             }
@@ -569,20 +589,24 @@ private struct RecoveryNewsletterView: View {
 
     private var dailyVerse: Verse { store.dailyVerse(for: selectedTradition) }
     private var dailyDevotional: Devotional {
-        InterfaithDailyContent.devotional(for: selectedTradition, base: store.devotional, verse: dailyVerse)
+        store.dailyDevotional(for: selectedTradition)
     }
+    private var dailyChallenge: RecoveryChallenge? { store.dailyChallenge(for: selectedTradition) }
 
     var body: some View {
         List {
             Section {
-                VStack(alignment: .leading, spacing: 10) {
-                    Label("Recovery Newsletter", systemImage: "newspaper.fill")
-                        .font(.caption.bold())
-                        .foregroundStyle(selectedTheme.accent)
-                    Text(selectedTradition.newsletterTagline)
-                        .font(.largeTitle.weight(.black))
-                    Text(Date(), format: .dateTime.weekday(.wide).month(.wide).day().year())
-                        .foregroundStyle(.secondary)
+                HStack(alignment: .top, spacing: 14) {
+                    FaithGuidePortrait(tradition: selectedTradition, width: 76, height: 94, cornerRadius: 15)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Recovery Newsletter with \(selectedTradition.guideName)", systemImage: "newspaper.fill")
+                            .font(.caption.bold())
+                            .foregroundStyle(selectedTheme.accent)
+                        Text(selectedTradition.newsletterTagline)
+                            .font(.title.weight(.black))
+                        Text(Date(), format: .dateTime.weekday(.wide).month(.wide).day().year())
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 .padding(.vertical, 8)
             }
@@ -611,7 +635,7 @@ private struct RecoveryNewsletterView: View {
                 Text(dailyDevotional.practice)
             }
 
-            if let challenge = store.challenge {
+            if let challenge = dailyChallenge {
                 Section("This Week: \(challenge.title)") {
                     Text(challenge.description)
                     ForEach(challenge.steps, id: \.self) { step in
@@ -661,6 +685,18 @@ private struct PrayerPracticesView: View {
     var body: some View {
         List {
             Section {
+                HStack(spacing: 14) {
+                    FaithGuidePortrait(tradition: tradition, width: 64, height: 78, cornerRadius: 13)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Practice with \(tradition.guideName)")
+                            .font(.headline)
+                        Text("Choose a guided \(tradition.prayerName.lowercased()) for this moment.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            Section {
                 ForEach(store.practices.filter { $0.title != "Peace Breath" && $0.title != "Weekly Challenge" }) { practice in
                     NavigationLink {
                         PrayerPracticeDetailView(practice: practice, tradition: tradition)
@@ -698,14 +734,18 @@ private struct PrayerPracticeDetailView: View {
     var body: some View {
         List {
             Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    Image(systemName: practice.systemImage)
-                        .font(.largeTitle)
-                        .foregroundStyle(selectedTheme.accent)
-                    Text(practice.title)
-                        .font(.largeTitle.weight(.black))
-                    Text(practice.subtitle)
-                        .foregroundStyle(.secondary)
+                HStack(alignment: .top, spacing: 14) {
+                    FaithGuidePortrait(tradition: tradition, width: 76, height: 94, cornerRadius: 15)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("With \(tradition.guideName)", systemImage: practice.systemImage)
+                            .font(.caption.bold())
+                            .foregroundStyle(selectedTheme.accent)
+                        Text(practice.title)
+                            .font(.largeTitle.weight(.black))
+                            .minimumScaleFactor(0.75)
+                        Text(practice.subtitle)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 .padding(.vertical, 8)
             }
@@ -754,8 +794,13 @@ private struct PrayerPracticeDetailView: View {
 private struct WeeklyChallengeView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
 
-    private var challenge: RecoveryChallenge? { store.challenge }
+    private var selectedTradition: FaithTradition {
+        FaithTradition(rawValue: traditionID) ?? .bible
+    }
+
+    private var challenge: RecoveryChallenge? { store.dailyChallenge(for: selectedTradition) }
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -764,18 +809,22 @@ private struct WeeklyChallengeView: View {
     var body: some View {
         List {
             Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    Image(systemName: "calendar.badge.checkmark")
-                        .font(.largeTitle)
-                        .foregroundStyle(selectedTheme.accent)
-                    Text(challenge?.title ?? "Faith in Action")
-                        .font(.largeTitle.weight(.black))
-                    Text(challenge?.description ?? "Choose one quiet act of faith this week and make it concrete.")
-                        .foregroundStyle(.secondary)
-                    if let challenge {
-                        Text(challenge.scriptureReference)
+                HStack(alignment: .top, spacing: 14) {
+                    FaithGuidePortrait(tradition: selectedTradition, width: 76, height: 94, cornerRadius: 15)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Label("Weekly challenge with \(selectedTradition.guideName)", systemImage: "calendar.badge.checkmark")
                             .font(.caption.bold())
                             .foregroundStyle(selectedTheme.accent)
+                        Text(challenge?.title ?? "Faith in Action")
+                            .font(.largeTitle.weight(.black))
+                            .minimumScaleFactor(0.75)
+                        Text(challenge?.description ?? "Choose one quiet act of faith this week and make it concrete.")
+                            .foregroundStyle(.secondary)
+                        if let challenge {
+                            Text(challenge.scriptureReference)
+                                .font(.caption.bold())
+                                .foregroundStyle(selectedTheme.accent)
+                        }
                     }
                 }
                 .padding(.vertical, 8)

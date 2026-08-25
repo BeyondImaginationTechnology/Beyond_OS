@@ -311,7 +311,7 @@ enum InterfaithDailyContent {
                 "Receive chizuk—strength and encouragement—for one honest choice today.",
                 "This passage from the Tanakh joins courage with responsibility. Teshuvah is a return: not pretending the past did not happen, but turning toward God, truth, repair, and life. You do not need to finish the whole journey in this moment. Take the next faithful step and let trusted community help you keep returning.",
                 "Source of strength, steady my heart and help me choose what leads toward truth, repair, and life. Give me courage to ask for help and wisdom to take the next right step.",
-                "Read (verse.reference) slowly. Name one act of teshuvah—return or repair—you can begin today, then share it with someone trustworthy."
+                "Read \(verse.reference) slowly. Name one act of teshuvah—return or repair—you can begin today, then share it with someone trustworthy."
             )
         case (.torah, .peace):
             content = (
@@ -319,7 +319,7 @@ enum InterfaithDailyContent {
                 "Let sacred reading, honest self-reckoning, and a quiet breath make room for peace.",
                 "Jewish tefillah is more than asking for something; it is also connection and honest self-examination before God. Let this passage slow the urgency of the moment. Breathe, notice what is true, and choose a response shaped by wisdom rather than impulse.",
                 "Holy One, quiet what is restless in me. Help me listen honestly, receive support, and act with patience, compassion, and good judgment.",
-                "Take three slow breaths after reading (verse.reference). Sit in silence for one minute, then write one truthful sentence about what you need now."
+                "Take three slow breaths after reading \(verse.reference). Sit in silence for one minute, then write one truthful sentence about what you need now."
             )
         case (.torah, .recovery):
             content = (
@@ -335,7 +335,7 @@ enum InterfaithDailyContent {
                 "Practice sabr—steadfast patience—without facing the struggle alone.",
                 "This ayah calls you toward sabr: patient perseverance rooted in trust in Allah. Sabr is not passive resignation. It can mean pausing before harm, seeking wise support, and continuing with the next right action even when the path feels difficult.",
                 "Allah, grant me sabr, clear judgment, and courage. Protect me from choices that cause harm, guide me toward trustworthy support, and strengthen me for the next right step. Amin.",
-                "Read (verse.reference) slowly, pause for three breaths, and say: Hasbunallahu wa ni‘mal-wakil—Allah is sufficient for us and the best disposer of affairs. Then contact one safe support person."
+                "Read \(verse.reference) slowly, pause for three breaths, and say: Hasbunallahu wa ni‘mal-wakil—Allah is sufficient for us and the best disposer of affairs. Then contact one safe support person."
             )
         case (.quran, .peace):
             content = (
@@ -366,6 +366,25 @@ enum InterfaithDailyContent {
             minutes: base.minutes,
             prayer: content.prayer,
             practice: content.practice
+        )
+    }
+
+    static func challenge(for tradition: FaithTradition, base: RecoveryChallenge, verse: Verse) -> RecoveryChallenge {
+        guard tradition != .bible else { return base }
+        let readingName = tradition == .quran ? "daily ayah" : "daily passage"
+        let steps = base.steps.map {
+            $0.replacingOccurrences(of: "recovery verse", with: readingName, options: .caseInsensitive)
+                .replacingOccurrences(of: "brief prayer", with: "brief spiritual practice", options: .caseInsensitive)
+        }
+        return RecoveryChallenge(
+            id: base.id,
+            title: base.title,
+            description: base.description,
+            scriptureReference: verse.reference,
+            steps: steps,
+            targetCount: base.targetCount,
+            startsOn: base.startsOn,
+            endsOn: base.endsOn
         )
     }
 
@@ -414,9 +433,21 @@ enum InterfaithDailyContent {
               let verseRange = Range(match.range(at: 3), in: reference),
               let chapter = Int(reference[chapterRange]),
               let verse = Int(reference[verseRange]) else { return nil }
-        let bookName = String(reference[bookRange])
-        return library.books.first { $0.name.caseInsensitiveCompare(bookName) == .orderedSame }?
+        let bookName = normalizedBookName(String(reference[bookRange]))
+        return library.books.first { normalizedBookName($0.name) == bookName }?
             .chapters.first { $0.number == chapter }?.verses.first { $0.verse == verse }
+    }
+
+    private static func normalizedBookName(_ value: String) -> String {
+        let normalized = value
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "en_US_POSIX"))
+            .lowercased()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        switch normalized {
+        case "psalm", "psalms": "psalms"
+        case "song of solomon", "song of songs": "song of solomon"
+        default: normalized
+        }
     }
 
     private static func resolve(code: String, in library: SacredTextLibrary) -> SacredTextVerse? {

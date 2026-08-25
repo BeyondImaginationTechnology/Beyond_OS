@@ -156,6 +156,76 @@ final class DailyBreathTests: XCTestCase {
         XCTAssertEqual(muslimVerse.reference, "Al-Imran 3:200")
     }
 
+    func testTorahResolverMatchesSingularPsalmReference() {
+        let bibleLibrary = BibleLibrary.loadWorldEnglishBible()
+        let torah = SacredTextLibrary.torah(from: bibleLibrary)
+        let verse = Verse(
+            id: 1,
+            text: "Wait for Yahweh. Be strong, and let your heart take courage.",
+            reference: "Psalm 27:14",
+            reflection: "Courage"
+        )
+
+        let resolved = InterfaithDailyContent.verse(
+            for: .torah,
+            date: Date(timeIntervalSince1970: 0),
+            bibleVerse: verse,
+            bible: SacredTextLibrary.bible(from: bibleLibrary),
+            torah: torah,
+            quran: SacredTextLibrary(tradition: .quran, translation: "Test", books: [])
+        )
+
+        XCTAssertEqual(resolved.reference, "Psalms 27:14")
+        XCTAssertEqual(resolved.text, torah.verse(bookCode: "PSA", chapter: 27, verse: 14)?.text)
+    }
+
+    func testFaithAwareDevotionalsUseSelectedReferenceAndPrayerLanguage() {
+        let base = Devotional(
+            id: 1,
+            title: "Christian Base",
+            excerpt: "Base excerpt",
+            body: "Base body",
+            scripture: "Psalm 27:14",
+            minutes: 3,
+            prayer: "Lord, help me.",
+            practice: "Base practice"
+        )
+        let torahVerse = Verse(id: 2, text: "Be strong.", reference: "Psalms 27:14", reflection: "Courage")
+        let quranVerse = Verse(id: 3, text: "Persevere.", reference: "Al-Imran 3:200", reflection: "Courage")
+
+        let jewish = InterfaithDailyContent.devotional(for: .torah, base: base, verse: torahVerse)
+        let muslim = InterfaithDailyContent.devotional(for: .quran, base: base, verse: quranVerse)
+
+        XCTAssertEqual(jewish.scripture, torahVerse.reference)
+        XCTAssertTrue(jewish.practice.contains(torahVerse.reference))
+        XCTAssertFalse(jewish.prayer.contains("Lord"))
+        XCTAssertEqual(muslim.scripture, quranVerse.reference)
+        XCTAssertTrue(muslim.practice.contains(quranVerse.reference))
+        XCTAssertTrue(muslim.prayer.contains("Allah"))
+        XCTAssertFalse(muslim.prayer.contains("Lord"))
+    }
+
+    func testFaithAwareChallengeUsesSelectedReading() {
+        let base = RecoveryChallenge(
+            id: "challenge",
+            title: "Morning Before Messages",
+            description: "Begin grounded.",
+            scriptureReference: "Ephesians 4:25",
+            steps: ["Read one recovery verse.", "End with a brief prayer."],
+            targetCount: 7,
+            startsOn: "2026-08-01",
+            endsOn: "2026-08-31"
+        )
+        let ayah = Verse(id: 1, text: "Remember Allah.", reference: "Ar-Ra'd 13:28", reflection: "Peace")
+
+        let muslim = InterfaithDailyContent.challenge(for: .quran, base: base, verse: ayah)
+
+        XCTAssertEqual(muslim.id, base.id)
+        XCTAssertEqual(muslim.scriptureReference, ayah.reference)
+        XCTAssertTrue(muslim.steps.contains { $0.localizedCaseInsensitiveContains("daily ayah") })
+        XCTAssertFalse(muslim.steps.contains { $0.localizedCaseInsensitiveContains("prayer") })
+    }
+
     func testReviewDateUsesScheduledVerseInsteadOfHardcodedFallback() {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!

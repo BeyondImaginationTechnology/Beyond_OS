@@ -360,6 +360,7 @@ final class DailyBreathStore: ObservableObject {
         bibleScriptureLibrary = SacredTextLibrary.bible(from: bibleLibrary)
         torahScriptureLibrary = SacredTextLibrary.torah(from: bibleLibrary)
         quranScriptureLibrary = await quranTask.value
+        publishSelectedFaithContent()
     }
 
     func scriptureLibrary(for tradition: FaithTradition) -> SacredTextLibrary {
@@ -371,13 +372,49 @@ final class DailyBreathStore: ObservableObject {
     }
 
     func dailyVerse(for tradition: FaithTradition, date: Date = Date()) -> Verse {
-        InterfaithDailyContent.verse(
+        let baseVerse: Verse
+        if Calendar.current.isDateInToday(date) {
+            baseVerse = verse
+        } else if let record = dailyHistory[Self.dateKey(date)] {
+            baseVerse = Verse(
+                id: record.verseReference.hashValue & Int.max,
+                text: record.verseText,
+                reference: record.verseReference,
+                reflection: RecoveryContent.recoveryVerseReflection
+            )
+        } else {
+            baseVerse = RecoveryContent.verseOfTheDay(for: date) ?? verse
+        }
+        return InterfaithDailyContent.verse(
             for: tradition,
             date: date,
-            bibleVerse: verse,
+            bibleVerse: baseVerse,
             bible: bibleScriptureLibrary,
             torah: torahScriptureLibrary,
             quran: quranScriptureLibrary
+        )
+    }
+
+    func dailyDevotional(for tradition: FaithTradition, date: Date = Date()) -> Devotional {
+        let baseDevotional = Calendar.current.isDateInToday(date)
+            ? devotional
+            : RecoveryContent.devotionalOfTheDay(for: date) ?? devotional
+        return InterfaithDailyContent.devotional(
+            for: tradition,
+            base: baseDevotional,
+            verse: dailyVerse(for: tradition, date: date)
+        )
+    }
+
+    func dailyChallenge(for tradition: FaithTradition, date: Date = Date()) -> RecoveryChallenge? {
+        let baseChallenge = Calendar.current.isDateInToday(date)
+            ? challenge
+            : RecoveryContent.challengeOfTheDay(for: date)
+        guard let baseChallenge else { return nil }
+        return InterfaithDailyContent.challenge(
+            for: tradition,
+            base: baseChallenge,
+            verse: dailyVerse(for: tradition, date: date)
         )
     }
 
@@ -693,11 +730,18 @@ final class DailyBreathStore: ObservableObject {
         persistUserData()
     }
 
+    func publishSelectedFaithContent() {
+        publishWidgetVerse(dateKey: Self.dateKey(Date()))
+    }
+
     private func publishWidgetVerse(dateKey: String) {
+        let tradition = FaithTradition(rawValue: UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "") ?? .bible
+        let selectedVerse = dailyVerse(for: tradition)
         let defaults = UserDefaults(suiteName: "group.technology.co.beyondimagination.thedailybreath")
         defaults?.set(dateKey, forKey: "widgetVerseDate")
-        defaults?.set(verse.text, forKey: "widgetVerseText")
-        defaults?.set(verse.reference, forKey: "widgetVerseReference")
+        defaults?.set(selectedVerse.text, forKey: "widgetVerseText")
+        defaults?.set(selectedVerse.reference, forKey: "widgetVerseReference")
+        defaults?.set(tradition.dailyReadingName.uppercased(), forKey: "widgetReadingLabel")
         _ = defaults?.synchronize()
 #if canImport(WidgetKit)
         WidgetCenter.shared.reloadAllTimelines()
@@ -707,8 +751,8 @@ final class DailyBreathStore: ObservableObject {
     var recoveryNewsletterShareText: String {
         let tradition = FaithTradition(rawValue: UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "") ?? .bible
         let sharedVerse = dailyVerse(for: tradition)
-        let sharedDevotional = InterfaithDailyContent.devotional(for: tradition, base: devotional, verse: sharedVerse)
-        let challengeCopy = challenge.map { item in
+        let sharedDevotional = dailyDevotional(for: tradition)
+        let challengeCopy = dailyChallenge(for: tradition).map { item in
             "Weekly challenge: \(item.title). \(item.description) \(item.scriptureReference)"
         } ?? ""
         return "Recovery Newsletter\n\n\(sharedVerse.reference)\n\(sharedVerse.text)\n\n\(sharedDevotional.title)\n\(sharedDevotional.body)\n\n\(tradition.prayerName)\n\(sharedDevotional.prayer)\n\n\(challengeCopy)"

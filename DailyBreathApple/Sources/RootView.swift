@@ -66,12 +66,15 @@ struct RootView: View {
         case "journal": selectedTab = .journal
         case "bible":
             UserDefaults.standard.set(FaithTradition.bible.id, forKey: "selectedFaithTradition")
+            store.publishSelectedFaithContent()
             selectedTab = .scripture
         case "torah":
             UserDefaults.standard.set(FaithTradition.torah.id, forKey: "selectedFaithTradition")
+            store.publishSelectedFaithContent()
             selectedTab = .scripture
         case "quran":
             UserDefaults.standard.set(FaithTradition.quran.id, forKey: "selectedFaithTradition")
+            store.publishSelectedFaithContent()
             selectedTab = .scripture
         case "academy": selectedTab = .academy
         default: selectedTab = .today

@@ -82,6 +82,7 @@ struct ScriptureLibraryView: View {
             searchResults = []
             let tradition = FaithTradition(rawValue: value) ?? .bible
             selectedThemeID = DailyBreathTheme.recommended(for: tradition).id
+            store.publishSelectedFaithContent()
         }
         .scrollContentBackground(.hidden)
         .background(DailyBreathThemeBackground(theme: theme))
@@ -90,11 +91,7 @@ struct ScriptureLibraryView: View {
     private var overview: some View {
         Section {
             HStack(spacing: 16) {
-                Image(tradition.guideAssetName)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 92, height: 112)
-                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                FaithGuidePortrait(tradition: tradition, width: 92, height: 112, cornerRadius: 18)
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Explore with \(tradition.guideName)")
                         .font(.title2.weight(.black))

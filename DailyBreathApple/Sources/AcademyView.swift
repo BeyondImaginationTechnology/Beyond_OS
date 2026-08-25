@@ -62,6 +62,7 @@ struct AcademyView: View {
         .onChange(of: traditionID) { _, value in
             let tradition = FaithTradition(rawValue: value) ?? .bible
             selectedThemeID = DailyBreathTheme.recommended(for: tradition).id
+            store.publishSelectedFaithContent()
             refreshCertificate()
         }
     }
@@ -76,27 +77,21 @@ struct AcademyView: View {
     }
 
     private var hero: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Label("Daily Breath Academy", systemImage: "graduationcap.fill")
-                .font(.caption.bold())
-                .foregroundStyle(selectedTheme.accent)
-            Text("Learn the rhythm behind the practice.")
-                .font(.largeTitle.weight(.black))
-            Text("Choose one of two journeys for each faith: join and learn the tradition, or build a faith-centered recovery practice.")
-                .foregroundStyle(.secondary)
-            HStack(spacing: 10) {
-                ForEach(FaithTradition.allCases) { tradition in
-                    VStack(spacing: 5) {
-                        Image(tradition.guideAssetName)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 72, height: 82)
-                            .clipShape(RoundedRectangle(cornerRadius: 14))
-                        Text(tradition.guideName)
-                            .font(.caption.bold())
-                    }
-                    .frame(maxWidth: .infinity)
-                }
+        HStack(alignment: .top, spacing: 18) {
+            FaithGuidePortrait(tradition: selectedTradition, width: 112, height: 142, cornerRadius: 20)
+            VStack(alignment: .leading, spacing: 10) {
+                Label("Daily Breath Academy", systemImage: "graduationcap.fill")
+                    .font(.caption.bold())
+                    .foregroundStyle(selectedTheme.accent)
+                Text("Learn with \(selectedTradition.guideName).")
+                    .font(.largeTitle.weight(.black))
+                    .minimumScaleFactor(0.75)
+                Text("Your guide leads two \(selectedTradition.name) journeys: joining and learning the tradition, and building a faith-centered recovery practice.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Label("Your \(selectedTradition.academyName) guide", systemImage: selectedTradition.symbolName)
+                    .font(.caption.bold())
+                    .foregroundStyle(selectedTheme.primary)
             }
         }
         .padding(20)
@@ -117,11 +112,9 @@ struct AcademyView: View {
                 AcademyLessonView(path: nextLesson.path, lesson: nextLesson.lesson, lessonIndex: nextLesson.index)
             } label: {
                 HStack(spacing: 14) {
-                    Image(systemName: completedCount == totalLessonCount ? "arrow.clockwise.circle.fill" : "play.circle.fill")
-                        .font(.title)
-                        .foregroundStyle(selectedTheme.accent)
+                    FaithGuidePortrait(tradition: selectedTradition, width: 62, height: 72, cornerRadius: 12)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(completedCount == totalLessonCount ? "Review Academy" : "Continue Academy")
+                        Text(completedCount == totalLessonCount ? "Review with \(selectedTradition.guideName)" : "Continue with \(selectedTradition.guideName)")
                             .font(.caption.weight(.bold))
                             .foregroundStyle(.secondary)
                         Text("\(nextLesson.path.title) · Lesson \(nextLesson.index + 1)")
@@ -168,11 +161,14 @@ struct AcademyView: View {
 
     private func certificateLabel(eyebrow: String, title: String, detail: String, systemImage: String) -> some View {
         HStack(spacing: 16) {
-            Image(systemName: systemImage)
-                .font(.title)
-                .foregroundStyle(isAcademyComplete ? selectedTheme.primary : .secondary)
-                .frame(width: 52, height: 52)
-                .background(selectedTheme.primary.opacity(0.12), in: Circle())
+            FaithGuidePortrait(tradition: selectedTradition, width: 56, height: 64, cornerRadius: 12)
+                .overlay(alignment: .bottomTrailing) {
+                    Image(systemName: systemImage)
+                        .font(.caption.bold())
+                        .foregroundStyle(.white)
+                        .padding(5)
+                        .background(isAcademyComplete ? selectedTheme.primary : Color.secondary, in: Circle())
+                }
             VStack(alignment: .leading, spacing: 4) {
                 Text(eyebrow)
                     .font(.caption2.weight(.black))
@@ -247,11 +243,7 @@ private struct AcademyModuleCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .top, spacing: 14) {
-                Image(path.guideAssetName)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 72, height: 88)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                FaithGuidePortrait(tradition: path.tradition, width: 72, height: 88, cornerRadius: 12)
                 VStack(alignment: .leading, spacing: 5) {
                     Label("Path \(pathNumber) · Guide: \(path.guideName)", systemImage: path.systemImage)
                         .font(.caption.bold())
@@ -307,11 +299,14 @@ private struct AcademyCertificateView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 22) {
-                Image("DailyBreathIcon")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 86, height: 86)
-                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                HStack(spacing: 16) {
+                    Image("DailyBreathIcon")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 86, height: 86)
+                        .clipShape(RoundedRectangle(cornerRadius: 18))
+                    FaithGuidePortrait(tradition: tradition, width: 76, height: 92, cornerRadius: 16)
+                }
 
                 VStack(spacing: 6) {
                     Text("BEYOND IMAGINATION")
@@ -409,8 +404,15 @@ private struct AcademyLessonRow: View {
                         .foregroundStyle(.secondary)
                 }
                 Spacer()
-                Image(systemName: isComplete ? "checkmark.circle.fill" : "chevron.right")
-                    .foregroundStyle(isComplete ? theme.primary : .secondary)
+                FaithGuidePortrait(tradition: path.tradition, width: 36, height: 42, cornerRadius: 8)
+                    .overlay(alignment: .bottomTrailing) {
+                        if isComplete {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.caption)
+                                .foregroundStyle(theme.primary)
+                                .background(.background, in: Circle())
+                        }
+                    }
             }
             .padding(12)
             .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
@@ -442,14 +444,21 @@ private struct AcademyLessonView: View {
     var body: some View {
         List {
             Section {
+                HStack(alignment: .top, spacing: 14) {
+                    FaithGuidePortrait(tradition: path.tradition, width: 88, height: 108, cornerRadius: 16)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("LESSON \(lessonIndex + 1) WITH \(path.guideName.uppercased())")
+                            .font(.caption2.bold())
+                            .tracking(1.1)
+                            .foregroundStyle(selectedTheme.accent)
+                        Text(lesson.title)
+                            .font(.largeTitle.weight(.black))
+                            .minimumScaleFactor(0.75)
+                        Text(lesson.summary)
+                            .foregroundStyle(.secondary)
+                    }
+                }
                 VStack(alignment: .leading, spacing: 12) {
-                    Label(path.title, systemImage: path.systemImage)
-                        .font(.caption.bold())
-                        .foregroundStyle(selectedTheme.accent)
-                    Text(lesson.title)
-                        .font(.largeTitle.weight(.black))
-                    Text(lesson.summary)
-                        .foregroundStyle(.secondary)
                     HStack {
                         Label(lesson.scripture, systemImage: "book.closed.fill")
                         Spacer()
@@ -467,13 +476,13 @@ private struct AcademyLessonView: View {
                     .foregroundStyle(selectedTheme.primary)
             }
 
-            Section("Teaching") {
+            Section("Teaching with \(path.guideName)") {
                 Text(lesson.teaching)
                     .font(.body)
                 Button {
                     store.speakAcademyLesson(lesson)
                 } label: {
-                    Label("Listen to Lesson", systemImage: "speaker.wave.2.fill")
+                    Label("Listen with \(path.guideName)", systemImage: "speaker.wave.2.fill")
                 }
             }
 
@@ -566,6 +575,27 @@ private struct AcademyLessonView: View {
             .split(separator: ",")
             .map(String.init)
             .filter { !$0.isEmpty }
+    }
+}
+
+struct FaithGuidePortrait: View {
+    let tradition: FaithTradition
+    var width: CGFloat = 64
+    var height: CGFloat = 76
+    var cornerRadius: CGFloat = 14
+
+    var body: some View {
+        Image(tradition.guideAssetName)
+            .resizable()
+            .scaledToFill()
+            .frame(width: width, height: height)
+            .clipped()
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+            .overlay {
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .stroke(.primary.opacity(0.12), lineWidth: 1)
+            }
+            .accessibilityLabel("\(tradition.guideName), \(tradition.academyName) guide")
     }
 }
 

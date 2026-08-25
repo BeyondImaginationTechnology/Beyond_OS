@@ -6,6 +6,7 @@ private struct VerseWidgetEntry: TimelineEntry {
     let date: Date
     let text: String
     let reference: String
+    let readingLabel: String
 }
 
 private struct WidgetVerseDocument: Decodable {
@@ -25,7 +26,7 @@ private struct WidgetVerseItem: Decodable {
 
 private struct VerseWidgetProvider: TimelineProvider {
     func placeholder(in context: Context) -> VerseWidgetEntry {
-        VerseWidgetEntry(date: Date(), text: "Be still, and know that I am God.", reference: "Psalm 46:10")
+        VerseWidgetEntry(date: Date(), text: "Be still, and know that I am God.", reference: "Psalm 46:10", readingLabel: "BIBLE VERSE")
     }
 
     func getSnapshot(in context: Context, completion: @escaping @Sendable (VerseWidgetEntry) -> Void) {
@@ -48,7 +49,8 @@ private struct VerseWidgetProvider: TimelineProvider {
         if shared?.string(forKey: "widgetVerseDate") == dateKey,
            let text = shared?.string(forKey: "widgetVerseText"),
            let reference = shared?.string(forKey: "widgetVerseReference") {
-            return VerseWidgetEntry(date: date, text: text, reference: reference)
+            let label = shared?.string(forKey: "widgetReadingLabel") ?? "DAILY READING"
+            return VerseWidgetEntry(date: date, text: text, reference: reference, readingLabel: label)
         }
 
         guard let url = Bundle.main.url(forResource: "daily-verses", withExtension: "json"),
@@ -58,12 +60,13 @@ private struct VerseWidgetProvider: TimelineProvider {
             return VerseWidgetEntry(
                 date: date,
                 text: "Be still, and know that I am God.",
-                reference: "Psalm 46:10"
+                reference: "Psalm 46:10",
+                readingLabel: "BIBLE VERSE"
             )
         }
         let day = Calendar.current.ordinality(of: .day, in: .era, for: date) ?? 1
         let verse = verses.first(where: { $0.scheduleDate == dateKey }) ?? verses[(day - 1) % verses.count]
-        return VerseWidgetEntry(date: date, text: verse.text, reference: verse.reference)
+        return VerseWidgetEntry(date: date, text: verse.text, reference: verse.reference, readingLabel: "BIBLE VERSE")
     }
 
     private static func dateKey(_ date: Date) -> String {
@@ -92,7 +95,7 @@ private struct VerseWidgetView: View {
                 }
             default:
                 VStack(alignment: .leading, spacing: 8) {
-                    Label("VERSE OF THE DAY", systemImage: "sun.max.fill")
+                    Label(entry.readingLabel, systemImage: "sun.max.fill")
                         .font(.caption2.bold())
                         .foregroundStyle(.secondary)
                     Text(entry.text)

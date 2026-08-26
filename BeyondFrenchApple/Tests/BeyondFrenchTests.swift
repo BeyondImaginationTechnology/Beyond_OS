@@ -15,6 +15,14 @@ final class BeyondFrenchTests: XCTestCase {
         XCTAssertEqual(lesson.text(for: .patois), lesson.patois)
     }
 
+    func testNativeSpeakerLanguagesUseGeneratorVoice() {
+        XCTAssertTrue(DictionaryAudioLanguage.kreyol.usesGeneratorVoice)
+        XCTAssertTrue(DictionaryAudioLanguage.patois.usesGeneratorVoice)
+        XCTAssertFalse(DictionaryAudioLanguage.french.usesGeneratorVoice)
+        XCTAssertFalse(DictionaryAudioLanguage.spanish.usesGeneratorVoice)
+        XCTAssertEqual(DictionaryAudioLanguage.kreyol.title, "Kreyòl")
+    }
+
     func testFallbackAcademyHasFreeGreetingLesson() {
         let module = AcademyCatalog.fallback.modules[0]
 

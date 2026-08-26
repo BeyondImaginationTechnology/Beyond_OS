@@ -128,9 +128,16 @@ enum DictionaryAudioLanguage: Equatable {
         switch self {
         case .french: "French"
         case .spanish: "Spanish"
-        case .kreyol: "Kreyol"
+        case .kreyol: "Kreyòl"
         case .patois: "Patois"
         }
+    }
+
+    /// Kreyòl and Patois use the native speakers configured in the same
+    /// server-side generator used by Daily Studio. Packaged clips from an
+    /// older app build must not override those current speaker selections.
+    var usesGeneratorVoice: Bool {
+        self == .kreyol || self == .patois
     }
 }
 

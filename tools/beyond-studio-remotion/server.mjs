@@ -5,6 +5,7 @@ import {basename, dirname, extname, join, resolve, sep} from 'node:path';
 import {randomUUID, timingSafeEqual} from 'node:crypto';
 import {spawn} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
+import {inferHtmlRenderOptions} from './lib/html-artifact.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(root, '..', '..');
@@ -165,6 +166,7 @@ const inspectCompositions = async (entry, projectRoot) => {
 const bridgeScript = String.raw`<script>
 (() => {
   let now = 0;
+  let lastFrame = -1;
   let nextId = 1;
   let queue = [];
   const cancelled = new Set();
@@ -173,9 +175,15 @@ const bridgeScript = String.raw`<script>
   window.cancelAnimationFrame = (id) => cancelled.add(id);
   try { Object.defineProperty(performance, 'now', {value: () => now}); } catch (_) {}
   const focusCanvas = (selector) => {
-    const candidates = [selector, '[data-remotion-root]', '[data-composition]', '[class*="aspect-[16/9]"]', 'main', '#root'];
+    const portrait = innerHeight > innerWidth;
+    const aspectCandidates = portrait
+      ? ['[class*="aspect-[9/16]"]', '[class*="aspect-[16/9]"]']
+      : ['[class*="aspect-[16/9]"]', '[class*="aspect-[9/16]"]'];
+    const candidates = [selector, '[data-remotion-root]', '[data-composition]', ...aspectCandidates, 'main', '#root'];
     const target = candidates.filter(Boolean).map((item) => { try { return document.querySelector(item); } catch (_) { return null; } }).find(Boolean);
     if (!target || target === document.body || target === document.documentElement) return;
+    Object.assign(document.documentElement.style, {margin:'0', width:'100%', height:'100%', overflow:'hidden', background:'#05070d'});
+    Object.assign(document.body.style, {margin:'0', width:'100%', height:'100%', overflow:'hidden', background:'#05070d'});
     target.setAttribute('data-beyond-render-target', 'true');
     Object.assign(target.style, {position:'fixed', inset:'0', width:'100vw', height:'100vh', maxWidth:'none', maxHeight:'none', margin:'0', borderRadius:'0', zIndex:'2147483647'});
   };
@@ -186,12 +194,19 @@ const bridgeScript = String.raw`<script>
   window.addEventListener('message', (event) => {
     if (!event.data || event.data.type !== 'beyond-remotion-frame') return;
     const fps = event.data.fps || 30;
-    for (let step = 0; step <= event.data.frame; step++) {
+    const requestedFrame = Math.max(0, Math.floor(event.data.frame || 0));
+    // A renderer page normally receives an ascending run of frames. Advance
+    // only the missing interval; replaying frame zero on every message makes
+    // requestAnimationFrame clocks jump backwards and corrupts animations.
+    const firstStep = lastFrame < 0 ? 0 : lastFrame + 1;
+    if (requestedFrame < lastFrame) return;
+    for (let step = firstStep; step <= requestedFrame; step++) {
       now = (step / fps) * 1000;
       const callbacks = queue; queue = [];
       for (const [id, callback] of callbacks) if (!cancelled.has(id)) callback(now);
       cancelled.clear();
     }
+    lastFrame = requestedFrame;
     for (const animation of document.getAnimations()) {
       try { animation.pause(); animation.currentTime = now; } catch (_) {}
     }
@@ -210,6 +225,7 @@ const createHtmlProject = async (projectRoot, uploadedHtml, options) => {
   await mkdir(publicDirectory, {recursive: true});
   await mkdir(sourceDirectory, {recursive: true});
   let html = await readFile(uploadedHtml, 'utf8');
+  const renderOptions = inferHtmlRenderOptions(html, options);
   html = html.includes('<head>') ? html.replace('<head>', `<head>${bridgeScript}`) : bridgeScript + html;
   await writeFile(join(publicDirectory, 'artifact.html'), html);
   await writeFile(join(projectRoot, 'package.json'), JSON.stringify({name: 'beyond-html-artifact', private: true}, null, 2));
@@ -217,24 +233,24 @@ const createHtmlProject = async (projectRoot, uploadedHtml, options) => {
   await writeFile(join(sourceDirectory, 'Root.tsx'), `import React, {useEffect, useRef, useState} from 'react';
 import {AbsoluteFill, Composition, continueRender, delayRender, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 
-const selector = ${JSON.stringify(options.selector || '')};
+const selector = ${JSON.stringify(renderOptions.selector || '')};
 const Artifact = () => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const iframe = useRef<HTMLIFrameElement>(null);
   const [ready, setReady] = useState(false);
   const [handle] = useState(() => delayRender('Waiting for HTML artifact'));
-  const [frameHandle] = useState(() => delayRender('Advancing HTML artifact to frame ' + frame));
+  const frameHandle = React.useMemo(() => delayRender('Advancing HTML artifact to frame ' + frame), [frame]);
   useEffect(() => {
     if (!ready) return;
     iframe.current?.contentWindow?.postMessage({type:'beyond-remotion-frame', frame, fps, time:(frame / fps) * 1000}, '*');
-    const timeout = setTimeout(() => continueRender(frameHandle), 60);
-    return () => clearTimeout(timeout);
+    const timeout = setTimeout(() => continueRender(frameHandle), 80);
+    return () => { clearTimeout(timeout); continueRender(frameHandle); };
   }, [frame, fps, ready, frameHandle]);
   return <AbsoluteFill style={{background:'#05070d'}}><iframe ref={iframe} title="HTML artifact" src={staticFile('artifact.html') + '?selector=' + encodeURIComponent(selector)} onLoad={() => {setTimeout(() => {setReady(true); continueRender(handle);}, 250)}} style={{width:'100%',height:'100%',border:0,background:'#05070d'}} /></AbsoluteFill>;
 };
 
-export const Root = () => <Composition id="HtmlArtifact" component={Artifact} width={${options.width}} height={${options.height}} fps={${options.fps}} durationInFrames={${options.durationInFrames}} />;
+export const Root = () => <Composition id="HtmlArtifact" component={Artifact} width={${renderOptions.width}} height={${renderOptions.height}} fps={${renderOptions.fps}} durationInFrames={${renderOptions.durationInFrames}} />;
 `);
   return join(sourceDirectory, 'index.tsx');
 };

@@ -115,4 +115,10 @@ configuration from reusable platform code.
 
 ## License
 
-Beyond OS is released under the MIT License. See `LICENSE` for details.
+Original Beyond OS source code and associated technical documentation are
+released under the MIT License. The MIT License does not cover Beyond branding,
+images, audio, video, voices, fonts, datasets, generated content, user content,
+or third-party material unless an asset-specific notice expressly says so.
+
+See `LICENSE` for the source-code license and `CONTENT_RIGHTS.md` for media,
+branding, generated-content, public-domain, and third-party rights guidance.

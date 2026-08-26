@@ -124,6 +124,15 @@ final class AppStore: ObservableObject {
         premiumVoicePlayer?.stop()
         configureAudioSession()
         let text = lesson.text(for: language)
+
+        // These voices are curated in Daily Studio (including the male
+        // Jamaican speaker). Ask the shared voice service first so an older
+        // MP3 bundled with the app cannot mask an updated speaker selection.
+        if language.usesGeneratorVoice {
+            speak(text, language: language.locale)
+            return
+        }
+
         if let url = bundledLessonAudioURL(for: lesson, language: language),
            let player = try? AVAudioPlayer(contentsOf: url) {
             player.prepareToPlay()
@@ -178,6 +187,13 @@ final class AppStore: ObservableObject {
         speaker.stopSpeaking(at: .immediate)
         premiumVoicePlayer?.stop()
         configureAudioSession()
+
+        // Keep Kreyòl and Patois aligned with the generator's currently
+        // configured native speakers instead of stale packaged dictionary MP3s.
+        if language.usesGeneratorVoice {
+            speak(text, language: language.locale)
+            return
+        }
 
         if let url = bundledDictionaryAudioURL(for: word, language: language),
            let player = try? AVAudioPlayer(contentsOf: url) {

@@ -35,6 +35,15 @@ return [
     'security' => [
         'jwt_secret' => 'replace-with-a-long-random-local-secret',
     ],
+    'oauth' => [
+        'instagram' => [
+            // Credentials from Meta's "API setup with Instagram login" use case.
+            // These are the Instagram App credentials, not the Facebook Login ID.
+            'app_id' => '',
+            'app_secret' => '',
+            'graph_version' => 'v26.0',
+        ],
+    ],
     'remotion' => [
         'bridge_url' => 'https://render.beyondimagination.co.technology',
         'bridge_token' => 'replace-with-the-render-bridge-token',

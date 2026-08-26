@@ -6,9 +6,18 @@ require __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../../config/mail.php';
 require_once __DIR__ . '/../../config/admin-alerts.php';
 require_once __DIR__ . '/../../config/roles.php';
-ob_start(static fn(string $html): string => str_replace('BEYOND OS 2.4 BETA', 'BEYOND OS · BETA BUILD 2.4', $html));
+$instagramRegisterHtml = '';
+ob_start(static function (string $html) use (&$instagramRegisterHtml): string {
+    $html = str_replace('BEYOND OS 2.4 BETA', 'BEYOND OS · BETA BUILD 2.4', $html);
+    $html = str_replace('Sign up with Facebook / Instagram', 'Sign up with Facebook', $html);
+    return str_replace('<div class="divider">or create with email</div>', $instagramRegisterHtml . '<div class="divider">or create with email</div>', $html);
+});
 $error=(string)($_SESSION['oauth_error'] ?? ''); unset($_SESSION['oauth_error']); $success='';
-$googleEnabled=beyond_social_enabled('google'); $metaEnabled=beyond_social_enabled('meta');
+$googleEnabled=beyond_social_enabled('google'); $metaEnabled=beyond_social_enabled('meta'); $instagramEnabled=beyond_social_enabled('instagram');
+$instagramRegisterHtml='<div class="social">'.($instagramEnabled
+    ? '<a href="oauth-start.php?provider=instagram" style="color:#fff;background:linear-gradient(90deg,#833ab4,#fd1d1d,#fcb045)">◎&nbsp; Sign up with Instagram</a>'
+    : '<span class="disabled" aria-disabled="true" style="display:flex;align-items:center;justify-content:center;min-height:48px;padding:12px;border-radius:13px">◎&nbsp; Sign up with Instagram</span>').'</div>'
+    .(!$instagramEnabled?'<p class="social-note">Instagram sign-up activates after its App ID and secret are added to <code>var/config/live.php</code>.</p>':'');
 $isSqlite=$pdo->getAttribute(PDO::ATTR_DRIVER_NAME)==='sqlite';
 $insertIgnore=static fn(string $sql):string=>$isSqlite?str_replace('INSERT INTO','INSERT OR IGNORE INTO',$sql):str_replace('INSERT INTO','INSERT IGNORE INTO',$sql);
 if ($_SERVER['REQUEST_METHOD']==='POST') {

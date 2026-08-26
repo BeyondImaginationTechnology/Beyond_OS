@@ -62,6 +62,10 @@ function beyond_social_authorization_url(string $provider, string $state, string
         $parameters['code_challenge'] = $codeChallenge;
         $parameters['code_challenge_method'] = 'S256';
         $parameters['prompt'] = 'select_account';
+    } elseif ($provider === 'instagram') {
+        $parameters['scope'] = implode(',', $config['scopes'] ?? []);
+        $parameters['enable_fb_login'] = '0';
+        $parameters['force_authentication'] = '1';
     }
     return $config['authorize_url'] . '?' . http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
 }
@@ -83,6 +87,21 @@ function beyond_social_exchange_code(string $provider, string $code, string $cod
 function beyond_social_profile(string $provider, string $accessToken): array
 {
     $config = beyond_social_config($provider);
+    if ($provider === 'instagram') {
+        $url = $config['userinfo_url'] . '?' . http_build_query(['fields' => 'user_id,username,account_type'], '', '&', PHP_QUERY_RFC3986);
+        $profile = beyond_social_http($url, ['access_token' => $accessToken]);
+        $username = trim((string)($profile['username'] ?? ''));
+        return [
+            'subject' => (string)($profile['user_id'] ?? $profile['id'] ?? ''),
+            'email' => '',
+            'email_verified' => false,
+            'name' => $username !== '' ? '@' . $username : 'Instagram member',
+            'first_name' => $username,
+            'last_name' => '',
+            'username' => $username,
+            'account_type' => trim((string)($profile['account_type'] ?? '')),
+        ];
+    }
     if ($provider === 'meta') {
         $url = $config['userinfo_url'] . '?' . http_build_query(['fields' => 'id,name,first_name,last_name,email'], '', '&', PHP_QUERY_RFC3986);
         $profile = beyond_social_http($url, ['access_token' => $accessToken]);

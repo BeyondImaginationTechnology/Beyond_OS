@@ -5,8 +5,8 @@ require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/social-auth.php';
 
 $provider = strtolower(trim((string)($_GET['provider'] ?? '')));
-if ($provider === 'facebook' || $provider === 'instagram') $provider = 'meta';
-if (!in_array($provider, ['google', 'meta'], true) || !beyond_social_enabled($provider)) {
+if ($provider === 'facebook') $provider = 'meta';
+if (!in_array($provider, ['google', 'meta', 'instagram'], true) || !beyond_social_enabled($provider)) {
     $_SESSION['oauth_error'] = 'That social sign-in provider is not configured yet.';
     header('Location: login.php');
     exit;

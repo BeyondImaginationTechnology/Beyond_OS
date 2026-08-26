@@ -32,6 +32,40 @@ function africaText(array $input,string $field,int $max): string {
     if($value===''||mb_strlen($value)>$max) throw new InvalidArgumentException('Complete every required phrase field before saving.');
     return $value;
 }
+function africaSourceLessons(): array {
+    static $sources=null;
+    if(is_array($sources))return $sources;
+    $root=dirname(__DIR__,4).'/beyond-french/data';
+    $lessons=json_decode((string)file_get_contents($root.'/lessons.json'),true);
+    $dialects=json_decode((string)file_get_contents($root.'/africa-meta-dialects.json'),true);
+    if(!is_array($lessons)||!is_array($dialects))throw new RuntimeException('The prepared Africa source bank is unavailable.');
+    $eligible=[];
+    foreach($dialects as $row){$id=trim((string)($row['id']??''));if($id!=='')$eligible[$id]=true;}
+    $sources=[];
+    foreach($lessons as $lesson){
+        $id=trim((string)($lesson['id']??''));
+        if($id===''||!isset($eligible[$id]))continue;
+        $sources[$id]=[
+            'source_id'=>$id,
+            'category'=>trim((string)($lesson['category']??'Daily Phrase')),
+            'english'=>africaText($lesson,'english',220),
+            'french'=>africaText($lesson,'french',220),
+            'french_pronunciation'=>africaText($lesson,'french_pronunciation',220),
+            'meaning'=>africaText($lesson,'meaning',600),
+            'culture_note'=>africaText($lesson,'culture_note',800),
+        ];
+    }
+    if(!$sources)throw new RuntimeException('No prepared Africa source lessons are available.');
+    return $sources;
+}
+function africaSourceLesson(array $input): array {
+    $sources=africaSourceLessons();
+    $sourceId=trim((string)($input['source_id']??''));
+    if($sourceId!==''&&isset($sources[$sourceId]))return $sources[$sourceId];
+    $english=mb_strtolower(trim((string)($input['english']??'')));
+    if($english!=='')foreach($sources as $source)if(mb_strtolower($source['english'])===$english)return $source;
+    throw new InvalidArgumentException('Choose one of the prepared Beyond French source lessons.');
+}
 function africaAzureRequest(string $path, array $body): array {
     $key=trim((string)beyond_config('ai.azure_translator.api_key',''));
     $usingSpeechFallback=$key==='';
@@ -156,7 +190,7 @@ if(($_SERVER['REQUEST_METHOD']??'GET')==='GET'){
     $scheduled=africaScheduledItems($items);$dates=array_keys($scheduled);$previous=null;$next=null;
     foreach($dates as $scheduledDate){if($scheduledDate<$date)$previous=$scheduledDate;if($scheduledDate>$date){$next=$scheduledDate;break;}}
     $complete=count(array_filter($items,static fn(array $item):bool=>count((array)($item['audio_urls']??[]))===4));
-    africaResponse(['ok'=>true,'date'=>$date,'item'=>$scheduled[$date]??null,'items'=>array_values($scheduled),'navigation'=>['previous'=>$previous,'today'=>date('Y-m-d'),'next'=>$next,'first'=>$dates[0]??null,'last'=>$dates?(string)end($dates):null,'next_available'=>africaNextAvailableDate($items)],'counts'=>['total'=>count($items),'scheduled'=>count($scheduled),'accepted'=>count(array_filter($items,static fn(array $item):bool=>!empty($item['azure_translation_accepted']))),'prerecorded'=>$complete]]);
+    africaResponse(['ok'=>true,'date'=>$date,'item'=>$scheduled[$date]??null,'items'=>array_values($scheduled),'sources'=>array_values(africaSourceLessons()),'navigation'=>['previous'=>$previous,'today'=>date('Y-m-d'),'next'=>$next,'first'=>$dates[0]??null,'last'=>$dates?(string)end($dates):null,'next_available'=>africaNextAvailableDate($items)],'counts'=>['total'=>count($items),'scheduled'=>count($scheduled),'accepted'=>count(array_filter($items,static fn(array $item):bool=>!empty($item['azure_translation_accepted']))),'prerecorded'=>$complete]]);
 }
 if(($_SERVER['REQUEST_METHOD']??'')!=='POST')africaResponse(['ok'=>false,'error'=>'Unsupported request.'],405);
 if(empty($_SESSION['verse_generator_csrf'])||!hash_equals((string)$_SESSION['verse_generator_csrf'],(string)($_SERVER['HTTP_X_CSRF_TOKEN']??'')))africaResponse(['ok'=>false,'error'=>'Reload the generator and try again.'],419);
@@ -164,18 +198,19 @@ $input=json_decode((string)file_get_contents('php://input'),true);if(!is_array($
 
 try{
     if(strtolower((string)($input['action']??''))==='translate'){
-        $english=africaText($input,'english',220);$translations=africaAzureTranslate($english);
-        africaResponse(['ok'=>true,'translations'=>$translations,'review_required'=>false,'message'=>'Azure translations and the validated Meta AI Arabic dialects are ready to prerecord.']);
+        $source=africaSourceLesson($input);$translations=africaAzureTranslate($source['english'],$source['source_id']);
+        africaResponse(['ok'=>true,'source'=>$source,'translations'=>$translations,'review_required'=>false,'message'=>'The fixed Beyond French source and its four Africa translations are ready to prerecord.']);
     }
     $date=trim((string)($input['publish_date']??''));$parsed=DateTimeImmutable::createFromFormat('!Y-m-d',$date);
     if(!$parsed||$parsed->format('Y-m-d')!==$date)throw new InvalidArgumentException('Choose a valid publication date.');
+    $source=africaSourceLesson($input);
     $values=[
-        'english'=>africaText($input,'english',220),'french_bridge'=>africaText($input,'french_bridge',220),'meaning'=>africaText($input,'meaning',600),
+        'source_id'=>$source['source_id'],'category'=>$source['category'],'english'=>$source['english'],'french'=>$source['french'],'french_bridge'=>$source['french'],'french_pronunciation'=>$source['french_pronunciation'],'meaning'=>$source['meaning'],
         'lingala'=>africaText($input,'lingala',240),'lingala_pronunciation'=>africaText($input,'lingala_pronunciation',240),
         'darija'=>africaText($input,'darija',240),'darija_transliteration'=>africaText($input,'darija_transliteration',240),
         'egyptian_arabic'=>africaText($input,'egyptian_arabic',240),'egyptian_transliteration'=>africaText($input,'egyptian_transliteration',240),
         'swahili'=>africaText($input,'swahili',240),'swahili_pronunciation'=>africaText($input,'swahili_pronunciation',240),
-        'culture_note'=>africaText($input,'culture_note',800),'dialect_model'=>'meta-ai-batch-2026-08-23',
+        'culture_note'=>$source['culture_note'],'dialect_model'=>'meta-ai-batch-2026-08-23',
     ];
     $prerecord=!empty($input['prerecord']);
     $existingIndex=null;$maxId=0;
@@ -190,7 +225,7 @@ try{
         @set_time_limit(240);
         $audio=africaGenerateTracks($values,$date);$audioUrls=$audio['urls'];$audioVoices=$audio['voices'];$audioProviders=$audio['providers'];
     }
-    $item=[...$existing,...$values,'id'=>$existingIndex===null?$maxId+1:(int)($existing['id']??$maxId+1),'pack'=>'africa-v1','publish_date'=>$date,'translation_policy'=>'azure-plus-meta-dialects-v1','azure_translation_accepted'=>true,'native_reviewed'=>false,'audio_urls'=>$audioUrls,'audio_voices'=>$audioVoices,'audio_providers'=>$audioProviders,'generator'=>['version'=>'1.3.0','translation'=>'azure-plus-meta-dialects','saved_by'=>(int)($_SESSION['user_id']??0),'saved_at'=>date(DATE_ATOM)]];
+    $item=[...$existing,...$values,'id'=>$existingIndex===null?$maxId+1:(int)($existing['id']??$maxId+1),'pack'=>'africa-v2','publish_date'=>$date,'translation_policy'=>'canonical-french-plus-azure-meta-v2','azure_translation_accepted'=>true,'native_reviewed'=>false,'audio_urls'=>$audioUrls,'audio_voices'=>$audioVoices,'audio_providers'=>$audioProviders,'generator'=>['version'=>'2.0.0','translation'=>'canonical-french-plus-azure-meta','saved_by'=>(int)($_SESSION['user_id']??0),'saved_at'=>date(DATE_ATOM)]];
     if($existingIndex===null)$items[]=$item;else$items[$existingIndex]=$item;africaWrite($file,$items);
-    africaResponse(['ok'=>true,'item'=>$item,'audio_generated'=>$prerecord&&count($audioUrls)===4,'message'=>$prerecord?'Africa phrase saved with four prerecorded MP3 tracks.':'Africa phrase saved under the Azure + Meta AI dialect policy.']);
+    africaResponse(['ok'=>true,'item'=>$item,'audio_generated'=>$prerecord&&count($audioUrls)===4,'message'=>$prerecord?'Prepared French lesson saved with four prerecorded Africa MP3 tracks.':'Prepared French lesson and its four Africa translations were saved together.']);
 }catch(InvalidArgumentException $error){africaResponse(['ok'=>false,'error'=>$error->getMessage()],422);}catch(Throwable $error){error_log('Africa expansion generator: '.$error->getMessage());africaResponse(['ok'=>false,'error'=>'The phrase or one of its audio tracks could not be saved: '.$error->getMessage()],502);}

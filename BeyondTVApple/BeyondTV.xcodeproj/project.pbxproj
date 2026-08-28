@@ -15,6 +15,8 @@
 		0124BEEF0124BEEF0124BEE5 /* BeyondTVSplash.svg in Resources */ = {isa = PBXBuildFile; fileRef = 0124BEEF0124BEEF0124BEE6 /* BeyondTVSplash.svg */; };
 		0124BEEF0124BEEF0124BEE7 /* BeyondTVSplash.svg in Resources */ = {isa = PBXBuildFile; fileRef = 0124BEEF0124BEEF0124BEE6 /* BeyondTVSplash.svg */; };
 		0124BEEF0124BEEF0124BEE8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0124BEEF0124BEEF0124BEE9 /* LaunchScreen.storyboard */; };
+		11PRIVACY000000000000001 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 11PRIVACY000000000000000 /* PrivacyInfo.xcprivacy */; };
+		11PRIVACY000000000000002 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 11PRIVACY000000000000000 /* PrivacyInfo.xcprivacy */; };
 		06243E4E9438DB10ADDB303E /* ChannelButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F1A275EA2E3B188D0D3838 /* ChannelButton.swift */; };
 		147BB0EF1BBC206A641C1E44 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B35747769C659CFBAC312E0 /* RootView.swift */; };
 		166BAF9409DFEBF37F3ABCD5 /* WebPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65162F4835AD0A014CD6CED0 /* WebPlayerView.swift */; };
@@ -67,6 +69,7 @@
 		0124BEEF0124BEEF0124BEE4 /* Info-tvOS.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-tvOS.plist"; sourceTree = "<group>"; };
 		0124BEEF0124BEEF0124BEE6 /* BeyondTVSplash.svg */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = BeyondTVSplash.svg; sourceTree = "<group>"; };
 		0124BEEF0124BEEF0124BEE9 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		11PRIVACY000000000000000 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		10BEF522FAE4A627E161D802 /* BeyondTVTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = BeyondTVTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		17BTVSTYLE000000000000000 /* BeyondTVStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeyondTVStyle.swift; sourceTree = "<group>"; };
 		1B552F01704CB870F4755F52 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
@@ -126,6 +129,7 @@
 				0124BEEF0124BEEF0124BEE3 /* Info-iOS.plist */,
 				0124BEEF0124BEEF0124BEE4 /* Info-tvOS.plist */,
 				0124BEEF0124BEEF0124BEE9 /* LaunchScreen.storyboard */,
+				11PRIVACY000000000000000 /* PrivacyInfo.xcprivacy */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -307,6 +311,7 @@
 			files = (
 				0124BEEF0124BEEF0124BEE2 /* Assets.xcassets in Resources */,
 				0124BEEF0124BEEF0124BEE7 /* BeyondTVSplash.svg in Resources */,
+				11PRIVACY000000000000002 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -317,6 +322,7 @@
 				0124BEEF0124BEEF0124BEE1 /* Assets.xcassets in Resources */,
 				0124BEEF0124BEEF0124BEE5 /* BeyondTVSplash.svg in Resources */,
 				0124BEEF0124BEEF0124BEE8 /* LaunchScreen.storyboard in Resources */,
+				11PRIVACY000000000000001 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -486,7 +492,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 110;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -508,7 +514,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -594,7 +600,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 110;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -610,7 +616,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

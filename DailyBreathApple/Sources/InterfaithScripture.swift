@@ -39,6 +39,18 @@ enum FaithTradition: String, CaseIterable, Identifiable, Codable, Sendable {
         }
     }
 
+    var passageUnitPlural: String {
+        switch self {
+        case .bible: "verses"
+        case .torah: "pesukim"
+        case .quran: "ayahs"
+        }
+    }
+
+    var chapterUnitPlural: String {
+        self == .quran ? "surahs" : "chapters"
+    }
+
     var devotionalName: String {
         switch self {
         case .bible: "Christian Devotional"
@@ -96,6 +108,96 @@ enum FaithTradition: String, CaseIterable, Identifiable, Codable, Sendable {
     }
 }
 
+enum ScriptureEdition: String, CaseIterable, Identifiable, Codable, Sendable {
+    case bibleEnglish
+    case bibleFrench
+    case bibleSpanish
+    case torahHebrew
+    case torahEnglish
+    case torahFrench
+    case quranArabic
+    case quranEnglish
+
+    var id: String { rawValue }
+
+    var tradition: FaithTradition {
+        switch self {
+        case .bibleEnglish, .bibleFrench, .bibleSpanish: .bible
+        case .torahHebrew, .torahEnglish, .torahFrench: .torah
+        case .quranArabic, .quranEnglish: .quran
+        }
+    }
+
+    var languageName: String {
+        switch self {
+        case .bibleEnglish, .torahEnglish, .quranEnglish: "English"
+        case .bibleFrench, .torahFrench: "Français"
+        case .bibleSpanish: "Español"
+        case .torahHebrew: "עברית"
+        case .quranArabic: "العربية"
+        }
+    }
+
+    var displayName: String {
+        switch self {
+        case .bibleEnglish: "English · World English Bible"
+        case .bibleFrench: "Français · Louis Segond 1910"
+        case .bibleSpanish: "Español · Reina-Valera 1909"
+        case .torahHebrew: "עברית · Hebrew (Default)"
+        case .torahEnglish: "English translation"
+        case .torahFrench: "Traduction française"
+        case .quranArabic: "العربية · Arabic (Default)"
+        case .quranEnglish: "English meaning · Pickthall"
+        }
+    }
+
+    var translationTitle: String {
+        switch self {
+        case .bibleEnglish: "World English Bible"
+        case .bibleFrench: "Louis Segond 1910"
+        case .bibleSpanish: "Reina-Valera 1909"
+        case .torahHebrew: "Hebrew Tanakh · Public Domain"
+        case .torahEnglish: "World English Bible · Jewish book names"
+        case .torahFrench: "Louis Segond 1910 · Noms des livres juifs"
+        case .quranArabic: "Arabic Quran · Uthmani text"
+        case .quranEnglish: "Pickthall English Meaning"
+        }
+    }
+
+    var attribution: String {
+        switch self {
+        case .bibleEnglish, .torahEnglish:
+            "World English Bible · Public domain"
+        case .bibleFrench, .torahFrench:
+            "Louis Segond 1910 via eBible.org · Public domain"
+        case .bibleSpanish:
+            "Reina-Valera 1909 via eBible.org · Public domain"
+        case .torahHebrew:
+            "Modern Hebrew Bible via eBible.org · Public domain"
+        case .quranArabic:
+            "Quran JSON 3.1.2 · CC BY-SA 4.0 · Uthmani text from QuranEnc"
+        case .quranEnglish:
+            "Mohammed Marmaduke Pickthall · English meaning · Public domain in the USA"
+        }
+    }
+
+    static func options(for tradition: FaithTradition) -> [ScriptureEdition] {
+        allCases.filter { $0.tradition == tradition }
+    }
+
+    static func defaultEdition(for tradition: FaithTradition) -> ScriptureEdition {
+        switch tradition {
+        case .bible: .bibleEnglish
+        case .torah: .torahHebrew
+        case .quran: .quranArabic
+        }
+    }
+
+    static func storageKey(for tradition: FaithTradition) -> String {
+        "scriptureEdition.\(tradition.rawValue)"
+    }
+}
+
 struct SacredTextVerse: Identifiable, Equatable, Sendable {
     let tradition: FaithTradition
     let bookCode: String
@@ -118,7 +220,13 @@ struct SacredTextChapter: Identifiable, Equatable, Sendable {
     let verses: [SacredTextVerse]
 
     var id: String { "\(tradition.rawValue)-\(bookCode)-\(number)" }
-    var title: String { tradition == .quran ? "Surah \(bookName)" : "\(bookName) \(number)" }
+    var title: String {
+        if tradition == .quran {
+            let hasArabic = bookName.unicodeScalars.contains { (0x0600...0x08FF).contains(Int($0.value)) }
+            return hasArabic ? "سورة \(bookName)" : "Surah \(bookName)"
+        }
+        return "\(bookName) \(number)"
+    }
 }
 
 struct SacredTextBook: Identifiable, Equatable, Sendable {
@@ -170,31 +278,39 @@ struct SacredTextLibrary: Equatable, Sendable {
     }
 
     static func torah(from library: BibleLibrary) -> SacredTextLibrary {
-        fromBible(library, tradition: .torah, include: { $0.testament == "Old Testament" })
+        fromBible(
+            library,
+            tradition: .torah,
+            include: { $0.testament == "Old Testament" },
+            names: jewishBookNames,
+            title: ScriptureEdition.torahEnglish.translationTitle
+        )
     }
 
     private static func fromBible(
         _ library: BibleLibrary,
         tradition: FaithTradition,
-        include: (BibleBook) -> Bool
+        include: (BibleBook) -> Bool,
+        names: [String: String] = [:],
+        title: String? = nil
     ) -> SacredTextLibrary {
         let books = library.books.filter(include).map { book in
             SacredTextBook(
                 tradition: tradition,
                 code: book.code,
-                name: book.name,
+                name: names[book.code] ?? book.name,
                 subtitle: tradition == .torah ? "Tanakh" : book.testament,
                 chapters: book.chapters.map { chapter in
                     SacredTextChapter(
                         tradition: tradition,
                         bookCode: book.code,
-                        bookName: book.name,
+                        bookName: names[book.code] ?? book.name,
                         number: chapter.number,
                         verses: chapter.verses.map {
                             SacredTextVerse(
                                 tradition: tradition,
                                 bookCode: $0.bookCode,
-                                bookName: $0.bookName,
+                                bookName: names[book.code] ?? $0.bookName,
                                 chapter: $0.chapter,
                                 verse: $0.verse,
                                 text: $0.text
@@ -204,9 +320,164 @@ struct SacredTextLibrary: Equatable, Sendable {
                 }
             )
         }
-        let title = tradition == .torah ? "World English Bible — Hebrew Scriptures" : library.translation
-        return SacredTextLibrary(tradition: tradition, translation: title, books: books)
+        return SacredTextLibrary(tradition: tradition, translation: title ?? library.translation, books: books)
     }
+
+    static func load(_ edition: ScriptureEdition, bundle: Bundle = .main) -> SacredTextLibrary {
+        switch edition {
+        case .bibleEnglish:
+            return bible(from: .loadWorldEnglishBible(bundle: bundle))
+        case .bibleFrench:
+            return loadBiblicalEdition(
+                resource: "fraLSG_vpl",
+                edition: edition,
+                names: frenchBibleBookNames,
+                bundle: bundle
+            )
+        case .bibleSpanish:
+            return loadBiblicalEdition(
+                resource: "spaRV1909_vpl",
+                edition: edition,
+                names: spanishBibleBookNames,
+                bundle: bundle
+            )
+        case .torahHebrew:
+            return loadBiblicalEdition(
+                resource: "heb_vpl",
+                edition: edition,
+                names: hebrewJewishBookNames,
+                oldTestamentOnly: true,
+                bundle: bundle
+            )
+        case .torahEnglish:
+            return torah(from: .loadWorldEnglishBible(bundle: bundle))
+        case .torahFrench:
+            return loadBiblicalEdition(
+                resource: "fraLSG_vpl",
+                edition: edition,
+                names: jewishBookNames,
+                oldTestamentOnly: true,
+                bundle: bundle
+            )
+        case .quranArabic:
+            return loadQuranJSON(resource: "quran-ar", edition: edition, bundle: bundle)
+        case .quranEnglish:
+            return loadPickthallQuran(bundle: bundle)
+        }
+    }
+
+    private static func loadBiblicalEdition(
+        resource: String,
+        edition: ScriptureEdition,
+        names: [String: String],
+        oldTestamentOnly: Bool = false,
+        bundle: Bundle
+    ) -> SacredTextLibrary {
+        guard let url = bundle.url(forResource: resource, withExtension: "txt"),
+              let source = try? String(contentsOf: url, encoding: .utf8) else {
+            return SacredTextLibrary(tradition: edition.tradition, translation: edition.translationTitle, books: [])
+        }
+        let parsed = BibleLibrary(translation: edition.translationTitle, books: BibleLibrary.parse(source))
+        return fromBible(
+            parsed,
+            tradition: edition.tradition,
+            include: { !oldTestamentOnly || $0.testament == "Old Testament" },
+            names: names,
+            title: edition.translationTitle
+        )
+    }
+
+    private struct QuranJSONChapter: Decodable {
+        let id: Int
+        let name: String
+        let transliteration: String
+        let translation: String?
+        let verses: [QuranJSONVerse]
+    }
+
+    private struct QuranJSONVerse: Decodable {
+        let id: Int
+        let text: String
+        let translation: String?
+    }
+
+    private static func loadQuranJSON(resource: String, edition: ScriptureEdition, bundle: Bundle) -> SacredTextLibrary {
+        guard let url = bundle.url(forResource: resource, withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let decoded = try? JSONDecoder().decode([QuranJSONChapter].self, from: data) else {
+            return SacredTextLibrary(tradition: .quran, translation: edition.translationTitle, books: [])
+        }
+        let isArabic = edition == .quranArabic
+        let books = decoded.map { item in
+            let code = String(format: "Q%03d", item.id)
+            let bookName = isArabic ? item.name : item.transliteration
+            let verses = item.verses.map {
+                SacredTextVerse(
+                    tradition: .quran,
+                    bookCode: code,
+                    bookName: bookName,
+                    chapter: item.id,
+                    verse: $0.id,
+                    text: isArabic ? $0.text : ($0.translation ?? $0.text)
+                )
+            }
+            let chapter = SacredTextChapter(tradition: .quran, bookCode: code, bookName: bookName, number: item.id, verses: verses)
+            return SacredTextBook(
+                tradition: .quran,
+                code: code,
+                name: bookName,
+                subtitle: isArabic ? item.transliteration : (item.translation ?? "Surah \(item.id)"),
+                chapters: [chapter]
+            )
+        }
+        return SacredTextLibrary(tradition: .quran, translation: edition.translationTitle, books: books)
+    }
+
+    private static let jewishBookNames: [String: String] = [
+        "GEN": "Bereshit", "EXO": "Shemot", "LEV": "Vayikra", "NUM": "Bamidbar", "DEU": "Devarim",
+        "JOS": "Yehoshua", "JDG": "Shoftim", "RUT": "Ruth", "1SA": "Shmuel I", "2SA": "Shmuel II",
+        "1KI": "Melakhim I", "2KI": "Melakhim II", "1CH": "Divrei Hayamim I", "2CH": "Divrei Hayamim II",
+        "EZR": "Ezra", "NEH": "Nechemyah", "EST": "Esther", "JOB": "Iyov", "PSA": "Tehillim",
+        "PRO": "Mishlei", "ECC": "Kohelet", "SNG": "Shir HaShirim", "ISA": "Yeshayahu", "JER": "Yirmeyahu",
+        "LAM": "Eikhah", "EZK": "Yechezkel", "DAN": "Daniel", "HOS": "Hoshea", "JOL": "Yoel", "AMO": "Amos",
+        "OBA": "Ovadiah", "JON": "Yonah", "MIC": "Mikhah", "NAM": "Nahum", "HAB": "Habakkuk",
+        "ZEP": "Tzefaniah", "HAG": "Haggai", "ZEC": "Zekhariah", "MAL": "Malakhi"
+    ]
+
+    private static let hebrewJewishBookNames: [String: String] = [
+        "GEN": "בראשית · Bereshit", "EXO": "שמות · Shemot", "LEV": "ויקרא · Vayikra", "NUM": "במדבר · Bamidbar", "DEU": "דברים · Devarim",
+        "JOS": "יהושע · Yehoshua", "JDG": "שופטים · Shoftim", "RUT": "רות · Ruth", "1SA": "שמואל א׳ · Shmuel I", "2SA": "שמואל ב׳ · Shmuel II",
+        "1KI": "מלכים א׳ · Melakhim I", "2KI": "מלכים ב׳ · Melakhim II", "1CH": "דברי הימים א׳ · Divrei Hayamim I", "2CH": "דברי הימים ב׳ · Divrei Hayamim II",
+        "EZR": "עזרא · Ezra", "NEH": "נחמיה · Nechemyah", "EST": "אסתר · Esther", "JOB": "איוב · Iyov", "PSA": "תהילים · Tehillim",
+        "PRO": "משלי · Mishlei", "ECC": "קהלת · Kohelet", "SNG": "שיר השירים · Shir HaShirim", "ISA": "ישעיהו · Yeshayahu", "JER": "ירמיהו · Yirmeyahu",
+        "LAM": "איכה · Eikhah", "EZK": "יחזקאל · Yechezkel", "DAN": "דניאל · Daniel", "HOS": "הושע · Hoshea", "JOL": "יואל · Yoel", "AMO": "עמוס · Amos",
+        "OBA": "עובדיה · Ovadiah", "JON": "יונה · Yonah", "MIC": "מיכה · Mikhah", "NAM": "נחום · Nahum", "HAB": "חבקוק · Habakkuk",
+        "ZEP": "צפניה · Tzefaniah", "HAG": "חגי · Haggai", "ZEC": "זכריה · Zekhariah", "MAL": "מלאכי · Malakhi"
+    ]
+
+    private static let frenchBibleBookNames: [String: String] = [
+        "GEN": "Genèse", "EXO": "Exode", "LEV": "Lévitique", "NUM": "Nombres", "DEU": "Deutéronome", "JOS": "Josué", "JDG": "Juges",
+        "1KI": "1 Rois", "2KI": "2 Rois", "1CH": "1 Chroniques", "2CH": "2 Chroniques", "NEH": "Néhémie", "PSA": "Psaumes",
+        "PRO": "Proverbes", "ECC": "Ecclésiaste", "SNG": "Cantique des Cantiques", "ISA": "Ésaïe", "JER": "Jérémie", "LAM": "Lamentations",
+        "EZK": "Ézékiel", "HOS": "Osée", "JOL": "Joël", "OBA": "Abdias", "JON": "Jonas", "MIC": "Michée", "HAB": "Habacuc",
+        "ZEP": "Sophonie", "HAG": "Aggée", "ZEC": "Zacharie", "MAT": "Matthieu", "MRK": "Marc", "LUK": "Luc", "JHN": "Jean",
+        "ACT": "Actes", "ROM": "Romains", "1CO": "1 Corinthiens", "2CO": "2 Corinthiens", "GAL": "Galates", "EPH": "Éphésiens",
+        "PHP": "Philippiens", "1TH": "1 Thessaloniciens", "2TH": "2 Thessaloniciens", "1TI": "1 Timothée", "2TI": "2 Timothée",
+        "PHM": "Philémon", "HEB": "Hébreux", "JAS": "Jacques", "1PE": "1 Pierre", "2PE": "2 Pierre",
+        "1JN": "1 Jean", "2JN": "2 Jean", "3JN": "3 Jean", "JUD": "Jude", "REV": "Apocalypse"
+    ]
+
+    private static let spanishBibleBookNames: [String: String] = [
+        "GEN": "Génesis", "EXO": "Éxodo", "LEV": "Levítico", "NUM": "Números", "DEU": "Deuteronomio", "JOS": "Josué", "JDG": "Jueces",
+        "1KI": "1 Reyes", "2KI": "2 Reyes", "1CH": "1 Crónicas", "2CH": "2 Crónicas", "EZR": "Esdras", "NEH": "Nehemías", "PSA": "Salmos",
+        "PRO": "Proverbios", "ECC": "Eclesiastés", "SNG": "Cantares", "ISA": "Isaías", "JER": "Jeremías", "LAM": "Lamentaciones",
+        "EZK": "Ezequiel", "HOS": "Oseas", "JOL": "Joel", "OBA": "Abdías", "JON": "Jonás", "MIC": "Miqueas", "NAH": "Nahúm",
+        "HAB": "Habacuc", "ZEP": "Sofonías", "HAG": "Hageo", "ZEC": "Zacarías", "MAT": "Mateo", "MRK": "Marcos", "LUK": "Lucas",
+        "JHN": "Juan", "ACT": "Hechos", "ROM": "Romanos", "1CO": "1 Corintios", "2CO": "2 Corintios", "GAL": "Gálatas",
+        "EPH": "Efesios", "PHP": "Filipenses", "COL": "Colosenses", "1TH": "1 Tesalonicenses", "2TH": "2 Tesalonicenses",
+        "1TI": "1 Timoteo", "2TI": "2 Timoteo", "TIT": "Tito", "PHM": "Filemón", "HEB": "Hebreos", "JAS": "Santiago",
+        "1PE": "1 Pedro", "2PE": "2 Pedro", "1JN": "1 Juan", "2JN": "2 Juan", "3JN": "3 Juan", "JUD": "Judas", "REV": "Apocalipsis"
+    ]
 
     static func loadPickthallQuran(bundle: Bundle = .main) -> SacredTextLibrary {
         guard
@@ -434,8 +705,56 @@ enum InterfaithDailyContent {
               let chapter = Int(reference[chapterRange]),
               let verse = Int(reference[verseRange]) else { return nil }
         let bookName = normalizedBookName(String(reference[bookRange]))
-        return library.books.first { normalizedBookName($0.name) == bookName }?
+        let canonicalCode = biblicalBookCode(for: bookName)
+        return library.books.first { book in
+            (canonicalCode != nil && book.code == canonicalCode) || normalizedBookName(book.name) == bookName
+        }?
             .chapters.first { $0.number == chapter }?.verses.first { $0.verse == verse }
+    }
+
+    private static func biblicalBookCode(for name: String) -> String? {
+        switch name {
+        case "genesis": "GEN"
+        case "exodus": "EXO"
+        case "leviticus": "LEV"
+        case "numbers": "NUM"
+        case "deuteronomy": "DEU"
+        case "joshua": "JOS"
+        case "judges": "JDG"
+        case "ruth": "RUT"
+        case "1 samuel": "1SA"
+        case "2 samuel": "2SA"
+        case "1 kings": "1KI"
+        case "2 kings": "2KI"
+        case "1 chronicles": "1CH"
+        case "2 chronicles": "2CH"
+        case "ezra": "EZR"
+        case "nehemiah": "NEH"
+        case "esther": "EST"
+        case "job": "JOB"
+        case "psalms": "PSA"
+        case "proverbs": "PRO"
+        case "ecclesiastes": "ECC"
+        case "song of solomon": "SNG"
+        case "isaiah": "ISA"
+        case "jeremiah": "JER"
+        case "lamentations": "LAM"
+        case "ezekiel": "EZK"
+        case "daniel": "DAN"
+        case "hosea": "HOS"
+        case "joel": "JOL"
+        case "amos": "AMO"
+        case "obadiah": "OBA"
+        case "jonah": "JON"
+        case "micah": "MIC"
+        case "nahum": "NAM"
+        case "habakkuk": "HAB"
+        case "zephaniah": "ZEP"
+        case "haggai": "HAG"
+        case "zechariah": "ZEC"
+        case "malachi": "MAL"
+        default: nil
+        }
     }
 
     private static func normalizedBookName(_ value: String) -> String {

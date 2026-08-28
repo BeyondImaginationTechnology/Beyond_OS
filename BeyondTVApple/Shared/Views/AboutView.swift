@@ -22,7 +22,7 @@ struct AboutView: View {
                     }
                     LabeledContent("Version", value: versionText)
                     LabeledContent("Schedule", value: "America/Vancouver")
-                    LabeledContent("Platforms", value: "iOS · iPadOS · tvOS")
+                    LabeledContent("Platforms", value: "Web · iOS · iPadOS · tvOS · Android soon")
                 }
                 .listRowBackground(Color.white.opacity(0.08))
 
@@ -56,7 +56,7 @@ struct AboutView: View {
     }
 
     private var versionText: String {
-        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.1.0"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "1"
         return "\(version) (\(build))"
     }

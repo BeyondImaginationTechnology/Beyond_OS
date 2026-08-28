@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="beyond_background">#160F23</color>
+    <color name="beyond_accent">#FFAB84</color>
+    <color name="beyond_muted">#D1BCCB</color>
+    <color name="white">#FFF8F4</color>
+</resources>

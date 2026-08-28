@@ -1,9 +1,51 @@
 import AVFoundation
 import Combine
 import Foundation
+import Security
 #if os(iOS)
 import AuthenticationServices
 #endif
+
+private struct SecureTokenStore {
+    let service = "technology.co.beyondimagination.beyondtv"
+    let account = "BeyondID.mobileToken"
+
+    func save(_ token: String) -> Bool {
+        guard let data = token.data(using: .utf8) else { return false }
+        delete()
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+            kSecValueData as String: data
+        ]
+        return SecItemAdd(query as CFDictionary, nil) == errSecSuccess
+    }
+
+    func load() -> String? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        var result: CFTypeRef?
+        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess,
+              let data = result as? Data else { return nil }
+        return String(data: data, encoding: .utf8)
+    }
+
+    func delete() {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account
+        ]
+        SecItemDelete(query as CFDictionary)
+    }
+}
 
 @MainActor
 final class AppModel: ObservableObject {
@@ -31,7 +73,7 @@ final class AppModel: ObservableObject {
     private var guideTask: Task<Void, Never>?
     private var catalogTask: Task<Void, Never>?
     private var tuneSequence = 0
-    private let tokenKey = "BeyondTV.BeyondID.mobileToken"
+    private let tokenStore = SecureTokenStore()
     #if os(iOS)
     private var webAuthSession: ASWebAuthenticationSession?
     private let webAuthPresentationProvider = WebAuthPresentationContextProvider()
@@ -75,8 +117,10 @@ final class AppModel: ObservableObject {
         do {
             let callbackURL = try await authenticate(url: beyondID.googleSignInURL())
             let token = try mobileToken(from: callbackURL)
-            UserDefaults.standard.set(token, forKey: tokenKey)
             try await loadBeyondIDSession(token: token)
+            guard tokenStore.save(token) else {
+                throw BeyondIDError.server("Beyond ID could not securely save this session.")
+            }
         } catch {
             authErrorMessage = error.localizedDescription
         }
@@ -88,18 +132,18 @@ final class AppModel: ObservableObject {
     }
 
     func restoreBeyondIDSession() async {
-        guard let token = UserDefaults.standard.string(forKey: tokenKey), !token.isEmpty else { return }
+        guard let token = tokenStore.load(), !token.isEmpty else { return }
         do {
             try await loadBeyondIDSession(token: token)
         } catch {
-            UserDefaults.standard.removeObject(forKey: tokenKey)
+            tokenStore.delete()
             beyondIDUser = nil
             beyondIDWallet = nil
         }
     }
 
     func signOutBeyondID() {
-        UserDefaults.standard.removeObject(forKey: tokenKey)
+        tokenStore.delete()
         beyondIDUser = nil
         beyondIDWallet = nil
         authErrorMessage = nil

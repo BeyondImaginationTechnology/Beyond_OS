@@ -84,7 +84,7 @@ struct BeyondTVAPI: Sendable {
         request.timeoutInterval = 8
         request.cachePolicy = .reloadRevalidatingCacheData
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("BeyondTV-Apple/1.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("BeyondTV-Apple/1.1.0", forHTTPHeaderField: "User-Agent")
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse else {
             throw APIError.invalidResponse

@@ -49,7 +49,8 @@ require __DIR__ . '/includes/header.php';
 document.querySelectorAll('.lesson-audio-button').forEach(button=>button.addEventListener('click',async function(){
  const url=button.dataset.audioUrl,text=button.dataset.speak||'',locale=button.dataset.locale||'fr-FR',label=button.dataset.label||'lesson';
  if(url){try{button.textContent='▶ Playing…';const audio=new Audio(url);audio.onended=()=>button.textContent='🔊 Hear '+label;audio.onerror=()=>button.textContent='Audio unavailable';await audio.play();return}catch(error){}}
- if('speechSynthesis' in window){speechSynthesis.cancel();const voice=new SpeechSynthesisUtterance(text);voice.lang=locale;voice.rate=.86;speechSynthesis.speak(voice)}
+ try{button.textContent='Loading personal-test voice…';const response=await fetch('api/voice.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,locale})});if(!response.ok)throw new Error('unavailable');const audio=new Audio(URL.createObjectURL(await response.blob()));audio.onended=()=>button.textContent='🔊 Hear '+label;await audio.play()}catch(error){button.textContent='Test voice unavailable'}
 }));
 </script>
+<p><small>Personal testing only · Kreyòl and Patois voice demos powered by <a href="https://elevenlabs.io" rel="noopener" target="_blank">elevenlabs.io</a></small></p>
 <?php require __DIR__ . '/includes/footer.php'; ?>

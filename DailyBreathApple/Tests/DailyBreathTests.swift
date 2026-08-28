@@ -134,9 +134,9 @@ final class DailyBreathTests: XCTestCase {
         let torah = SacredTextLibrary.torah(from: bible)
 
         XCTAssertEqual(torah.books.count, 39)
-        XCTAssertEqual(torah.books.first?.name, "Genesis")
-        XCTAssertEqual(torah.books.last?.name, "Malachi")
-        XCTAssertNotNil(torah.books.first { $0.name == "Psalms" })
+        XCTAssertEqual(torah.books.first?.name, "Bereshit")
+        XCTAssertEqual(torah.books.last?.name, "Malakhi")
+        XCTAssertNotNil(torah.books.first { $0.name == "Tehillim" })
     }
 
     func testAugustTwentyFourthInterfaithVersesMatchCourageTheme() {
@@ -152,7 +152,7 @@ final class DailyBreathTests: XCTestCase {
         let jewishVerse = InterfaithDailyContent.verse(for: .torah, date: date, bibleVerse: daily, bible: bible, torah: torah, quran: quran)
         let muslimVerse = InterfaithDailyContent.verse(for: .quran, date: date, bibleVerse: daily, bible: bible, torah: torah, quran: quran)
 
-        XCTAssertEqual(jewishVerse.reference, "Psalms 27:14")
+        XCTAssertEqual(jewishVerse.reference, "Tehillim 27:14")
         XCTAssertEqual(muslimVerse.reference, "Al-Imran 3:200")
     }
 
@@ -175,8 +175,34 @@ final class DailyBreathTests: XCTestCase {
             quran: SacredTextLibrary(tradition: .quran, translation: "Test", books: [])
         )
 
-        XCTAssertEqual(resolved.reference, "Psalms 27:14")
+        XCTAssertEqual(resolved.reference, "Tehillim 27:14")
         XCTAssertEqual(resolved.text, torah.verse(bookCode: "PSA", chapter: 27, verse: 14)?.text)
+    }
+
+    func testScriptureEditionsUseTraditionAppropriateDefaults() {
+        XCTAssertEqual(ScriptureEdition.defaultEdition(for: .bible), .bibleEnglish)
+        XCTAssertEqual(ScriptureEdition.defaultEdition(for: .torah), .torahHebrew)
+        XCTAssertEqual(ScriptureEdition.defaultEdition(for: .quran), .quranArabic)
+        XCTAssertEqual(ScriptureEdition.options(for: .bible), [.bibleEnglish, .bibleFrench, .bibleSpanish])
+        XCTAssertEqual(ScriptureEdition.options(for: .torah), [.torahHebrew, .torahEnglish, .torahFrench])
+        XCTAssertEqual(ScriptureEdition.options(for: .quran), [.quranArabic, .quranEnglish])
+    }
+
+    func testBundledNativeAndTranslatedEditionsLoadOffline() {
+        let hebrew = SacredTextLibrary.load(.torahHebrew)
+        let frenchBible = SacredTextLibrary.load(.bibleFrench)
+        let spanishBible = SacredTextLibrary.load(.bibleSpanish)
+        let arabicQuran = SacredTextLibrary.load(.quranArabic)
+
+        XCTAssertEqual(hebrew.books.count, 39)
+        XCTAssertEqual(hebrew.books.first { $0.code == "PSA" }?.name, "תהילים · Tehillim")
+        XCTAssertTrue(hebrew.verse(bookCode: "PSA", chapter: 23, verse: 1)?.text.contains("יהוה") == true)
+        XCTAssertEqual(frenchBible.books.count, 66)
+        XCTAssertEqual(frenchBible.books.first?.name, "Genèse")
+        XCTAssertEqual(spanishBible.books.count, 66)
+        XCTAssertEqual(spanishBible.books.first?.name, "Génesis")
+        XCTAssertEqual(arabicQuran.verseCount, 6_236)
+        XCTAssertEqual(arabicQuran.books.first?.name, "الفاتحة")
     }
 
     func testFaithAwareDevotionalsUseSelectedReferenceAndPrayerLanguage() {

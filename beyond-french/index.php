@@ -71,7 +71,7 @@ $isReturningLearner = !empty($learningProgress['last_lesson_id']);
                 <div>
                     <span class="eyebrow">LESSON AUDIO</span>
                     <h3 id="voice-lab-title">Listen to today’s phrase</h3>
-                    <p>Prerecorded daily-lesson audio is available in French, Spanish, Kreyòl, and Patois.</p>
+                    <p>French uses prerecorded Azure audio. Spanish uses Azure Elvira live; Kreyòl and Patois use temporary noncommercial ElevenLabs test voices.</p>
                 </div>
                 <button class="voice-stop" type="button" aria-label="Stop audio">■ Stop</button>
             </div>
@@ -94,6 +94,7 @@ $isReturningLearner = !empty($learningProgress['last_lesson_id']);
                 <label>Speed<input id="voice-rate" type="range" min="0.65" max="1.15" value="0.88" step="0.05"><output id="voice-rate-output">0.88×</output></label>
             </div>
             <div class="voice-status" role="status" aria-live="polite">Choose a voice and tap play.</div>
+            <small>Personal testing only · Kreyòl and Patois voice demos powered by <a href="https://elevenlabs.io" rel="noopener" target="_blank">elevenlabs.io</a></small>
         </section>
         <div class="culture-note"><strong>💡 Culture note:</strong> <?= h($lesson['culture_note']) ?></div>
         <div class="lesson-actions">

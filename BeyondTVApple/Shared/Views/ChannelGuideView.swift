@@ -4,7 +4,9 @@ struct ChannelGuideView: View {
     @EnvironmentObject private var model: AppModel
 
     private var currentHour: Int {
-        Calendar(identifier: .gregorian).component(.hour, from: Date())
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "America/Vancouver") ?? .current
+        return calendar.component(.hour, from: Date())
     }
 
     private var rows: [GuideChannelRow] {

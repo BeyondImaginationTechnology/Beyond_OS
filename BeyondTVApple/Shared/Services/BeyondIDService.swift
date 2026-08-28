@@ -40,17 +40,12 @@ struct BeyondIDService: Sendable {
     }
 
     func session(for token: String) async throws -> BeyondIDSession {
-        var components = URLComponents(url: baseURL.appending(path: "beyond-id/api/mobile-session.php"), resolvingAgainstBaseURL: false)!
-        components.queryItems = [URLQueryItem(name: "token", value: token)]
-        guard let url = components.url else {
-            throw APIError.invalidResponse
-        }
-
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: baseURL.appending(path: "beyond-id/api/mobile-session.php"))
         request.timeoutInterval = 10
         request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("BeyondTV-Apple/1.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("BeyondTV-Apple/1.1.0", forHTTPHeaderField: "User-Agent")
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse else {

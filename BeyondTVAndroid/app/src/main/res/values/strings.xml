@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Beyond TV</string>
+    <string name="web_content_description">Beyond TV web app</string>
+    <string name="error_title">Signal interrupted</string>
+    <string name="load_error">Beyond TV could not load this page. Check your connection and try again.</string>
+    <string name="offline_error">You appear to be offline. Reconnect to watch Beyond TV.</string>
+    <string name="external_link_error">No app is available to open this link.</string>
+    <string name="retry">Try again</string>
+</resources>

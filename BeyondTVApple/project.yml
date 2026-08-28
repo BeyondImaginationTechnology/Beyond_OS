@@ -10,8 +10,8 @@ settings:
   base:
     DEVELOPMENT_TEAM: FK9QM3VUNH
     CODE_SIGN_STYLE: Automatic
-    CURRENT_PROJECT_VERSION: 1
-    MARKETING_VERSION: 1.0
+    CURRENT_PROJECT_VERSION: 110
+    MARKETING_VERSION: 1.1.0
     SWIFT_VERSION: 6.0
     GENERATE_INFOPLIST_FILE: YES
     ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
@@ -31,6 +31,7 @@ targets:
       - path: Resources/Assets.xcassets
       - path: Resources/LaunchScreen.storyboard
       - path: Resources/BeyondTVSplash.svg
+      - path: Resources/PrivacyInfo.xcprivacy
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.beyondtv
@@ -52,6 +53,7 @@ targets:
     resources:
       - path: Resources/Assets.xcassets
       - path: Resources/BeyondTVSplash.svg
+      - path: Resources/PrivacyInfo.xcprivacy
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.beyondtv

@@ -1,6 +1,6 @@
 # DailyBreath for iOS
 
-Native SwiftUI app for DailyBreath 1.5 (build 1).
+Native SwiftUI app for DailyBreath 1.5 (build 2).
 
 ## Included in this build
 
@@ -8,8 +8,9 @@ Native SwiftUI app for DailyBreath 1.5 (build 1).
 - Bundled offline recovery verse, devotional, and challenge libraries
 - Recovery Newsletter digest built from the current synced content
 - Full local World English Bible with background loading and search
-- Full Torah/Tanakh edition with every bundled Hebrew Scripture book, chapter, and verse
-- Full Pickthall Quran English meaning with all 114 surahs and 6,236 ayahs
+- Offline multilingual scripture editions: English/French/Spanish Bible; Hebrew-default Torah/Tanakh with English/French translations; Arabic-default Quran with an English meaning
+- Tradition-native book names (including Bereshit, Shemot, and Tehillim) and right-to-left Hebrew/Arabic reading
+- Full Quran library with all 114 surahs and 6,236 ayahs
 - Matched Bible, Torah, and Quran Verse of the Day themes
 - Exactly two Christian, Jewish, and Muslim Academy journeys—Joining the Faith and Recovery—with narration, saved progress, and a Beyond Imagination completion certificate
 - Chris, Dovi, and Moe illustrated Academy guides

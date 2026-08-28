@@ -435,9 +435,9 @@ struct BibleLibrary: Equatable, Sendable {
         return matches
     }
 
-    static func loadWorldEnglishBible() -> BibleLibrary {
+    static func loadWorldEnglishBible(bundle: Bundle = .main) -> BibleLibrary {
         guard
-            let url = Bundle.main.url(forResource: "engwebp_vpl", withExtension: "txt"),
+            let url = bundle.url(forResource: "engwebp_vpl", withExtension: "txt"),
             let source = try? String(contentsOf: url, encoding: .utf8)
         else {
             return BibleLibrary(translation: "World English Bible", books: [])

@@ -79,10 +79,22 @@ struct SettingsAboutView: View {
             Section {
                 LabeledContent("The Daily Breath", value: versionText)
                 Link(destination: URL(string: "https://ebible.org/web/")!) {
-                    Label("World English Bible attribution", systemImage: "book.closed")
+                    Label("World English Bible · Public domain", systemImage: "book.closed")
+                }
+                Link(destination: URL(string: "https://ebible.org/find/details.php?id=fraLSG")!) {
+                    Label("Louis Segond 1910 · Public domain", systemImage: "book.closed")
+                }
+                Link(destination: URL(string: "https://ebible.org/find/details.php?id=spaRV1909")!) {
+                    Label("Reina-Valera 1909 · Public domain", systemImage: "book.closed")
+                }
+                Link(destination: URL(string: "https://ebible.org/find/details.php?id=heb")!) {
+                    Label("Hebrew Bible · Public domain", systemImage: "text.book.closed")
+                }
+                Link(destination: URL(string: "https://github.com/risan/quran-json/tree/v3.1.2")!) {
+                    Label("Arabic Quran · Source and license", systemImage: "moon.stars")
                 }
                 Link(destination: URL(string: "https://www.gutenberg.org/ebooks/16955")!) {
-                    Label("Pickthall Quran translation source", systemImage: "moon.stars")
+                    Label("Pickthall English meaning · Source", systemImage: "moon.stars")
                 }
                 Link(destination: URL(string: "https://beyondimagination.co.technology/legal/privacy.php")!) {
                     Label("Privacy Policy", systemImage: "hand.raised")
@@ -93,7 +105,7 @@ struct SettingsAboutView: View {
             } header: {
                 Text("About")
             } footer: {
-                Text("Bible and Torah/Tanakh text: World English Bible, Public Domain. Quran English meaning: Marmaduke Pickthall, Project Gutenberg eBook 16955, Public Domain in the USA.")
+                Text("Bible: World English Bible, Louis Segond 1910, and Reina-Valera 1909. Torah/Tanakh: Hebrew Bible, World English Bible, and Louis Segond 1910 with Jewish book names. Quran: Arabic Uthmani text from Quran JSON 3.1.2 (CC BY-SA 4.0; source attribution in the bundled notice) and the Pickthall English meaning, public domain in the USA.")
             }
         }
         .navigationTitle("Settings & About")

@@ -14,6 +14,8 @@ struct AccountView: View {
                     } else {
                         signedOutCard
                     }
+
+                    supporterCard
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 24)
@@ -26,6 +28,56 @@ struct AccountView: View {
                 }
             }
         }
+    }
+
+    private var supporterCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("BEYOND SUPPORTER · 1.1.0")
+                .font(.caption.bold())
+                .tracking(1.5)
+                .foregroundStyle(.orange)
+
+            Text("Your first year is on us.")
+                .font(.title2.bold())
+
+            Text("Enjoy 365 days of the private iOS experience at no charge and with no card required. Beyond TV on the web stays free forever.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+
+            HStack(spacing: 8) {
+                membershipPrice("Weekly", "$1.49")
+                membershipPrice("Monthly", "$4.99")
+                membershipPrice("Yearly", "$39.99")
+            }
+
+            Label("Android coming soon", systemImage: "smartphone")
+                .font(.caption.bold())
+                .foregroundStyle(.secondary)
+
+            Link(destination: URL(string: "https://beyondimagination.co.technology/beyond-tv/#membership")!) {
+                Label("Membership details", systemImage: "safari.fill")
+            }
+            .buttonStyle(.bordered)
+        }
+        .padding(18)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(Color.orange.opacity(0.35))
+        )
+    }
+
+    private func membershipPrice(_ period: String, _ price: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(period.uppercased())
+                .font(.caption2.bold())
+                .foregroundStyle(.secondary)
+            Text(price)
+                .font(.headline.bold())
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
     }
 
     private var header: some View {

@@ -69,8 +69,9 @@ final class DailyBreathStore: ObservableObject {
     @Published private(set) var entries: [JournalEntry] = []
     @Published private(set) var bibleLibrary = BibleLibrary(translation: "World English Bible", books: [])
     @Published private(set) var bibleScriptureLibrary = SacredTextLibrary(tradition: .bible, translation: "World English Bible", books: [])
-    @Published private(set) var torahScriptureLibrary = SacredTextLibrary(tradition: .torah, translation: "World English Bible — Hebrew Scriptures", books: [])
-    @Published private(set) var quranScriptureLibrary = SacredTextLibrary(tradition: .quran, translation: "Pickthall English Meaning", books: [])
+    @Published private(set) var torahScriptureLibrary = SacredTextLibrary(tradition: .torah, translation: ScriptureEdition.torahHebrew.translationTitle, books: [])
+    @Published private(set) var quranScriptureLibrary = SacredTextLibrary(tradition: .quran, translation: ScriptureEdition.quranArabic.translationTitle, books: [])
+    @Published private(set) var scriptureLibraries: [ScriptureEdition: SacredTextLibrary] = [:]
     @Published private(set) var isBibleLoading = true
     @Published private(set) var challengeCompletedDayKeys: [String] = []
     @Published private(set) var bibleAnnotations: [String: BibleAnnotation] = [:]
@@ -352,23 +353,48 @@ final class DailyBreathStore: ObservableObject {
         let bibleTask = Task.detached(priority: .userInitiated) {
             BibleLibrary.loadWorldEnglishBible()
         }
-        let quranTask = Task.detached(priority: .userInitiated) {
-            SacredTextLibrary.loadPickthallQuran()
+        let requestedEditions = Set(
+            FaithTradition.allCases.map { tradition in
+                let saved = UserDefaults.standard.string(forKey: ScriptureEdition.storageKey(for: tradition))
+                return ScriptureEdition(rawValue: saved ?? "") ?? ScriptureEdition.defaultEdition(for: tradition)
+            } + [.bibleEnglish, .torahHebrew, .quranArabic]
+        )
+        let scriptureTask = Task.detached(priority: .userInitiated) {
+            Dictionary(uniqueKeysWithValues: requestedEditions.map { ($0, SacredTextLibrary.load($0)) })
         }
         await refreshToday()
         bibleLibrary = await bibleTask.value
-        bibleScriptureLibrary = SacredTextLibrary.bible(from: bibleLibrary)
-        torahScriptureLibrary = SacredTextLibrary.torah(from: bibleLibrary)
-        quranScriptureLibrary = await quranTask.value
+        scriptureLibraries = await scriptureTask.value
+        bibleScriptureLibrary = scriptureLibraries[.bibleEnglish] ?? SacredTextLibrary.bible(from: bibleLibrary)
+        torahScriptureLibrary = scriptureLibraries[.torahHebrew] ?? SacredTextLibrary.torah(from: bibleLibrary)
+        quranScriptureLibrary = scriptureLibraries[.quranArabic] ?? SacredTextLibrary.loadPickthallQuran()
         publishSelectedFaithContent()
     }
 
-    func scriptureLibrary(for tradition: FaithTradition) -> SacredTextLibrary {
-        switch tradition {
-        case .bible: bibleScriptureLibrary
-        case .torah: torahScriptureLibrary
-        case .quran: quranScriptureLibrary
+    func selectedEdition(for tradition: FaithTradition) -> ScriptureEdition {
+        let saved = UserDefaults.standard.string(forKey: ScriptureEdition.storageKey(for: tradition))
+        guard let edition = ScriptureEdition(rawValue: saved ?? ""), edition.tradition == tradition else {
+            return ScriptureEdition.defaultEdition(for: tradition)
         }
+        return edition
+    }
+
+    func scriptureLibrary(for tradition: FaithTradition, edition: ScriptureEdition? = nil) -> SacredTextLibrary {
+        let requested = edition ?? selectedEdition(for: tradition)
+        if let library = scriptureLibraries[requested] { return library }
+        switch tradition {
+        case .bible: return bibleScriptureLibrary
+        case .torah: return torahScriptureLibrary
+        case .quran: return quranScriptureLibrary
+        }
+    }
+
+    func loadScriptureEdition(_ edition: ScriptureEdition) async {
+        guard scriptureLibraries[edition] == nil else { return }
+        let library = await Task.detached(priority: .userInitiated) {
+            SacredTextLibrary.load(edition)
+        }.value
+        scriptureLibraries[edition] = library
     }
 
     func dailyVerse(for tradition: FaithTradition, date: Date = Date()) -> Verse {
@@ -389,9 +415,9 @@ final class DailyBreathStore: ObservableObject {
             for: tradition,
             date: date,
             bibleVerse: baseVerse,
-            bible: bibleScriptureLibrary,
-            torah: torahScriptureLibrary,
-            quran: quranScriptureLibrary
+            bible: scriptureLibrary(for: .bible),
+            torah: scriptureLibrary(for: .torah),
+            quran: scriptureLibrary(for: .quran)
         )
     }
 
@@ -485,7 +511,7 @@ final class DailyBreathStore: ObservableObject {
         prepareAudioSessionForNarration()
 
         let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = preferredNarrationVoice()
+        utterance.voice = preferredNarrationVoice(for: text)
         let savedRate = UserDefaults.standard.double(forKey: "narrationRate")
         utterance.rate = Float(savedRate == 0 ? 0.38 : savedRate)
         if let language = UserDefaults.standard.string(forKey: "narrationVoiceLanguage"), !language.isEmpty {
@@ -550,8 +576,19 @@ final class DailyBreathStore: ObservableObject {
         return player.play()
     }
 
-    private func preferredNarrationVoice() -> AVSpeechSynthesisVoice? {
-        let preferredLanguages = ["en-US", "en-GB", "en-CA"]
+    private func preferredNarrationVoice(for text: String) -> AVSpeechSynthesisVoice? {
+        let preferredLanguages: [String]
+        if text.unicodeScalars.contains(where: { (0x0590...0x05FF).contains(Int($0.value)) }) {
+            preferredLanguages = ["he-IL"]
+        } else if text.unicodeScalars.contains(where: { (0x0600...0x08FF).contains(Int($0.value)) }) {
+            preferredLanguages = ["ar-SA", "ar-AE"]
+        } else if text.range(of: #"[àâçéèêëîïôùûüÿœæ]"#, options: [.regularExpression, .caseInsensitive]) != nil {
+            preferredLanguages = ["fr-FR", "fr-CA"]
+        } else if text.range(of: #"[áéíñóúü¿¡]"#, options: [.regularExpression, .caseInsensitive]) != nil {
+            preferredLanguages = ["es-ES", "es-MX"]
+        } else {
+            preferredLanguages = ["en-US", "en-GB", "en-CA"]
+        }
         let voices = AVSpeechSynthesisVoice.speechVoices()
 
         for quality in [AVSpeechSynthesisVoiceQuality.premium, .enhanced, .default] {
@@ -560,7 +597,7 @@ final class DailyBreathStore: ObservableObject {
             }
         }
 
-        return AVSpeechSynthesisVoice(language: "en-US")
+        return AVSpeechSynthesisVoice(language: preferredLanguages[0])
     }
 
     private func prepareAudioSessionForNarration() {

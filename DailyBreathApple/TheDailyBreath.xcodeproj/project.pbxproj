@@ -40,6 +40,12 @@
 		300000000000000000000032 /* InterfaithScripture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000035 /* InterfaithScripture.swift */; };
 		300000000000000000000033 /* ScriptureLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000036 /* ScriptureLibraryView.swift */; };
 		300000000000000000000034 /* quran-pickthall-vpl.txt in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000037 /* quran-pickthall-vpl.txt */; };
+		300000000000000000000035 /* fraLSG_vpl.txt in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000038 /* fraLSG_vpl.txt */; };
+		300000000000000000000036 /* spaRV1909_vpl.txt in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000039 /* spaRV1909_vpl.txt */; };
+		300000000000000000000037 /* heb_vpl.txt in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000040 /* heb_vpl.txt */; };
+		300000000000000000000038 /* quran-ar.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000041 /* quran-ar.json */; };
+		300000000000000000000040 /* QURAN_JSON_LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000043 /* QURAN_JSON_LICENSE.txt */; };
+		300000000000000000000041 /* SCRIPTURE_SOURCES.md in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000044 /* SCRIPTURE_SOURCES.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -129,6 +135,12 @@
 		100000000000000000000035 /* InterfaithScripture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterfaithScripture.swift; sourceTree = "<group>"; };
 		100000000000000000000036 /* ScriptureLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptureLibraryView.swift; sourceTree = "<group>"; };
 		100000000000000000000037 /* quran-pickthall-vpl.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "quran-pickthall-vpl.txt"; sourceTree = "<group>"; };
+		100000000000000000000038 /* fraLSG_vpl.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = fraLSG_vpl.txt; sourceTree = "<group>"; };
+		100000000000000000000039 /* spaRV1909_vpl.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = spaRV1909_vpl.txt; sourceTree = "<group>"; };
+		100000000000000000000040 /* heb_vpl.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = heb_vpl.txt; sourceTree = "<group>"; };
+		100000000000000000000041 /* quran-ar.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "quran-ar.json"; sourceTree = "<group>"; };
+		100000000000000000000043 /* QURAN_JSON_LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = QURAN_JSON_LICENSE.txt; sourceTree = "<group>"; };
+		100000000000000000000044 /* SCRIPTURE_SOURCES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SCRIPTURE_SOURCES.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +223,12 @@
 				100000000000000000000025 /* recovery-challenges.json */,
 				100000000000000000000026 /* PrivacyInfo.xcprivacy */,
 				100000000000000000000037 /* quran-pickthall-vpl.txt */,
+				100000000000000000000038 /* fraLSG_vpl.txt */,
+				100000000000000000000039 /* spaRV1909_vpl.txt */,
+				100000000000000000000040 /* heb_vpl.txt */,
+				100000000000000000000041 /* quran-ar.json */,
+				100000000000000000000043 /* QURAN_JSON_LICENSE.txt */,
+				100000000000000000000044 /* SCRIPTURE_SOURCES.md */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -412,6 +430,12 @@
 				300000000000000000000024 /* recovery-challenges.json in Resources */,
 				300000000000000000000025 /* PrivacyInfo.xcprivacy in Resources */,
 				300000000000000000000034 /* quran-pickthall-vpl.txt in Resources */,
+				300000000000000000000035 /* fraLSG_vpl.txt in Resources */,
+				300000000000000000000036 /* spaRV1909_vpl.txt in Resources */,
+				300000000000000000000037 /* heb_vpl.txt in Resources */,
+				300000000000000000000038 /* quran-ar.json in Resources */,
+				300000000000000000000040 /* QURAN_JSON_LICENSE.txt in Resources */,
+				300000000000000000000041 /* SCRIPTURE_SOURCES.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -634,7 +658,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -701,7 +725,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_NS_ASSERTIONS = NO;

@@ -140,7 +140,13 @@ struct CatalogItem: Decodable, Identifiable, Hashable, Sendable {
         }.joined(separator: " · ")
     }
 
+    var isPlaybackApproved: Bool {
+        guard let sourceType = sourceType?.lowercased(), !sourceType.isEmpty else { return false }
+        return !["watchlist", "candidate", "none", "pending_review", "archive_collection"].contains(sourceType)
+    }
+
     var playbackURL: URL? {
+        guard isPlaybackApproved else { return nil }
         if let videoURL { return videoURL }
         if let archiveID, !archiveID.isEmpty {
             return URL(string: "https://archive.org/embed/\(archiveID)")

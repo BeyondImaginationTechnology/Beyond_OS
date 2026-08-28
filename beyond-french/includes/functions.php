@@ -166,9 +166,11 @@ function sqlite_db(): PDO {
 function lesson_audio_map(int $lessonId): array {
     if ($lessonId < 1) return [];
     $audio = [];
+    $liveProviderDemoLocales = ['es-ES', 'ht-HT', 'en-JM'];
     foreach (french_lessons() as $lesson) {
         if ((int)($lesson['id'] ?? 0) !== $lessonId) continue;
         foreach ((array)($lesson['audio_urls'] ?? []) as $language => $path) {
+            if (in_array((string)$language, $liveProviderDemoLocales, true)) continue;
             if ((string)$path !== '') $audio[(string)$language] = (string)$path;
         }
         if (!isset($audio['fr-FR']) && (string)($lesson['audio_url'] ?? '') !== '') {
@@ -181,6 +183,7 @@ function lesson_audio_map(int $lessonId): array {
         $stmt->execute([$lessonId]);
         foreach ($stmt->fetchAll() as $row) {
             $language = (string)($row['language'] ?? '');
+            if (in_array($language, $liveProviderDemoLocales, true)) continue;
             if ($language !== '' && !isset($audio[$language])) $audio[$language] = (string)$row['audio_path'];
         }
         return $audio;

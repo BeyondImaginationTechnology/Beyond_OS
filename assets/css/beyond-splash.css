@@ -8,7 +8,9 @@
   padding: 24px;
   color: #f8fbff;
   background:
-    linear-gradient(145deg, rgba(5, 8, 23, .98), rgba(7, 18, 25, .97) 52%, rgba(21, 8, 34, .98));
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--beyond-splash-accent) 10%, transparent), transparent 28%),
+    radial-gradient(circle at 18% 12%, rgba(132, 97, 255, .1), transparent 30%),
+    linear-gradient(145deg, #040612, #080b18 52%, #0c0615);
   opacity: 1;
   visibility: visible;
   transition: opacity .42s ease, visibility .42s ease;
@@ -21,11 +23,11 @@
   width: min(540px, 100%);
   display: grid;
   justify-items: center;
-  gap: 18px;
+  gap: 15px;
   text-align: center;
 }
 .beyond-splash-mark {
-  width: min(250px, 62vw);
+  width: min(230px, 58vw);
   height: auto;
   display: block;
   overflow: visible;
@@ -33,14 +35,14 @@
 .beyond-splash-title {
   margin: 0;
   color: #fff;
-  font: 800 clamp(30px, 8vw, 58px) / .95 Inter, ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: 0;
+  font: 760 clamp(28px, 7vw, 50px) / 1 Inter, ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -.035em;
 }
 .beyond-splash-company {
-  margin: -4px 0 0;
+  margin: -2px 0 1px;
   color: var(--beyond-splash-accent);
   font: 800 12px / 1.2 Inter, ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: .18em;
+  letter-spacing: .24em;
   text-transform: uppercase;
 }
 .beyond-splash-app {
@@ -52,13 +54,26 @@
 .beyond-splash-skip {
   min-width: 132px;
   min-height: 42px;
-  border: 1px solid color-mix(in srgb, var(--beyond-splash-accent) 48%, transparent);
+  border: 1px solid color-mix(in srgb, var(--beyond-splash-accent) 38%, rgba(255,255,255,.16));
   border-radius: 999px;
-  color: #07121b;
-  background: var(--beyond-splash-accent);
+  color: #f8fbff;
+  background: linear-gradient(135deg, rgba(255,255,255,.095), rgba(255,255,255,.035));
   font: 850 12px / 1 Inter, ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: .08em;
   cursor: pointer;
-  box-shadow: 0 14px 34px color-mix(in srgb, var(--beyond-splash-accent) 22%, transparent);
+  box-shadow: 0 14px 34px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.1);
+  backdrop-filter: blur(12px);
+  transition: border-color .2s ease, background .2s ease, transform .2s ease;
+}
+.beyond-splash-skip:hover,
+.beyond-splash-skip:focus-visible {
+  border-color: color-mix(in srgb, var(--beyond-splash-accent) 72%, white 10%);
+  background: color-mix(in srgb, var(--beyond-splash-accent) 14%, rgba(255,255,255,.05));
+  transform: translateY(-1px);
+}
+.beyond-splash-skip:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
 }
 .beyond-splash-ring {
   transform-origin: 210px 210px;
@@ -67,6 +82,14 @@
 .beyond-splash-ring.alt {
   animation-duration: 8s;
   animation-direction: reverse;
+}
+.beyond-splash-ring.third {
+  animation-duration: 11s;
+  animation-direction: reverse;
+}
+.beyond-splash-halo {
+  transform-origin: 210px 210px;
+  animation: beyond-splash-breathe 3.4s ease-in-out infinite;
 }
 .beyond-splash-pulse {
   transform-origin: 210px 210px;
@@ -85,8 +108,12 @@
   to { transform: rotate(360deg); }
 }
 @keyframes beyond-splash-pulse {
-  0%, 100% { transform: scale(1); opacity: .72; }
-  50% { transform: scale(1.06); opacity: 1; }
+  0%, 100% { transform: scale(1); opacity: .82; }
+  50% { transform: scale(1.025); opacity: 1; }
+}
+@keyframes beyond-splash-breathe {
+  0%, 100% { transform: scale(.98); opacity: .72; }
+  50% { transform: scale(1.03); opacity: 1; }
 }
 @keyframes beyond-splash-spark {
   0%, 100% { opacity: .32; transform: scale(.82); }
@@ -94,6 +121,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .beyond-splash-ring,
+  .beyond-splash-halo,
   .beyond-splash-pulse,
   .beyond-splash-spark {
     animation: none !important;

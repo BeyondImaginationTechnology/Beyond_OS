@@ -2,6 +2,7 @@ import SwiftUI
 
 struct BrowseView: View {
     @EnvironmentObject private var model: AppModel
+    @Binding var selectedTab: BeyondTVTab
     @State private var selectedFilter = "All"
 
     private var filters: [String] {
@@ -94,11 +95,14 @@ struct BrowseView: View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 168), spacing: 14)], spacing: 14) {
             ForEach(filteredItems) { item in
                 Button {
+                    selectedTab = .watch
                     Task { await model.play(catalog: item) }
                 } label: {
                     CatalogCard(item: item)
                 }
                 .buttonStyle(.plain)
+                .disabled(!item.isPlaybackApproved)
+                .opacity(item.isPlaybackApproved ? 1 : 0.68)
             }
         }
     }
@@ -164,7 +168,10 @@ private struct CatalogCard: View {
             Spacer(minLength: 0)
 
             HStack {
-                Label(item.sourceLabel ?? "Play", systemImage: item.videoURL == nil ? "safari.fill" : "play.fill")
+                Label(
+                    item.isPlaybackApproved ? (item.sourceLabel ?? "Play") : "Pending review",
+                    systemImage: item.isPlaybackApproved ? (item.videoURL == nil ? "safari.fill" : "play.fill") : "lock.fill"
+                )
                     .font(.caption2.bold())
                     .lineLimit(1)
                 Spacer()

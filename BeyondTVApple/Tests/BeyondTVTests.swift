@@ -97,13 +97,23 @@ final class BeyondTVTests: XCTestCase {
 
     func testCatalogItemDecodesPlayableStream() throws {
         let data = Data(
-            #"{"slug":"sister-act-2","type":"movie","title":"Sister Act 2","video_url":"https://archive.org/download/sister-act-2/Sister%20Act%202.mp4","thumbnail":"https://archive.org/services/img/sister-act-2","source_label":"Internet Archive","channel_slug":"beyond-comedy"}"#.utf8
+            #"{"slug":"sister-act-2","type":"movie","title":"Sister Act 2","source_type":"direct_video","video_url":"https://archive.org/download/sister-act-2/Sister%20Act%202.mp4","thumbnail":"https://archive.org/services/img/sister-act-2","source_label":"Internet Archive","channel_slug":"beyond-comedy"}"#.utf8
         )
         let item = try JSONDecoder().decode(CatalogItem.self, from: data)
 
         XCTAssertEqual(item.categoryLabel, "Movie")
         XCTAssertEqual(item.playbackURL?.absoluteString, "https://archive.org/download/sister-act-2/Sister%20Act%202.mp4")
         XCTAssertEqual(item.channelSlug, "beyond-comedy")
+    }
+
+    func testPendingCatalogItemCannotResolvePlayback() throws {
+        let data = Data(
+            #"{"slug":"candidate","type":"movie","title":"Pending title","source_type":"watchlist","archive_id":"pending-archive-item","candidate_url":"https://archive.org/details/pending-archive-item"}"#.utf8
+        )
+        let item = try JSONDecoder().decode(CatalogItem.self, from: data)
+
+        XCTAssertFalse(item.isPlaybackApproved)
+        XCTAssertNil(item.playbackURL)
     }
 
     func testGuideBlockCurrentHourMatching() {

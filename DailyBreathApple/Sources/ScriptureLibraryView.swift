@@ -4,12 +4,36 @@ struct ScriptureLibraryView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("scriptureEdition.bible") private var bibleEditionID = ScriptureEdition.bibleEnglish.id
+    @AppStorage("scriptureEdition.torah") private var torahEditionID = ScriptureEdition.torahHebrew.id
+    @AppStorage("scriptureEdition.quran") private var quranEditionID = ScriptureEdition.quranArabic.id
     @State private var searchText = ""
     @State private var searchResults: [SacredTextVerse] = []
 
     private var tradition: FaithTradition { FaithTradition(rawValue: traditionID) ?? .bible }
     private var theme: DailyBreathTheme { DailyBreathTheme(id: selectedThemeID) }
-    private var library: SacredTextLibrary { store.scriptureLibrary(for: tradition) }
+    private var edition: ScriptureEdition {
+        let saved: String
+        switch tradition {
+        case .bible: saved = bibleEditionID
+        case .torah: saved = torahEditionID
+        case .quran: saved = quranEditionID
+        }
+        let value = ScriptureEdition(rawValue: saved) ?? ScriptureEdition.defaultEdition(for: tradition)
+        return value.tradition == tradition ? value : ScriptureEdition.defaultEdition(for: tradition)
+    }
+    private var library: SacredTextLibrary { store.scriptureLibrary(for: tradition, edition: edition) }
+    private var editionBinding: Binding<String> {
+        Binding {
+            edition.id
+        } set: { value in
+            switch tradition {
+            case .bible: bibleEditionID = value
+            case .torah: torahEditionID = value
+            case .quran: quranEditionID = value
+            }
+        }
+    }
 
     var body: some View {
         List {
@@ -20,6 +44,13 @@ struct ScriptureLibraryView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+
+                Picker("Language & edition", selection: editionBinding) {
+                    ForEach(ScriptureEdition.options(for: tradition)) { item in
+                        Text(item.displayName).tag(item.id)
+                    }
+                }
+                .pickerStyle(.menu)
             }
 
             if store.isBibleLoading {
@@ -68,8 +99,10 @@ struct ScriptureLibraryView: View {
             }
         }
         .navigationTitle(tradition.libraryName)
-        .searchable(text: $searchText, prompt: "Search \(tradition.name) verses")
-        .task(id: "\(traditionID)|\(searchText)") {
+        .searchable(text: $searchText, prompt: "Search \(tradition.name) \(tradition.passageUnitPlural)")
+        .task(id: "\(traditionID)|\(edition.id)|\(searchText)") {
+            await store.loadScriptureEdition(edition)
+            store.publishSelectedFaithContent()
             let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !query.isEmpty else { searchResults = []; return }
             try? await Task.sleep(for: .milliseconds(220))
@@ -84,6 +117,11 @@ struct ScriptureLibraryView: View {
             selectedThemeID = DailyBreathTheme.recommended(for: tradition).id
             store.publishSelectedFaithContent()
         }
+        .onChange(of: edition.id) { _, _ in
+            searchText = ""
+            searchResults = []
+            store.publishSelectedFaithContent()
+        }
         .scrollContentBackground(.hidden)
         .background(DailyBreathThemeBackground(theme: theme))
     }
@@ -95,12 +133,15 @@ struct ScriptureLibraryView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Explore with \(tradition.guideName)")
                         .font(.title2.weight(.black))
-                    Text("\(library.books.count) \(tradition == .quran ? "surahs" : "books") · \(library.chapterCount) chapters · \(library.verseCount.formatted()) verses")
+                    Text(summaryText)
                         .font(.caption.bold())
                         .foregroundStyle(theme.primary)
                     Text(library.translation)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                    Text(edition.attribution)
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
                 }
             }
             .padding(.vertical, 6)
@@ -109,6 +150,13 @@ struct ScriptureLibraryView: View {
 
     private func chapterLabel(_ count: Int) -> String {
         tradition == .quran ? "\(count) surah" : "\(count) chapters"
+    }
+
+    private var summaryText: String {
+        if tradition == .quran {
+            return "\(library.books.count) surahs · \(library.verseCount.formatted()) ayahs"
+        }
+        return "\(library.books.count) books · \(library.chapterCount) chapters · \(library.verseCount.formatted()) \(tradition.passageUnitPlural)"
     }
 }
 
@@ -121,7 +169,7 @@ private struct SacredTextBookView: View {
                 VStack(alignment: .leading, spacing: 7) {
                     Label(book.subtitle, systemImage: book.tradition.symbolName).font(.caption.bold())
                     Text(book.name).font(.largeTitle.weight(.black))
-                    Text("\(book.chapters.count) \(book.tradition == .quran ? "surah" : "chapters") · \(book.verseCount.formatted()) verses")
+                    Text("\(book.chapters.count) \(book.tradition == .quran ? "surah" : "chapters") · \(book.verseCount.formatted()) \(book.tradition.passageUnitPlural)")
                         .foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 8)
@@ -134,7 +182,7 @@ private struct SacredTextBookView: View {
                         HStack {
                             Text(book.tradition == .quran ? book.name : "Chapter \(chapter.number)")
                             Spacer()
-                            Text("\(chapter.verses.count) verses").font(.caption).foregroundStyle(.secondary)
+                            Text("\(chapter.verses.count) \(book.tradition.passageUnitPlural)").font(.caption).foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -159,15 +207,19 @@ private struct SacredTextChapterView: View {
                     VStack(alignment: .leading, spacing: 7) {
                         Label(chapter.tradition.libraryName, systemImage: chapter.tradition.symbolName).font(.caption.bold())
                         Text(chapter.title).font(.largeTitle.weight(.black))
-                        Text("\(chapter.verses.count) verses").foregroundStyle(.secondary)
+                        Text("\(chapter.verses.count) \(chapter.tradition.passageUnitPlural)").foregroundStyle(.secondary)
                     }
                     .padding(.vertical, 8)
                 }
-                Section("Verses") {
+                Section(chapter.tradition.passageUnitPlural.capitalized) {
                     ForEach(chapter.verses) { verse in
                         HStack(alignment: .firstTextBaseline, spacing: 10) {
                             Text("\(verse.verse)").font(.caption.bold()).foregroundStyle(theme.accent).frame(width: 30, alignment: .trailing)
-                            Text(verse.text).font(.system(.body, design: .serif)).textSelection(.enabled)
+                            Text(verse.text)
+                                .font(.system(.body, design: .serif))
+                                .frame(maxWidth: .infinity, alignment: isRightToLeft(verse.text) ? .trailing : .leading)
+                                .multilineTextAlignment(isRightToLeft(verse.text) ? .trailing : .leading)
+                                .textSelection(.enabled)
                         }
                         .padding(.vertical, 5)
                         .id(verse.id)
@@ -177,7 +229,7 @@ private struct SacredTextChapterView: View {
                                 Label("Listen", systemImage: "speaker.wave.2")
                             }
                             ShareLink(item: "\(verse.text) — \(verse.reference)") {
-                                Label("Share Verse", systemImage: "square.and.arrow.up")
+                                Label(shareLabel, systemImage: "square.and.arrow.up")
                             }
                         }
                     }
@@ -186,14 +238,40 @@ private struct SacredTextChapterView: View {
             .navigationTitle(chapter.title)
             .toolbar {
                 Button {
-                    store.speakText(chapter.verses.map { "Verse \($0.verse). \($0.text)" }.joined(separator: " "))
+                    store.speakText(chapter.verses.map { "\(spokenUnit) \($0.verse). \($0.text)" }.joined(separator: " "))
                 } label: {
-                    Label("Listen to Chapter", systemImage: "speaker.wave.2.fill")
+                    Label(listenLabel, systemImage: "speaker.wave.2.fill")
                 }
             }
             .onAppear {
                 if let highlightedVerseID { proxy.scrollTo(highlightedVerseID, anchor: .center) }
             }
+        }
+    }
+
+    private var shareLabel: String {
+        switch chapter.tradition {
+        case .bible: "Share Verse"
+        case .torah: "Share Passage"
+        case .quran: "Share Ayah"
+        }
+    }
+
+    private var spokenUnit: String {
+        switch chapter.tradition {
+        case .bible: "Verse"
+        case .torah: "Pasuk"
+        case .quran: "Ayah"
+        }
+    }
+
+    private var listenLabel: String {
+        chapter.tradition == .quran ? "Listen to Surah" : "Listen to Chapter"
+    }
+
+    private func isRightToLeft(_ text: String) -> Bool {
+        text.unicodeScalars.contains { scalar in
+            (0x0590...0x08FF).contains(Int(scalar.value))
         }
     }
 }

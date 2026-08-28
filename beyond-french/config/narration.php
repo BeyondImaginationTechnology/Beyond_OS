@@ -5,7 +5,7 @@ require_once dirname(__DIR__) . '/includes/config.php';
 
 $elevenVoices = (array)beyond_config('narration.elevenlabs.voices', beyond_config('voice.voices', []));
 $azureDefaults = [
-    'en-US' => ['en-US-JennyNeural', 'Jenny - English (United States)'],
+    'en-US' => ['en-US-AriaNeural', 'Aria - English (United States)'],
     'fr-CA' => ['fr-CA-SylvieNeural', 'Sylvie - French (Canada)'],
     'fr-FR' => ['fr-FR-DeniseNeural', 'Denise - French (France)'],
     'es-ES' => ['es-ES-ElviraNeural', 'Elvira - Spanish (Spain)'],

@@ -26,6 +26,10 @@ enum BeyondTVTheme: String, CaseIterable {
         let index = themes.firstIndex(of: self) ?? 0
         return themes[(index + 1) % themes.count]
     }
+
+    var preferredColorScheme: ColorScheme {
+        self == .light ? .light : .dark
+    }
 }
 
 struct BeyondTVBackground: View {

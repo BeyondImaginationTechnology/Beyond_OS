@@ -24,9 +24,13 @@ try {
 
     $cacheDir = beyond_private_root() . '/cache/voices';
     if (!is_dir($cacheDir)) mkdir($cacheDir, 0700, true);
-    $providerOrder = in_array($locale, ['ht-HT', 'en-JM'], true)
-        ? ['elevenlabs', 'openai']
-        : ['azure', 'openai', 'elevenlabs'];
+    if ($locale === 'es-ES') {
+        $providerOrder = ['azure'];
+    } elseif (in_array($locale, ['ht-HT', 'en-JM'], true)) {
+        $providerOrder = ['elevenlabs'];
+    } else {
+        $providerOrder = ['azure', 'openai', 'elevenlabs'];
+    }
     $voicePlan = [];
     foreach ($providerOrder as $providerName) {
         try {

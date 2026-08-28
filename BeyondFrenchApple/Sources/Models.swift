@@ -133,11 +133,11 @@ enum DictionaryAudioLanguage: Equatable {
         }
     }
 
-    /// Kreyòl and Patois use the native speakers configured in the same
-    /// server-side generator used by Daily Studio. Packaged clips from an
-    /// older app build must not override those current speaker selections.
-    var usesGeneratorVoice: Bool {
-        self == .kreyol || self == .patois
+    /// These locales temporarily use live providers for personal testing:
+    /// Azure Elvira for Spanish and ElevenLabs for Kreyòl and Patois.
+    /// Retired Jenny recordings must not override them.
+    var usesLiveProviderDemoVoice: Bool {
+        self == .spanish || self == .kreyol || self == .patois
     }
 }
 

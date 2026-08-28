@@ -9,6 +9,7 @@ Bible, Torah, and Quran verses with recovery-centered breathing, reflection, and
 DailyBreath 1.5 begins the Olive Era with three respectful faith journeys.
 
 - Complete local Bible, Torah/Tanakh, and Quran readers with every included chapter and verse
+- English, French, and Spanish Bible editions; Hebrew-default Torah/Tanakh with English and French translations; Arabic-default Quran with a Pickthall English meaning
 - Matched Bible, Jewish Scripture, and Quran Verse of the Day themes
 - Two Academy journeys for each faith: Joining the Faith and Recovery
 - Beyond Imagination certificate unlocked after both journeys are complete
@@ -41,11 +42,10 @@ Choose a Bible, Torah, or Quran Verse of the Day, search complete local sacred-t
 DailyBreath 1.5 includes:
 
 - Verse of the Day
-- Improved Scripture and lesson narration
-- Full World English Bible reader
-- All 66 books and 31,103 verses
-- Torah & Tanakh edition with all 39 Hebrew Scripture books in the bundled translation
-- Quran edition with all 114 surahs and 6,236 ayahs in Pickthall’s English meaning
+- Scripture and lesson narration
+- English World English Bible, French Louis Segond 1910, and Spanish Reina-Valera 1909 readers
+- Hebrew-default Torah/Tanakh with all 39 Hebrew Scripture books, plus English and French translations with Jewish book names
+- Arabic-default Quran with all 114 surahs and 6,236 ayahs, plus the Pickthall English meaning
 - Bible search
 - Book and chapter navigation
 - Continue Reading saved chapter
@@ -100,6 +100,8 @@ DailyBreath 1.5 does not require an account to use the Verse of the Day, Bible/T
 ## App Review Notes
 
 DailyBreath 1.5 is a self-contained faith-centered wellness app. No sign-in is required for review. The app opens directly to Today and includes selectable Bible, Torah, and Quran daily verses; complete local text readers and search; starter and recovery Academy paths; breathing; reflection journal; reminders; and an App Clip preview.
+
+To review the multilingual readers, open Scripture in the tab bar. Switch Faith tradition among Bible, Torah, and Quran, then use Language & edition. Torah defaults to Hebrew and includes תהילים · Tehillim; Quran defaults to Arabic. Open Today and change the tradition picker to verify tradition-specific daily content, then open Academy to inspect the separate Christian, Jewish, and Muslim journeys.
 
 This version does not include in-app purchases, subscriptions, iMessage features, Game Center, routing coverage, or user-generated public content.
 

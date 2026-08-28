@@ -72,10 +72,16 @@ class BeyondLocalVoiceAPI {
   }
 
   loadVoices() {
-    this.voices = (this.synth?.getVoices() || []).sort(
+    this.voices = (this.synth?.getVoices() || []).filter(
+      (voice) => !/jenny/i.test(voice.name || ""),
+    ).sort(
       (a, b) => Number(b.localService) - Number(a.localService) || a.lang.localeCompare(b.lang) || a.name.localeCompare(b.name),
     );
     this.refreshSelect(this.activeLocale);
+  }
+
+  liveProviderDemoOnly(locale) {
+    return ["es-ES", "ht-HT", "en-JM"].includes(locale);
   }
 
   matching(locale) {
@@ -89,6 +95,10 @@ class BeyondLocalVoiceAPI {
     if (!this.select) return;
     const matches = this.matching(locale);
     this.select.innerHTML = "";
+    if (this.liveProviderDemoOnly(locale)) {
+      this.select.add(new Option(locale === "es-ES" ? "Azure Elvira live test" : "ElevenLabs live personal test", ""));
+      return;
+    }
     if (matches.length) {
       matches.forEach((voice) => {
         const index = this.voices.indexOf(voice);
@@ -147,6 +157,10 @@ class BeyondLocalVoiceAPI {
   async speak(text, locale, card = null) {
     if (!text) return;
     this.stop(false);
+    if (this.liveProviderDemoOnly(locale)) {
+      await this.playApi(text, locale, card);
+      return;
+    }
     const matches = this.matching(locale);
     const voice = this.select && this.select.value !== "" ? this.voices[Number(this.select.value)] : matches[0];
 
@@ -174,7 +188,7 @@ class BeyondLocalVoiceAPI {
   async playApi(text, locale, card) {
     try {
       this.setPlayingCard(card);
-      this.setStatus("Loading protected " + (card?.dataset.language || locale) + " voice...");
+      this.setStatus("Loading live personal-test voice for " + (card?.dataset.language || locale) + "...");
       const response = await fetch("api/voice.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -188,7 +202,7 @@ class BeyondLocalVoiceAPI {
       this.audio.playbackRate = Number(this.rate?.value || 0.88);
       this.audio.onended = () => {
         this.clearPlayingCard();
-        this.setStatus("Finished. Tap another translation to compare.");
+        this.setStatus("Finished · personal testing only");
       };
       await this.audio.play();
     } catch (error) {

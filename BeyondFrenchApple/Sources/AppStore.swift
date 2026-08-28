@@ -125,10 +125,7 @@ final class AppStore: ObservableObject {
         configureAudioSession()
         let text = lesson.text(for: language)
 
-        // These voices are curated in Daily Studio (including the male
-        // Jamaican speaker). Ask the shared voice service first so an older
-        // MP3 bundled with the app cannot mask an updated speaker selection.
-        if language.usesGeneratorVoice {
+        if language.usesLiveProviderDemoVoice {
             speak(text, language: language.locale)
             return
         }
@@ -188,9 +185,7 @@ final class AppStore: ObservableObject {
         premiumVoicePlayer?.stop()
         configureAudioSession()
 
-        // Keep Kreyòl and Patois aligned with the generator's currently
-        // configured native speakers instead of stale packaged dictionary MP3s.
-        if language.usesGeneratorVoice {
+        if language.usesLiveProviderDemoVoice {
             speak(text, language: language.locale)
             return
         }
@@ -369,7 +364,9 @@ final class AppStore: ObservableObject {
 
     private func bestVoice(for language: String) -> AVSpeechSynthesisVoice? {
         let preferredLanguages = voiceFallbacks(for: language)
-        let voices = AVSpeechSynthesisVoice.speechVoices()
+        let voices = AVSpeechSynthesisVoice.speechVoices().filter {
+            !$0.name.localizedCaseInsensitiveContains("Jenny")
+        }
         for code in preferredLanguages {
             if let exact = voices
                 .filter({ $0.language == code })

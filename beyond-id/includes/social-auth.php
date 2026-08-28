@@ -17,7 +17,8 @@ function beyond_social_enabled(string $provider): bool
 function beyond_social_callback_url(string $provider): string
 {
     $app = require __DIR__ . '/../config/app.php';
-    return rtrim((string)$app['url'], '/') . '/auth/oauth-callback.php?provider=' . rawurlencode($provider);
+    $callback = rtrim((string)$app['url'], '/') . '/auth/oauth-callback.php';
+    return $provider === 'instagram' ? $callback : $callback . '?provider=' . rawurlencode($provider);
 }
 
 function beyond_social_http(string $url, array $options = []): array

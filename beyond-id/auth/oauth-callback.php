@@ -6,8 +6,8 @@ require __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/social-auth.php';
 require_once __DIR__ . '/../../config/roles.php';
 
-$provider = strtolower(trim((string)($_GET['provider'] ?? '')));
 $flow = is_array($_SESSION['oauth_flow'] ?? null) ? $_SESSION['oauth_flow'] : [];
+$provider = strtolower(trim((string)($_GET['provider'] ?? ($flow['provider'] ?? ''))));
 unset($_SESSION['oauth_flow']);
 try {
     if (!in_array($provider, ['google', 'meta', 'instagram'], true) || ($flow['provider'] ?? '') !== $provider) throw new RuntimeException('Social sign-in session is invalid.');

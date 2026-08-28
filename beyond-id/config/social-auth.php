@@ -41,7 +41,7 @@ return [
         'client_secret' => $read('BEYOND_INSTAGRAM_APP_SECRET', 'instagram', 'app_secret'),
         'authorize_url' => 'https://www.instagram.com/oauth/authorize',
         'token_url' => 'https://api.instagram.com/oauth/access_token',
-        'userinfo_url' => 'https://graph.instagram.com/' . $read('BEYOND_INSTAGRAM_GRAPH_VERSION', 'instagram', 'graph_version', 'v26.0') . '/me',
+        'userinfo_url' => 'https://graph.instagram.com/me',
         'scopes' => ['instagram_business_basic'],
     ],
 ];

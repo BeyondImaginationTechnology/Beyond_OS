@@ -44,7 +44,7 @@ if ($status === 'new') {
         . '<h2 style="margin-top:0">New Beyond French iOS beta request</h2>'
         . '<p><strong>Email:</strong> <a style="color:#8fc0ff" href="mailto:' . $safeEmail . '">' . $safeEmail . '</a></p>'
         . '<p><strong>Requested:</strong> ' . $safeTime . '</p>'
-        . '<p style="color:#bdc8dc">Source: Beyond French 2.0 iOS beta landing page</p>'
+        . '<p style="color:#bdc8dc">Source: Beyond French iOS beta landing page</p>'
         . '</div>';
     if (!smtp_send_html('admin@beyondimagination.co.technology', 'New Beyond French iOS beta request', $html, 'Beyond French')) {
         error_log('Beyond French iOS beta admin notification could not be sent for ' . $email);

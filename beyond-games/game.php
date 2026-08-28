@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . '/../includes/app-layout.php';
-$wallet = beyond_nav_bootstrap('Beyond Games');
+require_once __DIR__ . '/../includes/coming-soon-page.php';
 $games = json_decode((string)file_get_contents(__DIR__ . '/data/games.json'), true) ?: [];
 $slug = preg_replace('/[^a-z0-9-]/', '', strtolower((string)($_GET['slug'] ?? '')));
 $game = null;
@@ -10,6 +9,10 @@ if (!$game) {
     http_response_code(404);
     $game = ['slug'=>'unavailable','title'=>'Game unavailable','category'=>'Beyond Games','icon'=>'?','tagline'=>'This game could not be found.','gameplay'=>'Return to the catalogue to choose another original Beyond game.','status'=>'Unavailable','phase'=>'Catalogue','launch'=>false,'playable'=>false,'color'=>'#7855d8','features'=>[]];
 }
+if (($game['slug'] ?? 'unavailable') !== 'unavailable' && empty($game['playable'])) {
+    bos_coming_soon_page((string)$game['title'], (string)$game['tagline']);
+}
+$wallet = beyond_nav_bootstrap('Beyond Games');
 $color = preg_match('/^#[0-9a-f]{6}$/i', (string)($game['color'] ?? '')) ? (string)$game['color'] : '#7855d8';
 $features = is_array($game['features'] ?? null) ? $game['features'] : [];
 ?>

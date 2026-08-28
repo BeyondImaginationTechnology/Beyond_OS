@@ -13,7 +13,7 @@ $updated = 'August 2, 2026';
 <main class="page">
 <a class="app-back" href="register.php">Back to registration</a>
 <h1>Terms of Service</h1>
-<p class="muted">Version 2.3.3 · Effective <?= $updated ?></p>
+<p class="muted">Effective <?= $updated ?></p>
 <p>These Terms govern your use of Beyond OS, Beyond ID, Beyond Wallet, and connected Beyond Imagination Technology apps, websites, beta features, marketplaces, communities, and services. By creating an account or using the services, you agree to these Terms and our <a href="privacy.php">Privacy Policy</a>.</p>
 
 <h2>Your account</h2>

@@ -52,69 +52,15 @@ if (is_file($frenchLessonsPath)) {
     }
 }
 
-$homeMarketListing = [
-    'id' => 0,
-    'title' => 'Custom Coffee Mugs',
-    'item_type' => 'physical',
-    'listing_type' => 'buy_now',
-    'price_cash' => 16,
-    'price_bits' => null,
-    'currency' => 'CAD',
-];
-$homeMarketListings = [];
-try {
-    $homeMarketListings = beyond_db()->query(
-        "SELECT id,title,item_type,listing_type,price_cash,price_bits,currency
-         FROM listings
-         WHERE status='active'
-         ORDER BY created_at DESC
-         LIMIT 8"
-    )->fetchAll();
-    if (is_array($homeMarketListings[0] ?? null)) {
-        $homeMarketListing = array_merge($homeMarketListing, $homeMarketListings[0]);
-    }
-} catch (Throwable $exception) {
-    $homeMarketListings = [];
-    // The Canvas product fallback keeps this live-demo card useful before the first seller listing.
-}
-$homeMarketPrice = '';
-if ($homeMarketListing['price_bits'] !== null) {
-    $homeMarketPrice = number_format((int)$homeMarketListing['price_bits']) . ' bit$';
-}
-if ((float)$homeMarketListing['price_cash'] > 0) {
-    $cashPrice = '$' . number_format((float)$homeMarketListing['price_cash'], 2) . ' ' . (string)$homeMarketListing['currency'];
-    $homeMarketPrice .= $homeMarketPrice !== '' ? ' or ' . $cashPrice : $cashPrice;
-}
-$homeMarketUrl = (int)$homeMarketListing['id'] > 0
-    ? '/beyond-sell/listing.php?id=' . (int)$homeMarketListing['id']
-    : '/beyond-market/#shop';
-$homeMarketFeedIsPublished = $homeMarketListings !== [];
-$homeMarketFeed = $homeMarketFeedIsPublished
-    ? $homeMarketListings
-    : require __DIR__ . '/beyond-market/data/redbubble-featured.php';
-$homeGameDemos = [];
-try {
-    $homeGamesJson = file_get_contents(__DIR__ . '/beyond-games/data/games.json');
-    $homeGamesCatalog = json_decode((string)$homeGamesJson, true, 512, JSON_THROW_ON_ERROR);
-    foreach ($homeGamesCatalog as $homeGame) {
-        if (!is_array($homeGame) || empty($homeGame['playable']) || empty($homeGame['play_url'])) continue;
-        $playUrl = (string)$homeGame['play_url'];
-        if (!str_starts_with($playUrl, '/')) $playUrl = '/beyond-games/' . ltrim($playUrl, '/');
-        $homeGame['play_url'] = $playUrl;
-        $homeGameDemos[] = $homeGame;
-    }
-} catch (Throwable $exception) {
-    $homeGameDemos = [];
-}
 ?>
 <!doctype html>
-<html lang="en" data-default-theme="light">
+<html lang="en" data-default-theme="fall">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['dark','light','sunset','ocean','forest'].includes(t)?t:'light';}catch(e){document.documentElement.dataset.theme='light';}try{const c=localStorage.getItem('beyond-currency');document.documentElement.dataset.currency=['USD','CAD','BITS'].includes(c)?c:'CAD';}catch(e){document.documentElement.dataset.currency='CAD';}})();</script>
-<meta name="theme-color" content="#f4f6fc">
-<title>Beyond OS 2.4 | Live. Learn. Earn. Explore.</title>
+<script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['fall','dark','light','sunset','ocean','forest'].includes(t)?t:'fall';}catch(e){document.documentElement.dataset.theme='fall';}try{const c=localStorage.getItem('beyond-currency');document.documentElement.dataset.currency=['USD','CAD','BITS'].includes(c)?c:'CAD';}catch(e){document.documentElement.dataset.currency='CAD';}})();</script>
+<meta name="theme-color" content="#24140d">
+<title>Beyond OS | Live. Learn. Earn. Explore.</title>
 <meta name="description" content="Health, education, wallet and entertainment connected through one secure Beyond ID and one shared bit$ balance.">
 <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
 <link rel="stylesheet" href="/assets/css/beyond-splash.css?v=20260828-1">
@@ -137,58 +83,6 @@ try {
 
 html[data-theme="sunset"]{background:#1a0d24}html[data-theme="sunset"] body{color:#fff7f2;background:radial-gradient(circle at 76% 8%,rgba(255,111,97,.30),transparent 30%),radial-gradient(circle at 20% 34%,rgba(255,179,71,.18),transparent 35%),linear-gradient(180deg,#32113d 0%,#1d102b 46%,#0d1021 100%)}html[data-theme="sunset"] .brand small,html[data-theme="sunset"] .intro,html[data-theme="sunset"] .world p,html[data-theme="sunset"] .identity p{color:#f2c9c1}html[data-theme="sunset"] .login-btn,html[data-theme="sunset"] .ghost,html[data-theme="sunset"] .theme-toggle{border-color:rgba(255,220,190,.28);background:rgba(83,34,66,.48)}html[data-theme="sunset"] .core{background:radial-gradient(circle at 40% 35%,#fff0c6,#ff8a72 58%,#8f3b73);box-shadow:0 0 0 12px rgba(255,151,98,.09),0 0 52px rgba(255,96,108,.55),inset 0 0 35px rgba(255,222,170,.55)}html[data-theme="sunset"] .planet{background:rgba(70,25,60,.92);border-color:rgba(255,190,160,.30)}html[data-theme="sunset"] .world:before{background:linear-gradient(90deg,rgba(39,12,35,.95),rgba(54,17,46,.72) 42%,rgba(255,126,84,.12) 78%,rgba(36,14,44,.68))}html[data-theme="sunset"] .app{background:rgba(45,18,47,.78);border-color:rgba(255,207,176,.18)}html[data-theme="sunset"] .footer{border-color:rgba(255,210,183,.14);color:#d5aeb0}html[data-theme="sunset"] .footer h4{color:#ffe6dc}
 
-/* Live Marketplace landing */
-.home-market{position:relative;margin-top:28px;padding:42px 0 24px;isolation:isolate;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:30px;background:linear-gradient(145deg,rgba(17,20,42,.96),rgba(5,8,20,.98) 56%,rgba(23,8,34,.96));box-shadow:0 30px 90px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.05)}
-.home-market:before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(115deg,rgba(255,190,50,.6),transparent 26%,transparent 69%,rgba(242,70,157,.55));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
-.home-market__glow{position:absolute;z-index:-1;width:480px;height:480px;right:-180px;top:-250px;border-radius:50%;background:radial-gradient(circle,rgba(242,70,157,.24),rgba(112,87,255,.11) 38%,transparent 70%);filter:blur(8px)}
-.home-market__heading{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;padding:0 34px 28px}
-.home-market__heading h2{margin:8px 0 7px;font-family:"Space Grotesk",Inter,sans-serif;font-size:clamp(34px,5vw,58px);line-height:.96;letter-spacing:-.055em}
-.home-market__heading p{max-width:600px;margin:0;color:#aeb6cc;font-size:14px;line-height:1.55}
-.home-market__kicker{display:inline-flex;align-items:center;gap:9px;color:#ffd66e;font-size:10px;font-weight:900;letter-spacing:.17em}
-.home-market__kicker i{width:8px;height:8px;border-radius:50%;background:#55e58b;box-shadow:0 0 0 5px rgba(85,229,139,.1),0 0 18px rgba(85,229,139,.75);animation:market-live 2s ease-in-out infinite}
-@keyframes market-live{50%{opacity:.48;transform:scale(.82)}}
-.home-market__heading-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
-.home-market__sell,.home-market__browse{min-height:43px;display:inline-flex;align-items:center;justify-content:center;padding:0 17px;border-radius:12px;text-decoration:none;font-family:"Space Grotesk",Inter,sans-serif;font-size:12px;font-weight:780;white-space:nowrap;transition:.2s ease}
-.home-market__sell{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06)}
-.home-market__browse{border:1px solid rgba(255,200,73,.45);color:#171005;background:linear-gradient(135deg,#ffe083,#ffb932);box-shadow:0 10px 26px rgba(255,185,50,.17)}
-.home-market__sell:hover,.home-market__browse:hover{transform:translateY(-2px)}
-.home-market__controls{display:flex;gap:7px}
-.home-market__controls button{width:43px;height:43px;border:1px solid rgba(255,255,255,.16);border-radius:50%;color:#fff;background:rgba(255,255,255,.07);font:700 18px/1 inherit;cursor:pointer;transition:.2s ease}
-.home-market__controls button:hover,.home-market__controls button:focus-visible{border-color:#ffd16b;background:rgba(255,209,107,.12);transform:translateY(-2px)}
-.home-market__controls button:disabled{opacity:.3;cursor:default;transform:none}
-.home-market__feed{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(248px,292px);gap:15px;padding:7px 34px 20px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scrollbar-width:none;outline:none}
-.home-market__feed::-webkit-scrollbar{display:none}
-.home-market-card{position:relative;min-width:0;scroll-snap-align:start;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:20px;background:rgba(10,14,30,.86);box-shadow:0 18px 38px rgba(0,0,0,.25);transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
-.home-market-card:hover{transform:translateY(-5px);border-color:rgba(255,210,107,.42);box-shadow:0 24px 50px rgba(0,0,0,.36)}
-.home-market-card__visual{position:relative;height:184px;display:flex;align-items:center;justify-content:center;overflow:hidden;text-decoration:none;background:radial-gradient(circle at 68% 20%,hsla(var(--market-card-hue),88%,68%,.35),transparent 34%),radial-gradient(circle at 12% 92%,rgba(255,196,66,.18),transparent 35%),linear-gradient(145deg,hsl(var(--market-card-hue) 45% 17%),#080b19 70%)}
-.home-market-card__visual:before,.home-market-card__visual:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.12);border-radius:50%;transform:rotate(-24deg)}
-.home-market-card__visual:before{width:188px;height:78px}.home-market-card__visual:after{width:118px;height:188px}
-.home-market-card__icon{position:relative;z-index:1;width:72px;height:72px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.24);border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.2),rgba(255,255,255,.04));font:600 34px/1 "Space Grotesk",sans-serif;box-shadow:0 16px 34px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.25);backdrop-filter:blur(9px)}
-.home-market-card__badge{position:absolute;left:12px;top:12px;z-index:2;padding:6px 8px;border:1px solid rgba(255,255,255,.18);border-radius:9px;background:rgba(3,6,17,.64);font-size:8px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;backdrop-filter:blur(10px)}
-.home-market-card__preview{position:absolute;right:12px;bottom:11px;color:rgba(255,255,255,.55);font-size:8px;font-weight:900;letter-spacing:.15em}
-.home-market-card__visual{background-color:#eee5dc;background-image:url("/beyond-market/assets/images/beyond-product-categories.png");background-repeat:no-repeat;background-size:400% 200%}
-.home-market-card__visual:before,.home-market-card__visual:after{content:none}
-.home-market-card__visual--hoodie{background-position:0 0}
-.home-market-card__visual--art-print{background-position:66.667% 0}
-.home-market-card__visual--sticker{background-position:66.667% 100%}
-.home-market-card__visual--journal{background-position:100% 100%}
-.home-market-card__copy{padding:17px 17px 16px}
-.home-market-card__copy small{color:#8f99b3;font-size:10px;font-weight:760;text-transform:uppercase;letter-spacing:.08em}
-.home-market-card__copy h3{min-height:43px;margin:7px 0 13px;font-family:"Space Grotesk",Inter,sans-serif;font-size:17px;line-height:1.2;letter-spacing:-.02em}
-.home-market-card__copy h3 a{text-decoration:none}
-.home-market-card__copy>div{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.home-market-card__copy strong{color:#ffe083;font-size:13px}
-.home-market-card__copy button{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.13);border-radius:50%;color:#fff;background:rgba(255,255,255,.05);font-size:19px;cursor:pointer;transition:.2s}
-.home-market-card__copy button:hover,.home-market-card__copy button[aria-pressed="true"]{border-color:#f2469d;color:#ff79bd;background:rgba(242,70,157,.12);transform:scale(1.06)}
-.home-market-card--create{min-height:304px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:#d9dcee;text-align:center;text-decoration:none;border-style:dashed;background:linear-gradient(145deg,rgba(112,87,255,.11),rgba(255,255,255,.025))}
-.home-market-card--create span{width:58px;height:58px;display:grid;place-items:center;border:1px solid rgba(166,147,255,.38);border-radius:18px;color:#cabfff;background:rgba(112,87,255,.14);font-size:30px}
-.home-market-card--create strong{font-family:"Space Grotesk",Inter,sans-serif;font-size:17px}.home-market-card--create small{color:#8993ae}
-.home-market__footer{display:flex;align-items:center;justify-content:space-between;padding:2px 34px 0;color:#7f89a2;font-size:11px}
-.home-market__footer b{color:#fff}.home-market__footer a{color:#bfc6d9;text-decoration:none;font-weight:760}.home-market__footer a:hover{color:#ffe083}
-html[data-theme="light"] .home-market{color:#f9faff;background:linear-gradient(145deg,#171b37,#070b19 62%,#210d31)}
-@media(max-width:850px){.home-market__heading{align-items:flex-start;flex-direction:column}.home-market__heading-actions{justify-content:flex-start}.home-market__feed{grid-auto-columns:minmax(240px,44vw)}}
-@media(max-width:560px){.home-market{width:calc(100% - 14px);margin-top:18px;padding:30px 0 20px;border-radius:24px}.home-market__heading{padding:0 18px 22px;gap:18px}.home-market__heading h2{font-size:38px}.home-market__heading-actions{width:100%}.home-market__sell,.home-market__browse{flex:1;padding-inline:10px}.home-market__controls{display:none}.home-market__feed{grid-auto-columns:80vw;padding:4px 18px 17px}.home-market__footer{padding-inline:18px}.home-market__footer a{max-width:190px;text-align:right}}
-@media(prefers-reduced-motion:reduce){.home-market__kicker i{animation:none}}
 </style>
 <style>
 .login-btn{display:inline-flex!important;align-items:center;justify-content:center;min-height:47px;padding:0 21px!important;border:1px solid rgba(255,255,255,.28)!important;border-radius:9px;text-decoration:none!important;font-weight:850!important;font-size:13px!important;background:rgba(255,255,255,.04);transition:.2s}
@@ -216,7 +110,7 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
 .nav>a[href="/academy/"]{border-color:var(--gold)}.nav>a[href="/beyond-tv/"]{border-color:var(--pink)}.nav>a[href="/beyond-games/"]{border-color:#a855f7}.nav>a[href="/beyond-market/"]{border-color:var(--blue)}.nav>a[href="/release-notes.php"]{border-color:#51db78}
 .nav>a[href="/academy/"]:hover,.nav>a[href="/academy/"]:focus-visible{color:#ffd16b}.nav>a[href="/beyond-tv/"]:hover,.nav>a[href="/beyond-tv/"]:focus-visible{color:#ff73ba}.nav>a[href="/beyond-games/"]:hover,.nav>a[href="/beyond-games/"]:focus-visible{color:#c69cff}.nav>a[href="/beyond-market/"]:hover,.nav>a[href="/beyond-market/"]:focus-visible{color:#70a7ff}.nav>a[href="/release-notes.php"]:hover,.nav>a[href="/release-notes.php"]:focus-visible{color:#74e798}
 .currency-picker{position:relative;display:flex;align-items:center;min-width:84px;height:43px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.055);overflow:hidden}.currency-picker:focus-within{outline:2px solid #a99cff;outline-offset:2px}.currency-picker>span{position:absolute;left:11px;z-index:1;color:#c9bcff;font-size:12px;font-weight:950;pointer-events:none}.currency-picker select{position:relative;width:100%;height:100%;padding:0 25px 0 29px;border:0;outline:0;color:#fff;background:transparent;font:900 11px/1 inherit;cursor:pointer;appearance:none}.currency-picker:after{content:"⌄";position:absolute;right:10px;top:11px;color:#aeb4ca;font-size:12px;pointer-events:none}.currency-picker option{color:#111;background:#fff}html[data-theme="light"] .currency-picker{border-color:rgba(23,26,46,.2);background:rgba(255,255,255,.62)}html[data-theme="light"] .currency-picker select{color:#171a2e}@media(max-width:560px){.currency-picker{min-width:72px;height:40px}.currency-picker select{padding-left:25px;padding-right:20px;font-size:10px}.currency-picker>span{left:9px}.currency-picker:after{right:7px}}
-.brand,.nav,.primary,.ghost,.home-live-button,.live-app-actions a,.live-app-actions button{font-family:"Space Grotesk",Inter,system-ui,sans-serif}.brand{font-weight:700;letter-spacing:-.055em}.nav>a:not(.primary){font-weight:600;letter-spacing:-.015em}.primary{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.16);background:linear-gradient(105deg,#526dff 0%,#8658f6 50%,#e950aa 100%);font-weight:700;letter-spacing:-.02em;box-shadow:0 14px 36px rgba(101,72,255,.34),inset 0 1px rgba(255,255,255,.22)}.primary:hover,.primary:focus-visible{transform:translateY(-1px);box-shadow:0 18px 42px rgba(101,72,255,.42),inset 0 1px rgba(255,255,255,.28)}
+.brand,.nav,.primary,.ghost,.home-live-button{font-family:"Space Grotesk",Inter,system-ui,sans-serif}.brand{font-weight:700;letter-spacing:-.055em}.nav>a:not(.primary){font-weight:600;letter-spacing:-.015em}.primary{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.16);background:linear-gradient(105deg,#526dff 0%,#8658f6 50%,#e950aa 100%);font-weight:700;letter-spacing:-.02em;box-shadow:0 14px 36px rgba(101,72,255,.34),inset 0 1px rgba(255,255,255,.22)}.primary:hover,.primary:focus-visible{transform:translateY(-1px);box-shadow:0 18px 42px rgba(101,72,255,.42),inset 0 1px rgba(255,255,255,.28)}
 </style>
 </head>
 <body class="home-page">
@@ -374,92 +268,6 @@ $homeLiveControls = [
   </div>
 </section>
 
-<section class="home-market wrap" aria-labelledby="homeMarketTitle">
-  <div class="home-market__glow" aria-hidden="true"></div>
-  <header class="home-market__heading">
-    <div>
-      <span class="home-market__kicker"><i></i> LIVE MARKETPLACE</span>
-      <h2 id="homeMarketTitle">Fresh from Beyond Market.</h2>
-      <p><?=$homeMarketFeedIsPublished ? 'New active listings flow here automatically from Beyond Sell.' : 'Shop real products from independent artists. Checkout and fulfillment happen securely on Redbubble.'?></p>
-    </div>
-    <div class="home-market__heading-actions">
-      <a class="home-market__sell" href="/beyond-sell/">Start selling</a>
-      <a class="home-market__browse" href="/beyond-market/">Open Marketplace →</a>
-      <div class="home-market__controls" aria-label="Marketplace listing controls">
-        <button type="button" data-home-market-prev aria-label="Previous Marketplace listing">←</button>
-        <button type="button" data-home-market-next aria-label="Next Marketplace listing">→</button>
-      </div>
-    </div>
-  </header>
-  <div class="home-market__feed" data-home-market-carousel tabindex="0" role="region" aria-roledescription="carousel" aria-label="Latest Beyond Market listings">
-    <?php foreach ($homeMarketFeed as $marketIndex => $marketItem):
-      $marketPriceParts = [];
-      if (($marketItem['price_bits'] ?? null) !== null) {
-          $marketPriceParts[] = number_format((int)$marketItem['price_bits']) . ' bit$';
-      }
-      if ((float)($marketItem['price_cash'] ?? 0) > 0) {
-          $marketPriceParts[] = '$' . number_format((float)$marketItem['price_cash'], 2) . ' ' . (string)($marketItem['currency'] ?? 'CAD');
-      }
-      $marketPriceLabel = isset($marketItem['price_label'])
-          ? (string)$marketItem['price_label']
-          : ($marketPriceParts ? implode(' or ', $marketPriceParts) : 'Free');
-      $marketItemUrl = (string)($marketItem['market_url'] ?? ('/beyond-sell/listing.php?id=' . (int)($marketItem['id'] ?? 0)));
-      $marketItemExternal = !empty($marketItem['external']);
-      $marketItemType = (string)($marketItem['item_type'] ?? 'digital');
-      $marketVisualOptions = ['hoodie','art-print','sticker','journal'];
-      $marketVisual = (string)($marketItem['visual'] ?? $marketVisualOptions[$marketIndex % count($marketVisualOptions)]);
-      $marketSeller = (string)($marketItem['seller'] ?? 'Live listing');
-    ?>
-    <article class="home-market-card" data-market-slide>
-      <a class="home-market-card__visual home-market-card__visual--<?=e($marketVisual)?>" href="<?=e($marketItemUrl)?>"<?=$marketItemExternal ? ' target="_blank" rel="external noopener"' : ''?>>
-        <span class="home-market-card__badge"><?=e(ucwords(str_replace('_', ' ', (string)($marketItem['listing_type'] ?? 'listing'))))?></span>
-        <span class="home-market-card__preview"><?=$marketItemExternal ? 'SOLD ON REDBUBBLE' : 'BEYOND MARKET'?></span>
-      </a>
-      <div class="home-market-card__copy">
-        <small><?=e(ucfirst($marketItemType))?> · <?=e($marketSeller)?></small>
-        <h3><a href="<?=e($marketItemUrl)?>"<?=$marketItemExternal ? ' target="_blank" rel="external noopener"' : ''?>><?=e((string)($marketItem['title'] ?? 'Marketplace listing'))?></a></h3>
-        <div><strong><?=e($marketPriceLabel)?></strong><button type="button" data-market-save aria-label="Save <?=e((string)($marketItem['title'] ?? 'listing'))?>" aria-pressed="false">♡</button></div>
-      </div>
-    </article>
-    <?php endforeach; ?>
-    <a class="home-market-card home-market-card--create" href="/beyond-sell/create.php">
-      <span>＋</span><strong>List something new.</strong><small>Publish through Beyond Sell</small>
-    </a>
-  </div>
-  <footer class="home-market__footer"><span><b data-home-market-position>1</b> / <?=count($homeMarketFeed)+1?></span><a href="/beyond-market/#live-listings">See the full seller floor →</a></footer>
-</section>
-
-<?php if ($homeGameDemos): ?>
-<section class="live-apps live-game-demos wrap" aria-labelledby="liveAppsTitle">
-  <header class="live-apps-heading">
-    <div><span>PLAYABLE NOW · BEYOND GAMES</span><h2 id="liveAppsTitle">Live demo games.</h2></div>
-    <div class="live-apps-heading__actions">
-      <a href="/beyond-games/">Explore Beyond Games →</a>
-      <div class="live-app-controls" aria-label="Game demo carousel controls">
-        <button type="button" data-live-app-prev aria-label="Previous playable game">←</button>
-        <button type="button" data-live-app-next aria-label="Next playable game">→</button>
-      </div>
-    </div>
-  </header>
-  <div class="live-app-grid" data-live-app-carousel tabindex="0" role="region" aria-roledescription="carousel" aria-label="Playable Beyond Games demos">
-    <?php foreach ($homeGameDemos as $homeGame): ?>
-    <article class="live-app-card game-demo-card game-demo-<?=e((string)$homeGame['slug'])?>" style="--game-color:<?=e((string)($homeGame['color'] ?? '#ffb33d'))?>">
-      <div class="live-app-card__art" aria-hidden="true"><?=e((string)($homeGame['icon'] ?? '▶'))?></div>
-      <span class="live-app-label"><?=e(strtoupper((string)($homeGame['category'] ?? 'Beyond Games')))?> · <?=e(strtoupper((string)($homeGame['status'] ?? 'PLAYABLE DEMO')))?></span>
-      <h3><?=e((string)$homeGame['title'])?></h3>
-      <p class="translation"><?=e((string)($homeGame['tagline'] ?? 'Play the latest Beyond Games demo.'))?></p>
-      <p class="pronunciation"><?=e((string)($homeGame['gameplay'] ?? 'Jump in and play directly in your browser.'))?></p>
-      <div class="live-app-actions">
-        <a href="<?=e((string)$homeGame['play_url'])?>">Play demo →</a>
-        <a href="/beyond-games/">Game details</a>
-      </div>
-    </article>
-    <?php endforeach; ?>
-  </div>
-  <div class="live-app-progress" data-live-app-progress aria-label="Game carousel position"></div>
-</section>
-<?php endif; ?>
-
 <nav class="home-shortcuts wrap" aria-label="Beyond OS quick destinations">
   <a href="/app-store/"><span>🛍</span><strong>App Store</strong><small>Discover every Beyond app</small></a>
   <a href="/beyond-id/dashboard/wallet.php"><span>👛</span><strong>Wallet</strong><small>bit$, purchases and earnings</small></a>
@@ -473,21 +281,11 @@ $homeLiveControls = [
 .home-live-stage:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(3,5,13,.12),rgba(3,5,13,.48) 82%,rgba(5,7,18,.72));pointer-events:none}
 .home-live-stage[data-channel-theme="after-dark"]{--channel-bg:0 0;--channel-hue:-18deg}.home-live-stage[data-channel-theme="cartoons"]{--channel-bg:33.333% 0;--channel-hue:0deg}.home-live-stage[data-channel-theme="anime"]{--channel-bg:100% 0;--channel-hue:22deg}.home-live-stage[data-channel-theme="classic"]{--channel-bg:0 0}.home-live-stage[data-channel-theme="preschool"]{--channel-bg:66.666% 0}.home-live-stage[data-channel-theme="preschool-fr"]{--channel-bg:66.666% 100%}.home-live-stage[data-channel-theme="space"]{--channel-bg:100% 0}.home-live-stage[data-channel-theme="ancient"]{--channel-bg:0 100%}.home-live-stage[data-channel-theme="cinema"]{--channel-bg:33.333% 100%}.home-live-stage[data-channel-theme="french"]{--channel-bg:66.666% 100%}.home-live-stage[data-channel-theme="health"]{--channel-bg:100% 100%}.home-live-stage[data-channel-theme="comedy"]{--channel-bg:33.333% 100%}.home-live-stage[data-channel-theme="family"]{--channel-bg:66.666% 0}.home-live-stage[data-channel-theme="trailers"]{--channel-bg:33.333% 100%;--channel-hue:32deg}.home-live-stage[data-channel-theme="sports"]{--channel-bg:100% 0;--channel-hue:160deg}.home-live-stage[data-channel-theme="mystery"]{--channel-bg:0 100%;--channel-hue:-40deg}
 .home-live-stage__inner{padding:clamp(18px,3vw,42px)}.home-live-stage__top{display:flex;align-items:end;justify-content:space-between;gap:28px;margin-bottom:20px}.home-live-stage h2{margin:5px 0 0;font-size:clamp(34px,5vw,68px);line-height:.96;letter-spacing:-.055em}.home-live-stage__top p{max-width:850px;margin:12px 0 0;color:#d0d4e2;line-height:1.55}.home-live-description__icon{display:inline-grid;width:24px;height:24px;margin-right:7px;place-items:center;vertical-align:-7px;color:var(--channel-accent,#c6baff)}.home-live-description__icon svg{width:21px;height:21px}.home-live-kicker{display:inline-flex;align-items:center;gap:9px;color:#c6baff;font-size:11px;font-weight:950;letter-spacing:.14em;text-transform:uppercase}.home-live-kicker i,.live-dot{width:9px;height:9px;border-radius:50%;background:#ff365f;box-shadow:0 0 0 5px rgba(255,54,95,.16)}.home-live-actions{display:flex;gap:10px;flex:0 0 auto}.home-live-button{display:inline-flex;min-height:46px;align-items:center;justify-content:center;padding:0 17px;border-radius:12px;text-decoration:none;font-size:12px;font-weight:900;background:linear-gradient(100deg,#6857ff,#e946a0);box-shadow:0 12px 30px rgba(95,73,255,.28)}.home-live-button.secondary{border:1px solid rgba(255,255,255,.24);background:rgba(6,8,18,.48);box-shadow:none}.home-live-player{width:100%;aspect-ratio:16/8.4;min-height:540px;overflow:hidden;border:1px solid rgba(255,255,255,.18);border-radius:25px;background:#000;box-shadow:0 25px 70px rgba(0,0,0,.58)}.home-live-player iframe{display:block;width:100%;height:100%;border:0}.home-live-meta{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 3px 13px}.home-live-meta>div{display:flex;align-items:center;gap:11px;flex-wrap:wrap}.home-live-meta span{color:#c3c8d8}.home-live-clock{font-size:11px}.home-live-switch{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:9px}.home-live-switch button{--channel-accent:#a994ff;position:relative;min-width:0;min-height:90px;overflow:hidden;padding:12px 8px 10px;border:1px solid rgba(255,255,255,.15);border-radius:16px;color:#fff;background:linear-gradient(155deg,rgba(255,255,255,.075),rgba(4,7,17,.7) 62%);font:800 11px/1.15 inherit;cursor:pointer;box-shadow:inset 0 1px rgba(255,255,255,.08),0 10px 25px rgba(0,0,0,.18);transition:transform .22s ease,border-color .22s ease,background .22s ease,box-shadow .22s ease}.home-live-switch button:before{content:"";position:absolute;inset:auto -30% -65% 10%;height:90%;border-radius:50%;background:var(--channel-accent);filter:blur(22px);opacity:.11;pointer-events:none}.home-live-switch button[data-home-channel="after-dark"]{--channel-accent:#b59cff}.home-live-switch button[data-home-channel="cartoons"]{--channel-accent:#57d8ff}.home-live-switch button[data-home-channel="anime"]{--channel-accent:#ffd45c}.home-live-switch button[data-home-channel="cinema"]{--channel-accent:#ff628f}.home-live-switch button[data-home-channel="classic"]{--channel-accent:#f0b66e}.home-live-switch button[data-home-channel="preschool"]{--channel-accent:#74e79b}.home-live-switch button[data-home-channel="preschool-fr"]{--channel-accent:#719cff}.home-live-switch button[data-home-channel="space"]{--channel-accent:#7fe6ff}.home-live-switch button[data-home-channel="ancient"]{--channel-accent:#d9ad63}.home-live-switch button[data-home-channel="comedy"]{--channel-accent:#ffca57}.home-live-switch button[data-home-channel="family"]{--channel-accent:#ff89cc}.home-live-switch button[data-home-channel="french"]{--channel-accent:#7ca7ff}.home-live-switch button[data-home-channel="health"]{--channel-accent:#7df0b0}.home-live-switch button[data-home-channel="trailers"]{--channel-accent:#ff9a57}.home-live-switch button[data-home-channel="sports"]{--channel-accent:#54d4ff}.home-live-switch button[data-home-channel="mystery"]{--channel-accent:#d0a6ff}.home-live-switch__icon{position:relative;display:grid;width:40px;height:40px;margin:0 auto 8px;place-items:center;border:1px solid color-mix(in srgb,var(--channel-accent) 48%,transparent);border-radius:13px;color:var(--channel-accent);background:color-mix(in srgb,var(--channel-accent) 12%,rgba(255,255,255,.025));box-shadow:inset 0 1px rgba(255,255,255,.1),0 7px 18px color-mix(in srgb,var(--channel-accent) 13%,transparent)}.home-live-switch__icon svg{width:21px;height:21px;stroke-width:2}.home-live-switch__number{position:absolute;right:8px;top:7px;color:rgba(255,255,255,.36);font:750 8px/1 "Space Grotesk",Inter,sans-serif;letter-spacing:.1em}.home-live-switch__label{position:relative;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.01em}.home-live-switch button:hover,.home-live-switch button:focus-visible{transform:translateY(-3px);border-color:color-mix(in srgb,var(--channel-accent) 68%,transparent);background:linear-gradient(155deg,color-mix(in srgb,var(--channel-accent) 13%,rgba(255,255,255,.06)),rgba(5,7,17,.78));box-shadow:0 15px 30px rgba(0,0,0,.25)}.home-live-switch button:focus-visible{outline:2px solid #fff;outline-offset:2px}.home-live-switch button.active{border-color:var(--channel-accent);background:linear-gradient(150deg,color-mix(in srgb,var(--channel-accent) 28%,#17162c),rgba(17,14,38,.94));box-shadow:0 12px 30px color-mix(in srgb,var(--channel-accent) 25%,transparent),inset 0 1px rgba(255,255,255,.15)}.home-live-switch button.active .home-live-switch__icon{color:#090b16;background:var(--channel-accent);border-color:var(--channel-accent);box-shadow:0 8px 24px color-mix(in srgb,var(--channel-accent) 36%,transparent)}
-.live-apps{margin-bottom:24px}.live-apps-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:16px}.live-apps-heading span{color:#a99cff;font-size:10px;font-weight:950;letter-spacing:.15em}.live-apps-heading h2{margin:5px 0 0;font-size:clamp(30px,4vw,50px);letter-spacing:-.05em}.live-apps-heading>a{font-size:13px;font-weight:900;text-decoration:none}.live-app-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.live-app-card{position:relative;isolation:isolate;min-height:400px;overflow:hidden;padding:clamp(24px,4vw,44px);display:flex;flex-direction:column;justify-content:flex-end;border:1px solid rgba(255,255,255,.16);border-radius:28px;box-shadow:0 22px 60px rgba(0,0,0,.34)}.live-app-card:before{content:"";position:absolute;inset:0;z-index:-2}.live-app-card:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(3,6,14,.04),rgba(3,6,14,.9) 78%)}.verse-card:before{background:radial-gradient(circle at 75% 20%,rgba(243,218,143,.32),transparent 23%),linear-gradient(135deg,#071d14,#175137 58%,#596720)}.french-card:before{background:radial-gradient(circle at 77% 17%,rgba(255,255,255,.24),transparent 22%),linear-gradient(135deg,#061d4e,#173c9e 55%,#d92549)}.live-app-card__art{position:absolute;right:7%;top:12%;font-size:clamp(80px,13vw,175px);opacity:.2}.live-app-label{color:#d7d2ff;font-size:10px;font-weight:950;letter-spacing:.15em}.verse-card .live-app-label{color:#9be9b2}.live-app-card blockquote,.live-app-card h3{max-width:760px;margin:15px 0 10px;font-size:clamp(34px,5vw,64px);line-height:1;letter-spacing:-.045em;font-weight:900}.live-app-card blockquote{font-family:Georgia,serif;font-weight:500}.live-app-card p{margin:0;color:#d0d5e2;font-size:16px}.live-app-card .translation{font-size:22px;font-weight:800;color:#fff}.live-app-card .pronunciation{margin-top:7px;font-size:14px}.live-app-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}.live-app-actions a,.live-app-actions button{display:inline-flex;min-height:44px;align-items:center;justify-content:center;padding:0 16px;border:1px solid rgba(255,255,255,.27);border-radius:999px;color:#fff;background:rgba(255,255,255,.09);font:900 12px/1 inherit;text-decoration:none;cursor:pointer}.live-app-actions a:first-child{background:rgba(255,255,255,.15)}
-.live-apps-heading__actions{display:flex;align-items:center;gap:14px}.live-apps-heading__actions>a{font-size:13px;font-weight:900;text-decoration:none}.live-app-controls{display:flex;gap:8px}.live-app-controls button{display:grid;place-items:center;width:44px;height:44px;border:1px solid rgba(255,255,255,.19);border-radius:50%;background:rgba(12,15,31,.86);color:#fff;font:900 18px/1 inherit;cursor:pointer;box-shadow:0 10px 28px rgba(0,0,0,.22);transition:transform .2s ease,border-color .2s ease,background .2s ease}.live-app-controls button:hover,.live-app-controls button:focus-visible{transform:translateY(-2px);border-color:#b7a8ff;background:#6c55ef}.live-app-controls button:disabled{cursor:default;opacity:.35;transform:none}.live-app-grid{display:flex;gap:18px;overflow-x:auto;overscroll-behavior-inline:contain;scroll-snap-type:x mandatory;scrollbar-width:none;padding:4px max(0px,calc((100% - 1180px)/2)) 28px}.live-app-grid::-webkit-scrollbar{display:none}.live-app-grid:focus-visible{outline:2px solid #a99cff;outline-offset:7px;border-radius:22px}.live-app-card{flex:0 0 clamp(310px,67vw,760px);scroll-snap-align:start;scroll-snap-stop:always;min-height:470px;transform:translateZ(0);transition:transform .35s ease,border-color .35s ease,box-shadow .35s ease}.live-app-card.is-current{border-color:rgba(194,181,255,.62);box-shadow:0 30px 80px rgba(0,0,0,.46),0 0 0 1px rgba(169,156,255,.17)}.live-app-card:not(.is-current){transform:scale(.975)}.live-app-progress{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:-7px}.live-app-progress button{width:7px;height:7px;padding:0;border:0;border-radius:999px;background:rgba(255,255,255,.26);cursor:pointer;transition:width .25s ease,background .25s ease}.live-app-progress button.active{width:28px;background:linear-gradient(90deg,#a996ff,#ef5da8)}.live-app-progress button:focus-visible{outline:2px solid #fff;outline-offset:3px}
 .home-shortcuts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:45px}.home-shortcuts a{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center;padding:18px;border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(10,14,29,.72);text-decoration:none}.home-shortcuts span{grid-row:1/3;font-size:29px}.home-shortcuts strong{font-size:15px}.home-shortcuts small{margin-top:3px;color:#aeb5c9}
 @media(max-width:1100px){.home-live-player{min-height:0;aspect-ratio:16/9}.home-live-switch{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:800px){.home-live-stage{width:calc(100vw - 12px);border-radius:23px;margin-bottom:32px}.home-live-stage__inner{padding:14px}.home-live-stage__top{align-items:flex-start;flex-direction:column;margin-bottom:14px}.home-live-actions{width:100%}.home-live-button{flex:1}.home-live-player{aspect-ratio:16/9;border-radius:16px}.home-live-meta{align-items:flex-start;flex-direction:column}.home-live-switch{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 1px 8px}.home-live-switch button{min-width:102px;scroll-snap-align:start}.live-apps-heading{align-items:flex-start;flex-direction:column}.live-apps-heading__actions{width:100%;justify-content:space-between}.live-app-grid{width:calc(100vw - 16px);margin-left:calc((100% - 100vw)/2 + 8px);padding-inline:4px}.live-app-card{flex-basis:min(88vw,560px);min-height:390px}.home-shortcuts{grid-template-columns:1fr}}
-.games-card:before{background:radial-gradient(circle at 77% 17%,rgba(255,203,103,.34),transparent 24%),linear-gradient(135deg,#24120b,#7c2f20 55%,#e88a25)}.games-card .live-app-label{color:#ffd17f}.games-card .live-app-card__art{filter:drop-shadow(0 18px 32px rgba(0,0,0,.28))}
-.game-demo-card:before{background:radial-gradient(circle at 78% 18%,color-mix(in srgb,var(--game-color) 38%,transparent),transparent 25%),linear-gradient(135deg,#07101a,color-mix(in srgb,var(--game-color) 42%,#111827) 58%,#111820)}
-.game-demo-card .live-app-label{color:color-mix(in srgb,var(--game-color) 48%,#fff)}
-.game-demo-card .live-app-card__art{opacity:.42;filter:drop-shadow(0 20px 38px color-mix(in srgb,var(--game-color) 36%,transparent))}
-.game-demo-card .live-app-actions a:first-child{border-color:color-mix(in srgb,var(--game-color) 62%,#fff);background:color-mix(in srgb,var(--game-color) 32%,rgba(255,255,255,.12))}
-.casino-card:before{background:radial-gradient(circle at 77% 17%,rgba(255,216,109,.3),transparent 23%),linear-gradient(135deg,#160b25,#54205c 55%,#a42e65)}.casino-card .live-app-label{color:#ffd86d}.casino-card h3{font-size:clamp(34px,5vw,64px)}
-.math-card:before{background:radial-gradient(circle at 78% 18%,rgba(91,219,69,.3),transparent 24%),linear-gradient(135deg,#06172d,#0a4c82 58%,#178b73)}.math-card .live-app-label{color:#8ff0b3}.coding-card:before{background:radial-gradient(circle at 78% 18%,rgba(53,214,255,.28),transparent 24%),linear-gradient(135deg,#16092c,#51269a 56%,#087f9b)}.coding-card .live-app-label{color:#95eaff}.coding-card .live-app-card__art{font-size:clamp(60px,9vw,124px);font-weight:950;letter-spacing:-.12em}
-@media(min-width:1051px){.live-app-card{flex-basis:min(62vw,760px)}}
-@media(max-width:480px){.home-live-stage h2{font-size:34px}.home-live-stage__top p{font-size:13px}.home-live-actions{display:grid;grid-template-columns:1fr 1fr}.home-live-button{padding:0 10px}.home-live-player{aspect-ratio:16/10}.home-live-clock{display:none}.live-app-card{min-height:315px;padding:23px}.live-app-card blockquote,.live-app-card h3{font-size:36px}}
-html[data-theme="light"] .home-live-stage,html[data-theme="light"] .live-app-card{color:#fff}html[data-theme="light"] .home-shortcuts a{background:rgba(255,255,255,.82);border-color:rgba(26,31,54,.14)}html[data-theme="light"] .home-shortcuts small{color:#5e667a}
+@media(max-width:800px){.home-live-stage{width:calc(100vw - 12px);border-radius:23px;margin-bottom:32px}.home-live-stage__inner{padding:14px}.home-live-stage__top{align-items:flex-start;flex-direction:column;margin-bottom:14px}.home-live-actions{width:100%}.home-live-button{flex:1}.home-live-player{aspect-ratio:16/9;border-radius:16px}.home-live-meta{align-items:flex-start;flex-direction:column}.home-live-switch{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 1px 8px}.home-live-switch button{min-width:102px;scroll-snap-align:start}.home-shortcuts{grid-template-columns:1fr}}
+@media(max-width:480px){.home-live-stage h2{font-size:34px}.home-live-stage__top p{font-size:13px}.home-live-actions{display:grid;grid-template-columns:1fr 1fr}.home-live-button{padding:0 10px}.home-live-player{aspect-ratio:16/10}.home-live-clock{display:none}}
+html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .home-shortcuts a{background:rgba(255,255,255,.82);border-color:rgba(26,31,54,.14)}html[data-theme="light"] .home-shortcuts small{color:#5e667a}
 </style>
 
 <script>
@@ -588,66 +386,6 @@ window.addEventListener('DOMContentLoaded',()=>{
  if(window.lucide)window.lucide.createIcons({attrs:{'stroke-width':2}});
 });
 (function(){
- const carousel=document.querySelector('[data-home-market-carousel]');
- const previous=document.querySelector('[data-home-market-prev]');
- const next=document.querySelector('[data-home-market-next]');
- const position=document.querySelector('[data-home-market-position]');
- if(!carousel||!previous||!next||!position)return;
- const cards=[...carousel.querySelectorAll('.home-market-card')];
- let current=0;
- let frame=0;
-
- cards.forEach((card,index)=>{
-   card.setAttribute('role','group');
-   card.setAttribute('aria-roledescription','slide');
-   card.setAttribute('aria-label',`${index+1} of ${cards.length}`);
- });
-
- function update(){
-   cards.forEach((card,index)=>card.classList.toggle('is-current',index===current));
-   position.textContent=String(current+1);
-   previous.disabled=current===0;
-   next.disabled=current===cards.length-1;
- }
-
- function goTo(index){
-   current=Math.max(0,Math.min(cards.length-1,index));
-   cards[current].scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'});
-   update();
- }
-
- previous.addEventListener('click',()=>goTo(current-1));
- next.addEventListener('click',()=>goTo(current+1));
- carousel.addEventListener('keydown',event=>{
-   if(event.key==='ArrowLeft'){event.preventDefault();goTo(current-1);}
-   if(event.key==='ArrowRight'){event.preventDefault();goTo(current+1);}
-   if(event.key==='Home'){event.preventDefault();goTo(0);}
-   if(event.key==='End'){event.preventDefault();goTo(cards.length-1);}
- });
- carousel.addEventListener('scroll',()=>{
-   if(frame)return;
-   frame=requestAnimationFrame(()=>{
-     frame=0;
-     const left=carousel.getBoundingClientRect().left;
-     current=cards.reduce((best,card,index)=>{
-       const distance=Math.abs(card.getBoundingClientRect().left-left);
-       const bestDistance=Math.abs(cards[best].getBoundingClientRect().left-left);
-       return distance<bestDistance?index:best;
-     },current);
-     update();
-   });
- },{passive:true});
-
- carousel.querySelectorAll('[data-market-save]').forEach(button=>{
-   button.addEventListener('click',()=>{
-     const saved=button.getAttribute('aria-pressed')!=='true';
-     button.setAttribute('aria-pressed',saved?'true':'false');
-     button.textContent=saved?'♥':'♡';
-   });
- });
- update();
-})();
-(function(){
  const listen=document.getElementById('homeFrenchListen');
  if(!listen)return;
  listen.addEventListener('click',()=>{
@@ -657,67 +395,6 @@ window.addEventListener('DOMContentLoaded',()=>{
    utterance.lang='fr-FR'; utterance.rate=.88;
    window.speechSynthesis.speak(utterance);
  });
-})();
-(function(){
- const carousel=document.querySelector('[data-live-app-carousel]');
- const progress=document.querySelector('[data-live-app-progress]');
- const previous=document.querySelector('[data-live-app-prev]');
- const next=document.querySelector('[data-live-app-next]');
- if(!carousel||!progress||!previous||!next)return;
- const cards=[...carousel.querySelectorAll('.live-app-card')];
- let current=0;
-
- const dots=cards.map((card,index)=>{
-   card.setAttribute('role','group');
-   card.setAttribute('aria-roledescription','slide');
-   card.setAttribute('aria-label',`${index+1} of ${cards.length}`);
-   const dot=document.createElement('button');
-   dot.type='button';
-   dot.setAttribute('aria-label',`Show app experience ${index+1}`);
-   dot.addEventListener('click',()=>goTo(index));
-   progress.appendChild(dot);
-   return dot;
- });
-
- function goTo(index,behavior='smooth'){
-   current=Math.max(0,Math.min(cards.length-1,index));
-   cards[current].scrollIntoView({behavior,block:'nearest',inline:'start'});
-   update();
- }
-
- function update(){
-   cards.forEach((card,index)=>card.classList.toggle('is-current',index===current));
-   dots.forEach((dot,index)=>{
-     dot.classList.toggle('active',index===current);
-     dot.setAttribute('aria-current',index===current?'true':'false');
-   });
-   previous.disabled=current===0;
-   next.disabled=current===cards.length-1;
- }
-
- previous.addEventListener('click',()=>goTo(current-1));
- next.addEventListener('click',()=>goTo(current+1));
- carousel.addEventListener('keydown',event=>{
-   if(event.key==='ArrowLeft'){event.preventDefault();goTo(current-1);}
-   if(event.key==='ArrowRight'){event.preventDefault();goTo(current+1);}
- });
-
- let frame=0;
- carousel.addEventListener('scroll',()=>{
-   if(frame)return;
-   frame=requestAnimationFrame(()=>{
-     frame=0;
-     const left=carousel.getBoundingClientRect().left;
-     current=cards.reduce((best,card,index)=>{
-       const distance=Math.abs(card.getBoundingClientRect().left-left);
-       const bestDistance=Math.abs(cards[best].getBoundingClientRect().left-left);
-       return distance<bestDistance?index:best;
-     },current);
-     update();
-   });
- },{passive:true});
-
- update();
 })();
 (function(){
  const picker=document.getElementById('homeCurrency');

@@ -1,0 +1,13 @@
+{
+  "name": "Beyond Baby Names",
+  "short_name": "Baby Names",
+  "description": "Discover meaningful baby names and find the one together.",
+  "start_url": "/beyond-baby-names/",
+  "scope": "/beyond-baby-names/",
+  "display": "standalone",
+  "background_color": "#100719",
+  "theme_color": "#100719",
+  "icons": [
+    { "src": "/beyond-baby-names/assets/app-icon.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

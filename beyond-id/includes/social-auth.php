@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+require_once __DIR__ . '/remember-me.php';
 
 function beyond_social_config(string $provider): array
 {
@@ -136,6 +137,8 @@ function beyond_social_login_session(PDO $pdo, array $user, string $provider): n
     $_SESSION['locale'] = (string)($user['preferred_locale'] ?? 'en');
     $_SESSION['user'] = ['id' => (int)$user['id'], 'email' => (string)$user['email'], 'role' => $_SESSION['role']];
     register_session($pdo, (int)$user['id']);
+    beyondRememberForget($pdo);
+    beyondRememberIssue($pdo, (int)$user['id']);
     try { $pdo->prepare('UPDATE users SET last_login_at=?,last_login_ip=? WHERE id=?')->execute([date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR'] ?? null, $user['id']]); } catch (Throwable $exception) {}
     log_activity($pdo, (int)$user['id'], 'oauth_login_' . $provider);
     $destination = safe_return_path($_SESSION['beyond_return_to'] ?? null, '../dashboard/');

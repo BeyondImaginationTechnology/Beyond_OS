@@ -65,7 +65,7 @@ $chapterUrl = static fn(array $unit): string => '?tradition='.rawurlencode($trad
 </head>
 <body>
 <main class="shell">
-<header class="top"><strong>DailyBreath 1.5 · Sacred Text Library</strong><a href="index.php?faith=<?= e($tradition) ?>">DailyBreath home →</a></header>
+<header class="top"><strong>DailyBreath · Sacred Text Library</strong><a href="index.php?faith=<?= e($tradition) ?>">DailyBreath home →</a></header>
 <nav class="faith-switch" aria-label="Choose faith tradition">
 <?php foreach (['bible'=>'Bible','torah'=>'Torah','quran'=>'Quran'] as $key=>$label): ?><a class="<?= $tradition===$key?'active':'' ?>" href="?tradition=<?= e($key) ?>"><?= e($label) ?></a><?php endforeach; ?>
 </nav>

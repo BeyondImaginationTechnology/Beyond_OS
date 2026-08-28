@@ -12,7 +12,7 @@ $updated = 'August 1, 2026';
 <main class="page">
 <a class="app-back" href="register.php">Back to registration</a>
 <h1>Privacy Policy</h1>
-<p class="muted">Version 2.1 · Effective <?= $updated ?></p>
+<p class="muted">Effective <?= $updated ?></p>
 <p>This Privacy Policy explains how Beyond Imagination Technology collects, uses, shares, protects, and lets you manage information connected to Beyond OS, Beyond ID, Beyond Wallet, and connected apps.</p>
 
 <h2>Information we collect</h2>

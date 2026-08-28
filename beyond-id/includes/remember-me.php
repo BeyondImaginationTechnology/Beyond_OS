@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 const BEYOND_REMEMBER_COOKIE = 'beyond_id_remember';
-const BEYOND_REMEMBER_DAYS = 30;
+const BEYOND_REMEMBER_YEARS = 10;
 
 function beyondRememberCookieOptions(int $expires): array
 {
@@ -25,7 +25,7 @@ function beyondRememberIssue(PDO $pdo, int $userId): void
     $validator = bin2hex(random_bytes(32));
     $validatorHash = hash('sha256', $validator);
     $agentHash = hash('sha256', (string) ($_SERVER['HTTP_USER_AGENT'] ?? ''));
-    $expires = new DateTimeImmutable('+' . BEYOND_REMEMBER_DAYS . ' days', new DateTimeZone('UTC'));
+    $expires = new DateTimeImmutable('+' . BEYOND_REMEMBER_YEARS . ' years', new DateTimeZone('UTC'));
 
     $pdo->prepare(
         'INSERT INTO auth_remember_tokens
@@ -112,4 +112,3 @@ function beyondRememberRevokeAll(PDO $pdo, int $userId): void
           WHERE user_id = :user_id AND revoked_at IS NULL'
     )->execute(['user_id' => $userId]);
 }
-

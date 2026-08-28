@@ -40,3 +40,15 @@ function bos_app_card(string $title,string $copy,string $href,string $icon='✦'
     }
     return '<a class="bos-card" href="'.e(beyond_url($href)).'">'.$iconMarkup.'<div><strong>'.e($title).'</strong><p>'.e($copy).'</p></div><span class="bos-card-status">'.e($status).'</span></a>';
 }
+function bos_locked_app_card(string $title,string $copy,string $icon='✦',?string $brandIcon=null): string {
+    if ($brandIcon === '@blank') {
+        $iconMarkup = '<span class="bos-card-icon bos-card-icon-blank" aria-hidden="true"></span>';
+    } elseif ($brandIcon === '@atom') {
+        $iconMarkup = '<span class="bos-card-icon bos-card-brand-tile"><img src="'.e(beyond_url('assets/icons/app-store/beyond-imagination.jpg')).'" alt=""><small>'.e($icon).'</small></span>';
+    } elseif (is_string($brandIcon) && $brandIcon !== '') {
+        $iconMarkup = '<span class="bos-card-icon bos-card-brand-icon"><img src="'.e(beyond_url($brandIcon)).'" alt="'.e($title).' icon"></span>';
+    } else {
+        $iconMarkup = '<span class="bos-card-icon">'.e($icon).'</span>';
+    }
+    return '<div class="bos-card bos-card-locked" aria-disabled="true">'.$iconMarkup.'<div><strong>'.e($title).'</strong><p>'.e($copy).'</p></div><span class="bos-card-status">Coming soon</span></div>';
+}

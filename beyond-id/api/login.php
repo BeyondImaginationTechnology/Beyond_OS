@@ -3,6 +3,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/remember-me.php';
 require_once __DIR__ . '/../../config/roles.php';
 header('Content-Type: application/json; charset=utf-8');
 
@@ -54,6 +55,8 @@ if ($requiredRole !== (string)$_SESSION['role']) {
     try { $pdo->prepare('UPDATE users SET role=? WHERE id=?')->execute([$requiredRole,$user['id']]); } catch (Throwable $exception) {}
 }
 register_session($pdo,(int)$user['id']);
+beyondRememberForget($pdo);
+beyondRememberIssue($pdo,(int)$user['id']);
 $pdo->prepare('UPDATE users SET last_login_at=?,last_login_ip=? WHERE id=?')->execute([date('Y-m-d H:i:s'),$_SERVER['REMOTE_ADDR']??null,$user['id']]);
 log_activity($pdo,(int)$user['id'],'login_api');
 echo json_encode(['ok'=>true,'user'=>['id'=>(int)$user['id'],'email'=>$user['email'],'name'=>$_SESSION['name'],'role'=>$_SESSION['role'],'locale'=>$_SESSION['locale']]]);

@@ -37,7 +37,7 @@ if (!empty($stencilDay['iso_date'])) {
 <main class="bt-storefront" id="top">
   <div class="bt-announcement" aria-label="Store highlights">
     <div class="bt-wrap bt-announcement-inner">
-      <span>✦ Asset library 1.2</span>
+      <span>✦ Asset library</span>
       <span>◆ Premium quality</span>
       <span>Studio ready</span>
       <a href="<?= e($downloadFile) ?>" download>Free stencil packs →</a>

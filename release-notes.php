@@ -10,15 +10,15 @@ beyond_nav_bootstrap('Beyond OS');
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#050817">
-  <title>What’s New in Beyond OS 2.4</title>
-  <meta name="description" content="The latest app and project updates included in Beyond OS 2.4.">
+  <title>What’s New in Beyond OS</title>
+  <meta name="description" content="The latest app and project updates included in Beyond OS.">
   <link rel="manifest" href="<?=e(beyond_url('manifest.webmanifest'))?>">
   <link rel="stylesheet" href="<?=e(beyond_url('assets/css/bos-21.css'))?>">
 </head>
 <body class="bos-page">
 <main class="bos-main whats-new-main">
   <section class="bos-hero whats-new-hero">
-    <span class="bos-kicker">Beyond OS 2.4 · August 2026</span>
+    <span class="bos-kicker">Beyond OS · August 2026</span>
     <h1>What’s new.</h1>
     <p>A clearer view of the work landing across Beyond apps and creator projects, based on the latest project READMEs.</p>
     <div class="bos-actions">
@@ -33,9 +33,9 @@ beyond_nav_bootstrap('Beyond OS');
     <h2>Apps moving forward</h2>
     <p>Installable web experiences and native companions now carry richer offline, personal, and creator-focused features.</p>
     <div class="bos-grid">
-      <?=bos_app_card('DailyBreath Web 1.2','Installable Scripture and wellness PWA with narration, encrypted reflection journaling, weekly challenges, history, and recovery support.','dailybreath/','DB','Open app','assets/icons/app-store/daily-breath.jpg')?>
+      <?=bos_app_card('DailyBreath Web','Installable Scripture and wellness PWA with narration, encrypted reflection journaling, weekly challenges, history, and recovery support.','dailybreath/','DB','Open app','assets/icons/app-store/daily-breath.jpg')?>
       <?=bos_app_card('DailyBreath for Apple','Offline content, Bible search and narration, widgets, App Clip, private journaling, 45-day history, and optional encrypted iCloud sync.','DailyBreathApple/README.md','DB','Read README','assets/icons/app-store/daily-breath.jpg')?>
-      <?=bos_app_card('Beyond Tattoo Apple 1.2','Asset-backed daily stencils, a real-download collection browser, healing milestones, reward bits, and a location-aware Canadian studio directory.','BeyondTattooApple/README.md','BT','Read README','assets/icons/app-store/beyond-tattoo.jpg')?>
+      <?=bos_app_card('Beyond Tattoo Apple','Asset-backed daily stencils, a real-download collection browser, healing milestones, reward bits, and a location-aware Canadian studio directory.','BeyondTattooApple/README.md','BT','Read README','assets/icons/app-store/beyond-tattoo.jpg')?>
     </div>
   </section>
 
@@ -52,8 +52,8 @@ beyond_nav_bootstrap('Beyond OS');
 
   <section class="bos-section release-foundation">
     <span class="bos-kicker">Also included</span>
-    <h2>The 2.3 foundation stays intact</h2>
-    <p>Academy pathways, assessments, public certificate verification, and Beyond ID achievements remain part of 2.4.</p>
+    <h2>The foundation stays intact</h2>
+    <p>Academy pathways, assessments, public certificate verification, and Beyond ID achievements remain part of Beyond OS.</p>
     <div class="bos-actions">
       <a class="bos-btn secondary" href="<?=e(beyond_url('academy/'))?>">Open Academy</a>
       <a class="bos-btn secondary" href="<?=e(beyond_url('academy/verify.php'))?>">Verify a certificate</a>

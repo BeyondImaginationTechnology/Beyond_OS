@@ -1,0 +1,214 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A001 /* BeyondBabyNamesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F001; };
+		A002 /* BabyName.swift in Sources */ = {isa = PBXBuildFile; fileRef = F002; };
+		A003 /* NameLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = F003; };
+		A004 /* BabyNameStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F004; };
+		A005 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F005; };
+		A006 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F006; };
+		A007 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = F007; };
+		A008 /* NameLibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F008; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C001 = {isa = PBXContainerItemProxy; containerPortal = P001; proxyType = 1; remoteGlobalIDString = T001; remoteInfo = BeyondBabyNames; };
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		F001 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeyondBabyNamesApp.swift; sourceTree = "<group>"; };
+		F002 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyName.swift; sourceTree = "<group>"; };
+		F003 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NameLibrary.swift; sourceTree = "<group>"; };
+		F004 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyNameStore.swift; sourceTree = "<group>"; };
+		F005 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		F006 = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F007 = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		F008 = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NameLibraryTests.swift; sourceTree = "<group>"; };
+		F009 = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeyondBabyNames.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F010 = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeyondBabyNamesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B001 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		B002 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		G001 = {isa = PBXGroup; children = (G002, G003, G004, G005); sourceTree = "<group>"; };
+		G002 /* Sources */ = {isa = PBXGroup; children = (F001, F002, F003, F004, F005); path = Sources; sourceTree = "<group>"; };
+		G003 /* Resources */ = {isa = PBXGroup; children = (F006, F007); path = Resources; sourceTree = "<group>"; };
+		G004 /* Tests */ = {isa = PBXGroup; children = (F008); path = Tests; sourceTree = "<group>"; };
+		G005 /* Products */ = {isa = PBXGroup; children = (F009, F010); name = Products; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		T001 /* BeyondBabyNames */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L001;
+			buildPhases = (S001, B001, R001);
+			buildRules = ();
+			dependencies = ();
+			name = BeyondBabyNames;
+			packageProductDependencies = ();
+			productName = BeyondBabyNames;
+			productReference = F009;
+			productType = "com.apple.product-type.application";
+		};
+		T002 /* BeyondBabyNamesTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L002;
+			buildPhases = (S002, B002);
+			buildRules = ();
+			dependencies = (D001);
+			name = BeyondBabyNamesTests;
+			packageProductDependencies = ();
+			productName = BeyondBabyNamesTests;
+			productReference = F010;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		P001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2600;
+				TargetAttributes = {
+					T001 = {DevelopmentTeam = FK9QM3VUNH; ProvisioningStyle = Automatic; };
+					T002 = {DevelopmentTeam = FK9QM3VUNH; ProvisioningStyle = Automatic; TestTargetID = T001; };
+				};
+			};
+			buildConfigurationList = L003;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (Base, en);
+			mainGroup = G001;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = G005;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (T001, T002);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		R001 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A006, A007); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		S001 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A001, A002, A003, A004, A005); runOnlyForDeploymentPostprocessing = 0; };
+		S002 = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A008); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D001 = {isa = PBXTargetDependency; target = T001; targetProxy = C001; };
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		Q001 /* Debug app */ = {isa = XCBuildConfiguration; buildSettings = {
+			ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+			ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+			CODE_SIGN_STYLE = Automatic;
+			DEVELOPMENT_TEAM = FK9QM3VUNH;
+			GENERATE_INFOPLIST_FILE = YES;
+			INFOPLIST_KEY_CFBundleDisplayName = "Beyond Baby Names";
+			INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+			INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+			INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+			LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks");
+			PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.beyondbabynames;
+			PRODUCT_MODULE_NAME = BeyondBabyNames;
+			PRODUCT_NAME = BeyondBabyNames;
+			SDKROOT = iphoneos;
+			SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+			SUPPORTS_MACCATALYST = YES;
+			TARGETED_DEVICE_FAMILY = "1,2";
+		}; name = Debug; };
+		Q002 /* Release app */ = {isa = XCBuildConfiguration; buildSettings = {
+			ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+			ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+			CODE_SIGN_STYLE = Automatic;
+			DEVELOPMENT_TEAM = FK9QM3VUNH;
+			GENERATE_INFOPLIST_FILE = YES;
+			INFOPLIST_KEY_CFBundleDisplayName = "Beyond Baby Names";
+			INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+			INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+			INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+			LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks");
+			PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.beyondbabynames;
+			PRODUCT_MODULE_NAME = BeyondBabyNames;
+			PRODUCT_NAME = BeyondBabyNames;
+			SDKROOT = iphoneos;
+			SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+			SUPPORTS_MACCATALYST = YES;
+			TARGETED_DEVICE_FAMILY = "1,2";
+		}; name = Release; };
+		Q003 /* Debug tests */ = {isa = XCBuildConfiguration; buildSettings = {
+			BUNDLE_LOADER = "$(TEST_HOST)";
+			CODE_SIGN_STYLE = Automatic;
+			DEVELOPMENT_TEAM = FK9QM3VUNH;
+			GENERATE_INFOPLIST_FILE = YES;
+			LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@loader_path/Frameworks");
+			PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.beyondbabynames.tests;
+			PRODUCT_NAME = BeyondBabyNamesTests;
+			SDKROOT = iphoneos;
+			TARGETED_DEVICE_FAMILY = "1,2";
+			TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BeyondBabyNames.app/BeyondBabyNames";
+		}; name = Debug; };
+		Q004 /* Release tests */ = {isa = XCBuildConfiguration; buildSettings = {
+			BUNDLE_LOADER = "$(TEST_HOST)";
+			CODE_SIGN_STYLE = Automatic;
+			DEVELOPMENT_TEAM = FK9QM3VUNH;
+			GENERATE_INFOPLIST_FILE = YES;
+			LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@loader_path/Frameworks");
+			PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.beyondbabynames.tests;
+			PRODUCT_NAME = BeyondBabyNamesTests;
+			SDKROOT = iphoneos;
+			TARGETED_DEVICE_FAMILY = "1,2";
+			TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BeyondBabyNames.app/BeyondBabyNames";
+		}; name = Release; };
+		Q005 /* Debug project */ = {isa = XCBuildConfiguration; buildSettings = {
+			ALWAYS_SEARCH_USER_PATHS = NO;
+			CLANG_ENABLE_MODULES = YES;
+			CODE_SIGN_STYLE = Automatic;
+			CURRENT_PROJECT_VERSION = 1;
+			DEBUG_INFORMATION_FORMAT = dwarf;
+			DEVELOPMENT_TEAM = FK9QM3VUNH;
+			ENABLE_TESTABILITY = YES;
+			GENERATE_INFOPLIST_FILE = YES;
+			IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+			MARKETING_VERSION = 1.0.0;
+			SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+			SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			SWIFT_VERSION = 6.0;
+		}; name = Debug; };
+		Q006 /* Release project */ = {isa = XCBuildConfiguration; buildSettings = {
+			ALWAYS_SEARCH_USER_PATHS = NO;
+			CLANG_ENABLE_MODULES = YES;
+			CODE_SIGN_STYLE = Automatic;
+			CURRENT_PROJECT_VERSION = 1;
+			DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+			DEVELOPMENT_TEAM = FK9QM3VUNH;
+			GENERATE_INFOPLIST_FILE = YES;
+			IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+			MARKETING_VERSION = 1.0.0;
+			SWIFT_COMPILATION_MODE = wholemodule;
+			SWIFT_OPTIMIZATION_LEVEL = "-O";
+			SWIFT_VERSION = 6.0;
+		}; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		L001 = {isa = XCConfigurationList; buildConfigurations = (Q001, Q002); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
+		L002 = {isa = XCConfigurationList; buildConfigurations = (Q003, Q004); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
+		L003 = {isa = XCConfigurationList; buildConfigurations = (Q005, Q006); defaultConfigurationIsVisible = 0; defaultConfigurationName = Debug; };
+/* End XCConfigurationList section */
+	};
+	rootObject = P001;
+}

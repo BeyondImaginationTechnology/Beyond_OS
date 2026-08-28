@@ -1,11 +1,7 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . '/../includes/app-layout.php';
-$wallet = bos_page_start(
-    'Beyond Chromium',
-    'Beyond Chromium',
-    'A controller-first desktop browser for Beyond OS.'
-);
+require_once __DIR__ . '/../includes/coming-soon-page.php';
+bos_coming_soon_page('Beyond Chromium', 'The controller-first desktop browser is still a private prototype.');
 ?>
 <main class="bos-main chromium-main">
   <section class="bos-hero chromium-hero">

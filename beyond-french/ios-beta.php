@@ -1,13 +1,13 @@
 <?php
 require_once __DIR__ . '/../includes/ecosystem.php';
 beyond_nav_bootstrap('Beyond French');
-$pageTitle = 'Beyond French 2.0.0 iOS Beta';
+$pageTitle = 'Beyond French iOS Beta';
 require __DIR__ . '/includes/header.php';
 ?>
 <link rel="stylesheet" href="<?= h($frenchBase) ?>assets/css/ios-beta.css?v=<?= h((string)(@filemtime(__DIR__ . '/assets/css/ios-beta.css') ?: time())) ?>">
 <section class="ios-beta-hero">
     <div class="ios-beta-copy">
-        <span class="ios-beta-pill">VERSION 2.0.0 · iOS BETA</span>
+        <span class="ios-beta-pill">iOS BETA</span>
         <h1>French practice,<br><span>made for iPhone.</span></h1>
         <p>Take the daily phrase, pronunciation practice, four-language comparisons, and your Academy progress wherever you go.</p>
         <form class="ios-beta-form" id="join-beta" method="post" action="<?= h($frenchBase) ?>ios-beta-request.php">

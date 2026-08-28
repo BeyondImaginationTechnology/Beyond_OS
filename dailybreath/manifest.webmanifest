@@ -1,6 +1,6 @@
 {
   "id": "/dailybreath/",
-  "name": "DailyBreath 1.5",
+  "name": "DailyBreath",
   "short_name": "DailyBreath",
   "description": "Bible, Torah, and Quran daily readings, complete local sacred-text libraries, devotionals, breathing, reflection, and recovery support.",
   "start_url": "/dailybreath/?source=pwa",

@@ -86,15 +86,18 @@ function beyond_social_exchange_code(string $provider, string $code, string $cod
     return beyond_social_http($config['token_url'], ['post' => $post]);
 }
 
-function beyond_social_profile(string $provider, string $accessToken): array
+function beyond_social_profile(string $provider, string $accessToken, array $tokens = []): array
 {
     $config = beyond_social_config($provider);
     if ($provider === 'instagram') {
-        $url = $config['userinfo_url'] . '?' . http_build_query(['fields' => 'user_id,username,account_type'], '', '&', PHP_QUERY_RFC3986);
+        $instagramUserId = trim((string)($tokens['user_id'] ?? ''));
+        $profilePath = $instagramUserId !== '' ? rawurlencode($instagramUserId) : 'me';
+        $url = preg_replace('~/me$~', '/' . $profilePath, (string)$config['userinfo_url'])
+            . '?' . http_build_query(['fields' => 'user_id,username,account_type'], '', '&', PHP_QUERY_RFC3986);
         $profile = beyond_social_http($url, ['access_token' => $accessToken]);
         $username = trim((string)($profile['username'] ?? ''));
         return [
-            'subject' => (string)($profile['user_id'] ?? $profile['id'] ?? ''),
+            'subject' => (string)($profile['user_id'] ?? $profile['id'] ?? $instagramUserId),
             'email' => '',
             'email_verified' => false,
             'name' => $username !== '' ? '@' . $username : 'Instagram member',

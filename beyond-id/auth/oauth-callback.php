@@ -20,7 +20,7 @@ try {
     $tokens = beyond_social_exchange_code($provider, $code, (string)($flow['verifier'] ?? ''));
     $accessToken = (string)($tokens['access_token'] ?? '');
     if ($accessToken === '') throw new RuntimeException('The provider did not return an access token.');
-    $profile = beyond_social_profile($provider, $accessToken);
+    $profile = beyond_social_profile($provider, $accessToken, $tokens);
     if ($profile['subject'] === '') throw new RuntimeException('The provider account is missing an identifier.');
     if ($provider !== 'instagram' && (!$profile['email_verified'] || !filter_var($profile['email'], FILTER_VALIDATE_EMAIL))) {
         throw new RuntimeException('A verified email address is required. Make sure your social account shares its email with Beyond ID.');

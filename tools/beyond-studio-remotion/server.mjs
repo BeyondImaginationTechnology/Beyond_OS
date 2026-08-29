@@ -188,9 +188,28 @@ const bridgeScript = String.raw`<script>
       '[class*="aspect-video"]', ...aspectCandidates,
       '[data-remotion-root]', '[data-composition]', 'canvas', 'video', 'svg',
     ];
-    const target = canvasCandidates.filter(Boolean)
-      .map((item) => { try { return document.querySelector(item); } catch (_) { return null; } })
-      .find(Boolean)
+    const desiredRatio = innerWidth / Math.max(1, innerHeight);
+    const candidates = [];
+    const seen = new Set();
+    canvasCandidates.filter(Boolean).forEach((item, selectorOrder) => {
+      try {
+        document.querySelectorAll(item).forEach((element) => {
+          if (seen.has(element)) return;
+          const rect = element.getBoundingClientRect();
+          if (rect.width < 40 || rect.height < 40) return;
+          const ratio = rect.width / rect.height;
+          const ratioDistance = Math.abs(Math.log(ratio / desiredRatio));
+          const area = rect.width * rect.height;
+          seen.add(element);
+          candidates.push({element, selectorOrder, ratioDistance, area});
+        });
+      } catch (_) {}
+    });
+    // If a desktop canvas and a phone preview are both present, choose the
+    // surface whose aspect ratio matches the requested composition, then the
+    // largest matching surface.
+    candidates.sort((a, b) => a.ratioDistance - b.ratioDistance || b.area - a.area || a.selectorOrder - b.selectorOrder);
+    const target = candidates[0]?.element
       || ['main', '#root'].map((item) => document.querySelector(item)).find(Boolean);
     if (!target || target === document.body || target === document.documentElement) return;
     Object.assign(document.documentElement.style, {margin:'0', width:'100%', height:'100%', overflow:'hidden', background:'#05070d'});

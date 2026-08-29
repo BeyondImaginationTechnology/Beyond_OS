@@ -5,7 +5,7 @@ export const inferHtmlRenderOptions = (html, requested) => {
   const options = {...requested};
   const selector = String(options.selector || '').trim();
   const hasPortraitCanvas = html.includes('aspect-[9/16]');
-  const hasLandscapeCanvas = html.includes('aspect-[16/9]');
+  const hasLandscapeCanvas = html.includes('aspect-[16/9]') || html.includes('aspect-video');
   const usingLandscapeDefault = selector === '' || selector === LANDSCAPE_CANVAS_SELECTOR;
 
   // The Studio opens in 16:9, but many bundled React artifacts contain a

@@ -179,8 +179,19 @@ const bridgeScript = String.raw`<script>
     const aspectCandidates = portrait
       ? ['[class*="aspect-[9/16]"]', '[class*="aspect-[16/9]"]']
       : ['[class*="aspect-[16/9]"]', '[class*="aspect-[9/16]"]'];
-    const candidates = [selector, '[data-remotion-root]', '[data-composition]', ...aspectCandidates, 'main', '#root'];
-    const target = candidates.filter(Boolean).map((item) => { try { return document.querySelector(item); } catch (_) { return null; } }).find(Boolean);
+    // Prefer an actual canvas/content surface.  Falling straight back to
+    // `main` or `#root` is what makes editor workspaces get exported.
+    const canvasCandidates = [
+      selector,
+      '[data-video-canvas]', '[data-export-canvas]', '[data-canvas]',
+      '.video-canvas', '.render-canvas', '.export-canvas',
+      '[class*="aspect-video"]', ...aspectCandidates,
+      '[data-remotion-root]', '[data-composition]', 'canvas', 'video', 'svg',
+    ];
+    const target = canvasCandidates.filter(Boolean)
+      .map((item) => { try { return document.querySelector(item); } catch (_) { return null; } })
+      .find(Boolean)
+      || ['main', '#root'].map((item) => document.querySelector(item)).find(Boolean);
     if (!target || target === document.body || target === document.documentElement) return;
     Object.assign(document.documentElement.style, {margin:'0', width:'100%', height:'100%', overflow:'hidden', background:'#05070d'});
     Object.assign(document.body.style, {margin:'0', width:'100%', height:'100%', overflow:'hidden', background:'#05070d'});
@@ -209,6 +220,18 @@ const bridgeScript = String.raw`<script>
     lastFrame = requestedFrame;
     for (const animation of document.getAnimations()) {
       try { animation.pause(); animation.currentTime = now; } catch (_) {}
+    }
+    // HTML artifacts often contain an autoplay/looping video.  Let Remotion
+    // own its clock; otherwise Chromium plays the media in wall-clock time
+    // while Remotion renders frames as fast as it can, producing a sped-up
+    // or repeatedly-looped export.
+    for (const media of document.querySelectorAll('video, audio')) {
+      try {
+        media.pause();
+        if (Number.isFinite(media.duration) && media.duration > 0) {
+          media.currentTime = (now / 1000) % media.duration;
+        }
+      } catch (_) {}
     }
   });
   addEventListener('DOMContentLoaded', () => setTimeout(() => {

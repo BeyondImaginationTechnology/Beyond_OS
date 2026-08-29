@@ -36,6 +36,12 @@ const landscape = inferHtmlRenderOptions(
 );
 assert.deepEqual(landscape, defaults);
 
+const tailwindLandscape = inferHtmlRenderOptions(
+  '<div class="aspect-video">landscape composition</div>',
+  defaults,
+);
+assert.deepEqual(tailwindLandscape, defaults);
+
 const mixed = inferHtmlRenderOptions(
   '<div class="aspect-[16/9]"></div><div class="aspect-[9/16]"></div>',
   defaults,

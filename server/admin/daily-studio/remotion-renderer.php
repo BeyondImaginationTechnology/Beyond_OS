@@ -22,11 +22,11 @@ $blueprint = $blueprints[$blueprintId] ?? null;
 $ratio = in_array((string)($_GET['ratio'] ?? ''), ['16:9', '9:16', '2.39:1'], true) ? (string)$_GET['ratio'] : '16:9';
 $presetWidth = 1920;
 $presetHeight = 1080;
-$presetSelector = '[class*="aspect-[16/9]"]';
+$presetSelector = '[data-video-canvas], [data-export-canvas], [data-canvas], .video-canvas, .render-canvas, [class*="aspect-[16/9]"], [class*="aspect-video"]';
 if ($ratio === '9:16') {
     $presetWidth = 1080;
     $presetHeight = 1920;
-    $presetSelector = '[class*="aspect-[9/16]"]';
+    $presetSelector = '[data-video-canvas], [data-export-canvas], [data-canvas], .video-canvas, .render-canvas, [class*="aspect-[9/16]"]';
 } elseif ($ratio === '2.39:1') {
     $presetHeight = 804;
     $presetSelector = '[data-remotion-root]';
@@ -71,7 +71,7 @@ $presetSeconds = max(1, min(300, (int)($_GET['seconds'] ?? 15)));
           <label>Height<input id="height" type="number" min="320" max="3840" value="<?=htmlspecialchars((string)$presetHeight)?>"></label>
           <label>FPS<input id="fps" type="number" min="1" max="60" value="<?=htmlspecialchars((string)$presetFps)?>"></label>
           <label>Seconds<input id="seconds" type="number" min="1" max="300" value="<?=htmlspecialchars((string)$presetSeconds)?>"></label>
-          <label class="selector">Canvas selector <input id="selector" value='<?=htmlspecialchars($presetSelector, ENT_QUOTES)?>' placeholder="#video-root or [data-remotion-root]"></label>
+          <label class="selector">Canvas selector <input id="selector" value='<?=htmlspecialchars($presetSelector, ENT_QUOTES)?>' placeholder="#video-root or [data-video-canvas]"></label>
         </div>
         <button class="action" id="inspect" disabled>Inspect compositions</button>
         <button class="action secondary" id="recordFallback" disabled>Screen-record fallback</button>

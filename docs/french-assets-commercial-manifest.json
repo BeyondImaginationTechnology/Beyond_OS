@@ -1,0 +1,46 @@
+{
+  "generated_at": "2026-08-28T23:49:13.587Z",
+  "provider": "elevenlabs",
+  "model": "eleven_v3",
+  "output_format": "mp3_44100_128",
+  "commercial_license_acknowledged": true,
+  "voices": {
+    "fr-FR": "hpp4J3VqNfWAUOO0d1Us",
+    "es-ES": "hpp4J3VqNfWAUOO0d1Us",
+    "ht-HT": "PEjMkBhSB6492eADs4Ew",
+    "en-JM": "mrDMz4sYNCz18XYFpmyV",
+    "ln-CD": "hpp4J3VqNfWAUOO0d1Us",
+    "ar-MA": "",
+    "ar-EG": "",
+    "sw-KE": ""
+  },
+  "dry_run": false,
+  "lessons": {
+    "count": 100,
+    "locales": [
+      "fr-FR",
+      "es-ES",
+      "ht-HT",
+      "en-JM"
+    ],
+    "output": "beyond-french/assets/audio/lessons"
+  },
+  "dictionary": {
+    "count": 158,
+    "locales": [
+      "fr-FR",
+      "es-ES",
+      "ht-HT",
+      "en-JM"
+    ],
+    "outputs": [
+      "BeyondFrenchApple/Resources/Audio/dictionary",
+      "FrenchQuestApple/Resources/Audio/dictionary"
+    ]
+  },
+  "quest": {
+    "count": 15,
+    "locale": "fr-FR",
+    "output": "FrenchQuestApple/Resources/Audio/quest/fr-FR"
+  }
+}

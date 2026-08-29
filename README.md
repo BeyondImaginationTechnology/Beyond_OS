@@ -122,3 +122,8 @@ or third-party material unless an asset-specific notice expressly says so.
 
 See `LICENSE` for the source-code license and `CONTENT_RIGHTS.md` for media,
 branding, generated-content, public-domain, and third-party rights guidance.
+
+French audio regeneration is documented in
+[`docs/french-assets-commercial-regeneration.md`](docs/french-assets-commercial-regeneration.md).
+The batch requires an explicit commercial-license acknowledgement and keeps
+provider credentials out of the repository.

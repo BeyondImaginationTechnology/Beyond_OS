@@ -1194,6 +1194,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/066-welcome.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/066-welcome.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/066-welcome.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1221,6 +1247,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/067-good-afternoon.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/067-good-afternoon.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/067-good-afternoon.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1248,6 +1300,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/068-sleep-well.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/068-sleep-well.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/068-sleep-well.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1275,6 +1353,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/069-have-a-nice-weekend.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/069-have-a-nice-weekend.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/069-have-a-nice-weekend.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1302,6 +1406,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/070-it-is-good-to-see-you.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/070-it-is-good-to-see-you.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/070-it-is-good-to-see-you.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1329,6 +1459,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/071-how-have-you-been.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/071-how-have-you-been.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/071-how-have-you-been.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1356,6 +1512,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/072-please-come-in.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/072-please-come-in.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/072-please-come-in.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1383,6 +1565,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/073-make-yourself-at-home.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/073-make-yourself-at-home.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/073-make-yourself-at-home.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1410,6 +1618,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/074-give-me-a-call.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/074-give-me-a-call.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/074-give-me-a-call.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1437,6 +1671,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/075-see-you-next-week.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/075-see-you-next-week.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/075-see-you-next-week.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1464,6 +1724,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/076-what-do-you-mean.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/076-what-do-you-mean.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/076-what-do-you-mean.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1491,6 +1777,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/077-i-have-a-question.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/077-i-have-a-question.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/077-i-have-a-question.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1518,6 +1830,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/078-that-is-interesting.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/078-that-is-interesting.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/078-that-is-interesting.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1545,6 +1883,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/079-i-think-so.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/079-i-think-so.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/079-i-think-so.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1572,6 +1936,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/080-i-do-not-think-so.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/080-i-do-not-think-so.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/080-i-do-not-think-so.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1599,6 +1989,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/081-that-is-a-good-idea.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/081-that-is-a-good-idea.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/081-that-is-a-good-idea.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1626,6 +2042,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/082-i-am-not-sure.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/082-i-am-not-sure.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/082-i-am-not-sure.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1653,6 +2095,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/083-can-you-explain-it.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/083-can-you-explain-it.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/083-can-you-explain-it.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1680,6 +2148,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/084-what-happened.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/084-what-happened.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/084-what-happened.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1707,6 +2201,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/085-everything-is-fine.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/085-everything-is-fine.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/085-everything-is-fine.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1734,6 +2254,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/086-i-am-listening.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/086-i-am-listening.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/086-i-am-listening.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1761,6 +2307,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/087-tell-me-more.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/087-tell-me-more.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/087-tell-me-more.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1788,6 +2360,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/088-could-you-write-it-down.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/088-could-you-write-it-down.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/088-could-you-write-it-down.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1815,6 +2413,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/089-how-do-you-say-this-in-french.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/089-how-do-you-say-this-in-french.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/089-how-do-you-say-this-in-french.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1842,6 +2466,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/090-what-does-this-word-mean.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/090-what-does-this-word-mean.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/090-what-does-this-word-mean.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1869,6 +2519,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/091-i-am-learning-french.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/091-i-am-learning-french.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/091-i-am-learning-french.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1896,6 +2572,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/092-i-need-more-practice.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/092-i-need-more-practice.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/092-i-need-more-practice.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1923,6 +2625,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/093-please-correct-me.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/093-please-correct-me.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/093-please-correct-me.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1950,6 +2678,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/094-let-me-think.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/094-let-me-think.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/094-let-me-think.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -1977,6 +2731,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/095-i-will-try-again.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/095-i-will-try-again.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/095-i-will-try-again.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2004,6 +2784,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/096-where-is-the-train-station.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/096-where-is-the-train-station.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/096-where-is-the-train-station.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2031,6 +2837,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/097-i-need-a-taxi.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/097-i-need-a-taxi.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/097-i-need-a-taxi.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2058,6 +2890,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/098-please-take-me-to-this-address.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/098-please-take-me-to-this-address.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/098-please-take-me-to-this-address.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2085,6 +2943,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/099-how-long-does-it-take.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/099-how-long-does-it-take.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/099-how-long-does-it-take.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2112,6 +2996,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/100-is-it-far-from-here.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/100-is-it-far-from-here.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/100-is-it-far-from-here.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2139,6 +3049,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/101-turn-left.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/101-turn-left.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/101-turn-left.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2166,6 +3102,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/102-turn-right.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/102-turn-right.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/102-turn-right.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2193,6 +3155,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/103-go-straight-ahead.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/103-go-straight-ahead.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/103-go-straight-ahead.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2220,6 +3208,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/104-i-am-lost.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/104-i-am-lost.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/104-i-am-lost.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2247,6 +3261,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/105-can-you-show-me-on-the-map.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/105-can-you-show-me-on-the-map.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/105-can-you-show-me-on-the-map.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2274,6 +3314,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/106-what-time-does-the-train-leave.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/106-what-time-does-the-train-leave.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/106-what-time-does-the-train-leave.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2301,6 +3367,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/107-i-would-like-a-ticket.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/107-i-would-like-a-ticket.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/107-i-would-like-a-ticket.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2328,6 +3420,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/108-one-way-or-round-trip.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/108-one-way-or-round-trip.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/108-one-way-or-round-trip.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2355,6 +3473,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/109-where-can-i-buy-a-ticket.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/109-where-can-i-buy-a-ticket.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/109-where-can-i-buy-a-ticket.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2382,6 +3526,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/110-is-this-seat-free.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/110-is-this-seat-free.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/110-is-this-seat-free.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2409,6 +3579,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/111-please-wake-me-at-seven.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/111-please-wake-me-at-seven.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/111-please-wake-me-at-seven.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2436,6 +3632,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/112-i-have-a-reservation.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/112-i-have-a-reservation.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/112-i-have-a-reservation.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2463,6 +3685,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/113-where-is-my-hotel.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/113-where-is-my-hotel.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/113-where-is-my-hotel.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2490,6 +3738,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/114-i-need-a-room-for-one-night.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/114-i-need-a-room-for-one-night.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/114-i-need-a-room-for-one-night.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2517,6 +3791,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/115-what-is-the-wi-fi-password.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/115-what-is-the-wi-fi-password.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/115-what-is-the-wi-fi-password.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2544,6 +3844,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/116-a-table-for-two-please.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/116-a-table-for-two-please.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/116-a-table-for-two-please.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2571,6 +3897,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/117-may-i-see-the-menu.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/117-may-i-see-the-menu.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/117-may-i-see-the-menu.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2598,6 +3950,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/118-what-do-you-recommend.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/118-what-do-you-recommend.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/118-what-do-you-recommend.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2625,6 +4003,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/119-i-am-vegetarian.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/119-i-am-vegetarian.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/119-i-am-vegetarian.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2652,6 +4056,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/120-i-am-allergic-to-nuts.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/120-i-am-allergic-to-nuts.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/120-i-am-allergic-to-nuts.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2679,6 +4109,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/121-no-sugar-please.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/121-no-sugar-please.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/121-no-sugar-please.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2706,6 +4162,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/122-i-would-like-a-coffee.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/122-i-would-like-a-coffee.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/122-i-would-like-a-coffee.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2733,6 +4215,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/123-the-bill-please.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/123-the-bill-please.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/123-the-bill-please.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2760,6 +4268,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/124-this-is-delicious.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/124-this-is-delicious.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/124-this-is-delicious.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2787,6 +4321,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/125-it-is-too-spicy.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/125-it-is-too-spicy.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/125-it-is-too-spicy.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2814,6 +4374,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/126-i-would-like-it-well-done.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/126-i-would-like-it-well-done.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/126-i-would-like-it-well-done.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2841,6 +4427,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/127-can-i-have-more-bread.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/127-can-i-have-more-bread.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/127-can-i-have-more-bread.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2868,6 +4480,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/128-cheers.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/128-cheers.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/128-cheers.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2895,6 +4533,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/129-i-am-full.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/129-i-am-full.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/129-i-am-full.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2922,6 +4586,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/130-breakfast-is-included.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/130-breakfast-is-included.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/130-breakfast-is-included.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2949,6 +4639,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/131-do-you-have-this-in-another-size.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/131-do-you-have-this-in-another-size.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/131-do-you-have-this-in-another-size.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -2976,6 +4692,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/132-can-i-try-it-on.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/132-can-i-try-it-on.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/132-can-i-try-it-on.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3003,6 +4745,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/133-it-is-too-expensive.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/133-it-is-too-expensive.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/133-it-is-too-expensive.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3030,6 +4798,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/134-do-you-have-anything-cheaper.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/134-do-you-have-anything-cheaper.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/134-do-you-have-anything-cheaper.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3057,6 +4851,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/135-i-am-just-looking.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/135-i-am-just-looking.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/135-i-am-just-looking.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3084,6 +4904,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/136-i-will-take-it.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/136-i-will-take-it.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/136-i-will-take-it.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3111,6 +4957,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/137-can-i-pay-in-cash.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/137-can-i-pay-in-cash.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/137-can-i-pay-in-cash.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3138,6 +5010,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/138-may-i-have-a-receipt.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/138-may-i-have-a-receipt.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/138-may-i-have-a-receipt.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3165,6 +5063,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/139-where-is-the-market.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/139-where-is-the-market.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/139-where-is-the-market.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3192,6 +5116,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/140-what-time-do-you-close.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/140-what-time-do-you-close.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/140-what-time-do-you-close.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3219,6 +5169,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/141-i-am-ready.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/141-i-am-ready.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/141-i-am-ready.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3246,6 +5222,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/142-i-am-tired.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/142-i-am-tired.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/142-i-am-tired.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3273,6 +5275,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/143-i-am-hungry.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/143-i-am-hungry.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/143-i-am-hungry.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3300,6 +5328,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/144-i-am-thirsty.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/144-i-am-thirsty.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/144-i-am-thirsty.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3327,6 +5381,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/145-i-am-busy-right-now.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/145-i-am-busy-right-now.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/145-i-am-busy-right-now.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3354,6 +5434,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/146-i-will-be-there-soon.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/146-i-will-be-there-soon.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/146-i-will-be-there-soon.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3381,6 +5487,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/147-wait-a-moment-please.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/147-wait-a-moment-please.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/147-wait-a-moment-please.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3408,6 +5540,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/148-i-have-to-go.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/148-i-have-to-go.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/148-i-have-to-go.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3435,6 +5593,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/149-what-time-is-it.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/149-what-time-is-it.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/149-what-time-is-it.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3462,6 +5646,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/150-it-is-raining.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/150-it-is-raining.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/150-it-is-raining.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3489,6 +5699,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/151-the-weather-is-beautiful.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/151-the-weather-is-beautiful.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/151-the-weather-is-beautiful.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3516,6 +5752,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/152-open-the-window-please.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/152-open-the-window-please.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/152-open-the-window-please.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3543,6 +5805,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/153-close-the-door-please.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/153-close-the-door-please.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/153-close-the-door-please.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3570,6 +5858,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/154-i-am-looking-for-my-keys.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/154-i-am-looking-for-my-keys.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/154-i-am-looking-for-my-keys.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3597,6 +5911,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/155-my-phone-is-not-working.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/155-my-phone-is-not-working.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/155-my-phone-is-not-working.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3624,6 +5964,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/156-believe-in-yourself.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/156-believe-in-yourself.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/156-believe-in-yourself.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3651,6 +6017,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/157-you-are-doing-great.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/157-you-are-doing-great.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/157-you-are-doing-great.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3678,6 +6070,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/158-one-step-at-a-time.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/158-one-step-at-a-time.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/158-one-step-at-a-time.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3705,6 +6123,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/159-do-not-be-afraid.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/159-do-not-be-afraid.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/159-do-not-be-afraid.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3732,6 +6176,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/160-stay-positive.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/160-stay-positive.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/160-stay-positive.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3759,6 +6229,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/161-you-have-made-progress.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/161-you-have-made-progress.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/161-you-have-made-progress.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3786,6 +6282,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/162-mistakes-help-us-learn.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/162-mistakes-help-us-learn.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/162-mistakes-help-us-learn.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3813,6 +6335,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/163-keep-practicing.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/163-keep-practicing.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/163-keep-practicing.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3840,6 +6388,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/164-i-am-proud-of-my-progress.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/164-i-am-proud-of-my-progress.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/164-i-am-proud-of-my-progress.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   },
   {
@@ -3867,6 +6441,32 @@
       "es-ES": "/beyond-french/assets/audio/lessons/es-ES/165-today-is-a-new-opportunity.mp3",
       "ht-HT": "/beyond-french/assets/audio/lessons/ht-HT/165-today-is-a-new-opportunity.mp3",
       "en-JM": "/beyond-french/assets/audio/lessons/en-JM/165-today-is-a-new-opportunity.mp3"
+    },
+    "audio_generation": {
+      "fr-FR": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "es-ES": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "hpp4J3VqNfWAUOO0d1Us",
+        "license": "commercial-account-confirmed"
+      },
+      "ht-HT": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "PEjMkBhSB6492eADs4Ew",
+        "license": "commercial-account-confirmed"
+      },
+      "en-JM": {
+        "provider": "elevenlabs",
+        "model": "eleven_v3",
+        "voice": "mrDMz4sYNCz18XYFpmyV",
+        "license": "commercial-account-confirmed"
+      }
     }
   }
 ]

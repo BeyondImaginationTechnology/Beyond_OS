@@ -180,7 +180,7 @@ const bridgeScript = String.raw`<script>
       ? ['[class*="aspect-[9/16]"]', '[class*="aspect-[16/9]"]']
       : ['[class*="aspect-[16/9]"]', '[class*="aspect-[9/16]"]'];
     // Prefer an actual canvas/content surface.  Falling straight back to
-    // `main` or `#root` is what makes editor workspaces get exported.
+    // main or #root is what makes editor workspaces get exported.
     const canvasCandidates = [
       selector,
       '[data-video-canvas]', '[data-export-canvas]', '[data-canvas]',

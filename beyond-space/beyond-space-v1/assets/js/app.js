@@ -15,7 +15,7 @@
   all('.card').forEach(card=>card.addEventListener('click',()=>{const story=window.BS_STORIES[Number(card.dataset.story)];one('#modalIcon').textContent=story.icon;one('#modalEyebrow').textContent=story.eyebrow;one('#modalTitle').textContent=story.title;one('#modalCopy').textContent=story.copy;openModal(modal);}));
   one('#watchIntro')?.addEventListener('click',()=>openModal(videoModal));
   const planetPanel=one('#planetPanel');
-  all('.world').forEach(world=>world.addEventListener('click',()=>{all('.world').forEach(item=>item.classList.remove('active'));world.classList.add('active');one('h3',planetPanel).textContent=world.dataset.planet;one('p',planetPanel).textContent=world.dataset.fact;}));
+  all('.world').forEach(world=>world.addEventListener('click',()=>{all('.world').forEach(item=>item.classList.remove('active'));world.classList.add('active');one('h3',planetPanel).textContent=world.dataset.planet;one('p',planetPanel).textContent=world.dataset.fact;const image=one('#planetImage');if(image&&world.dataset.image){image.src=world.dataset.image;image.alt='Real NASA image of '+world.dataset.planet;}}));
   const blackHoleFacts=['A black hole is detected through its effects on nearby matter and light.','The boundary beyond which escape becomes impossible is called the event horizon.','Supermassive black holes are found at the centres of many large galaxies.','An accretion disk can become extremely hot and luminous before matter crosses the horizon.'];
   let factIndex=0;
   one('#nextFact')?.addEventListener('click',()=>{factIndex=(factIndex+1)%blackHoleFacts.length;one('#factBox span').textContent=blackHoleFacts[factIndex];});
@@ -25,7 +25,12 @@
     one('#dailyFactWorld').textContent='🪐 '+(fact.world||'Beyond Space');one('#dailyFactTitle').textContent=fact.title||'';one('#dailyFactCopy').textContent=fact.fact||'';one('#dailyFactLesson').textContent=fact.lesson||'';
     const source=one('#dailyFactSource');if(source&&fact.source_url){source.href=fact.source_url;source.textContent='Open source post ↗';source.hidden=false}
     const asset=one('#dailyFactAsset');if(asset&&fact.asset_url){asset.src=fact.asset_url;asset.alt=(fact.world||'Daily Space Fact')+' artwork';asset.hidden=false}
+    if(Array.isArray(fact.assets)&&fact.assets.length){window.BS_CHIBI_CARDS=fact.assets.map((item,index)=>({group:'Published card · '+(fact.world||'Space'),title:item.title||('Card '+(index+1)),copy:item.copy||'Published from Daily Studio.',image:item.url||item.asset_url||item}));initChibi();}
   }).catch(()=>{});
+
+  let chibiIndex=0;
+  const initChibi=()=>{const cards=window.BS_CHIBI_CARDS||[],image=one('#chibiImage');if(!cards.length||!image)return;const render=()=>{const card=cards[chibiIndex];image.src=card.image;image.alt=card.title||'Chibi space lesson';one('#chibiGroup').textContent=card.group||'Imported lesson';one('#chibiTitle').textContent=card.title||'';one('#chibiCopy').textContent=card.copy||'';one('#chibiCount').textContent=`${chibiIndex+1} / ${cards.length}`;one('#chibiDots').replaceChildren(...cards.map((_,index)=>{const dot=document.createElement('button');dot.type='button';dot.className=index===chibiIndex?'active':'';dot.ariaLabel=`Go to card ${index+1}`;dot.addEventListener('click',()=>{chibiIndex=index;render();});return dot;}));};one('#chibiPrev')?.addEventListener('click',()=>{chibiIndex=(chibiIndex+cards.length-1)%cards.length;render();});one('#chibiNext')?.addEventListener('click',()=>{chibiIndex=(chibiIndex+1)%cards.length;render();});render();};
+  initChibi();
 
   const signs=window.BS_SIGNS||[],today=new Date(),todayKey=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
   let dailyHoroscopes={};

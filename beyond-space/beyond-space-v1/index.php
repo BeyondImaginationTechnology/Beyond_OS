@@ -20,6 +20,58 @@ $dailyFactStart = new DateTimeImmutable('2026-08-24');
 $dailyFactToday = new DateTimeImmutable('today');
 $dailyFactOffset = max(0, min(count($dailySpaceFacts) - 1, (int)$dailyFactStart->diff($dailyFactToday)->format('%r%a')));
 $dailyFact = $dailySpaceFacts[$dailyFactOffset];
+$chibiCards = [
+  ['group'=>'Pluto · Chibi lesson','title'=>'Pluto is still there!','copy'=>'A five-card illustrated lesson about Pluto, its heart, size, orbit, and moons.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/01-pluto-cover.jpg'],
+  ['group'=>'Pluto · Chibi lesson','title'=>'Pluto has a big heart','copy'=>'Tombaugh Regio is a bright region shaped by frozen nitrogen and methane ice.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/02-pluto-heart.jpg'],
+  ['group'=>'Pluto · Chibi lesson','title'=>'Smaller than the Moon','copy'=>'Pluto is a dwarf planet smaller than Earth’s Moon.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/03-pluto-size.jpg'],
+  ['group'=>'Pluto · Chibi lesson','title'=>'The slowest orbit','copy'=>'One trip around the Sun takes Pluto about 248 Earth years.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/04-pluto-orbit.jpg'],
+  ['group'=>'Pluto · Chibi lesson','title'=>'Five moon friends','copy'=>'Pluto and Charon orbit as a binary pair, alongside Styx, Nix, Kerberos, and Hydra.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/05-pluto-moons.jpg'],
+  ['group'=>'55 Cancri e · Chibi lesson','title'=>'A diamond-rain world?','copy'=>'A hot super-Earth whose carbon-rich interior remains a scientific hypothesis, not a confirmed diamond world.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/06-diamond-rain.jpg'],
+  ['group'=>'55 Cancri e · Chibi lesson','title'=>'There’s a planet made of diamonds?','copy'=>'Meet the illustrated “diamond planet” story, framed with the evidence and uncertainty.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/07-diamond-planet.jpg'],
+  ['group'=>'55 Cancri e · Chibi lesson','title'=>'Space wealth story','copy'=>'A playful comparison card about the imagined value of a diamond-rich planet.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/08-diamond-value.jpg'],
+  ['group'=>'55 Cancri e · Chibi lesson','title'=>'Inside 55 Cancri e','copy'=>'A visual cross-section of the carbon-rich/super-Earth concept.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/09-diamond-core.jpg'],
+  ['group'=>'Venus · Chibi lesson','title'=>'Venus is hell','copy'=>'A fiery introduction to Venus: extreme heat, crushing pressure, and corrosive clouds.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/10-venus-cover.jpg'],
+  ['group'=>'Venus · Chibi lesson','title'=>'You would be crushed instantly','copy'=>'Venus has surface pressure around 92 times Earth’s, with a dense carbon-dioxide atmosphere.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/11-venus-pressure.jpg'],
+  ['group'=>'Venus · Chibi lesson','title'=>'Earth’s twin?','copy'=>'Venus is close to Earth in size, but a runaway greenhouse effect makes the two worlds radically different.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/12-venus-earth-twin.jpg'],
+  ['group'=>'Venus · Chibi lesson','title'=>'A day longer than its year','copy'=>'Venus rotates very slowly and backward compared with most planets.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/13-venus-day-year.jpg'],
+  ['group'=>'Mars · Chibi lesson','title'=>'Mars is the Red Planet','copy'=>'Iron-bearing dust and rock oxidize, giving Mars its distinctive rusty colour.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/14-mars-cover.jpg'],
+  ['group'=>'Mars · Chibi lesson','title'=>'It is red because of rust','copy'=>'Iron plus oxygen produces iron oxides that spread through Martian dust.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/15-mars-rust.jpg'],
+  ['group'=>'Mars · Chibi lesson','title'=>'Home to the biggest volcano','copy'=>'Olympus Mons is a giant shield volcano, built by many layers of lava.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/16-mars-volcano.jpg'],
+  ['group'=>'Mars · Chibi lesson','title'=>'You can’t breathe there','copy'=>'Mars has a very thin atmosphere, freezing temperatures, and planet-wide dust storms.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/17-mars-freezing.jpg'],
+  ['group'=>'Mars · Chibi lesson','title'=>'Two tiny moons','copy'=>'Phobos and Deimos are small, irregular moons that orbit Mars.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/18-earth-mars-moons.jpg'],
+  ['group'=>'Uranus · Chibi lesson','title'=>'Uranus spins sideways','copy'=>'Its extreme axial tilt makes Uranus one of the most distinctive worlds in the Solar System.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/19-new-1.jpg'],
+  ['group'=>'Uranus · Chibi lesson','title'=>'Why is it tilted?','copy'=>'A giant impact is one leading explanation for Uranus’s unusual tilt.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/20-new-2.jpg'],
+  ['group'=>'Uranus · Chibi lesson','title'=>'The coldest planet','copy'=>'Uranus has an icy atmosphere and can reach extremely low temperatures.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/21-new-3.jpg'],
+  ['group'=>'Uranus · Chibi lesson','title'=>'A hostile frozen world','copy'=>'No breathable air, extreme cold, and crushing pressure make Uranus uninhabitable.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/22-new-4.jpg'],
+  ['group'=>'Uranus · Chibi lesson','title'=>'Faint rings and many moons','copy'=>'Uranus has a faint ring system and a family of major moons.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/23-new-5.jpg'],
+  ['group'=>'Jupiter · Chibi lesson','title'=>'Jupiter is the king','copy'=>'The largest planet is a gas giant with a fast day and no solid surface to stand on.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/24-new-6.jpg'],
+  ['group'=>'Jupiter · Chibi lesson','title'=>'Bigger than the other planets','copy'=>'Jupiter’s diameter and mass dwarf the rocky worlds of the inner Solar System.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/25-new-7.jpg'],
+  ['group'=>'Jupiter · Chibi lesson','title'=>'A storm bigger than Earth','copy'=>'The Great Red Spot is a long-lived storm system, though its size changes over time.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/26-new-8.jpg'],
+  ['group'=>'Jupiter · Chibi lesson','title'=>'You can’t land on Jupiter','copy'=>'Jupiter is made mostly of hydrogen and helium, with pressure rising dramatically with depth.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/27-new-9.jpg'],
+  ['group'=>'Jupiter · Chibi lesson','title'=>'A huge moon family','copy'=>'Jupiter’s moons include the four Galilean moons: Io, Europa, Ganymede, and Callisto.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/28-new-10.jpg'],
+  ['group'=>'Saturn · Chibi lesson','title'=>'Ice and rock rings','copy'=>'Saturn’s rings are mostly ice with rocky and dusty material mixed in.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/29-new-1.jpg'],
+  ['group'=>'Saturn · Chibi lesson','title'=>'Ring rain','copy'=>'Tiny ring particles can drift into Saturn’s atmosphere in a process called ring rain.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/30-new-2.jpg'],
+  ['group'=>'Saturn · Chibi lesson','title'=>'A lucky time to see them','copy'=>'Saturn’s rings are temporary on cosmic timescales, making our era a beautiful one to observe them.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/31-new-3.jpg'],
+  ['group'=>'Saturn · Chibi lesson','title'=>'You can see them now','copy'=>'Saturn’s rings are a spectacular target for backyard telescopes and space missions.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/32-new-4.jpg'],
+  ['group'=>'Saturn · Chibi lesson','title'=>'Saturn is losing its rings','copy'=>'Ring material slowly falls inward; the exact timescale is an active area of study.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/33-new-5.jpg'],
+  ['group'=>'Saturn · Chibi lesson','title'=>'The most beautiful rings','copy'=>'A friendly introduction to Saturn’s icy ring system and why it stands out.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/34-new-6.jpg'],
+  ['group'=>'Saturn · Chibi lesson','title'=>'Rings made of ice and rock','copy'=>'The ring particles range from tiny grains to much larger chunks of water ice.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/35-new-7.jpg'],
+  ['group'=>'Saturn · Chibi lesson','title'=>'Could Saturn float?','copy'=>'Saturn’s average density is less than water, though no ocean is large enough to hold it.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/36-new-8.jpg'],
+  ['group'=>'Saturn · Chibi lesson','title'=>'A ringed world to explore','copy'=>'Use the illustrated comparison as a launch point for the real Saturn imagery in the explorer.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/37-new-9.jpg'],
+  ['group'=>'Saturn · Chibi lesson','title'=>'Moons with hidden oceans','copy'=>'Titan and Enceladus show why Saturn’s moon system is as exciting as its rings.','image'=>'/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/38-new-10.jpg'],
+];
+$realImages = [
+  'hero'=>'https://images-assets.nasa.gov/image/PIA19952/PIA19952~orig.jpg',
+  'Mercury'=>'https://images-assets.nasa.gov/image/PIA15162/PIA15162~orig.jpg',
+  'Venus'=>'https://images-assets.nasa.gov/image/PIA00271/PIA00271~orig.jpg',
+  'Earth'=>'https://images-assets.nasa.gov/image/PIA18033/PIA18033~orig.jpg',
+  'Mars'=>'https://images-assets.nasa.gov/image/PIA00407/PIA00407~orig.jpg',
+  'Jupiter'=>'https://images-assets.nasa.gov/image/PIA22946/PIA22946~orig.jpg',
+  'Saturn'=>'https://images-assets.nasa.gov/image/PIA01364/PIA01364~orig.jpg',
+  'Uranus'=>'https://images-assets.nasa.gov/image/PIA18182/PIA18182~orig.jpg',
+  'Neptune'=>'https://images-assets.nasa.gov/image/PIA01492/PIA01492~orig.jpg',
+  'blackHole'=>'https://svs.gsfc.nasa.gov/vis/a020000/a020100/a020157/blackhole_formation.jpg',
+];
 $signs = [
   ['name'=>'Aries','symbol'=>'♈','dates'=>'Mar 21 – Apr 19','element'=>'Fire','message'=>'Lead with curiosity today. A bold question may open a surprising path.'],
   ['name'=>'Taurus','symbol'=>'♉','dates'=>'Apr 20 – May 20','element'=>'Earth','message'=>'Slow down and notice the details. Steady progress beats a rushed launch.'],
@@ -62,6 +114,7 @@ $signs = [
 <main id="top">
 <section class="hero">
   <div class="nebula"></div><div class="planet planet-one"></div><div class="planet planet-two"></div><div class="moon"></div>
+  <figure class="hero-real-image"><img src="<?=htmlspecialchars($realImages['hero'])?>" alt="Real NASA image of Pluto" loading="eager"><figcaption>Real imagery · NASA / Johns Hopkins APL / SwRI</figcaption></figure>
   <div class="orbit orbit-a"><i></i></div><div class="orbit orbit-b"><i></i></div><div class="rocket" aria-hidden="true">🚀</div>
   <div class="hero-copy reveal">
     <span class="kicker">🚀 Launch into the unknown</span>
@@ -77,6 +130,11 @@ $signs = [
   <div class="daily-fact-card reveal">
     <div class="daily-fact-top"><span class="kicker">Daily Space Fact · <?= $dailyFact['number'] ?>/55</span><span class="daily-fact-date"><?=htmlspecialchars(date('l · M j, Y'))?></span></div>
     <div class="daily-fact-grid"><div><span class="daily-fact-world" id="dailyFactWorld">🪐 <?=htmlspecialchars($dailyFact['world'])?></span><h2 id="dailyFactTitle"><?=htmlspecialchars($dailyFact['title'])?></h2><p id="dailyFactCopy"><?=htmlspecialchars($dailyFact['fact'])?></p><?php if(!empty($dailyFact['source_url'])):?><a class="daily-fact-source" id="dailyFactSource" href="<?=htmlspecialchars($dailyFact['source_url'])?>" target="_blank" rel="noopener">Imported from Beyond Space Instagram ↗</a><?php else:?><a class="daily-fact-source" id="dailyFactSource" hidden target="_blank" rel="noopener"></a><?php endif;?><img class="daily-fact-art" id="dailyFactAsset" hidden alt=""></div><aside><strong>Today’s lesson</strong><p id="dailyFactLesson"><?=htmlspecialchars($dailyFact['lesson'])?></p><a class="btn ghost" href="/beyond-space/academy.php?view=lesson&amp;age=cosmic-explorer&amp;module=solar-system-planetary-science&amp;lesson=7">Open the lesson →</a></aside></div>
+  </div>
+  <div class="chibi-library reveal" id="chibiLesson">
+    <div class="section-head compact"><span>Imported Meta AI card library</span><h2>Chibi Space Lessons</h2><p>Your uploaded cards are ready to publish as swipeable lessons. The science notes keep the playful art grounded in what is known.</p></div>
+    <div class="chibi-viewer"><button class="carousel-button" id="chibiPrev" type="button" aria-label="Previous chibi lesson">‹</button><figure><img id="chibiImage" src="<?=htmlspecialchars($chibiCards[0]['image'])?>" alt="<?=htmlspecialchars($chibiCards[0]['title'])?>"><figcaption><span id="chibiGroup"><?=htmlspecialchars($chibiCards[0]['group'])?></span><strong id="chibiTitle"><?=htmlspecialchars($chibiCards[0]['title'])?></strong><small id="chibiCopy"><?=htmlspecialchars($chibiCards[0]['copy'])?></small></figcaption></figure><button class="carousel-button" id="chibiNext" type="button" aria-label="Next chibi lesson">›</button></div>
+    <div class="chibi-footer"><span id="chibiCount">1 / <?=count($chibiCards)?></span><div class="chibi-dots" id="chibiDots" aria-label="Chibi lesson slides"></div><span class="asset-note">Upload new cards from Daily Studio</span></div>
   </div>
 </section>
 
@@ -99,20 +157,20 @@ $signs = [
   <div class="section-head reveal"><span>Interactive orbit</span><h2>Solar System Explorer</h2><p>Select a planet to reveal its quick profile.</p></div>
   <div class="solar-stage reveal">
     <div class="sun"></div>
-    <button class="world mercury" data-planet="Mercury" data-fact="The smallest planet and the closest world to the Sun." aria-label="Mercury"></button>
-    <button class="world venus" data-planet="Venus" data-fact="A cloud-covered world with the hottest surface of any planet." aria-label="Venus"></button>
-    <button class="world earth" data-planet="Earth" data-fact="Our ocean world and the only place currently known to host life." aria-label="Earth"></button>
-    <button class="world mars" data-planet="Mars" data-fact="A cold desert world with giant volcanoes and signs of ancient water." aria-label="Mars"></button>
-    <button class="world jupiter" data-planet="Jupiter" data-fact="The largest planet, famous for its Great Red Spot and vast moon system." aria-label="Jupiter"></button>
-    <button class="world saturn" data-planet="Saturn" data-fact="A gas giant surrounded by an intricate system of icy rings." aria-label="Saturn"></button>
-    <button class="world uranus" data-planet="Uranus" data-fact="An ice giant rotating almost completely on its side." aria-label="Uranus"></button>
-    <button class="world neptune" data-planet="Neptune" data-fact="The farthest major planet, with some of the fastest winds known." aria-label="Neptune"></button>
+    <button class="world mercury" data-planet="Mercury" data-image="<?=htmlspecialchars($realImages['Mercury'])?>" data-fact="The smallest planet and the closest world to the Sun." aria-label="Mercury"></button>
+    <button class="world venus" data-planet="Venus" data-image="<?=htmlspecialchars($realImages['Venus'])?>" data-fact="A cloud-covered world with the hottest surface of any planet." aria-label="Venus"></button>
+    <button class="world earth" data-planet="Earth" data-image="<?=htmlspecialchars($realImages['Earth'])?>" data-fact="Our ocean world and the only place currently known to host life." aria-label="Earth"></button>
+    <button class="world mars" data-planet="Mars" data-image="<?=htmlspecialchars($realImages['Mars'])?>" data-fact="A cold desert world with giant volcanoes and signs of ancient water." aria-label="Mars"></button>
+    <button class="world jupiter" data-planet="Jupiter" data-image="<?=htmlspecialchars($realImages['Jupiter'])?>" data-fact="The largest planet, famous for its Great Red Spot and vast moon system." aria-label="Jupiter"></button>
+    <button class="world saturn" data-planet="Saturn" data-image="<?=htmlspecialchars($realImages['Saturn'])?>" data-fact="A gas giant surrounded by an intricate system of icy rings." aria-label="Saturn"></button>
+    <button class="world uranus" data-planet="Uranus" data-image="<?=htmlspecialchars($realImages['Uranus'])?>" data-fact="An ice giant rotating almost completely on its side." aria-label="Uranus"></button>
+    <button class="world neptune" data-planet="Neptune" data-image="<?=htmlspecialchars($realImages['Neptune'])?>" data-fact="The farthest major planet, with some of the fastest winds known." aria-label="Neptune"></button>
   </div>
-  <div class="planet-panel reveal" id="planetPanel"><span>Selected world</span><h3>Earth</h3><p>Tap any planet above to begin your tour.</p></div>
+  <div class="planet-panel reveal" id="planetPanel"><img id="planetImage" src="<?=htmlspecialchars($realImages['Earth'])?>" alt="Real NASA image of Earth"><div><span>Selected world · NASA imagery</span><h3>Earth</h3><p>Tap any planet above to begin your tour.</p></div></div>
 </section>
 
 <section class="split section feature">
-  <div class="black-hole reveal"><div class="disc"></div><div class="core"></div><span>Tap to distort spacetime</span></div>
+  <div class="black-hole reveal"><img src="https://svs.gsfc.nasa.gov/vis/a020000/a020100/a020157/blackhole_formation.jpg" alt="NASA visualization of a black hole accretion disk" loading="lazy"><div class="disc"></div><div class="core"></div><span>Tap to distort spacetime</span></div>
   <div class="reveal"><span class="kicker">Cosmic phenomenon</span><h2>Inside a Black Hole</h2><p>Use animations to visualize gravity, the event horizon, accretion disks, and why light bends around massive objects.</p>
     <div class="fact" id="factBox"><b>Quick fact</b><span>A black hole is detected through its effects on nearby matter and light.</span></div>
     <button class="btn primary" id="nextFact">Reveal another fact</button>
@@ -168,6 +226,6 @@ $signs = [
 
 <div class="modal" id="modal" aria-hidden="true"><div class="modal-card"><button class="close" aria-label="Close">×</button><span id="modalIcon">🪐</span><small id="modalEyebrow"></small><h2 id="modalTitle"></h2><p id="modalCopy"></p><a class="btn primary" href="/beyond-space/academy.php">Study this in Space Academy</a></div></div>
 <div class="modal" id="videoModal" aria-hidden="true"><div class="modal-card video-card"><button class="close" aria-label="Close">×</button><div class="cinema"><div class="cinema-earth"></div><div class="cinema-moon"></div><div class="cinema-rocket">🚀</div></div><h2>Welcome to Beyond Space</h2><p>A lightweight animated launch sequence ready to be replaced by an MP4 or WebM cinematic.</p></div></div>
-<script>window.BS_STORIES = <?= json_encode($featured, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) ?>; window.BS_SIGNS = <?= json_encode($signs, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) ?>;</script>
+<script>window.BS_STORIES = <?= json_encode($featured, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) ?>; window.BS_SIGNS = <?= json_encode($signs, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) ?>; window.BS_CHIBI_CARDS = <?= json_encode($chibiCards, JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES) ?>;</script>
 <script src="/beyond-space/beyond-space-v1/assets/js/app.js?v=1.0.0"></script>
 <script src="/assets/js/visitor-analytics.js" defer></script></body></html>

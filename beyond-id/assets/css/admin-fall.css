@@ -1,0 +1,23 @@
+/* Fall command-center theme for the admin overview. Scoped so other admin tools keep their existing themes. */
+html[data-theme] body[data-admin-page="index.php"]{--bg:#1b1110;--bg-elevated:#281815;--panel:rgba(44,25,20,.94);--panel-strong:#321d17;--panel2:#3a241d;--text:#fff7ed;--muted:#d5b7a5;--border:#654033;--border-strong:#8f5b43;--accent:#d97732;--accent2:#e9ad55;--accent-soft:rgba(217,119,50,.16);--good:#8dcc82;--good-soft:rgba(141,204,130,.14);--warn:#f2be63;--shadow:0 24px 70px rgba(19,7,4,.38);--shadow-soft:0 12px 34px rgba(19,7,4,.24);--brand-core:#1b1110}
+body[data-admin-page="index.php"]{background:radial-gradient(circle at 78% -10%,rgba(217,119,50,.22),transparent 34rem),radial-gradient(circle at 12% 106%,rgba(141,204,130,.1),transparent 38rem),var(--bg)}
+body[data-admin-page="index.php"] .sidebar{background:linear-gradient(180deg,rgba(217,119,50,.19),transparent 18rem),rgba(27,17,16,.97)}
+body[data-admin-page="index.php"] .topbar{background:rgba(27,17,16,.82)}
+body[data-admin-page="index.php"] .brand-mark{background:linear-gradient(135deg,#bd5b24,#e7a64e);box-shadow:0 12px 28px rgba(217,119,50,.24)}
+body[data-admin-page="index.php"] .nav-link.active{background:linear-gradient(135deg,#c86527,#e7a64e);box-shadow:0 10px 28px rgba(217,119,50,.22)}
+body[data-admin-page="index.php"] .page-heading{position:relative;padding:28px 30px;border:1px solid #754838;border-radius:26px;background:linear-gradient(135deg,rgba(75,39,28,.94),rgba(43,24,20,.9));box-shadow:var(--shadow)}
+body[data-admin-page="index.php"] .page-heading::after{position:absolute;right:26px;bottom:-13px;width:74px;height:25px;border-radius:50%;background:linear-gradient(135deg,#8dcc82,#e9ad55);content:"";opacity:.9;transform:rotate(-18deg);box-shadow:-54px 18px 0 -5px #d97732}
+body[data-admin-page="index.php"] .page-heading .eyebrow{color:#f1bb6c}
+body[data-admin-page="index.php"] .page-heading h1{font:900 clamp(30px,4vw,48px)/1.05 Georgia,serif;letter-spacing:-.045em}
+body[data-admin-page="index.php"] .page-status{background:rgba(141,204,130,.1);border-color:rgba(141,204,130,.34)}
+body[data-admin-page="index.php"] .tile,body[data-admin-page="index.php"] .card{border-color:#654033;background:linear-gradient(145deg,rgba(52,29,23,.96),rgba(38,22,19,.94));box-shadow:var(--shadow-soft)}
+body[data-admin-page="index.php"] .tile:nth-child(2n){transform:translateY(7px)}
+body[data-admin-page="index.php"] .tile::after{background:rgba(217,119,50,.14)}
+body[data-admin-page="index.php"] .stat-icon{border-color:#79503c;background:rgba(217,119,50,.13);color:#e9ad55}
+body[data-admin-page="index.php"] .metric-trend{background:rgba(141,204,130,.13);color:#a9df9c}
+body[data-admin-page="index.php"] .app-avatar{border-color:#79503c;background:#43271e;color:#f1bb6c}
+body[data-admin-page="index.php"] .tool-link{border-color:#654033;background:rgba(58,36,29,.72)}
+body[data-admin-page="index.php"] .tool-link:hover{border-color:#b56b42;background:rgba(217,119,50,.14)}
+body[data-admin-page="index.php"] .overview-layout{position:relative}
+body[data-admin-page="index.php"] .overview-layout::before{position:absolute;top:-11px;left:12%;width:68%;height:2px;background:linear-gradient(90deg,transparent,#8dcc82,#e9ad55,#d97732,transparent);content:"";opacity:.65}
+@media(max-width:720px){body[data-admin-page="index.php"] .page-heading{padding:22px 20px}body[data-admin-page="index.php"] .tile:nth-child(2n){transform:none}}

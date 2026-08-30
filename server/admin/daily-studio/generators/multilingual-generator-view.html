@@ -258,7 +258,7 @@
         }catch(error){audioNotice=' Audio was unavailable, so the visual was exported silently. Upload an MP3/M4A/WAV to include narration.'}
       }
       setStatus(audio?`Recording narrated video — about ${Math.ceil(duration)} seconds remaining…`:'Recording visual video without narration…');
-      const type=mimeType(),rec=new MediaRecorder(stream,type?{mimeType:type,videobit$PerSecond:6500000}:undefined),chunks=[];
+      const type=mimeType(),rec=new MediaRecorder(stream,type?{mimeType:type,videoBitsPerSecond:6500000}:undefined),chunks=[];
       rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
       const finished=new Promise((resolve,reject)=>{rec.onstop=resolve;rec.onerror=()=>reject(rec.error||new Error('Video export failed.'))});
       let running=true,start=performance.now();const animate=now=>{if(!running)return;draw((Math.sin((now-start)/420)+1)/2);requestAnimationFrame(animate)};

@@ -68,7 +68,7 @@ function bt_list_studios(string $query = ''): array
         $needle = '%' . strtolower($query) . '%';
         $params = [$needle, $needle, $needle, $needle, $needle];
     }
-    $sql .= " ORDER BY CASE WHEN s.city='Ottawa' THEN 0 ELSE 1 END,s.city,s.name";
+    $sql .= " ORDER BY CASE WHEN s.slug='beyond-studio-nanaimo' THEN 0 WHEN s.city='Ottawa' THEN 1 ELSE 2 END,s.city,s.name";
     $stmt = bt_db()->prepare($sql);
     $stmt->execute($params);
     return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];

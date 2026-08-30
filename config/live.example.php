@@ -41,7 +41,6 @@ return [
             // These are the Instagram App credentials, not the Facebook Login ID.
             'app_id' => '',
             'app_secret' => '',
-            'graph_version' => 'v26.0',
         ],
     ],
     'remotion' => [

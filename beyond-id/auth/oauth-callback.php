@@ -83,13 +83,11 @@ try {
         throw new RuntimeException('Verify your Beyond ID email before signing in with Instagram.');
     }
     $pdo->commit();
-    beyond_social_login_session($pdo, $user, $provider);
     $mobileScheme = strtolower(trim((string)($flow['mobile_scheme'] ?? '')));
     if (in_array($mobileScheme, ['beyondmusic', 'beyondtv', 'frenchquest'], true)) {
-        unset($_SESSION['beyond_return_to']);
-        header('Location: mobile-complete.php?scheme=' . rawurlencode($mobileScheme));
-        exit;
+        beyond_social_login_session($pdo, $user, $provider, '/beyond-id/auth/mobile-complete.php?scheme=' . rawurlencode($mobileScheme));
     }
+    beyond_social_login_session($pdo, $user, $provider);
 } catch (Throwable $exception) {
     if ($pdo->inTransaction()) $pdo->rollBack();
     error_log('OAuth callback failed: ' . $exception->getMessage());

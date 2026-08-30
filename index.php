@@ -112,12 +112,15 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
 .currency-picker{position:relative;display:flex;align-items:center;min-width:84px;height:43px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(255,255,255,.055);overflow:hidden}.currency-picker:focus-within{outline:2px solid #a99cff;outline-offset:2px}.currency-picker>span{position:absolute;left:11px;z-index:1;color:#c9bcff;font-size:12px;font-weight:950;pointer-events:none}.currency-picker select{position:relative;width:100%;height:100%;padding:0 25px 0 29px;border:0;outline:0;color:#fff;background:transparent;font:900 11px/1 inherit;cursor:pointer;appearance:none}.currency-picker:after{content:"⌄";position:absolute;right:10px;top:11px;color:#aeb4ca;font-size:12px;pointer-events:none}.currency-picker option{color:#111;background:#fff}html[data-theme="light"] .currency-picker{border-color:rgba(23,26,46,.2);background:rgba(255,255,255,.62)}html[data-theme="light"] .currency-picker select{color:#171a2e}@media(max-width:560px){.currency-picker{min-width:72px;height:40px}.currency-picker select{padding-left:25px;padding-right:20px;font-size:10px}.currency-picker>span{left:9px}.currency-picker:after{right:7px}}
 .brand,.nav,.primary,.ghost,.home-live-button{font-family:"Space Grotesk",Inter,system-ui,sans-serif}.brand{font-weight:700;letter-spacing:-.055em}.nav>a:not(.primary){font-weight:600;letter-spacing:-.015em}.primary{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.16);background:linear-gradient(105deg,#526dff 0%,#8658f6 50%,#e950aa 100%);font-weight:700;letter-spacing:-.02em;box-shadow:0 14px 36px rgba(101,72,255,.34),inset 0 1px rgba(255,255,255,.22)}.primary:hover,.primary:focus-visible{transform:translateY(-1px);box-shadow:0 18px 42px rgba(101,72,255,.42),inset 0 1px rgba(255,255,255,.28)}
 </style>
+<style>
+.hero-kicker,.platform-kicker{display:inline-flex;align-items:center;gap:9px;color:#b9adff;font-size:11px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}.hero-kicker:before,.platform-kicker:before{content:"";width:7px;height:7px;border-radius:50%;background:#7f67ff;box-shadow:0 0 14px #7f67ff}.hero .intro{max-width:500px;font-size:17px}.hero-actions .primary{min-height:50px;padding-inline:24px}.platform-proof{position:relative;padding:84px 0 96px}.platform-proof:before{content:"";position:absolute;inset:8% 0 auto;height:360px;background:radial-gradient(circle at 30% 40%,rgba(81,219,120,.08),transparent 34%),radial-gradient(circle at 72% 32%,rgba(112,87,255,.12),transparent 38%);pointer-events:none}.platform-head{position:relative;display:grid;grid-template-columns:1.2fr .8fr;align-items:end;gap:50px;margin-bottom:34px}.platform-head h2{max-width:760px;margin:16px 0 0;font-size:clamp(42px,6vw,74px);line-height:.95;letter-spacing:-.06em}.platform-head p{margin:0;color:var(--muted);font-size:17px;line-height:1.65}.proof-strip{position:relative;display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:18px;border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.035);overflow:hidden;box-shadow:0 28px 80px rgba(0,0,0,.22)}.proof-stat{min-height:132px;padding:27px 30px;border-right:1px solid var(--line)}.proof-stat:last-child{border-right:0}.proof-stat strong{display:block;font-size:clamp(31px,4vw,49px);line-height:1;letter-spacing:-.055em}.proof-stat span{display:block;margin-top:10px;color:#aeb5c9;font-size:12px;line-height:1.45}.product-grid{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.product-card{--card-accent:#7057ff;position:relative;min-height:280px;padding:24px;border:1px solid color-mix(in srgb,var(--card-accent) 42%,rgba(255,255,255,.08));border-radius:22px;display:flex;flex-direction:column;text-decoration:none;overflow:hidden;background:radial-gradient(circle at 90% 5%,color-mix(in srgb,var(--card-accent) 20%,transparent),transparent 38%),linear-gradient(150deg,rgba(17,23,45,.94),rgba(7,10,23,.98));transition:transform .2s,border-color .2s}.product-card:hover,.product-card:focus-visible{transform:translateY(-5px);border-color:var(--card-accent)}.product-card.health{--card-accent:var(--green)}.product-card.education{--card-accent:var(--gold)}.product-card.wallet{--card-accent:var(--blue)}.product-card.entertainment{--card-accent:var(--pink)}.product-number{color:var(--card-accent);font-size:11px;font-weight:900;letter-spacing:.14em}.product-card h3{margin:22px 0 10px;font-size:28px;letter-spacing:-.045em}.product-card p{margin:0;color:#afb6ca;font-size:14px;line-height:1.6}.product-link{margin-top:auto;padding-top:26px;color:#fff;font-size:13px;font-weight:800}.platform-loop{position:relative;margin-top:18px;padding:34px;border:1px solid rgba(112,87,255,.34);border-radius:24px;background:linear-gradient(120deg,rgba(37,32,92,.72),rgba(56,20,71,.66));display:grid;grid-template-columns:.85fr 1.15fr;gap:50px;align-items:center}.platform-loop h3{margin:10px 0 0;font-size:clamp(29px,4vw,45px);line-height:1;letter-spacing:-.05em}.loop-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.loop-step{padding:17px 12px;border:1px solid rgba(255,255,255,.12);border-radius:15px;background:rgba(255,255,255,.045);text-align:center}.loop-step b{display:block;font-size:13px}.loop-step span{display:block;margin-top:5px;color:#b8bed2;font-size:10px;line-height:1.35}.investor-banner{margin:0 auto 74px;padding:38px 42px;border:1px solid rgba(132,102,255,.38);border-radius:26px;background:radial-gradient(circle at 88% 18%,rgba(236,76,170,.2),transparent 30%),linear-gradient(120deg,rgba(32,35,92,.94),rgba(53,21,70,.9));display:flex;align-items:center;justify-content:space-between;gap:32px}.investor-banner .platform-kicker{color:#d0c7ff}.investor-banner h2{margin:12px 0 8px;font-size:clamp(29px,4vw,45px);letter-spacing:-.05em}.investor-banner p{max-width:650px;margin:0;color:#c8cede;line-height:1.6}.investor-banner .primary{flex:0 0 auto;min-height:52px;padding-inline:24px}.nav>a[href="/investors.php"]{border-color:#8f72ff!important;color:#d5ceff!important}html[data-theme="light"] .proof-strip,html[data-theme="light"] .product-card{background:rgba(255,255,255,.74)}html[data-theme="light"] .product-card p,html[data-theme="light"] .proof-stat span{color:#5b6277}html[data-theme="light"] .product-link{color:#1c2034}html[data-theme="light"] .platform-loop,html[data-theme="light"] .investor-banner{color:#fff}@media(max-width:980px){.product-grid{grid-template-columns:repeat(2,1fr)}.platform-loop{grid-template-columns:1fr}.nav>a[href="/release-notes.php"]{display:none!important}}@media(max-width:760px){.platform-proof{padding:58px 0 70px}.platform-head{grid-template-columns:1fr;gap:18px}.proof-strip{grid-template-columns:1fr}.proof-stat{min-height:auto;border-right:0;border-bottom:1px solid var(--line)}.proof-stat:last-child{border-bottom:0}.loop-steps{grid-template-columns:repeat(2,1fr)}.investor-banner{align-items:flex-start;flex-direction:column;padding:30px}.investor-banner .primary{width:100%}}@media(max-width:560px){.hero-kicker{margin-bottom:14px}.platform-head h2{font-size:42px}.product-grid{grid-template-columns:1fr}.product-card{min-height:230px}.platform-loop{padding:25px 20px}.nav>a[href="/investors.php"]{display:none!important}}
+</style>
 </head>
 <body class="home-page">
 <header class="top wrap">
     <a class="brand" href="./"><b class="brand-atom" aria-hidden="true"><img src="/assets/images/bos-logo-mark.svg?v=20260828-1" alt=""></b>BEYOND <span>OS</span><small>THE CONNECTED IMAGINATION ECOSYSTEM</small></a>
     <nav class="nav" aria-label="Primary navigation">
-          <a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="/beyond-market/">Marketplace</a><a href="/release-notes.php">What’s New</a>
+          <a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-market/">Marketplace</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a>
           <label class="currency-picker"><span aria-hidden="true">$</span><span class="visually-hidden">Display currency</span><select id="homeCurrency" aria-label="Display currency"><option value="USD">USD</option><option value="CAD">CAD</option><option value="BITS">bit$</option></select></label>
           <a class="primary" href="/app-store/">App Store</a>
     </nav>
@@ -125,11 +128,13 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
 <main>
 <section class="hero wrap">
     <div>
+        <span class="hero-kicker">One platform · many possibilities</span>
         <h1><span class="h">Health.</span><span class="e">Education.</span><span class="f">Wallet.</span><span class="x">Entertainment.</span></h1>
         <p class="tagline">Live. Learn. Earn. Explore.</p>
-        <p class="intro">Everything you need to grow, create and discover—connected in one ecosystem.</p>
+        <p class="intro">A web-first ecosystem where one identity connects everyday wellness, learning, creator commerce and entertainment.</p>
         <div class="hero-actions">
-            <a class="ghost" href="app-store/">Open App Store &nbsp;▶</a>
+            <a class="primary" href="app-store/">Explore the web apps &nbsp;→</a>
+            <a class="ghost" href="#platform">See how it connects</a>
         </div>
         <div class="benefits"><span><b>∞</b> Every possibility, connected</span></div>
     </div>
@@ -198,6 +203,55 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
             <a class="planet pf" href="beyond-id/dashboard/wallet.php"><span><i>👛</i>WALLET</span></a>
         <a class="planet px" href="beyond-tv/"><span class="label"><i>▶</i>ENTERTAIN<br>MENT</span></a>
     </div>
+</section>
+<section class="platform-proof wrap" id="platform" aria-labelledby="platform-title">
+    <div class="platform-head">
+        <div>
+            <span class="platform-kicker">Built, connected, testable</span>
+            <h2 id="platform-title">More than a vision.<br>A working product universe.</h2>
+        </div>
+        <p>Beyond OS brings focused web experiences into one recognizable system. People can move from discovery to learning, creation and rewards without starting over in a disconnected app.</p>
+    </div>
+    <div class="proof-strip" aria-label="Beyond OS platform at a glance">
+        <div class="proof-stat"><strong>18</strong><span>web product hubs in active development</span></div>
+        <div class="proof-stat"><strong>4</strong><span>connected pillars: Live, Learn, Earn and Explore</span></div>
+        <div class="proof-stat"><strong>1</strong><span>shared Beyond ID and bit$ wallet layer</span></div>
+    </div>
+    <div class="product-grid" aria-label="Explore flagship Beyond OS web products">
+        <a class="product-card health" href="/dailybreath/">
+            <span class="product-number">01 · LIVE</span><h3>DailyBreath</h3>
+            <p>Daily readings, breathing practices, recovery support and private reflection in an installable web experience.</p>
+            <span class="product-link">Open DailyBreath →</span>
+        </a>
+        <a class="product-card education" href="/academy/">
+            <span class="product-number">02 · LEARN</span><h3>Beyond Academy</h3>
+            <p>A growing learning layer spanning French, mathematics, history, space and coding pathways.</p>
+            <span class="product-link">Enter the Academy →</span>
+        </a>
+        <a class="product-card wallet" href="/beyond-market/">
+            <span class="product-number">03 · EARN</span><h3>Market + Wallet</h3>
+            <p>Creator listings, seller tools and a shared bit$ reward experience designed to connect participation across products.</p>
+            <span class="product-link">Explore the market →</span>
+        </a>
+        <a class="product-card entertainment" href="/beyond-tv/">
+            <span class="product-number">04 · EXPLORE</span><h3>Beyond TV</h3>
+            <p>Live thematic channels and on-demand discovery turn the ecosystem into an always-on destination.</p>
+            <span class="product-link">Watch the live demo →</span>
+        </a>
+    </div>
+    <div class="platform-loop">
+        <div><span class="platform-kicker">The connected loop</span><h3>Every product makes the next one more useful.</h3></div>
+        <div class="loop-steps" aria-label="Beyond OS engagement loop">
+            <div class="loop-step"><b>Discover</b><span>TV, games &amp; daily content</span></div>
+            <div class="loop-step"><b>Participate</b><span>Learn, create &amp; practice</span></div>
+            <div class="loop-step"><b>Earn</b><span>Shared rewards &amp; progress</span></div>
+            <div class="loop-step"><b>Return</b><span>One identity across the system</span></div>
+        </div>
+    </div>
+</section>
+<section class="investor-banner wrap" aria-labelledby="investor-banner-title">
+    <div><span class="platform-kicker">Seed-stage company brief</span><h2 id="investor-banner-title">See the platform thesis behind the products.</h2><p>Explore the market opportunity, product loop, business-model design and milestones this seed round is built to accelerate.</p></div>
+    <a class="primary" href="/investors.php">View investor brief →</a>
 </section>
 <?php
 $classicSchedule = beyond_classic_schedule_state();
@@ -425,7 +479,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 <footer class="footer wrap">
     <div><a class="brand" href="./">BEYOND <span>OS</span></a><p>The connected imagination ecosystem.</p><p class="copyright">© 2026 Beyond Imagination Corp.</p></div>
     <div><h4>DISCOVER</h4><a href="app-store/">App Store</a><a href="release-notes.php">What’s New</a><a href="beyond-id/dashboard/wallet.php">Wallet</a><a href="academy/">Learn</a><a href="beyond-tv/">Beyond TV</a></div>
-    <div><h4>COMPANY</h4><a href="about.php">About</a><a href="blog.php">Blog</a><a href="coding-school/">Career Pathways</a><a href="contact.php">Contact</a></div>
+    <div><h4>COMPANY</h4><a href="about.php">About</a><a href="investors.php">Investors</a><a href="blog.php">Blog</a><a href="contact.php">Contact</a></div>
     <div><h4>SUPPORT</h4><a href="help-center.php">Help Center</a><a href="legal/privacy.php">Privacy Policy</a><a href="legal/terms.php">Terms of Service</a></div>
     <div><h4>FOLLOW US</h4><a href="https://www.instagram.com/beyondimaginationtech/" target="_blank" rel="noopener noreferrer">Instagram @beyondimaginationtech</a></div>
 </footer>

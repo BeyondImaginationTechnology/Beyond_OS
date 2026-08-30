@@ -1,6 +1,14 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__.'/../includes/ecosystem.php';$wallet=beyond_app_bootstrap('DailyBreath');$pdo=beyond_db();
+require_once __DIR__.'/../includes/ecosystem.php';
+$isGuestPreview = empty($_SESSION['user_id']);
+if ($isGuestPreview) {
+  header('X-Beyond-Guest-Preview: DailyBreath-Devotionals');
+  $wallet = beyond_nav_bootstrap('DailyBreath', ['balance'=>0,'currency'=>'BITS','status'=>'guest']);
+} else {
+  $wallet = beyond_app_bootstrap('DailyBreath');
+}
+$pdo=beyond_db();
 $monday=new DateTimeImmutable('monday this week');
 $defaults=[
  ['Grace for Today','Lamentations 3:22–23','God’s mercy is not a resource you exhausted yesterday. It arrives new with this morning. Begin again without shame, receive grace without striving, and offer that same patience to someone else.','Where do you need permission to begin again?','God, help me receive today as a fresh gift of mercy.'],

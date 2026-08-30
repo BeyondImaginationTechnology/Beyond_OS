@@ -3,13 +3,19 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/ecosystem.php';
 require_once __DIR__ . '/includes/verse-of-day.php';
 require_once __DIR__ . '/includes/web-app.php';
-$beyondWallet = beyond_app_bootstrap('DailyBreath');
+$isGuestPreview = empty($_SESSION['user_id']);
+if ($isGuestPreview) {
+  header('X-Beyond-Guest-Preview: DailyBreath-Practices');
+  $beyondWallet = beyond_nav_bootstrap('DailyBreath', ['balance'=>0,'currency'=>'BITS','status'=>'guest']);
+} else {
+  $beyondWallet = beyond_app_bootstrap('DailyBreath');
+}
 $pdo = beyond_db();
 $userId = (int)$_SESSION['user_id'];
 dailybreath_ensure_web_tables($pdo);
 $section = in_array($_GET['section'] ?? '', ['breathing','prayers','journal','challenge'], true) ? $_GET['section'] : 'breathing';
 if (empty($_SESSION['practice_csrf'])) $_SESSION['practice_csrf'] = bin2hex(random_bytes(24));
-$notice='';$error='';
+$notice=$isGuestPreview?'Demo mode: breathing and prayer are available without an account. Create a free Beyond ID when you want to save progress or reflections.':'';$error='';
 
 function journal_key(): string {
   if (!function_exists('sodium_crypto_secretbox')) throw new RuntimeException('Secure journal encryption requires the PHP Sodium extension.');
@@ -44,6 +50,7 @@ function journal_decrypt(string $encoded): string {
 
 if ($_SERVER['REQUEST_METHOD']==='POST') {
   try {
+    if ($isGuestPreview) throw new RuntimeException('Create a free Beyond ID to save practice progress.');
     if (!hash_equals((string)$_SESSION['practice_csrf'], (string)($_POST['csrf'] ?? ''))) throw new RuntimeException('Reload the page and try again.');
     $action=$_POST['action'] ?? '';
     if ($action==='breath') {

@@ -57,6 +57,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $now = date('Y-m-d H:i:s');
                     $link = $pdo->prepare('INSERT INTO social_identities (user_id,provider,provider_user_id,email,display_name,created_at,updated_at) VALUES (?,?,?,?,?,?,?)');
                     $link->execute([(int)$signedInUser['id'], 'instagram', $pending['subject'], $signedInUser['email'], $displayName, $now, $now]);
+                } else {
+                    $update = $pdo->prepare('UPDATE social_identities SET email=?,display_name=?,updated_at=? WHERE provider=? AND provider_user_id=?');
+                    $update->execute([$signedInUser['email'], $displayName, date('Y-m-d H:i:s'), 'instagram', $pending['subject']]);
                 }
                 log_activity($pdo, (int)$signedInUser['id'], 'oauth_link_instagram');
                 unset($_SESSION['pending_instagram_identity']);

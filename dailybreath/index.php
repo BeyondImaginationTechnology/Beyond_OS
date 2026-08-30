@@ -1,7 +1,15 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/../includes/ecosystem.php';
-$beyondWallet = beyond_app_bootstrap('DailyBreath');
+$isGuestPreview = empty($_SESSION['user_id']);
+if ($isGuestPreview) {
+    // Keep the first-run experience useful to visitors and investors. Reading
+    // today's content does not require an account; saving progress does.
+    header('X-Beyond-Guest-Preview: DailyBreath');
+    $beyondWallet = beyond_nav_bootstrap('DailyBreath', ['balance'=>0,'currency'=>'BITS','status'=>'guest']);
+} else {
+    $beyondWallet = beyond_app_bootstrap('DailyBreath');
+}
 $pdo = beyond_db();
 
 require_once __DIR__ . '/includes/verse-of-day.php';

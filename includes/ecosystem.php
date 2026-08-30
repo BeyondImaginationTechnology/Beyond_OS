@@ -192,7 +192,7 @@ function beyond_nav_bootstrap(string $appName, ?array $wallet = null): array {
             }
             if (!str_contains($html, 'beyond-theme-default.js')) {
                 $themeAssets = '<script src="' . e(beyond_url('assets/js/beyond-theme-default.js?v=20260828-2')) . '"></script>'
-                    . '<script src="' . e(beyond_url('assets/js/beyond-locales.js?v=20260727-1')) . '" defer></script>'
+                    . '<script src="' . e(beyond_url('assets/js/beyond-locales.js?v=20260830-1')) . '" defer></script>'
                     . '<link rel="stylesheet" href="' . e(beyond_url('assets/css/beyond-dark-default.css?v=20260828-2')) . '">';
                 $html = preg_replace('/<\/head>/i', $themeAssets . '</head>', $html, 1) ?? $html;
             }

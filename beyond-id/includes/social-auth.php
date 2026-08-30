@@ -67,7 +67,6 @@ function beyond_social_authorization_url(string $provider, string $state, string
     } elseif ($provider === 'instagram') {
         $parameters['scope'] = implode(',', $config['scopes'] ?? []);
         $parameters['enable_fb_login'] = '0';
-        $parameters['force_authentication'] = '1';
     }
     return $config['authorize_url'] . '?' . http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
 }
@@ -90,14 +89,15 @@ function beyond_social_profile(string $provider, string $accessToken, array $tok
 {
     $config = beyond_social_config($provider);
     if ($provider === 'instagram') {
-        $instagramUserId = trim((string)($tokens['user_id'] ?? ''));
-        $profilePath = $instagramUserId !== '' ? rawurlencode($instagramUserId) : 'me';
-        $url = preg_replace('~/me$~', '/' . $profilePath, (string)$config['userinfo_url'])
+        // Instagram Login returns an Instagram-scoped user_id, but the profile
+        // lookup is intentionally made through /me. Calling /{user_id} with
+        // this token can return Meta's misleading "Unsupported post request".
+        $url = rtrim((string)$config['userinfo_url'], '/')
             . '?' . http_build_query(['fields' => 'user_id,username,account_type'], '', '&', PHP_QUERY_RFC3986);
         $profile = beyond_social_http($url, ['access_token' => $accessToken]);
         $username = trim((string)($profile['username'] ?? ''));
         return [
-            'subject' => (string)($profile['user_id'] ?? $profile['id'] ?? $instagramUserId),
+            'subject' => (string)($profile['user_id'] ?? $profile['id'] ?? $tokens['user_id'] ?? ''),
             'email' => '',
             'email_verified' => false,
             'name' => $username !== '' ? '@' . $username : 'Instagram member',
@@ -130,7 +130,7 @@ function beyond_social_profile(string $provider, string $accessToken, array $tok
     ];
 }
 
-function beyond_social_login_session(PDO $pdo, array $user, string $provider): never
+function beyond_social_login_session(PDO $pdo, array $user, string $provider, ?string $destinationOverride = null): never
 {
     session_regenerate_id(true);
     $_SESSION['user_id'] = (int)$user['id'];
@@ -144,7 +144,9 @@ function beyond_social_login_session(PDO $pdo, array $user, string $provider): n
     beyondRememberIssue($pdo, (int)$user['id']);
     try { $pdo->prepare('UPDATE users SET last_login_at=?,last_login_ip=? WHERE id=?')->execute([date('Y-m-d H:i:s'), $_SERVER['REMOTE_ADDR'] ?? null, $user['id']]); } catch (Throwable $exception) {}
     log_activity($pdo, (int)$user['id'], 'oauth_login_' . $provider);
-    $destination = safe_return_path($_SESSION['beyond_return_to'] ?? null, '../dashboard/');
+    $destination = $destinationOverride !== null
+        ? safe_return_path($destinationOverride, '../dashboard/')
+        : safe_return_path($_SESSION['beyond_return_to'] ?? null, '../dashboard/');
     unset($_SESSION['beyond_return_to']);
     header('Location: ' . $destination);
     exit;

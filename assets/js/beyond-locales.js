@@ -149,8 +149,10 @@
     var dictionary = dictionaries[locale] || dictionaries.en;
     var appStoreLabels = { en: 'App Store', fr: 'Boutique apps', ht: 'Magazen aplikasyon', es: 'Tienda de apps' };
     var appStoreCtas = { en: 'Open the App Store ▶', fr: 'Ouvrir la boutique ▶', ht: 'Louvri magazen an ▶', es: 'Abrir la tienda ▶' };
-    document.documentElement.lang = locale;
-    document.documentElement.dataset.locale = locale;
+    var root = document.documentElement;
+    if (!root) return;
+    root.lang = locale;
+    root.dataset.locale = locale;
     bindings.forEach(function (binding) {
       document.querySelectorAll(binding[0]).forEach(function (node) { var value = dictionary[binding[1]]; if (node.textContent !== value) node.textContent = value; });
     });
@@ -178,9 +180,15 @@
   else apply(selectedLocale());
   if (typeof MutationObserver === 'function') {
     var localeRefresh = 0;
-    new MutationObserver(function () {
-      clearTimeout(localeRefresh);
-      localeRefresh = setTimeout(function () { apply(selectedLocale()); }, 50);
-    }).observe(document.documentElement, { childList: true, subtree: true });
+    var observeLocaleRoot = function () {
+      var root = document.documentElement;
+      if (!root) return;
+      new MutationObserver(function () {
+        clearTimeout(localeRefresh);
+        localeRefresh = setTimeout(function () { apply(selectedLocale()); }, 50);
+      }).observe(root, { childList: true, subtree: true });
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', observeLocaleRoot, { once: true });
+    else observeLocaleRoot();
   }
 })();

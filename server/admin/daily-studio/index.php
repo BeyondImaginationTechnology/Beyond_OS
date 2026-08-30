@@ -14,6 +14,7 @@ $tabs=[
   'space'=>['Beyond Space','Horoscope generator','space-generator.php'],
   'space-facts'=>['Beyond Space','Daily fact generator','space-fact-generator.php'],
   'history'=>['Beyond Ancient','Daily history generator','history-generator.php'],
+  'history-facts'=>['Beyond Ancient','Import 12/55 facts','history-fact-generator.php'],
   'tattoo-publish'=>['Beyond Tattoo','Publish','stencil-library.php#publish'],
   'tattoo-assets'=>['Beyond Tattoo','Asset inbox','tattoo-asset-import.php'],
   'video-templates'=>['Video','Creation templates','video-templates.php'],

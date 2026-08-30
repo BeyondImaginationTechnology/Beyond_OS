@@ -202,8 +202,13 @@ function beyond_nav_bootstrap(string $appName, ?array $wallet = null): array {
     return $wallet;
 }
 
-function beyond_app_bootstrap(string $appName): array {
-    require_beyond_id();
+function beyond_app_bootstrap(string $appName, bool $requireIdentity = true): array {
+    // Product demos can render publicly while account-only areas keep the
+    // existing Beyond ID gate. Anonymous visitors still get a session-local
+    // experience; signed-in visitors keep the normal synced behavior.
+    if ($requireIdentity) {
+        require_beyond_id();
+    }
     beyond_track_app($appName);
     $wallet = beyond_wallet();
     header('X-Beyond-OS-Version: 2.4');

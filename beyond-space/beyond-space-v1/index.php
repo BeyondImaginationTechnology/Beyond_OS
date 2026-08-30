@@ -1,12 +1,25 @@
 <?php
 require_once __DIR__ . '/../../includes/ecosystem.php';
-$beyondWallet = beyond_app_bootstrap('Beyond Space');
+$beyondWallet = beyond_app_bootstrap('Beyond Space', false);
 $featured = [
   ['title'=>'Solar System','eyebrow'=>'Explore','icon'=>'🪐','copy'=>'Travel from the Sun to Neptune and compare every world along the way.'],
   ['title'=>'Deep Space','eyebrow'=>'Discover','icon'=>'🌌','copy'=>'Explore galaxies, nebulae, stars, pulsars, and the mysteries beyond our neighbourhood.'],
   ['title'=>'Space Technology','eyebrow'=>'Innovation','icon'=>'🚀','copy'=>'Learn how rockets, satellites, telescopes, rovers, and space stations work.'],
   ['title'=>'Life Beyond Earth','eyebrow'=>'Astrobiology','icon'=>'👽','copy'=>'Investigate habitable worlds, biosignatures, ocean moons, and the search for life.'],
 ];
+$dailySpaceFacts = [
+  ['number'=>1,'world'=>'Pluto','title'=>'Pluto has a heart-shaped glacier.','fact'=>'Pluto’s bright Tombaugh Regio includes a vast nitrogen-ice plain that helps drive winds and weather across its surface.','lesson'=>'Dwarf planets can have active landscapes, weather, and complex geology.','source_url'=>'https://www.instagram.com/beyondspaceapp/stories/highlights/17997645209797807/'],
+  ['number'=>2,'world'=>'Venus','title'=>'Venus is hell.','fact'=>'Venus reaches about 464°C, has crushing atmospheric pressure, and clouds of sulfuric acid. Its surface is hostile, but its atmosphere teaches us about runaway greenhouse warming.','lesson'=>'Atmosphere and pressure can transform a planet’s climate.','source_url'=>'https://www.instagram.com/beyondspaceapp/p/DcZ8zHaGwcF/'],
+  ['number'=>3,'world'=>'Diamond Planet','title'=>'There’s a planet made of diamonds?','fact'=>'55 Cancri e is a hot super-Earth whose composition is still being studied; earlier models suggested a carbon-rich interior, but “diamond planet” remains a hypothesis.','lesson'=>'Astronomy separates an exciting possibility from a confirmed discovery.','source_url'=>'https://www.instagram.com/beyondspaceapp/p/DcZ-HqVG-yp/'],
+  ['number'=>4,'world'=>'Mars','title'=>'Mars is the Red Planet.','fact'=>'Iron minerals in Martian dust oxidize and give Mars its rusty red colour. Valleys, deltas, minerals, and sediments also show that ancient water shaped parts of its surface.','lesson'=>'Colour can be a clue to chemistry, while landscapes preserve planetary history.','source_url'=>'https://www.instagram.com/beyondspaceapp/p/DccfoJUG8pL/'],
+  ['number'=>5,'world'=>'Jupiter','title'=>'Jupiter is the king of planets.','fact'=>'Jupiter is the largest planet in the Solar System, a gas giant with no solid surface, and its day lasts about 10 hours.','lesson'=>'Size, composition, and rotation help distinguish the worlds in our Solar System.','source_url'=>'https://www.instagram.com/beyondspaceapp/p/DccnVoum1hZ/'],
+  ['number'=>6,'world'=>'Saturn','title'=>'Saturn has the most beautiful rings.','fact'=>'Saturn’s rings are made mostly of ice and rock. They may be only around 100 million years old—far younger than Saturn itself.','lesson'=>'A planet’s visible features can form and change long after the planet.','source_url'=>'https://www.instagram.com/beyondspaceapp/p/DccpDJSm73U/'],
+  ['number'=>7,'world'=>'Uranus','title'=>'Uranus spins sideways.','fact'=>'Uranus has an axial tilt of about 98 degrees, a day of roughly 17 hours, a year of 84 Earth years, and temperatures near −224°C.','lesson'=>'Today’s lesson: compare composition, atmosphere, rotation, and orbit before drawing conclusions about a planet’s climate.','source_url'=>'https://www.instagram.com/beyondspaceapp/p/Dccq5qnm-dT/'],
+];
+$dailyFactStart = new DateTimeImmutable('2026-08-24');
+$dailyFactToday = new DateTimeImmutable('today');
+$dailyFactOffset = max(0, min(count($dailySpaceFacts) - 1, (int)$dailyFactStart->diff($dailyFactToday)->format('%r%a')));
+$dailyFact = $dailySpaceFacts[$dailyFactOffset];
 $signs = [
   ['name'=>'Aries','symbol'=>'♈','dates'=>'Mar 21 – Apr 19','element'=>'Fire','message'=>'Lead with curiosity today. A bold question may open a surprising path.'],
   ['name'=>'Taurus','symbol'=>'♉','dates'=>'Apr 20 – May 20','element'=>'Earth','message'=>'Slow down and notice the details. Steady progress beats a rushed launch.'],
@@ -42,7 +55,7 @@ $signs = [
   </a>
   <button class="menu" id="menuBtn" aria-label="Open menu">☰</button>
   <nav id="nav">
-    <a href="#explore">Explore</a><a href="/beyond-space/academy.php">Academy</a><a href="#system">Solar System</a><a href="#horoscope">Horoscope</a><a href="#quiz">Quiz</a>
+    <a href="#daily-fact">Daily Fact</a><a href="#explore">Explore</a><a href="/beyond-space/academy.php">Academy</a><a href="#system">Solar System</a><a href="#horoscope">Daily Astrology</a><a href="#quiz">Quiz</a>
   </nav>
 </header>
 
@@ -58,6 +71,13 @@ $signs = [
     <div class="stats"><span><b>50</b> academy lessons</span><span><b>8</b> planets</span><span><b>12</b> zodiac signs</span></div>
   </div>
   <button class="scroll-cue" aria-label="Scroll to explore" onclick="document.querySelector('#explore').scrollIntoView({behavior:'smooth'})">⌄</button>
+</section>
+
+<section class="section daily-fact" id="daily-fact">
+  <div class="daily-fact-card reveal">
+    <div class="daily-fact-top"><span class="kicker">Daily Space Fact · <?= $dailyFact['number'] ?>/55</span><span class="daily-fact-date"><?=htmlspecialchars(date('l · M j, Y'))?></span></div>
+    <div class="daily-fact-grid"><div><span class="daily-fact-world" id="dailyFactWorld">🪐 <?=htmlspecialchars($dailyFact['world'])?></span><h2 id="dailyFactTitle"><?=htmlspecialchars($dailyFact['title'])?></h2><p id="dailyFactCopy"><?=htmlspecialchars($dailyFact['fact'])?></p><?php if(!empty($dailyFact['source_url'])):?><a class="daily-fact-source" id="dailyFactSource" href="<?=htmlspecialchars($dailyFact['source_url'])?>" target="_blank" rel="noopener">Imported from Beyond Space Instagram ↗</a><?php else:?><a class="daily-fact-source" id="dailyFactSource" hidden target="_blank" rel="noopener"></a><?php endif;?><img class="daily-fact-art" id="dailyFactAsset" hidden alt=""></div><aside><strong>Today’s lesson</strong><p id="dailyFactLesson"><?=htmlspecialchars($dailyFact['lesson'])?></p><a class="btn ghost" href="/beyond-space/academy.php?view=lesson&amp;age=cosmic-explorer&amp;module=solar-system-planetary-science&amp;lesson=7">Open the lesson →</a></aside></div>
+  </div>
 </section>
 
 <section class="section" id="explore">
@@ -100,7 +120,7 @@ $signs = [
 </section>
 
 <section class="section horoscope" id="horoscope">
-  <div class="section-head reveal"><span>Astrology • For entertainment</span><h2>Your Daily Cosmic Reading</h2><p>Choose a zodiac sign for a playful daily message. Astronomy and astrology remain clearly separated throughout the app.</p></div>
+  <div class="section-head reveal"><span>Astrology • For entertainment</span><h2>Your Daily Cosmic Reading</h2><p>Every day gets a fresh sign-based reflection. Choose a sign or use the sun sign finder; astronomy and astrology remain clearly separated throughout the app.</p></div>
   <div class="astro-profile reveal">
     <div><span class="kicker">Sun sign finder</span><h3>Build your astrology profile</h3><p>Enter a birth date to find the traditional Western sun sign. Your choice can be remembered on this device.</p></div>
     <label>Birth date<input id="birthDate" type="date"></label><button class="btn primary" id="findSign" type="button">Find my sign</button><output id="signResult" aria-live="polite">No birth date saved.</output>
@@ -111,7 +131,7 @@ $signs = [
       <button data-sign="<?= $i ?>"><b><?= $sign['symbol'] ?></b><span><?= htmlspecialchars($sign['name']) ?></span></button>
       <?php endforeach; ?>
     </div>
-    <article class="reading reveal" id="reading"><span class="reading-symbol">♈</span><small>Daily reading · <span id="readingDate"><?=htmlspecialchars(date('M j'))?></span></small><h3>Aries</h3><em>Mar 21 – Apr 19</em><div class="reading-meta"><span id="readingElement">Fire</span><span id="readingEnergy">Energy: initiate</span></div><p>Lead with curiosity today. A bold question may open a surprising path.</p><small class="disclaimer">Astrology content is provided for reflection and entertainment, not as scientific, medical, legal, financial, or professional advice.</small></article>
+    <article class="reading reveal" id="reading"><span class="reading-symbol">♈</span><small>Daily reading · <span id="readingDate"><?=htmlspecialchars(date('M j'))?></span> · <span id="readingSource">Beyond Space original</span></small><h3>Aries</h3><em>Mar 21 – Apr 19</em><div class="reading-meta"><span id="readingElement">Fire</span><span id="readingEnergy">Energy: initiate</span></div><p>Lead with curiosity today. A bold question may open a surprising path.</p><small class="disclaimer">Astrology content is provided for reflection and entertainment, not as scientific, medical, legal, financial, or professional advice.</small></article>
   </div>
   <div class="compatibility reveal">
     <div><span class="kicker">Compatibility explorer</span><h3>Compare two signs</h3><p>A playful reflection on traditional element pairings—not a prediction about any relationship.</p></div>

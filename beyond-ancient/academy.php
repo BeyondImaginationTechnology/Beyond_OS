@@ -1,10 +1,15 @@
 <?php
 declare(strict_types=1);
+ $dailyHistoryFacts=require __DIR__.'/data/daily-history-facts.php';
 function ancient_lesson(string $title,string $focus,string $teaching,string $practice,string $concept,string $example,string $activity): array{
  return compact('title','focus','teaching','practice','concept','example','activity');
 }
 $academyConfig=[
- 'slug'=>'beyond-ancient','title'=>'Beyond Ancient Academy','icon'=>'🏺','tagline'=>'World history campus','accent'=>'#b06f2f','base'=>'/beyond-ancient/academy.php','css'=>'/beyond-ancient/academy.css?v=20260730-1','headline'=>'Read the evidence. Rebuild the past.','description'=>'Five world-history modules with 50 narrated lessons, artifact labs, source checks, saved progress, lesson assessments, and module exams. Module 1 is free for every historian.','default_path'=>'history-explorer','group_label'=>'historian paths',
+ 'slug'=>'beyond-ancient','title'=>'Beyond Ancient Academy','icon'=>'🏺','tagline'=>'World history campus','accent'=>'#b06f2f','base'=>'/beyond-ancient/academy.php','css'=>'/beyond-ancient/academy.css?v=20260730-1','headline'=>'Read the evidence. Rebuild the past.','description'=>'Five world-history modules with 50 narrated lessons, artifact labs, source checks, saved progress, lesson assessments, and module exams. All modules are open for this investor demo.','default_path'=>'history-explorer','group_label'=>'historian paths',
+ 'demo_access'=>true,
+ 'daily_history_facts'=>$dailyHistoryFacts,
+ 'daily_fact_api'=>'/beyond-ancient/api/daily-history-fact.php',
+ 'scripts'=>"<script>(function(){fetch('/beyond-ancient/api/daily-history-fact.php',{headers:{Accept:'application/json'}}).then(function(r){return r.ok?r.json():null}).then(function(p){var f=p&&p.fact;if(!f)return;[['dailyHistoryNumber',f.number],['dailyHistoryTitle',f.title],['dailyHistoryFact',f.fact],['dailyHistoryLesson',f.lesson]].forEach(function(x){var e=document.getElementById(x[0]);if(e&&x[1]!=null)e.textContent=x[1]});[['dailyHistorySource',f.source_url],['dailyHistoryInstagram',f.instagram_url]].forEach(function(x){var e=document.getElementById(x[0]);if(e&&x[1]){e.href=x[1];e.hidden=false}});if(f.asset_url){var img=document.createElement('img');img.src=f.asset_url;img.alt=(f.title||'Daily History Fact')+' artwork';img.className='la-daily-fact-art';document.querySelector('.la-daily-fact>div').appendChild(img)}}).catch(function(){})})();</script>",
  'disclaimer'=>'Beyond Ancient distinguishes evidence, interpretation, tradition, and uncertainty. Human remains, sacred objects, and cultural heritage should be studied and represented with respect.',
  'paths'=>[
   'young-historian'=>['title'=>'Young Historian','ages'=>'Ages 9–12','icon'=>'🧭','guide'=>'Visual timelines, artifact clues, maps, stories, and short evidence challenges.'],

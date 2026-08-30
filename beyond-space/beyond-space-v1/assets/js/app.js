@@ -20,8 +20,15 @@
   let factIndex=0;
   one('#nextFact')?.addEventListener('click',()=>{factIndex=(factIndex+1)%blackHoleFacts.length;one('#factBox span').textContent=blackHoleFacts[factIndex];});
   one('.black-hole')?.addEventListener('click',event=>event.currentTarget.classList.toggle('active'));
+  fetch('/beyond-space/api/daily-space-fact.php',{headers:{Accept:'application/json'}}).then(response=>response.ok?response.json():null).then(payload=>{
+    const fact=payload?.fact;if(!fact)return;
+    one('#dailyFactWorld').textContent='🪐 '+(fact.world||'Beyond Space');one('#dailyFactTitle').textContent=fact.title||'';one('#dailyFactCopy').textContent=fact.fact||'';one('#dailyFactLesson').textContent=fact.lesson||'';
+    const source=one('#dailyFactSource');if(source&&fact.source_url){source.href=fact.source_url;source.textContent='Open source post ↗';source.hidden=false}
+    const asset=one('#dailyFactAsset');if(asset&&fact.asset_url){asset.src=fact.asset_url;asset.alt=(fact.world||'Daily Space Fact')+' artwork';asset.hidden=false}
+  }).catch(()=>{});
 
-  const signs=window.BS_SIGNS||[],todayKey=new Date().toISOString().slice(0,10);
+  const signs=window.BS_SIGNS||[],today=new Date(),todayKey=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
+  let dailyHoroscopes={};
   const dailyThemes=['Give one unfinished idea a clear next step.','A useful conversation may change your view—listen for the detail beneath the words.','Protect an hour for focused work and let distractions orbit elsewhere.','Review what is working before adding something new.','Curiosity is stronger than certainty today; ask the better question.','Make one practical choice that your future self will appreciate.','Leave space for rest, reflection, and a small moment of wonder.'];
   const energyWords=['initiate','stabilize','communicate','restore','create','refine','balance','investigate','explore','structure','innovate','imagine'];
   const dateSeed=[...todayKey].reduce((sum,char)=>sum+char.charCodeAt(0),0);
@@ -30,9 +37,17 @@
     all('#zodiacGrid button').forEach((button,buttonIndex)=>button.classList.toggle('active',buttonIndex===index));
     one('.reading-symbol').textContent=sign.symbol;one('#reading h3').textContent=sign.name;one('#reading em').textContent=sign.dates;
     one('#readingElement').textContent=sign.element;one('#readingEnergy').textContent='Energy: '+energyWords[index];
-    one('#reading p').textContent=sign.message+' '+theme;
+    const generated=dailyHoroscopes[sign.name.toLowerCase()];
+    one('#reading p').textContent=generated?.paragraphs?.length?generated.paragraphs.join(' '):sign.message+' '+theme;
+    one('#readingSource').textContent=generated?.source||'Beyond Space original';
     try{localStorage.setItem('beyondSpaceSign',String(index));}catch(error){}
   };
+  fetch('/beyond-space/api/daily-horoscope.php',{headers:{Accept:'application/json'}}).then(response=>response.ok?response.json():null).then(payload=>{
+    if(!payload?.items?.length)return;
+    dailyHoroscopes=Object.fromEntries(payload.items.map(item=>[String(item.sign||'').toLowerCase(),item]));
+    const active=all('#zodiacGrid button').find(button=>button.classList.contains('active'));
+    renderSign(Number(active?.dataset.sign||0));
+  }).catch(()=>{});
   all('#zodiacGrid button').forEach(button=>button.addEventListener('click',()=>renderSign(Number(button.dataset.sign))));
   const signFromDate=value=>{
     if(!value)return -1;

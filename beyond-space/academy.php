@@ -4,7 +4,8 @@ function space_lesson(string $title,string $focus,string $teaching,string $pract
  return compact('title','focus','teaching','practice','concept','example','activity');
 }
 $academyConfig=[
- 'slug'=>'beyond-space','title'=>'Beyond Space Academy','icon'=>'🚀','logo'=>'/beyond-space/beyond-space-v1/assets/img/beyond-space-logo.webp','tagline'=>'Cosmic learning campus','accent'=>'#635bff','base'=>'/beyond-space/academy.php','css'=>'/beyond-space/academy.css?v=20260730-1','headline'=>'Learn the universe by exploring it.','description'=>'Five complete astronomy modules with 50 narrated lessons, interactive mission labs, lesson checks, saved progress, and module exams. Module 1 is free for every explorer.','default_path'=>'cosmic-explorer','group_label'=>'explorer paths',
+ 'slug'=>'beyond-space','title'=>'Beyond Space Academy','icon'=>'🚀','logo'=>'/beyond-space/beyond-space-v1/assets/img/beyond-space-logo.webp','tagline'=>'Cosmic learning campus','accent'=>'#635bff','base'=>'/beyond-space/academy.php','css'=>'/beyond-space/academy.css?v=20260730-1','headline'=>'Learn the universe by exploring it.','description'=>'Five complete astronomy modules with 50 narrated lessons, interactive mission labs, lesson checks, saved progress, and module exams. All modules are open for this investor demo.','default_path'=>'cosmic-explorer','group_label'=>'explorer paths',
+ 'demo_access'=>true,
  'disclaimer'=>'Beyond Space Academy teaches evidence-based astronomy and space science. Astrology and horoscopes are offered separately for entertainment and personal reflection.',
  'paths'=>[
   'space-cadet'=>['title'=>'Space Cadet','ages'=>'Ages 8–11','icon'=>'🛰️','guide'=>'Clear explanations, visual models, short missions, and discovery challenges.'],

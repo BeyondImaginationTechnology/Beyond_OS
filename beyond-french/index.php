@@ -110,6 +110,16 @@ $isReturningLearner = !empty($learningProgress['last_lesson_id']);
     </article>
 </section>
 <?php endif; ?>
+<?php if (!$lesson): ?>
+<section class="section" id="today-empty" aria-labelledby="today-empty-title">
+    <div class="lesson-card empty-today-card">
+        <span class="eyebrow">FRANÇAIS DU JOUR</span>
+        <h2 id="today-empty-title">Your next lesson is being prepared.</h2>
+        <p>Today’s phrase is temporarily unavailable, but your learning path is still open. Browse the archive or start with the dictionary while the daily lesson syncs.</p>
+        <div class="lesson-actions"><a class="button primary" href="<?= h($frenchBase) ?>archive.php">Browse daily lessons →</a><a class="button secondary" href="<?= h($frenchBase) ?>dictionary.php">Open dictionary</a></div>
+    </div>
+</section>
+<?php endif; ?>
 
 <section class="section app-next" id="academy">
     <div class="section-heading">

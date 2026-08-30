@@ -18,6 +18,7 @@ $read = static function (string $env, string $provider, string $key, string $def
     if (is_string($environment) && trim($environment) !== '') return trim($environment);
     return trim((string)($liveOauth[$provider][$key] ?? $default));
 };
+$instagramGraphVersion = preg_replace('/[^A-Za-z0-9.]/', '', $read('BEYOND_INSTAGRAM_GRAPH_VERSION', 'instagram', 'graph_version', 'v23.0')) ?: 'v23.0';
 
 return [
     'google' => [
@@ -41,7 +42,7 @@ return [
         'client_secret' => $read('BEYOND_INSTAGRAM_APP_SECRET', 'instagram', 'app_secret'),
         'authorize_url' => 'https://www.instagram.com/oauth/authorize',
         'token_url' => 'https://api.instagram.com/oauth/access_token',
-        'userinfo_url' => 'https://graph.instagram.com/me',
+        'userinfo_url' => 'https://graph.instagram.com/' . $instagramGraphVersion . '/me',
         'scopes' => ['instagram_business_basic'],
     ],
 ];

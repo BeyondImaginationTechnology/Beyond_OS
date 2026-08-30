@@ -16,7 +16,7 @@ $wallet = beyond_nav_bootstrap('Beyond App Store');
     <span class="bos-kicker">Live</span><h2>Health & daily life</h2><p>Daily guidance, wellness and creative self-expression.</p>
     <div class="bos-grid">
       <?=bos_app_card('DailyBreath','Bible, Torah, and Quran daily readings with complete local libraries, recovery, breathing, and private reflection.','dailybreath/','DB','Open web app','assets/icons/app-store/daily-breath.jpg')?>
-      <?=bos_app_card('Beyond Health','Health tools for mind, body and everyday care.','dailybreath/practices.php','BH','Open practices','assets/icons/app-store/beyond-health.jpg')?>
+      <?=bos_app_card('Beyond Health','Health tools for mind, body and everyday care.','beyond-health/','BH','Open demo','assets/icons/app-store/beyond-health.jpg')?>
       <?=bos_app_card('Beyond Tattoo','AI-assisted tattoo ideas and daily stencils.','beyond-tattoo/','BT','Open app','assets/icons/app-store/beyond-tattoo.jpg')?>
       <?=bos_app_card('Baby Names','Explore names, origins and meanings.','beyond-baby-names/','BN','Open app','assets/icons/app-store/baby-names.jpg')?>
     </div>

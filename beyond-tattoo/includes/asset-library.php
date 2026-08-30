@@ -29,8 +29,10 @@ function bt_asset_library(): array
         'divine-realism' => 'Black-and-grey realism',
         'beyond-ancient' => 'Engraving realism',
         'japanese-legends' => 'Japanese-inspired flow',
-        'dark-realism' => 'Dark realism',
-    ];
+          'dark-realism' => 'Dark realism',
+         'beyond-studio-originals' => 'Gothic illustrative blackwork',
+         'beyond-studio-japanese' => 'Japanese-inspired blackwork',
+      ];
     foreach (bt_library_collections() as $collectionSlug => $collection) {
         foreach ($collection['stencils'] as $collectionIndex => [$title, $releaseDate]) {
             $sequence++;

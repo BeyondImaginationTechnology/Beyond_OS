@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-const DAILYBREATH_WEB_VERSION = '1.5';
+const DAILYBREATH_WEB_VERSION = '1.6';
 
 function dailybreath_web_head(string $title = 'DailyBreath'): string
 {
@@ -12,7 +12,8 @@ function dailybreath_web_head(string $title = 'DailyBreath'): string
         . '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">'
         . '<meta name="apple-mobile-web-app-title" content="DailyBreath">'
         . '<link rel="manifest" href="/dailybreath/manifest.webmanifest">'
-        . '<link rel="apple-touch-icon" href="/assets/icons/daily-breath-192.jpg">'
+        . '<link rel="apple-touch-icon" href="/dailybreath/assets/icons/dailybreath-mark-v2.png">'
+        . '<link rel="icon" type="image/png" href="/dailybreath/assets/icons/dailybreath-mark-v2.png">'
         . '<link rel="stylesheet" href="/dailybreath/assets/css/web-app.css?v=' . DAILYBREATH_WEB_VERSION . '">'
         . '<meta property="og:title" content="' . $safeTitle . '">';
 }

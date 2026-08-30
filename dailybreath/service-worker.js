@@ -1,5 +1,5 @@
-const CACHE='dailybreath-1.5-shell-v1';
-const SHELL=['/dailybreath/offline.html','/dailybreath/manifest.webmanifest','/dailybreath/assets/css/web-app.css','/dailybreath/assets/js/web-app.js','/assets/icons/daily-breath-192.jpg','/assets/icons/app-store/daily-breath.jpg'];
+const CACHE='dailybreath-1.6-shell-v1';
+const SHELL=['/dailybreath/offline.html','/dailybreath/manifest.webmanifest','/dailybreath/assets/css/web-app.css','/dailybreath/assets/js/web-app.js','/dailybreath/assets/icons/dailybreath-mark-v2.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('dailybreath-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{

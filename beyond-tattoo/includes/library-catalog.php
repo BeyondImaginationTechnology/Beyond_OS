@@ -49,6 +49,27 @@ function bt_library_collections(): array
                 ['Possessed Statue', '2026-09-08'], ['Final Judgment', '2026-09-09'],
             ],
         ],
+        'beyond-studio-originals' => [
+            'name' => 'Beyond Studio Originals', 'count' => 10, 'dates' => 'Aug 30–Sep 8, 2026',
+            'image' => 'assets/img/storefront/collection-dark.webp',
+            'description' => 'The first Beyond Studio artist set: gothic architecture, chains, roses, ravens and mythic guardians.',
+            'stencils' => [
+                ['Chain Lantern Cathedral', '2026-08-30'], ['Skull Cathedral Smoke', '2026-08-31'], ['Crow Ruins', '2026-09-01'],
+                ['Demon Cathedral', '2026-09-02'], ['Fallen Angel', '2026-09-03'], ['Reaper and Ravens', '2026-09-04'],
+                ['Hooded Reaper', '2026-09-05'], ['Crow Moon', '2026-09-06'], ['Cathedral Skull', '2026-09-07'], ['Nio Guardians', '2026-09-08'],
+            ],
+        ],
+        'beyond-studio-japanese' => [
+            'name' => 'Beyond Studio Japanese Originals', 'count' => 10, 'dates' => 'Sep 9–18, 2026',
+            'image' => 'assets/img/storefront/collection-japanese.webp',
+            'description' => 'Japanese-inspired guardians, dragons, flowers and flowing ornamental compositions from the Beyond Studio artist set.',
+            'stencils' => [
+                ['Raijin Drummer', '2026-09-09'], ['Raijin Thunder', '2026-09-10'], ['Phoenix Chrysanthemum', '2026-09-11'],
+                ['Kitsune Koi', '2026-09-12'], ['Shishi Lion', '2026-09-13'], ['Yin Yang Waves', '2026-09-14'],
+                ['Peony Scroll', '2026-09-15'], ['Dragon Chrysanthemum', '2026-09-16'], ['Tiger Peony', '2026-09-17'],
+                ['Geisha Fan', '2026-09-18'],
+            ],
+        ],
     ];
 }
 

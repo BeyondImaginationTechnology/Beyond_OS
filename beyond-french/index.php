@@ -28,7 +28,8 @@ $isReturningLearner = !empty($learningProgress['last_lesson_id']);
     <div class="app-today-actions">
         <button class="button secondary install-app" id="install-beyond-french" type="button" hidden>Install app</button>
         <a class="button secondary" href="<?= h($frenchBase) ?>archive.php">Past lessons</a>
-        <a class="button primary" href="<?= h($frenchBase) ?>challenge.php<?= $lesson ? '?id=' . (int)$lesson['id'] : '' ?>">Start practice</a>
+        <a class="button primary" href="<?= h($frenchBase) ?>game.php">Play French Quest</a>
+        <a class="button secondary" href="<?= h($frenchBase) ?>challenge.php<?= $lesson ? '?id=' . (int)$lesson['id'] : '' ?>">Start practice</a>
     </div>
 </section>
 

@@ -17,6 +17,7 @@
 html{background:var(--math-bg)}
 body{background:radial-gradient(circle at 8% 3%,rgba(109,74,255,.12),transparent 25rem),radial-gradient(circle at 92% 18%,rgba(236,72,153,.11),transparent 22rem),linear-gradient(180deg,#fcfbff 0,#f7f4fb 45%,#f1eef8 100%)}
 .la-brand>span:first-child:not(.la-brand-copy){background:linear-gradient(145deg,#6d4aff,#9b51e0);color:#fff;font-size:24px;box-shadow:0 8px 22px rgba(109,74,255,.24)}
+.la-brand>img{width:48px;height:48px;flex:0 0 48px;object-fit:cover;border-radius:14px;box-shadow:0 8px 22px rgba(109,74,255,.24)}
 .la-hero,.la-title,.la-lock{border-color:#ded3f2;background:linear-gradient(130deg,#fff 0%,#f8f4ff 54%,#efe6ff 100%)}
 .la-hero:before,.la-title:before{background:linear-gradient(90deg,#6d4aff,#9b51e0,#12b981,#f6b93b,#ec4899)}
 .la-hero:after{border-color:rgba(109,74,255,.08)}

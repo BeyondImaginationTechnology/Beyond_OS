@@ -353,12 +353,10 @@ final class DailyBreathStore: ObservableObject {
         let bibleTask = Task.detached(priority: .userInitiated) {
             BibleLibrary.loadWorldEnglishBible()
         }
-        let requestedEditions = Set(
-            FaithTradition.allCases.map { tradition in
-                let saved = UserDefaults.standard.string(forKey: ScriptureEdition.storageKey(for: tradition))
-                return ScriptureEdition(rawValue: saved ?? "") ?? ScriptureEdition.defaultEdition(for: tradition)
-            } + [.bibleEnglish, .torahHebrew, .quranArabic]
-        )
+        let requestedEditions: Set<ScriptureEdition> = Set(FaithTradition.allCases.map { tradition in
+            let saved = UserDefaults.standard.string(forKey: ScriptureEdition.storageKey(for: tradition))
+            return ScriptureEdition(rawValue: saved ?? "") ?? ScriptureEdition.defaultEdition(for: tradition)
+        }).union([ScriptureEdition.bibleEnglish, .torahHebrew, .quranArabic])
         let scriptureTask = Task.detached(priority: .userInitiated) {
             Dictionary(uniqueKeysWithValues: requestedEditions.map { ($0, SacredTextLibrary.load($0)) })
         }

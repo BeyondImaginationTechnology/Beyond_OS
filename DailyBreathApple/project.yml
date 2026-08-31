@@ -54,10 +54,12 @@ targets:
         PRODUCT_NAME: The Daily Breath Clip
         PRODUCT_MODULE_NAME: DailyBreathClip
         CODE_SIGN_ENTITLEMENTS: AppClip/TheDailyBreathClip.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: AppClip/Info.plist
         INFOPLIST_KEY_CFBundleDisplayName: Daily Breath Clip
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
-        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
-        TARGETED_DEVICE_FAMILY: "1"
+        TARGETED_DEVICE_FAMILY: "1,2"
   DailyBreathWidget:
     type: app-extension
     platform: iOS

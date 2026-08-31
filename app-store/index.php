@@ -36,12 +36,12 @@ $wallet = beyond_nav_bootstrap('Beyond App Store');
   <section class="bos-section">
     <span class="bos-kicker">Earn</span><h2>Wallet, market & work</h2><p>Manage bit$, shop assets, follow markets and build income.</p>
     <div class="bos-grid">
-      <?=bos_app_card('Beyond Wallet','Spend bit$, review activity and manage your Beyond finances.','beyond-id/dashboard/wallet.php','BW','Open Wallet','@blank')?>
-      <?=bos_app_card('Beyond Marketplace','Discover and buy creator assets with bit$.','beyond-market/','MP','Open Marketplace','@blank')?>
-      <?=bos_app_card('Beyond Finance','Review your wallet, bit$ rewards and transaction activity.','beyond-id/dashboard/wallet.php','BF','Open Wallet','@blank')?>
-      <?=bos_app_card('Beyond Sell','List digital and physical products.','beyond-sell/','SELL','Open seller tools','@blank')?>
-      <?=bos_app_card('Beyond Jobs','Match jobs to your pathway, build a résumé and cover letter, and plan free training.','beyond-jobs/','JOBS','Build my career','@blank')?>
-      <?=bos_app_card('Career Pathways','Build job-ready skills through six Coding School pathways.','coding-school/','CAREER','Explore pathways','@blank')?>
+      <?=bos_app_card('Beyond Wallet','Spend bit$, review activity and manage your Beyond finances.','beyond-id/dashboard/wallet.php','BW','Open Wallet','assets/icons/app-store/beyond-wallet.png')?>
+      <?=bos_app_card('Beyond Marketplace','Discover and buy creator assets with bit$.','beyond-market/','MP','Open Marketplace','assets/icons/app-store/beyond-marketplace.png')?>
+      <?=bos_app_card('Beyond Finance','Review your wallet, bit$ rewards and transaction activity.','beyond-id/dashboard/wallet.php','BF','Open Wallet','assets/icons/app-store/beyond-wallet.png')?>
+      <?=bos_app_card('Beyond Sell','List digital and physical products.','beyond-sell/','SELL','Open seller tools','assets/icons/app-store/beyond-marketplace.png')?>
+      <?=bos_app_card('Beyond Jobs','Match jobs to your pathway, build a résumé and cover letter, and plan free training.','beyond-jobs/','JOBS','Build my career','assets/icons/app-store/beyond-work.png')?>
+      <?=bos_app_card('Career Pathways','Build job-ready skills through six Coding School pathways.','coding-school/','CAREER','Explore pathways','assets/icons/app-store/beyond-work.png')?>
     </div>
   </section>
 

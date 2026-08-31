@@ -762,7 +762,7 @@ enum InterfaithDailyContent {
             .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "en_US_POSIX"))
             .lowercased()
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        switch normalized {
+        return switch normalized {
         case "psalm", "psalms": "psalms"
         case "song of solomon", "song of songs": "song of solomon"
         default: normalized

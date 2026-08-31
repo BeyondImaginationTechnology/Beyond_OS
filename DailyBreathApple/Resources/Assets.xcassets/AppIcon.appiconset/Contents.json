@@ -5,6 +5,12 @@
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
+    },
+    {
+      "filename" : "AppIcon-152.png",
+      "idiom" : "ipad",
+      "platform" : "ios",
+      "size" : "152x152"
     }
   ],
   "info" : {

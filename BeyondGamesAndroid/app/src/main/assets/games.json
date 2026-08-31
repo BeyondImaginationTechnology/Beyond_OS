@@ -1,0 +1,471 @@
+[
+  {
+    "slug": "bit-runner",
+    "title": "Bit Runner",
+    "category": "Action & Adventure",
+    "icon": "⚡",
+    "tagline": "Neon action-platformer across the Beyond OS universe.",
+    "gameplay": "Run, wall-jump, grind rails, collect bit$, and defeat security viruses.",
+    "status": "Playable prototype",
+    "phase": "Launch lineup",
+    "launch": true,
+    "playable": true,
+    "play_url": "/beyond-games/bit-runner.php",
+    "color": "#8e5cff",
+    "features": [
+      "Responsive runner controls",
+      "Security-virus obstacles",
+      "Achievement challenges",
+      "Capped demo rewards"
+    ]
+  },
+  {
+    "slug": "beyond-skate",
+    "title": "Beyond Skate",
+    "category": "Action & Adventure",
+    "icon": "🛹",
+    "tagline": "Stylish 2.5D skating with custom parks.",
+    "gameplay": "Build trick lines, complete challenges, design boards and enter daily competitions.",
+    "status": "Pre-production",
+    "phase": "Launch lineup",
+    "launch": true,
+    "playable": false,
+    "related_url": "/beyond-skate/",
+    "color": "#23d7c4",
+    "features": [
+      "2.5D trick system",
+      "Custom park builder",
+      "Board designer",
+      "Daily competitions"
+    ]
+  },
+  {
+    "slug": "beyond-circuit",
+    "title": "Beyond Circuit",
+    "category": "Action & Adventure",
+    "icon": "🏎️",
+    "tagline": "Futuristic top-down racing.",
+    "gameplay": "Compete in short races, master drifting, upgrade vehicles and chase time-trial records.",
+    "status": "Concept",
+    "phase": "Future release",
+    "launch": false,
+    "playable": false,
+    "color": "#ff4d74",
+    "features": [
+      "Short-format races",
+      "Precision drifting",
+      "Vehicle upgrades",
+      "Time trials"
+    ]
+  },
+  {
+    "slug": "beyond-space-frontier",
+    "title": "Beyond Space: Frontier",
+    "category": "Action & Adventure",
+    "icon": "🚀",
+    "tagline": "Space exploration and survival.",
+    "gameplay": "Explore planets, mine resources, upgrade your ship and discover strange anomalies.",
+    "status": "Concept",
+    "phase": "Future release",
+    "launch": false,
+    "playable": false,
+    "related_url": "/beyond-space/",
+    "color": "#438cff",
+    "features": [
+      "Procedural expeditions",
+      "Resource mining",
+      "Ship upgrades",
+      "Anomaly discoveries"
+    ]
+  },
+  {
+    "slug": "tattoo-master",
+    "title": "Tattoo Master",
+    "category": "Creative & Simulation",
+    "icon": "✒️",
+    "tagline": "Creative tattoo studio simulator.",
+    "gameplay": "Trace stencils, control needle depth, shade original designs and manage clients.",
+    "status": "Playable prototype",
+    "phase": "Launch lineup",
+    "launch": true,
+    "playable": true,
+    "play_url": "tattoo-master.php",
+    "related_url": "/beyond-tattoo/",
+    "color": "#e64fa2",
+    "features": [
+      "Stencil tracing",
+      "Needle control",
+      "Layered shading",
+      "Studio progression"
+    ]
+  },
+  {
+    "slug": "zaks-kitchen-rush",
+    "title": "Zak’s Kitchen Rush",
+    "category": "Creative & Simulation",
+    "icon": "🍲",
+    "tagline": "Fast-paced restaurant management.",
+    "gameplay": "Prepare Haitian and American dishes, manage timed orders, build combos and upgrade a lively kitchen.",
+    "status": "Playable prototype",
+    "phase": "Launch lineup",
+    "launch": true,
+    "playable": true,
+    "color": "#ff9948",
+    "features": [
+      "Recipe mastery",
+      "Order combos and Kitchen Rush boosts",
+      "Persistent kitchen upgrades",
+      "Haitian and American menus"
+    ],
+    "play_url": "/beyond-games/zaks-kitchen-rush.php"
+  },
+  {
+    "slug": "beyond-hoop",
+    "title": "Beyond Hoop",
+    "category": "Sports & Competition",
+    "icon": "🏀",
+    "tagline": "Mobile-first street basketball.",
+    "gameplay": "Swipe to shoot, land trick shots, win tournaments and customize your character.",
+    "status": "Playable prototype",
+    "phase": "Playable proof",
+    "launch": true,
+    "playable": true,
+    "play_url": "/beyond-games/beyond-hoop.php",
+    "color": "#ff7a32",
+    "features": [
+      "Swipe shooting",
+      "Trick-shot challenges",
+      "Street tournaments",
+      "Character customization"
+    ]
+  },
+  {
+    "slug": "bit-defender",
+    "title": "Bit Defender",
+    "category": "Strategy & Puzzle",
+    "icon": "🛡️",
+    "tagline": "Tower defense inside Beyond OS.",
+    "gameplay": "Protect Health, Education, Finance and Entertainment systems from waves of viruses.",
+    "status": "Concept",
+    "phase": "Future release",
+    "launch": false,
+    "playable": false,
+    "color": "#4de8cd",
+    "features": [
+      "Four system worlds",
+      "Upgradeable defenses",
+      "Virus behaviors",
+      "Strategic challenges"
+    ]
+  },
+  {
+    "slug": "beyond-city",
+    "title": "Beyond City",
+    "category": "Creative & Simulation",
+    "icon": "🏙️",
+    "tagline": "Cozy business and city builder.",
+    "gameplay": "Build shops, homes and entertainment venues connected to the Beyond ecosystem.",
+    "status": "Concept",
+    "phase": "Future release",
+    "launch": false,
+    "playable": false,
+    "color": "#57c889",
+    "features": [
+      "Cozy city planning",
+      "Connected businesses",
+      "Resident goals",
+      "Creative decoration"
+    ]
+  },
+  {
+    "slug": "shadow-protocol",
+    "title": "Shadow Protocol",
+    "category": "Strategy & Puzzle",
+    "icon": "🥷",
+    "tagline": "Compact cyber-stealth puzzles.",
+    "gameplay": "Hack terminals, avoid cameras and solve tightly designed infiltration levels.",
+    "status": "Concept",
+    "phase": "Future release",
+    "launch": false,
+    "playable": false,
+    "color": "#7180a8",
+    "features": [
+      "Line-of-sight stealth",
+      "Terminal hacking",
+      "Compact levels",
+      "Multiple solutions"
+    ]
+  },
+  {
+    "slug": "beyond-islands",
+    "title": "Beyond Islands",
+    "category": "Sports & Competition",
+    "icon": "🏝️",
+    "tagline": "Multiplayer party-game collection.",
+    "gameplay": "Race, survive obstacle courses and work together across colorful island challenges.",
+    "status": "Concept",
+    "phase": "Future release",
+    "launch": false,
+    "playable": false,
+    "color": "#38c9e8",
+    "features": [
+      "Party races",
+      "Survival rounds",
+      "Team challenges",
+      "Seasonal islands"
+    ]
+  },
+  {
+    "slug": "dreamforge",
+    "title": "Dreamforge",
+    "category": "Action & Adventure",
+    "icon": "🐲",
+    "tagline": "Creature-collecting adventure.",
+    "gameplay": "Discover imaginative creatures, evolve their abilities and battle with friends.",
+    "status": "Concept",
+    "phase": "Future release",
+    "launch": false,
+    "playable": false,
+    "color": "#bc6cff",
+    "features": [
+      "Original creatures",
+      "Ability evolution",
+      "Exploration",
+      "Friendly battles"
+    ]
+  },
+  {
+    "slug": "codebreaker-academy",
+    "title": "Codebreaker Academy",
+    "category": "Learning Games",
+    "icon": "🤖",
+    "tagline": "Coding puzzles that feel like an adventure.",
+    "gameplay": "Program robots with visual commands to escape increasingly clever puzzle chambers.",
+    "status": "Design phase",
+    "phase": "Launch lineup",
+    "launch": true,
+    "playable": false,
+    "related_url": "/coding-school/",
+    "color": "#4b9cff",
+    "features": [
+      "Visual programming",
+      "Robot abilities",
+      "Puzzle chambers",
+      "Coding School connections"
+    ]
+  },
+  {
+    "slug": "math-raiders",
+    "title": "Math Raiders",
+    "category": "Learning Games",
+    "icon": "🛸",
+    "tagline": "Tactical space combat powered by mathematics.",
+    "gameplay": "Solve calculations to charge attacks, reinforce shields and outmaneuver enemy fleets.",
+    "status": "Concept",
+    "phase": "Learning roadmap",
+    "launch": false,
+    "playable": false,
+    "related_url": "/beyond-math/academy.php",
+    "color": "#586dff",
+    "features": [
+      "Adaptive calculations",
+      "Tactical battles",
+      "Ship abilities",
+      "Math Academy connections"
+    ]
+  },
+  {
+    "slug": "french-quest",
+    "title": "French Quest",
+    "category": "Learning Games",
+    "icon": "🇫🇷",
+    "tagline": "A dialogue adventure across the French-speaking world.",
+    "gameplay": "Explore Montréal, Paris and Haiti through missions built around real conversation.",
+    "status": "Playable prototype",
+    "phase": "Learning roadmap",
+    "launch": false,
+    "playable": true,
+    "play_url": "french-quest.php",
+    "related_url": "/beyond-french/",
+    "color": "#3979ef",
+    "features": [
+      "Dialogue missions",
+      "Pronunciation practice",
+      "Cultural locations",
+      "Vocabulary progression"
+    ]
+  },
+  {
+    "slug": "daily-breath-garden",
+    "title": "Daily Breath: Garden",
+    "category": "Learning Games",
+    "icon": "🌱",
+    "tagline": "A peaceful world grown through reflection.",
+    "gameplay": "Complete calming activities and daily reflections to grow a living garden.",
+    "status": "Concept",
+    "phase": "Learning roadmap",
+    "launch": false,
+    "playable": false,
+    "related_url": "/dailybreath/",
+    "color": "#54c782",
+    "features": [
+      "Daily reflections",
+      "Breathing activities",
+      "Garden growth",
+      "Gentle streaks"
+    ]
+  },
+  {
+    "slug": "word-voyage",
+    "title": "Word Voyage",
+    "category": "Learning Games",
+    "icon": "🧭",
+    "tagline": "Daily word puzzles across five languages.",
+    "gameplay": "Solve language challenges in English, French, Spanish, Kreyòl and Patois.",
+    "status": "Concept",
+    "phase": "Learning roadmap",
+    "launch": false,
+    "playable": false,
+    "color": "#2dc6ad",
+    "features": [
+      "Five languages",
+      "Daily puzzles",
+      "Travel map",
+      "Vocabulary collections"
+    ]
+  },
+  {
+    "slug": "beyond-money",
+    "title": "Beyond Money",
+    "category": "Learning Games",
+    "icon": "💼",
+    "tagline": "Learn money skills by running a virtual business.",
+    "gameplay": "Budget, save, invest and make business decisions in a consequence-driven simulation.",
+    "status": "Concept",
+    "phase": "Learning roadmap",
+    "launch": false,
+    "playable": false,
+    "related_url": "/beyond-id/dashboard/wallet.php",
+    "color": "#d8b948",
+    "features": [
+      "Budget decisions",
+      "Savings goals",
+      "Investment lessons",
+      "Business simulation"
+    ]
+  },
+  {
+    "slug": "bit-drop",
+    "title": "Bit Drop",
+    "category": "Casual & Daily",
+    "icon": "◉",
+    "tagline": "Polished physics-based merging puzzle.",
+    "gameplay": "Drop and merge glowing bit cores to build larger atoms and chase a daily high score.",
+    "status": "Design phase",
+    "phase": "Launch lineup",
+    "launch": true,
+    "playable": false,
+    "color": "#efce4f",
+    "features": [
+      "Physics merging",
+      "Daily seed",
+      "Combo system",
+      "One-hand controls"
+    ]
+  },
+  {
+    "slug": "orbit",
+    "title": "Orbit",
+    "category": "Casual & Daily",
+    "icon": "🪐",
+    "tagline": "One-touch planetary survival.",
+    "gameplay": "Change orbit at exactly the right moment to avoid hazards and travel deeper into space.",
+    "status": "Concept",
+    "phase": "Casual roadmap",
+    "launch": false,
+    "playable": false,
+    "color": "#5865e8",
+    "features": [
+      "One-touch play",
+      "Orbital hazards",
+      "Endless progression",
+      "Daily distance challenge"
+    ]
+  },
+  {
+    "slug": "beyond-solitaire",
+    "title": "Beyond Solitaire",
+    "category": "Casual & Daily",
+    "icon": "♠️",
+    "tagline": "Premium themed card collection.",
+    "gameplay": "Play polished solitaire variants with themes, goals and daily challenges.",
+    "status": "Concept",
+    "phase": "Casual roadmap",
+    "launch": false,
+    "playable": false,
+    "color": "#b84f74",
+    "features": [
+      "Multiple variants",
+      "Daily deals",
+      "Theme collection",
+      "Relaxed play"
+    ]
+  },
+  {
+    "slug": "pixel-cafe",
+    "title": "Pixel Café",
+    "category": "Casual & Daily",
+    "icon": "☕",
+    "tagline": "Cozy idle café management.",
+    "gameplay": "Serve customers, create a menu and slowly transform a tiny café into a neighborhood favorite.",
+    "status": "Concept",
+    "phase": "Casual roadmap",
+    "launch": false,
+    "playable": false,
+    "color": "#c6855b",
+    "features": [
+      "Idle progression",
+      "Menu creation",
+      "Café decorating",
+      "Regular customers"
+    ]
+  },
+  {
+    "slug": "atom-match",
+    "title": "Atom Match",
+    "category": "Casual & Daily",
+    "icon": "⚛️",
+    "tagline": "Fast puzzle play using the Beyond atom.",
+    "gameplay": "Connect orbiting particles, trigger chain reactions and clear compact timed boards.",
+    "status": "Concept",
+    "phase": "Casual roadmap",
+    "launch": false,
+    "playable": false,
+    "color": "#4cd9e9",
+    "features": [
+      "Chain reactions",
+      "Compact boards",
+      "Timed modes",
+      "Atom power-ups"
+    ]
+  },
+  {
+    "slug": "daily-dash",
+    "title": "Daily Dash",
+    "category": "Casual & Daily",
+    "icon": "⏱️",
+    "tagline": "One new 60-second challenge every day.",
+    "gameplay": "Master a rotating microgame and compare your best run with friends.",
+    "status": "Concept",
+    "phase": "Casual roadmap",
+    "launch": false,
+    "playable": false,
+    "color": "#ff6868",
+    "features": [
+      "Daily microgame",
+      "60-second sessions",
+      "Personal bests",
+      "Friend challenges"
+    ]
+  }
+]

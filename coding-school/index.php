@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 $academyConfig=[
- 'slug'=>'coding-school','title'=>'Beyond Coding School','icon'=>'💻','tagline'=>'Builder campus','accent'=>'#6d4aff','base'=>'/coding-school/','css'=>'/coding-school/academy.css?v=20260730-3','headline'=>'Choose a pathway. Build real skills.','description'=>'Six career pathways with 5 modules, 10 guided lessons per module, and three required practice labs before every lesson test. Module 1 is free in every pathway.','default_path'=>'web-designer','group_label'=>'career pathways',
+ 'slug'=>'coding-school','title'=>'Beyond Coding School','icon'=>'💻','logo'=>'/coding-school/assets/branding/beyond-coding-school-mark.png','tagline'=>'Builder campus','accent'=>'#6d4aff','base'=>'/coding-school/','css'=>'/coding-school/academy.css?v=20260830-1','headline'=>'Choose a pathway. Build real skills.','description'=>'Six career pathways with 5 modules, 10 guided lessons per module, and three required practice labs before every lesson test. Module 1 is free in every pathway.','default_path'=>'web-designer','group_label'=>'career pathways',
  'paths'=>[
   'web-designer'=>['title'=>'Web Designer','ages'=>'HTML · CSS · UI/UX','icon'=>'🎨','guide'=>'Design responsive, accessible websites and publish a polished portfolio.'],
   'ios-developer'=>['title'=>'iOS Developer','ages'=>'Swift · SwiftUI','icon'=>'🍎','guide'=>'Build native iPhone and iPad apps with Swift, SwiftUI, data, and testing.'],

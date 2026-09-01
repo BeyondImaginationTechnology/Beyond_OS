@@ -34,21 +34,21 @@ steps:
   - task: InstallAppleProvisioningProfile@1
     inputs:
       provisioningProfileLocation: secureFiles
-      provProfileSecureFile: TheDailyBreath_AppStore.mobileprovision
+      provProfileSecureFile: The_Daily_Breath_Azure_App_Store.mobileprovision
       removeProfile: true
     displayName: Install app provisioning profile
 
   - task: InstallAppleProvisioningProfile@1
     inputs:
       provisioningProfileLocation: secureFiles
-      provProfileSecureFile: DailyBreathWidget_AppStore.mobileprovision
+      provProfileSecureFile: DailyBreath_Widget_Azure_App_Store.mobileprovision
       removeProfile: true
     displayName: Install widget provisioning profile
 
   - task: InstallAppleProvisioningProfile@1
     inputs:
       provisioningProfileLocation: secureFiles
-      provProfileSecureFile: TheDailyBreathClip_AppStore.mobileprovision
+      provProfileSecureFile: DailyBreath_App_Clip_Azure_App_Store.mobileprovision
       removeProfile: true
     displayName: Install App Clip provisioning profile
 

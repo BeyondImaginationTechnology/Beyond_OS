@@ -18,9 +18,9 @@ access to the DailyBreath app in App Store Connect.
 
    | Target | Bundle ID | Secure-file name |
    | --- | --- | --- |
-   | App | `technology.co.beyondimagination.thedailybreath` | `TheDailyBreath_AppStore.mobileprovision` |
-   | Widget | `technology.co.beyondimagination.thedailybreath.widget` | `DailyBreathWidget_AppStore.mobileprovision` |
-   | App Clip | `technology.co.beyondimagination.thedailybreath.Clip` | `TheDailyBreathClip_AppStore.mobileprovision` |
+   | App | `technology.co.beyondimagination.thedailybreath` | `The_Daily_Breath_Azure_App_Store.mobileprovision` |
+   | Widget | `technology.co.beyondimagination.thedailybreath.widget` | `DailyBreath_Widget_Azure_App_Store.mobileprovision` |
+   | App Clip | `technology.co.beyondimagination.thedailybreath.Clip` | `DailyBreath_App_Clip_Azure_App_Store.mobileprovision` |
 
 3. In App Store Connect, create a **team** API key with **App Manager** access.
    This may be reused for every app in the team. Download the `.p8` file once
@@ -36,9 +36,9 @@ the following exact file names. Secure files are never committed to Git.
 | --- | --- |
 | `AuthKey_WCGDUVCBRB.p8` | App Store Connect API key |
 | `DailyBreath_Distribution.p12` | Apple Distribution certificate export |
-| `TheDailyBreath_AppStore.mobileprovision` | App profile |
-| `DailyBreathWidget_AppStore.mobileprovision` | Widget profile |
-| `TheDailyBreathClip_AppStore.mobileprovision` | App Clip profile |
+| `The_Daily_Breath_Azure_App_Store.mobileprovision` | App profile |
+| `DailyBreath_Widget_Azure_App_Store.mobileprovision` | Widget profile |
+| `DailyBreath_App_Clip_Azure_App_Store.mobileprovision` | App Clip profile |
 
 In **Pipelines → Library → Variable group**, create `dailybreath-testflight`
 and add these variables. Mark only the certificate password as secret; the API

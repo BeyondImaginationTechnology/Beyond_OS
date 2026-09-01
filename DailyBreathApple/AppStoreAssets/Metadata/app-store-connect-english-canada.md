@@ -1,4 +1,4 @@
-# DailyBreath 1.5 - App Store Connect Metadata
+# DailyBreath 1.6 - App Store Connect Metadata
 
 ## Promotional Text
 
@@ -6,7 +6,9 @@ Bible, Torah, and Quran verses with recovery-centered breathing, reflection, and
 
 ## What's New in This Version
 
-DailyBreath 1.5 begins the Olive Era with three respectful faith journeys.
+DailyBreath 1.6 continues the Olive Era with three respectful faith journeys.
+
+- A new calm, focused navigation workspace replaces the generic tab bar with a spacious practice sidebar and clear destinations.
 
 - Complete local Bible, Torah/Tanakh, and Quran readers with every included chapter and verse
 - English, French, and Spanish Bible editions; Hebrew-default Torah/Tanakh with English and French translations; Arabic-default Quran with a Pickthall English meaning
@@ -38,7 +40,7 @@ DailyBreath is a faith-centered wellness app designed to help you begin with Scr
 
 Choose a Bible, Torah, or Quran Verse of the Day, search complete local sacred-text libraries, open any included chapter, pause with a guided breathing practice, reflect through devotional prompts, and learn with Chris, Dovi, and Moe.
 
-DailyBreath 1.5 includes:
+DailyBreath 1.6 includes:
 
 - Verse of the Day
 - English World English Bible, French Louis Segond 1910, and Spanish Reina-Valera 1909 readers
@@ -82,7 +84,7 @@ https://beyondimagination.co.technology/dailybreath/
 
 ## Version
 
-1.5
+1.6
 
 ## Copyright
 
@@ -92,11 +94,11 @@ https://beyondimagination.co.technology/dailybreath/
 
 Sign-in required: No
 
-DailyBreath 1.5 does not require an account to use the Verse of the Day, Bible/Torah/Quran readers, search, Academy starter lessons, breathing practice, or reflection journal.
+DailyBreath 1.6 does not require an account to use the Verse of the Day, Bible/Torah/Quran readers, search, Academy starter lessons, breathing practice, or reflection journal.
 
 ## App Review Notes
 
-DailyBreath 1.5 is a self-contained faith-centered wellness app. No sign-in is required for review. The app opens directly to Today and includes selectable Bible, Torah, and Quran daily verses; complete local text readers and search; starter and recovery Academy paths; breathing; reflection journal; reminders; and an App Clip preview.
+DailyBreath 1.6 is a self-contained faith-centered wellness app. No sign-in is required for review. The app opens directly to Today and includes selectable Bible, Torah, and Quran daily verses; complete local text readers and search; starter and recovery Academy paths; breathing; reflection journal; reminders; and an App Clip preview.
 
 To review the multilingual readers, open Scripture in the tab bar. Switch Faith tradition among Bible, Torah, and Quran, then use Language & edition. Torah defaults to Hebrew and includes תהילים · Tehillim; Quran defaults to Arabic. Open Today and change the tradition picker to verify tradition-specific daily content, then open Academy to inspect the separate Christian, Jewish, and Muslim journeys.
 

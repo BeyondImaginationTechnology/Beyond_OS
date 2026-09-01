@@ -7,7 +7,7 @@ enum DailyBreathTab: String, Hashable {
 struct RootView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
-    @State private var selectedTab = DailyBreathTab.today
+    @State private var selectedTab: DailyBreathTab? = .today
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -22,24 +22,31 @@ struct RootView: View {
     }
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            NavigationStack { TodayView() }
-                .tabItem { Label("Today", systemImage: "sun.max.fill") }
-                .tag(DailyBreathTab.today)
-            NavigationStack { ScriptureLibraryView() }
-                .tabItem { Label("Scripture", systemImage: "book.closed.fill") }
-                .tag(DailyBreathTab.scripture)
-            NavigationStack { AcademyView() }
-                .tabItem { Label("Academy", systemImage: "graduationcap.fill") }
-                .tag(DailyBreathTab.academy)
-            NavigationStack { BreatheView() }
-                .tabItem { Label("Breathe", systemImage: "wind") }
-                .tag(DailyBreathTab.breathe)
-            NavigationStack { JournalView() }
-                .tabItem { Label("Journal", systemImage: "square.and.pencil") }
-                .tag(DailyBreathTab.journal)
+        NavigationSplitView {
+            List(selection: $selectedTab) {
+                Section {
+                    BrandHeader()
+                        .padding(.vertical, 8)
+                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 12, trailing: 16))
+                        .listRowBackground(Color.clear)
+                }
+
+                Section("Your practice") {
+                    navigationRow(.today, title: "Today", symbol: "sun.max.fill", subtitle: "A steady beginning")
+                    navigationRow(.scripture, title: "Scripture", symbol: "book.closed.fill", subtitle: "Read and reflect")
+                    navigationRow(.academy, title: "Academy", symbol: "graduationcap.fill", subtitle: "Learn at your pace")
+                    navigationRow(.breathe, title: "Breathe", symbol: "wind", subtitle: "Find your next breath")
+                    navigationRow(.journal, title: "Journal", symbol: "square.and.pencil", subtitle: "Keep what matters")
+                }
+            }
+            .listStyle(.sidebar)
+            .navigationTitle("DailyBreath")
+            .navigationBarTitleDisplayMode(.large)
+        } detail: {
+            detailView(for: selectedTab ?? .today)
         }
         .tint(selectedTheme.accent)
+        .navigationSplitViewStyle(.balanced)
         .preferredColorScheme(preferredScheme)
         .onOpenURL(perform: openDeepLink)
         .onAppear {
@@ -78,6 +85,40 @@ struct RootView: View {
             selectedTab = .scripture
         case "academy": selectedTab = .academy
         default: selectedTab = .today
+        }
+    }
+
+    @ViewBuilder
+    private func navigationRow(_ tab: DailyBreathTab, title: String, symbol: String, subtitle: String) -> some View {
+        Label {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                Text(subtitle)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        } icon: {
+            Image(systemName: symbol)
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(selectedTheme.accent)
+        }
+        .tag(tab)
+        .accessibilityHint("Opens the \(title) space")
+    }
+
+    @ViewBuilder
+    private func detailView(for tab: DailyBreathTab) -> some View {
+        switch tab {
+        case .today:
+            NavigationStack { TodayView() }
+        case .scripture:
+            NavigationStack { ScriptureLibraryView() }
+        case .academy:
+            NavigationStack { AcademyView() }
+        case .breathe:
+            NavigationStack { BreatheView() }
+        case .journal:
+            NavigationStack { JournalView() }
         }
     }
 }

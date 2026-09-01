@@ -12,8 +12,8 @@ function dailybreath_web_head(string $title = 'DailyBreath'): string
         . '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">'
         . '<meta name="apple-mobile-web-app-title" content="DailyBreath">'
         . '<link rel="manifest" href="/dailybreath/manifest.webmanifest">'
-        . '<link rel="apple-touch-icon" href="/dailybreath/assets/icons/dailybreath-mark-v2.png">'
-        . '<link rel="icon" type="image/png" href="/dailybreath/assets/icons/dailybreath-mark-v2.png">'
+        . '<link rel="apple-touch-icon" href="/dailybreath/assets/icons/dailybreath-mark-v2.png?v=20260901-2">'
+        . '<link rel="icon" type="image/png" href="/dailybreath/assets/icons/dailybreath-mark-v2.png?v=20260901-2">'
         . '<link rel="stylesheet" href="/dailybreath/assets/css/web-app.css?v=' . DAILYBREATH_WEB_VERSION . '">'
         . '<meta property="og:title" content="' . $safeTitle . '">';
 }

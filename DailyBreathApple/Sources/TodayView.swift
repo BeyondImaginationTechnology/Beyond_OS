@@ -189,13 +189,6 @@ struct TodayView: View {
                 .font(.body)
                 .foregroundStyle(.white.opacity(0.82))
             HStack(spacing: 10) {
-                Button { store.speakText("\(todayVerse.text) \(todayVerse.reference)") } label: {
-                    Label("Listen", systemImage: "speaker.wave.2.fill")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(selectedTheme.accent)
-
                 NavigationLink {
                     VerseDetailView(verse: todayVerse, tradition: selectedTradition)
                 } label: {

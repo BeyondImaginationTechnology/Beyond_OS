@@ -121,9 +121,6 @@ echo json_encode([
         'reference' => (string)($verse['reference'] ?? $fallbackVerse['reference']),
         'reflection' => 'Begin slowly. Make room for quiet, notice your breath, and let the next faithful step be enough for today.',
         'reader_url' => dailybreath_scripture_url($verse, 'https://beyondimagination.co.technology'),
-        'audio_url' => $tradition === 'bible' && !empty($verse['audio_file'])
-            ? 'https://beyondimagination.co.technology/dailybreath/assets/audio/verses/' . rawurlencode(basename((string)$verse['audio_file']))
-            : null,
     ],
     'devotional' => [
         'id' => 1,

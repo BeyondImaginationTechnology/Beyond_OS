@@ -12,16 +12,16 @@ Native SwiftUI app for DailyBreath 1.5 (build 2).
 - Tradition-native book names (including Bereshit, Shemot, and Tehillim) and right-to-left Hebrew/Arabic reading
 - Full Quran library with all 114 surahs and 6,236 ayahs
 - Matched Bible, Torah, and Quran Verse of the Day themes
-- Exactly two Christian, Jewish, and Muslim Academy journeys—Joining the Faith and Recovery—with narration, saved progress, and a Beyond Imagination completion certificate
+- Exactly two Christian, Jewish, and Muslim Academy journeys—Joining the Faith and Recovery—with saved progress and a Beyond Imagination completion certificate
 - Chris, Dovi, and Moe illustrated Academy guides
 - Olive-era logo plus Torah Light and Quran Moon themes
 - Guided breathing practices and optional daily reminders
 - Private, file-protected reflection journal stored on device
 - Persistent weekly challenge completion tracking
 - Home Screen and Lock Screen Verse of the Day widget
-- Settings and About hub for reminders, themes, narration, privacy, support, and version details
+- Settings and About hub for reminders, themes, privacy, support, and version details
 - Notification and widget deep links to Today, Breathe, and Journal
-- Persistent Bible highlights, favorite collections, private notes, and adjustable full-chapter narration
+- Persistent Bible highlights, favorite collections, and private notes
 - A gentle 45-day history for daily content, breathing, and reflection
 - Optional encrypted iCloud sync backed by iCloud Keychain
 - Recovery support and crisis-resource page with a clear non-medical disclaimer

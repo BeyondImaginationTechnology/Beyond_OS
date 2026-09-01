@@ -85,7 +85,7 @@ function dailybreath_verse_of_day(PDO $pdo, string $locale = 'en', ?string $date
     return $result + $location;
 }
 
-/** @return array{text:string,reference:string,source:string,audio_file:string}|null */
+/** @return array{text:string,reference:string,source:string}|null */
 function dailybreath_recovery_verse_for_date(string $date, bool $rotate = true): ?array
 {
     $source = dirname(__DIR__) . '/data/daily-verses.json';
@@ -110,7 +110,6 @@ function dailybreath_recovery_verse_for_date(string $date, bool $rotate = true):
         'text' => trim((string)($entry['text'] ?? '')),
         'reference' => trim((string)($entry['reference'] ?? '')),
         'source' => ($entry['schedule_date'] ?? null) === $date ? 'scheduled_recovery_library' : 'bundled_recovery_rotation',
-        'audio_file' => basename((string)($entry['audio_file'] ?? '')),
     ];
 }
 

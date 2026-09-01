@@ -7,19 +7,12 @@ struct Verse: Identifiable, Codable, Equatable, Sendable {
     let text: String
     let reference: String
     let reflection: String
-    let audioURL: String?
 
-    enum CodingKeys: String, CodingKey {
-        case id, text, reference, reflection
-        case audioURL = "audio_url"
-    }
-
-    init(id: Int, text: String, reference: String, reflection: String, audioURL: String? = nil) {
+    init(id: Int, text: String, reference: String, reflection: String) {
         self.id = id
         self.text = text
         self.reference = reference
         self.reflection = reflection
-        self.audioURL = audioURL
     }
 }
 
@@ -135,8 +128,7 @@ enum RecoveryContent {
                 id: scheduled.id,
                 text: scheduled.text,
                 reference: scheduled.reference,
-                reflection: scheduled.reflection,
-                audioURL: remoteVerse.audioURL
+                reflection: scheduled.reflection
             )
         }
 
@@ -207,8 +199,7 @@ enum RecoveryContent {
             id: verse.id,
             text: text,
             reference: reference,
-            reflection: reflection.isEmpty || containsTemplateToken ? recoveryVerseReflection : reflection,
-            audioURL: verse.audioURL
+            reflection: reflection.isEmpty || containsTemplateToken ? recoveryVerseReflection : reflection
         )
     }
 

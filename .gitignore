@@ -20,6 +20,7 @@
 .DS_Store
 **/xcuserdata/
 *.xcuserstate
+**/local.properties
 Thumbs.db
 *.zip
 /build/

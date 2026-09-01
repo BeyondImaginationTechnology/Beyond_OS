@@ -1,0 +1,60 @@
+# DailyBreath Apple validation on an Azure-hosted macOS agent.
+#
+# This pipeline deliberately performs an unsigned simulator test. Keep signing,
+# archiving, and TestFlight uploads in Xcode Cloud, where the app, widget, and
+# App Clip can use their separately managed Apple signing profiles.
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - DailyBreathApple/**
+      - azure-pipelines.yml
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - DailyBreathApple/**
+      - azure-pipelines.yml
+
+pool:
+  vmImage: macos-15
+
+variables:
+  project: DailyBreathApple/TheDailyBreath.xcodeproj
+  scheme: The Daily Breath
+  destination: platform=iOS Simulator,name=iPhone 16
+
+steps:
+  - checkout: self
+    clean: true
+
+  - bash: |
+      set -euo pipefail
+      xcodebuild -version
+      xcrun simctl list devices available
+    displayName: Inspect Xcode and available simulators
+
+  - bash: |
+      set -euo pipefail
+      result_bundle="$(Agent.TempDirectory)/DailyBreathTests.xcresult"
+      xcodebuild test \
+        -project "$(project)" \
+        -scheme "$(scheme)" \
+        -destination "$(destination)" \
+        -resultBundlePath "$result_bundle" \
+        -derivedDataPath "$(Agent.TempDirectory)/DerivedData" \
+        CODE_SIGNING_ALLOWED=NO \
+        CODE_SIGNING_REQUIRED=NO
+    displayName: Test DailyBreath on iPhone Simulator
+
+  - task: PublishPipelineArtifact@1
+    condition: succeededOrFailed()
+    inputs:
+      targetPath: $(Agent.TempDirectory)/DailyBreathTests.xcresult
+      artifact: DailyBreathTests-xcresult
+    displayName: Publish Xcode test result bundle

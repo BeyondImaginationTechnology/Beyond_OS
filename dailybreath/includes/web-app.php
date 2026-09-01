@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-const DAILYBREATH_WEB_VERSION = '1.6';
+const DAILYBREATH_WEB_VERSION = '1.7';
 
 function dailybreath_web_head(string $title = 'DailyBreath'): string
 {
     $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-    return '<meta name="theme-color" content="#173f2c">'
+    return '<meta name="theme-color" content="#62558f">'
         . '<meta name="application-name" content="DailyBreath">'
         . '<meta name="apple-mobile-web-app-capable" content="yes">'
         . '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">'

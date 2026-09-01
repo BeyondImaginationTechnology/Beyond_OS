@@ -41,7 +41,7 @@ foreach($courses as $course){
 </header>
 <main class="ba-main">
   <section class="ba-hero">
-    <div><span class="ba-kicker">SCRIPTURE · WISDOM · PRACTICE</span><h1>Grow deeper.<br>Live with purpose.</h1><p>Guided Bible learning built for teens and adults, with narrated lessons, knowledge checks, saved progress, and cumulative module exams.</p></div>
+    <div><span class="ba-kicker">SCRIPTURE · WISDOM · PRACTICE</span><h1>Grow deeper.<br>Live with purpose.</h1><p>Guided Bible learning built for teens and adults, with knowledge checks, saved progress, and cumulative module exams.</p></div>
     <div class="ba-hero-card"><span>YOUR PATH</span><strong><?=$selectedIcon?> <?=e($selectedName)?></strong><small>Ages <?=e($selectedAges)?> · 5 modules · 50 lessons</small></div>
   </section>
   <section class="ba-stats" aria-label="Academy overview"><div><b>2</b><span>learning paths</span></div><div><b>10</b><span>guided modules</span></div><div><b>100</b><span>lessons</span></div><div><b>80%</b><span>passing standard</span></div></section>

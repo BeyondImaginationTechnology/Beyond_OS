@@ -479,11 +479,6 @@ private struct AcademyLessonView: View {
             Section("Teaching with \(path.guideName)") {
                 Text(lesson.teaching)
                     .font(.body)
-                Button {
-                    store.speakAcademyLesson(lesson)
-                } label: {
-                    Label("Listen with \(path.guideName)", systemImage: "speaker.wave.2.fill")
-                }
             }
 
             Section("Practice") {

@@ -8,7 +8,8 @@ define('DB_NAME', 'YOUR_DATABASE_NAME');
 define('DB_USER', 'YOUR_DATABASE_USER');
 define('DB_PASS', 'YOUR_DATABASE_PASSWORD');
 
-define('ADMIN_PASSWORD', 'change-this-admin-password'); // Change before upload
+$adminPassword = getenv('DAILYBREATH_ADMIN_PASSWORD');
+define('ADMIN_PASSWORD', is_string($adminPassword) ? trim($adminPassword) : '');
 
 function db(): PDO {
     static $pdo = null;

@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . '/../config/database.php';
+if (ADMIN_PASSWORD === '') {
+    http_response_code(503);
+    exit('DailyBreath admin is unavailable until DAILYBREATH_ADMIN_PASSWORD is configured.');
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     beyond_require_csrf();
     $action = (string)($_POST['action'] ?? 'login');

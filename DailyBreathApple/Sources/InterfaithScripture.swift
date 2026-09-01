@@ -10,7 +10,7 @@ enum FaithTradition: String, CaseIterable, Identifiable, Codable, Sendable {
     var name: String {
         switch self {
         case .bible: "Bible"
-        case .torah: "Torah"
+        case .torah: "Tanakh"
         case .quran: "Quran"
         }
     }
@@ -18,7 +18,7 @@ enum FaithTradition: String, CaseIterable, Identifiable, Codable, Sendable {
     var libraryName: String {
         switch self {
         case .bible: "Bible"
-        case .torah: "Torah & Tanakh"
+        case .torah: "Tanakh"
         case .quran: "Quran"
         }
     }
@@ -34,7 +34,7 @@ enum FaithTradition: String, CaseIterable, Identifiable, Codable, Sendable {
     var dailyReadingName: String {
         switch self {
         case .bible: "Bible Verse"
-        case .torah: "Torah & Tanakh Passage"
+        case .torah: "Tanakh Passage"
         case .quran: "Quran Ayah"
         }
     }
@@ -48,7 +48,19 @@ enum FaithTradition: String, CaseIterable, Identifiable, Codable, Sendable {
     }
 
     var chapterUnitPlural: String {
-        self == .quran ? "surahs" : "chapters"
+        switch self {
+        case .bible: "chapters"
+        case .torah: "perakim"
+        case .quran: "surahs"
+        }
+    }
+
+    var chapterUnitSingular: String {
+        switch self {
+        case .bible: "chapter"
+        case .torah: "perek"
+        case .quran: "surah"
+        }
     }
 
     var devotionalName: String {
@@ -433,7 +445,7 @@ struct SacredTextLibrary: Equatable, Sendable {
         return SacredTextLibrary(tradition: .quran, translation: edition.translationTitle, books: books)
     }
 
-    private static let jewishBookNames: [String: String] = [
+    fileprivate static let jewishBookNames: [String: String] = [
         "GEN": "Bereshit", "EXO": "Shemot", "LEV": "Vayikra", "NUM": "Bamidbar", "DEU": "Devarim",
         "JOS": "Yehoshua", "JDG": "Shoftim", "RUT": "Ruth", "1SA": "Shmuel I", "2SA": "Shmuel II",
         "1KI": "Melakhim I", "2KI": "Melakhim II", "1CH": "Divrei Hayamim I", "2CH": "Divrei Hayamim II",
@@ -558,7 +570,7 @@ enum InterfaithDailyContent {
             let selected = pool[stableIndex(date, count: pool.count)]
             return resolve(code: selected, in: torah).map {
                 displayVerse($0, reflection: "Dovi pairs this teaching with today’s recovery theme: one breath, one faithful next step.")
-            } ?? bibleVerse
+            } ?? jewishDisplayVerse(bibleVerse)
         case .quran:
             if bibleVerse.reference == "Psalm 27:14", let matched = resolve(code: "Q003-3-200", in: quran) {
                 return displayVerse(matched, reflection: "Moe pairs perseverance in this ayah with today’s call to wait with courage.")
@@ -567,9 +579,23 @@ enum InterfaithDailyContent {
             let selected = pool[stableIndex(date, count: pool.count)]
             return resolve(code: selected, in: quran).map {
                 displayVerse($0, reflection: "Moe pairs this ayah with today’s recovery theme: pause, seek Allah’s help, and choose the next right step.")
-            } ?? bibleVerse
+            } ?? quranFallbackVerse
         }
     }
+
+    private static let quranFallbackVerse = Verse(
+        id: "Q013-13-28".hashValue & Int.max,
+        text: "Who have believed and whose hearts have rest in the remembrance of Allah. Verily in the remembrance of Allah do hearts find rest!",
+        reference: "Ar-Ra'd 13:28",
+        reflection: "Moe invites you to pause, remember Allah, and take the next right step with a steadier heart."
+    )
+
+    private static let tanakhFallbackVerse = Verse(
+        id: "PSA-46-10".hashValue & Int.max,
+        text: "Be still, and know that I am God.",
+        reference: "Tehillim 46:10",
+        reflection: "Dovi invites you to carry this Jewish Scripture into one honest, healthy choice today."
+    )
 
     static func devotional(for tradition: FaithTradition, base: Devotional, verse: Verse) -> Devotional {
         guard tradition != .bible else { return base }
@@ -661,6 +687,24 @@ enum InterfaithDailyContent {
 
     private static func displayVerse(_ verse: SacredTextVerse, reflection: String) -> Verse {
         Verse(id: verse.id.hashValue & Int.max, text: verse.text, reference: verse.reference, reflection: reflection)
+    }
+
+    private static func jewishDisplayVerse(_ verse: Verse) -> Verse {
+        let pattern = #"^(.+?)\s+(\d+:\d+.*)$"#
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+              let match = regex.firstMatch(in: verse.reference, range: NSRange(verse.reference.startIndex..., in: verse.reference)),
+              let bookRange = Range(match.range(at: 1), in: verse.reference),
+              let locationRange = Range(match.range(at: 2), in: verse.reference),
+              let code = biblicalBookCode(for: normalizedBookName(String(verse.reference[bookRange]))),
+              let jewishName = SacredTextLibrary.jewishBookNames[code] else {
+            return tanakhFallbackVerse
+        }
+        return Verse(
+            id: verse.id,
+            text: verse.text,
+            reference: "\(jewishName) \(verse.reference[locationRange])",
+            reflection: verse.reflection
+        )
     }
 
     private static func biblicalPool(for verse: Verse) -> [String] {

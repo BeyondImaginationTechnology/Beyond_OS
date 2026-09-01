@@ -179,6 +179,72 @@ final class DailyBreathTests: XCTestCase {
         XCTAssertEqual(resolved.text, torah.verse(bookCode: "PSA", chapter: 27, verse: 14)?.text)
     }
 
+    func testTorahFallbackUsesJewishBookNameBeforeLibraryLoads() {
+        let verse = Verse(
+            id: 1,
+            text: "You shall make no covenant with them, nor with their gods.",
+            reference: "Exodus 23:32",
+            reflection: "Choose the next faithful step."
+        )
+        let emptyLibrary = SacredTextLibrary(tradition: .torah, translation: "Loading", books: [])
+
+        let resolved = InterfaithDailyContent.verse(
+            for: .torah,
+            date: Date(timeIntervalSince1970: 0),
+            bibleVerse: verse,
+            bible: SacredTextLibrary(tradition: .bible, translation: "Loading", books: []),
+            torah: emptyLibrary,
+            quran: SacredTextLibrary(tradition: .quran, translation: "Loading", books: [])
+        )
+
+        XCTAssertEqual(resolved.reference, "Shemot 23:32")
+        XCTAssertEqual(resolved.text, verse.text)
+    }
+
+    func testQuranFallbackNeverDisplaysChristianDailyVerseWhileLibraryLoads() {
+        let emptyLibrary = SacredTextLibrary(tradition: .quran, translation: "Loading", books: [])
+        let resolved = InterfaithDailyContent.verse(
+            for: .quran,
+            date: Date(timeIntervalSince1970: 0),
+            bibleVerse: .daily,
+            bible: SacredTextLibrary(tradition: .bible, translation: "Loading", books: []),
+            torah: SacredTextLibrary(tradition: .torah, translation: "Loading", books: []),
+            quran: emptyLibrary
+        )
+
+        XCTAssertEqual(resolved.reference, "Ar-Ra'd 13:28")
+        XCTAssertTrue(resolved.text.localizedCaseInsensitiveContains("Allah"))
+        XCTAssertFalse(resolved.text.localizedCaseInsensitiveContains("the Son"))
+    }
+
+    func testTanakhFallbackNeverDisplaysNewTestamentVerseWhileLibraryLoads() {
+        let resolved = InterfaithDailyContent.verse(
+            for: .torah,
+            date: Date(timeIntervalSince1970: 0),
+            bibleVerse: .daily,
+            bible: SacredTextLibrary(tradition: .bible, translation: "Loading", books: []),
+            torah: SacredTextLibrary(tradition: .torah, translation: "Loading", books: []),
+            quran: SacredTextLibrary(tradition: .quran, translation: "Loading", books: [])
+        )
+
+        XCTAssertEqual(resolved.reference, "Tehillim 46:10")
+        XCTAssertFalse(resolved.text.localizedCaseInsensitiveContains("the Son"))
+    }
+
+    func testICloudMergeIsStableWhenContentAlreadyMatches() {
+        let timestamp = Date(timeIntervalSince1970: 100)
+        let data = DailyBreathUserData(
+            journalEntries: [],
+            challengeCompletionDayKeys: ["challenge": ["2026-09-01"]],
+            modifiedAt: timestamp
+        )
+
+        let merged = DailyBreathStore.mergeUserData(data, with: data)
+
+        XCTAssertEqual(merged.modifiedAt, timestamp)
+        XCTAssertTrue(DailyBreathStore.hasSameUserContent(merged, as: data))
+    }
+
     func testScriptureEditionsUseTraditionAppropriateDefaults() {
         XCTAssertEqual(ScriptureEdition.defaultEdition(for: .bible), .bibleEnglish)
         XCTAssertEqual(ScriptureEdition.defaultEdition(for: .torah), .torahHebrew)
@@ -284,7 +350,7 @@ final class DailyBreathTests: XCTestCase {
         XCTAssertFalse(resolved.reflection.contains("entry.theme"))
     }
 
-    func testMatchingRemoteVerseCanOnlyContributeItsAudioURL() {
+    func testMatchingRemoteVerseCannotOverwriteScheduledContent() {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         let date = DateComponents(calendar: calendar, year: 2026, month: 8, day: 24, hour: 12).date!
@@ -293,8 +359,7 @@ final class DailyBreathTests: XCTestCase {
             id: 500,
             text: scheduled.text,
             reference: scheduled.reference,
-            reflection: "Let this entry.theme verse guide your day.",
-            audioURL: "https://example.com/verse.mp3"
+            reflection: "Let this entry.theme verse guide your day."
         )
 
         let resolved = RecoveryContent.resolvedVerseOfTheDay(for: date, remoteVerse: matchingRemote)
@@ -302,7 +367,6 @@ final class DailyBreathTests: XCTestCase {
         XCTAssertEqual(resolved.id, scheduled.id)
         XCTAssertEqual(resolved.text, scheduled.text)
         XCTAssertEqual(resolved.reflection, RecoveryContent.recoveryVerseReflection)
-        XCTAssertEqual(resolved.audioURL, matchingRemote.audioURL)
     }
 
     func testUserDataStorePersistsJournalAndChallengeProgress() throws {

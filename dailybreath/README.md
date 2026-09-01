@@ -1,6 +1,6 @@
 # DailyBreath Web 1.5
 
-DailyBreath is an installable Beyond OS progressive web app for matched daily Bible, Torah, and Quran readings; complete local sacred-text libraries and search; narration; devotionals; guided breathing; encrypted reflection journaling; weekly challenges; activity history; and recovery support.
+DailyBreath is an installable Beyond OS progressive web app for matched daily Bible, Tanakh, and Quran readings; complete local sacred-text libraries and search; devotionals; guided breathing; encrypted reflection journaling; weekly challenges; activity history; and recovery support.
 
 ## Install
 
@@ -13,7 +13,7 @@ The app requires HTTPS in production for service workers and installation. Local
 - Reflection journal entries are encrypted on the server and attached to the signed-in Beyond ID.
 - Breathing sessions and database-backed weekly challenge progress are persisted in the Beyond OS database.
 - Bundled recovery challenge progress uses `dailybreath_challenge_progress`, created defensively at runtime and included in `sql/dailybreath_web_1_2.sql` for production migrations.
-- Faith tradition, theme, narration speed, and reduced-motion preferences remain on the current device.
+- Faith tradition, theme, and reduced-motion preferences remain on the current device.
 
 ## Content and safety
 

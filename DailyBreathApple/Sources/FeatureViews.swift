@@ -3,8 +3,6 @@ import SwiftUI
 struct SettingsAboutView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
-    @AppStorage("narrationRate") private var narrationRate = 0.38
-    @AppStorage("narrationVoiceLanguage") private var narrationVoiceLanguage = "en-US"
     @AppStorage("encryptedICloudSyncEnabled") private var encryptedICloudSyncEnabled = false
 
     private var versionText: String {
@@ -33,24 +31,6 @@ struct SettingsAboutView: View {
                         Label(theme.name, systemImage: theme.symbolName).tag(theme.id)
                     }
                 }
-            }
-
-            Section("Narration") {
-                Picker("Voice", selection: $narrationVoiceLanguage) {
-                    Text("English (United States)").tag("en-US")
-                    Text("English (Canada)").tag("en-CA")
-                    Text("English (United Kingdom)").tag("en-GB")
-                }
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Speaking Speed")
-                        Spacer()
-                        Text(narrationRate < 0.36 ? "Gentle" : narrationRate > 0.47 ? "Brisk" : "Balanced")
-                            .foregroundStyle(.secondary)
-                    }
-                    Slider(value: $narrationRate, in: 0.30...0.55, step: 0.01)
-                }
-                Button("Stop Narration") { store.stopNarration() }
             }
 
             Section {

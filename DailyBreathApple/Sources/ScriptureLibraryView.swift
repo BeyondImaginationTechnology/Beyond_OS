@@ -149,14 +149,14 @@ struct ScriptureLibraryView: View {
     }
 
     private func chapterLabel(_ count: Int) -> String {
-        tradition == .quran ? "\(count) surah" : "\(count) chapters"
+        "\(count) \(tradition.chapterUnitPlural)"
     }
 
     private var summaryText: String {
         if tradition == .quran {
             return "\(library.books.count) surahs · \(library.verseCount.formatted()) ayahs"
         }
-        return "\(library.books.count) books · \(library.chapterCount) chapters · \(library.verseCount.formatted()) \(tradition.passageUnitPlural)"
+        return "\(library.books.count) books · \(library.chapterCount) \(tradition.chapterUnitPlural) · \(library.verseCount.formatted()) \(tradition.passageUnitPlural)"
     }
 }
 
@@ -169,18 +169,18 @@ private struct SacredTextBookView: View {
                 VStack(alignment: .leading, spacing: 7) {
                     Label(book.subtitle, systemImage: book.tradition.symbolName).font(.caption.bold())
                     Text(book.name).font(.largeTitle.weight(.black))
-                    Text("\(book.chapters.count) \(book.tradition == .quran ? "surah" : "chapters") · \(book.verseCount.formatted()) \(book.tradition.passageUnitPlural)")
+                    Text("\(book.chapters.count) \(book.tradition.chapterUnitPlural) · \(book.verseCount.formatted()) \(book.tradition.passageUnitPlural)")
                         .foregroundStyle(.secondary)
                 }
                 .padding(.vertical, 8)
             }
-            Section(book.tradition == .quran ? "Surah" : "Chapters") {
+            Section(book.tradition.chapterUnitPlural.capitalized) {
                 ForEach(book.chapters) { chapter in
                     NavigationLink {
                         SacredTextChapterView(chapter: chapter)
                     } label: {
                         HStack {
-                            Text(book.tradition == .quran ? book.name : "Chapter \(chapter.number)")
+                            Text(book.tradition == .quran ? book.name : "\(book.tradition.chapterUnitSingular.capitalized) \(chapter.number)")
                             Spacer()
                             Text("\(chapter.verses.count) \(book.tradition.passageUnitPlural)").font(.caption).foregroundStyle(.secondary)
                         }
@@ -225,9 +225,6 @@ private struct SacredTextChapterView: View {
                         .id(verse.id)
                         .listRowBackground(verse.id == highlightedVerseID ? theme.accent.opacity(0.18) : nil)
                         .contextMenu {
-                            Button { store.speakText("\(verse.text) \(verse.reference)") } label: {
-                                Label("Listen", systemImage: "speaker.wave.2")
-                            }
                             ShareLink(item: "\(verse.text) — \(verse.reference)") {
                                 Label(shareLabel, systemImage: "square.and.arrow.up")
                             }
@@ -236,13 +233,6 @@ private struct SacredTextChapterView: View {
                 }
             }
             .navigationTitle(chapter.title)
-            .toolbar {
-                Button {
-                    store.speakText(chapter.verses.map { "\(spokenUnit) \($0.verse). \($0.text)" }.joined(separator: " "))
-                } label: {
-                    Label(listenLabel, systemImage: "speaker.wave.2.fill")
-                }
-            }
             .onAppear {
                 if let highlightedVerseID { proxy.scrollTo(highlightedVerseID, anchor: .center) }
             }
@@ -255,18 +245,6 @@ private struct SacredTextChapterView: View {
         case .torah: "Share Passage"
         case .quran: "Share Ayah"
         }
-    }
-
-    private var spokenUnit: String {
-        switch chapter.tradition {
-        case .bible: "Verse"
-        case .torah: "Pasuk"
-        case .quran: "Ayah"
-        }
-    }
-
-    private var listenLabel: String {
-        chapter.tradition == .quran ? "Listen to Surah" : "Listen to Chapter"
     }
 
     private func isRightToLeft(_ text: String) -> Bool {

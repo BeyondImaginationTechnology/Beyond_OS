@@ -318,11 +318,6 @@ private struct BibleChapterView: View {
                         .id(verse.id)
                         .contextMenu {
                             Button {
-                                store.speakBibleVerse(verse)
-                            } label: {
-                                Label("Listen to Verse", systemImage: "speaker.wave.2")
-                            }
-                            Button {
                                 store.toggleFavorite(verse)
                             } label: {
                                 Label(isFavorite(verse) ? "Remove Favorite" : "Favorite Verse", systemImage: isFavorite(verse) ? "star.slash" : "star")
@@ -361,16 +356,6 @@ private struct BibleChapterView: View {
                 }
             }
             .navigationTitle(chapter.title)
-            .toolbar {
-                ToolbarItemGroup(placement: .topBarTrailing) {
-                    Button { store.speakBibleChapter(chapter) } label: {
-                        Label("Listen to Chapter", systemImage: "speaker.wave.2.fill")
-                    }
-                    Button { store.stopNarration() } label: {
-                        Label("Stop Narration", systemImage: "stop.fill")
-                    }
-                }
-            }
             .scrollContentBackground(.hidden)
             .background(DailyBreathThemeBackground(theme: selectedTheme))
             .onAppear {

@@ -1,4 +1,3 @@
-import AVFoundation
 import Foundation
 #if canImport(WidgetKit)
 import WidgetKit
@@ -184,10 +183,10 @@ final class DailyBreathStore: ObservableObject {
                     id: 401,
                     title: "Begin with Shema",
                     duration: "5 min",
-                    scripture: "Deuteronomy 6:4-5",
+                    scripture: "Devarim 6:4-5",
                     summary: "Start with Jewish faith’s call to listen, love God, and live attentively.",
-                    teaching: "Shema means listen. Deuteronomy joins listening to love and daily action: faith is carried into ordinary choices, relationships, and habits. Dovi’s first invitation is simple—listen before reacting, remember that your life has sacred direction, and let one action embody what you are learning.",
-                    practice: "Read Deuteronomy 6:4-5 slowly. Take one quiet breath after each line and name one loving action for today.",
+                    teaching: "Shema means listen. Devarim joins listening to love and daily action: faith is carried into ordinary choices, relationships, and habits. Dovi’s first invitation is simple—listen before reacting, remember that your life has sacred direction, and let one action embody what you are learning.",
+                    practice: "Read Devarim 6:4-5 slowly. Take one quiet breath after each line and name one loving action for today.",
                     reflectionPrompt: "What would attentive listening change in my next decision?",
                     checkPrompt: "What does the word Shema invite you to do?",
                     checkAnswer: "listen"
@@ -219,7 +218,7 @@ final class DailyBreathStore: ObservableObject {
                     id: 501,
                     title: "Teshuvah: Return, Don’t Disappear",
                     duration: "6 min",
-                    scripture: "Psalm 51:12",
+                    scripture: "Tehillim 51:12",
                     summary: "Approach a setback as a call to return, repair, and reconnect.",
                     teaching: "Teshuvah is often translated as repentance, but its movement is return. Recovery grows when shame no longer drives isolation. Name what happened truthfully, return to God and your supports, repair what you safely can, and take the next concrete step. A lapse is serious, but it does not erase your capacity to return.",
                     practice: "Use four lines: what happened, who can support me, what needs repair, and what is my next safe action?",
@@ -231,12 +230,12 @@ final class DailyBreathStore: ObservableObject {
                     id: 502,
                     title: "Choose Life with Support",
                     duration: "6 min",
-                    scripture: "Deuteronomy 30:19",
+                    scripture: "Devarim 30:19",
                     summary: "Build recovery around life-giving choices, community, and a concrete safety plan.",
                     teaching: "The Torah’s call to choose life can guide one decision at a time. Recovery becomes more durable when a life-giving choice is made easier before a difficult moment arrives. Trusted community, professional care, and peer support can stand alongside prayer and teshuvah. Prepare the next right choice by reducing access to harm and increasing access to people who know how to help.",
                     practice: "Write one safeguard, one person to contact, and one life-giving action you can take when risk rises.",
                     reflectionPrompt: "What practical choice would make the path toward life easier today?",
-                    checkPrompt: "What does Deuteronomy 30:19 call you to choose?",
+                    checkPrompt: "What does Devarim 30:19 call you to choose?",
                     checkAnswer: "life"
                 )
             ],
@@ -316,9 +315,6 @@ final class DailyBreathStore: ObservableObject {
         )
     ]
 
-    private let speaker = AVSpeechSynthesizer()
-    private var prerecordedPlayer: AVAudioPlayer?
-    private var streamingPlayer: AVPlayer?
     private let apiClient: DailyBreathAPIClient
     private let userDataStore: DailyBreathUserDataStore
     private var challengeCompletionDayKeys: [String: [String]] = [:]
@@ -478,129 +474,6 @@ final class DailyBreathStore: ObservableObject {
         formatter.timeZone = .current
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: date)
-    }
-
-    func speakVerse() {
-        let referenceKey = verse.reference
-            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
-            .lowercased()
-            .replacingOccurrences(of: "[^a-z0-9]+", with: "-", options: .regularExpression)
-            .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
-        if playBundledNarration(named: "verse-\(referenceKey)") {
-            statusMessage = "Prerecorded offline verse"
-            return
-        }
-        if let audioURL = verse.audioURL, let url = URL(string: audioURL), url.scheme == "https" {
-            speaker.stopSpeaking(at: .immediate)
-            prerecordedPlayer?.stop()
-            prepareAudioSessionForNarration()
-            streamingPlayer = AVPlayer(url: url)
-            streamingPlayer?.play()
-            statusMessage = "Prerecorded Studio verse"
-            return
-        }
-        speakText("\(verse.text) \(verse.reference)")
-    }
-
-    func speakText(_ text: String) {
-        speaker.stopSpeaking(at: .immediate)
-        prerecordedPlayer?.stop()
-        streamingPlayer?.pause()
-        prepareAudioSessionForNarration()
-
-        let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = preferredNarrationVoice(for: text)
-        let savedRate = UserDefaults.standard.double(forKey: "narrationRate")
-        utterance.rate = Float(savedRate == 0 ? 0.38 : savedRate)
-        if let language = UserDefaults.standard.string(forKey: "narrationVoiceLanguage"), !language.isEmpty {
-            utterance.voice = AVSpeechSynthesisVoice(language: language) ?? utterance.voice
-        }
-        utterance.pitchMultiplier = 0.96
-        utterance.volume = 0.92
-        utterance.preUtteranceDelay = 0.08
-        utterance.postUtteranceDelay = 0.12
-        speaker.speak(utterance)
-    }
-
-    func speakAcademyLesson(_ lesson: AcademyLesson) {
-        if playBundledNarration(named: "academy-\(lesson.id)") { return }
-        speakText("\(lesson.title). \(lesson.scripture). \(lesson.teaching) Practice. \(lesson.practice)")
-    }
-
-    func speakBibleVerse(_ verse: BibleVerse) {
-        speakText("\(verse.reference). \(verse.text)")
-    }
-
-    func speakBibleChapter(_ chapter: BibleChapter) {
-        let verses = chapter.verses.map { "Verse \($0.verse). \($0.text)" }.joined(separator: " ")
-        speakText("\(chapter.title). \(verses)")
-    }
-
-    func stopNarration() {
-        speaker.stopSpeaking(at: .immediate)
-        prerecordedPlayer?.stop()
-        streamingPlayer?.pause()
-    }
-
-    func speakBreathPattern(_ pattern: BreathPattern) {
-        if playBundledNarration(named: "breath-pattern-\(pattern.id)") { return }
-        speakText("\(pattern.title). \(pattern.intention) \(pattern.instruction)")
-    }
-
-    func speakBreathCue(_ cue: String) {
-        let key = cue
-            .lowercased()
-            .replacingOccurrences(of: "[^a-z]+", with: "-", options: .regularExpression)
-            .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
-        if playBundledNarration(named: "breath-\(key)") { return }
-        speakText(cue)
-    }
-
-    @discardableResult
-    private func playBundledNarration(named resource: String) -> Bool {
-        guard let url = Bundle.main.url(
-            forResource: resource,
-            withExtension: "mp3",
-            subdirectory: "Audio/Narration"
-        ), let player = try? AVAudioPlayer(contentsOf: url) else {
-            return false
-        }
-
-        speaker.stopSpeaking(at: .immediate)
-        prerecordedPlayer?.stop()
-        prepareAudioSessionForNarration()
-        player.prepareToPlay()
-        prerecordedPlayer = player
-        return player.play()
-    }
-
-    private func preferredNarrationVoice(for text: String) -> AVSpeechSynthesisVoice? {
-        let preferredLanguages: [String]
-        if text.unicodeScalars.contains(where: { (0x0590...0x05FF).contains(Int($0.value)) }) {
-            preferredLanguages = ["he-IL"]
-        } else if text.unicodeScalars.contains(where: { (0x0600...0x08FF).contains(Int($0.value)) }) {
-            preferredLanguages = ["ar-SA", "ar-AE"]
-        } else if text.range(of: #"[àâçéèêëîïôùûüÿœæ]"#, options: [.regularExpression, .caseInsensitive]) != nil {
-            preferredLanguages = ["fr-FR", "fr-CA"]
-        } else if text.range(of: #"[áéíñóúü¿¡]"#, options: [.regularExpression, .caseInsensitive]) != nil {
-            preferredLanguages = ["es-ES", "es-MX"]
-        } else {
-            preferredLanguages = ["en-US", "en-GB", "en-CA"]
-        }
-        let voices = AVSpeechSynthesisVoice.speechVoices()
-
-        for quality in [AVSpeechSynthesisVoiceQuality.premium, .enhanced, .default] {
-            if let voice = voices.first(where: { preferredLanguages.contains($0.language) && $0.quality == quality }) {
-                return voice
-            }
-        }
-
-        return AVSpeechSynthesisVoice(language: preferredLanguages[0])
-    }
-
-    private func prepareAudioSessionForNarration() {
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: [.duckOthers])
-        try? AVAudioSession.sharedInstance().setActive(true)
     }
 
     func saveJournalEntry() {
@@ -834,10 +707,13 @@ final class DailyBreathStore: ObservableObject {
                 iCloudStatusMessage = "Encrypted iCloud sync is on"
                 return
             }
-            let combined = Self.mergeUserData(currentUserData(modifiedAt: localModifiedAt), with: cloudData)
+            let localData = currentUserData(modifiedAt: localModifiedAt)
+            let combined = Self.mergeUserData(localData, with: cloudData)
             apply(combined)
             try userDataStore.save(combined)
-            try EncryptedICloudSyncService.upload(combined)
+            if !Self.hasSameUserContent(combined, as: cloudData) {
+                try EncryptedICloudSyncService.upload(combined)
+            }
             iCloudStatusMessage = "Encrypted iCloud sync is on"
         } catch {
             iCloudStatusMessage = error.localizedDescription
@@ -900,8 +776,16 @@ final class DailyBreathStore: ObservableObject {
             bibleAnnotations: annotations,
             dailyHistory: history,
             deletedJournalEntryIDs: tombstones,
-            modifiedAt: Date()
+            modifiedAt: max(local.modifiedAt, cloud.modifiedAt)
         )
+    }
+
+    nonisolated static func hasSameUserContent(_ lhs: DailyBreathUserData, as rhs: DailyBreathUserData) -> Bool {
+        var left = lhs
+        var right = rhs
+        left.modifiedAt = .distantPast
+        right.modifiedAt = .distantPast
+        return left == right
     }
 
     private func updateCurrentChallengeProgress() {

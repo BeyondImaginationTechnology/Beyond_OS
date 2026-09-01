@@ -5,5 +5,5 @@ self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=
 self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET')return;
   if(event.request.mode==='navigate')event.respondWith(fetch(event.request).catch(()=>caches.match('/dailybreath/offline.html')));
-  else if(new URL(event.request.url).origin===location.origin&&['style','script','image','font','audio'].includes(event.request.destination))event.respondWith(caches.match(event.request).then(hit=>hit||fetch(event.request).then(response=>{if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy))}return response})));
+  else if(new URL(event.request.url).origin===location.origin&&['style','script','image','font'].includes(event.request.destination))event.respondWith(caches.match(event.request).then(hit=>hit||fetch(event.request).then(response=>{if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy))}return response})));
 });

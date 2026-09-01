@@ -24,7 +24,6 @@ DailyBreath 1.5 begins the Olive Era with three respectful faith journeys.
 - Reflection journal entries and weekly challenge completion now persist on device
 - Home Screen and Lock Screen Verse of the Day widgets
 - New Settings & About, daily history, Bible highlights, favorite collections, and private notes
-- Full Bible chapter narration with adjustable voice and speed
 - Notification deep links and optional encrypted iCloud sync
 - Recovery support page with professional and crisis resources
 - New Rose theme with pink accents for a softer devotional feel
@@ -42,7 +41,6 @@ Choose a Bible, Torah, or Quran Verse of the Day, search complete local sacred-t
 DailyBreath 1.5 includes:
 
 - Verse of the Day
-- Scripture and lesson narration
 - English World English Bible, French Louis Segond 1910, and Spanish Reina-Valera 1909 readers
 - Hebrew-default Torah/Tanakh with all 39 Hebrew Scripture books, plus English and French translations with Jewish book names
 - Arabic-default Quran with all 114 surahs and 6,236 ayahs, plus the Pickthall English meaning
@@ -50,7 +48,6 @@ DailyBreath 1.5 includes:
 - Book and chapter navigation
 - Continue Reading saved chapter
 - Persistent highlights, favorite collections, private notes, copy, and share verse actions
-- Full verse and chapter narration with adjustable controls
 - Daily devotional reflection
 - Mark-read devotional flow
 - Christian, Jewish, and Muslim Academy Joining the Faith and Recovery journeys with checks, progress, and a completion certificate

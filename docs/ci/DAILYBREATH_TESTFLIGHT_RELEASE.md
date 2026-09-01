@@ -22,9 +22,9 @@ access to the DailyBreath app in App Store Connect.
    | Widget | `technology.co.beyondimagination.thedailybreath.widget` | `DailyBreathWidget_AppStore.mobileprovision` |
    | App Clip | `technology.co.beyondimagination.thedailybreath.Clip` | `TheDailyBreathClip_AppStore.mobileprovision` |
 
-3. In App Store Connect, create an **individual** API key from a user with
-   **App Manager** access to The Daily Breath. Download the `.p8` file once and save it as
-   `AuthKey_DailyBreath.p8`. Record its Key ID and Issuer ID. Treat the `.p8`
+3. In App Store Connect, create a **team** API key with **App Manager** access.
+   This may be reused for every app in the team. Download the `.p8` file once
+   and record its Key ID and Issuer ID. Treat the `.p8`
    file like a password: Apple does not allow it to be downloaded again.
 
 ## One-time Azure preparation
@@ -34,7 +34,7 @@ the following exact file names. Secure files are never committed to Git.
 
 | Secure file | Source |
 | --- | --- |
-| `AuthKey_DailyBreath.p8` | App Store Connect API key |
+| `AuthKey_WCGDUVCBRB.p8` | App Store Connect API key |
 | `DailyBreath_Distribution.p12` | Apple Distribution certificate export |
 | `TheDailyBreath_AppStore.mobileprovision` | App profile |
 | `DailyBreathWidget_AppStore.mobileprovision` | Widget profile |
@@ -68,8 +68,8 @@ key itself remains a Secure file.
 
 ## Future apps
 
-Reuse this pattern, but give every app its own release YAML file, Fastlane
-lane, five-or-more app-specific secure-file names, and app-specific variable
-group. A shared Apple Distribution certificate is possible, but each bundle ID
-and extension still needs its own provisioning profile. Keep release pipelines
-manual-only until their validation pipeline is stable.
+Reuse this pattern with an app-specific release YAML file, Fastlane lane,
+provisioning profiles, and variable group for each app. The team API key and
+Apple Distribution certificate can be shared; each bundle ID and extension
+still needs its own provisioning profile. Keep release pipelines manual-only
+until their validation pipeline is stable.

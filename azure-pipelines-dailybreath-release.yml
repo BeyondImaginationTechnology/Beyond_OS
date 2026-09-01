@@ -20,7 +20,7 @@ steps:
   - task: DownloadSecureFile@1
     name: appStoreConnectKey
     inputs:
-      secureFile: AuthKey_DailyBreath.p8
+      secureFile: AuthKey_WCGDUVCBRB.p8
     displayName: Download App Store Connect API key
 
   - task: InstallAppleCertificate@2

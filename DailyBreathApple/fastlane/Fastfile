@@ -16,6 +16,25 @@ platform :ios do
       build_number: ENV.fetch("CI_BUILD_NUMBER")
     )
 
+    # The project normally uses automatic signing for local development. The
+    # hosted Azure agent has no Apple account, so set the three Release targets
+    # to the already-installed App Store profiles in this CI checkout only.
+    [
+      ["TheDailyBreath", ENV.fetch("THE_DAILY_BREATH_PROFILE_NAME")],
+      ["DailyBreathWidget", ENV.fetch("DAILY_BREATH_WIDGET_PROFILE_NAME")],
+      ["TheDailyBreathClip", ENV.fetch("DAILY_BREATH_CLIP_PROFILE_NAME")]
+    ].each do |target, profile|
+      update_code_signing_settings(
+        path: "TheDailyBreath.xcodeproj",
+        use_automatic_signing: false,
+        team_id: "FK9QM3VUNH",
+        profile_name: profile,
+        code_sign_identity: "Apple Distribution",
+        target_filter: target,
+        build_configurations: ["Release"]
+      )
+    end
+
     build_app(
       project: "TheDailyBreath.xcodeproj",
       scheme: "The Daily Breath",

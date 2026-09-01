@@ -1,0 +1,70 @@
+# Manual-only release pipeline for signed DailyBreath TestFlight builds.
+#
+# Before running, upload the secure files and create the secret variables listed
+# in docs/ci/DAILYBREATH_TESTFLIGHT_RELEASE.md. Do not add credentials to Git.
+trigger: none
+pr: none
+
+pool:
+  vmImage: macos-15
+
+variables:
+  - group: dailybreath-testflight
+  - name: projectDirectory
+    value: DailyBreathApple
+
+steps:
+  - checkout: self
+    clean: true
+
+  - task: DownloadSecureFile@1
+    name: appStoreConnectKey
+    inputs:
+      secureFile: AuthKey_DailyBreath.p8
+    displayName: Download App Store Connect API key
+
+  - task: InstallAppleCertificate@2
+    inputs:
+      certSecureFile: DailyBreath_Distribution.p12
+      certPwd: $(APPLE_CERTIFICATE_PASSWORD)
+      keychain: temp
+      deleteCert: true
+    displayName: Install Apple Distribution certificate
+
+  - task: InstallAppleProvisioningProfile@1
+    inputs:
+      provisioningProfileLocation: secureFiles
+      provProfileSecureFile: TheDailyBreath_AppStore.mobileprovision
+      removeProfile: true
+    displayName: Install app provisioning profile
+
+  - task: InstallAppleProvisioningProfile@1
+    inputs:
+      provisioningProfileLocation: secureFiles
+      provProfileSecureFile: DailyBreathWidget_AppStore.mobileprovision
+      removeProfile: true
+    displayName: Install widget provisioning profile
+
+  - task: InstallAppleProvisioningProfile@1
+    inputs:
+      provisioningProfileLocation: secureFiles
+      provProfileSecureFile: TheDailyBreathClip_AppStore.mobileprovision
+      removeProfile: true
+    displayName: Install App Clip provisioning profile
+
+  - bash: |
+      set -euo pipefail
+      gem install bundler --no-document
+      bundle config set path vendor/bundle
+      bundle install
+      bundle exec fastlane ios testflight
+    workingDirectory: $(projectDirectory)
+    env:
+      APP_STORE_CONNECT_API_KEY_PATH: $(appStoreConnectKey.secureFilePath)
+      APP_STORE_CONNECT_KEY_ID: $(APP_STORE_CONNECT_KEY_ID)
+      APP_STORE_CONNECT_ISSUER_ID: $(APP_STORE_CONNECT_ISSUER_ID)
+      THE_DAILY_BREATH_PROFILE_NAME: $(THE_DAILY_BREATH_PROFILE_NAME)
+      DAILY_BREATH_WIDGET_PROFILE_NAME: $(DAILY_BREATH_WIDGET_PROFILE_NAME)
+      DAILY_BREATH_CLIP_PROFILE_NAME: $(DAILY_BREATH_CLIP_PROFILE_NAME)
+      CI_BUILD_NUMBER: $(Build.BuildId)
+    displayName: Archive and upload DailyBreath to TestFlight

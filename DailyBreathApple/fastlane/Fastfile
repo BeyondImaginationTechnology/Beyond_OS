@@ -1,0 +1,40 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Archive The Daily Breath and upload it to TestFlight"
+  lane :testflight do
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("APP_STORE_CONNECT_KEY_ID"),
+      issuer_id: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
+      key_filepath: ENV.fetch("APP_STORE_CONNECT_API_KEY_PATH")
+    )
+
+    # Azure build IDs are monotonic. This updates only the CI checkout so every
+    # TestFlight upload has a build number that is unique without touching Git.
+    increment_build_number(
+      xcodeproj: "TheDailyBreath.xcodeproj",
+      build_number: ENV.fetch("CI_BUILD_NUMBER")
+    )
+
+    build_app(
+      project: "TheDailyBreath.xcodeproj",
+      scheme: "The Daily Breath",
+      clean: true,
+      export_method: "app-store",
+      export_options: {
+        method: "app-store",
+        provisioningProfiles: {
+          "technology.co.beyondimagination.thedailybreath" => ENV.fetch("THE_DAILY_BREATH_PROFILE_NAME"),
+          "technology.co.beyondimagination.thedailybreath.widget" => ENV.fetch("DAILY_BREATH_WIDGET_PROFILE_NAME"),
+          "technology.co.beyondimagination.thedailybreath.Clip" => ENV.fetch("DAILY_BREATH_CLIP_PROFILE_NAME")
+        }
+      }
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
+      skip_waiting_for_build_processing: true
+    )
+  end
+end

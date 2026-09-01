@@ -128,7 +128,6 @@ html[data-faith=bible] .splash{color:#17231b;background:linear-gradient(#f3f8f2e
     </section>
   </section>
 
-<section class="db-green-entry" style="max-width:1100px;margin:24px auto;padding:0 20px"><div style="border:1px solid rgba(84,220,125,.35);border-radius:20px;padding:24px;background:linear-gradient(135deg,rgba(18,53,34,.92),rgba(8,19,16,.96));display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap"><div><small style="letter-spacing:.16em;color:#72e39a;font-weight:800">ADULT WELLNESS · LEGAL AGE ONLY</small><h2 style="margin:8px 0">Beyond Green 🌿</h2><p style="margin:0;max-width:680px;color:#c9d7ce">Private cannabis wellness journaling, tolerance awareness, T-break goals, mood and sleep check-ins, and safer-use reminders—now part of Daily Breath.</p></div><a href="/dailybreath/beyond-green/" style="display:inline-flex;min-height:46px;align-items:center;padding:0 18px;border-radius:12px;background:#62df8b;color:#07140c;text-decoration:none;font-weight:900">Open Beyond Green</a></div></section>
 </main>
 <nav class="bottom" aria-label="DailyBreath navigation">
   <a class="active" href="index.php"><svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/></svg><span>Home</span></a>

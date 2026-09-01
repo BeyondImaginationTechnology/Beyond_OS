@@ -28,18 +28,18 @@ function dailybreath_verse_of_day(PDO $pdo, string $locale = 'en', ?string $date
         ['We know that all things work together for good for those who love God.', 'Romans 8:28'],
     ];
 
-    $result = dailybreath_recovery_verse_for_date($date, false);
+    $result = null;
     try {
-        // Prefer the visitor's language, then use the managed English edition
-        // until a localized post has been published for the same experience.
-        $query = $pdo->prepare("SELECT verse_text, scripture_reference FROM verse_day_posts WHERE status='published' AND publish_date<=? AND locale IN (?, 'en') ORDER BY CASE WHEN locale=? THEN 0 ELSE 1 END, publish_date DESC, id DESC LIMIT 1");
+        // A Studio post is an explicit override for this calendar day only.
+        // Do not allow a previously published post to become a stale "daily" verse.
+        $query = $pdo->prepare("SELECT verse_text, scripture_reference FROM verse_day_posts WHERE status='published' AND publish_date=? AND locale IN (?, 'en') ORDER BY CASE WHEN locale=? THEN 0 ELSE 1 END, id DESC LIMIT 1");
         $query->execute([$date, $locale, $locale]);
         $row = $query->fetch(PDO::FETCH_ASSOC);
-        if ($row && trim((string)($row['verse_text'] ?? '')) !== '') {
+        if ($row && dailybreath_is_valid_verse_record($row)) {
             $result = [
                 'text' => trim((string)$row['verse_text']),
                 'reference' => trim((string)($row['scripture_reference'] ?? '')),
-                'source' => 'verse_day_posts',
+                'source' => 'daily_studio_override',
             ];
         }
     } catch (Throwable $exception) {
@@ -47,42 +47,33 @@ function dailybreath_verse_of_day(PDO $pdo, string $locale = 'en', ?string $date
     }
 
     if ($result === null) {
-        try {
-            $query = $pdo->prepare("SELECT title, body FROM beyond_content WHERE product='dailybreath' AND status='published' AND scheduled_for<=? ORDER BY scheduled_for DESC, id DESC LIMIT 1");
-            $query->execute([$date]);
-            $row = $query->fetch(PDO::FETCH_ASSOC);
-            if ($row && trim((string)($row['title'] ?? '')) !== '') {
-                $result = [
-                    'text' => trim((string)$row['title']),
-                    'reference' => trim((string)($row['body'] ?? '')),
-                    'source' => 'beyond_content',
-                ];
-            }
-        } catch (Throwable $exception) {
-            // Fall through to the bundled daily rotation.
-        }
+        $candidate = dailybreath_recovery_verse_for_date($date, false);
+        if ($candidate !== null && dailybreath_is_valid_verse_record($candidate)) $result = $candidate;
     }
 
     if ($result === null) {
-        $result = dailybreath_recovery_verse_for_date($date);
+        $candidate = dailybreath_recovery_verse_for_date($date);
+        if ($candidate !== null && dailybreath_is_valid_verse_record($candidate)) $result = $candidate;
     }
 
     if ($result === null) {
-        $webFallback = dailybreath_web_verse_fallback($date);
-        if ($webFallback !== null) {
-            $result = $webFallback;
-        } else {
-            $index = (int)(abs(crc32($date)) % count($fallbacks));
-            $result = [
-                'text' => $fallbacks[$index][0],
-                'reference' => $fallbacks[$index][1],
-                'source' => 'bundled_rotation',
-            ];
-        }
+        $index = (int)(abs(crc32($date)) % count($fallbacks));
+        $result = [
+            'text' => $fallbacks[$index][0],
+            'reference' => $fallbacks[$index][1],
+            'source' => 'emergency_bible_fallback',
+        ];
     }
 
     $location = dailybreath_reference_location($result['reference']);
     return $result + $location;
+}
+
+/** @param array<string,mixed> $verse */
+function dailybreath_is_valid_verse_record(array $verse): bool
+{
+    return trim((string)($verse['text'] ?? $verse['verse_text'] ?? '')) !== ''
+        && trim((string)($verse['reference'] ?? $verse['scripture_reference'] ?? '')) !== '';
 }
 
 /** @return array{text:string,reference:string,source:string}|null */

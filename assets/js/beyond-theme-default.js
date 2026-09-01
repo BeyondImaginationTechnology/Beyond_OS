@@ -29,7 +29,7 @@
   }
   function initializeControls() {
     applyTheme(savedTheme());
-    each('#localePicker', function (picker) {
+    each('.bos-locale-picker', function (picker) {
       var locale = 'en';
       try { locale = localStorage.getItem('beyond-locale') || 'en'; } catch (error) {}
       for (var index = 0; index < picker.options.length; index += 1) if (picker.options[index].value === locale) picker.value = locale;
@@ -59,7 +59,7 @@
   });
   document.addEventListener('change', function (event) {
     var picker = event.target;
-    if (!picker || picker.id !== 'localePicker') return;
+    if (!picker || !picker.classList || !picker.classList.contains('bos-locale-picker')) return;
     root.lang = picker.value;
     try { localStorage.setItem('beyond-locale', picker.value); } catch (error) {}
     emitLocale(picker.value);

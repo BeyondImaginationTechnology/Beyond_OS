@@ -158,7 +158,7 @@
     });
     document.querySelectorAll('.bos-apps-toggle').forEach(function (button) { var value = dictionary.apps + ' ▾'; if (button.textContent !== value) button.textContent = value; });
     document.querySelectorAll('.bos-locale').forEach(function (label) { label.title = dictionary.language; });
-    document.querySelectorAll('#localePicker').forEach(function (picker) { picker.setAttribute('aria-label', dictionary.language); });
+    document.querySelectorAll('.bos-locale-picker').forEach(function (picker) { picker.setAttribute('aria-label', dictionary.language); });
     document.querySelectorAll('.bos-app-store-label-full').forEach(function (label) { var value = appStoreLabels[locale] || appStoreLabels.en; if (label.textContent !== value) label.textContent = value; });
     document.querySelectorAll('.hero-actions .ghost').forEach(function (link) { var value = appStoreCtas[locale] || appStoreCtas.en; if (link.textContent !== value) link.textContent = value; });
     document.querySelectorAll('#beyond-os-shell .bos-home-label').forEach(function (label) { if (label.textContent !== 'BEYOND OS') label.textContent = 'BEYOND OS'; });
@@ -182,11 +182,16 @@
     var localeRefresh = 0;
     var observeLocaleRoot = function () {
       var root = document.documentElement;
-      if (!root) return;
-      new MutationObserver(function () {
+      if (!root || root.nodeType !== 1) return;
+      var observer = new MutationObserver(function () {
         clearTimeout(localeRefresh);
         localeRefresh = setTimeout(function () { apply(selectedLocale()); }, 50);
-      }).observe(root, { childList: true, subtree: true });
+      });
+      try {
+        observer.observe(root, { childList: true, subtree: true });
+      } catch (error) {
+        observer.disconnect();
+      }
     };
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', observeLocaleRoot, { once: true });
     else observeLocaleRoot();

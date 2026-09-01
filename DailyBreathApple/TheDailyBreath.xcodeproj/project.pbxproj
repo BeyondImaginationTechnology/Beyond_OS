@@ -26,7 +26,6 @@
 		300000000000000000000018 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000018 /* LaunchScreen.storyboard */; };
 		300000000000000000000019 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000020 /* NotificationService.swift */; };
 		300000000000000000000020 /* ReminderSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000021 /* ReminderSettingsView.swift */; };
-		300000000000000000000021 /* Audio in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000022 /* Audio */; };
 		300000000000000000000022 /* daily-verses.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000023 /* daily-verses.json */; };
 		300000000000000000000023 /* daily-devotionals.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000024 /* daily-devotionals.json */; };
 		300000000000000000000024 /* recovery-challenges.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000025 /* recovery-challenges.json */; };
@@ -119,7 +118,6 @@
 		100000000000000000000019 /* TheDailyBreathClip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TheDailyBreathClip.entitlements; sourceTree = "<group>"; };
 		100000000000000000000020 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		100000000000000000000021 /* ReminderSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderSettingsView.swift; sourceTree = "<group>"; };
-		100000000000000000000022 /* Audio */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Audio; sourceTree = "<group>"; };
 		100000000000000000000023 /* daily-verses.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "daily-verses.json"; sourceTree = "<group>"; };
 		100000000000000000000024 /* daily-devotionals.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "daily-devotionals.json"; sourceTree = "<group>"; };
 		100000000000000000000025 /* recovery-challenges.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "recovery-challenges.json"; sourceTree = "<group>"; };
@@ -217,7 +215,6 @@
 				100000000000000000000010 /* Assets.xcassets */,
 				100000000000000000000014 /* engwebp_vpl.txt */,
 				100000000000000000000018 /* LaunchScreen.storyboard */,
-				100000000000000000000022 /* Audio */,
 				100000000000000000000023 /* daily-verses.json */,
 				100000000000000000000024 /* daily-devotionals.json */,
 				100000000000000000000025 /* recovery-challenges.json */,
@@ -424,7 +421,6 @@
 				300000000000000000000010 /* Assets.xcassets in Resources */,
 				300000000000000000000012 /* engwebp_vpl.txt in Resources */,
 				300000000000000000000018 /* LaunchScreen.storyboard in Resources */,
-				300000000000000000000021 /* Audio in Resources */,
 				300000000000000000000022 /* daily-verses.json in Resources */,
 				300000000000000000000023 /* daily-devotionals.json in Resources */,
 				300000000000000000000024 /* recovery-challenges.json in Resources */,

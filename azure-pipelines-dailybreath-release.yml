@@ -54,6 +54,21 @@ steps:
 
   - bash: |
       set -euo pipefail
+      selected_xcode=""
+      for xcode_app in /Applications/Xcode_26*.app /Applications/Xcode.app; do
+        [[ -d "$xcode_app" ]] || continue
+        xcode_version="$(DEVELOPER_DIR="$xcode_app/Contents/Developer" xcodebuild -version | head -n 1)"
+        if [[ "$xcode_version" == Xcode\ 26* ]]; then
+          selected_xcode="$xcode_app"
+          break
+        fi
+      done
+      if [[ -z "$selected_xcode" ]]; then
+        echo "##vso[task.logissue type=error]Xcode 26 or later is required for App Store Connect uploads."
+        exit 1
+      fi
+      export DEVELOPER_DIR="$selected_xcode/Contents/Developer"
+      xcodebuild -version
       gem install bundler --no-document
       bundle config set path vendor/bundle
       bundle install

@@ -22,8 +22,8 @@ access to the DailyBreath app in App Store Connect.
    | Widget | `technology.co.beyondimagination.thedailybreath.widget` | `DailyBreathWidget_AppStore.mobileprovision` |
    | App Clip | `technology.co.beyondimagination.thedailybreath.Clip` | `TheDailyBreathClip_AppStore.mobileprovision` |
 
-3. In App Store Connect, create an API key with **App Manager** access to The
-   Daily Breath. Download the `.p8` file once and save it as
+3. In App Store Connect, create an **individual** API key from a user with
+   **App Manager** access to The Daily Breath. Download the `.p8` file once and save it as
    `AuthKey_DailyBreath.p8`. Record its Key ID and Issuer ID. Treat the `.p8`
    file like a password: Apple does not allow it to be downloaded again.
 

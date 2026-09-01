@@ -30,7 +30,7 @@ platform :ios do
         team_id: "FK9QM3VUNH",
         profile_name: profile,
         code_sign_identity: "Apple Distribution",
-        target_filter: target,
+        targets: [target],
         build_configurations: ["Release"]
       )
     end

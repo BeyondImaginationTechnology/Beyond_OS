@@ -32,6 +32,13 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     elseif (strlen($password)<8) $error='Password must be at least 8 characters.';
     elseif (!$accepted) $error='You must accept the Terms and Privacy Policy to create a Beyond ID.';
     else {
+        $accountLimit=beyond_rate_limit_consume($pdo,'web-register-account',$email,3,3600,3600);
+        $ipLimit=beyond_rate_limit_consume($pdo,'web-register-ip','',10,3600,3600);
+        if(!$accountLimit['allowed']||!$ipLimit['allowed']){
+            $retryAfter=max($accountLimit['retry_after'],$ipLimit['retry_after']);
+            http_response_code(429);header('Retry-After: '.$retryAfter);
+            $error='Too many registration attempts. Please try again later.';
+        } else {
         $check=$pdo->prepare("SELECT id FROM users WHERE email=? LIMIT 1"); $check->execute([$email]);
         if ($check->fetch()) $error='Account already exists.';
         else {
@@ -49,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
             if ($isSqlite) $success='Your local Beyond ID was created. You can sign in now.';
             elseif (send_verification_email($email,$token,'beyond_id',trim($first.' '.$last))) $success='Check your inbox. We sent a verification link to '.$email.'.';
             else $success='Your account was created, but the verification message could not be sent. Please contact support.';
+        }
         }
     }
 }

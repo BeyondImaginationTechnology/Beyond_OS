@@ -72,12 +72,17 @@ function beyond_app_icon(string $appName): string {
         'beyond-imagination-technology' => 'beyond-os',
     ];
     $slug = $aliases[$key] ?? $key;
+    if ($slug === 'daily-breath') {
+        $dailyBreathIcon = 'dailybreath/assets/icons/dailybreath-mark-v2.png';
+        return is_file(__DIR__ . '/../' . $dailyBreathIcon)
+            ? beyond_url($dailyBreathIcon . '?v=20260903-1')
+            : (is_file(__DIR__ . '/../' . $fallback) ? beyond_url($fallback) : '');
+    }
     $supported = ['beyond-os','beyond-id','daily-breath','beyond-health','beyond-tv','beyond-french','beyond-ancient','beyond-space','beyond-baby-names','beyond-tattoo'];
     if (!in_array($slug, $supported, true)) {
         return is_file(__DIR__ . '/../' . $fallback) ? beyond_url($fallback) : '';
     }
     $versioned = [
-        'daily-breath' => 'daily-breath-192.jpg?v=20260730-1',
         'beyond-baby-names' => 'beyond-baby-names-v2-192.webp?v=20260717-3',
         'beyond-tattoo' => 'beyond-tattoo-v2-192.webp?v=20260717-3',
     ];

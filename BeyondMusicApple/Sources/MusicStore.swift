@@ -1,5 +1,6 @@
 import AVFoundation
 import AuthenticationServices
+import CryptoKit
 import Foundation
 import UIKit
 
@@ -502,9 +503,10 @@ final class MusicStore: ObservableObject {
         defer { isAuthenticatingBeyondID = false }
 
         do {
-            let url = beyondIDService.googleSignInURL()
+            let verifier = BeyondMusicPKCE.verifier()
+            let url = beyondIDService.googleSignInURL(codeChallenge: BeyondMusicPKCE.challenge(verifier))
             let callbackURL = try await beyondIDWebAuthenticator.authenticate(url: url, callbackScheme: "beyondmusic")
-            beyondIDSession = try await beyondIDService.completeMobileSignIn(callbackURL: callbackURL)
+            beyondIDSession = try await beyondIDService.completeMobileSignIn(callbackURL: callbackURL, verifier: verifier)
             statusMessage = "Signed in with Google"
             savePreferences()
         } catch {
@@ -902,34 +904,40 @@ private struct BeyondIDService {
         }
     }
 
-    func googleSignInURL() -> URL {
+    func googleSignInURL(codeChallenge: String) -> URL {
         var components = URLComponents(url: baseURL.appending(path: "/beyond-id/auth/oauth-start.php"), resolvingAgainstBaseURL: false)
         components?.queryItems = [
             URLQueryItem(name: "provider", value: "google"),
             URLQueryItem(name: "app", value: "beyond-music"),
-            URLQueryItem(name: "return", value: "/beyond-id/auth/mobile-complete.php"),
-            URLQueryItem(name: "scheme", value: "beyondmusic")
+            URLQueryItem(name: "return", value: "/beyond-id/auth/mobile-complete.php?scheme=beyondmusic&code_challenge=\(codeChallenge)")
         ]
         return components?.url ?? baseURL.appending(path: "/beyond-id/auth/login.php")
     }
 
-    func completeMobileSignIn(callbackURL: URL) async throws -> BeyondIDSession {
+    func completeMobileSignIn(callbackURL: URL, verifier: String) async throws -> BeyondIDSession {
         let components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false)
         let queryItems = components?.queryItems ?? []
-        let token = queryItems.first(where: { $0.name == "token" })?.value
-            ?? callbackURL.absoluteString.components(separatedBy: "token=").dropFirst().first?.components(separatedBy: "&").first
-        guard let token, !token.isEmpty else {
+        guard let code = queryItems.first(where: { $0.name == "code" })?.value, !code.isEmpty else {
             let message = queryItems.first(where: { $0.name == "error" })?.value ?? "Google sign in did not return a mobile token"
             throw BeyondIDError.server(message)
         }
+        var request = URLRequest(url: baseURL.appending(path: "/beyond-id/api/mobile-token.php"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(["code": code, "code_verifier": verifier])
+        let (data, response) = try await session.data(for: request)
+        try validate(response: response, data: data)
+        let payload = try decoder.decode(BeyondMusicTokenResponse.self, from: data)
+        guard payload.ok, let token = payload.accessToken else { throw BeyondIDError.unauthorized }
         return try await mobileSession(token: token)
     }
 
     func mobileSession(token: String) async throws -> BeyondIDSession {
-        var components = URLComponents(url: baseURL.appending(path: "/beyond-id/api/mobile-session.php"), resolvingAgainstBaseURL: false)
-        components?.queryItems = [URLQueryItem(name: "token", value: token)]
-        guard let url = components?.url else { throw URLError(.badURL) }
-        let (data, response) = try await session.data(from: url)
+        var request = URLRequest(url: baseURL.appending(path: "/beyond-id/api/mobile-session.php"))
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("beyond-music-ios", forHTTPHeaderField: "X-Beyond-App")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        let (data, response) = try await session.data(for: request)
         try validate(response: response, data: data)
         let payload = try decoder.decode(BeyondIDMeResponse.self, from: data)
         guard payload.ok, payload.authenticated, let user = payload.user else {
@@ -980,6 +988,9 @@ private struct BeyondIDService {
         return URL(string: "https://beyondimagination.co.technology")!
     }
 }
+
+private struct BeyondMusicTokenResponse: Decodable { let ok: Bool; let accessToken: String?; enum CodingKeys: String, CodingKey { case ok; case accessToken = "access_token" } }
+private enum BeyondMusicPKCE { static func verifier() -> String { (UUID().uuidString + UUID().uuidString).replacingOccurrences(of: "-", with: "") }; static func challenge(_ verifier: String) -> String { let digest = SHA256.hash(data: Data(verifier.utf8)); return Data(digest).base64EncodedString().replacingOccurrences(of: "+", with: "-").replacingOccurrences(of: "/", with: "_").replacingOccurrences(of: "=", with: "") } }
 
 private enum BeyondIDError: LocalizedError, Equatable {
     case unauthorized

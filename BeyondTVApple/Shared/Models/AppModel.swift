@@ -1,6 +1,7 @@
 import AVFoundation
 import Combine
 import Foundation
+import CryptoKit
 import Security
 #if os(iOS)
 import AuthenticationServices
@@ -115,8 +116,9 @@ final class AppModel: ObservableObject {
         authErrorMessage = nil
 
         do {
-            let callbackURL = try await authenticate(url: beyondID.googleSignInURL())
-            let token = try mobileToken(from: callbackURL)
+            let verifier = BeyondTVPKCE.verifier()
+            let callbackURL = try await authenticate(url: beyondID.googleSignInURL(codeChallenge: BeyondTVPKCE.challenge(verifier)))
+            let token = try await beyondID.exchange(code: mobileCode(from: callbackURL), verifier: verifier)
             try await loadBeyondIDSession(token: token)
             guard tokenStore.save(token) else {
                 throw BeyondIDError.server("Beyond ID could not securely save this session.")
@@ -434,15 +436,17 @@ final class AppModel: ObservableObject {
         }
     }
 
-    private func mobileToken(from callbackURL: URL) throws -> String {
+    private func mobileCode(from callbackURL: URL) throws -> String {
         let components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false)
         if let error = components?.queryItems?.first(where: { $0.name == "error" })?.value, !error.isEmpty {
             throw BeyondIDError.server(error)
         }
-        guard let token = components?.queryItems?.first(where: { $0.name == "token" })?.value, !token.isEmpty else {
+        guard let token = components?.queryItems?.first(where: { $0.name == "code" })?.value, !token.isEmpty else {
             throw BeyondIDError.missingCallbackToken
         }
         return token
     }
     #endif
 }
+
+private enum BeyondTVPKCE { static func verifier() -> String { (UUID().uuidString + UUID().uuidString).replacingOccurrences(of: "-", with: "") }; static func challenge(_ verifier: String) -> String { let digest = SHA256.hash(data: Data(verifier.utf8)); return Data(digest).base64EncodedString().replacingOccurrences(of: "+", with: "-").replacingOccurrences(of: "/", with: "_").replacingOccurrences(of: "=", with: "") } }

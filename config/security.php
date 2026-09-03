@@ -25,6 +25,8 @@ function beyond_security_bootstrap(): void
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('X-Frame-Options: SAMEORIGIN');
     header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+    header("Content-Security-Policy: default-src 'self' https: data: blob:; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self' https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' https: data: blob:; font-src 'self' https: data:; media-src 'self' https: data: blob:; connect-src 'self' https: wss:; frame-src 'self' https:");
+    if (beyond_is_https()) header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
 }
 
 function beyond_csrf_token(): string

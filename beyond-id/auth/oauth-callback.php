@@ -84,8 +84,11 @@ try {
     }
     $pdo->commit();
     $mobileScheme = strtolower(trim((string)($flow['mobile_scheme'] ?? '')));
-    if (in_array($mobileScheme, ['beyondmusic', 'beyondtv', 'frenchquest'], true)) {
-        beyond_social_login_session($pdo, $user, $provider, '/beyond-id/auth/mobile-complete.php?scheme=' . rawurlencode($mobileScheme));
+    if (in_array($mobileScheme, ['beyondmusic', 'beyondtv', 'frenchquest', 'dailybreath'], true)) {
+        $destination = '/beyond-id/auth/mobile-complete.php?scheme=' . rawurlencode($mobileScheme);
+        $challenge = trim((string)($flow['mobile_code_challenge'] ?? ''));
+        if ($challenge !== '') $destination .= '&code_challenge=' . rawurlencode($challenge);
+        beyond_social_login_session($pdo, $user, $provider, $destination);
     }
     beyond_social_login_session($pdo, $user, $provider);
 } catch (Throwable $exception) {

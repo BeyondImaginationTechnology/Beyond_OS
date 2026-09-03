@@ -8,6 +8,49 @@ $apps=[
  'space'=>['name'=>'Beyond Space','icon'=>'🪐','summary'=>'Astrology, facts, and space media','tools'=>[['space','Astrology generator','Generate all 12 daily horoscopes','space-generator.php'],['space-facts','Daily fact generator','Build and publish the space fact','space-fact-generator.php']]],
  'ancient'=>['name'=>'Beyond Ancient','icon'=>'🏺','summary'=>'History facts and visual learning','tools'=>[['history','History generator','Create the historical carousel','history-generator.php'],['history-facts','Import 12/55 facts','Edit and publish the daily history fact','history-fact-generator.php']]],
  'shared'=>['name'=>'Shared production','icon'=>'✦','summary'=>'Voice, video, and reusable assets','tools'=>[['voices','Premium voices','Configure shared narration','voice-settings.php'],['video-templates','Video templates','Open production templates','video-templates.php'],['remotion','Remotion renderer','Render a finished media artifact','remotion-renderer.php']]],
- 'tattoo'=>['name'=>'Beyond Tattoo','icon'=>'🖋️','summary'=>'Stencils and artist assets','tools'=>[['tattoo-publish','Publish','Publish a stencil library drop','stencil-library.php#publish'],['tattoo-assets','Asset inbox','Review uploaded tattoo assets','tattoo-asset-import.php']]],
+ 'tattoo'=>['name'=>'Beyond Tattoo','icon'=>'🖋️','summary'=>'Stencils and artist assets','tools'=>[['tattoo-publish','Generate & publish','Publish a stencil library drop','stencil-library.php#publish'],['tattoo-assets','Asset inbox','Review uploaded tattoo assets','tattoo-asset-import.php']]],
 ];
-?><link rel="stylesheet" href="/server/admin/daily-studio/studio.css"><link rel="stylesheet" href="/server/admin/daily-studio/studio-sunset.css"><link rel="stylesheet" href="/server/admin/daily-studio/studio-organized.css"><div class="studio-console"><header class="console-hero"><div><p class="console-eyebrow">Beyond OS · production workspace</p><h1>Make the day <span>ready to publish.</span></h1><p>Choose an app, then stay in one focused workspace for its generators, content, and assets.</p></div><div class="console-status"><span class="status-dot"></span><div><strong>Studio online</strong><small>One workspace · six app rooms</small></div></div></header><nav class="app-switcher" aria-label="Production apps" role="tablist"><?php foreach($apps as $key=>$app):?><button type="button" role="tab" class="app-switch" data-app="<?=DailyStudio::esc($key)?>" aria-selected="false"><span class="app-switch-icon"><?=DailyStudio::esc($app['icon'])?></span><span><strong><?=DailyStudio::esc($app['name'])?></strong><small><?=DailyStudio::esc($app['summary'])?></small></span></button><?php endforeach;?></nav><main class="room" aria-live="polite"><aside class="tool-rail"><div class="room-heading"><p class="console-eyebrow">Current room</p><h2 id="roomName">DailyBreath</h2><p id="roomSummary">Faith, recovery, and weekly publishing</p></div><div id="toolList" class="tool-list"></div><div class="rail-note"><span>⌘</span><div><strong>Focused flow</strong><small>Switch tools without leaving Daily Studio.</small></div></div></aside><section class="workbench"><div class="workbench-head"><div><p class="console-eyebrow">Now working in</p><h2 id="toolName">Content manager</h2><p id="toolSummary">Verse, devotional, challenge, and academy</p></div><a class="btn launch" id="open-studio-page" href="dailybreath-content.php" target="_blank" rel="noopener">Open full page ↗</a></div><div class="studio-frame-shell"><iframe id="studio-frame" title="Daily Studio tool" loading="eager"></iframe></div></section></main></div><script>const rooms=<?=json_encode($apps,JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE)?>;const apps=[...document.querySelectorAll('.app-switch')],roomName=document.getElementById('roomName'),roomSummary=document.getElementById('roomSummary'),toolName=document.getElementById('toolName'),toolSummary=document.getElementById('toolSummary'),toolList=document.getElementById('toolList'),frame=document.getElementById('studio-frame'),open=document.getElementById('open-studio-page');let activeApp='dailybreath',activeTool='content';try{activeApp=localStorage.getItem('beyond-studio-app')||activeApp;activeTool=localStorage.getItem('beyond-studio-tool')||activeTool}catch(e){}function selectTool(key){const room=rooms[activeApp],tool=room.tools.find(item=>item[0]===key)||room.tools[0];activeTool=tool[0];[...toolList.children].forEach(item=>item.classList.toggle('active',item.dataset.tool===activeTool));toolName.textContent=tool[1];toolSummary.textContent=tool[2];frame.src=tool[3];open.href=tool[3];try{localStorage.setItem('beyond-studio-tool',activeTool)}catch(e){}}function selectApp(key){activeApp=rooms[key]?key:'dailybreath';const room=rooms[activeApp];apps.forEach(item=>{const on=item.dataset.app===activeApp;item.setAttribute('aria-selected',on?'true':'false');item.classList.toggle('active',on)});roomName.textContent=room.name;roomSummary.textContent=room.summary;toolList.innerHTML=room.tools.map(tool=>`<button type="button" class="tool-choice" data-tool="${tool[0]}"><span class="tool-choice-icon">${room.icon}</span><span><strong>${tool[1]}</strong><small>${tool[2]}</small></span><b>→</b></button>`).join('');toolList.querySelectorAll('.tool-choice').forEach(button=>button.addEventListener('click',()=>selectTool(button.dataset.tool)));try{localStorage.setItem('beyond-studio-app',activeApp)}catch(e){}selectTool(room.tools.some(item=>item[0]===activeTool)?activeTool:room.tools[0][0])}apps.forEach(button=>button.addEventListener('click',()=>selectApp(button.dataset.app)));selectApp(activeApp);</script><?php require dirname(__DIR__).'/_footer.php';?>
+?>
+<link rel="stylesheet" href="/server/admin/daily-studio/studio.css">
+<section class="studio-console">
+  <header class="console-hero">
+    <div>
+      <p class="console-eyebrow">Beyond OS · production workspace</p>
+      <h1>What are we making <span>today?</span></h1>
+      <p>Pick a product, then open the one tool you need. No nested dashboards and no competing themes.</p>
+    </div>
+    <div class="console-status"><span class="status-dot"></span><div><strong>Studio online</strong><small>Six production rooms</small></div></div>
+  </header>
+  <nav class="app-switcher" aria-label="Production apps" role="tablist">
+    <?php foreach($apps as $key=>$app): ?>
+      <button type="button" role="tab" class="app-switch" data-app="<?=DailyStudio::esc($key)?>" aria-selected="false">
+        <span class="app-switch-icon"><?=DailyStudio::esc($app['icon'])?></span>
+        <span><strong><?=DailyStudio::esc($app['name'])?></strong><small><?=DailyStudio::esc($app['summary'])?></small></span>
+      </button>
+    <?php endforeach; ?>
+  </nav>
+  <main class="room" aria-live="polite">
+    <div class="room-heading">
+      <div><p class="console-eyebrow">Selected room</p><h2 id="roomName">DailyBreath</h2><p id="roomSummary">Faith, recovery, and weekly publishing</p></div>
+      <span class="room-count" id="roomCount">3 tools</span>
+    </div>
+    <div id="toolList" class="tool-list"></div>
+  </main>
+</section>
+<script>
+const rooms=<?=json_encode($apps,JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE)?>;
+const appButtons=[...document.querySelectorAll('.app-switch')],roomName=document.getElementById('roomName'),roomSummary=document.getElementById('roomSummary'),roomCount=document.getElementById('roomCount'),toolList=document.getElementById('toolList');
+let activeApp='dailybreath';
+try{activeApp=localStorage.getItem('beyond-studio-app')||activeApp}catch(e){}
+function selectApp(key){
+  activeApp=rooms[key]?key:'dailybreath';
+  const room=rooms[activeApp];
+  appButtons.forEach(button=>button.setAttribute('aria-selected',button.dataset.app===activeApp?'true':'false'));
+  roomName.textContent=room.name;roomSummary.textContent=room.summary;roomCount.textContent=`${room.tools.length} ${room.tools.length===1?'tool':'tools'}`;
+  toolList.innerHTML=room.tools.map((tool,index)=>`<a class="tool-card" href="${tool[3]}"><span class="tool-number">${String(index+1).padStart(2,'0')}</span><span class="tool-icon">${room.icon}</span><span class="tool-copy"><strong>${tool[1]}</strong><small>${tool[2]}</small></span><span class="tool-arrow" aria-hidden="true">→</span></a>`).join('');
+  try{localStorage.setItem('beyond-studio-app',activeApp)}catch(e){}
+}
+appButtons.forEach(button=>button.addEventListener('click',()=>selectApp(button.dataset.app)));
+selectApp(activeApp);
+</script>
+<?php require dirname(__DIR__).'/_footer.php'; ?>

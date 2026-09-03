@@ -25,6 +25,9 @@ DirectoryIndex index.php index.html
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set Content-Security-Policy "default-src 'self' https: data: blob:; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self' https:; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' https: data: blob:; font-src 'self' https: data:; media-src 'self' https: data: blob:; connect-src 'self' https: wss:; frame-src 'self' https:"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" "expr=%{HTTPS} == 'on'"
 
   # Deployments must be visible immediately. Dynamic pages and the service
   # worker are revalidated on every request instead of being served stale.
@@ -54,7 +57,9 @@ DirectoryIndex index.php index.html
   RewriteBase /
 
   # Keep implementation, migration, and database resources off the web.
-  RewriteRule ^(?:config|includes|migrations|sql|docs)(?:/|$) - [F,L,NC]
+  RewriteRule ^(?:config|includes|migrations|sql|docs|tools|AppStoreAssets|\.cache|beyond-chromium)(?:/|$) - [F,L,NC]
+  RewriteRule ^[A-Za-z0-9_-]+(?:Apple|Android)(?:/|$) - [F,L,NC]
+  RewriteRule ^server/(?:classes|cron|lib)(?:/|$) - [F,L,NC]
   RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L]
 
   # Serve real application files and folders directly.
@@ -66,7 +71,7 @@ DirectoryIndex index.php index.html
   RewriteRule ^ index.php [L]
 </IfModule>
 
-<FilesMatch "(^\.|(?:\.env|\.ini|\.log|\.sql|\.sqlite|\.sqlite3|\.db|composer\.(?:json|lock))$)">
+<FilesMatch "(^\.|(?:\.env|\.ini|\.log|\.sql|\.sqlite|\.sqlite3|\.db|\.toml|\.ya?ml|\.md|\.csr|\.pem|\.key|\.p8|\.p12|\.pfx|\.mobileprovision|\.gradle|\.lock|\.xcconfig|\.pbxproj|composer\.(?:json|lock)|package(?:-lock)?\.json)$)">
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>

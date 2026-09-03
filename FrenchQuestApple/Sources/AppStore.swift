@@ -1,6 +1,7 @@
 import AVFoundation
 import AuthenticationServices
 import Combine
+import CryptoKit
 import Foundation
 import Security
 import UIKit
@@ -127,11 +128,12 @@ final class QuestStore: ObservableObject {
         cloudMessage = "Opening Beyond ID…"
         defer { isCloudBusy = false }
         do {
+            let verifier = FrenchQuestPKCE.verifier()
             let callbackURL = try await webAuthenticator.authenticate(
-                url: beyondID.signInURL(),
+                url: beyondID.signInURL(codeChallenge: FrenchQuestPKCE.challenge(verifier)),
                 callbackScheme: "frenchquest"
             )
-            let token = try beyondID.token(from: callbackURL)
+            let token = try await beyondID.exchange(code: beyondID.code(from: callbackURL), verifier: verifier)
             let account = try await beyondID.account(for: token)
             try FrenchQuestKeychain.save(token)
             mobileToken = token
@@ -507,29 +509,42 @@ enum FrenchQuestBeyondIDError: LocalizedError {
 private struct FrenchQuestBeyondIDService: Sendable {
     private let baseURL = URL(string: "https://beyondimagination.co.technology")!
 
-    func signInURL() -> URL {
+    func signInURL(codeChallenge: String) -> URL {
         var components = URLComponents(url: baseURL.appending(path: "beyond-id/auth/login.php"), resolvingAgainstBaseURL: false)!
         components.queryItems = [
             URLQueryItem(name: "app", value: "beyond-french"),
-            URLQueryItem(name: "return", value: "/beyond-id/auth/mobile-complete.php?scheme=frenchquest")
+            URLQueryItem(name: "return", value: "/beyond-id/auth/mobile-complete.php?scheme=frenchquest&code_challenge=\(codeChallenge)")
         ]
         return components.url!
     }
 
-    func token(from callbackURL: URL) throws -> String {
+    func code(from callbackURL: URL) throws -> String {
         let items = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false)?.queryItems ?? []
         if let message = items.first(where: { $0.name == "error" })?.value, !message.isEmpty {
             throw FrenchQuestBeyondIDError.server(message)
         }
-        guard let token = items.first(where: { $0.name == "token" })?.value, !token.isEmpty else {
+        guard let code = items.first(where: { $0.name == "code" })?.value, !code.isEmpty else {
             throw FrenchQuestBeyondIDError.missingCallbackToken
         }
+        return code
+    }
+
+    func exchange(code: String, verifier: String) async throws -> String {
+        var request = URLRequest(url: baseURL.appending(path: "beyond-id/api/mobile-token.php"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(["code": code, "code_verifier": verifier])
+        let (data, response) = try await URLSession.shared.data(for: request)
+        try validate(response, data: data)
+        let payload = try JSONDecoder().decode(FrenchQuestTokenResponse.self, from: data)
+        guard payload.ok, let token = payload.accessToken else { throw FrenchQuestBeyondIDError.server(payload.error ?? "Could not complete sign-in.") }
         return token
     }
 
     func account(for token: String) async throws -> BeyondIDAccount {
         var request = URLRequest(url: baseURL.appending(path: "beyond-id/api/mobile-session.php"))
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("french-quest-ios", forHTTPHeaderField: "X-Beyond-App")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         let (data, response) = try await URLSession.shared.data(for: request)
         try validate(response, data: data)
@@ -573,6 +588,12 @@ private struct FrenchQuestBeyondIDService: Sendable {
             throw FrenchQuestBeyondIDError.server(message ?? "Beyond ID returned HTTP \(response.statusCode).")
         }
     }
+}
+
+private struct FrenchQuestTokenResponse: Decodable { let ok: Bool; let accessToken: String?; let error: String?; enum CodingKeys: String, CodingKey { case ok, error; case accessToken = "access_token" } }
+private enum FrenchQuestPKCE {
+    static func verifier() -> String { let value = UUID().uuidString + UUID().uuidString; return value.replacingOccurrences(of: "-", with: "") }
+    static func challenge(_ verifier: String) -> String { let digest = SHA256.hash(data: Data(verifier.utf8)); return Data(digest).base64EncodedString().replacingOccurrences(of: "+", with: "-").replacingOccurrences(of: "/", with: "_").replacingOccurrences(of: "=", with: "") }
 }
 
 @MainActor

@@ -7,9 +7,15 @@ require_once __DIR__ . '/../../config/admin-alerts.php';
 require_once __DIR__ . '/../../config/roles.php';
 header('Content-Type: application/json; charset=utf-8');
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); echo json_encode(['ok'=>false,'error'=>'Method not allowed']); exit; }
-$data=json_decode(file_get_contents('php://input'),true)?:$_POST;
+$contentType = strtolower((string)($_SERVER['CONTENT_TYPE'] ?? ''));
+if (!str_starts_with($contentType, 'application/json')) { http_response_code(415); echo json_encode(['ok'=>false,'error'=>'JSON requests only']); exit; }
+$data=json_decode(file_get_contents('php://input'),true);
+if (!is_array($data)) { http_response_code(400); echo json_encode(['ok'=>false,'error'=>'Invalid JSON']); exit; }
 $first=trim((string)($data['first_name']??''));$last=trim((string)($data['last_name']??''));$email=strtolower(trim((string)($data['email']??'')));$password=(string)($data['password']??'');
 if(!$first||!$last||!filter_var($email,FILTER_VALIDATE_EMAIL)||strlen($password)<8){http_response_code(422);echo json_encode(['ok'=>false,'error'=>'Valid name, email and password of 8+ characters required']);exit;}
+$accountLimit=beyond_rate_limit_consume($pdo,'api-register-account',$email,3,3600,3600);
+$ipLimit=beyond_rate_limit_consume($pdo,'api-register-ip','',10,3600,3600);
+if(!$accountLimit['allowed']||!$ipLimit['allowed']){$retryAfter=max($accountLimit['retry_after'],$ipLimit['retry_after']);http_response_code(429);header('Retry-After: '.$retryAfter);echo json_encode(['ok'=>false,'error'=>'Too many registration attempts. Try again later.','retry_after'=>$retryAfter]);exit;}
 try{
  $pdo->beginTransaction();
  $hash=password_hash($password,PASSWORD_DEFAULT);$token=bin2hex(random_bytes(32));$role=beyond_signup_role($email);

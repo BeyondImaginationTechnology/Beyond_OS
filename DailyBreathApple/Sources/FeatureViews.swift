@@ -1,7 +1,81 @@
 import SwiftUI
 
+struct AccountSyncView: View {
+    @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject private var store: DailyBreathStore
+    @EnvironmentObject private var beyondIDSession: DailyBreathBeyondIDSession
+    @AppStorage("encryptedICloudSyncEnabled") private var encryptedICloudSyncEnabled = false
+
+    var body: some View {
+        List {
+            Section {
+                if let account = beyondIDSession.account {
+                    Label(account.displayName, systemImage: "person.crop.circle.badge.checkmark")
+                        .font(.title3.weight(.bold))
+                    Text(account.email)
+                        .foregroundStyle(.secondary)
+                    Button("Sign Out", role: .destructive) {
+                        beyondIDSession.signOut()
+                    }
+                } else {
+                    Text("Keep your DailyBreath connection available wherever you use Beyond ID.")
+                        .foregroundStyle(.secondary)
+                    Button {
+                        Task { await beyondIDSession.signIn() }
+                    } label: {
+                        Label("Sign in with Beyond ID", systemImage: "person.badge.key.fill")
+                    }
+                    .disabled(beyondIDSession.isWorking)
+                }
+                if beyondIDSession.isWorking { ProgressView() }
+                Text(beyondIDSession.statusMessage)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Beyond ID")
+            } footer: {
+                Text("Signing in never changes or uploads your reflections.")
+            }
+
+            Section("Private Sync") {
+                Toggle("Encrypted iCloud Sync", isOn: Binding(
+                    get: { encryptedICloudSyncEnabled },
+                    set: { value in
+                        encryptedICloudSyncEnabled = value
+                        Task {
+                            await store.setICloudSyncEnabled(value)
+                            encryptedICloudSyncEnabled = UserDefaults.standard.bool(forKey: "encryptedICloudSyncEnabled")
+                        }
+                    }
+                ))
+                Text(store.iCloudStatusMessage)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if encryptedICloudSyncEnabled {
+                    Button("Sync Now") { Task { await store.syncICloudNow() } }
+                }
+            } footer: {
+                Text("Reflections are encrypted before iCloud upload. Beyond ID does not receive them.")
+            }
+
+            Section {
+                NavigationLink { SettingsAboutView() } label: {
+                    Label("More Settings", systemImage: "gearshape")
+                }
+            }
+        }
+        .navigationTitle("Account & Sync")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Done") { dismiss() }
+            }
+        }
+    }
+}
+
 struct SettingsAboutView: View {
     @EnvironmentObject private var store: DailyBreathStore
+    @EnvironmentObject private var beyondIDSession: DailyBreathBeyondIDSession
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
     @AppStorage("encryptedICloudSyncEnabled") private var encryptedICloudSyncEnabled = false
 
@@ -23,6 +97,33 @@ struct SettingsAboutView: View {
                 NavigationLink { RecoverySupportView() } label: {
                     Label("Recovery Support", systemImage: "lifepreserver")
                 }
+            }
+
+            Section("Beyond ID") {
+                if let account = beyondIDSession.account {
+                    Label(account.displayName, systemImage: "person.crop.circle.badge.checkmark")
+                    Text(account.email)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Button("Sign Out", role: .destructive) {
+                        beyondIDSession.signOut()
+                    }
+                } else {
+                    Button {
+                        Task { await beyondIDSession.signIn() }
+                    } label: {
+                        Label("Sign in with Beyond ID", systemImage: "person.badge.key.fill")
+                    }
+                    .disabled(beyondIDSession.isWorking)
+                }
+                if beyondIDSession.isWorking {
+                    ProgressView()
+                }
+                Text(beyondIDSession.statusMessage)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } footer: {
+                Text("Beyond ID connects your DailyBreath account. Reflections stay on this device unless you enable encrypted iCloud sync.")
             }
 
             Section("Appearance") {

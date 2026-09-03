@@ -30,13 +30,25 @@ struct BeyondIDService: Sendable {
     let baseURL: URL
     private let decoder = JSONDecoder()
 
-    func googleSignInURL() -> URL {
+    func googleSignInURL(codeChallenge: String = "") -> URL {
         var components = URLComponents(url: baseURL.appending(path: "beyond-id/auth/oauth-start.php"), resolvingAgainstBaseURL: false)!
         components.queryItems = [
             URLQueryItem(name: "provider", value: "google"),
-            URLQueryItem(name: "return", value: "/beyond-id/auth/mobile-complete.php?scheme=beyondtv")
+            URLQueryItem(name: "return", value: "/beyond-id/auth/mobile-complete.php?scheme=beyondtv&code_challenge=\(codeChallenge)")
         ]
         return components.url!
+    }
+
+    func exchange(code: String, verifier: String) async throws -> String {
+        var request = URLRequest(url: baseURL.appending(path: "beyond-id/api/mobile-token.php"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(["code": code, "code_verifier": verifier])
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else { throw BeyondIDError.server("Could not complete mobile sign-in.") }
+        let payload = try decoder.decode(BeyondTVTokenResponse.self, from: data)
+        guard payload.ok, let token = payload.accessToken else { throw BeyondIDError.server("Could not complete mobile sign-in.") }
+        return token
     }
 
     func session(for token: String) async throws -> BeyondIDSession {
@@ -45,6 +57,7 @@ struct BeyondIDService: Sendable {
         request.cachePolicy = .reloadIgnoringLocalAndRemoteCacheData
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("beyond-tv-ios", forHTTPHeaderField: "X-Beyond-App")
         request.setValue("BeyondTV-Apple/1.1.0", forHTTPHeaderField: "User-Agent")
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -59,6 +72,8 @@ struct BeyondIDService: Sendable {
         return session
     }
 }
+
+private struct BeyondTVTokenResponse: Decodable { let ok: Bool; let accessToken: String?; enum CodingKeys: String, CodingKey { case ok; case accessToken = "access_token" } }
 
 #if os(iOS)
 @MainActor

@@ -44,8 +44,6 @@ foreach ($experiences as $slug => $candidate) if (str_contains($returnTo, '/' . 
 [$product,$tagline,$mark,$accent,$accent2] = $experience;
 $isDailyBreath = $product === 'DailyBreath';
 $isBeyondFrench = $product === 'Beyond French';
-$isDailyBreath = false;
-$isBeyondFrench = false;
 $dailyVerse = null;
 $dailyVerseBibleUrl = '../../dailybreath/bible.php';
 if ($isDailyBreath) {
@@ -70,6 +68,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $email = strtolower(trim($_POST['email'] ?? ''));
         $password = $_POST['password'] ?? '';
+        $accountLimit = beyond_rate_limit_consume($pdo, 'web-login-account', $email, 5, 900, 900);
+        $ipLimit = beyond_rate_limit_consume($pdo, 'web-login-ip', '', 30, 900, 1800);
+        if (!$accountLimit['allowed'] || !$ipLimit['allowed']) {
+            $retryAfter = max($accountLimit['retry_after'], $ipLimit['retry_after']);
+            http_response_code(429);
+            header('Retry-After: ' . $retryAfter);
+            $error = 'Too many sign-in attempts. Please try again later.';
+        } else {
         $stmt = $pdo->prepare('SELECT * FROM users WHERE email=? LIMIT 1');
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -88,17 +94,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($valid && empty($user['email_verified']) && empty($user['email_verified_at']) && !empty($user['verification_token'])) {
             $error = 'Verify your email before signing in. Check your inbox for the verification link.';
         } elseif ($valid && ($user['status'] ?? 'active') === 'active') {
+            beyond_rate_limit_clear($pdo, 'web-login-account', $email);
             session_regenerate_id(true);
             $_SESSION['user_id'] = (int)$user['id'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['name'] = $user['name'] ?? trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''));
             $_SESSION['role'] = $user['role'] ?? 'user';
             $_SESSION['locale'] = $user['preferred_locale'] ?? 'en';
-            $requiredRole = beyond_signup_role($email, (string)$_SESSION['role']);
-            if ($requiredRole !== (string)$_SESSION['role']) {
-                $_SESSION['role'] = $requiredRole;
-                try { $pdo->prepare('UPDATE users SET role=? WHERE id=?')->execute([$requiredRole,$user['id']]); } catch (Throwable $exception) {}
-            }
             $_SESSION['user'] = ['id'=>(int)$user['id'],'email'=>$user['email'],'role'=>$_SESSION['role']];
             register_session($pdo, (int)$user['id']);
             beyondRememberForget($pdo);
@@ -118,6 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = $socialAccount
                 ? 'This email uses social sign-in. Continue with the linked provider, or use Forgot password to create or replace your password.'
                 : 'That email and password combination was not recognized.';
+        }
         }
     }
 }

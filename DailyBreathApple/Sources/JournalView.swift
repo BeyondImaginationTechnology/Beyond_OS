@@ -100,6 +100,13 @@ struct JournalView: View {
                 .environmentObject(store)
         }
         .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                if !store.entries.isEmpty {
+                    ShareLink(item: exportText, subject: Text("DailyBreath reflections")) {
+                        Label("Export", systemImage: "square.and.arrow.up")
+                    }
+                }
+            }
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()
                 Button("Done") {
@@ -107,6 +114,13 @@ struct JournalView: View {
                 }
             }
         }
+    }
+
+    private var exportText: String {
+        store.entries.map { entry in
+            let mood = entry.mood.map { " · \($0)" } ?? ""
+            return "\(entry.createdAt.formatted(date: .abbreviated, time: .shortened))\(mood)\n\(entry.prompt)\n\(entry.text)"
+        }.joined(separator: "\n\n")
     }
 
     private var moodPicker: some View {

@@ -108,6 +108,7 @@ html[data-faith=bible] .practice .icon,html[data-faith=bible] .side .icon{color:
 html[data-faith=bible] .bottom,html[data-faith=torah] .bottom{color:#365143;background:#fffffff0;border-color:#d0ddd2;box-shadow:0 14px 35px #315b3a22}html[data-faith=bible] .bottom .active{color:#1e6b43}html[data-faith=torah] .bottom .active{color:#2e5d9a}
 html[data-faith=bible] .splash{color:#17231b;background:linear-gradient(#f3f8f2e8,#e9f2e9f5)}html[data-faith=torah] .splash{color:#332d20;background:linear-gradient(#f8f3e7f0,#eef3f9f5)}html[data-faith=bible] .splash h1,html[data-faith=torah] .splash h1{text-shadow:none;color:#173f2c}html[data-faith=bible] .splash p,html[data-faith=torah] .splash p{color:#5d7163}
 </style>
+<style>.bottom-dock{position:fixed;z-index:2147483500;left:50%;bottom:18px;transform:translateX(-50%);width:min(430px,calc(100% - 36px));height:52px;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;padding:5px 8px;border:1px solid #ffffff55;border-radius:999px;color:#dce7dd;background:rgba(18,57,39,.97);box-shadow:0 14px 38px #001a0d66;backdrop-filter:blur(20px)}.bottom-dock a{display:flex;height:40px;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px;font-weight:750}.bottom-dock svg{width:19px;height:19px}.bottom-dock .active{color:#f0cf83}html[data-faith=bible] .bottom-dock,html[data-faith=torah] .bottom-dock{color:#365143;background:#fffffff0;border-color:#d0ddd2}</style>
 </head>
 <body>
 <div class="splash" id="splash"><div class="splash-inner"><img class="splash-mark" src="assets/icons/dailybreath-mark-v2.png?v=20260901-2" alt=""><span class="kicker">FAITH · GROWTH · PEACE · PURPOSE</span><h1>DailyBreath</h1><p>Begin with Scripture. Breathe, pray, learn, and carry peace into your day.</p><button id="enter" type="button">Enter DailyBreath →</button></div></div>
@@ -130,7 +131,7 @@ html[data-faith=bible] .splash{color:#17231b;background:linear-gradient(#f3f8f2e
   </section>
 
 </main>
-<nav class="bottom" aria-label="DailyBreath navigation">
+<nav class="bottom-dock" aria-label="DailyBreath navigation">
   <a class="active" href="index.php"><svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/></svg><span>Home</span></a>
   <a href="devotionals.php"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.4-9-9.2C1.3 7.7 4 4 8 4c2 0 3.3 1 4 2 0.7-1 2-2 4-2 4 0 6.7 3.7 5 7.8C19 16.6 12 21 12 21Z"/></svg><span>Devotionals</span></a>
   <a class="bible" href="scripture.php?tradition=<?= e($faithTradition) ?>"><svg viewBox="0 0 24 24"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H12v18H7.5A3.5 3.5 0 0 0 4 23V5.5ZM20 5.5A3.5 3.5 0 0 0 16.5 2H12v18h4.5A3.5 3.5 0 0 1 20 23V5.5Z"/></svg><span>Scripture</span></a>

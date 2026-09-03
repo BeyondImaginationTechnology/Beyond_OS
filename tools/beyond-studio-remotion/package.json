@@ -2,6 +2,7 @@
   "name": "beyond-studio-remotion-bridge",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@11.19.0",
   "type": "module",
   "scripts": {
     "start": "node server.mjs",

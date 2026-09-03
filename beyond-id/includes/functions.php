@@ -115,6 +115,11 @@ function beyond_rate_limit_clear(PDO $pdo, string $action, string $identity): vo
     }
 }
 
+function beyond_sql_console_enabled(): bool {
+    return strtolower((string)($_SESSION['role'] ?? '')) === 'super_admin'
+        && strtolower(trim((string)getenv('BEYOND_SQL_CONSOLE_ENABLED'))) === 'true';
+}
+
 function safe_return_path(?string $path, string $fallback = '../dashboard/'): string {
     if (!$path || preg_match('/[\\x00-\\x1F\\x7F\\\\]/', $path)) return $fallback;
     $decoded = rawurldecode($path);

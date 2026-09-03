@@ -1,0 +1,75 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - checkout: self
+    clean: true
+    fetchDepth: 1
+
+  - bash: |
+      set -euo pipefail
+      find . -type f -name '*.php' \
+        -not -path './.git/*' \
+        -not -path '*/vendor/*' \
+        -print0 | xargs -0 -n1 php -l
+    displayName: Lint PHP
+
+  - bash: |
+      set -euo pipefail
+      find . -type f -name '*.js' \
+        -not -path './.git/*' \
+        -not -path '*/node_modules/*' \
+        -print0 | xargs -0 -n1 node --check
+      node - <<'NODE'
+      const fs = require('fs');
+      const path = require('path');
+      function walk(dir) {
+        for (const entry of fs.readdirSync(dir, {withFileTypes: true})) {
+          if (entry.name === '.git' || entry.name === 'node_modules') continue;
+          const file = path.join(dir, entry.name);
+          if (entry.isDirectory()) walk(file);
+          else if (entry.name.endsWith('.json')) JSON.parse(fs.readFileSync(file, 'utf8'));
+        }
+      }
+      walk('.');
+      NODE
+    displayName: Validate JavaScript and JSON
+
+  - bash: |
+      set -euo pipefail
+      forbidden="$(git ls-files | grep -Ei '(^|/)(config\.toml|\.env($|\.)|.*\.(pem|p8|p12|pfx|key|mobileprovision))$' || true)"
+      if [[ -n "$forbidden" ]]; then
+        echo "Forbidden private or deployment files are tracked:"
+        echo "$forbidden"
+        exit 1
+      fi
+      leaked="$(git grep -IlE '(sk_live_[A-Za-z0-9]{16,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)' -- . ':!*.example.*' || true)"
+      if [[ -n "$leaked" ]]; then
+        echo "Potential production credential material detected in:"
+        echo "$leaked"
+        exit 1
+      fi
+    displayName: Guard secrets and deployment files
+
+  - bash: |
+      set -euo pipefail
+      corepack enable
+      corepack prepare pnpm@11.19.0 --activate
+      for project in tools/hello-world-app-preview tools/daily-stencil-video tools/stencil-pack-remotion tools/beyond-studio-remotion beyond-chromium; do
+        if [[ -f "$project/package-lock.json" ]]; then
+          (cd "$project" && npm audit --package-lock-only --audit-level=high)
+        elif [[ -f "$project/pnpm-lock.yaml" ]]; then
+          (cd "$project" && pnpm install --frozen-lockfile --ignore-scripts && pnpm audit --audit-level=high)
+        fi
+      done
+    displayName: Audit locked Node dependencies

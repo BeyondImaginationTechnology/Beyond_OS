@@ -18,6 +18,12 @@ $adminNavGroups = [
         ['settings.php', 'Appearance', 'settings'],
     ],
 ];
+if (!beyond_sql_console_enabled()) {
+    $adminNavGroups['Management'] = array_values(array_filter(
+        $adminNavGroups['Management'],
+        static fn(array $item): bool => $item[0] !== 'sql.php'
+    ));
+}
 
 $adminIconPaths = [
     'overview' => '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-7h6v7"/>',

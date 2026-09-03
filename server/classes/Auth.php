@@ -33,11 +33,7 @@ class Auth {
             catch (Throwable $e) { Database::conn()->prepare("UPDATE users SET password_hash=? WHERE id=?")->execute([$freshHash, $user['id']]); }
         }
         if (($user['status'] ?? 'active') !== 'active') return ['ok'=>false, 'message'=>'Account inactive.'];
-        require_once dirname(__DIR__, 2) . '/config/roles.php';
-        $role = beyond_signup_role($normalizedEmail, (string)($user['role'] ?? 'user'));
-        if ($role !== (string)($user['role'] ?? 'user')) {
-            try { Database::conn()->prepare("UPDATE users SET role=? WHERE id=?")->execute([$role, $user['id']]); } catch (Throwable $e) {}
-        }
+        $role = (string)($user['role'] ?? 'user');
         session_regenerate_id(true);
         $_SESSION['user_id'] = (int)$user['id'];
         $_SESSION['user_email'] = $user['email'];

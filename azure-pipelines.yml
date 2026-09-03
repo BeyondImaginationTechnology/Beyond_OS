@@ -58,3 +58,130 @@ steps:
       targetPath: $(Agent.TempDirectory)/DailyBreathTests.xcresult
       artifact: DailyBreathTests-xcresult
     displayName: Publish Xcode test result bundle
+
+  - bash: |
+      set -euo pipefail
+      screenshot_root="$(Build.ArtifactStagingDirectory)/DailyBreathScreenshots"
+      derived="$(Agent.TempDirectory)/DailyBreathScreenshotBuild"
+      mkdir -p "$screenshot_root"
+
+      xcodebuild build \
+        -project "$(project)" \
+        -scheme "$(scheme)" \
+        -sdk iphonesimulator \
+        -configuration Debug \
+        -derivedDataPath "$derived" \
+        CODE_SIGNING_ALLOWED=NO \
+        CODE_SIGNING_REQUIRED=NO
+
+      app_path="$derived/Build/Products/Debug-iphonesimulator/The Daily Breath.app"
+      [[ -d "$app_path" ]] || {
+        echo "Simulator app was not produced at $app_path"
+        exit 1
+      }
+
+      for device in "iPhone 16" "iPad Pro 13-inch (M4)"; do
+        device_udid="$(xcrun simctl list devices available | awk -F '[()]' -v name="$device" '$1 ~ name {print $2; exit}')"
+        if [[ -z "$device_udid" ]]; then
+          echo "##vso[task.logissue type=warning]Simulator not available: $device"
+          continue
+        fi
+
+        xcrun simctl boot "$device_udid" 2>/dev/null || true
+        xcrun simctl bootstatus "$device_udid" -b
+        xcrun simctl install "$device_udid" "$app_path"
+        safe_device="$(printf '%s' "$device" | tr ' ' '-')"
+
+        for state in today scripture breathe journal; do
+          xcrun simctl launch "$device_udid" technology.co.beyondimagination.thedailybreath >/dev/null
+          sleep 1
+          xcrun simctl openurl "$device_udid" "dailybreath://$state"
+          sleep 2
+          xcrun simctl io "$device_udid" screenshot "$screenshot_root/$safe_device-$state.png"
+        done
+
+        xcrun simctl shutdown "$device_udid" || true
+      done
+
+      find "$screenshot_root" -type f -name '*.png' -print
+    displayName: Capture iPhone and iPad App Store screenshots
+
+  - task: PublishPipelineArtifact@1
+    condition: succeededOrFailed()
+    inputs:
+      targetPath: $(Build.ArtifactStagingDirectory)/DailyBreathScreenshots
+      artifact: DailyBreath-iPhone-iPad-Screenshots
+    displayName: Publish iPhone and iPad screenshots
+
+  - bash: |
+      set -euo pipefail
+      screenshot_root="$(Build.ArtifactStagingDirectory)/DailyBreathScreenshots"
+      archive="$(Build.ArtifactStagingDirectory)/DailyBreath-iPhone-iPad-Screenshots.zip"
+
+      if [[ ! -d "$screenshot_root" ]]; then
+        echo "Screenshot directory not found; skipping email notification."
+        exit 0
+      fi
+
+      ditto -c -k --sequesterRsrc --keepParent "$screenshot_root" "$archive"
+
+      python3 - "$archive" <<'PY'
+      import os
+      import smtplib
+      import ssl
+      import sys
+      from email.message import EmailMessage
+      from pathlib import Path
+
+      archive = Path(sys.argv[1])
+      def configured(name, default=""):
+          value = os.environ.get(name, "")
+          return default if not value or value.startswith("$(") else value
+
+      host = configured("SMTP_HOST")
+      port_value = configured("SMTP_PORT", "587")
+      port = int(port_value) if port_value.isdigit() else 587
+      username = configured("SMTP_USERNAME")
+      password = configured("SMTP_PASSWORD")
+      sender = configured("SMTP_FROM", username)
+      recipient = "admin@beyondimagination.co.technology"
+      use_ssl = configured("SMTP_USE_SSL", "false").lower() == "true"
+
+      message = EmailMessage()
+      message["Subject"] = "DailyBreath iPhone and iPad screenshots"
+      message["From"] = sender
+      message["To"] = recipient
+      message.set_content(
+          "The DailyBreath simulator screenshot artifact is attached. "
+          "It contains Today, Scripture, Breathe, and Journal captures for "
+          "the available iPhone 16 and iPad Pro 13-inch (M4) simulators."
+      )
+      message.add_attachment(
+          archive.read_bytes(),
+          maintype="application",
+          subtype="zip",
+          filename=archive.name,
+      )
+
+      if use_ssl:
+          with smtplib.SMTP_SSL(host, port, context=ssl.create_default_context()) as smtp:
+              smtp.login(username, password)
+              smtp.send_message(message)
+      else:
+          with smtplib.SMTP(host, port) as smtp:
+              smtp.ehlo()
+              smtp.starttls(context=ssl.create_default_context())
+              smtp.ehlo()
+              smtp.login(username, password)
+              smtp.send_message(message)
+      PY
+    displayName: Email screenshot artifact via SMTP
+    condition: and(succeededOrFailed(), ne(variables['SMTP_HOST'], ''), ne(variables['SMTP_PASSWORD'], ''))
+    env:
+      SMTP_HOST: $(SMTP_HOST)
+      SMTP_PORT: $(SMTP_PORT)
+      SMTP_USERNAME: $(SMTP_USERNAME)
+      SMTP_PASSWORD: $(SMTP_PASSWORD)
+      SMTP_FROM: $(SMTP_FROM)
+      SMTP_TO: $(SMTP_TO)
+      SMTP_USE_SSL: $(SMTP_USE_SSL)

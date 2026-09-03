@@ -11,11 +11,16 @@ function beyond_start_session(): void
     $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
         || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
 
+    // A host-only cookie is the default. Cross-subdomain SSO requires an
+    // explicit deployment setting and is limited to the Beyond parent domain.
+    $configuredDomain = strtolower(trim((string)getenv('BEYOND_SESSION_COOKIE_DOMAIN')));
+    $cookieDomain = $configuredDomain === '.beyondimagination.co.technology' ? $configuredDomain : '';
+
     session_name('BEYOND_ID');
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
-        'domain' => '',
+        'domain' => $cookieDomain,
         'secure' => $secure,
         'httponly' => true,
         'samesite' => 'Lax',

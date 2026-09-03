@@ -32,6 +32,16 @@ function studio_narration_voice(string $provider,string $locale): string {
   if($provider==='azure' && $locale!=='en-US' && $v==='en-US-JennyMultilingualNeural') return $fallback;
   return $v;
 }
+function studio_assert_mp3(string $audio): void {
+  if(strlen($audio)<128) throw new RuntimeException('The narration provider returned invalid audio.');
+  if(substr($audio,0,3)==='ID3') return;
+  $limit=min(strlen($audio)-1,4096);
+  for($i=0;$i<$limit;$i++){
+    $first=ord($audio[$i]);$second=ord($audio[$i+1]);
+    if($first===0xff && ($second&0xe0)===0xe0 && ($second&0x18)!==0x08 && ($second&0x06)!==0) return;
+  }
+  throw new RuntimeException('The narration provider did not return a valid MP3. No audio file was saved; regenerate the narration.');
+}
 function studio_narration_generate(string $text,string $locale,string $preferredProvider='',string $preferredVoice=''): array {
   $cfg=studio_narration_config();
   $service=new NarrationService([
@@ -84,7 +94,7 @@ function studio_narration_generate(string $text,string $locale,string $preferred
   throw new RuntimeException('No narration provider is fully configured. Add an ElevenLabs, OpenAI, or Azure Speech key in Premium Voices.');
 }
 function studio_store_mp3(string $audio,string $library,string $date,string $locale,string $text): array {
-  if(strlen($audio)<128) throw new RuntimeException('The narration provider returned invalid audio.');
+  studio_assert_mp3($audio);
   if(!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date)) $date=date('Y-m-d');
   $year=substr($date,0,4);$month=substr($date,5,2);
   $folder=$library==='daily-breath'?'dailybreath':$library;
@@ -94,7 +104,12 @@ function studio_store_mp3(string $audio,string $library,string $date,string $loc
   $slug=$library==='beyond-french'?'francais-du-jour':($library==='beyond-space'?'beyond-space-horoscope':'daily-breath');
   $name=$slug.'-'.$date.'-'.strtolower(str_replace('-','_',$locale)).'-'.substr(hash('sha256',$text),0,10).'.mp3';
   $file=$base.'/'.$name;
-  if(!is_file($file) && file_put_contents($file,$audio,LOCK_EX)===false) throw new RuntimeException('The MP3 could not be saved.');
+  $write=!is_file($file);
+  if(!$write){
+    $existing=file_get_contents($file);
+    try{studio_assert_mp3(is_string($existing)?$existing:'');}catch(RuntimeException){$write=true;}
+  }
+  if($write && file_put_contents($file,$audio,LOCK_EX)===false) throw new RuntimeException('The MP3 could not be saved.');
   @chmod($file,0644);
   return ['file'=>$file,'name'=>$name,'url'=>'/'.$folder.'/assets/audio/'.$year.'/'.$month.'/'.rawurlencode($name)];
 }

@@ -7,19 +7,11 @@ trigger:
   branches:
     include:
       - main
-  paths:
-    include:
-      - DailyBreathApple/**
-      - azure-pipelines.yml
 
 pr:
   branches:
     include:
       - main
-  paths:
-    include:
-      - DailyBreathApple/**
-      - azure-pipelines.yml
 
 pool:
   vmImage: macos-15
@@ -32,6 +24,78 @@ variables:
 steps:
   - checkout: self
     clean: true
+
+  - bash: |
+      set -euo pipefail
+      find . -type f -name '*.php' \
+        -not -path './.git/*' \
+        -not -path '*/vendor/*' \
+        -print0 | xargs -0 -n1 php -l
+    displayName: Lint PHP platform
+
+  - bash: |
+      set -euo pipefail
+      php <<'PHP'
+      <?php
+      session_start();
+      require 'beyond-id/includes/functions.php';
+      foreach (['//evil.example', '/\\evil.example', '/%5cevil.example', "\n/location"] as $unsafe) {
+          if (safe_return_path($unsafe, '/fallback') !== '/fallback') throw new RuntimeException('Unsafe return path accepted: '.$unsafe);
+      }
+      if (safe_return_path('/dailybreath/?tab=today', '/fallback') !== '/dailybreath/?tab=today') throw new RuntimeException('Safe return path rejected.');
+      if (in_array('sqlite', PDO::getAvailableDrivers(), true)) {
+          $_SERVER['REMOTE_ADDR'] = '192.0.2.10';
+          $pdo = new PDO('sqlite::memory:');
+          if (!beyond_rate_limit_consume($pdo, 'ci-login', 'member@example.test', 2, 60, 60)['allowed']) throw new RuntimeException('First request was throttled.');
+          if (!beyond_rate_limit_consume($pdo, 'ci-login', 'member@example.test', 2, 60, 60)['allowed']) throw new RuntimeException('Second request was throttled.');
+          if (beyond_rate_limit_consume($pdo, 'ci-login', 'member@example.test', 2, 60, 60)['allowed']) throw new RuntimeException('Throttle did not activate.');
+          beyond_rate_limit_clear($pdo, 'ci-login', 'member@example.test');
+          if (!beyond_rate_limit_consume($pdo, 'ci-login', 'member@example.test', 2, 60, 60)['allowed']) throw new RuntimeException('Throttle did not clear.');
+      }
+      PHP
+    displayName: Test authentication security helpers
+
+  - bash: |
+      set -euo pipefail
+      find . -type f -name '*.js' \
+        -not -path './.git/*' \
+        -not -path '*/node_modules/*' \
+        -print0 | xargs -0 -n1 node --check
+      node - <<'NODE'
+      const fs = require('fs');
+      const path = require('path');
+      function walk(dir) {
+        for (const entry of fs.readdirSync(dir, {withFileTypes: true})) {
+          if (entry.name === '.git' || entry.name === 'node_modules') continue;
+          const file = path.join(dir, entry.name);
+          if (entry.isDirectory()) walk(file);
+          else if (entry.name.endsWith('.json')) JSON.parse(fs.readFileSync(file, 'utf8'));
+        }
+      }
+      walk('.');
+      NODE
+    displayName: Validate JavaScript and JSON
+
+  - bash: |
+      set -euo pipefail
+      forbidden="$(git ls-files | grep -Ei '(^|/)(config\.toml|\.env($|\.)|.*\.(pem|p8|p12|pfx|key|mobileprovision))$' || true)"
+      [[ -z "$forbidden" ]] || { echo "Forbidden private files are tracked:"; echo "$forbidden"; exit 1; }
+      leaked="$(git grep -IlE '(sk_live_[A-Za-z0-9]{16,}|AKIA[0-9A-Z]{16}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----)' -- . ':!*.example.*' || true)"
+      [[ -z "$leaked" ]] || { echo "Potential credential material detected in:"; echo "$leaked"; exit 1; }
+    displayName: Guard secrets and deployment files
+
+  - bash: |
+      set -euo pipefail
+      corepack enable
+      corepack prepare pnpm@11.19.0 --activate
+      for project in tools/hello-world-app-preview tools/daily-stencil-video tools/stencil-pack-remotion tools/beyond-studio-remotion beyond-chromium; do
+        if [[ -f "$project/package-lock.json" ]]; then
+          (cd "$project" && npm audit --package-lock-only --audit-level=high)
+        elif [[ -f "$project/pnpm-lock.yaml" ]]; then
+          (cd "$project" && pnpm install --frozen-lockfile --ignore-scripts && pnpm audit --audit-level=high)
+        fi
+      done
+    displayName: Audit locked Node dependencies
 
   - bash: |
       set -euo pipefail

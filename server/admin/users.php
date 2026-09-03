@@ -1,2 +1,3 @@
-<?php require_once __DIR__.'/bootstrap.php'; Auth::requireLogin(); $users=Database::conn()->query("SELECT id,name,email,role,status,last_login,created_at FROM users ORDER BY id DESC")->fetchAll(); require __DIR__.'/_header.php'; ?>
-<h1>Users</h1><div class="card"><table class="table"><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Last Login</th></tr><?php foreach($users as $u): ?><tr><td><?=htmlspecialchars($u['name'])?></td><td><?=htmlspecialchars($u['email'])?></td><td><?=htmlspecialchars($u['role'])?></td><td><span class="pill"><?=htmlspecialchars($u['status'])?></span></td><td><?=htmlspecialchars($u['last_login'] ?? '-')?></td></tr><?php endforeach; ?></table></div><?php require __DIR__.'/_footer.php'; ?>
+<?php
+header('Location: /beyond-id/admin/users.php', true, 302);
+exit;

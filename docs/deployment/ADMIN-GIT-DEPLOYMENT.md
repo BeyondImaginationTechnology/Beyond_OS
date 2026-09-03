@@ -15,10 +15,10 @@ The Settings page queues deployments without executing operating-system commands
 Run the worker once per minute with the hosting account's PHP CLI binary:
 
 ```cron
-* * * * * /usr/bin/php /home/sites/42b/a/a9823859bb/beyondimagination.co.technology/beyond/server/cron/deploy-worker.php >/dev/null 2>&1
+* * * * * /usr/bin/php81 /home/sites/42b/a/a9823859bb/beyondimagination.co.technology/beyond/server/cron/deploy-worker.php >/dev/null 2>&1
 ```
 
-Confirm the PHP CLI path in StartCP before saving the cron entry. The worker exits when no job is queued, and `flock()` prevents overlapping deployments.
+StartCP identifies `/usr/bin/php81` as its PHP 8.1 CLI interpreter. The worker exits when no job is queued, and `flock()` prevents overlapping deployments.
 
 ## StartCP deployment shortcut
 

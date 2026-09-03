@@ -123,6 +123,17 @@ function beyond_sql_console_enabled(): bool {
 function safe_return_path(?string $path, string $fallback = '../dashboard/'): string {
     if (!$path || preg_match('/[\\x00-\\x1F\\x7F\\\\]/', $path)) return $fallback;
     $decoded = rawurldecode($path);
+    $osOrigin = rtrim((string)getenv('BEYOND_OS_ORIGIN'), '/');
+    if ($osOrigin !== '' && str_starts_with($decoded, $osOrigin . '/')) {
+        $originParts = parse_url($osOrigin);
+        $returnParts = parse_url($decoded);
+        if ($originParts && $returnParts
+            && ($originParts['scheme'] ?? '') === 'https'
+            && ($returnParts['scheme'] ?? '') === 'https'
+            && ($originParts['host'] ?? '') === 'os.beyondimagination.co.technology'
+            && ($returnParts['host'] ?? '') === ($originParts['host'] ?? '')
+            && !isset($returnParts['user']) && !isset($returnParts['pass'])) return $path;
+    }
     if (!str_starts_with($decoded, '/') || str_starts_with($decoded, '//') || str_contains($decoded, '\\')) return $fallback;
     $parts = parse_url($decoded);
     if ($parts === false || isset($parts['scheme']) || isset($parts['host']) || isset($parts['user']) || isset($parts['pass'])) return $fallback;

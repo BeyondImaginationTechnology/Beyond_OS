@@ -1,4 +1,4 @@
-# DailyBreath Web 1.5
+# DailyBreath Web 1.7
 
 DailyBreath is an installable Beyond OS progressive web app for matched daily Bible, Tanakh, and Quran readings; complete local sacred-text libraries and search; devotionals; guided breathing; encrypted reflection journaling; weekly challenges; activity history; and recovery support.
 

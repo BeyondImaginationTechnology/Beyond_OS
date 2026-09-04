@@ -161,10 +161,10 @@
     document.querySelectorAll('.bos-locale-picker').forEach(function (picker) { picker.setAttribute('aria-label', dictionary.language); });
     document.querySelectorAll('.bos-app-store-label-full').forEach(function (label) { var value = appStoreLabels[locale] || appStoreLabels.en; if (label.textContent !== value) label.textContent = value; });
     document.querySelectorAll('.hero-actions .ghost').forEach(function (link) { var value = appStoreCtas[locale] || appStoreCtas.en; if (link.textContent !== value) link.textContent = value; });
-    document.querySelectorAll('#beyond-os-shell .bos-home-label').forEach(function (label) { if (label.textContent !== 'BEYOND OS') label.textContent = 'BEYOND OS'; });
+    document.querySelectorAll('#beyond-os-shell .bos-home-label').forEach(function (label) { if (label.textContent !== 'BEYOND IMAGINATION') label.textContent = 'BEYOND IMAGINATION'; });
     document.querySelectorAll('.bos-kicker,.bos-hero h1,.os,.logo').forEach(function (label) {
       var nextText = label.textContent
-        .replace(/Beyond OS 2\.1 Beta/gi, 'Beyond OS · Beta')
+        .replace(/Beyond OS 2\.1 Beta/gi, 'BIT · Beta')
         .replace(/(Beyond (?:Wallet|Investing|TV|Sell|Finance|Careers)) (?:2\.1|2\.2) Beta/gi, '$1 · Beta Build 2.1.1');
       if (label.textContent !== nextText) label.textContent = nextText;
     });

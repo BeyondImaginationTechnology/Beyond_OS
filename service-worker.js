@@ -1,4 +1,4 @@
-const CACHE = "beyond-os-offline-v7";
+const CACHE = "bit-platform-offline-v1";
 const OFFLINE_ASSETS = ["offline.html", "assets/img/beyond-logo.png"];
 
 self.addEventListener("install", event => {

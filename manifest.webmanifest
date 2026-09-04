@@ -1,11 +1,11 @@
 {
-  "name": "Beyond OS",
-  "short_name": "Beyond OS",
+  "name": "Beyond Imagination Technology",
+  "short_name": "BIT",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#050817",
   "theme_color": "#050817",
-  "description": "Live. Learn. Earn. Explore with Beyond OS.",
+  "description": "Live. Learn. Earn. Explore with Beyond Imagination Technology.",
   "icons": [
     {
       "src": "assets/icons/beyond-os-192.webp",

@@ -15,7 +15,7 @@ function bos_coming_soon_page(string $appName, string $description): never {
         . '<h1>' . e($appName) . ' is not ready yet.</h1>'
         . '<p>' . e($description) . ' This experience stays locked until it is ready for a public release.</p>'
         . '<div class="bos-actions"><a class="bos-btn" href="' . e(beyond_url('app-store/')) . '">Back to App Store</a>'
-        . '<a class="bos-btn secondary" href="' . e(beyond_url()) . '">Beyond OS home</a></div>'
+        . '<a class="bos-btn secondary" href="' . e(beyond_url()) . '">Beyond Imagination Technology home</a></div>'
         . '</section></main><style>.coming-soon-main{width:min(980px,calc(100% - 28px))}.coming-soon-hero{min-height:520px;display:flex;flex-direction:column;justify-content:center;background:radial-gradient(circle at 82% 15%,rgba(242,184,75,.24),transparent 28%),linear-gradient(135deg,#23140e,#4c2416 58%,#211318)}.coming-soon-hero h1{max-width:820px}@media(max-width:560px){.coming-soon-main{width:min(100% - 18px,980px)}.coming-soon-hero{min-height:430px;padding:30px 18px}}</style>';
     bos_page_end();
     exit;

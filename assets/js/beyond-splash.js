@@ -42,7 +42,7 @@
     for (var i = 0; i < apps.length; i += 1) {
       if (path.indexOf(apps[i][0]) === 0) return { name: apps[i][1], accent: apps[i][2] };
     }
-    return { name: 'Beyond OS', accent: '#a99cff' };
+    return { name: 'BIT', accent: '#a99cff' };
   }
 
   function hideLegacySplash() {
@@ -79,7 +79,7 @@
       + '<circle class="beyond-splash-spark" cx="93" cy="143" r="3.5" fill="#fff"/><circle class="beyond-splash-spark two" cx="316" cy="110" r="3" fill="var(--beyond-splash-accent)"/><circle class="beyond-splash-spark three" cx="327" cy="306" r="3.5" fill="#b78cff"/>'
       + '</svg>'
       + '<h1 class="beyond-splash-title">Beyond Imagination</h1>'
-      + '<p class="beyond-splash-company">Corp. Technology</p>'
+      + '<p class="beyond-splash-company">Technology · BIT</p>'
       + '<p class="beyond-splash-app">' + escapeHtml(config.name) + '</p>'
       + '<button class="beyond-splash-skip" type="button">Enter</button>'
       + '</div>';

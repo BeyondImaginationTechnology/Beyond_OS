@@ -95,7 +95,7 @@ function beyond_app_icon(string $appName): string {
 }
 function beyond_splash_assets_markup(): string {
     return '<link rel="stylesheet" href="' . e(beyond_url('assets/css/beyond-splash.css?v=20260828-1')) . '">'
-        . '<script src="' . e(beyond_url('assets/js/beyond-splash.js?v=20260828-1')) . '" defer></script>';
+        . '<script src="' . e(beyond_url('assets/js/beyond-splash.js?v=20260904-1')) . '" defer></script>';
 }
 function beyond_inject_splash_assets(string $html): string {
     if (stripos($html, '</head>') === false || str_contains($html, 'beyond-splash.js')) {
@@ -188,7 +188,7 @@ function beyond_nav_bootstrap(string $appName, ?array $wallet = null): array {
             $html = beyond_inject_splash_assets($html);
             if (stripos($html, '<body') === false || str_contains($html, 'id="beyond-os-shell"')) return $html;
             $wallet = $GLOBALS['beyond_wallet_override'] ?? $wallet;
-            $icon = beyond_app_icon($appName) ?: beyond_app_icon('Beyond OS');
+            $icon = beyond_app_icon($appName) ?: beyond_app_icon('Beyond Imagination Technology');
             if ($icon && stripos($html, 'rel="icon"') === false) {
                 $iconType = preg_match('/\.jpe?g(?:\?|$)/i', $icon) ? 'image/jpeg' : 'image/webp';
                 $tag = '<link rel="icon" type="' . $iconType . '" href="' . e($icon) . '">'
@@ -230,6 +230,7 @@ function beyond_shell_markup(string $appName, array $wallet): string {
     $currentIconPath = beyond_app_icon($appName);
     $currentIcon = $currentIconPath ? '<img class="bos-current-icon" src="' . e($currentIconPath) . '" alt="">' : '';
     $appIdentity = strcasecmp(trim($appName), 'Beyond OS') === 0
+        || strcasecmp(trim($appName), 'Beyond Imagination Technology') === 0
         ? ''
         : '<span class="bos-app-label">/</span>' . $currentIcon . '<strong class="bos-app">' . $app . '</strong>';
 
@@ -298,7 +299,7 @@ html[data-theme="fall"] #beyond-os-shell{background:rgba(47,25,16,.95);border-co
 @media(max-width:560px){#beyond-os-shell .bos-home,#beyond-os-shell .bos-action{min-height:44px}#beyond-os-shell .bos-tool-cluster-direct{display:none}#beyond-os-shell .bos-utility-menu{position:relative;display:block}#beyond-os-shell .bos-utility-menu summary{display:grid;width:44px;height:44px;place-items:center;border:1px solid rgba(255,255,255,.16);border-radius:50%;background:rgba(255,255,255,.055);color:#e9ebf5;cursor:pointer;list-style:none}#beyond-os-shell .bos-utility-menu summary::-webkit-details-marker{display:none}#beyond-os-shell .bos-utility-menu summary:hover,#beyond-os-shell .bos-utility-menu summary:focus-visible{background:rgba(255,255,255,.12);color:#fff}#beyond-os-shell .bos-utility-menu summary svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}#beyond-os-shell .bos-utility-menu>.bos-tool-cluster{position:absolute;right:0;top:50px;display:none;gap:5px;padding:4px;background:rgba(12,13,25,.98);border-color:rgba(255,255,255,.16);box-shadow:0 18px 45px rgba(0,0,0,.42)}#beyond-os-shell .bos-utility-menu[open]>.bos-tool-cluster{display:flex}#beyond-os-shell .bos-utility-menu .bos-locale,#beyond-os-shell .bos-utility-menu .bos-theme-toggle{width:44px;height:44px;flex-basis:44px}}
 @media(max-width:520px){#beyond-os-shell .bos-bits{display:none}#beyond-os-shell .bos-tool-cluster,#beyond-os-shell .bos-account-cluster{gap:2px;padding:2px}}
 @media(max-width:430px){#beyond-os-shell .bos-row{gap:4px}#beyond-os-shell .bos-current-icon{display:none}#beyond-os-shell .bos-home img{width:28px;height:28px}#beyond-os-shell .bos-locale,#beyond-os-shell .bos-theme-toggle{display:grid;width:34px;height:34px;flex-basis:34px}#beyond-os-shell .bos-utility-menu .bos-locale,#beyond-os-shell .bos-utility-menu .bos-theme-toggle{width:44px;height:44px;flex-basis:44px}#beyond-os-shell .bos-app-store{width:auto;min-width:58px;min-height:44px;padding:6px 9px;justify-content:center}#beyond-os-shell .bos-app-store-label-full{display:none}#beyond-os-shell .bos-app-store-label-mobile{display:inline;font-size:11px}#beyond-os-shell .bos-avatar{width:32px;height:32px;flex-basis:32px}}
-</style><nav id="beyond-os-shell" aria-label="Beyond OS navigation"><div class="bos-row"><a class="bos-home" href="' . $home . '" aria-label="Beyond OS" title="Beyond OS">' . $homeIcon . '<span class="bos-home-label">BEYOND OS</span></a>' . $appIdentity . '<div class="bos-actions">' . $appStoreAction . $navTools . $accountActions . '</div></div></nav>';
+</style><nav id="beyond-os-shell" aria-label="Beyond Imagination Technology navigation"><div class="bos-row"><a class="bos-home" href="' . $home . '" aria-label="Beyond Imagination Technology" title="Beyond Imagination Technology">' . $homeIcon . '<span class="bos-home-label">BEYOND IMAGINATION</span></a>' . $appIdentity . '<div class="bos-actions">' . $appStoreAction . $navTools . $accountActions . '</div></div></nav>';
 }
 
 function render_beyond_bar(string $appName, array $wallet = []): void { echo beyond_shell_markup($appName, $wallet ?: beyond_wallet()); }

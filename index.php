@@ -150,9 +150,6 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
                 <linearGradient id="atomStroke" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0" stop-color="#4f8cff"/><stop offset=".5" stop-color="#8d58ff"/><stop offset="1" stop-color="#4ee097"/>
                 </linearGradient>
-                <linearGradient id="keyholeFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0" stop-color="#e853c1"/><stop offset=".46" stop-color="#755cff"/><stop offset="1" stop-color="#080a18"/>
-                </linearGradient>
                 <filter id="gatewayGlow" x="-80%" y="-80%" width="260%" height="260%">
                     <feGaussianBlur stdDeviation="13" result="blur"/><feFlood flood-color="#7657ff" flood-opacity=".78"/><feComposite in2="blur" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
                 </filter>
@@ -192,9 +189,8 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
                     <ellipse rx="72" ry="31" transform="rotate(60)"/>
                     <ellipse rx="72" ry="31" transform="rotate(120)"/>
                 </g>
-                <g class="svg-nucleus">
-                    <path d="M0-25A17 17 0 0 0-9.5 6L-17 32H17L9.5 6A17 17 0 0 0 0-25Z" fill="none" stroke="url(#keyholeFill)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 10px rgba(168,85,247,.85))"/>
-                    <path d="M-8-20A17 17 0 0 1 8-20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".72"/>
+                <g class="svg-nucleus" transform="scale(.7)">
+                    <path d="M0-25A17 17 0 0 0-9.5 6L-17 32H17L9.5 6A17 17 0 0 0 0-25Z" fill="none" stroke="#d7d1ff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 7px rgba(181,172,255,.46))"/>
                 </g>
                 <circle class="svg-sheen" cx="-22" cy="-36" r="10" fill="#fff" opacity=".18"/>
             </g>

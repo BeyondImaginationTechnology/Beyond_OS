@@ -1,0 +1,70 @@
+# Manual-only release pipeline for the signed DailyBreath Amazon Appstore APK.
+trigger: none
+pr: none
+
+parameters:
+  - name: androidVersionCode
+    displayName: Android version code
+    type: string
+    default: '3'
+  - name: androidVersionName
+    displayName: Android version name
+    type: string
+    default: '1.7.1'
+
+pool:
+  vmImage: ubuntu-24.04
+
+variables:
+  - group: dailybreath-amazon-release
+  - name: projectDirectory
+    value: DailyBreathAndroid
+
+steps:
+  - checkout: self
+    clean: true
+
+  - task: DownloadSecureFile@1
+    name: amazonSigningKey
+    inputs:
+      secureFile: DailyBreath_Amazon_Release.keystore
+    displayName: Download Amazon signing key
+
+  - bash: |
+      set -euo pipefail
+      if [[ ! "$AMAZON_VERSION_CODE" =~ ^[1-9][0-9]*$ ]]; then
+        echo "##vso[task.logissue type=error]Android version code must be a positive integer."
+        exit 1
+      fi
+      ./gradlew --no-daemon \
+        -Pandroid.injected.signing.store.file="$AMAZON_KEYSTORE_PATH" \
+        -Pandroid.injected.signing.store.password="$AMAZON_KEYSTORE_PASSWORD" \
+        -Pandroid.injected.signing.key.alias="$AMAZON_KEY_ALIAS" \
+        -Pandroid.injected.signing.key.password="$AMAZON_KEY_PASSWORD" \
+        -PversionCode="$AMAZON_VERSION_CODE" \
+        -PversionName="$AMAZON_VERSION_NAME" \
+        lintAmazonRelease assembleAmazonRelease
+      apk_path="app/build/outputs/apk/amazon/release/app-amazon-release.apk"
+      test -s "$apk_path"
+      apksigner_path="$(find "$ANDROID_HOME/build-tools" -name apksigner -type f -print | sort -V | tail -n 1)"
+      if [[ -z "$apksigner_path" ]]; then
+        echo "##vso[task.logissue type=error]Android SDK apksigner was not found."
+        exit 1
+      fi
+      "$apksigner_path" verify --verbose "$apk_path"
+    workingDirectory: $(projectDirectory)
+    env:
+      AMAZON_KEYSTORE_PATH: $(amazonSigningKey.secureFilePath)
+      AMAZON_KEYSTORE_PASSWORD: $(AMAZON_KEYSTORE_PASSWORD)
+      AMAZON_KEY_ALIAS: $(AMAZON_KEY_ALIAS)
+      AMAZON_KEY_PASSWORD: $(AMAZON_KEY_PASSWORD)
+      AMAZON_VERSION_CODE: ${{ parameters.androidVersionCode }}
+      AMAZON_VERSION_NAME: ${{ parameters.androidVersionName }}
+    displayName: Build signed Amazon Appstore APK
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: $(projectDirectory)/app/build/outputs/apk/amazon/release
+      artifact: dailybreath-amazon-apk
+      publishLocation: pipeline
+    displayName: Publish Amazon Appstore APK

@@ -15,3 +15,15 @@ Native Android companion to `DailyBreathApple`, built with Java 17 and the Andro
 Open this directory in Android Studio, install API 37 when prompted, and use **Build > Generate App Bundles or APKs**. The project uses the same Android Gradle Plugin 9.3.0 / Java 17 baseline as `BeyondTVAndroid`.
 
 The next Android slices can add lesson state, encrypted journal storage, notifications, widgets, and Play Billing once the base app is installed and verified on a device.
+
+## Store releases
+
+The dependency-free `amazon` flavor produces an APK for Amazon Appstore submission:
+
+```powershell
+.\gradlew.bat assembleAmazonRelease
+```
+
+For a signed distributable APK, use the manual `azure-pipelines-dailybreath-amazon-release.yml` pipeline. Create the `dailybreath-amazon-release` variable group with secret `AMAZON_KEYSTORE_PASSWORD` and `AMAZON_KEY_PASSWORD`, plus non-secret `AMAZON_KEY_ALIAS`; upload `DailyBreath_Amazon_Release.keystore` as an Azure Secure file. Give every submitted build a higher `androidVersionCode` than its predecessor. The pipeline publishes the signed `amazon/release` APK as `dailybreath-amazon-apk` without placing signing material in the repository or log output.
+
+Google Play requires an Android App Bundle rather than an APK for a new app. Use the manual `azure-pipelines-dailybreath-play-release.yml` pipeline, which runs `bundlePlayRelease` and publishes `dailybreath-play-aab`. Create the `dailybreath-play-release` variable group with secret `PLAY_KEYSTORE_PASSWORD` and `PLAY_KEY_PASSWORD`, plus non-secret `PLAY_KEY_ALIAS`; upload `DailyBreath_Play_Upload.keystore` as an Azure Secure file. Keep the upload key safe: Play requires later updates to use the same package name and upload key.

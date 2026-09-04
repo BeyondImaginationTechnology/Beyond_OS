@@ -32,6 +32,12 @@ $wallet = bos_page_start('Beyond OS', 'Privacy Policy', 'Privacy practices for B
         <h2>Daily Breath iOS local data and optional iCloud sync</h2>
         <p>The Daily Breath iOS app stores journal entries, Bible notes, highlights, favorite collections, challenge progress, and daily history in protected local app storage. If you explicitly enable encrypted iCloud sync, the app encrypts that private data on your device before placing it in your Apple iCloud key-value store. The encryption key is stored through iCloud Keychain. Beyond Imagination Technology does not receive the unencrypted journal or Bible-note content through this sync feature. You may turn sync off without deleting the local copy.</p>
 
+        <h2>Daily Breath iOS and Beyond ID</h2>
+        <p>Daily Breath can be used without an account. If you choose to sign in with Beyond ID, Beyond Imagination Technology processes your name, email address, account identifier, and session information to authenticate your account and show its connection status in the app. The app keeps the session token in the iOS Keychain. Your journal entries, notes, highlights, challenge history, and breathing history remain on your device unless you separately enable encrypted iCloud sync. You can sign out in the app; you may request account-data help through our privacy contact.</p>
+
+        <h2>Daily Breath Android local data</h2>
+        <p>The Daily Breath Android app stores journal entries, selected faith, and breathing progress only in private on-device app storage. The app does not include analytics or upload that data, and Android device backup is disabled for the app. When you choose to share reflections, Android’s system share sheet sends only the text you select to the recipient or app you choose. You can delete journal entries from the app or delete the app’s local data through Android settings.</p>
+
         <h2>DailyBreath web app data</h2>
         <p>The DailyBreath web app associates saved breathing sessions, encrypted reflection journal entries, and weekly challenge progress with your Beyond ID. Journal content is encrypted before database storage. Bible highlights, favorite collections, private Bible notes, theme, narration speed, and reduced-motion preferences are stored locally in your browser and do not automatically transfer to another device. Your browser manages the installed app and offline shell. Optional newsletter signup stores the name and email address you submit so we can deliver those messages.</p>
 

@@ -1,0 +1,65 @@
+# Manual-only release pipeline for the signed DailyBreath Google Play App Bundle.
+trigger: none
+pr: none
+
+parameters:
+  - name: androidVersionCode
+    displayName: Android version code
+    type: string
+    default: '3'
+  - name: androidVersionName
+    displayName: Android version name
+    type: string
+    default: '1.7.1'
+
+pool:
+  vmImage: ubuntu-24.04
+
+variables:
+  - group: dailybreath-play-release
+  - name: projectDirectory
+    value: DailyBreathAndroid
+
+steps:
+  - checkout: self
+    clean: true
+
+  - task: DownloadSecureFile@1
+    name: playUploadKey
+    inputs:
+      secureFile: DailyBreath_Play_Upload.keystore
+    displayName: Download Google Play upload key
+
+  - bash: |
+      set -euo pipefail
+      if [[ ! "$PLAY_VERSION_CODE" =~ ^[1-9][0-9]*$ ]]; then
+        echo "##vso[task.logissue type=error]Android version code must be a positive integer."
+        exit 1
+      fi
+      ./gradlew --no-daemon \
+        -Pandroid.injected.signing.store.file="$PLAY_KEYSTORE_PATH" \
+        -Pandroid.injected.signing.store.password="$PLAY_KEYSTORE_PASSWORD" \
+        -Pandroid.injected.signing.key.alias="$PLAY_KEY_ALIAS" \
+        -Pandroid.injected.signing.key.password="$PLAY_KEY_PASSWORD" \
+        -PversionCode="$PLAY_VERSION_CODE" \
+        -PversionName="$PLAY_VERSION_NAME" \
+        lintPlayRelease bundlePlayRelease
+      bundle_path="app/build/outputs/bundle/playRelease/app-play-release.aab"
+      test -s "$bundle_path"
+      jarsigner -verify -certs "$bundle_path"
+    workingDirectory: $(projectDirectory)
+    env:
+      PLAY_KEYSTORE_PATH: $(playUploadKey.secureFilePath)
+      PLAY_KEYSTORE_PASSWORD: $(PLAY_KEYSTORE_PASSWORD)
+      PLAY_KEY_ALIAS: $(PLAY_KEY_ALIAS)
+      PLAY_KEY_PASSWORD: $(PLAY_KEY_PASSWORD)
+      PLAY_VERSION_CODE: ${{ parameters.androidVersionCode }}
+      PLAY_VERSION_NAME: ${{ parameters.androidVersionName }}
+    displayName: Build and verify signed Google Play App Bundle
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: $(projectDirectory)/app/build/outputs/bundle/playRelease
+      artifact: dailybreath-play-aab
+      publishLocation: pipeline
+    displayName: Publish Google Play App Bundle

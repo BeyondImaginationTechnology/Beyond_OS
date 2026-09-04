@@ -1,0 +1,13 @@
+Daily Breath scripture sources
+
+The app keeps these English editions offline and identifies them as translations
+or meanings rather than replacements for the original sacred texts.
+
+- English Bible and English Torah/Tanakh: World English Bible (WEB), public
+  domain. Source: https://ebible.org/details.php?id=engwebp
+- English Quran meaning: The Meaning of the Glorious Koran, translated by
+  Mohammed Marmaduke Pickthall. Source: Project Gutenberg eBook 16955,
+  https://www.gutenberg.org/ebooks/16955 (public domain in the United States).
+
+Before enabling distribution in a new territory, confirm that the included
+editions may be distributed there and retain any required attribution.

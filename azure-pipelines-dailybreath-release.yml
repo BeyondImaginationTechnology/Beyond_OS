@@ -61,12 +61,16 @@ steps:
   - bash: |
       set -euo pipefail
       selected_xcode=""
+      selected_version=""
       for xcode_app in /Applications/Xcode_26*.app /Applications/Xcode.app; do
         [[ -d "$xcode_app" ]] || continue
-        xcode_version="$(DEVELOPER_DIR="$xcode_app/Contents/Developer" xcodebuild -version)"
-        if [[ "$xcode_version" == Xcode\ 26* ]]; then
-          selected_xcode="$xcode_app"
-          break
+        xcode_version="$(DEVELOPER_DIR="$xcode_app/Contents/Developer" xcodebuild -version 2>/dev/null || true)"
+        if [[ "$xcode_version" =~ ^Xcode[[:space:]]+([0-9]+)(\.[0-9]+)*$ ]] && (( BASH_REMATCH[1] >= 26 )); then
+          candidate_version="${xcode_version#Xcode }"
+          if [[ -z "$selected_version" || "$(printf '%s\n%s\n' "$selected_version" "$candidate_version" | sort -V | tail -n 1)" == "$candidate_version" ]]; then
+            selected_version="$candidate_version"
+            selected_xcode="$xcode_app"
+          fi
         fi
       done
       if [[ -z "$selected_xcode" ]]; then
@@ -74,11 +78,27 @@ steps:
         exit 1
       fi
       export DEVELOPER_DIR="$selected_xcode/Contents/Developer"
+      sdk_version="$(xcrun --sdk iphoneos --show-sdk-version)"
+      if [[ ! "$sdk_version" =~ ^([0-9]+)(\.[0-9]+)*$ ]] || (( BASH_REMATCH[1] < 26 )); then
+        echo "##vso[task.logissue type=error]The selected Xcode must include the iOS 26 SDK or later. Found iPhoneOS SDK $sdk_version."
+        exit 1
+      fi
       xcodebuild -version
-      gem install bundler --no-document
-      bundle config set path vendor/bundle
-      bundle install
-      bundle exec fastlane ios testflight
+      simulator_udid="$(xcrun simctl list devices available -j | /usr/bin/ruby -rjson -e '
+        devices = JSON.parse(STDIN.read).fetch("devices").values.flatten
+        device = devices.find { |candidate| candidate["isAvailable"] && candidate["name"].start_with?("iPhone") }
+        abort "No available iPhone simulator was found." unless device
+        puts device.fetch("udid")
+      ')"
+      xcodebuild test \
+        -project TheDailyBreath.xcodeproj \
+        -scheme "The Daily Breath" \
+        -destination "id=$simulator_udid" \
+        CODE_SIGNING_ALLOWED=NO
+      gem install bundler -v 2.7.2 --no-document
+      bundle _2.7.2_ config set path vendor/bundle
+      bundle _2.7.2_ install
+      bundle _2.7.2_ exec fastlane ios testflight
     workingDirectory: $(projectDirectory)
     env:
       APP_STORE_CONNECT_API_KEY_PATH: $(appStoreConnectKey.secureFilePath)

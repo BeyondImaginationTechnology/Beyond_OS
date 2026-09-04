@@ -47,7 +47,13 @@ platform :ios do
           "technology.co.beyondimagination.thedailybreath.widget" => ENV.fetch("DAILY_BREATH_WIDGET_PROFILE_NAME"),
           "technology.co.beyondimagination.thedailybreath.Clip" => ENV.fetch("DAILY_BREATH_CLIP_PROFILE_NAME")
         }
-      }
+      },
+      # Keep the complete Xcode diagnostics in Azure instead of reducing them
+      # to a generic fastlane failure. The result bundle also makes failures
+      # from signing, Swift compilation, and export reproducible.
+      disable_xcpretty: true,
+      result_bundle: true,
+      buildlog_path: "fastlane/build_logs"
     )
 
     upload_to_testflight(

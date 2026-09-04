@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-const DAILYBREATH_WEB_VERSION = '1.7';
+const DAILYBREATH_WEB_VERSION = '1.8';
 
-function dailybreath_web_head(string $title = 'DailyBreath'): string
+function dailybreath_web_head(string $title = 'Daily Breath'): string
 {
     $safeTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
     return '<meta name="theme-color" content="#62558f">'
-        . '<meta name="application-name" content="DailyBreath">'
+        . '<meta name="application-name" content="Daily Breath">'
         . '<meta name="apple-mobile-web-app-capable" content="yes">'
         . '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">'
-        . '<meta name="apple-mobile-web-app-title" content="DailyBreath">'
+        . '<meta name="apple-mobile-web-app-title" content="Daily Breath">'
         . '<link rel="manifest" href="/dailybreath/manifest.webmanifest">'
         . '<link rel="apple-touch-icon" href="/dailybreath/assets/icons/dailybreath-mark-v2.png?v=20260901-2">'
         . '<link rel="icon" type="image/png" href="/dailybreath/assets/icons/dailybreath-mark-v2.png?v=20260901-2">'

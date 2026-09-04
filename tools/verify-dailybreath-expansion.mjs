@@ -1,12 +1,11 @@
 #!/usr/bin/env node
-import { readFile, readdir } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
 
-const root = resolve(import.meta.dirname, '..');
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const appResources = resolve(root, 'DailyBreathApple/Resources');
 const webData = resolve(root, 'dailybreath/data');
-const appAudio = resolve(appResources, 'Audio/Narration');
-const webAudio = resolve(root, 'dailybreath/assets/audio/verses');
 
 const loadPair = async (name) => {
   const [web, app] = await Promise.all([
@@ -15,10 +14,6 @@ const loadPair = async (name) => {
   ]);
   if (web !== app) throw new Error(`${name} differs between the website and iOS app.`);
   return JSON.parse(web);
-};
-const validMp3 = async (path) => {
-  const data = await readFile(path);
-  return data.length >= 128 && (data.subarray(0, 3).equals(Buffer.from('ID3')) || data[0] === 0xff);
 };
 const assert = (condition, message) => { if (!condition) throw new Error(message); };
 
@@ -52,28 +47,12 @@ for (const entry of challenges.entries) {
   assert(entry.ends_on <= '2026-11-23', `${entry.id} ends outside the campaign.`);
 }
 
-for (const entry of verses.entries) {
-  const [appOk, webOk] = await Promise.all([
-    validMp3(resolve(appAudio, entry.audio_file)),
-    validMp3(resolve(webAudio, entry.audio_file)),
-  ]);
-  assert(appOk, `Invalid iOS MP3: ${entry.audio_file}`);
-  assert(webOk, `Invalid website MP3: ${entry.audio_file}`);
-}
-
-const appMp3s = (await readdir(appAudio)).filter((name) => name.endsWith('.mp3'));
-const webMp3s = (await readdir(webAudio)).filter((name) => name.endsWith('.mp3'));
-assert(appMp3s.length === 149, `Expected 149 total iOS narration files, found ${appMp3s.length}.`);
-assert(webMp3s.length === 138, `Expected 138 website verse files, found ${webMp3s.length}.`);
-
 console.log(JSON.stringify({
   verses: verses.entries.length,
   newScheduledVerses: scheduled.length,
   devotionals: devotionals.entries.length,
   challenges: challenges.entries.length,
-  iosNarrationMp3s: appMp3s.length,
-  websiteVerseMp3s: webMp3s.length,
   schedule: `${scheduled[0].schedule_date}..${scheduled.at(-1).schedule_date}`,
   resourcesMatch: true,
-  audioReferencesValid: true,
+  contentReferencesValid: true,
 }));

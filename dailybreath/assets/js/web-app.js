@@ -9,10 +9,10 @@
   if(settings.reduceMotion)document.documentElement.style.scrollBehavior='auto';
   window.DailyBreath={settings,save(next){Object.assign(settings,next);localStorage.setItem('dailybreath.settings',JSON.stringify(settings));},toast(message){let el=document.querySelector('.db-toast');if(!el){el=document.createElement('div');el.className='db-toast';el.setAttribute('role','status');document.body.append(el)}el.textContent=message;el.classList.add('show');clearTimeout(el._timer);el._timer=setTimeout(()=>el.classList.remove('show'),2600)}};
   if('serviceWorker'in navigator)navigator.serviceWorker.register('/dailybreath/service-worker.js',{scope:'/dailybreath/'}).catch(()=>{});
-  let promptEvent=null;const install=document.createElement('button');install.className='db-install';install.type='button';install.innerHTML='<span>＋</span> Install DailyBreath';document.body.append(install);
+  let promptEvent=null;const install=document.createElement('button');install.className='db-install';install.type='button';install.innerHTML='<span>＋</span> Install Daily Breath';document.body.append(install);
   addEventListener('beforeinstallprompt',event=>{event.preventDefault();promptEvent=event;install.classList.add('show')});
   install.addEventListener('click',async()=>{if(!promptEvent)return;promptEvent.prompt();await promptEvent.userChoice;promptEvent=null;install.classList.remove('show')});
-  addEventListener('appinstalled',()=>window.DailyBreath.toast('DailyBreath installed on this device.'));
+  addEventListener('appinstalled',()=>window.DailyBreath.toast('Daily Breath installed on this device.'));
   const entries=[...document.querySelectorAll('.entry')];
   if(entries.length){
     const heading=document.createElement('div');heading.className='db-journal-tools';heading.style.cssText='display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px';

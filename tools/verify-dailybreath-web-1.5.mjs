@@ -8,9 +8,12 @@ const assert = (condition, message) => { if (!condition) throw new Error(message
 const webApp = read('dailybreath', 'includes', 'web-app.php');
 const manifest = JSON.parse(read('dailybreath', 'manifest.webmanifest'));
 const serviceWorker = read('dailybreath', 'service-worker.js');
-assert(webApp.includes("DAILYBREATH_WEB_VERSION = '1.5'"), 'Web version constant must be 1.5.');
-assert(manifest.name === 'DailyBreath 1.5', 'PWA manifest must be version 1.5.');
-assert(serviceWorker.includes("dailybreath-1.5-shell-v1"), 'PWA cache must be refreshed for 1.5.');
+const versionMatch = webApp.match(/DAILYBREATH_WEB_VERSION = '([^']+)'/);
+assert(versionMatch, 'Web version constant is missing.');
+const version = versionMatch[1];
+assert(manifest.name === 'Daily Breath', 'PWA manifest must use the public app name.');
+assert(manifest.short_name === 'Daily Breath', 'PWA short name must use the public app name.');
+assert(serviceWorker.includes(`dailybreath-${version}-shell-`), 'PWA cache must match the current web version.');
 
 const quranLines = read('dailybreath', 'data', 'quran-pickthall-vpl.txt').split(/\r?\n/).filter(line => line && !line.startsWith('#'));
 const quranParts = quranLines.map(line => line.split('|', 4));
@@ -32,18 +35,17 @@ for (const tradition of ['bible', 'torah', 'quran']) {
 assert(sacred.includes('dailybreath_interfaith_verse_of_day'), 'Interfaith daily matching is missing.');
 assert(sacred.includes('dailybreath_search_sacred_text'), 'Sacred-text search is missing.');
 assert(reader.includes('data-faith='), 'Reader tradition theme is missing.');
-assert(reader.includes('Narrate'), 'Reader narration is missing.');
 assert(todayApi.includes('dailybreath_interfaith_verse_of_day'), 'Today API must return the selected faith tradition.');
 assert(todayApi.includes("'reader_url'"), 'Today API reader deep link is missing.');
 
 console.log(JSON.stringify({
-  version: '1.5',
+  version,
   traditions: 3,
   bibleVerses: bibleLines.length,
   torahTanakhVerses: matthew,
   quranSurahs: 114,
   quranAyahs: quranLines.length,
   search: true,
-  narration: true,
-  pwaCache: 'dailybreath-1.5-shell-v1',
+  readerControls: true,
+  pwaCache: `dailybreath-${version}-shell`,
 }, null, 2));

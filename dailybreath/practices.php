@@ -54,7 +54,13 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     if (!hash_equals((string)$_SESSION['practice_csrf'], (string)($_POST['csrf'] ?? ''))) throw new RuntimeException('Reload the page and try again.');
     $action=$_POST['action'] ?? '';
     if ($action==='breath') {
-      $pdo->prepare('INSERT INTO breathing_sessions(user_id,exercise_id,completed_cycles,duration_seconds,completed_at) VALUES(?,?,?,?,CURRENT_TIMESTAMP)')->execute([$userId,(int)$_POST['exercise_id'],(int)$_POST['cycles'],(int)$_POST['duration']]);
+      $exerciseId=(int)($_POST['exercise_id']??0);$cycles=(int)($_POST['cycles']??0);$duration=(int)($_POST['duration']??0);
+      if(!in_array($cycles,[2,5,10],true))throw new RuntimeException('Choose a supported session length.');
+      $exerciseQuery=$pdo->prepare('SELECT id,inhale_seconds,hold_seconds,exhale_seconds FROM breathing_exercises WHERE id=? AND is_published=1 LIMIT 1');$exerciseQuery->execute([$exerciseId]);$savedExercise=$exerciseQuery->fetch(PDO::FETCH_ASSOC);
+      if(!$savedExercise)throw new RuntimeException('That breathing exercise is no longer available.');
+      $expectedDuration=((int)$savedExercise['inhale_seconds']+(int)$savedExercise['hold_seconds']+(int)$savedExercise['exhale_seconds'])*$cycles;
+      if($duration!==$expectedDuration)throw new RuntimeException('Breathing session data did not match the selected exercise.');
+      $pdo->prepare('INSERT INTO breathing_sessions(user_id,exercise_id,completed_cycles,duration_seconds,completed_at) VALUES(?,?,?,?,CURRENT_TIMESTAMP)')->execute([$userId,$exerciseId,$cycles,$expectedDuration]);
       $notice='Breathing session completed.';
     } elseif ($action==='journal') {
       $plain=trim((string)($_POST['entry'] ?? ''));if($plain==='')throw new RuntimeException('Write a reflection before saving.');
@@ -74,12 +80,13 @@ if ($_SERVER['REQUEST_METHOD']==='POST') {
     } elseif ($action==='challenge') {
       if(($_POST['challenge_source']??'')==='bundled'){
         $id=preg_replace('/[^a-z0-9-]/','',(string)($_POST['challenge_id']??''));
-        if($id==='')throw new RuntimeException('Challenge not found.');
+        $currentChallenge=dailybreath_recovery_challenge_for_date(date('Y-m-d'));
+        if($id===''||!$currentChallenge||!hash_equals((string)$currentChallenge['id'],$id))throw new RuntimeException('Challenge not found.');
         $driver=$pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
         $sql=$driver==='sqlite'?'INSERT INTO dailybreath_challenge_progress(user_id,challenge_key,completed_count,updated_at) VALUES(?,?,1,CURRENT_TIMESTAMP) ON CONFLICT(user_id,challenge_key) DO UPDATE SET completed_count=MIN(completed_count+1,7),updated_at=CURRENT_TIMESTAMP':'INSERT INTO dailybreath_challenge_progress(user_id,challenge_key,completed_count) VALUES(?,?,1) ON DUPLICATE KEY UPDATE completed_count=LEAST(completed_count+1,7),updated_at=CURRENT_TIMESTAMP';
         $pdo->prepare($sql)->execute([$userId,$id]);
       }else{
-        $id=(int)$_POST['challenge_id'];$driver=$pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        $id=(int)($_POST['challenge_id']??0);$currentQuery=$pdo->prepare('SELECT id FROM weekly_challenges WHERE id=? AND is_published=1 AND starts_on<=CURRENT_DATE AND ends_on>=CURRENT_DATE LIMIT 1');$currentQuery->execute([$id]);if(!$currentQuery->fetchColumn())throw new RuntimeException('Challenge not found.');$driver=$pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
         $sql=$driver==='sqlite'?'INSERT INTO weekly_challenge_progress(user_id,challenge_id,completed_count,updated_at) VALUES(?,?,1,CURRENT_TIMESTAMP) ON CONFLICT(user_id,challenge_id) DO UPDATE SET completed_count=MIN(completed_count+1,7),updated_at=CURRENT_TIMESTAMP':'INSERT INTO weekly_challenge_progress(user_id,challenge_id,completed_count) VALUES(?,?,1) ON DUPLICATE KEY UPDATE completed_count=LEAST(completed_count+1,7),updated_at=CURRENT_TIMESTAMP';
         $pdo->prepare($sql)->execute([$userId,$id]);
       }

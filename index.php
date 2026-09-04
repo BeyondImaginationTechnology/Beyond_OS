@@ -121,7 +121,7 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
 <header class="top wrap">
     <a class="brand" href="./"><b class="brand-atom" aria-hidden="true"><img src="/assets/images/bos-logo-mark.svg?v=20260828-1" alt=""></b>BEYOND <span>OS</span><small>THE CONNECTED IMAGINATION ECOSYSTEM</small></a>
     <nav class="nav" aria-label="Primary navigation">
-          <a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-market/">Marketplace</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a>
+          <a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="/beyond-market/">Marketplace</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a><a href="https://os.beyondimagination.co.technology/">OS</a>
           <label class="currency-picker"><span aria-hidden="true">$</span><span class="visually-hidden">Display currency</span><select id="homeCurrency" aria-label="Display currency"><option value="USD">USD</option><option value="CAD">CAD</option><option value="BITS">bit$</option></select></label>
           <a class="primary" href="/app-store/">App Store</a>
     </nav>
@@ -249,10 +249,6 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
             <div class="loop-step"><b>Return</b><span>One identity across the system</span></div>
         </div>
     </div>
-</section>
-<section class="investor-banner wrap" aria-labelledby="investor-banner-title">
-    <div><span class="platform-kicker">Seed-stage company brief</span><h2 id="investor-banner-title">See the platform thesis behind the products.</h2><p>Explore the market opportunity, product loop, business-model design and milestones this seed round is built to accelerate.</p></div>
-    <a class="primary" href="/investors.php">View investor brief →</a>
 </section>
 <?php
 $classicSchedule = beyond_classic_schedule_state();
@@ -479,7 +475,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 </main>
 <footer class="footer wrap">
     <div><a class="brand" href="./">BEYOND <span>OS</span></a><p>The connected imagination ecosystem.</p><p class="copyright">© 2026 Beyond Imagination Corp.</p></div>
-    <div><h4>DISCOVER</h4><a href="app-store/">App Store</a><a href="release-notes.php">What’s New</a><a href="beyond-id/dashboard/wallet.php">Wallet</a><a href="academy/">Learn</a><a href="beyond-tv/">Beyond TV</a></div>
+    <div><h4>DISCOVER</h4><a href="app-store/">App Store</a><a href="release-notes.php">What’s New</a><a href="beyond-id/dashboard/wallet.php">Wallet</a><a href="academy/">Learn</a><a href="beyond-tv/">Beyond TV</a><a href="https://os.beyondimagination.co.technology/">Beyond OS</a></div>
     <div><h4>COMPANY</h4><a href="about.php">About</a><a href="investors.php">Investors</a><a href="blog.php">Blog</a><a href="contact.php">Contact</a></div>
     <div><h4>SUPPORT</h4><a href="help-center.php">Help Center</a><a href="legal/privacy.php">Privacy Policy</a><a href="legal/terms.php">Terms of Service</a></div>
     <div><h4>FOLLOW US</h4><a href="https://www.instagram.com/beyondimaginationtech/" target="_blank" rel="noopener noreferrer">Instagram @beyondimaginationtech</a></div>

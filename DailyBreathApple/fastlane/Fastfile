@@ -9,8 +9,8 @@ platform :ios do
       key_filepath: ENV.fetch("APP_STORE_CONNECT_API_KEY_PATH")
     )
 
-    # Azure build IDs are monotonic. This updates only the CI checkout so every
-    # TestFlight upload has a build number that is unique without touching Git.
+    # The pipeline supplies the App Store build number independently from its
+    # Azure run ID. This updates only the CI checkout without touching Git.
     increment_build_number(
       xcodeproj: "TheDailyBreath.xcodeproj",
       build_number: ENV.fetch("CI_BUILD_NUMBER")

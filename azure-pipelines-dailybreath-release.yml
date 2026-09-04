@@ -5,6 +5,12 @@
 trigger: none
 pr: none
 
+parameters:
+  - name: iosBuildNumber
+    displayName: iOS build number
+    type: string
+    default: '18'
+
 pool:
   vmImage: macos-15
 
@@ -81,5 +87,8 @@ steps:
       THE_DAILY_BREATH_PROFILE_NAME: $(THE_DAILY_BREATH_PROFILE_NAME)
       DAILY_BREATH_WIDGET_PROFILE_NAME: $(DAILY_BREATH_WIDGET_PROFILE_NAME)
       DAILY_BREATH_CLIP_PROFILE_NAME: $(DAILY_BREATH_CLIP_PROFILE_NAME)
-      CI_BUILD_NUMBER: $(Build.BuildId)
+      # Keep the App Store build sequence independent from Azure's run IDs.
+      # Bump this parameter for each new upload; retries of a failed archive
+      # may reuse it, but an uploaded build number must never be reused.
+      CI_BUILD_NUMBER: ${{ parameters.iosBuildNumber }}
     displayName: Archive and upload DailyBreath to TestFlight

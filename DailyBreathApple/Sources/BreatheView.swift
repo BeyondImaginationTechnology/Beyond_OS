@@ -341,8 +341,13 @@ private struct PremiumBreathHourglass: View {
 
             VStack(spacing: 10) {
                 ZStack {
-                    HourglassSand(progress: sandProgress, color: accent, reduceMotion: reduceMotion)
-                        .frame(width: 116, height: 148)
+                    HourglassSand(
+                        progress: sandProgress,
+                        color: accent,
+                        reduceMotion: reduceMotion,
+                        isExhaling: phaseText == "Exhale"
+                    )
+                    .frame(width: 116, height: 148)
 
                     HourglassFrame(color: primary)
                         .frame(width: 116, height: 148)
@@ -396,32 +401,53 @@ private struct HourglassSand: View {
     let progress: Double
     let color: Color
     let reduceMotion: Bool
+    let isExhaling: Bool
 
     var body: some View {
-        let p = min(max(progress, 0), 1)
-        let sand = LinearGradient(
-            colors: [color.opacity(0.72), color, color.opacity(0.82)],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        TimelineView(.animation(minimumInterval: reduceMotion ? 1 : 1.0 / 30.0)) { timeline in
+            let p = min(max(progress, 0), 1)
+            let sand = LinearGradient(
+                colors: [color.opacity(0.72), color, color.opacity(0.82)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            let cycle = timeline.date.timeIntervalSinceReferenceDate
+                .truncatingRemainder(dividingBy: 1.2) / 1.2
 
-        ZStack {
-            HourglassChamber(isTop: true)
-                .fill(color.opacity(0.10))
-            HourglassChamber(isTop: false)
-                .fill(color.opacity(0.10))
-            HourglassSandFill(isTop: true, amount: 1 - p)
-                .fill(sand)
-            HourglassSandFill(isTop: false, amount: p)
-                .fill(sand)
-            Capsule()
-                .fill(color)
-                .frame(width: 3, height: p < 0.98 ? 24 : 0)
-                .offset(y: -12)
+            ZStack {
+                HourglassChamber(isTop: true)
+                    .fill(color.opacity(0.10))
+                HourglassChamber(isTop: false)
+                    .fill(color.opacity(0.10))
+                HourglassSandFill(isTop: true, amount: 1 - p)
+                    .fill(sand)
+                HourglassSandFill(isTop: false, amount: p)
+                    .fill(sand)
+                Capsule()
+                    .fill(color)
+                    .frame(width: isExhaling && !reduceMotion ? 4 : 3, height: p < 0.98 ? 24 : 0)
+                    .offset(y: -12)
+                    .opacity(isExhaling ? 1 : 0.72)
+
+                if isExhaling && !reduceMotion && p < 0.98 {
+                    ForEach(0..<4, id: \.self) { index in
+                        let particlePhase = (cycle + Double(index) * 0.23)
+                            .truncatingRemainder(dividingBy: 1)
+                        Circle()
+                            .fill(color.opacity(0.9))
+                            .frame(width: index.isMultiple(of: 2) ? 3 : 2, height: index.isMultiple(of: 2) ? 3 : 2)
+                            .offset(
+                                x: CGFloat(index - 1) * 1.8,
+                                y: CGFloat(particlePhase * 28 - 12)
+                            )
+                            .opacity(0.3 + (1 - particlePhase) * 0.7)
+                    }
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 18)
+            .animation(reduceMotion ? nil : .easeInOut(duration: 0.82), value: p)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 18)
-        .animation(reduceMotion ? nil : .easeInOut(duration: 0.82), value: p)
     }
 }
 

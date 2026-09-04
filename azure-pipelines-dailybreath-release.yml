@@ -57,7 +57,7 @@ steps:
       selected_xcode=""
       for xcode_app in /Applications/Xcode_26*.app /Applications/Xcode.app; do
         [[ -d "$xcode_app" ]] || continue
-        xcode_version="$(DEVELOPER_DIR="$xcode_app/Contents/Developer" xcodebuild -version | head -n 1)"
+        xcode_version="$(DEVELOPER_DIR="$xcode_app/Contents/Developer" xcodebuild -version)"
         if [[ "$xcode_version" == Xcode\ 26* ]]; then
           selected_xcode="$xcode_app"
           break

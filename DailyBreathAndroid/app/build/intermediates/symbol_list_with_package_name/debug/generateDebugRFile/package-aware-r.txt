@@ -1,0 +1,4 @@
+technology.co.beyondimagination.dailybreath
+drawable ic_launcher
+string app_name
+style AppTheme

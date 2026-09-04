@@ -1,0 +1,8 @@
+technology.co.beyondimagination.dailybreath.app-pngs-0 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\build\generated\res\pngs\debug
+technology.co.beyondimagination.dailybreath.app-updated_navigation_xml-1 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\build\generated\updated_navigation_xml\debug
+technology.co.beyondimagination.dailybreath.app-packageDebugResources-2 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+technology.co.beyondimagination.dailybreath.app-packageDebugResources-3 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+technology.co.beyondimagination.dailybreath.app-debug-4 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\build\intermediates\merged_res\debug\mergeDebugResources
+technology.co.beyondimagination.dailybreath.app-debug-5 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\src\debug\res
+technology.co.beyondimagination.dailybreath.app-main-6 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\src\main\res
+gradleHome-0 C:\Users\fresh\.gradle

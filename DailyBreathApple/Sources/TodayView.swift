@@ -52,16 +52,9 @@ struct TodayView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                BrandHeader()
-                themePicker
-                dailyRhythmCard
-                reminderCard
-                traditionPicker
-                verseCard
-                devotionalCard
-                recoveryNewsletterCard
-                journalCard
-                quickActions
+                todayIntro
+                todayReading
+                todayReflection
             }
             .padding()
         }
@@ -103,6 +96,28 @@ struct TodayView: View {
         .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
             Task { await store.refreshToday() }
         }
+    }
+
+    @ViewBuilder
+    private var todayIntro: some View {
+        BrandHeader()
+        themePicker
+        dailyRhythmCard
+        reminderCard
+        traditionPicker
+    }
+
+    @ViewBuilder
+    private var todayReading: some View {
+        verseCard
+        devotionalCard
+    }
+
+    @ViewBuilder
+    private var todayReflection: some View {
+        recoveryNewsletterCard
+        journalCard
+        quickActions
     }
 
     private var dailyRhythmCard: some View {

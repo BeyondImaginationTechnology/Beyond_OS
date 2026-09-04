@@ -1,0 +1,3 @@
+technology.co.beyondimagination.dailybreath:style/AppTheme = 0x7f030000
+technology.co.beyondimagination.dailybreath:string/app_name = 0x7f020000
+technology.co.beyondimagination.dailybreath:drawable/ic_launcher = 0x7f010000

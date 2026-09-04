@@ -109,24 +109,15 @@ struct BreatheView: View {
     }
 
     private var breathOrb: some View {
-        ZStack {
-            Circle()
-                .fill(selectedTheme.primary.opacity(0.14))
-                .frame(width: isBreathing && !reduceMotion ? 252 : 178, height: isBreathing && !reduceMotion ? 252 : 178)
-                .animation(reduceMotion ? nil : .easeInOut(duration: Double(breathPattern.inhale)).repeatForever(autoreverses: true), value: isBreathing)
-            Circle()
-                .stroke(selectedTheme.accent, lineWidth: 4)
-                .frame(width: 178, height: 178)
-            VStack(spacing: 8) {
-                Text(isBreathing ? store.breathPhase : timeRemainingText)
-                    .font(.title2.weight(.bold))
-                Text(didCompleteSession ? "Complete" : breathPattern.instruction)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .frame(width: 132)
-            }
-        }
+        PremiumBreathHourglass(
+            progress: progress,
+            isRunning: isBreathing,
+            reduceMotion: reduceMotion,
+            primary: selectedTheme.primary,
+            accent: selectedTheme.accent,
+            phaseText: isBreathing ? store.breathPhase : timeRemainingText,
+            instruction: didCompleteSession ? "Complete" : breathPattern.instruction
+        )
         .accessibilityElement(children: .combine)
         .accessibilityLabel(didCompleteSession ? "Breathing session complete" : "\(timeRemainingText) remaining")
     }
@@ -323,4 +314,185 @@ struct BreatheView: View {
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
+}
+
+private struct PremiumBreathHourglass: View {
+    let progress: Double
+    let isRunning: Bool
+    let reduceMotion: Bool
+    let primary: Color
+    let accent: Color
+    let phaseText: String
+    let instruction: String
+
+    private var sandProgress: Double {
+        isRunning ? progress : (progress == 0 ? 0.14 : progress)
+    }
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 32, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .overlay {
+                    RoundedRectangle(cornerRadius: 32, style: .continuous)
+                        .stroke(primary.opacity(0.18), lineWidth: 1)
+                }
+                .shadow(color: primary.opacity(0.14), radius: 24, y: 12)
+
+            VStack(spacing: 10) {
+                ZStack {
+                    HourglassSand(progress: sandProgress, color: accent, reduceMotion: reduceMotion)
+                        .frame(width: 116, height: 148)
+
+                    HourglassFrame(color: primary)
+                        .frame(width: 116, height: 148)
+                }
+                .frame(height: 154)
+
+                Text(phaseText)
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(primary)
+                    .contentTransition(.opacity)
+                    .animation(reduceMotion ? nil : .easeInOut(duration: 0.24), value: phaseText)
+                Text(instruction)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
+                    .frame(width: 190)
+            }
+            .padding(.vertical, 18)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 254)
+        .scaleEffect(isRunning && !reduceMotion ? 1.025 : 1)
+        .animation(reduceMotion ? nil : .spring(response: 0.48, dampingFraction: 0.72), value: isRunning)
+    }
+}
+
+private struct HourglassFrame: View {
+    let color: Color
+
+    var body: some View {
+        ZStack {
+            Capsule()
+                .fill(color)
+                .frame(width: 104, height: 9)
+                .offset(y: -69)
+            Capsule()
+                .fill(color)
+                .frame(width: 104, height: 9)
+                .offset(y: 69)
+            HourglassOutline()
+                .stroke(color, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
+                .padding(.horizontal, 11)
+                .padding(.vertical, 9)
+        }
+        .shadow(color: color.opacity(0.22), radius: 5, y: 3)
+    }
+}
+
+private struct HourglassSand: View {
+    let progress: Double
+    let color: Color
+    let reduceMotion: Bool
+
+    var body: some View {
+        let p = min(max(progress, 0), 1)
+        let sand = LinearGradient(
+            colors: [color.opacity(0.72), color, color.opacity(0.82)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+
+        ZStack {
+            HourglassChamber(isTop: true)
+                .fill(color.opacity(0.10))
+            HourglassChamber(isTop: false)
+                .fill(color.opacity(0.10))
+            HourglassSandFill(isTop: true, amount: 1 - p)
+                .fill(sand)
+            HourglassSandFill(isTop: false, amount: p)
+                .fill(sand)
+            Capsule()
+                .fill(color)
+                .frame(width: 3, height: p < 0.98 ? 24 : 0)
+                .offset(y: -12)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 18)
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.82), value: p)
+    }
+}
+
+private struct HourglassOutline: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let inset: CGFloat = 8
+        let top = rect.minY + inset
+        let bottom = rect.maxY - inset
+        let left = rect.minX + inset
+        let right = rect.maxX - inset
+        let middle = rect.midY
+        path.move(to: CGPoint(x: left, y: top))
+        path.addLine(to: CGPoint(x: left, y: top + 16))
+        path.addCurve(to: CGPoint(x: rect.midX, y: middle), control1: CGPoint(x: left, y: middle - 25), control2: CGPoint(x: rect.midX - 9, y: middle - 9))
+        path.addCurve(to: CGPoint(x: right, y: bottom - 16), control1: CGPoint(x: rect.midX + 9, y: middle + 9), control2: CGPoint(x: right, y: middle + 25))
+        path.addLine(to: CGPoint(x: right, y: bottom))
+        path.move(to: CGPoint(x: right, y: top))
+        path.addLine(to: CGPoint(x: right, y: top + 16))
+        path.addCurve(to: CGPoint(x: rect.midX, y: middle), control1: CGPoint(x: right, y: middle - 25), control2: CGPoint(x: rect.midX + 9, y: middle - 9))
+        path.addCurve(to: CGPoint(x: left, y: bottom - 16), control1: CGPoint(x: rect.midX - 9, y: middle + 9), control2: CGPoint(x: left, y: middle + 25))
+        path.addLine(to: CGPoint(x: left, y: bottom))
+        return path
+    }
+}
+
+private struct HourglassChamber: Shape {
+    let isTop: Bool
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let middle = rect.midY
+        if isTop {
+            path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.midX, y: middle))
+        } else {
+            path.move(to: CGPoint(x: rect.midX, y: middle))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+            path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        }
+        path.closeSubpath()
+        return path
+    }
+}
+
+private struct HourglassSandFill: Shape {
+    let isTop: Bool
+    let amount: Double
+
+    func path(in rect: CGRect) -> Path {
+        let fill = min(max(amount, 0), 1)
+        let middle = rect.midY
+        var path = Path()
+
+        if isTop {
+            let endY = rect.minY + (middle - rect.minY) * fill
+            let inset = (endY - rect.minY) / 2
+            path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.maxX - inset, y: endY))
+            path.addLine(to: CGPoint(x: rect.minX + inset, y: endY))
+        } else {
+            let startY = middle
+            let endY = middle + (rect.maxY - middle) * fill
+            let inset = (endY - middle) / 2
+            path.move(to: CGPoint(x: rect.midX, y: startY))
+            path.addLine(to: CGPoint(x: rect.maxX - inset, y: endY))
+            path.addLine(to: CGPoint(x: rect.minX + inset, y: endY))
+        }
+        path.closeSubpath()
+        return path
+    }
 }

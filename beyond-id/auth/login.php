@@ -11,6 +11,7 @@ header('Pragma: no-cache');
 $instagramLoginHtml = '';
 ob_start(static function (string $html) use (&$instagramLoginHtml): string {
     $layoutFix = '.page{position:relative}.story>a[aria-label="Back to home"]{z-index:5;display:inline-flex;align-items:center;min-height:44px;white-space:nowrap}.os{z-index:5;left:auto;right:34px;letter-spacing:.12em;white-space:nowrap;text-shadow:0 2px 12px rgba(0,0,0,.65)}@media(max-width:820px){.story>a[aria-label="Back to home"]{top:18px!important;left:20px!important;min-height:40px;padding:8px 12px!important;font-size:13px}.os{top:29px;right:20px;font-size:11px}body.dailybreath-login .story>a[aria-label="Back to home"]{left:14px!important}body.dailybreath-login .os{right:14px}}';
+    $layoutFix .= "body.dailybreath-login{background-color:#092016;background-image:linear-gradient(115deg,rgba(1,21,12,.62),rgba(4,35,20,.38) 43%,rgba(2,20,11,.68)),radial-gradient(circle at 70% 14%,rgba(242,208,129,.24),transparent 31%),url('../../assets/dailybreath-login-background.webp');background-size:cover;background-position:center;background-attachment:fixed}body.dailybreath-login:before{content:'';position:fixed;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,16,8,.34));backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}body.dailybreath-login .page{position:relative;z-index:1}body.dailybreath-login .card{background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(247,249,244,.94));box-shadow:0 28px 80px rgba(0,18,8,.48),inset 0 1px 0 #fff}.daily-login-hero{background:linear-gradient(145deg,rgba(20,70,42,.90),rgba(4,35,19,.84));box-shadow:0 25px 75px rgba(0,15,6,.52),inset 0 1px 0 rgba(255,255,255,.13)}";
     $html = str_replace(['BEYOND OS 2.4 BETA','BEYOND OS 2.4'], ['BEYOND OS · BETA','BEYOND OS'], $html);
     $html = str_replace('</style>', $layoutFix . '</style>', $html);
     return str_replace('<div class="divider">or use email</div>', $instagramLoginHtml . '<div class="divider">or use email</div>', $html);
@@ -44,8 +45,6 @@ foreach ($experiences as $slug => $candidate) if (str_contains($returnTo, '/' . 
 [$product,$tagline,$mark,$accent,$accent2] = $experience;
 $isDailyBreath = $product === 'DailyBreath';
 $isBeyondFrench = $product === 'Beyond French';
-$isDailyBreath = false;
-$isBeyondFrench = false;
 $dailyVerse = null;
 $dailyVerseBibleUrl = '../../dailybreath/bible.php';
 if ($isDailyBreath) {
@@ -70,6 +69,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $email = strtolower(trim($_POST['email'] ?? ''));
         $password = $_POST['password'] ?? '';
+        $accountLimit = beyond_rate_limit_consume($pdo, 'web-login-account', $email, 5, 900, 900);
+        $ipLimit = beyond_rate_limit_consume($pdo, 'web-login-ip', '', 30, 900, 1800);
+        if (!$accountLimit['allowed'] || !$ipLimit['allowed']) {
+            $retryAfter = max($accountLimit['retry_after'], $ipLimit['retry_after']);
+            http_response_code(429);
+            header('Retry-After: ' . $retryAfter);
+            $error = 'Too many sign-in attempts. Please try again later.';
+        } else {
         $stmt = $pdo->prepare('SELECT * FROM users WHERE email=? LIMIT 1');
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -88,17 +95,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($valid && empty($user['email_verified']) && empty($user['email_verified_at']) && !empty($user['verification_token'])) {
             $error = 'Verify your email before signing in. Check your inbox for the verification link.';
         } elseif ($valid && ($user['status'] ?? 'active') === 'active') {
+            beyond_rate_limit_clear($pdo, 'web-login-account', $email);
             session_regenerate_id(true);
             $_SESSION['user_id'] = (int)$user['id'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['name'] = $user['name'] ?? trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''));
             $_SESSION['role'] = $user['role'] ?? 'user';
             $_SESSION['locale'] = $user['preferred_locale'] ?? 'en';
-            $requiredRole = beyond_signup_role($email, (string)$_SESSION['role']);
-            if ($requiredRole !== (string)$_SESSION['role']) {
-                $_SESSION['role'] = $requiredRole;
-                try { $pdo->prepare('UPDATE users SET role=? WHERE id=?')->execute([$requiredRole,$user['id']]); } catch (Throwable $exception) {}
-            }
             $_SESSION['user'] = ['id'=>(int)$user['id'],'email'=>$user['email'],'role'=>$_SESSION['role']];
             register_session($pdo, (int)$user['id']);
             beyondRememberForget($pdo);
@@ -118,6 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = $socialAccount
                 ? 'This email uses social sign-in. Continue with the linked provider, or use Forgot password to create or replace your password.'
                 : 'That email and password combination was not recognized.';
+        }
         }
     }
 }

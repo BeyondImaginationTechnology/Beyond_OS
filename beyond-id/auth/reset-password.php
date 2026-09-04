@@ -12,7 +12,7 @@ $reset = false;
 
 if (preg_match('/^[a-f0-9]{64}$/', $token)) {
     $stmt = $pdo->prepare('SELECT id,user_id FROM password_resets WHERE token=? AND used_at IS NULL AND expires_at>? LIMIT 1');
-    $stmt->execute([$token, date('Y-m-d H:i:s')]);
+    $stmt->execute([hash('sha256', $token), date('Y-m-d H:i:s')]);
     $reset = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
@@ -29,14 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $pdo->beginTransaction();
         try {
-            $userStatement = $pdo->prepare('SELECT email, role FROM users WHERE id=? LIMIT 1');
-            $userStatement->execute([(int)$reset['user_id']]);
-            $user = $userStatement->fetch(PDO::FETCH_ASSOC) ?: [];
-            $role = beyond_signup_role((string)($user['email'] ?? ''), (string)($user['role'] ?? 'user'));
             try {
-                $pdo->prepare('UPDATE users SET password_hash=?, password=?, role=? WHERE id=?')->execute([$hash, $hash, $role, (int)$reset['user_id']]);
+                $pdo->prepare('UPDATE users SET password_hash=?, password=? WHERE id=?')->execute([$hash, $hash, (int)$reset['user_id']]);
             } catch (Throwable $exception) {
-                $pdo->prepare('UPDATE users SET password_hash=?, role=? WHERE id=?')->execute([$hash, $role, (int)$reset['user_id']]);
+                $pdo->prepare('UPDATE users SET password_hash=? WHERE id=?')->execute([$hash, (int)$reset['user_id']]);
             }
             $pdo->prepare('UPDATE password_resets SET used_at=? WHERE id=? AND used_at IS NULL')->execute([date('Y-m-d H:i:s'), (int)$reset['id']]);
             beyondRememberRevokeAll($pdo, (int)$reset['user_id']);

@@ -5,6 +5,11 @@ require __DIR__ . '/../includes/admin-check.php';
 require_once __DIR__ . '/../includes/functions.php';
 require __DIR__ . '/../includes/db.php';
 
+if (!beyond_sql_console_enabled()) {
+    http_response_code(403);
+    exit('SQL Console is restricted to super administrators and must be explicitly enabled for this deployment.');
+}
+
 $title = 'SQL Console';
 $query = '';
 $email = trim((string)($_POST['email'] ?? ''));
@@ -32,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($normalized === '') $error = 'Enter a SQL command.';
     elseif (str_contains($normalized, ';')) $error = 'Only one SQL statement can run at a time.';
     elseif ($blocked) $error = 'Schema, file, and database attachment commands are blocked in the web console.';
-    elseif (!$readOnly && empty($_POST['confirm_write'])) $error = 'Confirm the write operation before running it.';
+    elseif (!$readOnly && (empty($_POST['confirm_write']) || (string)($_POST['write_confirmation'] ?? '') !== 'RUN WRITE')) $error = 'Confirm the write operation and enter RUN WRITE before running it.';
     elseif (str_contains($normalized, ':email') && !filter_var($email, FILTER_VALIDATE_EMAIL)) $error = 'Enter the target user email address.';
     else {
         try {
@@ -62,9 +67,9 @@ $presets = [
 require __DIR__ . '/../includes/admin-header.php';
 require __DIR__ . '/../includes/admin-sidebar.php';
 ?>
-<section class="content"><h1>Protected SQL Console</h1><p class="muted">Admin-only, single-statement console. Writes run in a transaction and require confirmation.</p>
+<section class="content"><h1>Protected SQL Console</h1><p class="muted">Super-admin-only, deployment-gated, single-statement console. Writes run in a transaction and require explicit confirmation.</p>
 <div class="card"><h2>Command presets</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><?php foreach($presets as $label=>$sql): ?><button class="btn sql-preset" type="button" data-sql="<?= e($sql) ?>"><?= e($label) ?></button><?php endforeach; ?></div></div>
-<div class="card"><?php if($error): ?><div class="badge danger"><?= e($error) ?></div><?php endif; ?><form method="post" id="sql-form"><input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>"><label>Target email for <code>:email</code><input type="email" name="email" value="<?= e($email) ?>" placeholder="member@example.com"></label><label>SQL command<textarea id="sql-query" name="query" rows="10" spellcheck="false" placeholder="SELECT id, email, role FROM users LIMIT 50;"><?= e($query) ?></textarea></label><label><input type="checkbox" name="confirm_write" value="1"> I understand and confirm this write operation.</label><p><button class="btn" type="submit">Run command</button> <a class="btn" href="database.php">Database explorer</a></p></form></div>
+<div class="card"><?php if($error): ?><div class="badge danger"><?= e($error) ?></div><?php endif; ?><form method="post" id="sql-form"><input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>"><label>Target email for <code>:email</code><input type="email" name="email" value="<?= e($email) ?>" placeholder="member@example.com"></label><label>SQL command<textarea id="sql-query" name="query" rows="10" spellcheck="false" placeholder="SELECT id, email, role FROM users LIMIT 50;"><?= e($query) ?></textarea></label><label><input type="checkbox" name="confirm_write" value="1"> I understand and confirm this write operation.</label><label>Write confirmation<input type="text" name="write_confirmation" autocomplete="off" placeholder="Enter RUN WRITE for a write command"></label><p><button class="btn" type="submit">Run command</button> <a class="btn" href="database.php">Database explorer</a></p></form></div>
 <?php if(is_array($result)): ?><div class="card"><h2>Results</h2><div style="overflow:auto"><table><?php if($result): ?><thead><tr><?php foreach(array_keys($result[0]) as $column): ?><th><?= e($column) ?></th><?php endforeach; ?></tr></thead><tbody><?php foreach($result as $row): ?><tr><?php foreach($row as $value): ?><td><?= e(is_scalar($value)||$value===null?(string)$value:json_encode($value)) ?></td><?php endforeach; ?></tr><?php endforeach; ?></tbody><?php else: ?><tr><td>No results.</td></tr><?php endif; ?></table></div></div><?php endif; ?></section>
 <script>document.querySelectorAll('.sql-preset').forEach(function(button){button.addEventListener('click',function(){document.getElementById('sql-query').value=button.dataset.sql||'';document.getElementById('sql-query').focus();});});</script>
 <?php require __DIR__ . '/../includes/admin-footer.php'; ?>

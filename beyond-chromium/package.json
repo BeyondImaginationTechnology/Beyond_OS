@@ -2,6 +2,7 @@
   "name": "beyond-chromium",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.19.0",
   "description": "The controller-first desktop browser for Beyond OS.",
   "main": "src/main.js",
   "scripts": {
@@ -9,6 +10,6 @@
     "check": "node --check src/main.js && node --check src/preload.js && node --check src/renderer.js"
   },
   "devDependencies": {
-    "electron": "^37.2.0"
+    "electron": "39.8.10"
   }
 }

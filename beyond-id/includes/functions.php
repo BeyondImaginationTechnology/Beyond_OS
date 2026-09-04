@@ -27,8 +27,116 @@ function verify_csrf_token(?string $token): bool {
     return is_string($token) && hash_equals(csrf_token(), $token);
 }
 
+function beyond_rate_limit_client_ip(): string {
+    $ip = trim((string)($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+    return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : 'unknown';
+}
+
+function beyond_rate_limit_table(PDO $pdo): void {
+    static $ready = [];
+    $connection = spl_object_id($pdo);
+    if (isset($ready[$connection])) return;
+    if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+        $pdo->exec('CREATE TABLE IF NOT EXISTS auth_rate_limits (
+            bucket_key TEXT PRIMARY KEY,
+            attempts INTEGER NOT NULL DEFAULT 0,
+            window_started_at INTEGER NOT NULL,
+            blocked_until INTEGER NOT NULL DEFAULT 0,
+            updated_at INTEGER NOT NULL
+        )');
+    } else {
+        $pdo->exec('CREATE TABLE IF NOT EXISTS auth_rate_limits (
+            bucket_key CHAR(64) PRIMARY KEY,
+            attempts INT UNSIGNED NOT NULL DEFAULT 0,
+            window_started_at BIGINT UNSIGNED NOT NULL,
+            blocked_until BIGINT UNSIGNED NOT NULL DEFAULT 0,
+            updated_at BIGINT UNSIGNED NOT NULL,
+            KEY idx_auth_rate_limits_updated (updated_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+    }
+    $ready[$connection] = true;
+}
+
+function beyond_rate_limit_key(string $action, string $identity): string {
+    return hash('sha256', strtolower(trim($action)) . '|' . beyond_rate_limit_client_ip() . '|' . strtolower(trim($identity)));
+}
+
+/** @return array{allowed:bool,retry_after:int} */
+function beyond_rate_limit_consume(PDO $pdo, string $action, string $identity, int $limit, int $windowSeconds, int $blockSeconds): array {
+    $limit = max(1, $limit);
+    $windowSeconds = max(1, $windowSeconds);
+    $blockSeconds = max(1, $blockSeconds);
+    $now = time();
+    $key = beyond_rate_limit_key($action, $identity);
+    try {
+        beyond_rate_limit_table($pdo);
+        $query = $pdo->prepare('SELECT attempts,window_started_at,blocked_until FROM auth_rate_limits WHERE bucket_key=? LIMIT 1');
+        $query->execute([$key]);
+        $row = $query->fetch(PDO::FETCH_ASSOC) ?: null;
+        if ($row && (int)$row['blocked_until'] > $now) {
+            return ['allowed'=>false, 'retry_after'=>max(1, (int)$row['blocked_until'] - $now)];
+        }
+        $windowStarted = $row ? (int)$row['window_started_at'] : $now;
+        $attempts = $row ? (int)$row['attempts'] : 0;
+        if ($windowStarted <= $now - $windowSeconds) {
+            $windowStarted = $now;
+            $attempts = 0;
+        }
+        $attempts++;
+        $blockedUntil = $attempts > $limit ? $now + $blockSeconds : 0;
+        if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+            $sql = 'INSERT INTO auth_rate_limits(bucket_key,attempts,window_started_at,blocked_until,updated_at) VALUES(?,?,?,?,?)
+                    ON CONFLICT(bucket_key) DO UPDATE SET attempts=excluded.attempts,window_started_at=excluded.window_started_at,blocked_until=excluded.blocked_until,updated_at=excluded.updated_at';
+        } else {
+            $sql = 'INSERT INTO auth_rate_limits(bucket_key,attempts,window_started_at,blocked_until,updated_at) VALUES(?,?,?,?,?)
+                    ON DUPLICATE KEY UPDATE attempts=VALUES(attempts),window_started_at=VALUES(window_started_at),blocked_until=VALUES(blocked_until),updated_at=VALUES(updated_at)';
+        }
+        $pdo->prepare($sql)->execute([$key, $attempts, $windowStarted, $blockedUntil, $now]);
+        if ($blockedUntil > 0) {
+            error_log('Authentication throttle activated for action=' . $action . ' ip=' . beyond_rate_limit_client_ip());
+            return ['allowed'=>false, 'retry_after'=>$blockSeconds];
+        }
+        if (random_int(1, 100) === 1) {
+            $pdo->prepare('DELETE FROM auth_rate_limits WHERE updated_at<?')->execute([$now - 7 * 86400]);
+        }
+        return ['allowed'=>true, 'retry_after'=>0];
+    } catch (Throwable $exception) {
+        error_log('Authentication throttle unavailable: ' . $exception->getMessage());
+        return ['allowed'=>true, 'retry_after'=>0];
+    }
+}
+
+function beyond_rate_limit_clear(PDO $pdo, string $action, string $identity): void {
+    try {
+        beyond_rate_limit_table($pdo);
+        $pdo->prepare('DELETE FROM auth_rate_limits WHERE bucket_key=?')->execute([beyond_rate_limit_key($action, $identity)]);
+    } catch (Throwable $exception) {
+        error_log('Authentication throttle cleanup failed: ' . $exception->getMessage());
+    }
+}
+
+function beyond_sql_console_enabled(): bool {
+    return strtolower((string)($_SESSION['role'] ?? '')) === 'super_admin'
+        && strtolower(trim((string)getenv('BEYOND_SQL_CONSOLE_ENABLED'))) === 'true';
+}
+
 function safe_return_path(?string $path, string $fallback = '../dashboard/'): string {
-    if (!$path || !str_starts_with($path, '/') || str_starts_with($path, '//')) return $fallback;
+    if (!$path || preg_match('/[\\x00-\\x1F\\x7F\\\\]/', $path)) return $fallback;
+    $decoded = rawurldecode($path);
+    $osOrigin = rtrim((string)getenv('BEYOND_OS_ORIGIN'), '/');
+    if ($osOrigin !== '' && str_starts_with($decoded, $osOrigin . '/')) {
+        $originParts = parse_url($osOrigin);
+        $returnParts = parse_url($decoded);
+        if ($originParts && $returnParts
+            && ($originParts['scheme'] ?? '') === 'https'
+            && ($returnParts['scheme'] ?? '') === 'https'
+            && ($originParts['host'] ?? '') === 'os.beyondimagination.co.technology'
+            && ($returnParts['host'] ?? '') === ($originParts['host'] ?? '')
+            && !isset($returnParts['user']) && !isset($returnParts['pass'])) return $path;
+    }
+    if (!str_starts_with($decoded, '/') || str_starts_with($decoded, '//') || str_contains($decoded, '\\')) return $fallback;
+    $parts = parse_url($decoded);
+    if ($parts === false || isset($parts['scheme']) || isset($parts['host']) || isset($parts['user']) || isset($parts['pass'])) return $fallback;
     return $path;
 }
 

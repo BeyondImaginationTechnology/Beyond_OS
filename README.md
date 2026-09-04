@@ -95,6 +95,13 @@ That file must return a PHP array. Use `config/live.example.php` as the template
 Do not commit real credentials, production URLs, customer data, user uploads, or
 generated private assets.
 
+Bootstrap administrator email lists belong in protected `live.php` under
+`security.super_admin_emails` and `security.admin_emails`, or in the comma-separated
+`BEYOND_SUPER_ADMIN_EMAILS` and `BEYOND_ADMIN_EMAILS` environment variables. Existing
+database roles are never recalculated during sign-in or password reset. The browser
+SQL console is disabled by default; temporarily set `BEYOND_SQL_CONSOLE_ENABLED=true`
+only when a super administrator needs it, then disable it again.
+
 ## Security
 
 Please do not open public issues for suspected vulnerabilities. Follow

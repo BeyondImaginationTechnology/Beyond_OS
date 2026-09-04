@@ -67,7 +67,7 @@ $publicUrl = !empty($user['username']) ? '/u/' . rawurlencode((string)$user['use
     <header class="top">
         <div class="brand">BEYOND ID · BETA</div>
         <div class="actions">
-            <?php if (in_array(strtolower((string)($user['role'] ?? '')), ['admin','super_admin'], true)): ?><a class="btn admin" href="../admin/review.php">Admin</a><?php endif; ?>
+            <?php if (in_array(strtolower((string)($user['role'] ?? '')), ['admin','super_admin'], true)): ?><a class="btn admin" href="../admin/index.php">Admin</a><?php endif; ?>
             <?php if ($publicUrl): ?><a class="btn" href="<?= e($publicUrl) ?>">Public profile</a><?php endif; ?>
             <a class="btn" href="connected-apps.php">Connected apps</a>
             <a class="btn" href="notifications.php">Notifications</a>

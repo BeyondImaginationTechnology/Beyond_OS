@@ -10,11 +10,27 @@ header('Content-Type: application/json; charset=utf-8');
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405); echo json_encode(['ok'=>false,'error'=>'Method not allowed']); exit;
 }
-$data = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+$contentType = strtolower((string)($_SERVER['CONTENT_TYPE'] ?? ''));
+if (!str_starts_with($contentType, 'application/json')) {
+    http_response_code(415); echo json_encode(['ok'=>false,'error'=>'JSON requests only']); exit;
+}
+$data = json_decode(file_get_contents('php://input'), true);
+if (!is_array($data)) {
+    http_response_code(400); echo json_encode(['ok'=>false,'error'=>'Invalid JSON']); exit;
+}
 $email = strtolower(trim((string)($data['email'] ?? '')));
 $password = (string)($data['password'] ?? '');
 if (!filter_var($email, FILTER_VALIDATE_EMAIL) || $password === '') {
     http_response_code(422); echo json_encode(['ok'=>false,'error'=>'Valid email and password required']); exit;
+}
+$accountLimit = beyond_rate_limit_consume($pdo, 'api-login-account', $email, 5, 900, 900);
+$ipLimit = beyond_rate_limit_consume($pdo, 'api-login-ip', '', 30, 900, 1800);
+if (!$accountLimit['allowed'] || !$ipLimit['allowed']) {
+    $retryAfter = max($accountLimit['retry_after'], $ipLimit['retry_after']);
+    http_response_code(429);
+    header('Retry-After: ' . $retryAfter);
+    echo json_encode(['ok'=>false,'error'=>'Too many sign-in attempts. Try again later.','retry_after'=>$retryAfter]);
+    exit;
 }
 $stmt = $pdo->prepare('SELECT * FROM users WHERE email=? LIMIT 1');
 $stmt->execute([$email]); $user=$stmt->fetch(PDO::FETCH_ASSOC);
@@ -43,17 +59,13 @@ if (($user['status'] ?? 'active') !== 'active') {
 if (empty($user['email_verified']) && empty($user['email_verified_at']) && !empty($user['verification_token'])) {
     http_response_code(403); echo json_encode(['ok'=>false,'error'=>'Email verification required']); exit;
 }
+beyond_rate_limit_clear($pdo, 'api-login-account', $email);
 session_regenerate_id(true);
 $_SESSION['user_id']=(int)$user['id'];
 $_SESSION['email']=$user['email'];
 $_SESSION['name']=$user['name'] ?? trim(($user['first_name']??'').' '.($user['last_name']??''));
 $_SESSION['role']=$user['role'] ?? 'user';
 $_SESSION['locale']=$user['preferred_locale'] ?? 'en';
-$requiredRole = beyond_signup_role($email, (string)$_SESSION['role']);
-if ($requiredRole !== (string)$_SESSION['role']) {
-    $_SESSION['role'] = $requiredRole;
-    try { $pdo->prepare('UPDATE users SET role=? WHERE id=?')->execute([$requiredRole,$user['id']]); } catch (Throwable $exception) {}
-}
 register_session($pdo,(int)$user['id']);
 beyondRememberForget($pdo);
 beyondRememberIssue($pdo,(int)$user['id']);

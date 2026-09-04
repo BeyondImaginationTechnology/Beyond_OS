@@ -6,13 +6,22 @@ $studioGroups = [
     'DailyBreath' => [
         ['/server/admin/daily-studio/dailybreath-content.php', 'Content manager', '📖'],
         ['/server/admin/daily-studio/breath-generator.php', 'Verse generator', '✨'],
+        ['/server/admin/daily-studio/recovery-newsletter.php', 'Recovery newsletter', '📰'],
     ],
     'Beyond French' => [
         ['/server/admin/daily-studio/french-generator.php', 'French generator', '🇫🇷'],
+        ['/server/admin/daily-studio/multilingual-generator.php', 'Euro expansion', '🌍'],
+        ['/server/admin/daily-studio/africa-generator.php', 'Africa expansion', '🌍'],
         ['/server/admin/daily-studio/french-options.php', 'Lesson options', '⚙️'],
+        ['/server/admin/daily-studio/frenchquest-assets.php', 'FrenchQuest assets', '🗺️'],
     ],
     'Beyond Space' => [
         ['/server/admin/daily-studio/space-generator.php', 'Horoscope generator', '🪐'],
+        ['/server/admin/daily-studio/space-fact-generator.php', 'Daily fact generator', '✦'],
+    ],
+    'Beyond Ancient' => [
+        ['/server/admin/daily-studio/history-generator.php', 'History generator', '🏺'],
+        ['/server/admin/daily-studio/history-fact-generator.php', 'Daily fact generator', '📜'],
     ],
     'Beyond Tattoo' => [
         ['/server/admin/daily-studio/stencil-library.php', 'Generate & publish', '📤'],
@@ -34,7 +43,7 @@ $studioGroups = [
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title><?= $isStudio ? 'Beyond Studio' : 'Beyond Imagination Admin' ?></title>
   <link rel="stylesheet" href="/server/admin/assets/css/app.css">
-  <?php if ($isStudio): ?><link rel="stylesheet" href="/server/admin/daily-studio/studio-light.css"><link rel="stylesheet" href="/server/admin/daily-studio/studio-organized.css?v=20260719-1"><?php endif; ?>
+  <?php if ($isStudio): ?><link rel="stylesheet" href="/server/admin/daily-studio/studio-light.css?v=20260903-1"><link rel="stylesheet" href="/server/admin/daily-studio/studio-organized.css?v=20260903-1"><?php endif; ?>
 </head>
 <body<?= $isStudio ? ' class="studio-body"' : '' ?>>
 <div class="layout<?= $isStudio ? ' studio-layout' : '' ?>">

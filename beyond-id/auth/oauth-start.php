@@ -13,11 +13,14 @@ if (!in_array($provider, ['google', 'meta', 'instagram'], true) || !beyond_socia
 }
 $returnTo = safe_return_path((string)($_GET['return'] ?? ''), '');
 $requestedScheme = strtolower(trim((string)($_GET['scheme'] ?? '')));
+$codeChallenge = '';
 if ($requestedScheme === '' && $returnTo !== '') {
     parse_str((string)parse_url($returnTo, PHP_URL_QUERY), $returnQuery);
     $requestedScheme = strtolower(trim((string)($returnQuery['scheme'] ?? '')));
+    $codeChallenge = trim((string)($returnQuery['code_challenge'] ?? ''));
 }
-$mobileScheme = in_array($requestedScheme, ['beyondmusic', 'beyondtv', 'frenchquest'], true) ? $requestedScheme : '';
+$mobileScheme = in_array($requestedScheme, ['beyondmusic', 'beyondtv', 'frenchquest', 'dailybreath'], true) ? $requestedScheme : '';
+if ($codeChallenge !== '' && !preg_match('/^[A-Za-z0-9_-]{43,128}$/', $codeChallenge)) $codeChallenge = '';
 if ($returnTo !== '') $_SESSION['beyond_return_to'] = $returnTo;
 $state = bin2hex(random_bytes(32));
 $verifier = rtrim(strtr(base64_encode(random_bytes(64)), '+/', '-_'), '=');
@@ -28,6 +31,7 @@ $_SESSION['oauth_flow'] = [
     'verifier' => $verifier,
     'created_at' => time(),
     'mobile_scheme' => $mobileScheme,
+    'mobile_code_challenge' => $codeChallenge,
 ];
 header('Location: ' . beyond_social_authorization_url($provider, $state, $challenge));
 exit;

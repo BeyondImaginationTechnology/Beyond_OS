@@ -15,7 +15,7 @@ function french_quest_json(int $status, array $payload): never
 }
 
 try {
-    $userId = beyond_mobile_verify_token(beyond_mobile_bearer_token(), 'french-quest-ios');
+    $userId = beyond_mobile_verify_token(beyond_mobile_bearer_token(), 'french-quest-ios', $pdo)['user_id'];
 } catch (Throwable $exception) {
     french_quest_json(401, ['ok' => false, 'error' => $exception->getMessage()]);
 }

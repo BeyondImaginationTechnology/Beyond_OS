@@ -26,7 +26,7 @@ require __DIR__ . '/../includes/admin-sidebar.php';
       <div class="tools-list">
         <a class="tool-link" href="users.php"><span>Review users and roles</span><span aria-hidden="true">&rarr;</span></a>
         <a class="tool-link" href="database.php"><span>Database Explorer</span><span aria-hidden="true">&rarr;</span></a>
-        <a class="tool-link" href="sql.php"><span>Protected SQL Console</span><span aria-hidden="true">&rarr;</span></a>
+        <?php if (beyond_sql_console_enabled()): ?><a class="tool-link" href="sql.php"><span>Protected SQL Console</span><span aria-hidden="true">&rarr;</span></a><?php endif; ?>
         <a class="tool-link" href="logs.php"><span>Audit Logs</span><span aria-hidden="true">&rarr;</span></a>
       </div>
     </div>

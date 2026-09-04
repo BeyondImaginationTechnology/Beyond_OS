@@ -17,8 +17,7 @@ $apps = [
     ['Beyond Skate','/beyond-skate/','beyond-skate/index.php','Skate platform'],
     ['Beyond Sell','/beyond-sell/','beyond-sell/index.php','Selling tools'],
     ['Beyond Radio','/beyond-radio/','beyond-radio/index.php','Audio and radio'],
-    ['Admin Portal','/server/admin/','server/admin/index.php','Operations dashboard'],
-    ['Daily Studio','/server/admin/daily-studio/','server/admin/daily-studio/index.php','Publishing studio'],
+    ['Daily Studio','/server/admin/daily-studio/','server/admin/daily-studio/index.php','Publishing tool — uses your current admin session'],
 ];
 foreach ($apps as &$app) $app[] = is_file($root . '/' . $app[2]);
 unset($app);

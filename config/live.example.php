@@ -34,6 +34,8 @@ return [
     ],
     'security' => [
         'jwt_secret' => 'replace-with-a-long-random-local-secret',
+        'super_admin_emails' => [],
+        'admin_emails' => [],
     ],
     'oauth' => [
         'instagram' => [

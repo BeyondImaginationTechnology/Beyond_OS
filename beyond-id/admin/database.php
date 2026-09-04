@@ -57,7 +57,7 @@ require __DIR__ . '/../includes/admin-sidebar.php';
     </div>
   </div>
   <div class="card"><table><thead><tr><th>Table</th><th>Rows</th><th>Option</th></tr></thead><tbody>
-    <?php foreach ($tables as $table): ?><tr><td><code><?= e($table['name']) ?></code></td><td><?= $table['rows'] >= 0 ? number_format($table['rows']) : 'Unavailable' ?></td><td><a href="sql.php?table=<?= rawurlencode($table['name']) ?>">Open SQL console</a></td></tr><?php endforeach; ?>
+    <?php foreach ($tables as $table): ?><tr><td><code><?= e($table['name']) ?></code></td><td><?= $table['rows'] >= 0 ? number_format($table['rows']) : 'Unavailable' ?></td><td><?php if (beyond_sql_console_enabled()): ?><a href="sql.php?table=<?= rawurlencode($table['name']) ?>">Open SQL console</a><?php else: ?>Restricted<?php endif; ?></td></tr><?php endforeach; ?>
   </tbody></table></div>
   <?php if ($driver === 'mysql' && $phpMyAdminUrl === ''): ?><p class="muted">Set <code>BEYOND_PHPMYADMIN_URL</code> to an HTTPS URL to display the phpMyAdmin option. Credentials are never embedded in the link.</p><?php endif; ?>
 </section>

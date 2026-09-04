@@ -1,0 +1,6 @@
+# Electron 39.8.10 still resolves extract-zip 2.0.1. The advisory names 2.0.2
+# as patched, but that version is not published. Keep this narrow exception
+# until Electron updates its installer dependency.
+auditConfig:
+  ignoreGhsas:
+    - GHSA-jmr9-qjv8-65gv

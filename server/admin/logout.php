@@ -1,4 +1,3 @@
 <?php
-require_once __DIR__ . '/bootstrap.php';
-Auth::logout();
-header('Location: /server/admin/login.php'); exit;
+header('Location: /beyond-id/auth/logout.php', true, 302);
+exit;

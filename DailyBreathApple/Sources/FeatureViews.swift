@@ -99,7 +99,7 @@ struct SettingsAboutView: View {
                 }
             }
 
-            Section("Beyond ID") {
+            Section {
                 if let account = beyondIDSession.account {
                     Label(account.displayName, systemImage: "person.crop.circle.badge.checkmark")
                     Text(account.email)
@@ -122,6 +122,8 @@ struct SettingsAboutView: View {
                 Text(beyondIDSession.statusMessage)
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            } header: {
+                Text("Beyond ID")
             } footer: {
                 Text("Beyond ID connects your DailyBreath account. Reflections stay on this device unless you enable encrypted iCloud sync.")
             }

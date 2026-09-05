@@ -43,6 +43,7 @@
 		300000000000000000000036 /* spaRV1909_vpl.txt in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000039 /* spaRV1909_vpl.txt */; };
 		300000000000000000000037 /* heb_vpl.txt in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000040 /* heb_vpl.txt */; };
 		300000000000000000000038 /* quran-ar.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000041 /* quran-ar.json */; };
+		300000000000000000000039 /* DailyBreathBeyondID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000042 /* DailyBreathBeyondID.swift */; };
 		300000000000000000000040 /* QURAN_JSON_LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000043 /* QURAN_JSON_LICENSE.txt */; };
 		300000000000000000000041 /* SCRIPTURE_SOURCES.md in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000044 /* SCRIPTURE_SOURCES.md */; };
 /* End PBXBuildFile section */
@@ -137,6 +138,7 @@
 		100000000000000000000039 /* spaRV1909_vpl.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = spaRV1909_vpl.txt; sourceTree = "<group>"; };
 		100000000000000000000040 /* heb_vpl.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = heb_vpl.txt; sourceTree = "<group>"; };
 		100000000000000000000041 /* quran-ar.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "quran-ar.json"; sourceTree = "<group>"; };
+		100000000000000000000042 /* DailyBreathBeyondID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyBreathBeyondID.swift; sourceTree = "<group>"; };
 		100000000000000000000043 /* QURAN_JSON_LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = QURAN_JSON_LICENSE.txt; sourceTree = "<group>"; };
 		100000000000000000000044 /* SCRIPTURE_SOURCES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = SCRIPTURE_SOURCES.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -203,6 +205,7 @@
 				100000000000000000000021 /* ReminderSettingsView.swift */,
 				100000000000000000000008 /* RootView.swift */,
 				100000000000000000000036 /* ScriptureLibraryView.swift */,
+				100000000000000000000042 /* DailyBreathBeyondID.swift */,
 				100000000000000000000009 /* TodayView.swift */,
 				100000000000000000000027 /* TheDailyBreath.entitlements */,
 			);
@@ -474,6 +477,7 @@
 				300000000000000000000020 /* ReminderSettingsView.swift in Sources */,
 				300000000000000000000008 /* RootView.swift in Sources */,
 				300000000000000000000033 /* ScriptureLibraryView.swift in Sources */,
+				300000000000000000000039 /* DailyBreathBeyondID.swift in Sources */,
 				300000000000000000000009 /* TodayView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -37,7 +37,7 @@ struct AccountSyncView: View {
                 Text("Signing in never changes or uploads your reflections.")
             }
 
-            Section("Private Sync") {
+            Section {
                 Toggle("Encrypted iCloud Sync", isOn: Binding(
                     get: { encryptedICloudSyncEnabled },
                     set: { value in
@@ -54,6 +54,8 @@ struct AccountSyncView: View {
                 if encryptedICloudSyncEnabled {
                     Button("Sync Now") { Task { await store.syncICloudNow() } }
                 }
+            } header: {
+                Text("Private Sync")
             } footer: {
                 Text("Reflections are encrypted before iCloud upload. Beyond ID does not receive them.")
             }

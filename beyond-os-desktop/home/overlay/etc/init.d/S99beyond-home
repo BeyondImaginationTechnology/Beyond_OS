@@ -2,6 +2,9 @@
 set -eu
 case "${1:-}" in
   start)
+    if grep -qw 'bit.install=1' /proc/cmdline; then
+      exec /usr/bin/bit-install-home </dev/tty1 >/dev/tty1 2>&1
+    fi
     # X uses a private cookie and has no TCP listener.
     umask 077
     install -d -m 0700 -o home -g home /home/home

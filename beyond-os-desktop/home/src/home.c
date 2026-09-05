@@ -41,9 +41,27 @@ static bool dirty, note_writable = true;
 static const SDL_Color white = {239, 242, 255, 255};
 static const SDL_Color muted = {153, 170, 195, 255};
 static const SDL_Color accent = {150, 174, 255, 255};
+#ifdef BIT_EDITION_CYBER
+#define EDITION_LABEL "CYBER EDITION 1.0"
+#define HOME_KICKER "AUTHORIZED SECURITY WORKSPACE"
+#define HOME_TITLE "Know your scope."
+#define HOME_COPY "Start with permission. Preserve the evidence."
+#define FOUNDATION_NOTE "Authorized inventory, evidence and reporting foundation"
+#define UPCOMING_NOTE "Packet capture, browser research and signed updates are upcoming milestones."
+static const char *titles[] = {"Scope & Inventory", "Evidence", "Terminal", "About Cyber"};
+static const char *subtitles[] = {"Record authorization before network discovery", "Keep local findings together",
+                                  "Your Linux command line", "Your system, at a glance"};
+#else
+#define EDITION_LABEL "HOME EDITION 1.0"
+#define HOME_KICKER "YOUR SPACE. YOUR POSSIBILITIES."
+#define HOME_TITLE "Welcome home."
+#define HOME_COPY "A little room to think. A new place to begin."
+#define FOUNDATION_NOTE "Linux foundation preview"
+#define UPCOMING_NOTE "Browsing, streaming, device settings and updates are upcoming milestones."
 static const char *titles[] = {"Files", "Notes", "Terminal", "About Beyond OS"};
 static const char *subtitles[] = {"Explore your computer", "A place to put your thoughts",
                                   "Your Linux command line", "Your system, at a glance"};
+#endif
 
 static void box(int x, int y, int w, int h, int r, int g, int b)
 {
@@ -179,8 +197,14 @@ static void launch_terminal(void)
 #ifndef _WIN32
     pid_t child = fork();
     if (child == 0) {
+#ifdef BIT_EDITION_CYBER
+        execlp("xterm", "xterm", "-T", "BIT OS Cyber Terminal", "-bg", "#090d16",
+               "-fg", "#eff2ff", "-fa", "DejaVu Sans Mono", "-fs", "12",
+               "-e", "bit-cyber-menu", (char *)NULL);
+#else
         execlp("xterm", "xterm", "-T", "Beyond Terminal", "-bg", "#090d16",
                "-fg", "#eff2ff", "-fa", "DejaVu Sans Mono", "-fs", "12", (char *)NULL);
+#endif
         _exit(127);
     }
     if (child < 0) snprintf(status, sizeof status, "Could not open terminal: %s", strerror(errno));
@@ -192,10 +216,24 @@ static void launch_terminal(void)
 
 static void activate(int card)
 {
+#ifdef BIT_EDITION_CYBER
+    if (card == 0 || card == 2) launch_terminal();
+    else if (card == 1) {
+        const char *home = getenv("HOME");
+        int count = home ? snprintf(directory, sizeof directory, "%s/Documents/Cyber/Evidence", home) : -1;
+        if (count < 0 || (size_t)count >= sizeof directory) {
+            snprintf(status, sizeof status, "Evidence folder path is unavailable.");
+            return;
+        }
+        page = FILES;
+        load_directory();
+    } else { page = ABOUT; status[0] = 0; }
+#else
     if (card == 0) { page = FILES; load_directory(); }
     else if (card == 1) { if (!note_writable) { snprintf(status, sizeof status, "Notes could not load the existing file (unreadable or over 8 KB). It has not been changed."); return; } page = NOTES; SDL_StartTextInput(); snprintf(status, sizeof status, "Type a note. Ctrl+S saves. Home also saves before leaving."); }
     else if (card == 2) launch_terminal();
     else { page = ABOUT; status[0] = 0; }
+#endif
 }
 
 static void open_entry(int index)
@@ -241,7 +279,7 @@ static void draw(void)
     box(0, 0, W, 64, 12, 18, 30);
     orbit(35, 32, 20);
     text(font, "Beyond OS", 68, 18, white);
-    text(small_font, "HOME EDITION 1.0", 224, 24, muted);
+    text(small_font, EDITION_LABEL, 224, 24, muted);
     time_t now = time(NULL);
     struct tm *local = localtime(&now);
     char clock[80] = "";
@@ -249,9 +287,9 @@ static void draw(void)
     text(small_font, clock, 1000, 24, muted);
 
     if (page == HOME) {
-        text(small_font, "YOUR SPACE. YOUR POSSIBILITIES.", 74, 133, accent);
-        text(title_font, "Welcome home.", 70, 170, white);
-        text(font, "A little room to think. A new place to begin.", 74, 232, muted);
+        text(small_font, HOME_KICKER, 74, 133, accent);
+        text(title_font, HOME_TITLE, 70, 170, white);
+        text(font, HOME_COPY, 74, 232, muted);
         orbit(1060, 217, 93);
         for (int i = 0; i < 4; i++) {
             int x = 74 + (i % 2)*575, y = 320 + (i/2)*153;
@@ -261,8 +299,8 @@ static void draw(void)
             text(font, titles[i], x+80, y+28, white);
             text(small_font, subtitles[i], x+80, y+67, muted);
         }
-        text(small_font, "Linux foundation preview", 74, 653, accent);
-        text(small_font, "Browsing, streaming, device settings and updates are upcoming milestones.", 74, 682, muted);
+        text(small_font, FOUNDATION_NOTE, 74, 653, accent);
+        text(small_font, UPCOMING_NOTE, 74, 682, muted);
     } else {
         box(50, 90, 110, 44, 33, 45, 65);
         text(font, "Home", 72, 99, white);
@@ -288,7 +326,11 @@ static void draw(void)
                 text(small_font, dirty ? "Unsaved changes  /  Ctrl+S to save" : "Documents/Home Note.txt", 51, 704, accent);
             }
         } else {
+#ifdef BIT_EDITION_CYBER
+            paragraph("BIT OS Cyber Edition 1.0\nDevelopment build: cyber-dev.1\n\nAn independent Linux workspace for authorized assessment, evidence handling and reporting.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2 / Nmap\n\nThe inventory launcher requires a local authorization record and runs a limited TCP connect inventory. Packet capture, browser research, user setup, installation and signed updates are still in development.",
+#else
             paragraph("Beyond OS Home Edition 1.0\nDevelopment build: home-dev.1\n\nAn independent Linux system, assembled from upstream source.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2\n\nLocal Files and Notes work in this preview. Modern browsing, media,\nuser setup, installation and signed updates are still in development.",
+#endif
                       54, 236, 1150, 365);
 #ifndef _WIN32
             struct utsname system;
@@ -338,7 +380,7 @@ int main(int argc, char **argv)
     SDL_DisplayMode display = {0};
     SDL_GetCurrentDisplayMode(0, &display);
     SDL_SetHint(SDL_HINT_X11_WINDOW_TYPE, "desktop");
-    SDL_Window *window = SDL_CreateWindow("Beyond OS Home Edition 1.0", 0, 0,
+    SDL_Window *window = SDL_CreateWindow("BIT OS " EDITION_LABEL, 0, 0,
                          preview || !display.w ? W : display.w,
                          preview || !display.h ? H : display.h,
                          SDL_WINDOW_BORDERLESS | (preview ? SDL_WINDOW_HIDDEN : 0));

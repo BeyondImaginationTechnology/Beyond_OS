@@ -20,6 +20,47 @@ QEMU VM. The Files view shows up to 512 non-hidden entries and previews up to
 yet a full text editor. Browser and media cards are deliberately absent until
 working integrations exist.
 
+## UEFI installer candidate
+
+The UEFI candidate creates `bit-os-home-1.0-installer.img`, a GPT USB image
+with a FAT EFI partition and an ext4 Home filesystem. It is written to a
+separate USB drive, then booted in UEFI mode. Its menu offers **Try Home** for a
+non-installing live session and **Install Home** for setup. The installer always
+shows storage and requires an exact confirmation. It offers two intentional
+paths: use a selected Linux partition alongside Windows or other systems, or
+erase a selected non-USB disk and create a new GPT layout with a 512 MB EFI
+System Partition plus a Home partition. The dual-boot path does not format the
+selected EFI partition or replace Windows Boot Manager; it adds a separate
+`BIT OS Home` UEFI boot entry.
+
+The same GPT image is also a VM disk candidate: attach it as a removable UEFI
+boot disk and attach a separate disposable virtual disk as the install target.
+For a Windows computer, the release will include a signed checksum and clear
+instructions for writing this image to a USB drive from Windows. Windows itself
+is never modified by the image-writing step.
+
+## Public release formats
+
+Home is being designed as one product with several delivery choices, rather
+than as a build tailored to one computer:
+
+| User choice | Release artifact | Intended use |
+| --- | --- | --- |
+| Try Home from USB or VM | UEFI-bootable `bitHomeos.iso` | Run Home without altering the computer, or boot it in a VM. |
+| Install from USB | UEFI GPT disk image | Install beside Windows or onto a whole disk after explicit confirmation. |
+| Install on a Windows PC | The installer image plus a Windows USB-writing guide | Create removable installation media without altering Windows. |
+| Run in a virtual machine | ISO for a live session; GPT image for an install test | Evaluate Home or install it onto a separate disposable virtual disk. |
+| Verify before use | SHA-256 checksum and signed release metadata | Confirm that the downloaded image is the published release. |
+
+A graphical installer, Secure Boot signing, encryption, update signing, and a
+supported Windows USB-writing application remain release gates; they are not
+claimed as completed by this development source.
+
+The image is not yet boot-tested. Do not write it to a USB drive or use its
+installer on a physical computer until the UEFI QEMU and hardware acceptance
+gates in `RELEASE.md` pass. Its initial filesystem is 2 GB; installation expands
+it to fill the explicit target partition.
+
 ## Build host
 
 Use an x86-64 Linux host or VM with a case-sensitive Linux filesystem. Keep the
@@ -38,6 +79,7 @@ From this directory:
 ```sh
 bash build.sh configure  # Downloads and verifies the pinned source, resolves config
 bash build.sh build      # Compiles the kernel, toolchain, desktop and root filesystem
+bash build.sh installer  # Builds the UEFI USB installer candidate in installer-output/
 bash run-qemu.sh         # Boots the resulting VM in disposable snapshot mode
 ```
 
@@ -49,8 +91,8 @@ the repository. Output is `out/output/images/` by default:
 - `SHA256SUMS`: hashes produced after a successful build.
 - `beyond-home.config`: the resolved build configuration.
 
-These are QEMU direct-kernel-boot artifacts, **not an installer ISO or a
-USB-bootable disk**. GRUB/UEFI image assembly is a subsequent milestone.
+The regular build artifacts are QEMU direct-kernel-boot artifacts. The
+`installer` action produces the separate GRUB/UEFI USB and VM disk candidate.
 The VM has no host disk access, shared folders, or forwarded network ports.
 User-mode NAT permits outbound networking. Root password login and SSH are
 disabled. The development desktop opens automatically as `home`; this is not

@@ -1,0 +1,118 @@
+#!/bin/sh
+# BIT OS Home installer. Installs to a selected partition or a selected whole disk.
+set -eu
+
+efi_guid=c12a7328-f81f-11d2-ba4b-00a0c93ec93b
+linux_guid=0fc63daf-8483-4772-8e79-3d69d8477de4
+
+fail() { printf '%s\n' "Installer stopped: $*" >&2; exit 1; }
+notice() { printf '%s\n' "$*"; }
+partition_disk() { printf '/dev/%s\n' "$(lsblk -n -o PKNAME "$1" | head -n 1)"; }
+partition_type() { lsblk -n -o TYPE "$1"; }
+unmounted() { ! mountpoint -q "$1"; }
+
+[ "$(id -u)" -eq 0 ] || fail "installer must start from the installer boot entry"
+[ -d /sys/firmware/efi ] || fail "UEFI boot is required"
+
+source_root=$(findmnt -n -o SOURCE / || true)
+[ -b "$source_root" ] || fail "could not identify the installer root partition"
+source_disk=$(partition_disk "$source_root")
+[ -b "$source_disk" ] || fail "could not identify the installer USB"
+source_bytes=$(blockdev --getsize64 "$source_root")
+
+notice "BIT OS Home Edition 1.0 installer"
+notice "Choose where Home will be installed. The installer never chooses a disk automatically."
+notice "\nAvailable block devices:"
+lsblk -o NAME,SIZE,TYPE,FSTYPE,PARTTYPE,MODEL,MOUNTPOINTS
+notice "\nInstallation choices:"
+notice "  1) Use an existing Linux partition (keeps Windows and other partitions)"
+notice "  2) Erase a whole non-USB disk for BIT OS Home"
+printf 'Choose 1 or 2: '
+IFS= read -r mode
+
+target_esp_new=false
+case "$mode" in
+  1)
+    notice "\nSelect an empty Linux partition. It must be at least as large as the Home image."
+    printf 'Target Linux partition (example: /dev/nvme0n1p5): '
+    IFS= read -r target_root
+    [ -b "$target_root" ] || fail "target is not a block device"
+    [ "$(partition_type "$target_root")" = part ] || fail "choose a partition for this installation mode"
+    [ "$target_root" != "$source_root" ] || fail "the installer USB cannot be the install target"
+    target_disk=$(partition_disk "$target_root")
+    [ "$target_disk" != "$source_disk" ] || fail "the installer USB disk cannot be the install target"
+    unmounted "$target_root" || fail "target partition is mounted"
+    [ "$(blockdev --getsize64 "$target_root")" -ge "$source_bytes" ] || fail "target partition is smaller than the Home image"
+
+    printf 'EFI System Partition on %s (example: /dev/nvme0n1p1): ' "$target_disk"
+    IFS= read -r target_esp
+    [ -b "$target_esp" ] || fail "EFI System Partition is not a block device"
+    [ "$(partition_type "$target_esp")" = part ] || fail "EFI System Partition must be a partition"
+    [ "$(partition_disk "$target_esp")" = "$target_disk" ] || fail "EFI System Partition is not on the target disk"
+    esp_type=$(blkid -s PART_ENTRY_TYPE -o value "$target_esp" || true)
+    [ "$esp_type" = "$efi_guid" ] || fail "chosen partition is not an EFI System Partition"
+    unmounted "$target_esp" || fail "EFI System Partition is mounted"
+
+    notice "\nThe next step replaces only $target_root and adds a BIT OS Home UEFI entry."
+    notice "It does not format $target_esp or replace Windows Boot Manager."
+    printf 'Type exactly: INSTALL %s\n> ' "$target_root"
+    IFS= read -r confirmation
+    [ "$confirmation" = "INSTALL $target_root" ] || fail "confirmation did not match"
+    ;;
+  2)
+    notice "\nThis option deletes every partition and file on the selected disk."
+    printf 'Whole disk to erase (example: /dev/nvme0n1): '
+    IFS= read -r target_disk
+    [ -b "$target_disk" ] || fail "target is not a block device"
+    [ "$(partition_type "$target_disk")" = disk ] || fail "choose a whole disk for this installation mode"
+    [ "$target_disk" != "$source_disk" ] || fail "the installer USB disk cannot be erased"
+    [ "$(blockdev --getsize64 "$target_disk")" -gt "$source_bytes" ] || fail "disk is too small for Home"
+    for device in $(lsblk -nrpo NAME,TYPE "$target_disk" | awk '$2 == "part" { print $1 }'); do
+      unmounted "$device" || fail "refusing to erase mounted partition $device"
+    done
+    printf 'Type exactly: ERASE %s\n> ' "$target_disk"
+    IFS= read -r confirmation
+    [ "$confirmation" = "ERASE $target_disk" ] || fail "confirmation did not match"
+
+    notice "Creating the BIT OS Home partition layout..."
+    wipefs -a "$target_disk"
+    printf 'label: gpt\n,512M,U\n,,L\n' | sfdisk --wipe always --wipe-partitions always "$target_disk"
+    blockdev --rereadpt "$target_disk" || true
+    udevadm settle || true
+    sleep 2
+    target_esp=$(lsblk -nrpo NAME,PARTTYPE "$target_disk" | awk -v type="$efi_guid" 'tolower($2) == type { print $1; exit }')
+    target_root=$(lsblk -nrpo NAME,PARTTYPE "$target_disk" | awk -v type="$linux_guid" 'tolower($2) == type { print $1; exit }')
+    [ -b "$target_esp" ] && [ -b "$target_root" ] || fail "could not create the Home partition layout"
+    [ "$(blockdev --getsize64 "$target_root")" -ge "$source_bytes" ] || fail "new Home partition is smaller than the Home image"
+    target_esp_new=true
+    ;;
+  *) fail "choose 1 or 2" ;;
+esac
+
+notice "Making the installer root read-only and copying the Home filesystem..."
+mount -o remount,ro / || fail "could not protect the source filesystem"
+dd if="$source_root" of="$target_root" bs=16M conv=fsync status=progress
+e2fsck -pf "$target_root" || [ "$?" -eq 1 ] || fail "filesystem check failed"
+resize2fs "$target_root"
+
+target_uuid=$(blkid -s PARTUUID -o value "$target_root" || true)
+[ -n "$target_uuid" ] || fail "could not read target partition UUID"
+source_esp=$(lsblk -nrpo NAME,PARTTYPE "$source_disk" | awk -v type="$efi_guid" 'tolower($2) == type { print $1; exit }')
+[ -n "$source_esp" ] && [ -b "$source_esp" ] || fail "could not locate the installer EFI partition"
+
+install -d /mnt/bit-source-esp /mnt/bit-target-esp
+mount -o ro "$source_esp" /mnt/bit-source-esp
+if [ "$target_esp_new" = true ]; then
+  mkfs.vfat -F 32 -n BITOS_EFI "$target_esp"
+fi
+mount "$target_esp" /mnt/bit-target-esp
+install -d /mnt/bit-target-esp/EFI/BITOS
+cp /mnt/bit-source-esp/EFI/BOOT/bootx64.efi /mnt/bit-target-esp/EFI/BITOS/bootx64.efi
+sed "s/%PARTUUID%/$target_uuid/g" /usr/share/beyond-home/grub.cfg.in > /mnt/bit-target-esp/EFI/BITOS/grub.cfg
+sync
+umount /mnt/bit-target-esp /mnt/bit-source-esp
+
+esp_number=$(lsblk -n -o PARTN "$target_esp")
+efibootmgr -c -d "$target_disk" -p "$esp_number" -L "BIT OS Home" -l '\\EFI\\BITOS\\bootx64.efi'
+notice "Installation completed. Remove the USB and choose BIT OS Home from UEFI boot options."
+exec /sbin/reboot -f

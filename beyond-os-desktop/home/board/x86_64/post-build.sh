@@ -7,7 +7,7 @@ target=$(realpath "$1")
 rm -f "$target/etc/init.d/S40xorg"
 # Normalize executable modes even when the checkout originated on Windows.
 chmod 0755 "$target/etc/init.d/S01beyond-splash" "$target/etc/init.d/S99beyond-home"
-chmod 0755 "$target/usr/bin/beyond-session" "$target/usr/bin/beyond-user-session"
+chmod 0755 "$target/usr/bin/beyond-session" "$target/usr/bin/beyond-user-session" "$target/usr/bin/bit-install-home"
 # The skeleton may use a symlink; remove it inside the target before writing.
 rm -f "$target/etc/os-release"
 cat > "$target/etc/os-release" <<'EOF'

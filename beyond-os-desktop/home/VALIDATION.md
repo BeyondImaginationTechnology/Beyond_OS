@@ -36,3 +36,22 @@ Status: **development foundation; no complete Linux image has been built or boot
 
 The next acceptance step is a clean Linux build followed by the foundation
 checks in `RELEASE.md`.
+
+## UEFI installer source status
+
+The repository now includes an unbuilt UEFI USB installer candidate. Source
+review and Bash syntax checks passed for its image-generation and installation
+scripts. Its GRUB menu separates a non-installing Try Home session from an
+installer session. The installer source supports a selected existing Linux
+partition or an explicitly confirmed whole non-USB disk, where it creates a GPT
+EFI/Home layout. It has not been run, booted, or tested on a disposable disk
+yet. Treat it as unvalidated source.
+
+The installer configuration also requests Buildroot's UEFI ISO9660 output for
+the Try Home path. No ISO has been built or booted; its firmware configuration,
+live desktop behavior, and checksum output remain unvalidated.
+
+On the Windows build workstation, both `wsl --install --distribution Debian`
+and the direct-download variant stopped before installing a distribution with
+`WSL/CallMsi/Install/REGDB_E_CLASSNOTREG` (Class not registered). No WSL
+distribution, VM, USB image, or disk partition was created by those attempts.

@@ -7,6 +7,10 @@ The current work is `home-dev.1`. Passing source checks is not a successful boot
 - [ ] Complete a clean build on Linux using the locked source archive.
 - [ ] Record kernel/rootfs hashes, resolved config, build log and dependency notices.
 - [ ] QEMU cold boot displays the Beyond splash and reaches the Home desktop.
+- [ ] UEFI QEMU boot reaches both the Home and installer boot-menu entries.
+- [ ] Installer supports both selected-partition and selected-whole-disk paths; refuses its own USB, mounted targets, invalid EFI partitions, and confirmation mismatches.
+- [ ] Installer writes to a disposable QEMU target partition and creates a separate UEFI entry without replacing another entry.
+- [ ] Reboot from the QEMU target reaches Home with the USB removed.
 - [ ] No parent-distribution branding in boot, desktop or system identity.
 - [ ] Mouse, keyboard, focus switching and display scaling work.
 - [ ] Terminal confirms UID 1000; password login for root remains locked.

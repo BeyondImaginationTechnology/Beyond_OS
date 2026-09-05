@@ -12,7 +12,9 @@ parameters:
     default: '18'
 
 pool:
-  vmImage: macos-15
+  # App Store Connect now requires Xcode 26+; macOS 26 is the hosted image
+  # that carries the supported Xcode/iOS 26 toolchain.
+  vmImage: macos-26
 
 variables:
   - group: dailybreath-testflight
@@ -65,8 +67,11 @@ steps:
       for xcode_app in /Applications/Xcode_*.app /Applications/Xcode.app; do
         [[ -d "$xcode_app" ]] || continue
         xcode_version="$(DEVELOPER_DIR="$xcode_app/Contents/Developer" xcodebuild -version 2>/dev/null || true)"
-        if [[ "$xcode_version" =~ ^Xcode[[:space:]]+([0-9]+)(\.[0-9]+)*$ ]] && (( BASH_REMATCH[1] >= 26 )); then
-          candidate_version="${xcode_version#Xcode }"
+        # xcodebuild prints a second Build line; inspect only the Xcode line
+        # so the version check remains valid with multiline command output.
+        xcode_line="$(printf '%s\n' "$xcode_version" | sed -n 's/^Xcode[[:space:]]\+//p' | sed -n '1p')"
+        if [[ "$xcode_line" =~ ^([0-9]+)(\.[0-9]+)*$ ]] && (( BASH_REMATCH[1] >= 26 )); then
+          candidate_version="$xcode_line"
           if [[ -z "$selected_version" || "$(printf '%s\n%s\n' "$selected_version" "$candidate_version" | sort -V | tail -n 1)" == "$candidate_version" ]]; then
             selected_version="$candidate_version"
             selected_xcode="$xcode_app"

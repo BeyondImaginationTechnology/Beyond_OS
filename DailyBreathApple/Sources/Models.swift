@@ -138,7 +138,13 @@ enum RecoveryContent {
     static func devotionalOfTheDay(for date: Date = Date(), bundle: Bundle = .main) -> Devotional? {
         guard let document: DevotionalDocument = decode("daily-devotionals", bundle: bundle), !document.entries.isEmpty else { return nil }
         let key = dateKey(date)
-        let index = document.entries.firstIndex { $0.scheduleDate == key } ?? rotationIndex(date, count: document.entries.count)
+        // A date can have a companion entry as well as its primary devotional.
+        // Prefer the primary entry so the daily rhythm stays aligned with its verse.
+        let index = document.entries.firstIndex {
+            $0.scheduleDate == key && $0.scheduleRole == "primary"
+        } ?? document.entries.firstIndex {
+            $0.scheduleDate == key
+        } ?? rotationIndex(date, count: document.entries.count)
         let entry = document.entries[index]
         return Devotional(
             id: index + 1,
@@ -442,7 +448,10 @@ struct BibleLibrary: Equatable, Sendable {
 
         for line in source.split(whereSeparator: \.isNewline) {
             let parts = line.split(separator: " ", maxSplits: 2, omittingEmptySubsequences: true)
-            guard parts.count == 3 else { continue }
+            // A few WEB records preserve a verse reference while intentionally
+            // omitting its text. Keep those records so verse navigation and
+            // counts retain the canonical 31,103-verse structure.
+            guard parts.count >= 2 else { continue }
             let sourceCode = String(parts[0])
             let code = codeAliases[sourceCode] ?? sourceCode
             let chapterVerse = parts[1].split(separator: ":", maxSplits: 1)
@@ -460,7 +469,7 @@ struct BibleLibrary: Equatable, Sendable {
                 bookName: metadata.name,
                 chapter: chapter,
                 verse: verse,
-                text: String(parts[2])
+                text: parts.count == 3 ? String(parts[2]) : "—"
             )
             versesByBook[code, default: []].append(bibleVerse)
         }

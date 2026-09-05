@@ -39,6 +39,8 @@ bos_page_start('Beyond Academy', $course['title'], $course['description']);
     <p><?=$progress['completed']?> of <?=$progress['total']?> lessons completed. Your best assessment score is <?=$progress['best_score']?>/<?=count($course['questions'])?>.</p>
     <?php if ($progress['credential']): ?>
       <a class="academy-action" href="<?=e(beyond_url('academy/certificate.php?id=' . rawurlencode($progress['credential']['credential_id'])))?>">View certificate</a>
+    <?php elseif ($progress['pending_credential']): ?>
+      <p><strong>Certificate request under review.</strong> You should receive your certificate within 24 hours.</p>
     <?php else: ?>
       <a class="academy-action" <?=$progress['completed'] !== $progress['total'] ? 'aria-disabled="true"' : ''?> href="<?=e(beyond_url('academy/assessment.php?course=' . rawurlencode($slug)))?>"><?=$progress['completed'] === $progress['total'] ? 'Take assessment' : 'Complete all lessons'?></a>
     <?php endif; ?>

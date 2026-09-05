@@ -46,7 +46,7 @@ bos_page_start('Beyond Academy', 'Learner Dashboard', 'Track course progress, as
         <h2><?=e($course['title'])?></h2>
         <p><?=e($course['description'])?></p>
         <div class="path-progress" aria-label="<?=$progress['percent']?>% complete"><span style="width:<?=$progress['percent']?>%"></span></div>
-        <footer><small><?=$progress['completed']?> of <?=$progress['total']?> lessons</small><b><?=$progress['credential'] ? 'Earned ✓' : $progress['percent'] . '%'?></b></footer>
+        <footer><small><?=$progress['completed']?> of <?=$progress['total']?> lessons</small><b><?=$progress['credential'] ? 'Earned ✓' : ($progress['pending_credential'] ? 'Under review' : $progress['percent'] . '%')?></b></footer>
       </a>
       <?php endforeach; ?>
     </div>

@@ -14,6 +14,14 @@ if (!$course) {
     http_response_code(404);
     exit('Certificate pathway not found.');
 }
+if (($credential['approval_status'] ?? 'approved') !== 'approved') {
+    bos_page_start('Beyond Academy', 'Certificate under review', 'Your certification request is being reviewed.');
+    ?>
+    <main class="academy-shell"><section class="verify-card"><span class="academy-kicker">Certificate request received</span><h1>Your certificate is under review.</h1><p>A Beyond Imagination administrator will review your completion. You should receive your certificate within 24 hours.</p><a class="academy-action" href="<?=e(beyond_url('academy/dashboard.php'))?>">Return to dashboard</a></section></main>
+    <?php
+    bos_page_end();
+    exit;
+}
 $verifyUrl = beyond_url('academy/verify.php?id=' . rawurlencode($credentialId));
 bos_page_start('Beyond Academy', $course['title'] . ' Certificate', 'A verifiable Beyond-issued skills certificate.');
 ?>

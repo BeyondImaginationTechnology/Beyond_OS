@@ -30,7 +30,10 @@ bos_page_start('Beyond Academy', $course['title'] . ' Assessment', 'Complete the
   <section class="course-head" style="--course:<?=e($course['accent'])?>"><span class="academy-kicker">Final assessment</span><h1><?=e($course['title'])?></h1><p>Answer every question. A score of <?=ceil(count($course['questions']) * .8)?>/<?=count($course['questions'])?> is required to earn the certificate.</p></section>
   <?php if ($result): ?>
     <section class="result <?=$result['passed'] ? 'pass' : ''?>" role="status"><h2><?=$result['passed'] ? 'You passed!' : 'Review and try again.'?></h2><p>Your score: <strong><?=$result['score']?>/<?=$result['total']?></strong></p>
-    <?php if ($result['credential']): ?><a class="academy-action" href="<?=e(beyond_url('academy/certificate.php?id=' . rawurlencode($result['credential']['credential_id'])))?>">Open your certificate</a><?php endif; ?></section>
+    <?php if ($result['credential']): ?>
+      <?php if (($result['credential']['approval_status'] ?? 'pending') === 'approved'): ?><a class="academy-action" href="<?=e(beyond_url('academy/certificate.php?id=' . rawurlencode($result['credential']['credential_id'])))?>">Open your certificate</a>
+      <?php else: ?><p><strong>Your certificate request is under review.</strong> You should receive your certificate within 24 hours.</p><?php endif; ?>
+    <?php endif; ?></section>
     <section class="assessment-review" aria-label="Assessment answer review"><h2>Answer review</h2><?php foreach($result['review'] as $index=>$review):?><article class="<?=$review['correct']?'correct':'incorrect'?>"><span><?=$review['correct']?'✓':'Review'?></span><div><strong><?=($index+1)?>. <?=e($review['question'])?></strong><?php if(!$review['correct']):?><p>Your answer: <?=e($review['given']?:'No answer')?> · Correct answer: <b><?=e($review['answer'])?></b></p><?php else:?><p><?=e($review['answer'])?></p><?php endif;?></div></article><?php endforeach;?></section>
   <?php endif; ?>
   <?php if (!$result || !$result['passed']): ?><form class="assessment-form" method="post">

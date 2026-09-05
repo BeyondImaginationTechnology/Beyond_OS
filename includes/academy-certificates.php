@@ -362,10 +362,29 @@ function academy_db(): PDO
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_academy_attempt_user ON academy_assessment_attempts(user_id, course_slug, passed)');
     $pdo->exec('CREATE TABLE IF NOT EXISTS academy_credentials (
         id INTEGER PRIMARY KEY AUTOINCREMENT, credential_id TEXT NOT NULL UNIQUE, user_id INTEGER NOT NULL,
-        course_slug TEXT NOT NULL, learner_name TEXT NOT NULL, score INTEGER NOT NULL,
-        issued_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, revoked_at TEXT NULL,
+        course_slug TEXT NOT NULL, learner_name TEXT NOT NULL, learner_email TEXT NOT NULL DEFAULT \'\', score INTEGER NOT NULL,
+        approval_status TEXT NOT NULL DEFAULT \'pending\', approval_requested_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        approved_at TEXT NULL, approved_by INTEGER NULL, issued_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, revoked_at TEXT NULL,
         UNIQUE(user_id, course_slug)
     )');
+    $columns = array_column($pdo->query('PRAGMA table_info(academy_credentials)')->fetchAll(), 'name');
+    $legacyCredentialTable = !in_array('approval_status', $columns, true);
+    foreach ([
+        'learner_email' => "TEXT NOT NULL DEFAULT ''",
+        'approval_status' => "TEXT NOT NULL DEFAULT 'pending'",
+        'approval_requested_at' => 'TEXT NULL',
+        'approved_at' => 'TEXT NULL',
+        'approved_by' => 'INTEGER NULL',
+    ] as $column => $definition) {
+        if (!in_array($column, $columns, true)) {
+            $pdo->exec("ALTER TABLE academy_credentials ADD COLUMN {$column} {$definition}");
+        }
+    }
+    // Credentials issued before the approval gate remain valid; only new
+    // requests begin pending review.
+    if ($legacyCredentialTable) {
+        $pdo->exec("UPDATE academy_credentials SET approval_status='approved', approval_requested_at=COALESCE(approval_requested_at, issued_at), approved_at=COALESCE(approved_at, issued_at) WHERE approval_status IS NULL OR approval_status='' OR approval_status='pending'");
+    }
     $pdo->exec('CREATE TABLE IF NOT EXISTS academy_badges (
         id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, badge_slug TEXT NOT NULL,
         title TEXT NOT NULL, credential_id TEXT NULL, awarded_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -388,8 +407,10 @@ function academy_progress(int $userId, string $courseSlug): array
     $completed = academy_completed_lessons($userId, $courseSlug);
     $attempt = academy_db()->prepare('SELECT MAX(score) FROM academy_assessment_attempts WHERE user_id=? AND course_slug=?');
     $attempt->execute([$userId, $courseSlug]);
-    $credential = academy_db()->prepare('SELECT * FROM academy_credentials WHERE user_id=? AND course_slug=? AND revoked_at IS NULL LIMIT 1');
+    $credential = academy_db()->prepare("SELECT * FROM academy_credentials WHERE user_id=? AND course_slug=? AND revoked_at IS NULL AND approval_status='approved' LIMIT 1");
+    $pendingCredential = academy_db()->prepare("SELECT * FROM academy_credentials WHERE user_id=? AND course_slug=? AND revoked_at IS NULL AND approval_status='pending' LIMIT 1");
     $credential->execute([$userId, $courseSlug]);
+    $pendingCredential->execute([$userId, $courseSlug]);
     return [
         'completed' => count($completed),
         'completed_lessons' => $completed,
@@ -397,6 +418,7 @@ function academy_progress(int $userId, string $courseSlug): array
         'percent' => $total > 0 ? (int)round(count($completed) / $total * 100) : 0,
         'best_score' => (int)($attempt->fetchColumn() ?: 0),
         'credential' => $credential->fetch() ?: null,
+        'pending_credential' => $pendingCredential->fetch() ?: null,
     ];
 }
 
@@ -440,6 +462,73 @@ function academy_learner_name(): string
     return function_exists('mb_substr') ? mb_substr($label, 0, 120) : substr($label, 0, 120);
 }
 
+function academy_learner_email(): string
+{
+    return strtolower(trim((string)($_SESSION['email'] ?? '')));
+}
+
+function academy_notify_credential_requested(array $credential, array $course): void
+{
+    require_once __DIR__ . '/../config/mail.php';
+    $learnerName = htmlspecialchars((string)$credential['learner_name'], ENT_QUOTES, 'UTF-8');
+    $courseTitle = htmlspecialchars((string)$course['title'], ENT_QUOTES, 'UTF-8');
+    $credentialId = htmlspecialchars((string)$credential['credential_id'], ENT_QUOTES, 'UTF-8');
+    $reviewUrl = 'https://beyondimagination.co.technology/academy/admin-certifications.php';
+    $adminHtml = "<html><body><h2>Beyond Academy certificate approval requested</h2><p><strong>{$learnerName}</strong> passed <strong>{$courseTitle}</strong> and is awaiting approval.</p><p>Credential request: {$credentialId}</p><p><a href=\"{$reviewUrl}\">Review certificate requests</a></p></body></html>";
+    if (!send_email('admin@beyondimagination.co.technology', 'Certificate approval requested: ' . (string)$credential['learner_name'], $adminHtml)) {
+        error_log('Academy certificate approval alert could not be delivered.');
+    }
+    $email = (string)($credential['learner_email'] ?? '');
+    if ($email !== '') {
+        $learnerHtml = "<html><body><h2>Your Beyond Academy certificate request was received</h2><p>You passed <strong>{$courseTitle}</strong>.</p><p>A Beyond Imagination administrator will review your request. You should receive your certificate within 24 hours.</p></body></html>";
+        if (!send_email($email, 'Your Beyond Academy certificate is under review', $learnerHtml)) {
+            error_log('Academy learner certificate request email could not be delivered.');
+        }
+    }
+}
+
+function academy_approve_credential(string $credentialId, int $adminId): ?array
+{
+    $credential = academy_credential($credentialId);
+    if (!$credential || (string)$credential['approval_status'] !== 'pending') {
+        return null;
+    }
+    $course = academy_course((string)$credential['course_slug']);
+    if (!$course) {
+        return null;
+    }
+    $pdo = academy_db();
+    $pdo->beginTransaction();
+    try {
+        $statement = $pdo->prepare("UPDATE academy_credentials SET approval_status='approved', approved_at=CURRENT_TIMESTAMP, approved_by=? WHERE credential_id=? AND approval_status='pending'");
+        $statement->execute([$adminId, $credentialId]);
+        if ($statement->rowCount() !== 1) {
+            $pdo->rollBack();
+            return null;
+        }
+        $badge = $pdo->prepare('INSERT OR IGNORE INTO academy_badges(user_id,badge_slug,title,credential_id) VALUES(?,?,?,?)');
+        $badge->execute([(int)$credential['user_id'], (string)$credential['course_slug'], $course['title'] . ' Badge', $credentialId]);
+        $pdo->commit();
+    } catch (Throwable $exception) {
+        $pdo->rollBack();
+        throw $exception;
+    }
+    $approved = academy_credential($credentialId);
+    if ($approved) {
+        require_once __DIR__ . '/../config/mail.php';
+        $email = (string)($approved['learner_email'] ?? '');
+        if ($email !== '') {
+            $certificateUrl = 'https://beyondimagination.co.technology/academy/certificate.php?id=' . rawurlencode($credentialId);
+            $courseTitle = htmlspecialchars((string)$course['title'], ENT_QUOTES, 'UTF-8');
+            $html = "<html><body><h2>Your Beyond Academy certificate is ready</h2><p>Your {$courseTitle} certificate has been approved.</p><p><a href=\"{$certificateUrl}\">Open your certificate</a></p></body></html>";
+            if (!send_email($email, 'Your Beyond Academy certificate is ready', $html)) {
+                error_log('Academy learner approval email could not be delivered.');
+            }
+        }
+    }
+    return $approved;
+}
+
 function academy_issue_credential(int $userId, string $courseSlug, int $score): array
 {
     $course = academy_course($courseSlug);
@@ -456,17 +545,19 @@ function academy_issue_credential(int $userId, string $courseSlug, int $score): 
     $pdo = academy_db();
     $pdo->beginTransaction();
     try {
-        $statement = $pdo->prepare('INSERT INTO academy_credentials(credential_id,user_id,course_slug,learner_name,score) VALUES(?,?,?,?,?)');
-        $statement->execute([$credentialId, $userId, $courseSlug, academy_learner_name(), $score]);
-        $badge = $pdo->prepare('INSERT OR IGNORE INTO academy_badges(user_id,badge_slug,title,credential_id) VALUES(?,?,?,?)');
-        $badge->execute([$userId, $courseSlug, $course['title'] . ' Badge', $credentialId]);
+        $statement = $pdo->prepare('INSERT INTO academy_credentials(credential_id,user_id,course_slug,learner_name,learner_email,score,approval_status,approval_requested_at) VALUES(?,?,?,?,?,?,\'pending\',CURRENT_TIMESTAMP)');
+        $statement->execute([$credentialId, $userId, $courseSlug, academy_learner_name(), academy_learner_email(), $score]);
         $pdo->commit();
     } catch (Throwable $exception) {
         $pdo->rollBack();
         throw $exception;
     }
     $existing->execute([$userId, $courseSlug]);
-    return $existing->fetch();
+    $credential = $existing->fetch();
+    if ($credential) {
+        $credential['newly_requested'] = true;
+    }
+    return $credential;
 }
 
 function academy_record_assessment(int $userId, string $courseSlug, array $answers): array
@@ -495,6 +586,9 @@ function academy_record_assessment(int $userId, string $courseSlug, array $answe
     $statement = academy_db()->prepare('INSERT INTO academy_assessment_attempts(user_id,course_slug,score,question_count,passed) VALUES(?,?,?,?,?)');
     $statement->execute([$userId, $courseSlug, $score, count($questions), $passed ? 1 : 0]);
     $credential = $passed ? academy_issue_credential($userId, $courseSlug, $score) : null;
+    if ($credential && !empty($credential['newly_requested'])) {
+        academy_notify_credential_requested($credential, $course);
+    }
     return ['score' => $score, 'total' => count($questions), 'passed' => $passed, 'credential' => $credential, 'review' => $review];
 }
 

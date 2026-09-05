@@ -62,7 +62,7 @@ steps:
       set -euo pipefail
       selected_xcode=""
       selected_version=""
-      for xcode_app in /Applications/Xcode_26*.app /Applications/Xcode.app; do
+      for xcode_app in /Applications/Xcode_*.app /Applications/Xcode.app; do
         [[ -d "$xcode_app" ]] || continue
         xcode_version="$(DEVELOPER_DIR="$xcode_app/Contents/Developer" xcodebuild -version 2>/dev/null || true)"
         if [[ "$xcode_version" =~ ^Xcode[[:space:]]+([0-9]+)(\.[0-9]+)*$ ]] && (( BASH_REMATCH[1] >= 26 )); then

@@ -69,7 +69,8 @@ steps:
         xcode_version="$(DEVELOPER_DIR="$xcode_app/Contents/Developer" xcodebuild -version 2>/dev/null || true)"
         # xcodebuild prints a second Build line; inspect only the Xcode line
         # so the version check remains valid with multiline command output.
-        xcode_line="$(printf '%s\n' "$xcode_version" | sed -n 's/^Xcode[[:space:]]\+//p' | sed -n '1p')"
+        xcode_line="$(printf '%s\n' "$xcode_version" | awk '/^Xcode[[:space:]]/ { print $2; exit }')"
+        echo "Detected $xcode_app: ${xcode_line:-unavailable}"
         if [[ "$xcode_line" =~ ^([0-9]+)(\.[0-9]+)*$ ]] && (( BASH_REMATCH[1] >= 26 )); then
           candidate_version="$xcode_line"
           if [[ -z "$selected_version" || "$(printf '%s\n%s\n' "$selected_version" "$candidate_version" | sort -V | tail -n 1)" == "$candidate_version" ]]; then
@@ -79,7 +80,8 @@ steps:
         fi
       done
       if [[ -z "$selected_xcode" ]]; then
-        echo "##vso[task.logissue type=error]Xcode 26 or later is required for App Store Connect uploads."
+        echo "##vso[task.logissue type=error]No Xcode 26+ installation was found on the macOS 26 agent."
+        ls -1d /Applications/Xcode*.app 2>/dev/null || true
         exit 1
       fi
       export DEVELOPER_DIR="$selected_xcode/Contents/Developer"

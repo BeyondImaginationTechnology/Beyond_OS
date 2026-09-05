@@ -61,7 +61,7 @@ if (is_file($frenchLessonsPath)) {
 <script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['fall','dark','light','sunset','ocean','forest'].includes(t)?t:'fall';}catch(e){document.documentElement.dataset.theme='fall';}try{const c=localStorage.getItem('beyond-currency');document.documentElement.dataset.currency=['USD','CAD','BITS'].includes(c)?c:'CAD';}catch(e){document.documentElement.dataset.currency='CAD';}})();</script>
 <meta name="theme-color" content="#24140d">
 <title>Beyond Imagination Technology | Live. Learn. Earn. Explore.</title>
-<meta name="description" content="Health, education, wallet and entertainment connected by Beyond Imagination Technology through one secure Beyond ID and one shared bit$ balance.">
+<meta name="description" content="Beyond Imagination Technology connects health, education, creator commerce and entertainment through Beyond ID, with BIT OS environments in development.">
 <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
 <link rel="stylesheet" href="/assets/css/beyond-splash.css?v=20260828-1">
 <script src="/assets/js/beyond-splash.js?v=20260904-1" defer></script>
@@ -115,27 +115,39 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
 <style>
 .hero-kicker,.platform-kicker{display:inline-flex;align-items:center;gap:9px;color:#b9adff;font-size:11px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}.hero-kicker:before,.platform-kicker:before{content:"";width:7px;height:7px;border-radius:50%;background:#7f67ff;box-shadow:0 0 14px #7f67ff}.hero .intro{max-width:500px;font-size:17px}.hero-actions .primary{min-height:50px;padding-inline:24px}.platform-proof{position:relative;padding:84px 0 96px}.platform-proof:before{content:"";position:absolute;inset:8% 0 auto;height:360px;background:radial-gradient(circle at 30% 40%,rgba(81,219,120,.08),transparent 34%),radial-gradient(circle at 72% 32%,rgba(112,87,255,.12),transparent 38%);pointer-events:none}.platform-head{position:relative;display:grid;grid-template-columns:1.2fr .8fr;align-items:end;gap:50px;margin-bottom:34px}.platform-head h2{max-width:760px;margin:16px 0 0;font-size:clamp(42px,6vw,74px);line-height:.95;letter-spacing:-.06em}.platform-head p{margin:0;color:var(--muted);font-size:17px;line-height:1.65}.proof-strip{position:relative;display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:18px;border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.035);overflow:hidden;box-shadow:0 28px 80px rgba(0,0,0,.22)}.proof-stat{min-height:132px;padding:27px 30px;border-right:1px solid var(--line)}.proof-stat:last-child{border-right:0}.proof-stat strong{display:block;font-size:clamp(31px,4vw,49px);line-height:1;letter-spacing:-.055em}.proof-stat span{display:block;margin-top:10px;color:#aeb5c9;font-size:12px;line-height:1.45}.product-grid{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.product-card{--card-accent:#7057ff;position:relative;min-height:280px;padding:24px;border:1px solid color-mix(in srgb,var(--card-accent) 42%,rgba(255,255,255,.08));border-radius:22px;display:flex;flex-direction:column;text-decoration:none;overflow:hidden;background:radial-gradient(circle at 90% 5%,color-mix(in srgb,var(--card-accent) 20%,transparent),transparent 38%),linear-gradient(150deg,rgba(17,23,45,.94),rgba(7,10,23,.98));transition:transform .2s,border-color .2s}.product-card:hover,.product-card:focus-visible{transform:translateY(-5px);border-color:var(--card-accent)}.product-card.health{--card-accent:var(--green)}.product-card.education{--card-accent:var(--gold)}.product-card.wallet{--card-accent:var(--blue)}.product-card.entertainment{--card-accent:var(--pink)}.product-number{color:var(--card-accent);font-size:11px;font-weight:900;letter-spacing:.14em}.product-card h3{margin:22px 0 10px;font-size:28px;letter-spacing:-.045em}.product-card p{margin:0;color:#afb6ca;font-size:14px;line-height:1.6}.product-link{margin-top:auto;padding-top:26px;color:#fff;font-size:13px;font-weight:800}.platform-loop{position:relative;margin-top:18px;padding:34px;border:1px solid rgba(112,87,255,.34);border-radius:24px;background:linear-gradient(120deg,rgba(37,32,92,.72),rgba(56,20,71,.66));display:grid;grid-template-columns:.85fr 1.15fr;gap:50px;align-items:center}.platform-loop h3{margin:10px 0 0;font-size:clamp(29px,4vw,45px);line-height:1;letter-spacing:-.05em}.loop-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.loop-step{padding:17px 12px;border:1px solid rgba(255,255,255,.12);border-radius:15px;background:rgba(255,255,255,.045);text-align:center}.loop-step b{display:block;font-size:13px}.loop-step span{display:block;margin-top:5px;color:#b8bed2;font-size:10px;line-height:1.35}.investor-banner{margin:0 auto 74px;padding:38px 42px;border:1px solid rgba(132,102,255,.38);border-radius:26px;background:radial-gradient(circle at 88% 18%,rgba(236,76,170,.2),transparent 30%),linear-gradient(120deg,rgba(32,35,92,.94),rgba(53,21,70,.9));display:flex;align-items:center;justify-content:space-between;gap:32px}.investor-banner .platform-kicker{color:#d0c7ff}.investor-banner h2{margin:12px 0 8px;font-size:clamp(29px,4vw,45px);letter-spacing:-.05em}.investor-banner p{max-width:650px;margin:0;color:#c8cede;line-height:1.6}.investor-banner .primary{flex:0 0 auto;min-height:52px;padding-inline:24px}.nav>a[href="/investors.php"]{border-color:#8f72ff!important;color:#d5ceff!important}html[data-theme="light"] .proof-strip,html[data-theme="light"] .product-card{background:rgba(255,255,255,.74)}html[data-theme="light"] .product-card p,html[data-theme="light"] .proof-stat span{color:#5b6277}html[data-theme="light"] .product-link{color:#1c2034}html[data-theme="light"] .platform-loop,html[data-theme="light"] .investor-banner{color:#fff}@media(max-width:980px){.product-grid{grid-template-columns:repeat(2,1fr)}.platform-loop{grid-template-columns:1fr}.nav>a[href="/release-notes.php"]{display:none!important}}@media(max-width:760px){.platform-proof{padding:58px 0 70px}.platform-head{grid-template-columns:1fr;gap:18px}.proof-strip{grid-template-columns:1fr}.proof-stat{min-height:auto;border-right:0;border-bottom:1px solid var(--line)}.proof-stat:last-child{border-bottom:0}.loop-steps{grid-template-columns:repeat(2,1fr)}.investor-banner{align-items:flex-start;flex-direction:column;padding:30px}.investor-banner .primary{width:100%}}@media(max-width:560px){.hero-kicker{margin-bottom:14px}.platform-head h2{font-size:42px}.product-grid{grid-template-columns:1fr}.product-card{min-height:230px}.platform-loop{padding:25px 20px}.nav>a[href="/investors.php"]{display:none!important}}
 @media(max-width:560px){body.home-page>.top{display:none}.footer a{display:flex;align-items:center;min-height:44px;margin:0}.footer h4{margin-bottom:8px}}
+.site-header{position:relative;z-index:30;min-height:76px}.site-header .nav{gap:18px}.site-header .nav>a:not(.primary){white-space:nowrap}.site-header .nav>a[href="https://os.beyondimagination.co.technology/"]{border-color:#83a7ff}.site-header .nav>a[href="https://os.beyondimagination.co.technology/"]:hover,.site-header .nav>a[href="https://os.beyondimagination.co.technology/"]:focus-visible{color:#a9c2ff}.menu-toggle{display:none;width:44px;height:44px;padding:0;border:1px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.06);color:inherit;cursor:pointer}.menu-toggle svg{width:22px;height:22px}.mobile-drawer,.mobile-drawer-backdrop{display:none}.mobile-currency{display:none}
+@media(max-width:1080px){.site-header .nav{display:none}.menu-toggle{display:grid;place-items:center}.mobile-drawer-backdrop{position:fixed;inset:0;z-index:40;background:rgba(2,4,13,.7);backdrop-filter:blur(4px)}.mobile-drawer{position:fixed;top:0;right:0;z-index:41;width:min(390px,calc(100% - 32px));height:100dvh;padding:22px;overflow:auto;flex-direction:column;background:linear-gradient(160deg,#171334,#070b1b 58%);border-left:1px solid rgba(255,255,255,.16);box-shadow:-24px 0 70px rgba(0,0,0,.38)}.mobile-drawer.is-open,.mobile-drawer-backdrop.is-open{display:flex}.mobile-drawer-backdrop.is-open{display:block}.mobile-drawer-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:19px;border-bottom:1px solid rgba(255,255,255,.13)}.mobile-drawer-head strong{font-size:14px;letter-spacing:.04em}.drawer-close{width:42px;height:42px;padding:0;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(255,255,255,.06);color:inherit;font-size:27px;cursor:pointer}.mobile-drawer nav{display:grid;gap:2px;padding:18px 0}.mobile-drawer nav a{min-height:49px;display:flex;align-items:center;padding:0 13px;border-bottom:2px solid transparent;text-decoration:none;font-weight:700}.mobile-drawer nav a:nth-child(1){border-color:var(--gold)}.mobile-drawer nav a:nth-child(2){border-color:var(--pink)}.mobile-drawer nav a:nth-child(3){border-color:#a855f7}.mobile-drawer nav a:nth-child(4){border-color:var(--blue)}.mobile-drawer nav a:nth-child(5){border-color:var(--green)}.mobile-drawer nav a:nth-child(6){border-color:#8f72ff}.mobile-drawer nav a:nth-child(7){border-color:#83a7ff}.mobile-drawer .primary{width:100%;min-height:52px;margin-top:auto}.mobile-currency{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:22px;padding-top:20px;border-top:1px solid rgba(255,255,255,.13);font-size:12px;font-weight:800}.mobile-currency .currency-picker{display:flex}.site-header .brand{font-size:21px}body.home-page>.top.site-header{display:flex}}
+html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{border-color:rgba(23,26,46,.2);background:rgba(255,255,255,.72);color:#171a2e}html[data-theme="light"] .mobile-drawer{color:#171a2e;background:linear-gradient(160deg,#fbfcff,#e9edfb)}html[data-theme="light"] .mobile-drawer-head,html[data-theme="light"] .mobile-currency{border-color:rgba(23,26,46,.13)}
+@media(max-width:560px){.site-header{min-height:68px}.site-header .brand{font-size:18px}.site-header .brand-atom{width:34px;height:34px;margin-right:6px}.site-header .brand-atom img{width:30px;height:30px}.menu-toggle{width:42px;height:42px}.mobile-drawer{width:calc(100% - 20px);padding:19px}}
 </style>
 </head>
 <body class="home-page">
-<header class="top wrap">
+<header class="top wrap site-header">
     <a class="brand" href="./"><b class="brand-atom" aria-hidden="true"><img src="/assets/images/bos-logo-mark.svg?v=20260828-1" alt=""></b>BEYOND <span>IMAGINATION</span><small>TECHNOLOGY · BIT</small></a>
     <nav class="nav" aria-label="Primary navigation">
           <a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="/beyond-market/">Marketplace</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a><a href="https://os.beyondimagination.co.technology/">OS</a>
           <label class="currency-picker"><span aria-hidden="true">$</span><span class="visually-hidden">Display currency</span><select id="homeCurrency" aria-label="Display currency"><option value="USD">USD</option><option value="CAD">CAD</option><option value="BITS">bit$</option></select></label>
           <a class="primary" href="/app-store/">App Store</a>
     </nav>
+    <button class="menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="mobileNavigation" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 </header>
+<div class="mobile-drawer-backdrop" aria-hidden="true"></div>
+<aside class="mobile-drawer" id="mobileNavigation" aria-label="Mobile navigation" aria-hidden="true">
+    <div class="mobile-drawer-head"><strong>BEYOND IMAGINATION</strong><button class="drawer-close" type="button" aria-label="Close navigation menu">×</button></div>
+    <nav aria-label="Primary navigation"><a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="/beyond-market/">Marketplace</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a><a href="https://os.beyondimagination.co.technology/">OS</a></nav>
+    <a class="primary" href="/app-store/">Open App Store</a>
+    <label class="mobile-currency">Display currency <span class="currency-picker"><span aria-hidden="true">$</span><select id="mobileCurrency" aria-label="Display currency"><option value="USD">USD</option><option value="CAD">CAD</option><option value="BITS">bit$</option></select></span></label>
+</aside>
 <main>
 <section class="hero wrap">
     <div>
-        <span class="hero-kicker">One platform · many possibilities</span>
+        <span class="hero-kicker">Connected apps · BIT OS in development</span>
         <h1><span class="h">Health.</span><span class="e">Education.</span><span class="f">Wallet.</span><span class="x">Entertainment.</span></h1>
         <p class="tagline">Live. Learn. Earn. Explore.</p>
-        <p class="intro">A web-first ecosystem where one identity connects everyday wellness, learning, creator commerce and entertainment.</p>
+        <p class="intro">Useful apps for wellness, learning, creator commerce and entertainment—connected through Beyond ID. BIT OS is the planned operating-environment layer for home, learning, creating and organizational work.</p>
         <div class="hero-actions">
-            <a class="primary" href="app-store/">Explore the web apps &nbsp;→</a>
-            <a class="ghost" href="app-store/">Open the App Store ▶</a>
+            <a class="primary" href="app-store/">Explore the apps &nbsp;→</a>
+            <a class="ghost" href="/os/">Explore BIT OS →</a>
         </div>
         <div class="benefits"><span><b>∞</b> Every possibility, connected</span></div>
     </div>
@@ -204,15 +216,15 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
 <section class="platform-proof wrap" id="platform" aria-labelledby="platform-title">
     <div class="platform-head">
         <div>
-            <span class="platform-kicker">Built, connected, testable</span>
-            <h2 id="platform-title">More than a vision.<br>A working product universe.</h2>
+            <span class="platform-kicker">Apps today · operating environments next</span>
+            <h2 id="platform-title">A working app ecosystem.<br>A broader foundation in progress.</h2>
         </div>
-        <p>Beyond Imagination Technology brings focused web experiences into one recognizable system. People can move from discovery to learning, creation and rewards without starting over in a disconnected app.</p>
+        <p>Beyond Imagination Technology brings focused web experiences into one recognizable system. BIT OS extends that direction with planned Home, Creator, Academy and organizational environments, while the apps remain the live product experience today.</p>
     </div>
     <div class="proof-strip" aria-label="Beyond Imagination Technology platform at a glance">
         <div class="proof-stat"><strong>18</strong><span>web product hubs in active development</span></div>
         <div class="proof-stat"><strong>4</strong><span>connected pillars: Live, Learn, Earn and Explore</span></div>
-        <div class="proof-stat"><strong>1</strong><span>shared Beyond ID and bit$ wallet layer</span></div>
+        <div class="proof-stat"><strong>BIT OS</strong><span>planned operating-environment family, beginning with Home 1.0</span></div>
     </div>
     <div class="product-grid" aria-label="Explore flagship Beyond Imagination Technology web products">
         <a class="product-card health" href="/dailybreath/">
@@ -237,7 +249,7 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
         </a>
     </div>
     <div class="platform-loop">
-        <div><span class="platform-kicker">The connected loop</span><h3>Every product makes the next one more useful.</h3></div>
+        <div><span class="platform-kicker">The connected loop</span><h3>Every app builds the foundation for what comes next.</h3></div>
         <div class="loop-steps" aria-label="Beyond Imagination Technology engagement loop">
             <div class="loop-step"><b>Discover</b><span>TV, games &amp; daily content</span></div>
             <div class="loop-step"><b>Participate</b><span>Learn, create &amp; practice</span></div>
@@ -444,15 +456,15 @@ window.addEventListener('DOMContentLoaded',()=>{
  });
 })();
 (function(){
- const picker=document.getElementById('homeCurrency');
- if(!picker)return;
+ const pickers=[...document.querySelectorAll('#homeCurrency,#mobileCurrency')];
+ if(!pickers.length)return;
  const supported=['USD','CAD','BITS'];
  const root=document.documentElement;
 
  function applyCurrency(value,announce=false){
    const currency=supported.includes(value)?value:'CAD';
    root.dataset.currency=currency;
-   picker.value=currency;
+   pickers.forEach(picker=>{picker.value=currency;});
    try{localStorage.setItem('beyond-currency',currency);}catch(error){}
    document.cookie=`beyond_currency=${encodeURIComponent(currency)}; path=/; max-age=31536000; SameSite=Lax`;
    window.BeyondCurrency={
@@ -464,7 +476,29 @@ window.addEventListener('DOMContentLoaded',()=>{
  }
 
  applyCurrency(root.dataset.currency||'CAD');
- picker.addEventListener('change',()=>applyCurrency(picker.value,true));
+ pickers.forEach(picker=>picker.addEventListener('change',()=>applyCurrency(picker.value,true)));
+})();
+(function(){
+ const toggle=document.querySelector('.menu-toggle');
+ const drawer=document.querySelector('.mobile-drawer');
+ const backdrop=document.querySelector('.mobile-drawer-backdrop');
+ const close=document.querySelector('.drawer-close');
+ if(!toggle||!drawer||!backdrop||!close)return;
+ let lastFocus=null;
+ const setOpen=(open)=>{
+   drawer.classList.toggle('is-open',open);
+   backdrop.classList.toggle('is-open',open);
+   drawer.setAttribute('aria-hidden',String(!open));
+   toggle.setAttribute('aria-expanded',String(open));
+   document.body.style.overflow=open?'hidden':'';
+   if(open){lastFocus=document.activeElement;close.focus();}
+   else if(lastFocus instanceof HTMLElement)lastFocus.focus();
+ };
+ toggle.addEventListener('click',()=>setOpen(true));
+ close.addEventListener('click',()=>setOpen(false));
+ backdrop.addEventListener('click',()=>setOpen(false));
+ drawer.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>setOpen(false)));
+ document.addEventListener('keydown',event=>{if(event.key==='Escape'&&drawer.classList.contains('is-open'))setOpen(false);});
 })();
 </script>
 <script src="/beyond-tv/assets/js/app.js?v=3.0.2"></script>

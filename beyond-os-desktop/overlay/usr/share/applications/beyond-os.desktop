@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Beyond OS
-Comment=Open the Beyond OS command center
-Exec=xdg-open https://os.beyondimagination.co.technology/
-Icon=utilities-terminal
-Terminal=false
-Categories=Office;Utility;
-StartupNotify=true

@@ -1,0 +1,2 @@
+# Automatic local desktop for VM development; password login is locked.
+home 1000 home 1000 ! /home/home /bin/sh video,audio,input Beyond OS Home

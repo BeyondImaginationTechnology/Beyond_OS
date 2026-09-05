@@ -11,6 +11,9 @@ $wallet = beyond_nav_bootstrap('Beyond App Store');
     <p>Browse the connected tools for living, learning, earning and exploring. Open apps instantly, and install supported web apps on your device.</p>
     <div class="bos-actions"><a class="bos-btn" href="<?=e(beyond_url('beyond-id/dashboard/wallet.php'))?>">Open Wallet</a><a class="bos-btn secondary" href="<?=e(beyond_url('beyond-market/'))?>">Explore Marketplace</a><a class="bos-btn secondary" href="#featured">Browse all apps</a></div>
   </section>
+  <nav class="store-jump" aria-label="Browse app collections">
+    <a href="#featured"><span>01</span>Live</a><a href="#learn"><span>02</span>Learn</a><a href="#earn"><span>03</span>Earn</a><a href="#games"><span>04</span>Games</a><a href="#explore"><span>05</span>Explore</a>
+  </nav>
 
   <section class="bos-section" id="featured">
     <span class="bos-kicker">Live</span><h2>Health & daily life</h2><p>Daily guidance, wellness and creative self-expression.</p>
@@ -33,7 +36,7 @@ $wallet = beyond_nav_bootstrap('Beyond App Store');
     </div>
   </section>
 
-  <section class="bos-section">
+  <section class="bos-section" id="earn">
     <span class="bos-kicker">Earn</span><h2>Wallet, market & work</h2><p>Manage bit$, shop assets, follow markets and build income.</p>
     <div class="bos-grid">
       <?=bos_app_card('Beyond Wallet','Spend bit$, review activity and manage your Beyond finances.','beyond-id/dashboard/wallet.php','BW','Open Wallet','assets/icons/app-store/beyond-wallet.png')?>
@@ -58,7 +61,7 @@ $wallet = beyond_nav_bootstrap('Beyond App Store');
     </div>
   </section>
 
-  <section class="bos-section">
+  <section class="bos-section" id="explore">
     <span class="bos-kicker">Explore</span><h2>Entertainment & creation</h2><p>Watch, listen, create and play across Beyond.</p>
     <div class="bos-grid">
       <?=bos_app_card('Beyond TV','Live channels and an on-demand catalogue.','beyond-tv/','TV','Live demo','assets/icons/app-store/beyond-tv.jpg')?>
@@ -72,21 +75,22 @@ $wallet = beyond_nav_bootstrap('Beyond App Store');
   </section>
 </main>
 <style>
-.app-store-main{width:min(1320px,calc(100% - 28px))}.app-store-hero{background:radial-gradient(circle at 90% 8%,rgba(112,143,255,.28),transparent 28%),linear-gradient(135deg,#ffffff,#eef1ff 58%,#fcecf5);box-shadow:0 24px 70px rgba(48,59,106,.16)}.app-store-hero h1{max-width:900px;color:#171a26}.app-store-hero p{color:#4f5870}.app-store-main .bos-section{scroll-margin-top:88px}.app-store-main .bos-section>p{max-width:680px}.app-store-main .bos-card{min-height:126px;padding:14px;gap:11px;border-radius:16px;box-shadow:0 8px 22px rgba(35,48,84,.09)}.app-store-main .bos-card-icon{width:50px;height:50px;font-size:16px;font-weight:950;border-radius:12px}.app-store-main .bos-card-icon-blank{background:transparent}.app-store-main .bos-btn.secondary{background:#fff;border-color:#cfd5e3;color:#171a26}.app-store-main .bos-section-head{margin-bottom:12px}.app-store-main .bos-section-head h2{font-size:clamp(25px,3.5vw,38px)}.app-carousel{position:relative}.app-carousel .bos-grid{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;padding:4px 3px 14px;margin-top:0;scrollbar-width:thin;scrollbar-color:#aab4d8 transparent}.app-carousel .bos-card{flex:0 0 clamp(245px,28vw,330px);scroll-snap-align:start}.app-carousel-controls{display:flex;gap:7px;position:absolute;right:0;top:-52px}.app-carousel-controls button{width:34px;height:34px;border:1px solid #cfd5e3;border-radius:50%;background:#fff;color:#313b59;font-size:1rem;cursor:pointer;box-shadow:0 4px 12px rgba(35,48,84,.08)}.app-carousel-controls button:hover{border-color:#5968db;color:#5968db}.app-carousel-hint{display:none;color:#7b8498;font-size:.72rem;margin:0 0 4px}@media(max-width:850px){.app-carousel .bos-card{flex-basis:clamp(240px,43vw,300px)}}
-@media(max-width:560px){.app-store-main{width:min(100% - 18px,1320px)}.app-store-hero{padding:30px 18px}.app-store-hero h1{font-size:clamp(2.45rem,13vw,4rem)}.app-store-main .bos-card{min-height:118px}.app-store-main .bos-actions{display:grid;grid-template-columns:1fr}.app-store-main .bos-btn{width:100%}.app-carousel-controls{display:none}.app-carousel-hint{display:block}}html[data-theme="sunset"]{--bos-bg:#1a0d24;--bos-panel:#32133f;--bos-line:rgba(255,204,176,.2);--bos-text:#fff7f2;--bos-muted:#e5bdb5;--bos-purple:#ff8a62;--bos-pink:#c44c88}html[data-theme="sunset"] .bos-page{background:radial-gradient(circle at 80% 0,rgba(255,111,97,.3),transparent 30%),radial-gradient(circle at 12% 35%,rgba(255,179,71,.16),transparent 34%),linear-gradient(180deg,#32113d,#1d102b 48%,#0d1021)}html[data-theme="sunset"] .app-store-hero{background:radial-gradient(circle at 88% 8%,rgba(255,179,71,.28),transparent 30%),linear-gradient(135deg,#5f214e,#3a183f 58%,#27162f)}html[data-theme="sunset"] .bos-card{background:rgba(75,29,64,.76);border-color:rgba(255,204,176,.18)}html[data-theme="sunset"] .bos-btn.secondary{background:rgba(103,40,72,.56)}</style>
+.app-store-main{width:min(1320px,calc(100% - 28px))}.app-store-hero{background:radial-gradient(circle at 90% 8%,rgba(112,143,255,.28),transparent 28%),linear-gradient(135deg,#ffffff,#eef1ff 58%,#fcecf5);box-shadow:0 24px 70px rgba(48,59,106,.16)}.app-store-hero h1{max-width:900px;color:#171a26}.app-store-hero p{color:#4f5870}.store-jump{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0 10px}.store-jump a{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 14px;border:1px solid #d8ddea;border-radius:999px;background:rgba(255,255,255,.72);color:#252c43;text-decoration:none;font-size:12px;font-weight:850;box-shadow:0 5px 14px rgba(48,59,106,.06);transition:border-color .2s,box-shadow .2s,transform .2s}.store-jump a:hover,.store-jump a:focus-visible{border-color:#7a72ff;box-shadow:0 10px 23px rgba(89,86,214,.17);transform:translateY(-2px)}.store-jump span{color:#7067e8;font-size:10px;letter-spacing:.08em}.app-store-main .bos-section{--collection:#746bff;position:relative;scroll-margin-top:88px;margin-top:54px;padding:28px;border:1px solid color-mix(in srgb,var(--collection) 22%,#d8ddea);border-radius:24px;background:radial-gradient(circle at 92% 8%,color-mix(in srgb,var(--collection) 12%,transparent),transparent 26%),rgba(255,255,255,.48);box-shadow:0 18px 40px rgba(48,59,106,.07)}.app-store-main .bos-section:nth-of-type(3){--collection:#ed6fba}.app-store-main .bos-section:nth-of-type(4){--collection:#4c96e8}.app-store-main .bos-section:nth-of-type(5){--collection:#9571df}.app-store-main .bos-section:nth-of-type(6){--collection:#ec9a4d}.app-store-main .bos-section>p{max-width:680px}.app-store-main .bos-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.app-store-main .bos-card{position:relative;isolation:isolate;min-height:132px;padding:15px;gap:11px;overflow:hidden;border-radius:18px;background:linear-gradient(145deg,#fff,#f7f8ff);box-shadow:0 8px 22px rgba(35,48,84,.09);transition:transform .24s ease,border-color .24s ease,box-shadow .24s ease}.app-store-main .bos-card:before{content:"";position:absolute;z-index:-1;inset:auto -26px -42px auto;width:96px;height:96px;border-radius:50%;background:color-mix(in srgb,var(--collection) 18%,transparent);filter:blur(7px);transition:transform .3s ease}.app-store-main .bos-card:hover,.app-store-main .bos-card:focus-visible{border-color:var(--collection);box-shadow:0 16px 30px color-mix(in srgb,var(--collection) 18%,transparent);transform:translateY(-5px)}.app-store-main .bos-card:hover:before,.app-store-main .bos-card:focus-visible:before{transform:scale(1.6)}.app-store-main .bos-card-icon{width:50px;height:50px;font-size:16px;font-weight:950;border-radius:14px}.app-store-main .bos-card-icon-blank{background:transparent}.app-store-main .bos-btn.secondary{background:#fff;border-color:#cfd5e3;color:#171a26}.app-store-main .bos-section-head{margin-bottom:12px}.app-store-main .bos-section-head h2{font-size:clamp(25px,3.5vw,38px)}@media(max-width:1100px){.app-store-main .bos-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:850px){.app-store-main .bos-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.app-store-main{width:min(100% - 18px,1320px)}.app-store-hero{padding:30px 18px}.app-store-hero h1{font-size:clamp(2.45rem,13vw,4rem)}.app-store-main .bos-grid{grid-template-columns:1fr}.app-store-main .bos-card{min-height:118px}.app-store-main .bos-actions{display:grid;grid-template-columns:1fr}.app-store-main .bos-btn{width:100%}}html[data-theme="sunset"]{--bos-bg:#1a0d24;--bos-panel:#32133f;--bos-line:rgba(255,204,176,.2);--bos-text:#fff7f2;--bos-muted:#e5bdb5;--bos-purple:#ff8a62;--bos-pink:#c44c88}html[data-theme="sunset"] .bos-page{background:radial-gradient(circle at 80% 0,rgba(255,111,97,.3),transparent 30%),radial-gradient(circle at 12% 35%,rgba(255,179,71,.16),transparent 34%),linear-gradient(180deg,#32113d,#1d102b 48%,#0d1021)}html[data-theme="sunset"] .app-store-hero{background:radial-gradient(circle at 88% 8%,rgba(255,179,71,.28),transparent 30%),linear-gradient(135deg,#5f214e,#3a183f 58%,#27162f)}html[data-theme="sunset"] .bos-card{background:rgba(75,29,64,.76);border-color:rgba(255,204,176,.18)}html[data-theme="sunset"] .bos-btn.secondary{background:rgba(103,40,72,.56)}</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" defer></script>
 <script>
-document.querySelectorAll('.app-store-main .bos-section').forEach((section,index)=>{
-  const grid=section.querySelector('.bos-grid');
-  if(!grid || grid.children.length < 3) return;
-  const carousel=document.createElement('div'); carousel.className='app-carousel';
-  grid.parentNode.insertBefore(carousel,grid); carousel.appendChild(grid);
-  const controls=document.createElement('div'); controls.className='app-carousel-controls';
-  controls.innerHTML='<button type="button" aria-label="Previous apps">←</button><button type="button" aria-label="Next apps">→</button>';
-  carousel.appendChild(controls);
-  const hint=document.createElement('p'); hint.className='app-carousel-hint'; hint.textContent='Swipe to browse apps →'; carousel.insertBefore(hint,grid);
-  const amount=()=>Math.max(260,Math.round(grid.clientWidth*.72));
-  controls.children[0].addEventListener('click',()=>grid.scrollBy({left:-amount(),behavior:'smooth'}));
-  controls.children[1].addEventListener('click',()=>grid.scrollBy({left:amount(),behavior:'smooth'}));
+window.addEventListener('DOMContentLoaded',()=>{
+  if(!window.anime || window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const collections=document.querySelectorAll('.app-store-main .bos-section');
+  const reveal=(collection)=>{
+    if(collection.dataset.revealed)return;
+    collection.dataset.revealed='true';
+    anime({targets:collection.querySelectorAll('.bos-kicker,h2,:scope > p'),opacity:[0,1],translateY:[16,0],delay:anime.stagger(65),duration:520,easing:'easeOutCubic'});
+    anime({targets:collection.querySelectorAll('.bos-card'),opacity:[0,1],translateY:[28,0],scale:[.97,1],delay:anime.stagger(70,{start:130}),duration:620,easing:'easeOutExpo'});
+  };
+  const observer=new IntersectionObserver((entries)=>entries.forEach(entry=>{if(entry.isIntersecting){reveal(entry.target);observer.unobserve(entry.target);}}),{threshold:.14});
+  collections.forEach(collection=>observer.observe(collection));
+  document.querySelectorAll('.store-jump a').forEach(link=>link.addEventListener('click',()=>anime({targets:link,scale:[1,.94,1],duration:260,easing:'easeOutQuad'})));
 });
 </script>
 <?php bos_page_end(); ?>

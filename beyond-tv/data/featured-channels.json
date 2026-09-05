@@ -12,7 +12,7 @@
   {"number":11,"slug":"beyond-ancient","name":"Beyond Ancient","icon":"🏺","description":"Archaeology, civilizations, and ancient history.","category":"History"},
   {"number":12,"slug":"beyond-french","name":"Beyond French","icon":"🇫🇷","description":"Lessons, conversation, and French culture.","category":"Education"},
   {"number":13,"slug":"beyond-health","name":"Beyond Health","icon":"💚","description":"Fitness, nutrition, meditation, and wellness.","category":"Wellness"},
-  {"number":14,"slug":"beyond-trailers","name":"Beyond Trailers","icon":"🍿","description":"Official trailers, teasers, first looks, and coming-soon previews.","category":"Entertainment"},
-  {"number":15,"slug":"beyond-sports","name":"Beyond Sports","icon":"🏆","description":"Official highlights, full replays, athlete stories, and iconic moments.","category":"Sports"},
+  {"number":14,"slug":"mrbeast-tv","name":"MrBeast TV","icon":"🦁","description":"Official MrBeast videos, challenges, and new-episode updates.","category":"Entertainment"},
+  {"number":15,"slug":"redbull-tv","name":"Red Bull TV","icon":"🪽","description":"Official Red Bull action sports, events, films, and athlete stories.","category":"Sports"},
   {"number":16,"slug":"beyond-mystery","name":"Beyond Mystery","icon":"🔎","description":"Detectives, puzzles, thrillers, and mysteries from the curated Beyond TV library.","category":"Mystery"}
 ]

@@ -27,8 +27,8 @@ $channelPanelArt = [
     'beyond-ancient' => ['channel-backgrounds-sprite.png', '0% 100%'],
     'beyond-french' => ['channel-backgrounds-sprite.png', '66.666% 100%'],
     'beyond-health' => ['channel-backgrounds-sprite.png', '100% 100%'],
-    'beyond-trailers' => ['channel-backgrounds-sprite-v2.png', '33.333% 100%'],
-    'beyond-sports' => ['channel-backgrounds-sprite-v2.png', '66.666% 100%'],
+    'mrbeast-tv' => ['channel-backgrounds-sprite-v2.png', '33.333% 100%'],
+    'redbull-tv' => ['channel-backgrounds-sprite-v2.png', '66.666% 100%'],
     'beyond-mystery' => ['channel-backgrounds-sprite-v2.png', '0% 100%'],
 ];
 $classic = null; $cartoons = null; $afterDark = null;

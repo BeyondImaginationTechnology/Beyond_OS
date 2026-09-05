@@ -695,24 +695,24 @@
       "lineup": "Bedtime Classics"
     }
   ],
-  "beyond-trailers": [
-    {"start":0,"end":3,"icon":"🌙","title":"Midnight Premieres","lineup":"Official trailers and late-night first looks"},
-    {"start":3,"end":6,"icon":"🎞️","title":"Coming Soon","lineup":"Teasers, announcements, and release previews"},
-    {"start":6,"end":9,"icon":"☀️","title":"Morning First Look","lineup":"New official trailers to start the day"},
-    {"start":9,"end":12,"icon":"🍿","title":"Trailer Showcase","lineup":"Big-screen premieres and studio previews"},
-    {"start":12,"end":15,"icon":"🚀","title":"Action & Adventure","lineup":"Official action, adventure, and sci-fi previews"},
-    {"start":15,"end":18,"icon":"✨","title":"Family Preview","lineup":"Animation, fantasy, and family first looks"},
-    {"start":18,"end":21,"icon":"🎬","title":"Prime-Time Trailers","lineup":"The latest official studio premieres"},
-    {"start":21,"end":24,"icon":"👀","title":"After-Hours Preview","lineup":"Thrillers, mysteries, and coming attractions"}
+  "mrbeast-tv": [
+    {"start":0,"end":3,"icon":"🦁","title":"MrBeast After Hours","lineup":"Official challenges and big-stakes videos"},
+    {"start":3,"end":6,"icon":"🎁","title":"Big Giveaways","lineup":"Official MrBeast competitions and surprises"},
+    {"start":6,"end":9,"icon":"☀️","title":"Morning Challenge","lineup":"Start with official MrBeast videos"},
+    {"start":9,"end":12,"icon":"🏝️","title":"Extreme Adventures","lineup":"Official endurance and travel challenges"},
+    {"start":12,"end":15,"icon":"🏆","title":"Competition Time","lineup":"Official contests and creator collaborations"},
+    {"start":15,"end":18,"icon":"❤️","title":"Beast Philanthropy Spotlight","lineup":"Official charitable projects and community stories"},
+    {"start":18,"end":21,"icon":"📺","title":"Prime-Time MrBeast","lineup":"Featured official MrBeast episodes"},
+    {"start":21,"end":24,"icon":"🔔","title":"New Episode Watch","lineup":"Follow IFTTT for official new-episode alerts"}
   ],
-  "beyond-sports": [
-    {"start":0,"end":3,"icon":"🏆","title":"Classic Finals","lineup":"Iconic championship moments and full replays"},
-    {"start":3,"end":6,"icon":"🌍","title":"World Stage","lineup":"International competition highlights"},
-    {"start":6,"end":9,"icon":"🏃","title":"Morning Motion","lineup":"Athletics, training, and athlete stories"},
-    {"start":9,"end":12,"icon":"🏀","title":"Court Classics","lineup":"Basketball highlights and memorable matchups"},
-    {"start":12,"end":15,"icon":"⚽","title":"Global Football","lineup":"Goals, finals, and tournament stories"},
-    {"start":15,"end":18,"icon":"🏊","title":"Olympic Spotlight","lineup":"Summer and winter sport highlights"},
-    {"start":18,"end":21,"icon":"🥇","title":"Gold-Medal Replays","lineup":"Full official replays and winning performances"},
-    {"start":21,"end":24,"icon":"🔥","title":"Best of Sport","lineup":"Unforgettable moments from the official archive"}
+  "redbull-tv": [
+    {"start":0,"end":3,"icon":"🌙","title":"Red Bull After Dark","lineup":"Official films and action sports stories"},
+    {"start":3,"end":6,"icon":"🧗","title":"Adventure Sessions","lineup":"Climbing, mountain, and outdoor films"},
+    {"start":6,"end":9,"icon":"🚵","title":"Morning Motion","lineup":"Mountain bike, motorsport, and training"},
+    {"start":9,"end":12,"icon":"🏄","title":"Water & Air","lineup":"Surf, flight, and board sports"},
+    {"start":12,"end":15,"icon":"🏎️","title":"Motorsport","lineup":"Official racing and behind-the-scenes stories"},
+    {"start":15,"end":18,"icon":"🎬","title":"Red Bull Films","lineup":"Featured official Red Bull films and series"},
+    {"start":18,"end":21,"icon":"🔴","title":"Red Bull Prime","lineup":"Featured action sports and events"},
+    {"start":21,"end":24,"icon":"🪽","title":"Night Flight","lineup":"Official Red Bull athlete stories"}
   ]
 }

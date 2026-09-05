@@ -131,3 +131,41 @@ steps:
       # may reuse it, but an uploaded build number must never be reused.
       CI_BUILD_NUMBER: ${{ parameters.iosBuildNumber }}
     displayName: Archive and upload DailyBreath to TestFlight
+
+  - bash: |
+      set -euo pipefail
+      swift AppStoreAssets/generate_screenshots.swift
+      mkdir -p "$(Build.ArtifactStagingDirectory)"
+      ditto -c -k --sequesterRsrc --keepParent \
+        AppStoreAssets/Screenshots \
+        "$(Build.ArtifactStagingDirectory)/dailybreath-app-store-screenshots.zip"
+    workingDirectory: $(projectDirectory)
+    displayName: Generate iPhone and iPad App Store screenshots
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: $(Build.ArtifactStagingDirectory)/dailybreath-app-store-screenshots.zip
+      artifact: dailybreath-app-store-screenshots
+      publishLocation: pipeline
+    displayName: Publish App Store screenshot artifact
+
+  - bash: |
+      set -euo pipefail
+      python3 ci_scripts/send_screenshot_email.py \
+        "$(Build.ArtifactStagingDirectory)/dailybreath-app-store-screenshots.zip"
+    workingDirectory: $(projectDirectory)
+    env:
+      CI_BUILD_NUMBER: ${{ parameters.iosBuildNumber }}
+      SMTP_HOST: $(SMTP_HOST)
+      SMTP_SERVER: $(SMTP_SERVER)
+      SMTP_PORT: $(SMTP_PORT)
+      SMTP_SECURITY: $(SMTP_SECURITY)
+      SMTP_USE_SSL: $(SMTP_USE_SSL)
+      SMTP_USERNAME: $(SMTP_USERNAME)
+      SMTP_USER: $(SMTP_USER)
+      SMTP_PASSWORD: $(SMTP_PASSWORD)
+      SMTP_PASS: $(SMTP_PASS)
+      SMTP_FROM: $(SMTP_FROM)
+      SMTP_TO: $(SMTP_TO)
+      SCREENSHOT_EMAIL_TO: admin@beyondimagination.co.technology
+    displayName: Email App Store screenshots to administrator

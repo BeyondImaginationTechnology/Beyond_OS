@@ -79,6 +79,18 @@ steps:
           fi
         fi
       done
+      # Some hosted images expose the active Xcode through xcode-select without
+      # a conventional Xcode_*.app bundle name. Use that toolchain as a safe
+      # fallback after the explicit bundle scan.
+      if [[ -z "$selected_xcode" ]]; then
+        active_developer_dir="$(xcode-select -p 2>/dev/null || true)"
+        active_version="$(DEVELOPER_DIR="$active_developer_dir" xcodebuild -version 2>/dev/null | awk '/^Xcode[[:space:]]/ { print $2; exit }')"
+        echo "Active xcode-select toolchain: ${active_version:-unavailable}"
+        if [[ "$active_version" =~ ^([0-9]+)(\.[0-9]+)*$ ]] && (( BASH_REMATCH[1] >= 26 )); then
+          selected_version="$active_version"
+          selected_xcode="${active_developer_dir%/Contents/Developer}"
+        fi
+      fi
       if [[ -z "$selected_xcode" ]]; then
         echo "##vso[task.logissue type=error]No Xcode 26+ installation was found on the macOS 26 agent."
         ls -1d /Applications/Xcode*.app 2>/dev/null || true

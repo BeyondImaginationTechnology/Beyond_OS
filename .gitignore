@@ -30,3 +30,6 @@ Thumbs.db
 /tmp/
 /output/
 /.local/
+
+# Locally staged BIT OS release artifacts (published separately to HostDeal).
+/exports/bit-os-cyber-1.0/

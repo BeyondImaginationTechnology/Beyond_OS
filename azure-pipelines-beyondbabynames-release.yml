@@ -44,6 +44,7 @@ steps:
 
   - bash: |
       set -euo pipefail
+      mkdir -p fastlane/build_logs
       selected_xcode=""
       selected_version=""
       for xcode_app in /Applications/Xcode_*.app /Applications/Xcode.app; do

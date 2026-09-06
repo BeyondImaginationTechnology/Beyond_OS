@@ -329,7 +329,11 @@ private struct CoupleView: View {
                         if store.matches.isEmpty {
                             Text("Keep swiping—your shared favorites will appear here.").foregroundStyle(.secondary).padding(.vertical, 20)
                         } else {
-                            ForEach(store.matches) { NameRow(name: $0, isFavorite: true) { store.toggleFavorite($0) } }
+                            ForEach(store.matches) { name in
+                                NameRow(name: name, isFavorite: true) {
+                                    store.toggleFavorite(name)
+                                }
+                            }
                         }
                     }
                     Button("Refresh demo partner picks") { store.loadDemoPartnerPicks() }

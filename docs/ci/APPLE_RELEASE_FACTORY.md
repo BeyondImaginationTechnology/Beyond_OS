@@ -41,7 +41,8 @@ not included in this iOS/TestFlight inventory.
 1. Complete DailyBreath first. It is the best proof case because it has the
    most difficult signing layout: app, widget, and App Clip.
 2. Promote the proven Azure signing pattern to a shared template.
-3. Create one small manual release wrapper per remaining iOS app. Each wrapper
+3. Create one small manual release wrapper per remaining iOS app. Beyond Baby
+   Names now has `azure-pipelines-beyondbabynames-release.yml`; each wrapper
    specifies only its project, scheme, bundle ID, and Secure File profile.
 4. Confirm that an App Store Connect app record exists before activating each
    wrapper. A successful Azure archive cannot upload to a missing app record.

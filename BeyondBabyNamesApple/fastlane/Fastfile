@@ -1,0 +1,50 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Archive Beyond Baby Names 1.0 and upload it to TestFlight"
+  lane :testflight do
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("APP_STORE_CONNECT_KEY_ID"),
+      issuer_id: ENV.fetch("APP_STORE_CONNECT_ISSUER_ID"),
+      key_filepath: ENV.fetch("APP_STORE_CONNECT_API_KEY_PATH")
+    )
+
+    increment_build_number(
+      xcodeproj: "BeyondBabyNames.xcodeproj",
+      build_number: ENV.fetch("CI_BUILD_NUMBER")
+    )
+
+    profile_name = ENV.fetch("BEYOND_BABY_NAMES_PROFILE_NAME")
+    update_code_signing_settings(
+      path: "BeyondBabyNames.xcodeproj",
+      use_automatic_signing: false,
+      team_id: "FK9QM3VUNH",
+      profile_name: profile_name,
+      code_sign_identity: "Apple Distribution",
+      targets: ["BeyondBabyNames"],
+      build_configurations: ["Release"]
+    )
+
+    build_app(
+      project: "BeyondBabyNames.xcodeproj",
+      scheme: "BeyondBabyNames",
+      clean: true,
+      export_method: "app-store",
+      export_options: {
+        method: "app-store",
+        provisioningProfiles: {
+          "technology.co.beyondimagination.beyondbabynames" => profile_name
+        }
+      },
+      disable_xcpretty: true,
+      result_bundle: true,
+      buildlog_path: "fastlane/build_logs"
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
+      skip_waiting_for_build_processing: true
+    )
+  end
+end

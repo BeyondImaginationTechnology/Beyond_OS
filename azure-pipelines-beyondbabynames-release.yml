@@ -1,0 +1,96 @@
+# Manual-only signed release pipeline for Beyond Baby Names 1.0.
+# Credentials remain in Azure Secure Files and the shared variable group.
+trigger: none
+pr: none
+
+parameters:
+  - name: iosBuildNumber
+    displayName: iOS build number
+    type: string
+    default: '1'
+
+pool:
+  vmImage: macos-26
+
+variables:
+  - group: dailybreath-testflight
+  - name: projectDirectory
+    value: BeyondBabyNamesApple
+
+steps:
+  - checkout: self
+    clean: true
+
+  - task: DownloadSecureFile@1
+    name: appStoreConnectKey
+    inputs:
+      secureFile: AuthKey_WCGDUVCBRB.p8
+    displayName: Download App Store Connect API key
+
+  - task: InstallAppleCertificate@2
+    inputs:
+      certSecureFile: DailyBreath_Distribution.p12
+      certPwd: $(APPLE_CERTIFICATE_PASSWORD)
+      keychain: temp
+      deleteCert: true
+    displayName: Install shared Apple Distribution certificate
+
+  - task: InstallAppleProvisioningProfile@1
+    inputs:
+      provisioningProfileLocation: secureFiles
+      provProfileSecureFile: Beyond_Baby_Names_Azure_App_Store.mobileprovision
+      removeProfile: true
+    displayName: Install Beyond Baby Names App Store profile
+
+  - bash: |
+      set -euo pipefail
+      selected_xcode=""
+      selected_version=""
+      for xcode_app in /Applications/Xcode_*.app /Applications/Xcode.app; do
+        [[ -d "$xcode_app" ]] || continue
+        xcode_line="$(DEVELOPER_DIR="$xcode_app/Contents/Developer" xcodebuild -version 2>/dev/null | awk '/^Xcode[[:space:]]/ { print $2; exit }' || true)"
+        echo "Detected $xcode_app: ${xcode_line:-unavailable}"
+        if [[ "$xcode_line" =~ ^([0-9]+)(\.[0-9]+)*$ ]] && (( BASH_REMATCH[1] >= 26 )); then
+          if [[ -z "$selected_version" || "$(printf '%s\n%s\n' "$selected_version" "$xcode_line" | sort -V | tail -n 1)" == "$xcode_line" ]]; then
+            selected_version="$xcode_line"
+            selected_xcode="$xcode_app"
+          fi
+        fi
+      done
+      if [[ -z "$selected_xcode" ]]; then
+        echo "##vso[task.logissue type=error]No Xcode 26+ installation was found on the macOS 26 agent."
+        exit 1
+      fi
+      export DEVELOPER_DIR="$selected_xcode/Contents/Developer"
+      xcodebuild -version
+      simulator_udid="$(xcrun simctl list devices available -j | /usr/bin/ruby -rjson -e '
+        devices = JSON.parse(STDIN.read).fetch("devices").values.flatten
+        device = devices.find { |candidate| candidate["isAvailable"] && candidate["name"].start_with?("iPhone") }
+        abort "No available iPhone simulator was found." unless device
+        puts device.fetch("udid")
+      ')"
+      xcodebuild test \
+        -project BeyondBabyNames.xcodeproj \
+        -scheme BeyondBabyNames \
+        -destination "id=$simulator_udid" \
+        CODE_SIGNING_ALLOWED=NO
+      gem install bundler -v 2.7.2 --no-document
+      bundle _2.7.2_ config set path vendor/bundle
+      bundle _2.7.2_ install
+      bundle _2.7.2_ exec fastlane ios testflight
+    workingDirectory: $(projectDirectory)
+    env:
+      APP_STORE_CONNECT_API_KEY_PATH: $(appStoreConnectKey.secureFilePath)
+      APP_STORE_CONNECT_KEY_ID: $(APP_STORE_CONNECT_KEY_ID)
+      APP_STORE_CONNECT_ISSUER_ID: $(APP_STORE_CONNECT_ISSUER_ID)
+      BEYOND_BABY_NAMES_PROFILE_NAME: $(BEYOND_BABY_NAMES_PROFILE_NAME)
+      CI_BUILD_NUMBER: ${{ parameters.iosBuildNumber }}
+    displayName: Test, archive, and upload Beyond Baby Names to TestFlight
+
+  - task: PublishPipelineArtifact@1
+    condition: succeededOrFailed()
+    inputs:
+      targetPath: $(projectDirectory)/fastlane/build_logs
+      artifact: beyond-baby-names-build-logs
+      publishLocation: pipeline
+    displayName: Publish Xcode build logs

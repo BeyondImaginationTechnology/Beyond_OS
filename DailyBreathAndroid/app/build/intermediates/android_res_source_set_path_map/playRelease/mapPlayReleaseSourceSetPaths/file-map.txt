@@ -1,0 +1,11 @@
+technology.co.beyondimagination.dailybreath.app-play-0 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\build\generated\res\pngs\play\release
+technology.co.beyondimagination.dailybreath.app-updated_navigation_xml-1 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\build\generated\updated_navigation_xml\playRelease
+technology.co.beyondimagination.dailybreath.app-packagePlayReleaseResources-2 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\build\intermediates\incremental\playRelease\packagePlayReleaseResources\merged.dir
+technology.co.beyondimagination.dailybreath.app-packagePlayReleaseResources-3 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\build\intermediates\incremental\playRelease\packagePlayReleaseResources\stripped.dir
+technology.co.beyondimagination.dailybreath.app-play-4 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\build\intermediates\merged-not-compiled-resources\play\release
+technology.co.beyondimagination.dailybreath.app-playRelease-5 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\build\intermediates\merged_res\playRelease\mergePlayReleaseResources
+technology.co.beyondimagination.dailybreath.app-main-6 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\src\main\res
+technology.co.beyondimagination.dailybreath.app-play-7 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\src\play\res
+technology.co.beyondimagination.dailybreath.app-playRelease-8 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\src\playRelease\res
+technology.co.beyondimagination.dailybreath.app-release-9 C:\Users\fresh\OneDrive\Desktop\Beyond_OS\DailyBreathAndroid\app\src\release\res
+gradleHome-0 C:\Users\fresh\.gradle

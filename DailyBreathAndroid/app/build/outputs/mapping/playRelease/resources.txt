@@ -1,0 +1,3 @@
+drawable:ic_launcher:2130771968 reachable from AndroidManifest.xml
+style:AppTheme:2130903040 reachable from AndroidManifest.xml
+string:app_name:2130837504 is not reachable.

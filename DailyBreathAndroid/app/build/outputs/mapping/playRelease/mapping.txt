@@ -1,0 +1,371 @@
+# compiler: R8
+# compiler_version: 9.3.16
+# min_api: 26
+# common_typos_disable
+# {"id":"com.android.tools.r8.mapping","version":"2.2"}
+# pg_map_id: e67f8eadb3c572bd454d976aebda2185e123ac9059f28d5aefd2f962253d149f
+# pg_map_hash: SHA-256 e67f8eadb3c572bd454d976aebda2185e123ac9059f28d5aefd2f962253d149f
+technology.co.beyondimagination.dailybreath.MainActivity -> technology.co.beyondimagination.dailybreath.MainActivity:
+# {"id":"sourceFile","fileName":"MainActivity.java"}
+    java.util.Set TANAKH_CODES -> A
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Ljava/util/HashSet;"}
+    android.os.Handler handler -> a
+    java.util.List dailyVerses -> b
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Ljava/util/ArrayList;"}
+    java.util.List bible -> c
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Ljava/util/ArrayList;"}
+    java.util.List quran -> d
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Ljava/util/ArrayList;"}
+    java.lang.Runnable ticker -> e
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Ld;"}
+    java.util.Map englishNames -> f
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Ljava/util/HashMap;"}
+    java.util.Map tanakhNames -> g
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Ljava/util/HashMap;"}
+    android.content.SharedPreferences prefs -> h
+    android.widget.LinearLayout page -> i
+    android.widget.LinearLayout nav -> j
+    int tab -> k
+    int seconds -> l
+    boolean breathing -> m
+    boolean complete -> n
+    android.widget.TextView timerView -> o
+    android.widget.TextView phaseView -> p
+    android.widget.TextView weekView -> q
+    android.widget.Button breathButton -> r
+    technology.co.beyondimagination.dailybreath.MainActivity$Faith faith -> s
+      # {"id":"com.android.tools.r8.residualsignature","signature":"I"}
+    int INK -> t
+    int PURPLE -> u
+    int LILAC -> v
+    int CREAM -> w
+    int NIGHT -> x
+    int GOLD -> y
+    java.lang.String[] TABS -> z
+    1:3:void <clinit>():42:44 -> <clinit>
+    1:1:void <init>():41:41 -> <init>
+    2:6:void <init>():45:49 -> <init>
+    7:7:java.util.Map tanakhNames():161:161 -> <init>
+    7:7:void <init>():49 -> <init>
+    8:8:void <init>():49:49 -> <init>
+    9:9:void <init>():52:52 -> <init>
+    1:65:android.widget.Button action(java.lang.String):152:152 -> a
+    7:31:void addBody(java.lang.String):150:150 -> b
+    1:1:void addFaithPicker():87:87 -> c
+    2:2:technology.co.beyondimagination.dailybreath.MainActivity$Faith[] technology.co.beyondimagination.dailybreath.MainActivity$Faith.values():58:58 -> c
+    2:2:void addFaithPicker():88 -> c
+    3:4:void addFaithPicker():88:89 -> c
+    1:1:void addLesson(java.lang.String,java.lang.String,java.lang.String):115:115 -> d
+    1:21:java.io.BufferedReader assetReader(java.lang.String):137:137 -> e
+    1:1:java.lang.String bibleReference(java.lang.String,java.lang.String,java.lang.String,boolean):157:157 -> f
+    1:40:android.widget.LinearLayout card(int):153:153 -> g
+    1:1:java.util.List completionDays():128:128 -> h
+      # {"id":"com.android.tools.r8.residualsignature","signature":"()Ljava/util/ArrayList;"}
+    2:17:int dp(int):156:156 -> i
+    1:1:java.util.Map englishNames():160:160 -> j
+      # {"id":"com.android.tools.r8.residualsignature","signature":"()Ljava/util/HashMap;"}
+    1:1:android.widget.TextView label(java.lang.String,float,int,boolean):151:151 -> k
+    1:1:void openIntent(android.content.Intent):148:148 -> l
+    1:1:java.lang.String quranReference(java.lang.String,int,int):158:158 -> m
+    2:2:java.lang.String titleCase(java.lang.String):159:159 -> m
+    2:2:java.lang.String quranReference(java.lang.String,int,int):158 -> m
+    3:3:java.lang.String quranReference(java.lang.String,int,int):158:158 -> m
+    1:54:java.lang.String reflectionCopy(technology.co.beyondimagination.dailybreath.MainActivity$Reading):141:141 -> n
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Lh;)Ljava/lang/String;"}
+    1:1:void refreshBreathControls():124:124 -> o
+    2:2:java.lang.String format(int):156:156 -> o
+    2:2:void refreshBreathControls():124 -> o
+    3:3:void refreshBreathControls():124:124 -> o
+    4:4:java.lang.String phase():125:125 -> o
+    4:4:void refreshBreathControls():124 -> o
+    5:5:void refreshBreathControls():124:124 -> o
+    1:2:void onCreate(android.os.Bundle):65:66 -> onCreate
+    3:3:technology.co.beyondimagination.dailybreath.MainActivity$Faith readFaith():139:139 -> onCreate
+    3:3:void onCreate(android.os.Bundle):67 -> onCreate
+    4:4:technology.co.beyondimagination.dailybreath.MainActivity$Faith technology.co.beyondimagination.dailybreath.MainActivity$Faith.valueOf(java.lang.String):58:58 -> onCreate
+    4:4:technology.co.beyondimagination.dailybreath.MainActivity$Faith readFaith():139 -> onCreate
+    4:4:void onCreate(android.os.Bundle):67 -> onCreate
+    5:5:void onCreate(android.os.Bundle):67:67 -> onCreate
+    6:6:void loadDailyVerses():130:130 -> onCreate
+    6:6:void onCreate(android.os.Bundle):68 -> onCreate
+    7:7:java.lang.String readAsset(java.lang.String):138:138 -> onCreate
+    7:7:void loadDailyVerses():130 -> onCreate
+    7:7:void onCreate(android.os.Bundle):68 -> onCreate
+    8:8:void loadDailyVerses():130:130 -> onCreate
+    8:8:void onCreate(android.os.Bundle):68 -> onCreate
+    9:9:java.lang.String readAsset(java.lang.String):138:138 -> onCreate
+    9:9:void loadDailyVerses():130 -> onCreate
+    9:9:void onCreate(android.os.Bundle):68 -> onCreate
+    10:10:void loadLibraries():131:131 -> onCreate
+    10:10:void onCreate(android.os.Bundle):68 -> onCreate
+    11:11:int number(java.lang.String):156:156 -> onCreate
+    11:11:void loadLibraries():131 -> onCreate
+    11:11:void onCreate(android.os.Bundle):68 -> onCreate
+    12:12:void loadLibraries():131:131 -> onCreate
+    12:12:void onCreate(android.os.Bundle):68 -> onCreate
+    13:13:int number(java.lang.String):156:156 -> onCreate
+    13:13:void loadLibraries():131 -> onCreate
+    13:13:void onCreate(android.os.Bundle):68 -> onCreate
+    14:14:void loadLibraries():131:131 -> onCreate
+    14:14:void onCreate(android.os.Bundle):68 -> onCreate
+    15:15:int number(java.lang.String):156:156 -> onCreate
+    15:15:void loadLibraries():131 -> onCreate
+    15:15:void onCreate(android.os.Bundle):68 -> onCreate
+    16:16:void loadLibraries():131:131 -> onCreate
+    16:16:void onCreate(android.os.Bundle):68 -> onCreate
+    17:17:int number(java.lang.String):156:156 -> onCreate
+    17:17:void loadLibraries():131 -> onCreate
+    17:17:void onCreate(android.os.Bundle):68 -> onCreate
+    18:18:void loadLibraries():131:131 -> onCreate
+    18:18:void onCreate(android.os.Bundle):68 -> onCreate
+    19:24:void buildLayout():75:80 -> onCreate
+    19:24:void onCreate(android.os.Bundle):68 -> onCreate
+    25:25:void onCreate(android.os.Bundle):68:68 -> onCreate
+    1:1:void onDestroy():72:72 -> onDestroy
+    1:10:void onNewIntent(android.content.Intent):70:70 -> onNewIntent
+    1:1:void onPause():71:71 -> onPause
+    1:2:void renderResults(java.lang.String,android.widget.LinearLayout):105:106 -> p
+    3:3:java.util.List libraryFor(technology.co.beyondimagination.dailybreath.MainActivity$Faith):134:134 -> p
+    3:3:void renderResults(java.lang.String,android.widget.LinearLayout):106 -> p
+    4:5:void renderResults(java.lang.String,android.widget.LinearLayout):106:107 -> p
+    6:6:java.lang.String plural(java.lang.String):142:142 -> p
+    6:6:void renderResults(java.lang.String,android.widget.LinearLayout):107 -> p
+    7:7:void renderResults(java.lang.String,android.widget.LinearLayout):107:107 -> p
+    1:17:android.graphics.drawable.GradientDrawable round(int,int):154:154 -> q
+    1:1:void showDetail(java.lang.String,java.lang.String):147:147 -> r
+    1:1:void showTab(int):82:82 -> s
+    2:2:void renderNav():84:84 -> s
+    2:2:void showTab(int):82 -> s
+    3:3:void showTab(int):82:82 -> s
+    4:4:void showToday():93:93 -> s
+    4:4:void showTab(int):82 -> s
+    5:5:java.lang.String todayIntro():140:140 -> s
+    5:5:void showToday():93 -> s
+    5:5:void showTab(int):82 -> s
+    6:6:void showToday():93:93 -> s
+    6:6:void showTab(int):82 -> s
+    7:7:technology.co.beyondimagination.dailybreath.MainActivity$Reading readingOfTheDay():132:132 -> s
+    7:7:void showToday():93 -> s
+    7:7:void showTab(int):82 -> s
+    8:8:technology.co.beyondimagination.dailybreath.MainActivity$DailyVerse dailyVerseOfTheDay():133:133 -> s
+    8:8:technology.co.beyondimagination.dailybreath.MainActivity$Reading readingOfTheDay():132 -> s
+    8:8:void showToday():93 -> s
+    8:8:void showTab(int):82 -> s
+    9:9:int java.lang.Math.floorMod(long,int):0:0 -> s
+    9:9:technology.co.beyondimagination.dailybreath.MainActivity$DailyVerse dailyVerseOfTheDay():133 -> s
+    9:9:technology.co.beyondimagination.dailybreath.MainActivity$Reading readingOfTheDay():132 -> s
+    9:9:void showToday():93 -> s
+    9:9:void showTab(int):82 -> s
+    10:10:technology.co.beyondimagination.dailybreath.MainActivity$DailyVerse dailyVerseOfTheDay():133:133 -> s
+    10:10:technology.co.beyondimagination.dailybreath.MainActivity$Reading readingOfTheDay():132 -> s
+    10:10:void showToday():93 -> s
+    10:10:void showTab(int):82 -> s
+    11:11:technology.co.beyondimagination.dailybreath.MainActivity$Reading readingOfTheDay():132:132 -> s
+    11:11:void showToday():93 -> s
+    11:11:void showTab(int):82 -> s
+    12:12:int number(java.lang.String):156:156 -> s
+    12:12:technology.co.beyondimagination.dailybreath.MainActivity$Reading readingOfTheDay():132 -> s
+    12:12:void showToday():93 -> s
+    12:12:void showTab(int):82 -> s
+    13:13:technology.co.beyondimagination.dailybreath.MainActivity$Reading readingOfTheDay():132:132 -> s
+    13:13:void showToday():93 -> s
+    13:13:void showTab(int):82 -> s
+    14:14:int number(java.lang.String):156:156 -> s
+    14:14:technology.co.beyondimagination.dailybreath.MainActivity$Reading readingOfTheDay():132 -> s
+    14:14:void showToday():93 -> s
+    14:14:void showTab(int):82 -> s
+    15:15:technology.co.beyondimagination.dailybreath.MainActivity$ScriptureVerse findBible(java.lang.String,int,int):135:135 -> s
+    15:15:technology.co.beyondimagination.dailybreath.MainActivity$Reading readingOfTheDay():132 -> s
+    15:15:void showToday():93 -> s
+    15:15:void showTab(int):82 -> s
+    16:16:technology.co.beyondimagination.dailybreath.MainActivity$Reading readingOfTheDay():132:132 -> s
+    16:16:void showToday():93 -> s
+    16:16:void showTab(int):82 -> s
+    17:17:technology.co.beyondimagination.dailybreath.MainActivity$ScriptureVerse findQuran(int,int):136:136 -> s
+    17:17:technology.co.beyondimagination.dailybreath.MainActivity$Reading readingOfTheDay():132 -> s
+    17:17:void showToday():93 -> s
+    17:17:void showTab(int):82 -> s
+    18:18:technology.co.beyondimagination.dailybreath.MainActivity$Reading readingOfTheDay():132:132 -> s
+    18:18:void showToday():93 -> s
+    18:18:void showTab(int):82 -> s
+    19:22:void showToday():94:97 -> s
+    19:22:void showTab(int):82 -> s
+    23:25:void showScripture():100:102 -> s
+    23:25:void showTab(int):82 -> s
+    26:26:java.lang.String plural(java.lang.String):142:142 -> s
+    26:26:void showScripture():102 -> s
+    26:26:void showTab(int):82 -> s
+    27:27:void showScripture():102:102 -> s
+    27:27:void showTab(int):82 -> s
+    28:31:void showAcademy():110:113 -> s
+    28:31:void showTab(int):82 -> s
+    32:32:void showBreathe():117:117 -> s
+    32:32:void showTab(int):82 -> s
+    33:33:java.lang.String format(int):156:156 -> s
+    33:33:void showBreathe():117 -> s
+    33:33:void showTab(int):82 -> s
+    34:34:void showBreathe():117:117 -> s
+    34:34:void showTab(int):82 -> s
+    35:35:java.lang.String phase():125:125 -> s
+    35:35:void showBreathe():117 -> s
+    35:35:void showTab(int):82 -> s
+    36:36:void showBreathe():117:117 -> s
+    36:36:void showTab(int):82 -> s
+    37:37:void showJournal():118:118 -> s
+    37:37:void showTab(int):82 -> s
+    38:38:void renderJournal():121:121 -> s
+    38:38:void showJournal():118 -> s
+    38:38:void showTab(int):82 -> s
+    1:1:android.widget.LinearLayout$LayoutParams spaced():155:155 -> t
+    1:1:void title(java.lang.String,java.lang.String):149:149 -> u
+    1:1:int weeklyCount():127:127 -> v
+technology.co.beyondimagination.dailybreath.MainActivity$$ExternalSyntheticLambda0 -> a:
+# {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
+# {"id":"com.android.tools.r8.synthesized"}
+    int MainActivity$$ExternalSyntheticLambda0.$r8$classId -> a
+      # {"id":"com.android.tools.r8.synthesized"}
+    technology.co.beyondimagination.dailybreath.MainActivity technology.co.beyondimagination.dailybreath.MainActivity$$InternalSyntheticLambda$1$0caf43f50437b20c68c4c28dc4cd3ba8b56d4d69dab898d3e324c3687421b3dd$0.f$0 -> b
+      # {"id":"com.android.tools.r8.synthesized"}
+    java.lang.String technology.co.beyondimagination.dailybreath.MainActivity$$InternalSyntheticLambda$1$0caf43f50437b20c68c4c28dc4cd3ba8b56d4d69dab898d3e324c3687421b3dd$0.f$1 -> c
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Ljava/lang/Object;"}
+      # {"id":"com.android.tools.r8.synthesized"}
+    java.lang.String technology.co.beyondimagination.dailybreath.MainActivity$$InternalSyntheticLambda$1$0caf43f50437b20c68c4c28dc4cd3ba8b56d4d69dab898d3e324c3687421b3dd$0.f$2 -> d
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Ljava/lang/Object;"}
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:1:void MainActivity$$ExternalSyntheticLambda0.<init>(technology.co.beyondimagination.dailybreath.MainActivity,java.lang.Object,java.lang.Object,int):0:0 -> <init>
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:1:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$showScripture$0(android.widget.EditText,android.widget.LinearLayout,android.view.View):102:102 -> onClick
+    1:1:void MainActivity$$ExternalSyntheticLambda0.onClick(android.view.View):0 -> onClick
+      # {"id":"com.android.tools.r8.synthesized"}
+    2:2:void MainActivity$$ExternalSyntheticLambda0.onClick(android.view.View):0:0 -> onClick
+    3:3:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$showJournal$0(android.widget.EditText,android.widget.Spinner,android.view.View):118:118 -> onClick
+    3:3:void MainActivity$$ExternalSyntheticLambda0.onClick(android.view.View):0 -> onClick
+    4:4:void technology.co.beyondimagination.dailybreath.MainActivity.saveJournal(android.widget.EditText,java.lang.String):119:119 -> onClick
+    4:4:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$showJournal$0(android.widget.EditText,android.widget.Spinner,android.view.View):118 -> onClick
+    4:4:void MainActivity$$ExternalSyntheticLambda0.onClick(android.view.View):0 -> onClick
+    5:5:void MainActivity$$ExternalSyntheticLambda0.onClick(android.view.View):0:0 -> onClick
+    6:6:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$addLesson$0(java.lang.String,java.lang.String,android.view.View):115:115 -> onClick
+    6:6:void MainActivity$$ExternalSyntheticLambda0.onClick(android.view.View):0 -> onClick
+technology.co.beyondimagination.dailybreath.MainActivity$$ExternalSyntheticLambda1 -> d:
+# {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
+# {"id":"com.android.tools.r8.synthesized"}
+    technology.co.beyondimagination.dailybreath.MainActivity technology.co.beyondimagination.dailybreath.MainActivity$$InternalSyntheticLambda$1$12906034e00470aea3b1c95b8bd555e604beaaffa272ef44e03135a7e6f4883c$0.f$0 -> a
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:6:void MainActivity$$ExternalSyntheticLambda1.<init>(technology.co.beyondimagination.dailybreath.MainActivity):0:0 -> <init>
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:1:void technology.co.beyondimagination.dailybreath.MainActivity.tick():123:123 -> run
+    2:2:void technology.co.beyondimagination.dailybreath.MainActivity.recordCompletion():126:126 -> run
+    2:2:void technology.co.beyondimagination.dailybreath.MainActivity.tick():123 -> run
+    3:3:void technology.co.beyondimagination.dailybreath.MainActivity.tick():123:123 -> run
+technology.co.beyondimagination.dailybreath.MainActivity$$ExternalSyntheticLambda10 -> b:
+# {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
+# {"id":"com.android.tools.r8.synthesized"}
+    int MainActivity$$ExternalSyntheticLambda10.$r8$classId -> a
+      # {"id":"com.android.tools.r8.synthesized"}
+    technology.co.beyondimagination.dailybreath.MainActivity technology.co.beyondimagination.dailybreath.MainActivity$$InternalSyntheticLambda$1$c01062fdf30a5ac8d2a2b830e4b27933ff5df8eb51828914ebd4be61e4235bc6$0.f$0 -> b
+      # {"id":"com.android.tools.r8.synthesized"}
+    technology.co.beyondimagination.dailybreath.MainActivity$Faith technology.co.beyondimagination.dailybreath.MainActivity$$InternalSyntheticLambda$1$c01062fdf30a5ac8d2a2b830e4b27933ff5df8eb51828914ebd4be61e4235bc6$0.f$1 -> c
+      # {"id":"com.android.tools.r8.residualsignature","signature":"I"}
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:10:void MainActivity$$ExternalSyntheticLambda10.<init>(technology.co.beyondimagination.dailybreath.MainActivity,int,int):0:0 -> <init>
+      # {"id":"com.android.tools.r8.synthesized"}
+    12:15:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$renderNav$0(int,android.view.View):84:84 -> onClick
+    12:15:void MainActivity$$ExternalSyntheticLambda10.onClick(android.view.View):0 -> onClick
+      # {"id":"com.android.tools.r8.synthesized"}
+    16:17:void MainActivity$$ExternalSyntheticLambda10.onClick(android.view.View):0:0 -> onClick
+    18:46:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$addFaithPicker$0(technology.co.beyondimagination.dailybreath.MainActivity$Faith,android.view.View):88:88 -> onClick
+    18:46:void MainActivity$$ExternalSyntheticLambda10.onClick(android.view.View):0 -> onClick
+technology.co.beyondimagination.dailybreath.MainActivity$$ExternalSyntheticLambda12 -> c:
+# {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
+# {"id":"com.android.tools.r8.synthesized"}
+    int MainActivity$$ExternalSyntheticLambda12.$r8$classId -> a
+      # {"id":"com.android.tools.r8.synthesized"}
+    technology.co.beyondimagination.dailybreath.MainActivity technology.co.beyondimagination.dailybreath.MainActivity$$InternalSyntheticLambda$2$22b7935ba842eeb4449354921b7e15d86f0b0ba7b9d0a6f976c2b04d150587f0$0.f$0 -> b
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:8:void MainActivity$$ExternalSyntheticLambda12.<init>(technology.co.beyondimagination.dailybreath.MainActivity,int):0:0 -> <init>
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:1:void technology.co.beyondimagination.dailybreath.MainActivity.toggleBreathing():122:122 -> onClick
+    1:1:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$showBreathe$0(android.view.View):117 -> onClick
+    1:1:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0 -> onClick
+      # {"id":"com.android.tools.r8.synthesized"}
+    2:2:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0:0 -> onClick
+    3:3:void technology.co.beyondimagination.dailybreath.MainActivity.showPrivacy():145:145 -> onClick
+    3:3:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$showJournal$2(android.view.View):118 -> onClick
+    3:3:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0 -> onClick
+    4:4:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0:0 -> onClick
+    5:5:void technology.co.beyondimagination.dailybreath.MainActivity.shareJournal():120:120 -> onClick
+    5:5:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$showJournal$1(android.view.View):118 -> onClick
+    5:5:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0 -> onClick
+    6:6:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0:0 -> onClick
+    7:7:void technology.co.beyondimagination.dailybreath.MainActivity.showSources():144:144 -> onClick
+    7:7:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$showToday$2(android.view.View):97 -> onClick
+    7:7:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0 -> onClick
+    8:8:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0:0 -> onClick
+    9:9:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$showToday$1(android.view.View):96:96 -> onClick
+    9:9:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0 -> onClick
+    10:10:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0:0 -> onClick
+    11:11:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$showSources$0(android.view.View):144:144 -> onClick
+    11:11:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0 -> onClick
+    12:12:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0:0 -> onClick
+    13:13:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$showPrivacy$1(android.view.View):145:145 -> onClick
+    13:13:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0 -> onClick
+    14:14:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0:0 -> onClick
+    15:15:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$showPrivacy$0(android.view.View):145:145 -> onClick
+    15:15:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0 -> onClick
+    16:16:void technology.co.beyondimagination.dailybreath.MainActivity.openUrl(java.lang.String):146:146 -> onClick
+    16:16:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$showPrivacy$0(android.view.View):145 -> onClick
+    16:16:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0 -> onClick
+    17:17:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0:0 -> onClick
+    18:18:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$showDetail$0(android.view.View):147:147 -> onClick
+    18:18:void MainActivity$$ExternalSyntheticLambda12.onClick(android.view.View):0 -> onClick
+technology.co.beyondimagination.dailybreath.MainActivity$$ExternalSyntheticLambda2 -> e:
+# {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
+# {"id":"com.android.tools.r8.synthesized"}
+    technology.co.beyondimagination.dailybreath.MainActivity technology.co.beyondimagination.dailybreath.MainActivity$$InternalSyntheticLambda$1$339271244e1d51531ccfb1bea1fe7614ab3b1144de869dbc1a23f48a66ba9a55$0.f$0 -> a
+      # {"id":"com.android.tools.r8.synthesized"}
+    technology.co.beyondimagination.dailybreath.MainActivity$Reading technology.co.beyondimagination.dailybreath.MainActivity$$InternalSyntheticLambda$1$339271244e1d51531ccfb1bea1fe7614ab3b1144de869dbc1a23f48a66ba9a55$0.f$1 -> b
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Lh;"}
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:8:void MainActivity$$ExternalSyntheticLambda2.<init>(technology.co.beyondimagination.dailybreath.MainActivity,MainActivity$Reading):0:0 -> <init>
+      # {"id":"com.android.tools.r8.synthesized"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Ltechnology/co/beyondimagination/dailybreath/MainActivity;Lh;)V"}
+    3:20:void technology.co.beyondimagination.dailybreath.MainActivity.lambda$showToday$0(technology.co.beyondimagination.dailybreath.MainActivity$Reading,android.view.View):95:95 -> onClick
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Landroid/view/View;)V"}
+technology.co.beyondimagination.dailybreath.MainActivity$DailyVerse -> f:
+# {"id":"sourceFile","fileName":"MainActivity.java"}
+    java.lang.String text -> a
+    java.lang.String reference -> b
+    java.lang.String date -> c
+    1:10:void <init>(java.lang.String,java.lang.String,java.lang.String):162:162 -> <init>
+technology.co.beyondimagination.dailybreath.MainActivity$Faith -> R8$$REMOVED$$CLASS$$0:
+# {"id":"sourceFile","fileName":"MainActivity.java"}
+technology.co.beyondimagination.dailybreath.MainActivity$Faith$EnumUnboxingSharedUtility -> g:
+# {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
+# {"id":"com.android.tools.r8.synthesized"}
+    int[] $VALUES -> a
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:1:void MainActivity$Faith$EnumUnboxingSharedUtility.<clinit>():0:0 -> <clinit>
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:20:java.lang.String MainActivity$Faith$EnumUnboxingSharedUtility.getDailyLabel(int):0:0 -> a
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:20:java.lang.String MainActivity$Faith$EnumUnboxingSharedUtility.getTitle(int):0:0 -> b
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:20:java.lang.String MainActivity$Faith$EnumUnboxingSharedUtility.getUnit(int):0:0 -> c
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:20:java.lang.String MainActivity$Faith$EnumUnboxingSharedUtility.name(int):0:0 -> d
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:52:int MainActivity$Faith$EnumUnboxingSharedUtility.valueOf(java.lang.String):0:0 -> e
+      # {"id":"com.android.tools.r8.synthesized"}
+technology.co.beyondimagination.dailybreath.MainActivity$Reading -> h:
+# {"id":"sourceFile","fileName":"MainActivity.java"}
+    java.lang.String text -> a
+    java.lang.String reference -> b
+    1:8:void <init>(java.lang.String,java.lang.String):164:164 -> <init>
+technology.co.beyondimagination.dailybreath.MainActivity$ScriptureVerse -> i:
+# {"id":"sourceFile","fileName":"MainActivity.java"}
+    java.lang.String code -> a
+    java.lang.String text -> b
+    java.lang.String reference -> c
+    int chapter -> d
+    int number -> e
+    1:1:void <init>(java.lang.String,int,int,java.lang.String,java.lang.String):163:163 -> <init>

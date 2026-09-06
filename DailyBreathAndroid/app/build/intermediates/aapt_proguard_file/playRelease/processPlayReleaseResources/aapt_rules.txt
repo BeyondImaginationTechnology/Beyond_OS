@@ -1,0 +1,1 @@
+-keep class technology.co.beyondimagination.dailybreath.MainActivity { <init>(); }

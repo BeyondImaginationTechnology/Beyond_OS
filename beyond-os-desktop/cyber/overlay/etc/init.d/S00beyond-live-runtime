@@ -1,0 +1,16 @@
+#!/bin/sh
+# A Try Home ISO mounts its root filesystem read-only. Give services and the
+# unprivileged desktop account ephemeral writable locations without changing
+# the installed-system path.
+case "$(awk '$2 == "/" { print $4 }' /proc/mounts)" in
+  *ro*)
+    cp -a /home /run/beyond-cyber-seed
+    mount -t tmpfs -o mode=0755 tmpfs /var
+    install -d -m 0755 /var/cache /var/lib /var/log
+    install -d -m 1777 /var/tmp
+    ln -s /run /var/run
+    ln -s /run/lock /var/lock
+    mount -t tmpfs -o mode=0755 tmpfs /home
+    cp -a /run/beyond-cyber-seed/. /home/
+    ;;
+esac

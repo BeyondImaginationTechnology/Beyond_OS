@@ -1,5 +1,5 @@
 #!/bin/sh
-# BIT OS Home installer. Installs to a selected partition or a selected whole disk.
+# BIT OS Cyber installer. Installs to a selected partition or a selected whole disk.
 set -eu
 
 efi_guid=c12a7328-f81f-11d2-ba4b-00a0c93ec93b
@@ -20,7 +20,7 @@ case "$source_root" in
   /dev/sr*)
     source_kind=iso
     source_disk=
-    # ISO installs copy the live filesystem into a newly formatted Home root.
+    # ISO installs copy the live filesystem into a newly formatted Cyber root.
     source_bytes=$((2 * 1024 * 1024 * 1024))
     ;;
   *)
@@ -31,20 +31,20 @@ case "$source_root" in
     ;;
 esac
 
-notice "BIT OS Home Edition 1.0 installer"
-notice "Choose where Home will be installed. The installer never chooses a disk automatically."
+notice "BIT OS Cyber Edition 1.0 installer"
+notice "Choose where Cyber will be installed. The installer never chooses a disk automatically."
 notice "\nAvailable block devices:"
 lsblk -o NAME,SIZE,TYPE,FSTYPE,PARTTYPE,MODEL,MOUNTPOINTS
 notice "\nInstallation choices:"
 notice "  1) Use an existing Linux partition (keeps Windows and other partitions)"
-notice "  2) Erase a whole non-USB disk for BIT OS Home"
+notice "  2) Erase a whole non-USB disk for BIT OS Cyber"
 printf 'Choose 1 or 2: '
 IFS= read -r mode
 
 target_esp_new=false
 case "$mode" in
   1)
-    notice "\nSelect an empty Linux partition. It must be at least as large as the Home image."
+    notice "\nSelect an empty Linux partition. It must be at least as large as the Cyber image."
     printf 'Target Linux partition (example: /dev/nvme0n1p5): '
     IFS= read -r target_root
     [ -b "$target_root" ] || fail "target is not a block device"
@@ -53,7 +53,7 @@ case "$mode" in
     target_disk=$(partition_disk "$target_root")
     [ "$source_kind" = iso ] || [ "$target_disk" != "$source_disk" ] || fail "the installer USB disk cannot be the install target"
     unmounted "$target_root" || fail "target partition is mounted"
-    [ "$(blockdev --getsize64 "$target_root")" -ge "$source_bytes" ] || fail "target partition is smaller than the Home image"
+    [ "$(blockdev --getsize64 "$target_root")" -ge "$source_bytes" ] || fail "target partition is smaller than the Cyber image"
 
     printf 'EFI System Partition on %s (example: /dev/nvme0n1p1): ' "$target_disk"
     IFS= read -r target_esp
@@ -64,7 +64,7 @@ case "$mode" in
     [ "$esp_type" = "$efi_guid" ] || fail "chosen partition is not an EFI System Partition"
     unmounted "$target_esp" || fail "EFI System Partition is mounted"
 
-    notice "\nThe next step replaces only $target_root and adds a BIT OS Home UEFI entry."
+    notice "\nThe next step replaces only $target_root and adds a BIT OS Cyber UEFI entry."
     notice "It does not format $target_esp or replace Windows Boot Manager."
     printf 'Type exactly: INSTALL %s\n> ' "$target_root"
     IFS= read -r confirmation
@@ -77,7 +77,7 @@ case "$mode" in
     [ -b "$target_disk" ] || fail "target is not a block device"
     [ "$(partition_type "$target_disk")" = disk ] || fail "choose a whole disk for this installation mode"
     [ "$source_kind" = iso ] || [ "$target_disk" != "$source_disk" ] || fail "the installer USB disk cannot be erased"
-    [ "$(blockdev --getsize64 "$target_disk")" -gt "$source_bytes" ] || fail "disk is too small for Home"
+    [ "$(blockdev --getsize64 "$target_disk")" -gt "$source_bytes" ] || fail "disk is too small for Cyber"
     for device in $(lsblk -nrpo NAME,TYPE "$target_disk" | awk '$2 == "part" { print $1 }'); do
       unmounted "$device" || fail "refusing to erase mounted partition $device"
     done
@@ -85,7 +85,7 @@ case "$mode" in
     IFS= read -r confirmation
     [ "$confirmation" = "ERASE $target_disk" ] || fail "confirmation did not match"
 
-    notice "Creating the BIT OS Home partition layout..."
+    notice "Creating the BIT OS Cyber partition layout..."
     wipefs -a "$target_disk"
     printf 'label: gpt\n,512M,U\n,,L\n' | sfdisk --wipe always --wipe-partitions always "$target_disk"
     blockdev --rereadpt "$target_disk" || true
@@ -93,21 +93,21 @@ case "$mode" in
     sleep 2
     target_esp=$(lsblk -nrpo NAME,PARTTYPE "$target_disk" | awk -v type="$efi_guid" 'tolower($2) == type { print $1; exit }')
     target_root=$(lsblk -nrpo NAME,PARTTYPE "$target_disk" | awk -v type="$linux_guid" 'tolower($2) == type { print $1; exit }')
-    [ -b "$target_esp" ] && [ -b "$target_root" ] || fail "could not create the Home partition layout"
-    [ "$(blockdev --getsize64 "$target_root")" -ge "$source_bytes" ] || fail "new Home partition is smaller than the Home image"
+    [ -b "$target_esp" ] && [ -b "$target_root" ] || fail "could not create the Cyber partition layout"
+    [ "$(blockdev --getsize64 "$target_root")" -ge "$source_bytes" ] || fail "new Cyber partition is smaller than the Cyber image"
     target_esp_new=true
     ;;
   *) fail "choose 1 or 2" ;;
 esac
 
-notice "Making the installer root read-only and copying the Home filesystem..."
+notice "Making the installer root read-only and copying the Cyber filesystem..."
 mount -o remount,ro / || fail "could not protect the source filesystem"
 if [ "$source_kind" = usb ]; then
   dd if="$source_root" of="$target_root" bs=16M conv=fsync status=progress
   e2fsck -pf "$target_root" || [ "$?" -eq 1 ] || fail "filesystem check failed"
   resize2fs "$target_root"
 else
-  mkfs.ext4 -F -L BEYOND_HOME "$target_root"
+  mkfs.ext4 -F -L BEYOND_CYBER "$target_root"
   install -d /mnt/bit-target-root
   mount "$target_root" /mnt/bit-target-root
   tar -C / --one-file-system --exclude=./dev --exclude=./proc --exclude=./sys \
@@ -137,11 +137,11 @@ if [ "$source_kind" = usb ]; then
 else
   mcopy -o -i /boot/fat.efi ::EFI/BOOT/bootx64.efi /mnt/bit-target-esp/EFI/BITOS/bootx64.efi
 fi
-sed "s/%PARTUUID%/$target_uuid/g" /usr/share/beyond-home/grub.cfg.in > /mnt/bit-target-esp/EFI/BITOS/grub.cfg
+sed "s/%PARTUUID%/$target_uuid/g" /usr/share/beyond-cyber/grub.cfg.in > /mnt/bit-target-esp/EFI/BITOS/grub.cfg
 sync
 umount /mnt/bit-target-esp
 
 esp_number=$(lsblk -n -o PARTN "$target_esp")
-efibootmgr -c -d "$target_disk" -p "$esp_number" -L "BIT OS Home" -l '\\EFI\\BITOS\\bootx64.efi'
-notice "Installation completed. Remove the USB and choose BIT OS Home from UEFI boot options."
+efibootmgr -c -d "$target_disk" -p "$esp_number" -L "BIT OS Cyber" -l '\\EFI\\BITOS\\bootx64.efi'
+notice "Installation completed. Remove the USB and choose BIT OS Cyber from UEFI boot options."
 exec /sbin/reboot -f

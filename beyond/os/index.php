@@ -11,7 +11,7 @@ $returnTo = $osOrigin !== '' ? $osOrigin . '/' : '/beyond/os/';
 $platformOrigin = 'https://beyondimagination.co.technology';
 
 if ($isDedicatedOsHost) {
-    $downloads = $osOrigin . '/downloads/';
+    $downloads = $osOrigin . '/downloads/cyber/1.0/';
     ?>
     <!doctype html>
     <html lang="en">
@@ -19,57 +19,57 @@ if ($isDedicatedOsHost) {
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#080d19">
-        <meta name="description" content="Beyond OS Beta — a focused Linux desktop and companion ecosystem for builders.">
-        <title>Beyond OS Beta</title>
+        <meta name="description" content="BIT OS Cyber 1.0 — a defensive Linux desktop for focused, authorized security work.">
+        <title>BIT OS Cyber 1.0</title>
         <link rel="stylesheet" href="assets/landing.css?v=1.0.0-beta.1">
     </head>
     <body>
         <header class="site-header">
-            <a class="brand" href="/" aria-label="Beyond OS home"><span class="brand-mark">B</span><span><strong>Beyond OS</strong><small>Beta</small></span></a>
+            <a class="brand" href="/" aria-label="Beyond OS home"><span class="brand-mark">B</span><span><strong>BIT OS</strong><small>Cyber 1.0</small></span></a>
             <nav aria-label="Primary navigation">
                 <a href="#downloads">Downloads</a>
                 <a href="#guides">Guides</a>
                 <a href="#companion">Companion</a>
-                <a class="header-button" href="#downloads">Get the Beta <span>↗</span></a>
+                <a class="header-button" href="#downloads">Get BIT OS <span>↗</span></a>
             </nav>
         </header>
 
         <main>
             <section class="hero">
                 <div class="hero-copy">
-                    <p class="eyebrow"><span class="pulse"></span> Beyond OS Beta · Release 0.1</p>
-                    <h1>A calm, capable desktop for curious builders.</h1>
-                    <p class="lede">A Linux security-developer flavor with a focused desktop, practical tools, and a companion ecosystem that keeps your work in reach.</p>
+                    <p class="eyebrow"><span class="pulse"></span> BIT OS Cyber · Release 1.0 Candidate</p>
+                    <h1>A focused defensive desktop for authorized security work.</h1>
+                    <p class="lede">An independent Linux system built with a minimal toolchain, a practical desktop, and a defensive network baseline.</p>
                     <div class="hero-actions"><a class="primary-button" href="#downloads">Explore downloads <span>↓</span></a><a class="text-link" href="#guides">Read the install guide <span>→</span></a></div>
                     <div class="trust-row"><span>Open source foundations</span><span>SHA-256 verified</span><span>Built for authorized testing</span></div>
                 </div>
                 <div class="hero-panel" aria-label="Beyond OS desktop preview">
-                    <div class="panel-top"><span class="window-dots"><i></i><i></i><i></i></span><span>BEYOND / TERMINAL</span><span class="panel-status">● ONLINE</span></div>
-                    <div class="terminal"><p><span class="muted">beyond@desktop</span><b>:</b><span class="path">~</span><b>$</b> beyond doctor</p><p class="success">✓ desktop environment ready</p><p class="success">✓ developer toolchain available</p><p class="success">✓ security lab isolated</p><p><span class="muted">Next:</span> build something that matters.</p></div>
-                    <div class="panel-footer"><span>XFCE / WAYLAND</span><span>BEYOND OS 0.1.0-BETA</span></div>
+                    <div class="panel-top"><span class="window-dots"><i></i><i></i><i></i></span><span>BIT OS / TERMINAL</span><span class="panel-status">● ONLINE</span></div>
+                    <div class="terminal"><p><span class="muted">bit@cyber</span><b>:</b><span class="path">~</span><b>$</b> beyond-cyber doctor</p><p class="success">✓ desktop environment ready</p><p class="success">✓ defensive network baseline active</p><p class="success">✓ evidence workspace prepared</p><p><span class="muted">Next:</span> build something that matters.</p></div>
+                    <div class="panel-footer"><span>XFCE / X11</span><span>BIT OS CYBER 1.0</span></div>
                 </div>
             </section>
 
             <section class="section" id="downloads">
-                <div class="section-heading"><div><p class="eyebrow">Choose your starting point</p><h2>Download Beyond OS Beta</h2></div><a class="subtle-link" href="<?= htmlspecialchars($downloads . 'SHA256SUMS', ENT_QUOTES, 'UTF-8') ?>">SHA-256 checksums ↗</a></div>
+                <div class="section-heading"><div><p class="eyebrow">Choose your starting point</p><h2>Download BIT OS Cyber 1.0</h2></div><a class="subtle-link" href="<?= htmlspecialchars($downloads . 'SHA256SUMS', ENT_QUOTES, 'UTF-8') ?>">SHA-256 checksums ↗</a></div>
                 <div class="download-grid">
-                    <article class="download-card featured"><div class="card-icon">◈</div><div class="card-meta"><span class="tag">Recommended</span><span>AMD64 · 2.4 GB</span></div><h3>Bootable ISO</h3><p>Install on bare metal or boot it from a USB drive to explore the full desktop.</p><a href="<?= htmlspecialchars($downloads . 'beyond-os-beta-amd64.iso', ENT_QUOTES, 'UTF-8') ?>">Download ISO <span>↓</span></a></article>
-                    <article class="download-card"><div class="card-icon">▣</div><div class="card-meta"><span class="tag">Virtual machine</span><span>QCOW2 · 3.1 GB</span></div><h3>VM image</h3><p>Launch in QEMU, UTM, or another compatible hypervisor with cloud-init-ready defaults.</p><a href="<?= htmlspecialchars($downloads . 'beyond-os-beta-amd64.qcow2', ENT_QUOTES, 'UTF-8') ?>">Download VM image <span>↓</span></a></article>
-                    <article class="download-card"><div class="card-icon">▤</div><div class="card-meta"><span class="tag">Preview</span><span>Pixel 8 Pro · husky</span></div><h3>Android ROM</h3><p>Beyond OS Beta for Pixel 8 Pro, with recovery notes and verified boot instructions.</p><a href="<?= htmlspecialchars($downloads . 'android/pixel-8-pro/', ENT_QUOTES, 'UTF-8') ?>">View Pixel 8 Pro build <span>→</span></a></article>
+                    <article class="download-card featured"><div class="card-icon">◈</div><div class="card-meta"><span class="tag">Recommended</span><span>AMD64 · 84 MB</span></div><h3>Bootable ISO</h3><p>Boot the installer from a USB drive, firmware menu, or a virtual machine.</p><a href="<?= htmlspecialchars($downloads . 'bitCyberos.iso', ENT_QUOTES, 'UTF-8') ?>">Download ISO <span>↓</span></a></article>
+                    <article class="download-card"><div class="card-icon">▣</div><div class="card-meta"><span class="tag">Direct USB</span><span>GPT image · 2.1 GB</span></div><h3>USB Installer Image</h3><p>Write this verified GPT image directly to a USB drive with a compatible imaging tool.</p><a href="<?= htmlspecialchars($downloads . 'bit-os-cyber-1.0-installer.img', ENT_QUOTES, 'UTF-8') ?>">Download USB Installer Image <span>↓</span></a></article>
+                    <article class="download-card"><div class="card-icon">▤</div><div class="card-meta"><span class="tag">Windows companion</span><span>Coming next</span></div><h3>Windows Installer</h3><p>Guided USB creation and install preparation for Windows systems. The signed executable is in development.</p><a href="<?= htmlspecialchars('#guides', ENT_QUOTES, 'UTF-8') ?>">Read install guide <span>→</span></a></article>
                 </div>
             </section>
 
             <section class="split-section" id="companion">
                 <div><p class="eyebrow">One ecosystem, wherever you are</p><h2>Keep your work close.</h2><p>Use the desktop as your focused base, then reach your systems from the Beyond OS companion apps for iPhone, iPad, and macOS.</p><a class="text-link" href="<?= htmlspecialchars($downloads . 'companion/', ENT_QUOTES, 'UTF-8') ?>">Get companion apps <span>→</span></a></div>
-                <div class="platform-list"><div><strong>Linux Desktop</strong><span>ISO and VM images</span><b>Available now</b></div><div><strong>Pixel 8 Pro</strong><span>Android ROM preview</span><b>In progress</b></div><div><strong>iOS · macOS</strong><span>Secure companion</span><b>In progress</b></div></div>
+                <div class="platform-list"><div><strong>Linux Desktop</strong><span>ISO and USB Installer Images</span><b>Available now</b></div><div><strong>Windows Installer</strong><span>Guided USB creation</span><b>In progress</b></div><div><strong>iOS · macOS</strong><span>Secure companion</span><b>In progress</b></div></div>
             </section>
 
             <section class="section guide-section" id="guides">
                 <div class="section-heading"><div><p class="eyebrow">Start safely</p><h2>Release notes and guides</h2></div></div>
-                <div class="guide-grid"><a href="/docs/releases/beyond-os-beta.md"><span>01</span><strong>What’s in Beta</strong><small>Release notes and known issues →</small></a><a href="/docs/guides/install-iso.md"><span>02</span><strong>Install from ISO</strong><small>USB and bare-metal setup →</small></a><a href="/docs/guides/run-vm.md"><span>03</span><strong>Run the VM</strong><small>QEMU, UTM, and checksums →</small></a></div>
+                <div class="guide-grid"><a href="#downloads"><span>01</span><strong>Cyber 1.0 Candidate</strong><small>Release details and checksums →</small></a><a href="#downloads"><span>02</span><strong>Install from ISO</strong><small>USB, dual-boot, and bare-metal setup →</small></a><a href="#downloads"><span>03</span><strong>Write the USB image</strong><small>Direct USB installation image →</small></a></div>
             </section>
         </main>
-        <footer><span>© <?= date('Y') ?> Beyond Imagination Technology</span><span>Beyond OS Beta · Use security tools only on systems you own or are authorized to test.</span></footer>
+        <footer><span>© <?= date('Y') ?> Beyond Imagination Technology</span><span>BIT OS Cyber 1.0 Candidate · Use only on systems you own or are authorized to test.</span></footer>
     </body>
     </html>
     <?php

@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+case "${1:-}" in
+  start)
+    if grep -qw 'bit.install=1' /proc/cmdline; then
+      exec /usr/bin/bit-install-cyber </dev/tty1 >/dev/tty1 2>&1
+    fi
+    # X uses a private cookie and has no TCP listener.
+    umask 077
+    install -d -m 0700 -o home -g home /home/home
+    install -d -m 0755 -o home -g home /home/home/Documents
+    chown -R home:home /home/home
+    export XAUTHORITY=/home/home/.Xauthority
+    touch "$XAUTHORITY"
+    xauth -f "$XAUTHORITY" add :0 . "$(mcookie)"
+    chown home:home "$XAUTHORITY"
+    start-stop-daemon -S -b -m -p /run/beyond-cyber.pid \
+      -x /usr/bin/xinit -- /usr/bin/beyond-session -- /usr/bin/Xorg :0 vt1 \
+      -nolisten tcp -auth "$XAUTHORITY" >> /var/log/beyond-cyber.log 2>&1
+    ;;
+  stop)
+    start-stop-daemon -K -p /run/beyond-cyber.pid || true
+    rm -f /run/beyond-cyber.pid
+    ;;
+  restart) "$0" stop; "$0" start ;;
+  *) echo "Usage: $0 {start|stop|restart}" >&2; exit 1 ;;
+esac

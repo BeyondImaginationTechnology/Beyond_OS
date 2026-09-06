@@ -1,0 +1,7 @@
+config BR2_PACKAGE_BEYOND_CYBER
+	bool "BIT OS Cyber desktop"
+	depends on BR2_PACKAGE_SDL2
+	depends on BR2_PACKAGE_SDL2_TTF
+	depends on BR2_PACKAGE_SDL2_X11
+	help
+	  Native Cyber shell and framebuffer startup screen for BIT OS.

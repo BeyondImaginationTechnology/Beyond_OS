@@ -2,7 +2,6 @@ import SwiftUI
 
 struct TodayView: View {
     @EnvironmentObject private var store: DailyBreathStore
-    @EnvironmentObject private var beyondIDSession: DailyBreathBeyondIDSession
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
     @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
@@ -11,7 +10,6 @@ struct TodayView: View {
     @AppStorage("dailyReminderEnabled") private var reminderEnabled = false
     @AppStorage("dailyReminderHour") private var reminderHour = 8
     @AppStorage("dailyReminderMinute") private var reminderMinute = 0
-    @State private var showsAccountSheet = false
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -63,26 +61,9 @@ struct TodayView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 16) {
-                    Button {
-                        showsAccountSheet = true
-                    } label: {
-                        Label(
-                            beyondIDSession.account == nil ? "Account" : "Beyond ID account",
-                            systemImage: beyondIDSession.account == nil ? "person.crop.circle" : "person.crop.circle.fill"
-                        )
-                    }
-                    .accessibilityHint("Opens Account and Sync")
-
-                    NavigationLink { SettingsAboutView() } label: {
-                        Label("Settings", systemImage: "gearshape.fill")
-                    }
+                NavigationLink { SettingsAboutView() } label: {
+                    Label("Settings", systemImage: "gearshape.fill")
                 }
-            }
-        }
-        .sheet(isPresented: $showsAccountSheet) {
-            NavigationStack {
-                AccountSyncView()
             }
         }
         .refreshable { await store.refreshToday() }

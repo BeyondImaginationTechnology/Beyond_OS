@@ -10,6 +10,10 @@ parameters:
     displayName: iOS build number
     type: string
     default: '18'
+  - name: smtpSmokeTest
+    displayName: Send SMTP smoke-test email
+    type: boolean
+    default: false
 
 pool:
   # App Store Connect now requires Xcode 26+; macOS 26 is the hosted image
@@ -24,6 +28,26 @@ variables:
 steps:
   - checkout: self
     clean: true
+
+  - bash: |
+      set -euo pipefail
+      python3 ci_scripts/send_smtp_smoke_test.py
+    workingDirectory: $(projectDirectory)
+    condition: and(succeeded(), eq('${{ parameters.smtpSmokeTest }}', 'true'))
+    env:
+      SMTP_HOST: $(SMTP_HOST)
+      SMTP_SERVER: $(SMTP_SERVER)
+      SMTP_PORT: $(SMTP_PORT)
+      SMTP_SECURITY: $(SMTP_SECURITY)
+      SMTP_USE_SSL: $(SMTP_USE_SSL)
+      SMTP_USERNAME: $(SMTP_USERNAME)
+      SMTP_USER: $(SMTP_USER)
+      SMTP_PASSWORD: $(SMTP_PASSWORD)
+      SMTP_PASS: $(SMTP_PASS)
+      SMTP_FROM: $(SMTP_FROM)
+      SMTP_TO: $(SMTP_TO)
+      SCREENSHOT_EMAIL_TO: admin@beyondimagination.co.technology
+    displayName: Send SMTP delivery smoke test
 
   - task: DownloadSecureFile@1
     name: appStoreConnectKey

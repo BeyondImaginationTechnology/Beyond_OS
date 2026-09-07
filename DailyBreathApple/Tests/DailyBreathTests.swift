@@ -318,6 +318,17 @@ final class DailyBreathTests: XCTestCase {
         XCTAssertFalse(muslim.steps.contains { $0.localizedCaseInsensitiveContains("prayer") })
     }
 
+    func testWeeklyChallengeTakesPrecedenceOverOverlappingBonus() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let date = DateComponents(calendar: calendar, year: 2026, month: 9, day: 9, hour: 12).date!
+
+        let challenge = RecoveryContent.challengeOfTheDay(for: date)
+
+        XCTAssertEqual(challenge?.id, "challenge-05")
+        XCTAssertEqual(challenge?.scheduleType, "weekly")
+    }
+
     func testReviewDateUsesScheduledVerseInsteadOfHardcodedFallback() {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!

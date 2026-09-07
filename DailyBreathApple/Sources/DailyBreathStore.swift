@@ -422,7 +422,8 @@ final class DailyBreathStore: ObservableObject {
         return InterfaithDailyContent.devotional(
             for: tradition,
             base: baseDevotional,
-            verse: dailyVerse(for: tradition, date: date)
+            verse: dailyVerse(for: tradition, date: date),
+            date: date
         )
     }
 

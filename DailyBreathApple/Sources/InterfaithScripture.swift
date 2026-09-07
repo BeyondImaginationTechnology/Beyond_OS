@@ -544,12 +544,14 @@ struct SacredTextLibrary: Equatable, Sendable {
 }
 
 enum InterfaithDailyContent {
-    private static let torahCourage = ["DEU-31-6", "JOS-1-9", "PSA-27-14", "PSA-31-24", "ISA-41-10"]
-    private static let torahPeace = ["PSA-4-8", "PSA-23-4", "ISA-26-3", "PRO-3-5", "PSA-46-10"]
-    private static let torahRecovery = ["PSA-40-1", "PSA-107-14", "ISA-43-2", "PRO-24-16", "PSA-118-5"]
-    private static let quranCourage = ["Q003-3-200", "Q002-2-286", "Q009-9-40", "Q094-94-5", "Q065-65-3"]
-    private static let quranPeace = ["Q013-13-28", "Q002-2-153", "Q039-39-23", "Q089-89-27", "Q048-48-4"]
-    private static let quranRecovery = ["Q039-39-53", "Q012-12-87", "Q003-3-139", "Q005-5-90", "Q094-94-6"]
+    // Ten choices per theme give each tradition a substantially longer daily
+    // cycle while keeping every reference in the bundled Scripture editions.
+    private static let torahCourage = ["DEU-31-6", "JOS-1-9", "PSA-27-14", "PSA-31-24", "ISA-41-10", "DEU-20-4", "PSA-56-3", "ISA-40-31", "PSA-121-1", "PSA-138-3"]
+    private static let torahPeace = ["PSA-4-8", "PSA-23-4", "ISA-26-3", "PRO-3-5", "PSA-46-10", "PSA-34-14", "NUM-6-24", "ISA-30-15", "PSA-29-11", "PSA-119-165"]
+    private static let torahRecovery = ["PSA-40-1", "PSA-107-14", "ISA-43-2", "PRO-24-16", "PSA-118-5", "EZE-36-26", "LAM-3-22", "HOS-14-4", "ISA-1-18", "PSA-51-10"]
+    private static let quranCourage = ["Q003-3-200", "Q002-2-286", "Q009-9-40", "Q094-94-5", "Q065-65-3", "Q008-8-46", "Q047-47-7", "Q029-29-69", "Q039-39-10", "Q003-3-139"]
+    private static let quranPeace = ["Q013-13-28", "Q002-2-153", "Q039-39-23", "Q089-89-27", "Q048-48-4", "Q010-10-57", "Q017-17-82", "Q025-25-63", "Q057-57-28", "Q006-6-17"]
+    private static let quranRecovery = ["Q039-39-53", "Q012-12-87", "Q003-3-139", "Q005-5-90", "Q094-94-6", "Q002-2-222", "Q004-4-110", "Q007-7-23", "Q003-3-135", "Q066-66-8"]
 
     static func verse(
         for tradition: FaithTradition,
@@ -597,7 +599,7 @@ enum InterfaithDailyContent {
         reflection: "Dovi invites you to carry this Jewish Scripture into one honest, healthy choice today."
     )
 
-    static func devotional(for tradition: FaithTradition, base: Devotional, verse: Verse) -> Devotional {
+    static func devotional(for tradition: FaithTradition, base: Devotional, verse: Verse, date: Date = Date()) -> Devotional {
         guard tradition != .bible else { return base }
 
         let content: (title: String, excerpt: String, body: String, prayer: String, practice: String)
@@ -654,15 +656,16 @@ enum InterfaithDailyContent {
             return base
         }
 
+        let lens = dailyLens(for: tradition, date: date)
         return Devotional(
             id: base.id + (tradition == .torah ? 10_000 : 20_000),
-            title: content.title,
+            title: "\(content.title) · \(lens.title)",
             excerpt: content.excerpt,
-            body: content.body,
+            body: "\(content.body)\n\n\(lens.prompt)",
             scripture: verse.reference,
             minutes: base.minutes,
             prayer: content.prayer,
-            practice: content.practice
+            practice: "\(content.practice) \(lens.practice)"
         )
     }
 
@@ -681,8 +684,38 @@ enum InterfaithDailyContent {
             steps: steps,
             targetCount: base.targetCount,
             startsOn: base.startsOn,
-            endsOn: base.endsOn
+            endsOn: base.endsOn,
+            scheduleType: base.scheduleType
         )
+    }
+
+    private static func dailyLens(for tradition: FaithTradition, date: Date) -> (title: String, prompt: String, practice: String) {
+        let lenses: [(String, String, String)]
+        switch tradition {
+        case .bible:
+            lenses = [("Today", "", "")]
+        case .torah:
+            lenses = [
+                ("Notice", "Today’s lens: notice one moment when choosing patience protects both dignity and peace.", "Write one sentence about what you noticed."),
+                ("Repair", "Today’s lens: consider one small repair that is honest, safe, and within your responsibility.", "Name the next safe repair."),
+                ("Community", "Today’s lens: let trusted community be part of the next step rather than carrying it alone.", "Contact one trusted person if support would help."),
+                ("Rest", "Today’s lens: make room for rest as a practice of wisdom rather than a reward you must earn.", "Choose one gentle boundary for today."),
+                ("Courage", "Today’s lens: courage can be quiet—telling the truth, asking for help, or beginning again.", "Choose the smallest courageous action."),
+                ("Gratitude", "Today’s lens: name one gift, one responsibility, and one way to share goodness.", "Record all three in your journal."),
+                ("Return", "Today’s lens: returning to what is life-giving is always available in the next choice.", "Take one concrete step toward return.")
+            ]
+        case .quran:
+            lenses = [
+                ("Intention", "Today’s lens: renew a clear intention before the next task, conversation, or decision.", "State that intention in one sentence."),
+                ("Mercy", "Today’s lens: meet a difficult moment with mercy while still choosing what protects you from harm.", "Pair compassion with one practical safeguard."),
+                ("Steadiness", "Today’s lens: sabr can be a calm pause that creates room for the next right action.", "Take three unhurried breaths before responding."),
+                ("Remembrance", "Today’s lens: let a brief remembrance return your attention to Allah in an ordinary moment.", "Choose a short dhikr that feels grounding."),
+                ("Trust", "Today’s lens: place one worry before Allah, then take the practical action available to you.", "Write the action you will take today."),
+                ("Service", "Today’s lens: notice one way kindness, honesty, or care can strengthen your community.", "Offer one small act of benefit."),
+                ("Hope", "Today’s lens: a return toward what is good can begin with the next sincere choice.", "Name the next hopeful step.")
+            ]
+        }
+        return lenses[stableIndex(date, count: lenses.count)]
     }
 
     private static func displayVerse(_ verse: SacredTextVerse, reflection: String) -> Verse {

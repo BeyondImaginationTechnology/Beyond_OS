@@ -55,18 +55,6 @@ struct ReminderSettingsView: View {
                 Text("Daily Breath asks for notification permission only when you enable reminders.")
             }
 
-            Section("Reminder Copy Rotation") {
-                ForEach(DailyBreathNotificationService.reminderMessages, id: \.0) { message in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(message.0)
-                            .font(.subheadline.weight(.semibold))
-                        Text(message.1)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-
             if authorizationStatus == .denied {
                 Section {
                     Button {

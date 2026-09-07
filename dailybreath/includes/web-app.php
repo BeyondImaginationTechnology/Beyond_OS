@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-const DAILYBREATH_WEB_VERSION = '1.9';
+const DAILYBREATH_WEB_VERSION = '1.10';
 
 function dailybreath_web_head(string $title = 'Daily Breath'): string
 {

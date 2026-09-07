@@ -7,9 +7,6 @@ struct TodayView: View {
     @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
     @AppStorage("devotionalReadDayKeys") private var devotionalReadDayKeys = ""
     @AppStorage("completedBreathDayKeys") private var completedBreathDayKeys = ""
-    @AppStorage("dailyReminderEnabled") private var reminderEnabled = false
-    @AppStorage("dailyReminderHour") private var reminderHour = 8
-    @AppStorage("dailyReminderMinute") private var reminderMinute = 0
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -84,7 +81,6 @@ struct TodayView: View {
         BrandHeader()
         themePicker
         dailyRhythmCard
-        reminderCard
         traditionPicker
     }
 
@@ -112,45 +108,41 @@ struct TodayView: View {
                     .foregroundStyle(selectedTheme.primary)
             }
             HStack(spacing: 8) {
-                RhythmPill(title: "Read", isComplete: true, theme: selectedTheme)
-                RhythmPill(title: "Study", isComplete: didReadDevotionalToday, theme: selectedTheme)
-                RhythmPill(title: "Breathe", isComplete: didBreatheToday, theme: selectedTheme)
-                RhythmPill(title: "Reflect", isComplete: didReflectToday, theme: selectedTheme)
+                NavigationLink {
+                    VerseDetailView(verse: todayVerse, tradition: selectedTradition)
+                } label: {
+                    RhythmPill(title: "Read", isComplete: true, theme: selectedTheme)
+                }
+                .accessibilityHint("Opens today’s \(selectedTradition.dailyReadingName)")
+
+                NavigationLink {
+                    DevotionalDetailView(devotional: todayDevotional, tradition: selectedTradition)
+                } label: {
+                    RhythmPill(title: "Study", isComplete: didReadDevotionalToday, theme: selectedTheme)
+                }
+                .accessibilityHint("Opens today’s \(selectedTradition.devotionalName)")
+
+                NavigationLink {
+                    BreatheView()
+                } label: {
+                    RhythmPill(title: "Breathe", isComplete: didBreatheToday, theme: selectedTheme)
+                }
+                .accessibilityHint("Opens the breathing practice")
+
+                NavigationLink {
+                    JournalView()
+                } label: {
+                    RhythmPill(title: "Reflect", isComplete: didReflectToday, theme: selectedTheme)
+                }
+                .accessibilityHint("Opens the reflection journal")
             }
+            .buttonStyle(.plain)
             Text("Small faithful steps count. Come back tomorrow, not because you broke a streak, but because peace is worth returning to.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
         .padding(16)
         .background(.background.opacity(0.9), in: RoundedRectangle(cornerRadius: 8))
-    }
-
-    private var reminderCard: some View {
-        NavigationLink {
-            ReminderSettingsView()
-        } label: {
-            HStack(spacing: 14) {
-                Image(systemName: reminderEnabled ? "bell.badge.fill" : "bell.fill")
-                    .font(.title2)
-                    .foregroundStyle(selectedTheme.accent)
-                    .frame(width: 34)
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("Daily Reminder")
-                        .font(.headline)
-                    Text(reminderEnabled ? "Scheduled for \(formattedReminderTime)" : "Set a gentle nudge to return tomorrow")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                }
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.bold))
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(16)
-            .background(.background.opacity(0.9), in: RoundedRectangle(cornerRadius: 8))
-        }
-        .buttonStyle(.plain)
     }
 
     private var themePicker: some View {
@@ -351,18 +343,8 @@ struct TodayView: View {
             } label: {
                 QuickAction(title: "One Sentence", subtitle: "Reflect today", systemImage: "pencil.and.list.clipboard")
             }
-            NavigationLink {
-                ReminderSettingsView()
-            } label: {
-                QuickAction(title: "Reminder", subtitle: reminderEnabled ? formattedReminderTime : "Daily nudge", systemImage: "bell.badge.fill")
-            }
         }
         .buttonStyle(.plain)
-    }
-
-    private var formattedReminderTime: String {
-        let date = Calendar.current.date(from: DateComponents(hour: reminderHour, minute: reminderMinute)) ?? Date()
-        return date.formatted(date: .omitted, time: .shortened)
     }
 
     private static let dayFormatter: DateFormatter = {

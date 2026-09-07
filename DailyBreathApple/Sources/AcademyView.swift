@@ -91,7 +91,7 @@ struct AcademyView: View {
                     .foregroundStyle(.secondary)
                 Label("Your \(selectedTradition.academyName) guide", systemImage: selectedTradition.symbolName)
                     .font(.caption.bold())
-                    .foregroundStyle(selectedTheme.primary)
+                    .foregroundStyle(selectedTheme.academyEmphasis)
             }
         }
         .padding(20)
@@ -100,7 +100,7 @@ struct AcademyView: View {
 
     private var metricGrid: some View {
         LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 12) {
-            AcademyMetricTile(title: "Lessons Complete", value: "\(completedCount)", systemImage: "checkmark.seal.fill", color: selectedTheme.primary)
+            AcademyMetricTile(title: "Lessons Complete", value: "\(completedCount)", systemImage: "checkmark.seal.fill", color: selectedTheme.academyEmphasis)
             AcademyMetricTile(title: "Journey Paths", value: "\(selectedPaths.count)", systemImage: "rectangle.stack.fill", color: selectedTheme.accent)
         }
     }
@@ -167,7 +167,7 @@ struct AcademyView: View {
                         .font(.caption.bold())
                         .foregroundStyle(.white)
                         .padding(5)
-                        .background(isAcademyComplete ? selectedTheme.primary : Color.secondary, in: Circle())
+                        .background(isAcademyComplete ? selectedTheme.academyEmphasis : Color.secondary, in: Circle())
                 }
             VStack(alignment: .leading, spacing: 4) {
                 Text(eyebrow)
@@ -190,7 +190,7 @@ struct AcademyView: View {
         .background(.background.opacity(0.94), in: RoundedRectangle(cornerRadius: 8))
         .overlay {
             RoundedRectangle(cornerRadius: 8)
-                .stroke(selectedTheme.primary.opacity(isAcademyComplete ? 0.55 : 0.18), lineWidth: 1)
+                .stroke(selectedTheme.academyEmphasis.opacity(isAcademyComplete ? 0.55 : 0.18), lineWidth: 1)
         }
     }
 
@@ -257,7 +257,7 @@ private struct AcademyModuleCard: View {
             }
 
             ProgressView(value: Double(completedCount), total: Double(max(path.lessons.count, 1)))
-                .tint(theme.primary)
+                .tint(theme.academyEmphasis)
 
             VStack(spacing: 8) {
                 ForEach(Array(path.lessons.enumerated()), id: \.element.id) { index, lesson in
@@ -323,7 +323,7 @@ private struct AcademyCertificateView: View {
 
                 Image(systemName: "checkmark.seal.fill")
                     .font(.system(size: 64))
-                    .foregroundStyle(selectedTheme.primary)
+                    .foregroundStyle(selectedTheme.academyEmphasis)
 
                 VStack(spacing: 10) {
                     Text("Presented to")
@@ -339,7 +339,7 @@ private struct AcademyCertificateView: View {
                         .foregroundStyle(.secondary)
                     Text("Joining the Faith + Recovery")
                         .font(.headline.weight(.black))
-                        .foregroundStyle(selectedTheme.primary)
+                        .foregroundStyle(selectedTheme.academyEmphasis)
                 }
 
                 Divider()
@@ -357,7 +357,7 @@ private struct AcademyCertificateView: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(selectedTheme.primary)
+                .tint(selectedTheme.academyEmphasis)
                 .controlSize(.large)
 
                 Text("This certificate recognizes completion of Daily Breath educational lessons. It is not ordination, conversion documentation, clinical certification, or an accredited credential.")
@@ -369,7 +369,7 @@ private struct AcademyCertificateView: View {
             .background(.background.opacity(0.95), in: RoundedRectangle(cornerRadius: 14))
             .overlay {
                 RoundedRectangle(cornerRadius: 14)
-                    .stroke(selectedTheme.primary.opacity(0.45), lineWidth: 2)
+                    .stroke(selectedTheme.academyEmphasis.opacity(0.45), lineWidth: 2)
             }
             .padding()
         }
@@ -395,7 +395,7 @@ private struct AcademyLessonRow: View {
                     .font(.headline.weight(.black))
                     .foregroundStyle(isComplete ? .white : theme.accent)
                     .frame(width: 34, height: 34)
-                    .background(isComplete ? theme.primary : theme.accent.opacity(0.12), in: Circle())
+                    .background(isComplete ? theme.academyEmphasis : theme.accent.opacity(0.12), in: Circle())
                 VStack(alignment: .leading, spacing: 3) {
                     Text(lesson.title)
                         .font(.subheadline.weight(.bold))
@@ -409,7 +409,7 @@ private struct AcademyLessonRow: View {
                         if isComplete {
                             Image(systemName: "checkmark.circle.fill")
                                 .font(.caption)
-                                .foregroundStyle(theme.primary)
+                                .foregroundStyle(theme.academyEmphasis)
                                 .background(.background, in: Circle())
                         }
                     }
@@ -422,6 +422,7 @@ private struct AcademyLessonRow: View {
 }
 
 private struct AcademyLessonView: View {
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
     @AppStorage("completedAcademyLessonIDs") private var completedLessonIDs = ""
@@ -432,6 +433,7 @@ private struct AcademyLessonView: View {
 
     @State private var answer = ""
     @State private var checkResult: LessonCheckResult?
+    @State private var showsNextLesson = false
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -439,6 +441,12 @@ private struct AcademyLessonView: View {
 
     private var isComplete: Bool {
         completedLessonIDs.split(separator: ",").contains(Substring("\(lesson.id)"))
+    }
+
+    private var nextLesson: (lesson: AcademyLesson, index: Int)? {
+        let nextIndex = lessonIndex + 1
+        guard path.lessons.indices.contains(nextIndex) else { return nil }
+        return (path.lessons[nextIndex], nextIndex)
     }
 
     var body: some View {
@@ -465,7 +473,7 @@ private struct AcademyLessonView: View {
                         Label(lesson.duration, systemImage: "clock.fill")
                     }
                     .font(.caption.bold())
-                    .foregroundStyle(selectedTheme.primary)
+                    .foregroundStyle(selectedTheme.academyEmphasis)
                 }
                 .padding(.vertical, 8)
             }
@@ -473,7 +481,7 @@ private struct AcademyLessonView: View {
             Section(path.tradition.libraryName) {
                 Text(lesson.scripture)
                     .font(.headline)
-                    .foregroundStyle(selectedTheme.primary)
+                    .foregroundStyle(selectedTheme.academyEmphasis)
             }
 
             Section("Teaching with \(path.guideName)") {
@@ -512,7 +520,7 @@ private struct AcademyLessonView: View {
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
-                    .tint(selectedTheme.primary)
+                    .tint(selectedTheme.academyEmphasis)
 
                     Button {
                         checkResult = .revealed
@@ -540,11 +548,16 @@ private struct AcademyLessonView: View {
                 } label: {
                     Label(isComplete ? "Lesson Complete" : "Mark Lesson Complete", systemImage: isComplete ? "checkmark.circle.fill" : "circle")
                 }
-                .foregroundStyle(selectedTheme.primary)
+                .foregroundStyle(selectedTheme.academyEmphasis)
             }
         }
         .navigationTitle("Lesson \(lessonIndex + 1)")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $showsNextLesson) {
+            if let nextLesson {
+                AcademyLessonView(path: path, lesson: nextLesson.lesson, lessonIndex: nextLesson.index)
+            }
+        }
     }
 
     private func checkLesson() {
@@ -559,10 +572,15 @@ private struct AcademyLessonView: View {
     private func markComplete() {
         var ids = completedAcademyIDs
         let lessonID = "\(lesson.id)"
-        if !ids.contains(lessonID) {
-            ids.append(lessonID)
-        }
+        guard !ids.contains(lessonID) else { return }
+        ids.append(lessonID)
         completedLessonIDs = ids.joined(separator: ",")
+
+        if nextLesson != nil {
+            showsNextLesson = true
+        } else {
+            dismiss()
+        }
     }
 
     private var completedAcademyIDs: [String] {
@@ -570,6 +588,16 @@ private struct AcademyLessonView: View {
             .split(separator: ",")
             .map(String.init)
             .filter { !$0.isEmpty }
+    }
+}
+
+private extension DailyBreathTheme {
+    /// Quran Moon uses a navy surface, so Academy emphasis needs a light blue
+    /// rather than the normal navy primary color to remain readable.
+    var academyEmphasis: Color {
+        self == .quranMoon
+            ? Color(red: 0.52, green: 0.78, blue: 1.0)
+            : primary
     }
 }
 

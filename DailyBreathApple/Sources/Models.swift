@@ -36,6 +36,7 @@ struct RecoveryChallenge: Identifiable, Codable, Equatable, Sendable {
     let targetCount: Int
     let startsOn: String
     let endsOn: String
+    let scheduleType: String?
 
     enum CodingKeys: String, CodingKey {
         case id, title, description, steps
@@ -43,6 +44,29 @@ struct RecoveryChallenge: Identifiable, Codable, Equatable, Sendable {
         case targetCount = "target_count"
         case startsOn = "starts_on"
         case endsOn = "ends_on"
+        case scheduleType = "schedule_type"
+    }
+
+    init(
+        id: String,
+        title: String,
+        description: String,
+        scriptureReference: String,
+        steps: [String],
+        targetCount: Int,
+        startsOn: String,
+        endsOn: String,
+        scheduleType: String? = nil
+    ) {
+        self.id = id
+        self.title = title
+        self.description = description
+        self.scriptureReference = scriptureReference
+        self.steps = steps
+        self.targetCount = targetCount
+        self.startsOn = startsOn
+        self.endsOn = endsOn
+        self.scheduleType = scheduleType
     }
 }
 
@@ -161,10 +185,14 @@ enum RecoveryContent {
     static func challengeOfTheDay(for date: Date = Date(), bundle: Bundle = .main) -> RecoveryChallenge? {
         guard let document: ChallengeDocument = decode("recovery-challenges", bundle: bundle), !document.entries.isEmpty else { return nil }
         let key = dateKey(date)
-        return document.entries
+        let active = document.entries
             .filter { $0.startsOn <= key && $0.endsOn >= key }
             .sorted { $0.startsOn > $1.startsOn }
-            .first ?? document.entries[rotationIndex(date, count: document.entries.count)]
+        // A bonus is an optional companion, never a replacement for the
+        // main seven-day practice when the two date windows overlap.
+        return active.first { $0.scheduleType != "bonus" }
+            ?? active.first
+            ?? document.entries[rotationIndex(date, count: document.entries.count)]
     }
 
     static func resourceCounts(bundle: Bundle = .main) -> (verses: Int, devotionals: Int, challenges: Int) {
@@ -280,9 +308,34 @@ struct BreathPattern: Identifiable, Equatable {
     let inhale: Int
     let hold: Int
     let exhale: Int
+    let holdOut: Int
+
+    init(
+        id: Int,
+        title: String,
+        intention: String,
+        instruction: String,
+        inhale: Int,
+        hold: Int,
+        exhale: Int,
+        holdOut: Int = 0
+    ) {
+        self.id = id
+        self.title = title
+        self.intention = intention
+        self.instruction = instruction
+        self.inhale = inhale
+        self.hold = hold
+        self.exhale = exhale
+        self.holdOut = holdOut
+    }
 
     var rhythmText: String {
-        "Inhale \(inhale) · Hold \(hold) · Exhale \(exhale)"
+        var steps = ["Inhale \(inhale)", "Hold \(hold)", "Exhale \(exhale)"]
+        if holdOut > 0 {
+            steps.append("Rest \(holdOut)")
+        }
+        return steps.joined(separator: " · ")
     }
 
     static let dailyPatterns = [
@@ -312,6 +365,37 @@ struct BreathPattern: Identifiable, Equatable {
             inhale: 4,
             hold: 2,
             exhale: 4
+        )
+    ]
+
+    static let sessionPatterns = [
+        BreathPattern(
+            id: 101,
+            title: "Box Breathing",
+            intention: "Create an even, grounded rhythm for focus.",
+            instruction: "Move through four equal, steady counts.",
+            inhale: 4,
+            hold: 4,
+            exhale: 4,
+            holdOut: 4
+        ),
+        BreathPattern(
+            id: 102,
+            title: "4–7–8 Reset",
+            intention: "Lengthen the exhale and soften into rest.",
+            instruction: "Inhale for four, hold for seven, then exhale for eight.",
+            inhale: 4,
+            hold: 7,
+            exhale: 8
+        ),
+        BreathPattern(
+            id: 103,
+            title: "Calm Focus",
+            intention: "Use a gentle, longer exhale to settle your attention.",
+            instruction: "Inhale for four, pause for two, and exhale for six.",
+            inhale: 4,
+            hold: 2,
+            exhale: 6
         )
     ]
 

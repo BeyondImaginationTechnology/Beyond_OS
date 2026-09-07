@@ -9,7 +9,7 @@ parameters:
   - name: iosBuildNumber
     displayName: iOS build number
     type: string
-    default: '18'
+    default: '19'
   - name: smtpSmokeTest
     displayName: Send SMTP smoke-test email
     type: boolean

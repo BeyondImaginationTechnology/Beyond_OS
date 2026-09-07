@@ -109,6 +109,16 @@ struct DailyHistoryView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 18) {
+                Picker("History tradition", selection: $traditionID) {
+                    ForEach(FaithTradition.allCases) { tradition in
+                        Text(tradition.name).tag(tradition.id)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .controlSize(.small)
+                .font(.caption.weight(.semibold))
+                .accessibilityHint("Selects the faith tradition used for readings in Daily History")
+
                 HStack {
                     Button { changeMonth(by: -1) } label: { Image(systemName: "chevron.left") }
                     Spacer()
@@ -143,8 +153,8 @@ struct DailyHistoryView: View {
                 }
 
                 HStack(spacing: 12) {
-                    HistoryLegend(color: .dailyGold, title: "Verse")
-                    HistoryLegend(color: .green, title: "Devotional")
+                    HistoryLegend(color: .dailyGold, title: selectedTradition.dailyReadingName)
+                    HistoryLegend(color: .green, title: selectedTradition.devotionalName)
                     HistoryLegend(color: .blue, title: "Breath")
                     HistoryLegend(color: .pink, title: "Reflection")
                 }
@@ -156,11 +166,14 @@ struct DailyHistoryView: View {
                     Text(selectedDate.formatted(date: .complete, time: .omitted))
                         .font(.headline)
                     if let verse = verse(for: selectedDate) {
+                        Text(selectedTradition.dailyReadingName)
+                            .font(.caption.bold())
+                            .foregroundStyle(.secondary)
                         Text(verse.reference).font(.headline)
                         Text(verse.text).font(.system(.body, design: .serif)).foregroundStyle(.secondary)
                     }
                     if let devotional = devotionalTitle(for: selectedDate) {
-                        Label(devotional, systemImage: isContained(Self.dayKey(selectedDate), in: devotionalReadDayKeys) ? "checkmark.circle.fill" : "book.closed")
+                        Label("\(selectedTradition.devotionalName): \(devotional)", systemImage: isContained(Self.dayKey(selectedDate), in: devotionalReadDayKeys) ? "checkmark.circle.fill" : "book.closed")
                     }
                     Label("Breathing practice", systemImage: isContained(Self.dayKey(selectedDate), in: completedBreathDayKeys) ? "checkmark.circle.fill" : "wind")
                     Label("Reflection", systemImage: hasReflection(on: selectedDate) ? "checkmark.circle.fill" : "square.and.pencil")

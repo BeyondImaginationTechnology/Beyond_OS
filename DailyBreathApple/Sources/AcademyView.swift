@@ -592,12 +592,9 @@ private struct AcademyLessonView: View {
 }
 
 private extension DailyBreathTheme {
-    /// Quran Moon uses a navy surface, so Academy emphasis needs a light blue
-    /// rather than the normal navy primary color to remain readable.
+    /// Academy emphasis follows the shared readable theme ink.
     var academyEmphasis: Color {
-        self == .quranMoon
-            ? Color(red: 0.52, green: 0.78, blue: 1.0)
-            : primary
+        primary
     }
 }
 
@@ -607,18 +604,25 @@ struct FaithGuidePortrait: View {
     var height: CGFloat = 76
     var cornerRadius: CGFloat = 14
 
+    private var frameWidth: CGFloat { width + max(8, width * 0.10) }
+    private var frameHeight: CGFloat { height + max(10, height * 0.10) }
+
     var body: some View {
-        Image(tradition.guideAssetName)
-            .resizable()
-            .scaledToFill()
-            .frame(width: width, height: height)
-            .clipped()
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-            .overlay {
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(.primary.opacity(0.12), lineWidth: 1)
-            }
-            .accessibilityLabel("\(tradition.guideName), \(tradition.academyName) guide")
+        ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .fill(Color(.secondarySystemBackground))
+            Image(tradition.guideAssetName)
+                .resizable()
+                .scaledToFit()
+                .padding(4)
+        }
+        .frame(width: frameWidth, height: frameHeight)
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+        .overlay {
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(.primary.opacity(0.16), lineWidth: 1)
+        }
+        .accessibilityLabel("\(tradition.guideName), \(tradition.academyName) guide")
     }
 }
 

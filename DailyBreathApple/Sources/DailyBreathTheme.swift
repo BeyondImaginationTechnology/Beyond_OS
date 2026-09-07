@@ -51,7 +51,10 @@ enum DailyBreathTheme: String, CaseIterable, Identifiable {
         case .dawn: return Color(red: 0.49, green: 0.25, blue: 0.18)
         case .rose: return Color(red: 0.62, green: 0.16, blue: 0.35)
         case .torahLight: return Color(red: 0.18, green: 0.36, blue: 0.62)
-        case .quranMoon: return Color(red: 0.035, green: 0.075, blue: 0.16)
+        // Quran Moon's page is intentionally midnight navy. Use a sky-blue
+        // ink for titles, controls, and labels so it remains legible on that
+        // surface everywhere the shared theme primary color is used.
+        case .quranMoon: return Color(red: 0.52, green: 0.78, blue: 1.0)
         }
     }
 

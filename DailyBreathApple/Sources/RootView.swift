@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 
 enum DailyBreathTab: String, Hashable {
@@ -67,6 +68,11 @@ struct RootView: View {
 
     private func openDeepLink(_ url: URL) {
         guard url.scheme == "dailybreath" else { return }
+        if let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+           let themeID = components.queryItems?.first(where: { $0.name == "theme" })?.value,
+           DailyBreathTheme.allCases.contains(where: { $0.id == themeID }) {
+            selectedThemeID = themeID
+        }
         let route = (url.host ?? url.pathComponents.last ?? "today").lowercased()
         switch route {
         case "breathe": selectedTab = .breathe

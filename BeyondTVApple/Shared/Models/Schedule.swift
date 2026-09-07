@@ -119,6 +119,7 @@ struct CatalogItem: Decodable, Identifiable, Hashable, Sendable {
     let videoURL: URL?
     let archiveID: String?
     let thumbnail: URL?
+    let posterURL: URL?
     let sourceLabel: String?
     let candidateURL: URL?
     let channelSlug: String?
@@ -140,24 +141,47 @@ struct CatalogItem: Decodable, Identifiable, Hashable, Sendable {
         }.joined(separator: " · ")
     }
 
-    var isPlaybackApproved: Bool {
-        guard let sourceType = sourceType?.lowercased(), !sourceType.isEmpty else { return false }
-        return !["watchlist", "candidate", "none", "pending_review", "archive_collection"].contains(sourceType)
-    }
-
     var playbackURL: URL? {
-        guard isPlaybackApproved else { return nil }
         if let videoURL { return videoURL }
         if let archiveID, !archiveID.isEmpty {
             return URL(string: "https://archive.org/embed/\(archiveID)")
         }
-        return candidateURL
+        if let candidateURL { return candidateURL }
+
+        var search = URLComponents(string: "https://archive.org/search")
+        search?.queryItems = [URLQueryItem(name: "query", value: "title:(\(title))")]
+        return search?.url
+    }
+
+    var playbackActionLabel: String {
+        return isNativelyPlayable ? "Play" : "Open source"
+    }
+
+    var isNativelyPlayable: Bool {
+        guard let playbackURL else { return false }
+        let value = playbackURL.absoluteString.lowercased()
+        return value.contains(".mp4") || value.contains(".m4v")
+            || value.contains(".mov") || value.contains(".m3u8")
+    }
+
+    /// Archive collection covers are useful fallbacks, but a frame from the
+    /// direct video is a much more truthful browse image when available.
+    var prefersVideoFramePreview: Bool {
+        guard videoURL != nil else { return false }
+        guard let thumbnail else { return true }
+        return thumbnail.host()?.contains("archive.org") == true
+            && thumbnail.path.contains("/services/img/")
+    }
+
+    var preferredArtworkURL: URL? {
+        posterURL ?? (prefersVideoFramePreview ? nil : thumbnail)
     }
 
     enum CodingKeys: String, CodingKey {
         case slug, type, title, subtitle, description, icon, rating, year, genre, runtime, thumbnail
         case sourceType = "source_type"
         case videoURL = "video_url"
+        case posterURL = "poster_url"
         case archiveID = "archive_id"
         case sourceLabel = "source_label"
         case candidateURL = "candidate_url"
@@ -182,6 +206,7 @@ struct CatalogItem: Decodable, Identifiable, Hashable, Sendable {
         videoURL = Self.decodeURL(from: container, forKey: .videoURL)
         archiveID = try container.decodeIfPresent(String.self, forKey: .archiveID)
         thumbnail = Self.decodeURL(from: container, forKey: .thumbnail)
+        posterURL = Self.decodeURL(from: container, forKey: .posterURL)
         sourceLabel = try container.decodeIfPresent(String.self, forKey: .sourceLabel)
         candidateURL = Self.decodeURL(from: container, forKey: .candidateURL)
         channelSlug = try container.decodeIfPresent(String.self, forKey: .channelSlug)
@@ -209,6 +234,15 @@ struct ChannelStatus: Sendable {
         label: "LIVE",
         sourceKey: ""
     )
+
+    static func updating(channel: Channel) -> ChannelStatus {
+        ChannelStatus(
+            now: channel.description,
+            next: "More on \(channel.name)",
+            label: "LIVE · UPDATING",
+            sourceKey: ""
+        )
+    }
 }
 
 struct GuideItem: Identifiable, Sendable {

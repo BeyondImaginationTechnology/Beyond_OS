@@ -1,8 +1,8 @@
+import AVFoundation
 import SwiftUI
 
 struct BrowseView: View {
     @EnvironmentObject private var model: AppModel
-    @Binding var selectedTab: BeyondTVTab
     @State private var selectedFilter = "All"
 
     private var filters: [String] {
@@ -12,8 +12,14 @@ struct BrowseView: View {
 
     private var filteredItems: [CatalogItem] {
         let items = model.catalogItems
-        guard selectedFilter != "All" else { return items }
-        return items.filter { $0.type?.capitalized == selectedFilter }
+        let typeFiltered = selectedFilter == "All"
+            ? items
+            : items.filter { $0.type?.capitalized == selectedFilter }
+        #if os(tvOS)
+        return typeFiltered.filter(\.isNativelyPlayable)
+        #else
+        return typeFiltered
+        #endif
     }
 
     var body: some View {
@@ -50,10 +56,10 @@ struct BrowseView: View {
                 .font(.caption.bold())
                 .tracking(2)
                 .foregroundStyle(.orange)
-            Text("Movies, seasons, specials, and direct streams ready to play.")
+            Text("Movies, seasons, specials, and every available source in one catalog.")
                 .font(.title.bold())
                 .lineLimit(3)
-            Text("\(model.catalogItems.count) catalog titles · channels stay in the Watch tab")
+            Text(catalogSummary)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -64,6 +70,14 @@ struct BrowseView: View {
             RoundedRectangle(cornerRadius: 18)
                 .stroke(.white.opacity(0.12), lineWidth: 1)
         }
+    }
+
+    private var catalogSummary: String {
+        #if os(tvOS)
+        "\(filteredItems.count) direct-playback titles · web-player titles are omitted"
+        #else
+        "\(model.catalogItems.count) unlocked catalog titles · channels stay in the Watch tab"
+        #endif
     }
 
     private var filterPicker: some View {
@@ -95,14 +109,11 @@ struct BrowseView: View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 168), spacing: 14)], spacing: 14) {
             ForEach(filteredItems) { item in
                 Button {
-                    selectedTab = .watch
-                    Task { await model.play(catalog: item) }
+                    Task { await model.watch(catalog: item) }
                 } label: {
                     CatalogCard(item: item)
                 }
                 .buttonStyle(.plain)
-                .disabled(!item.isPlaybackApproved)
-                .opacity(item.isPlaybackApproved ? 1 : 0.68)
             }
         }
     }
@@ -117,8 +128,10 @@ private struct CatalogCard: View {
                 RoundedRectangle(cornerRadius: 14)
                     .fill(.black.opacity(0.32))
 
-                if let thumbnail = item.thumbnail {
-                    AsyncImage(url: thumbnail) { phase in
+                if item.prefersVideoFramePreview, let videoURL = item.videoURL {
+                    VideoFramePreview(url: videoURL) { fallbackArt }
+                } else if let artworkURL = item.preferredArtworkURL {
+                    AsyncImage(url: artworkURL) { phase in
                         switch phase {
                         case .success(let image):
                             image
@@ -169,8 +182,8 @@ private struct CatalogCard: View {
 
             HStack {
                 Label(
-                    item.isPlaybackApproved ? (item.sourceLabel ?? "Play") : "Pending review",
-                    systemImage: item.isPlaybackApproved ? (item.videoURL == nil ? "safari.fill" : "play.fill") : "lock.fill"
+                    item.playbackActionLabel,
+                    systemImage: item.isNativelyPlayable ? "play.fill" : "safari.fill"
                 )
                     .font(.caption2.bold())
                     .lineLimit(1)
@@ -196,5 +209,72 @@ private struct CatalogCard: View {
                 .font(.system(size: 42))
         }
         .clipShape(RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+private struct VideoFramePreview<Fallback: View>: View {
+    let url: URL
+    let fallback: Fallback
+    @StateObject private var loader = VideoFrameLoader()
+
+    init(url: URL, @ViewBuilder fallback: () -> Fallback) {
+        self.url = url
+        self.fallback = fallback()
+    }
+
+    var body: some View {
+        ZStack {
+            if let frame = loader.frame {
+                Image(decorative: frame, scale: 1)
+                    .resizable()
+                    .scaledToFill()
+            } else if loader.didFail {
+                fallback
+            } else {
+                fallback
+                    .overlay { ProgressView().tint(.white) }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .aspectRatio(16 / 10, contentMode: .fill)
+        .clipShape(RoundedRectangle(cornerRadius: 14))
+        .task(id: url) {
+            loader.load(url: url)
+        }
+    }
+}
+
+@MainActor
+private final class VideoFrameLoader: ObservableObject {
+    @Published var frame: CGImage?
+    @Published var didFail = false
+    private static var cache: [URL: CGImage] = [:]
+
+    func load(url: URL) {
+        if let cachedFrame = Self.cache[url] {
+            frame = cachedFrame
+            didFail = false
+            return
+        }
+        frame = nil
+        didFail = false
+
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            let asset = AVURLAsset(url: url)
+            let generator = AVAssetImageGenerator(asset: asset)
+            generator.appliesPreferredTrackTransform = true
+            generator.maximumSize = CGSize(width: 640, height: 400)
+            let time = CMTime(seconds: 8, preferredTimescale: 600)
+            let image = try? generator.copyCGImage(at: time, actualTime: nil)
+
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.frame = image
+                self.didFail = image == nil
+                if let image {
+                    Self.cache[url] = image
+                }
+            }
+        }
     }
 }

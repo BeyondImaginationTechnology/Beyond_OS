@@ -3,18 +3,36 @@ import SwiftUI
 
 struct WatchView: View {
     @EnvironmentObject private var model: AppModel
+    private let playerAnchor = "watch-player"
+
+    private var availableChannels: [Channel] {
+        model.channels.filter(\.isAvailableOnCurrentPlatform)
+    }
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
-                    hero
-                    player
-                    nowPlaying
-                    onNow
-                    channelRail
+            ScrollViewReader { scrollProxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        hero
+                        player
+                            .id(playerAnchor)
+                        nowPlaying
+                        channelRail
+                    }
+                    .padding()
                 }
-                .padding()
+                .onChange(of: model.watchPlayerRequest) { _, _ in
+                    centerPlayer(using: scrollProxy)
+                }
+                .onChange(of: model.selectedTab) { _, tab in
+                    guard tab == .watch else { return }
+                    centerPlayer(using: scrollProxy)
+                }
+                .task(id: model.watchPlayerRequest) {
+                    // Also runs when Watch is recreated after a tab change.
+                    centerPlayer(using: scrollProxy)
+                }
             }
             .background(BeyondTVBackground().ignoresSafeArea())
             .toolbar {
@@ -25,6 +43,12 @@ struct WatchView: View {
         }
     }
 
+    private func centerPlayer(using scrollProxy: ScrollViewProxy) {
+        withAnimation(.easeInOut(duration: 0.28)) {
+            scrollProxy.scrollTo(playerAnchor, anchor: .center)
+        }
+    }
+
     private var hero: some View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(alignment: .center, spacing: 14) {
@@ -32,7 +56,7 @@ struct WatchView: View {
             }
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("\(model.channels.count) CHANNELS · FREE TO WATCH · NO ACCOUNT REQUIRED")
+                Text(lineupLabel)
                     .font(.caption.bold())
                     .tracking(1.8)
                     .foregroundStyle(.orange)
@@ -46,6 +70,14 @@ struct WatchView: View {
                     .lineLimit(3)
             }
         }
+    }
+
+    private var lineupLabel: String {
+        #if os(tvOS)
+        "\(availableChannels.count) DIRECT-PLAYBACK CHANNELS · APPLE TV"
+        #else
+        "\(availableChannels.count) CHANNELS · INTERNAL PLAYBACK REVIEW"
+        #endif
     }
 
     private var header: some View {
@@ -180,33 +212,17 @@ struct WatchView: View {
         }
     }
 
-    private var onNow: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            SectionHeading(kicker: "ON NOW", title: "Currently playing")
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 155), spacing: 12)], spacing: 12) {
-                ForEach(Array(model.channels.prefix(8))) { channel in
-                    Button {
-                        Task { await model.tune(to: channel) }
-                    } label: {
-                        MiniNowCard(channel: channel, selected: model.selectedChannel == channel)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-    }
-
     private var channelRail: some View {
         VStack(alignment: .leading, spacing: 14) {
             SectionHeading(kicker: "COMPLETE LINEUP", title: "All channels")
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: 14) {
-                    ForEach(model.channels) { channel in
+                    ForEach(availableChannels) { channel in
                         ChannelButton(
                             channel: channel,
                             selected: model.selectedChannel == channel
                         ) {
-                            Task { await model.tune(to: channel) }
+                            Task { await model.watch(channel: channel) }
                         }
                     }
                 }
@@ -228,47 +244,5 @@ struct SectionHeading: View {
             Text(title)
                 .font(.title2.bold())
         }
-    }
-}
-
-private struct MiniNowCard: View {
-    let channel: Channel
-    let selected: Bool
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("CH \(channel.displayNumber)")
-                    .font(.caption2.monospacedDigit().bold())
-                    .foregroundStyle(.orange.opacity(0.9))
-                Spacer()
-                Circle()
-                    .fill(selected ? .green : .red)
-                    .frame(width: 8, height: 8)
-            }
-
-            Image(systemName: channel.symbolName)
-                .font(.title2.bold())
-                .frame(width: 38, height: 38)
-                .background(.black.opacity(0.20), in: RoundedRectangle(cornerRadius: 11))
-
-            Text(channel.name)
-                .font(.headline)
-                .lineLimit(2)
-            Text(channel.category)
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.72))
-        }
-        .frame(maxWidth: .infinity, minHeight: 142, alignment: .leading)
-        .padding(14)
-        .background(
-            LinearGradient(colors: channel.gradientColors, startPoint: .topLeading, endPoint: .bottomTrailing),
-            in: RoundedRectangle(cornerRadius: 18)
-        )
-        .overlay {
-            RoundedRectangle(cornerRadius: 18)
-                .stroke(selected ? .white.opacity(0.72) : .white.opacity(0.13), lineWidth: selected ? 2 : 1)
-        }
-        .foregroundStyle(.white)
     }
 }

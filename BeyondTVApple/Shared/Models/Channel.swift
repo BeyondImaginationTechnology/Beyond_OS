@@ -134,6 +134,14 @@ struct Channel: Codable, Identifiable, Hashable, Sendable {
         isWebPlaybackChannel ? "WEB" : "LIVE"
     }
 
+    var isAvailableOnCurrentPlatform: Bool {
+        #if os(tvOS)
+        !isWebPlaybackChannel
+        #else
+        true
+        #endif
+    }
+
     static func defaultChannel(in channels: [Channel]) -> Channel? {
         channels.first(where: { $0.number == 1 })
             ?? channels.first(where: { $0.slug == "beyond-after-dark" })

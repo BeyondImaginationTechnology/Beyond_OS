@@ -3,7 +3,7 @@ import SwiftUI
 @main
 struct BeyondTVApp: App {
     @StateObject private var model = AppModel()
-    @AppStorage("beyondTVTheme") private var storedTheme = BeyondTVTheme.sunset.rawValue
+    @AppStorage("beyondTVTheme") private var storedTheme = BeyondTVTheme.light.rawValue
 
     private var preferredColorScheme: ColorScheme {
         (BeyondTVTheme(rawValue: storedTheme) ?? .sunset).preferredColorScheme

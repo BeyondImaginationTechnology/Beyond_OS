@@ -1,55 +1,11 @@
 import AVFoundation
 import Combine
 import Foundation
-import CryptoKit
-import Security
-#if os(iOS)
-import AuthenticationServices
-#endif
-
-private struct SecureTokenStore {
-    let service = "technology.co.beyondimagination.beyondtv"
-    let account = "BeyondID.mobileToken"
-
-    func save(_ token: String) -> Bool {
-        guard let data = token.data(using: .utf8) else { return false }
-        delete()
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account,
-            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
-            kSecValueData as String: data
-        ]
-        return SecItemAdd(query as CFDictionary, nil) == errSecSuccess
-    }
-
-    func load() -> String? {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account,
-            kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne
-        ]
-        var result: CFTypeRef?
-        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess,
-              let data = result as? Data else { return nil }
-        return String(data: data, encoding: .utf8)
-    }
-
-    func delete() {
-        let query: [String: Any] = [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: account
-        ]
-        SecItemDelete(query as CFDictionary)
-    }
-}
 
 @MainActor
 final class AppModel: ObservableObject {
+    @Published var selectedTab: BeyondTVTab = .watch
+    @Published private(set) var watchPlayerRequest = 0
     @Published private(set) var channels: [Channel] = []
     @Published var selectedChannel: Channel?
     @Published private(set) var status = ChannelStatus.loading
@@ -62,33 +18,23 @@ final class AppModel: ObservableObject {
     @Published private(set) var guideSchedule: [String: [GuideBlock]] = [:]
     @Published private(set) var catalogItems: [CatalogItem] = []
     @Published private(set) var isCatalogLoading = false
-    @Published private(set) var beyondIDUser: BeyondIDUser?
-    @Published private(set) var beyondIDWallet: BeyondIDWallet?
-    @Published private(set) var isSigningIn = false
-    @Published private(set) var authErrorMessage: String?
-
     let player = AVPlayer()
     private let api: BeyondTVAPI
-    private let beyondID: BeyondIDService
     private var refreshTask: Task<Void, Never>?
+    private var statusTask: Task<Void, Never>?
     private var guideTask: Task<Void, Never>?
     private var catalogTask: Task<Void, Never>?
     private var tuneSequence = 0
-    private let tokenStore = SecureTokenStore()
-    #if os(iOS)
-    private var webAuthSession: ASWebAuthenticationSession?
-    private let webAuthPresentationProvider = WebAuthPresentationContextProvider()
-    #endif
 
-    init(api: BeyondTVAPI = .production, beyondID: BeyondIDService = .production) {
+    init(api: BeyondTVAPI = .production) {
         self.api = api
-        self.beyondID = beyondID
         player.automaticallyWaitsToMinimizeStalling = true
         player.preventsDisplaySleepDuringVideoPlayback = true
     }
 
     deinit {
         refreshTask?.cancel()
+        statusTask?.cancel()
         guideTask?.cancel()
         catalogTask?.cancel()
     }
@@ -96,7 +42,6 @@ final class AppModel: ObservableObject {
     func start() async {
         guard channels.isEmpty else { return }
         do {
-            await restoreBeyondIDSession()
             channels = try await api.channels()
             let initial = Channel.defaultChannel(in: channels)
             if let initial {
@@ -109,60 +54,22 @@ final class AppModel: ObservableObject {
         }
     }
 
-    func signInWithGoogle() async {
-        #if os(iOS)
-        guard !isSigningIn else { return }
-        isSigningIn = true
-        authErrorMessage = nil
-
-        do {
-            let verifier = BeyondTVPKCE.verifier()
-            let callbackURL = try await authenticate(url: beyondID.googleSignInURL(codeChallenge: BeyondTVPKCE.challenge(verifier)))
-            let token = try await beyondID.exchange(code: mobileCode(from: callbackURL), verifier: verifier)
-            try await loadBeyondIDSession(token: token)
-            guard tokenStore.save(token) else {
-                throw BeyondIDError.server("Beyond ID could not securely save this session.")
-            }
-        } catch {
-            authErrorMessage = error.localizedDescription
-        }
-
-        isSigningIn = false
-        #else
-        authErrorMessage = BeyondIDError.unavailableOnPlatform.localizedDescription
-        #endif
-    }
-
-    func restoreBeyondIDSession() async {
-        guard let token = tokenStore.load(), !token.isEmpty else { return }
-        do {
-            try await loadBeyondIDSession(token: token)
-        } catch {
-            tokenStore.delete()
-            beyondIDUser = nil
-            beyondIDWallet = nil
-        }
-    }
-
-    func signOutBeyondID() {
-        tokenStore.delete()
-        beyondIDUser = nil
-        beyondIDWallet = nil
-        authErrorMessage = nil
-    }
-
     func tune(to channel: Channel) async {
         tuneSequence += 1
         let sequence = tuneSequence
         refreshTask?.cancel()
+        statusTask?.cancel()
         selectedChannel = channel
-        status = .loading
+        status = guideItems.first(where: { $0.channel == channel })?.status
+            ?? .updating(channel: channel)
         isLoading = true
         errorMessage = nil
         currentSource = nil
         webPlaybackURL = nil
         player.pause()
         player.replaceCurrentItem(with: nil)
+
+        refreshCurrentStatus(for: channel, sequence: sequence)
 
         #if os(iOS)
         if let embedURL = URL(string: channel.embedPath, relativeTo: api.baseURL)?.absoluteURL {
@@ -269,9 +176,19 @@ final class AppModel: ObservableObject {
         isLoading = false
     }
 
+    /// Opens the Watch tab and places the player in view before tuning a channel.
+    /// Keep all user-initiated channel changes on this route so touch and Siri Remote
+    /// selections have the same landing place.
+    func watch(channel: Channel) async {
+        guard channel.isAvailableOnCurrentPlatform else { return }
+        showWatchPlayer()
+        await tune(to: channel)
+    }
+
     func play(catalog item: CatalogItem) async {
         tuneSequence += 1
         refreshTask?.cancel()
+        statusTask?.cancel()
         selectedChannel = item.channelSlug.flatMap { slug in channels.first(where: { $0.slug == slug }) }
         status = ChannelStatus(
             now: item.title,
@@ -317,6 +234,15 @@ final class AppModel: ObservableObject {
         #endif
     }
 
+    /// Opens the Watch tab and centers the player before playing a catalog title.
+    func watch(catalog item: CatalogItem) async {
+        #if os(tvOS)
+        guard item.isNativelyPlayable else { return }
+        #endif
+        showWatchPlayer()
+        await play(catalog: item)
+    }
+
     func refreshGuide() async {
         guard !channels.isEmpty else { return }
         guideTask?.cancel()
@@ -345,6 +271,11 @@ final class AppModel: ObservableObject {
             await MainActor.run {
                 self.guideSchedule = loadedSchedule ?? self.guideSchedule
                 self.guideItems = loadedItems
+                if self.isLoading,
+                   let selectedChannel = self.selectedChannel,
+                   let selectedGuideItem = loadedItems.first(where: { $0.channel == selectedChannel }) {
+                    self.status = selectedGuideItem.status
+                }
                 self.isGuideLoading = false
             }
         }
@@ -378,6 +309,11 @@ final class AppModel: ObservableObject {
         await tune(to: selectedChannel)
     }
 
+    private func showWatchPlayer() {
+        selectedTab = .watch
+        watchPlayerRequest &+= 1
+    }
+
     func togglePlayback() {
         if player.timeControlStatus == .playing {
             player.pause()
@@ -394,6 +330,22 @@ final class AppModel: ObservableObject {
         }
     }
 
+    /// The full playback endpoint can take longer than a web player needs to start.
+    /// Load the lightweight guide in parallel so the card stays useful while that
+    /// endpoint resolves sources.
+    private func refreshCurrentStatus(for channel: Channel, sequence: Int) {
+        let api = api
+        statusTask = Task { [weak self, api] in
+            guard let guideItem = try? await api.guideItem(for: channel) else { return }
+            guard !Task.isCancelled,
+                  let self,
+                  sequence == self.tuneSequence,
+                  self.selectedChannel == channel else { return }
+            self.updateGuideItem(guideItem)
+            self.status = guideItem.status
+        }
+    }
+
     private func updateGuideItem(_ item: GuideItem) {
         if let index = guideItems.firstIndex(where: { $0.channel == item.channel }) {
             guideItems[index] = item
@@ -403,50 +355,4 @@ final class AppModel: ObservableObject {
         }
     }
 
-    private func loadBeyondIDSession(token: String) async throws {
-        let session = try await beyondID.session(for: token)
-        beyondIDUser = session.user
-        beyondIDWallet = session.wallet
-        authErrorMessage = nil
-    }
-
-    #if os(iOS)
-    private func authenticate(url: URL) async throws -> URL {
-        try await withCheckedThrowingContinuation { continuation in
-            let session = ASWebAuthenticationSession(
-                url: url,
-                callbackURLScheme: "beyondtv"
-            ) { callbackURL, error in
-                if let error {
-                    continuation.resume(throwing: error)
-                    return
-                }
-                guard let callbackURL else {
-                    continuation.resume(throwing: BeyondIDError.missingCallbackToken)
-                    return
-                }
-                continuation.resume(returning: callbackURL)
-            }
-            session.presentationContextProvider = webAuthPresentationProvider
-            session.prefersEphemeralWebBrowserSession = false
-            webAuthSession = session
-            if !session.start() {
-                continuation.resume(throwing: BeyondIDError.server("Could not open Google sign-in."))
-            }
-        }
-    }
-
-    private func mobileCode(from callbackURL: URL) throws -> String {
-        let components = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false)
-        if let error = components?.queryItems?.first(where: { $0.name == "error" })?.value, !error.isEmpty {
-            throw BeyondIDError.server(error)
-        }
-        guard let token = components?.queryItems?.first(where: { $0.name == "code" })?.value, !token.isEmpty else {
-            throw BeyondIDError.missingCallbackToken
-        }
-        return token
-    }
-    #endif
 }
-
-private enum BeyondTVPKCE { static func verifier() -> String { (UUID().uuidString + UUID().uuidString).replacingOccurrences(of: "-", with: "") }; static func challenge(_ verifier: String) -> String { let digest = SHA256.hash(data: Data(verifier.utf8)); return Data(digest).base64EncodedString().replacingOccurrences(of: "+", with: "-").replacingOccurrences(of: "/", with: "_").replacingOccurrences(of: "=", with: "") } }

@@ -33,7 +33,7 @@ enum BeyondTVTheme: String, CaseIterable {
 }
 
 struct BeyondTVBackground: View {
-    @AppStorage("beyondTVTheme") private var storedTheme = BeyondTVTheme.sunset.rawValue
+    @AppStorage("beyondTVTheme") private var storedTheme = BeyondTVTheme.light.rawValue
 
     private var theme: BeyondTVTheme {
         BeyondTVTheme(rawValue: storedTheme) ?? .sunset
@@ -81,8 +81,8 @@ struct BeyondTVBackground: View {
             ]
         case .light:
             [
-                Color(red: 0.97, green: 0.94, blue: 0.96),
-                Color(red: 0.92, green: 0.95, blue: 0.99)
+                Color(red: 0.97, green: 0.99, blue: 1.00),
+                Color(red: 0.88, green: 0.95, blue: 1.00)
             ]
         }
     }
@@ -94,13 +94,13 @@ struct BeyondTVBackground: View {
         case .dark:
             [.purple.opacity(0.22), .blue.opacity(0.12), .clear]
         case .light:
-            [.pink.opacity(0.16), .orange.opacity(0.08), .clear]
+            [.cyan.opacity(0.24), .blue.opacity(0.12), .clear]
         }
     }
 }
 
 struct ThemeToggleButton: View {
-    @AppStorage("beyondTVTheme") private var storedTheme = BeyondTVTheme.sunset.rawValue
+    @AppStorage("beyondTVTheme") private var storedTheme = BeyondTVTheme.light.rawValue
 
     private var theme: BeyondTVTheme {
         BeyondTVTheme(rawValue: storedTheme) ?? .sunset

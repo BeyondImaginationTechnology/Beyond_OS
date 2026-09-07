@@ -72,29 +72,6 @@ final class BeyondTVTests: XCTestCase {
         )
     }
 
-    func testGoogleSignInURLTargetsBeyondTVMobileCompletion() throws {
-        let service = BeyondIDService(baseURL: URL(string: "https://example.com")!)
-        let components = try XCTUnwrap(URLComponents(url: service.googleSignInURL(), resolvingAgainstBaseURL: false))
-        let query = Dictionary(uniqueKeysWithValues: (components.queryItems ?? []).compactMap { item in
-            item.value.map { (item.name, $0) }
-        })
-
-        XCTAssertEqual(components.path, "/beyond-id/auth/oauth-start.php")
-        XCTAssertEqual(query["provider"], "google")
-        XCTAssertEqual(query["return"], "/beyond-id/auth/mobile-complete.php?scheme=beyondtv")
-    }
-
-    func testBeyondIDSessionDecodesFlexibleProfileValues() throws {
-        let data = Data(
-            #"{"ok":true,"authenticated":true,"user":{"id":"42","name":"Ari Beyond","email":"ari@example.com","role":"user"},"wallet":{"balance":"12.5","currency":"BITS","status":"active"}}"#.utf8
-        )
-        let session = try JSONDecoder().decode(BeyondIDSession.self, from: data)
-
-        XCTAssertEqual(session.user?.id, 42)
-        XCTAssertEqual(session.user?.preferredName, "Ari Beyond")
-        XCTAssertEqual(session.wallet?.balanceText, "12.50 BITS")
-    }
-
     func testCatalogItemDecodesPlayableStream() throws {
         let data = Data(
             #"{"slug":"sister-act-2","type":"movie","title":"Sister Act 2","source_type":"direct_video","video_url":"https://archive.org/download/sister-act-2/Sister%20Act%202.mp4","thumbnail":"https://archive.org/services/img/sister-act-2","source_label":"Internet Archive","channel_slug":"beyond-comedy"}"#.utf8
@@ -104,16 +81,30 @@ final class BeyondTVTests: XCTestCase {
         XCTAssertEqual(item.categoryLabel, "Movie")
         XCTAssertEqual(item.playbackURL?.absoluteString, "https://archive.org/download/sister-act-2/Sister%20Act%202.mp4")
         XCTAssertEqual(item.channelSlug, "beyond-comedy")
+        XCTAssertTrue(item.isNativelyPlayable)
+        XCTAssertTrue(item.prefersVideoFramePreview)
+        XCTAssertNil(item.preferredArtworkURL)
     }
 
-    func testPendingCatalogItemCannotResolvePlayback() throws {
+    func testWatchlistCatalogItemUsesAvailableArchiveSource() throws {
         let data = Data(
             #"{"slug":"candidate","type":"movie","title":"Pending title","source_type":"watchlist","archive_id":"pending-archive-item","candidate_url":"https://archive.org/details/pending-archive-item"}"#.utf8
         )
         let item = try JSONDecoder().decode(CatalogItem.self, from: data)
 
-        XCTAssertFalse(item.isPlaybackApproved)
-        XCTAssertNil(item.playbackURL)
+        XCTAssertEqual(item.playbackURL?.absoluteString, "https://archive.org/embed/pending-archive-item")
+        XCTAssertFalse(item.isNativelyPlayable)
+    }
+
+    func testCatalogItemWithoutStoredSourceFallsBackToArchiveSearch() throws {
+        let data = Data(
+            #"{"slug":"missing-source","type":"series","title":"Teen Titans","source_type":"none"}"#.utf8
+        )
+        let item = try JSONDecoder().decode(CatalogItem.self, from: data)
+
+        XCTAssertEqual(item.playbackURL?.host, "archive.org")
+        XCTAssertTrue(item.playbackURL?.absoluteString.contains("Teen%20Titans") == true)
+        XCTAssertEqual(item.playbackActionLabel, "Open source")
     }
 
     func testGuideBlockCurrentHourMatching() {
@@ -124,5 +115,13 @@ final class BeyondTVTests: XCTestCase {
         XCTAssertFalse(morning.contains(hour: 10))
         XCTAssertTrue(overnight.contains(hour: 22))
         XCTAssertTrue(overnight.contains(hour: 1))
+    }
+
+    func testUpdatingStatusKeepsUsefulChannelContext() {
+        let status = ChannelStatus.updating(channel: Channel.preview)
+
+        XCTAssertEqual(status.now, Channel.preview.description)
+        XCTAssertEqual(status.next, "More on Beyond Movies")
+        XCTAssertEqual(status.label, "LIVE · UPDATING")
     }
 }

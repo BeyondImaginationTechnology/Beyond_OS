@@ -15,14 +15,14 @@ struct AboutView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Beyond TV")
                                 .font(.headline)
-                            Text("Live channels from Beyond Imagination")
+                            Text("Internal channel operations and playback review")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
                     }
                     LabeledContent("Version", value: versionText)
                     LabeledContent("Schedule", value: "America/Vancouver")
-                    LabeledContent("Platforms", value: "Web · iOS · iPadOS · tvOS · Android soon")
+                    LabeledContent("Platforms", value: "Internal iOS · iPadOS · tvOS")
                 }
                 .listRowBackground(Color.white.opacity(0.08))
 
@@ -35,6 +35,9 @@ struct AboutView: View {
 
                 Section("Playback") {
                     Text("Beyond TV uses AVPlayer for native MP4 and HLS streams. Provider attribution remains visible with each program.")
+                    #if os(tvOS)
+                    Text("Apple TV shows direct-playback channels and catalog titles only; web-player sources are omitted.")
+                    #endif
                 }
                 .listRowBackground(Color.white.opacity(0.08))
 

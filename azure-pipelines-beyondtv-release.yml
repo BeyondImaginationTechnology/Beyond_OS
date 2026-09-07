@@ -34,13 +34,6 @@ steps:
       deleteCert: true
     displayName: Install shared Apple Distribution certificate
 
-  - task: InstallAppleProvisioningProfile@1
-    inputs:
-      provisioningProfileLocation: secureFiles
-      provProfileSecureFile: Beyond_TV_Azure_App_Store.mobileprovision
-      removeProfile: true
-    displayName: Install Beyond TV App Store profile
-
   - bash: |
       set -euo pipefail
       mkdir -p fastlane/build_logs
@@ -83,7 +76,6 @@ steps:
       APP_STORE_CONNECT_API_KEY_PATH: $(appStoreConnectKey.secureFilePath)
       APP_STORE_CONNECT_KEY_ID: $(APP_STORE_CONNECT_KEY_ID)
       APP_STORE_CONNECT_ISSUER_ID: $(APP_STORE_CONNECT_ISSUER_ID)
-      BEYOND_TV_PROFILE_NAME: $(BEYOND_TV_PROFILE_NAME)
       CI_BUILD_NUMBER: ${{ parameters.iosBuildNumber }}
     displayName: Test, archive, and upload Beyond TV to TestFlight
 

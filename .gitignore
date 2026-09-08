@@ -16,6 +16,9 @@
 **/generated-*
 **/node_modules/
 **/vendor/
+**/.gradle/
+**/.idea/
+**/build/
 .idea/
 .vscode/
 .DS_Store

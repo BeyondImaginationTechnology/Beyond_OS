@@ -54,6 +54,11 @@ namespace BITOSInstaller
                 Edition = "BIT OS Home", Version = "1.0", Available = false,
                 ImageUrl = "https://beyondimagination.co.technology/downloads/home/1.0/bit-os-home-1.0-installer.img",
                 ChecksumsUrl = "https://beyondimagination.co.technology/downloads/home/1.0/SHA256SUMS"
+            },
+            new ReleaseDefinition {
+                Edition = "BIT OS Core", Version = "1.0", Available = true,
+                ImageUrl = "https://beyondimagination.co.technology/downloads/core/1.0/bit-os-core-1.0-installer.img",
+                ChecksumsUrl = "https://beyondimagination.co.technology/downloads/core/1.0/SHA256SUMS"
             }
         };
         private bool verified;
@@ -99,7 +104,7 @@ namespace BITOSInstaller
             var warning = new Label { Text = "Writing erases the selected USB drive. Confirm the exact physical-disk number shown above; internal disks are not listed.", Location = new Point(32, 545), Size = new Size(710, 22), ForeColor = Color.FromArgb(242, 190, 108) }; Controls.Add(warning);
 
             editions.DataSource = releases;
-            editions.SelectedIndexChanged += delegate { verified = false; imagePath.Text = ""; var r = CurrentRelease(); status.Text = r.Available ? "Cyber is available now. Home will activate when its signed release is published." : "This edition is not published yet."; };
+            editions.SelectedIndexChanged += delegate { verified = false; imagePath.Text = ""; var r = CurrentRelease(); status.Text = r.Available ? r.Edition + " " + r.Version + " is available." : r.Edition + " is not published yet."; };
             download.Click += async delegate { await DownloadAndVerifyAsync(); };
             choose.Click += delegate { ChooseImage(); };
             verify.Click += async delegate { await VerifyAsync(); };

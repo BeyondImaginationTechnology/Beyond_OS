@@ -247,13 +247,14 @@ private struct FavoritesView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
+                    FamilyNameLab()
                     if store.favoriteNames.isEmpty {
                         ContentUnavailableView("Your shortlist is waiting", systemImage: "heart", description: Text("Love a name while browsing or swiping to save it here."))
                             .frame(minHeight: 420)
                     } else {
                         summary
                         ForEach(store.favoriteNames) { name in
-                            NameRow(name: name, isFavorite: true) { store.toggleFavorite(name) }
+                            FamilyNameCard(name: name)
                                 .onTapGesture { selectedName = name }
                         }
                         if !NameLibrary.twinPairs(from: store.favoriteNames).isEmpty {
@@ -316,7 +317,9 @@ private struct CoupleView: View {
                                 .padding(16).background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 16))
                         }
                         .buttonStyle(.plain)
-                        Text("Share this code with your partner. Version 1.0 keeps demo picks on this device; account sync can plug into this space later.").font(.caption).foregroundStyle(.secondary)
+                        Text("This stable, private invite stays on this device. The Couple Mode database can exchange it for member credentials when sync is enabled.").font(.caption).foregroundStyle(.secondary)
+                        Button("Create a new invite code") { store.regenerateInviteCode() }
+                            .font(.caption.bold()).tint(Brand.pink)
                     }
                     .padding(20).background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 24))
                     HStack(spacing: 12) {
@@ -392,6 +395,17 @@ private struct NameDetailView: View {
                         DetailPill(title: "Origin", value: name.origin, symbol: "globe")
                         DetailPill(title: "Style", value: name.style.rawValue, symbol: name.style.symbol)
                     }
+                    if !store.familyName.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("FULL-NAME PREVIEW").font(.caption.bold()).foregroundStyle(Brand.pink).tracking(1.1)
+                            Text(NameLibrary.fullName(for: name, familyName: store.familyName)).font(.title.bold())
+                            Text("\(NameLibrary.initials(for: name, familyName: store.familyName)) · \(NameLibrary.flowDescription(for: name, familyName: store.familyName))")
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(18)
+                        .background(.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 20))
+                    }
                     VStack(alignment: .leading, spacing: 12) {
                         Text("The feeling").font(.title2.bold())
                         FlowLayout(spacing: 9) { ForEach(name.vibe, id: \.self) { Text($0).font(.subheadline.bold()).padding(.horizontal, 14).padding(.vertical, 9).background(.white.opacity(0.08), in: Capsule()) } }
@@ -409,6 +423,59 @@ private struct NameDetailView: View {
             .background(Brand.ink)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } } }
         }
+    }
+}
+
+private struct FamilyNameLab: View {
+    @EnvironmentObject private var store: BabyNameStore
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("FAMILY NAME PREVIEW", systemImage: "textformat.abc")
+                .font(.caption.bold()).foregroundStyle(Brand.pink).tracking(1.1)
+            Text("Hear the whole name").font(.title2.bold())
+            Text("Try a surname to preview rhythm and initials. It stays private on this device.")
+                .font(.subheadline).foregroundStyle(.secondary)
+            HStack {
+                TextField("Family name", text: $store.familyName)
+                    .textInputAutocapitalization(.words)
+                    .submitLabel(.done)
+                    .onSubmit { store.saveFamilyName() }
+                if !store.familyName.isEmpty {
+                    Button("Save") { store.saveFamilyName() }.fontWeight(.bold)
+                }
+            }
+            .padding(.horizontal, 16).padding(.vertical, 13)
+            .background(.black.opacity(0.22), in: RoundedRectangle(cornerRadius: 16))
+        }
+        .padding(20)
+        .background(LinearGradient(colors: [Brand.purple.opacity(0.42), .white.opacity(0.05)], startPoint: .topLeading, endPoint: .bottomTrailing), in: RoundedRectangle(cornerRadius: 24))
+        .overlay(RoundedRectangle(cornerRadius: 24).stroke(.white.opacity(0.1)))
+    }
+}
+
+private struct FamilyNameCard: View {
+    @EnvironmentObject private var store: BabyNameStore
+    let name: BabyName
+
+    var body: some View {
+        HStack(spacing: 14) {
+            Text(NameLibrary.initials(for: name, familyName: store.familyName))
+                .font(.headline.bold()).frame(width: 52, height: 52)
+                .background(Brand.gradient, in: RoundedRectangle(cornerRadius: 16))
+            VStack(alignment: .leading, spacing: 4) {
+                Text(NameLibrary.fullName(for: name, familyName: store.familyName)).font(.title3.bold())
+                Text(NameLibrary.flowDescription(for: name, familyName: store.familyName))
+                    .font(.subheadline).foregroundStyle(.secondary).lineLimit(1)
+            }
+            Spacer()
+            Button { store.toggleFavorite(name) } label: {
+                Image(systemName: "heart.fill").foregroundStyle(Brand.pink).padding(8)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(14).background(.white.opacity(0.055), in: RoundedRectangle(cornerRadius: 19))
+        .overlay(RoundedRectangle(cornerRadius: 19).stroke(.white.opacity(0.07)))
     }
 }
 

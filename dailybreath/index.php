@@ -1,15 +1,6 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/../includes/ecosystem.php';
-$isGuestPreview = empty($_SESSION['user_id']);
-if ($isGuestPreview) {
-    // Keep the first-run experience useful to visitors and investors. Reading
-    // today's content does not require an account; saving progress does.
-    header('X-Beyond-Guest-Preview: DailyBreath');
-    $beyondWallet = beyond_nav_bootstrap('DailyBreath', ['balance'=>0,'currency'=>'BITS','status'=>'guest']);
-} else {
-    $beyondWallet = beyond_app_bootstrap('DailyBreath');
-}
 $pdo = beyond_db();
 
 require_once __DIR__ . '/includes/verse-of-day.php';
@@ -56,7 +47,7 @@ if ($faithTradition === 'torah') {
     ];
 }
 
-$name = trim((string)($_SESSION['name'] ?? '')) ?: 'Friend';
+$name = 'Friend';
 ?>
 <!doctype html>
 <html lang="en" data-faith="<?= e($faithTradition) ?>">
@@ -109,6 +100,7 @@ html[data-faith=bible] .bottom,html[data-faith=torah] .bottom{color:#365143;back
 html[data-faith=bible] .splash{color:#17231b;background:linear-gradient(#f3f8f2e8,#e9f2e9f5)}html[data-faith=torah] .splash{color:#332d20;background:linear-gradient(#f8f3e7f0,#eef3f9f5)}html[data-faith=bible] .splash h1,html[data-faith=torah] .splash h1{text-shadow:none;color:#173f2c}html[data-faith=bible] .splash p,html[data-faith=torah] .splash p{color:#5d7163}
 </style>
 <style>.bottom-dock{position:fixed;z-index:2147483500;left:50%;bottom:18px;transform:translateX(-50%);width:min(430px,calc(100% - 36px));height:52px;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;padding:5px 8px;border:1px solid #ffffff55;border-radius:999px;color:#dce7dd;background:rgba(18,57,39,.97);box-shadow:0 14px 38px #001a0d66;backdrop-filter:blur(20px)}.bottom-dock a{display:flex;height:40px;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:9px;font-weight:750}.bottom-dock svg{width:19px;height:19px}.bottom-dock .active{color:#f0cf83}html[data-faith=bible] .bottom-dock,html[data-faith=torah] .bottom-dock{color:#365143;background:#fffffff0;border-color:#d0ddd2}</style>
+<style>body{background-image:radial-gradient(circle at 88% -8%,#dcebd7 0,transparent 34%),radial-gradient(circle at 6% 12%,#f5e7d5 0,transparent 28%),linear-gradient(180deg,#f8fbf7,#edf4ee 52%,#e7f0e9)!important;background-attachment:scroll!important}</style>
 </head>
 <body>
 <div class="splash" id="splash"><div class="splash-inner"><img class="splash-mark" src="assets/icons/dailybreath-mark-v2.png?v=20260901-2" alt=""><span class="kicker">FAITH · GROWTH · PEACE · PURPOSE</span><h1>Daily Breath</h1><p>Begin with Scripture. Breathe, pray, learn, and carry peace into your day.</p><button id="enter" type="button">Enter Daily Breath →</button></div></div>

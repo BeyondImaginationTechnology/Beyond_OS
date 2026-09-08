@@ -41,6 +41,30 @@ enum NameLibrary {
 
     static var origins: [String] { Array(Set(all.map(\.origin))).sorted() }
 
+    static func fullName(for name: BabyName, familyName: String) -> String {
+        let surname = familyName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return surname.isEmpty ? name.name : "\(name.name) \(surname)"
+    }
+
+    static func initials(for name: BabyName, familyName: String) -> String {
+        fullName(for: name, familyName: familyName)
+            .split(separator: " ")
+            .compactMap(\.first)
+            .map(String.init)
+            .joined()
+            .uppercased()
+    }
+
+    static func flowDescription(for name: BabyName, familyName: String) -> String {
+        guard !familyName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return "Add a family name to hear the complete rhythm."
+        }
+        let firstLength = name.name.count
+        let familyLength = familyName.filter(\.isLetter).count
+        if abs(firstLength - familyLength) <= 2 { return "Balanced, even rhythm" }
+        return firstLength < familyLength ? "Crisp first name, flowing finish" : "Expressive first name, concise finish"
+    }
+
     static func search(_ query: String, style: NameStyle?, origin: String?, vibes: Set<String>) -> [BabyName] {
         let needle = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         return all.filter { item in

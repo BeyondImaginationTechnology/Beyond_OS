@@ -51,6 +51,10 @@ struct RootView: View {
         .preferredColorScheme(preferredScheme)
         .onOpenURL(perform: openDeepLink)
         .onAppear {
+            if let captureRoute = DailyBreathCaptureRoute.url {
+                openDeepLink(captureRoute)
+                return
+            }
             guard let value = UserDefaults.standard.string(forKey: "pendingDailyBreathDeepLink"),
                   let url = URL(string: value) else { return }
             UserDefaults.standard.removeObject(forKey: "pendingDailyBreathDeepLink")
@@ -126,6 +130,17 @@ struct RootView: View {
         case .journal:
             NavigationStack { JournalView() }
         }
+    }
+}
+
+private enum DailyBreathCaptureRoute {
+    static var url: URL? {
+        guard let flagIndex = CommandLine.arguments.firstIndex(of: "-dailyBreathCaptureRoute"),
+              CommandLine.arguments.indices.contains(flagIndex + 1) else {
+            return nil
+        }
+
+        return URL(string: "dailybreath://\(CommandLine.arguments[flagIndex + 1])")
     }
 }
 

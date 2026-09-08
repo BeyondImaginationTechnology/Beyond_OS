@@ -1,7 +1,7 @@
 {
   "name": "Beyond Baby Names",
   "short_name": "Baby Names",
-  "description": "Discover meaningful baby names and find the one together.",
+  "description": "Discover meaningful baby names, preview the full name, and find the one together.",
   "start_url": "/beyond-baby-names/",
   "scope": "/beyond-baby-names/",
   "display": "standalone",

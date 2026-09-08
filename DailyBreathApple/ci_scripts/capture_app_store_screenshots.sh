@@ -56,7 +56,10 @@ capture_set() {
   local destination="$output_root/$folder"
   mkdir -p "$destination"
   while IFS='|' read -r filename route; do
-    xcrun simctl openurl "$udid" "dailybreath://$route"
+    # `openurl` presents iOS's "Open in The Daily Breath?" confirmation.
+    # Launching with a simulator-only route argument keeps every capture in-app.
+    xcrun simctl terminate "$udid" "$bundle_id" 2>/dev/null || true
+    xcrun simctl launch "$udid" "$bundle_id" -dailyBreathCaptureRoute "$route" >/dev/null
     sleep 4
     xcrun simctl io "$udid" screenshot "$destination/$filename"
   done <<'ROUTES'

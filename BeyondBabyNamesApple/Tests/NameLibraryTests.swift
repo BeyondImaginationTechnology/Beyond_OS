@@ -23,4 +23,11 @@ final class NameLibraryTests: XCTestCase {
         XCTAssertFalse(pairs.isEmpty)
         XCTAssertTrue(pairs.allSatisfy { $0.first != $0.second })
     }
+
+    func testFamilyNamePreviewBuildsNameInitialsAndFlow() {
+        let luna = NameLibrary.all.first { $0.name == "Luna" }!
+        XCTAssertEqual(NameLibrary.fullName(for: luna, familyName: " Carter "), "Luna Carter")
+        XCTAssertEqual(NameLibrary.initials(for: luna, familyName: "Carter"), "LC")
+        XCTAssertEqual(NameLibrary.flowDescription(for: luna, familyName: "Carter"), "Balanced, even rhythm")
+    }
 }

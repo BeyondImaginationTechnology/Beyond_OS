@@ -3,19 +3,13 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/ecosystem.php';
 require_once __DIR__ . '/includes/verse-of-day.php';
 require_once __DIR__ . '/includes/web-app.php';
-$isGuestPreview = empty($_SESSION['user_id']);
-if ($isGuestPreview) {
-  header('X-Beyond-Guest-Preview: DailyBreath-Practices');
-  $beyondWallet = beyond_nav_bootstrap('DailyBreath', ['balance'=>0,'currency'=>'BITS','status'=>'guest']);
-} else {
-  $beyondWallet = beyond_app_bootstrap('DailyBreath');
-}
+$isGuestPreview = true;
 $pdo = beyond_db();
 $userId = (int)$_SESSION['user_id'];
 dailybreath_ensure_web_tables($pdo);
 $section = in_array($_GET['section'] ?? '', ['breathing','prayers','journal','challenge'], true) ? $_GET['section'] : 'breathing';
 if (empty($_SESSION['practice_csrf'])) $_SESSION['practice_csrf'] = bin2hex(random_bytes(24));
-$notice=$isGuestPreview?'Demo mode: breathing and prayer are available without an account. Create a free Beyond ID when you want to save progress or reflections.':'';$error='';
+$notice=$isGuestPreview?'Breathing and prayer are available here. Personal accounts and cloud saving are not part of Daily Breath at this time.':'';$error='';
 
 function journal_key(): string {
   if (!function_exists('sodium_crypto_secretbox')) throw new RuntimeException('Secure journal encryption requires the PHP Sodium extension.');
@@ -24,7 +18,7 @@ function journal_key(): string {
     $decoded = base64_decode($env, true);
     if ($decoded !== false && strlen($decoded) === SODIUM_CRYPTO_SECRETBOX_KEYBYTES) return $decoded;
   }
-  $privateDir = __DIR__ . '/../beyond-id/storage/private';
+  $privateDir = __DIR__ . '/../storage/private';
   $keyFile = $privateDir . '/dailybreath-journal.key';
   if (!is_dir($privateDir) && !mkdir($privateDir, 0700, true) && !is_dir($privateDir)) throw new RuntimeException('The private journal storage folder could not be created.');
   $denyFile = $privateDir . '/.htaccess';
@@ -50,7 +44,7 @@ function journal_decrypt(string $encoded): string {
 
 if ($_SERVER['REQUEST_METHOD']==='POST') {
   try {
-    if ($isGuestPreview) throw new RuntimeException('Create a free Beyond ID to save practice progress.');
+    if ($isGuestPreview) throw new RuntimeException('Personal accounts and cloud saving are not available at this time.');
     if (!hash_equals((string)$_SESSION['practice_csrf'], (string)($_POST['csrf'] ?? ''))) throw new RuntimeException('Reload the page and try again.');
     $action=$_POST['action'] ?? '';
     if ($action==='breath') {
@@ -182,5 +176,5 @@ html[data-db-theme=dusk] .top,html[data-db-theme=dusk] .hero,html[data-db-theme=
 </script>
 <?php endif;?>
 <?php if($section==='prayers'):?><section class="card"><h2>Prayers for this moment</h2><?php foreach($prayers as $prayer):?><article class="prayer"><strong><?= e($prayer['title']) ?></strong><p><?= e($prayer['prayer_text']) ?></p><small><?= e($prayer['scripture_reference']) ?></small></article><?php endforeach;?></section><?php endif;?>
-<?php if($section==='journal'):?><section class="card"><div class="journal-head"><div><h2>Private Reflection Journal</h2><p class="muted">Your entries are encrypted before they are stored.</p></div><span class="journal-count"><?= count($journalEntries) ?> recent</span></div><p><strong>Today’s prompt:</strong> <?= e($prompt['prompt_text']??'What is God inviting you to notice today?') ?></p><form method="post" id="journal-form" autocomplete="off"><input type="hidden" name="csrf" value="<?= e($_SESSION['practice_csrf']) ?>"><input type="hidden" name="action" value="journal"><input type="hidden" name="prompt_id" value="<?= (int)($prompt['id']??0) ?>"><label for="journal-mood">Mood</label><input id="journal-mood" class="field" name="mood" maxlength="40" value="<?= e((string)($_POST['mood']??'')) ?>" placeholder="Peaceful, hopeful, uncertain…"><label for="journal-entry">Reflection</label><textarea id="journal-entry" class="field area" name="entry" maxlength="10000" required placeholder="Write privately here…"><?= e((string)($_POST['entry']??'')) ?></textarea><p class="privacy" id="journal-draft-status" role="status">Drafts stay on this device until you submit.</p><div class="submit-row"><button class="btn" type="submit">Submit private reflection</button><span class="privacy">🔒 Visible only through your Beyond ID</span></div></form></section><section class="card"><h2>Recent reflections</h2><?php if(!$journalEntries):?><p class="muted">Your submitted reflections will appear here.</p><?php endif;?><?php foreach($journalEntries as $entry):?><article class="entry"><div class="entry-top"><div><time><?= e(date('M j, Y · g:i a',strtotime((string)$entry['created_at']))) ?></time><?php if(trim((string)$entry['mood'])!==''):?> <span class="mood"><?= e($entry['mood']) ?></span><?php endif;?></div><form method="post" onsubmit="return confirm('Delete this private journal entry?')"><input type="hidden" name="csrf" value="<?= e($_SESSION['practice_csrf']) ?>"><input type="hidden" name="action" value="delete_journal"><input type="hidden" name="entry_id" value="<?= (int)$entry['id'] ?>"><button class="delete" type="submit">Delete</button></form></div><?php if(!empty($entry['prompt_text'])):?><small class="muted"><?= e($entry['prompt_text']) ?></small><?php endif;?><p><?= e($entry['content_plain']) ?></p></article><?php endforeach;?></section><?php endif;?>
-<?php if($section==='challenge'&&$challenge):?><section class="card"><h2><?= e($challenge['title']) ?></h2><p><?= e($challenge['description']) ?></p><p class="muted"><?= e($challenge['scripture_reference']) ?></p><?php if(!empty($challenge['steps'])):?><ol><?php foreach($challenge['steps'] as $step):?><li><?= e($step) ?></li><?php endforeach;?></ol><?php endif;?><div class="progress"><span style="width:<?= min(100,round($progress/max(1,(int)$challenge['target_count'])*100)) ?>%"></span></div><p><?= $progress ?> of <?= (int)$challenge['target_count'] ?> days complete</p><form method="post"><input type="hidden" name="csrf" value="<?= e($_SESSION['practice_csrf']) ?>"><input type="hidden" name="action" value="challenge"><input type="hidden" name="challenge_id" value="<?= e((string)$challenge['id']) ?>"><input type="hidden" name="challenge_source" value="<?= ($challenge['source']??'')==='bundled_recovery_challenge'?'bundled':'database' ?>"><button class="btn" <?= $progress >= (int)$challenge['target_count']?'disabled':'' ?>><?= $progress >= (int)$challenge['target_count']?'Challenge complete':'Mark today complete' ?></button></form><p class="privacy">Progress is saved to your Beyond ID, including bundled recovery challenges.</p></section><?php endif;?></main><?php if($section==='journal'):?><script>(()=>{const form=document.getElementById('journal-form'),entry=document.getElementById('journal-entry'),mood=document.getElementById('journal-mood'),status=document.getElementById('journal-draft-status'),key='dailybreath.journal.draft';if(!form||!entry)return;try{const draft=JSON.parse(localStorage.getItem(key)||'null');if(draft&&!entry.value&&!mood.value){entry.value=draft.entry||'';mood.value=draft.mood||'';if(draft.entry||draft.mood)status.textContent='Draft restored from this device.'}}catch(e){};const save=()=>{try{localStorage.setItem(key,JSON.stringify({entry:entry.value,mood:mood.value}))}catch(e){}};entry.addEventListener('input',save);mood.addEventListener('input',save);form.addEventListener('submit',()=>{try{localStorage.removeItem(key)}catch(e){}})})();</script><?php endif;?><?=dailybreath_web_scripts()?><script src="/assets/js/visitor-analytics.js" defer></script></body></html>
+<?php if($section==='journal'):?><section class="card"><div class="journal-head"><div><h2>Private Reflection Journal</h2><p class="muted">Personal accounts and cloud journaling are coming in a future release.</p></div></section><?php endif;?>
+<?php if($section==='challenge'&&$challenge):?><section class="card"><h2><?= e($challenge['title']) ?></h2><p><?= e($challenge['description']) ?></p><p class="muted"><?= e($challenge['scripture_reference']) ?></p><?php if(!empty($challenge['steps'])):?><ol><?php foreach($challenge['steps'] as $step):?><li><?= e($step) ?></li><?php endforeach;?></ol><?php endif;?><p class="privacy">Progress tracking will return in a future release.</p></section><?php endif;?></main><?=dailybreath_web_scripts()?><script src="/assets/js/visitor-analytics.js" defer></script></body></html>

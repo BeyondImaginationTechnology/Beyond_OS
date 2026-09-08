@@ -1,4 +1,4 @@
-# Beyond Baby Names 1.0 for iOS
+# Beyond Baby Names 1.1 for iOS
 
 A native SwiftUI baby-name discovery app based on the Beyond Baby Names brand.
 
@@ -9,6 +9,7 @@ A native SwiftUI baby-name discovery app based on the Beyond Baby Names brand.
 - Swipe flow with Pass, Maybe, and Love decisions.
 - Couple Mode with a shareable invite code, demo partner picks, and match reveals.
 - Twin-name pair ideas generated from the user’s shortlist.
+- Private family-name previews with complete-name rhythm and initials.
 - iPhone, iPad, and Mac Catalyst targets with an App Store-ready 1024px icon.
 
 ## Build
@@ -27,4 +28,4 @@ xcodegen generate
 open BeyondBabyNames.xcodeproj
 ```
 
-The bundle identifier is `technology.co.beyondimagination.beyondbabynames`, marketing version is `1.0.0`, and signing is configured for the repository’s existing Apple team.
+The bundle identifier is `technology.co.beyondimagination.beyondbabynames`, marketing version is `1.1.0`, and signing is configured for the repository’s existing Apple team.

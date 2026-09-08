@@ -1,4 +1,4 @@
-const CACHE = 'beyond-baby-names-1.0.0';
+const CACHE = 'beyond-baby-names-1.1.0';
 const CORE = [
   '/beyond-baby-names/',
   '/beyond-baby-names/assets/app-icon.png',

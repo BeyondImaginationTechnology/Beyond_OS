@@ -41,14 +41,15 @@ DirectoryIndex index.php index.html
     Header set Service-Worker-Allowed "/"
   </Files>
 
-  # CSS and JavaScript may be stored locally, but the browser must check for
-  # a newer deployed copy before using them.
+  # Static styles and scripts are cacheable. Versioned URLs are already used
+  # for deployment-sensitive assets; unversioned files get the same bounded
+  # 30-day lifetime rather than being marked immutable.
   <FilesMatch "\.(?:css|js)$">
-    Header set Cache-Control "no-cache, must-revalidate, max-age=0"
+    Header set Cache-Control "public, max-age=2592000"
   </FilesMatch>
 
   <FilesMatch "\.(?:png|jpe?g|gif|webp|svg|woff2?)$">
-    Header set Cache-Control "public, max-age=604800"
+    Header set Cache-Control "public, max-age=7776000"
   </FilesMatch>
 </IfModule>
 

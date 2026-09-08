@@ -46,6 +46,8 @@ function database(): PDO
     ]);
     $pdo->exec('PRAGMA foreign_keys = ON');
     $pdo->exec((string) file_get_contents(dirname(__DIR__) . '/database/schema.sql'));
+    $cleanup = $pdo->prepare('DELETE FROM couple_spaces WHERE expires_at <= :now');
+    $cleanup->execute(['now' => gmdate('c')]);
     return $pdo;
 }
 
@@ -79,9 +81,19 @@ function secret_hash(string $value): string
     return hash('sha256', $value);
 }
 
+function text_limit(string $value, int $length): string
+{
+    return function_exists('mb_substr') ? mb_substr($value, 0, $length) : substr($value, 0, $length);
+}
+
+function text_key(string $value): string
+{
+    return function_exists('mb_strtolower') ? mb_strtolower($value) : strtolower($value);
+}
+
 function display_name(mixed $value): string
 {
-    return mb_substr(trim(is_string($value) ? $value : ''), 0, 60);
+    return text_limit(trim(is_string($value) ? $value : ''), 60);
 }
 
 function bearer_token(): string
@@ -243,12 +255,12 @@ function join_space(PDO $pdo, array $input): never
 function save_pick(PDO $pdo, array $input): never
 {
     $current = member($pdo);
-    $label = mb_substr(trim((string) ($input['name'] ?? '')), 0, 80);
+    $label = text_limit(trim((string) ($input['name'] ?? '')), 80);
     $decision = (string) ($input['decision'] ?? '');
     if ($label === '' || !in_array($decision, ['pass', 'maybe', 'love'], true)) {
         respond(422, ['error' => 'invalid_pick']);
     }
-    $key = mb_strtolower($label);
+    $key = text_key($label);
     $statement = $pdo->prepare(
         'INSERT INTO couple_picks (couple_id, member_id, name_key, name_label, decision, updated_at)
          VALUES (:couple, :member, :key, :label, :decision, :updated)
@@ -266,6 +278,14 @@ function save_pick(PDO $pdo, array $input): never
         'updated' => gmdate('c'),
     ]);
     respond(200, ['saved' => true]);
+}
+
+function close_space(PDO $pdo): never
+{
+    $current = member($pdo);
+    $statement = $pdo->prepare('DELETE FROM couple_spaces WHERE id = :couple');
+    $statement->execute(['couple' => $current['couple_id']]);
+    respond(200, ['closed' => true]);
 }
 
 function get_state(PDO $pdo): never
@@ -308,6 +328,7 @@ try {
         'join' => join_space($pdo, $input),
         'savePick' => save_pick($pdo, $input),
         'state' => get_state($pdo),
+        'close' => close_space($pdo),
         default => respond(422, ['error' => 'unknown_action']),
     };
 } catch (Throwable $error) {

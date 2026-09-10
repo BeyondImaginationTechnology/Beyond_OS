@@ -293,6 +293,7 @@ private struct FavoritesView: View {
 private struct CoupleView: View {
     @EnvironmentObject private var store: BabyNameStore
     @State private var copied = false
+    @State private var joinCode = ""
 
     var body: some View {
         NavigationStack {
@@ -307,19 +308,23 @@ private struct CoupleView: View {
                     .padding(.vertical, 16)
                     VStack(alignment: .leading, spacing: 14) {
                         Text("YOUR COUPLE SPACE").font(.caption.bold()).foregroundStyle(Brand.pink).tracking(1.2)
-                        TextField("Partner name", text: $store.partnerName).textFieldStyle(.plain).font(.title3.bold()).onSubmit { store.savePartnerName() }
-                        Button {
-                            UIPasteboard.general.string = store.inviteCode
-                            copied = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { copied = false }
-                        } label: {
-                            HStack { Text(store.inviteCode).font(.system(.headline, design: .monospaced)); Spacer(); Label(copied ? "Copied" : "Copy", systemImage: copied ? "checkmark" : "doc.on.doc") }
-                                .padding(16).background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 16))
+                        TextField("Your name", text: $store.partnerName).textFieldStyle(.plain).font(.title3.bold()).onSubmit { store.savePartnerName() }
+                        if store.isCoupleConnected {
+                            Button {
+                                UIPasteboard.general.string = store.inviteCode
+                                copied = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { copied = false }
+                            } label: {
+                                HStack { Text(store.inviteCode).font(.system(.headline, design: .monospaced)); Spacer(); Label(copied ? "Copied" : "Copy", systemImage: copied ? "checkmark" : "doc.on.doc") }
+                                    .padding(16).background(.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 16))
+                            }.buttonStyle(.plain)
+                            Button(store.isCoupleSyncing ? "Syncing…" : "Refresh shared matches") { Task { await store.refreshCoupleState() } }.disabled(store.isCoupleSyncing)
+                        } else {
+                            Button(store.isCoupleSyncing ? "Creating…" : "Create private space") { store.savePartnerName(); Task { await store.createCoupleSpace() } }.buttonStyle(.borderedProminent).tint(Brand.pink).disabled(store.isCoupleSyncing)
+                            TextField("Partner invite code", text: $joinCode).textInputAutocapitalization(.characters).autocorrectionDisabled().textFieldStyle(.roundedBorder)
+                            Button("Join partner’s space") { store.savePartnerName(); Task { await store.joinCoupleSpace(code: joinCode) } }.disabled(joinCode.isEmpty || store.isCoupleSyncing)
                         }
-                        .buttonStyle(.plain)
-                        Text("This stable, private invite stays on this device. The Couple Mode database can exchange it for member credentials when sync is enabled.").font(.caption).foregroundStyle(.secondary)
-                        Button("Create a new invite code") { store.regenerateInviteCode() }
-                            .font(.caption.bold()).tint(Brand.pink)
+                        Text(store.coupleStatus).font(.caption).foregroundStyle(.secondary)
                     }
                     .padding(20).background(.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 24))
                     HStack(spacing: 12) {
@@ -339,8 +344,6 @@ private struct CoupleView: View {
                             }
                         }
                     }
-                    Button("Refresh demo partner picks") { store.loadDemoPartnerPicks() }
-                        .buttonStyle(.bordered).tint(.white.opacity(0.7))
                 }
                 .padding(20)
             }

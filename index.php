@@ -508,7 +508,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     <div><h4>DISCOVER</h4><a href="app-store/">App Store</a><a href="release-notes.php">What’s New</a><a href="beyond-id/dashboard/wallet.php">Wallet</a><a href="academy/">Learn</a><a href="beyond-tv/">Beyond TV</a><a href="https://os.beyondimagination.co.technology/">BIT OS</a></div>
     <div><h4>COMPANY</h4><a href="about.php">About</a><a href="investors.php">Investors</a><a href="blog.php">Blog</a><a href="contact.php">Contact</a></div>
     <div><h4>SUPPORT</h4><a href="help-center.php">Help Center</a><a href="legal/privacy.php">Privacy Policy</a><a href="legal/terms.php">Terms of Service</a></div>
-    <div><h4>FOLLOW US</h4><a href="https://www.instagram.com/beyondimaginationtech/" target="_blank" rel="noopener noreferrer">Instagram @beyondimaginationtech</a></div>
+    <div><h4>FOLLOW US</h4><a href="https://www.instagram.com/beyondimaginationtech/" target="_blank" rel="noopener noreferrer">Instagram @beyondimaginationtech</a><a href="https://www.youtube.com/@beyondimaginationtech" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:9px;margin:9px 0"><img src="/assets/img/beyond-imagination-youtube-profile.png" alt="Beyond Imagination YouTube profile" width="30" height="30" style="border-radius:50%;border:1px solid rgba(255,255,255,.24);box-shadow:0 5px 14px rgba(72,82,255,.22)"><span>YouTube @beyondimaginationtech</span></a></div>
 </footer>
 <script>
 (function(){

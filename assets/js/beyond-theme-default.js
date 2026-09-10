@@ -6,7 +6,8 @@
   var labels = { fall: 'Fall', dark: 'Dark', light: 'Light', sunset: 'Sunset', ocean: 'Ocean', forest: 'Forest' };
   function validTheme(theme) { return themes.indexOf(theme) !== -1; }
   function defaultTheme() { var preferred = root.getAttribute('data-default-theme'); return validTheme(preferred) ? preferred : 'dark'; }
-  function savedTheme() { try { var saved = localStorage.getItem('beyond-theme'); return validTheme(saved) ? saved : defaultTheme(); } catch (error) { return defaultTheme(); } }
+  // Pages may opt into a deliberate default without overwriting the visitor's global choice.
+  function savedTheme() { if (root.hasAttribute('data-default-theme')) return defaultTheme(); try { var saved = localStorage.getItem('beyond-theme'); return validTheme(saved) ? saved : defaultTheme(); } catch (error) { return defaultTheme(); } }
   function each(selector, callback) { var nodes = document.querySelectorAll(selector); for (var index = 0; index < nodes.length; index += 1) callback(nodes[index]); }
   function applyTheme(theme) {
     if (!validTheme(theme)) theme = defaultTheme();

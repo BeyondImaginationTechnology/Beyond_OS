@@ -146,8 +146,8 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
         <p class="tagline">Live. Learn. Earn. Explore.</p>
         <p class="intro">Useful apps for wellness, learning, creator commerce and entertainment—connected through Beyond ID. BIT OS is the planned operating-environment layer for home, learning, creating and organizational work.</p>
         <div class="hero-actions">
-            <a class="primary" href="app-store/">Explore the apps &nbsp;→</a>
-            <a class="ghost" href="/os/">Explore BIT OS →</a>
+            <a class="primary" href="https://os.beyondimagination.co.technology/">Explore The OS &nbsp;→</a>
+            <a class="ghost" href="/app-store/">Open the App Store →</a>
         </div>
         <div class="benefits"><span><b>∞</b> Every possibility, connected</span></div>
     </div>

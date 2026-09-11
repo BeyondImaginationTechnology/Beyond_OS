@@ -66,8 +66,11 @@ steps:
       xcodebuild -version
       simulator_udid="$(xcrun simctl list devices available -j | /usr/bin/ruby -rjson -e '
         devices = JSON.parse(STDIN.read).fetch("devices").values.flatten
-        device = devices.find { |candidate| candidate["isAvailable"] && candidate["name"].start_with?("iPhone") }
+        preferred_names = ["iPhone 14 Plus", "iPhone 13 Pro Max", "iPhone 12 Pro Max"]
+        device = preferred_names.lazy.map { |name| devices.find { |candidate| candidate["isAvailable"] && candidate["name"] == name } }.find(&:itself)
+        device ||= devices.find { |candidate| candidate["isAvailable"] && candidate["name"].start_with?("iPhone") }
         abort "No available iPhone simulator was found." unless device
+        warn "Using #{device.fetch("name")} for tests and screenshots."
         puts device.fetch("udid")
       ')"
       xcodebuild test \
@@ -75,6 +78,28 @@ steps:
         -scheme BeyondBabyNames \
         -destination "id=$simulator_udid" \
         CODE_SIGNING_ALLOWED=NO
+      screenshot_directory="$(Build.ArtifactStagingDirectory)/beyond-baby-names-screenshots"
+      screenshot_derived_data="$(Build.SourcesDirectory)/BeyondBabyNamesApple/screenshot-derived-data"
+      rm -rf "$screenshot_directory" "$screenshot_derived_data"
+      mkdir -p "$screenshot_directory"
+      xcodebuild build \
+        -project BeyondBabyNames.xcodeproj \
+        -scheme BeyondBabyNames \
+        -sdk iphonesimulator \
+        -destination "id=$simulator_udid" \
+        -derivedDataPath "$screenshot_derived_data" \
+        CODE_SIGNING_ALLOWED=NO
+      app_path="$(find "$screenshot_derived_data/Build/Products/Debug-iphonesimulator" -maxdepth 1 -name 'BeyondBabyNames.app' -print -quit)"
+      test -n "$app_path"
+      xcrun simctl boot "$simulator_udid" || true
+      xcrun simctl bootstatus "$simulator_udid" -b
+      xcrun simctl install "$simulator_udid" "$app_path"
+      for tab in discover swipe favorites together; do
+        xcrun simctl terminate "$simulator_udid" technology.co.beyondimagination.beyondbabynames || true
+        xcrun simctl launch "$simulator_udid" technology.co.beyondimagination.beyondbabynames -captureScreenshots -screenshotTab "$tab"
+        sleep 3
+        xcrun simctl io "$simulator_udid" screenshot "$screenshot_directory/beyond-baby-names-$tab.png"
+      done
       gem install bundler -v 2.7.2 --no-document
       bundle _2.7.2_ config set path vendor/bundle
       bundle _2.7.2_ install
@@ -95,3 +120,11 @@ steps:
       artifact: beyond-baby-names-build-logs
       publishLocation: pipeline
     displayName: Publish Xcode build logs
+
+  - task: PublishPipelineArtifact@1
+    condition: succeededOrFailed()
+    inputs:
+      targetPath: $(Build.ArtifactStagingDirectory)/beyond-baby-names-screenshots
+      artifact: beyond-baby-names-screenshots
+      publishLocation: pipeline
+    displayName: Publish Beyond Baby Names screenshots

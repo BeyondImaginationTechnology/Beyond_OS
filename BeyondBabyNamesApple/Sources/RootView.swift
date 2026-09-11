@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 #if canImport(UIKit)
 import UIKit
@@ -11,22 +12,47 @@ private enum Brand {
     static let gradient = LinearGradient(colors: [blue, purple, pink], startPoint: .bottomLeading, endPoint: .topTrailing)
 }
 
+private enum AppTab: String {
+    case discover, swipe, favorites, together
+}
+
+private enum LaunchOptions {
+    static let arguments = ProcessInfo.processInfo.arguments
+    static let capturesScreenshots = arguments.contains("-captureScreenshots")
+
+    static var screenshotTab: AppTab? {
+        guard capturesScreenshots,
+              let index = arguments.firstIndex(of: "-screenshotTab"),
+              arguments.indices.contains(index + 1) else { return nil }
+        return AppTab(rawValue: arguments[index + 1])
+    }
+}
+
 struct RootView: View {
     @AppStorage("beyond.baby.didOnboard") private var didOnboard = false
+    @State private var selectedTab: AppTab
+
+    init() {
+        _selectedTab = State(initialValue: LaunchOptions.screenshotTab ?? .discover)
+    }
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             DiscoverView()
                 .tabItem { Label("Discover", systemImage: "sparkles") }
+                .tag(AppTab.discover)
             SwipeView()
                 .tabItem { Label("Swipe", systemImage: "rectangle.stack.fill") }
+                .tag(AppTab.swipe)
             FavoritesView()
                 .tabItem { Label("Favorites", systemImage: "heart.fill") }
+                .tag(AppTab.favorites)
             CoupleView()
                 .tabItem { Label("Together", systemImage: "person.2.fill") }
+                .tag(AppTab.together)
         }
         .tint(Brand.pink)
-        .fullScreenCover(isPresented: Binding(get: { !didOnboard }, set: { if !$0 { didOnboard = true } })) {
+        .fullScreenCover(isPresented: Binding(get: { !didOnboard && !LaunchOptions.capturesScreenshots }, set: { if !$0 { didOnboard = true } })) {
             OnboardingView { didOnboard = true }
         }
     }

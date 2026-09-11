@@ -15,6 +15,7 @@ final class BabyNameStore: ObservableObject {
     @Published private(set) var isCoupleSyncing = false
 
     private let defaults: UserDefaults
+    private static let isScreenshotMode = ProcessInfo.processInfo.arguments.contains("-captureScreenshots")
     private var memberToken: String? { Keychain.value(for: "beyond.baby.coupleMemberToken") }
     private enum Key {
         static let favorites = "beyond.baby.favorites"
@@ -28,24 +29,36 @@ final class BabyNameStore: ObservableObject {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        favorites = Set(defaults.stringArray(forKey: Key.favorites) ?? [])
-        partnerLikes = Set(defaults.stringArray(forKey: Key.partnerLikes) ?? [])
-        preferredVibes = Set(defaults.stringArray(forKey: Key.vibes) ?? ["Rare", "Gentle"])
-        partnerName = defaults.string(forKey: Key.partnerName) ?? "My partner"
-        familyName = defaults.string(forKey: Key.familyName) ?? ""
-        inviteCode = defaults.string(forKey: Key.inviteCode) ?? ""
-        if let data = defaults.data(forKey: Key.choices),
-           let savedChoices = try? JSONDecoder().decode([String: SwipeChoice].self, from: data) {
-            choices = savedChoices
+        if Self.isScreenshotMode {
+            favorites = ["Caleb", "Elio"]
+            partnerLikes = ["Caleb", "Elio", "Ezra", "Kai", "Luca", "Noah", "Sage"]
+            choices = ["Caleb": .love, "Elio": .love]
+            preferredVibes = ["Rare", "Gentle"]
+            partnerName = "My partner"
+            familyName = "Carter"
+            inviteCode = "BBN-DEMO"
+            coupleMemberCount = 2
+            coupleStatus = "Connected — shared loves are ready."
         } else {
-            choices = [:]
+            favorites = Set(defaults.stringArray(forKey: Key.favorites) ?? [])
+            partnerLikes = Set(defaults.stringArray(forKey: Key.partnerLikes) ?? [])
+            preferredVibes = Set(defaults.stringArray(forKey: Key.vibes) ?? ["Rare", "Gentle"])
+            partnerName = defaults.string(forKey: Key.partnerName) ?? "My partner"
+            familyName = defaults.string(forKey: Key.familyName) ?? ""
+            inviteCode = defaults.string(forKey: Key.inviteCode) ?? ""
+            if let data = defaults.data(forKey: Key.choices),
+               let savedChoices = try? JSONDecoder().decode([String: SwipeChoice].self, from: data) {
+                choices = savedChoices
+            } else {
+                choices = [:]
+            }
+            if memberToken != nil { coupleStatus = "Private space connected." }
         }
-        if memberToken != nil { coupleStatus = "Private space connected." }
     }
 
     var favoriteNames: [BabyName] { NameLibrary.all.filter { favorites.contains($0.id) } }
     var matches: [BabyName] { NameLibrary.all.filter { favorites.contains($0.id) && partnerLikes.contains($0.id) } }
-    var isCoupleConnected: Bool { memberToken != nil }
+    var isCoupleConnected: Bool { Self.isScreenshotMode || memberToken != nil }
 
     func toggleFavorite(_ name: BabyName) {
         if favorites.contains(name.id) { favorites.remove(name.id) } else { favorites.insert(name.id) }

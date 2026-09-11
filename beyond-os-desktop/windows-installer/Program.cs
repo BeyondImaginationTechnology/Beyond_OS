@@ -46,7 +46,7 @@ namespace BITOSInstaller
         private readonly List<ReleaseDefinition> releases = new List<ReleaseDefinition>
         {
             new ReleaseDefinition {
-                Edition = "BIT OS Cyber", Version = "1.0", Available = true,
+                Edition = "BIT OS Cyber", Version = "1.0", Available = false,
                 ImageUrl = "https://beyondimagination.co.technology/downloads/cyber/1.0/bit-os-cyber-1.0-installer.img",
                 ChecksumsUrl = "https://beyondimagination.co.technology/downloads/cyber/1.0/SHA256SUMS"
             },
@@ -56,7 +56,7 @@ namespace BITOSInstaller
                 ChecksumsUrl = "https://beyondimagination.co.technology/downloads/home/1.0/SHA256SUMS"
             },
             new ReleaseDefinition {
-                Edition = "BIT OS Core", Version = "1.0", Available = true,
+                Edition = "BIT OS Core", Version = "1.0", Available = false,
                 ImageUrl = "https://beyondimagination.co.technology/downloads/core/1.0/bit-os-core-1.0-installer.img",
                 ChecksumsUrl = "https://beyondimagination.co.technology/downloads/core/1.0/SHA256SUMS"
             }

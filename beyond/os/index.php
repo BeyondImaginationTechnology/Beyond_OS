@@ -12,6 +12,14 @@ $platformOrigin = 'https://beyondimagination.co.technology';
 
 if ($isDedicatedOsHost) {
     $downloads = $osOrigin . '/downloads/cyber/1.0/';
+    $releaseRoot = rtrim((string)($_SERVER['DOCUMENT_ROOT'] ?? ''), DIRECTORY_SEPARATOR);
+    $hasReleaseFile = static function (string $file) use ($releaseRoot): bool {
+        return $releaseRoot !== '' && is_file($releaseRoot . '/downloads/cyber/1.0/' . $file);
+    };
+    $cyberIsoReady = $hasReleaseFile('bitCyberos.iso');
+    $cyberUsbReady = $hasReleaseFile('bit-os-cyber-1.0-installer.img');
+    $cyberChecksumsReady = $hasReleaseFile('SHA256SUMS');
+    $cyberWindowsReady = $hasReleaseFile('BITOSInstaller.exe');
     ?>
     <!doctype html>
     <html lang="en">
@@ -51,11 +59,11 @@ if ($isDedicatedOsHost) {
             </section>
 
             <section class="section" id="downloads">
-                <div class="section-heading"><div><p class="eyebrow">Choose your starting point</p><h2>Download BIT OS Cyber 1.0</h2></div><a class="subtle-link" href="<?= htmlspecialchars($downloads . 'SHA256SUMS', ENT_QUOTES, 'UTF-8') ?>">SHA-256 checksums ↗</a></div>
+                <div class="section-heading"><div><p class="eyebrow">Choose your starting point</p><h2>Download BIT OS Cyber 1.0</h2></div><?php if ($cyberChecksumsReady): ?><a class="subtle-link" href="<?= htmlspecialchars($downloads . 'SHA256SUMS', ENT_QUOTES, 'UTF-8') ?>">SHA-256 checksums ↗</a><?php else: ?><span class="subtle-link">Checksums publish with the release</span><?php endif; ?></div>
                 <div class="download-grid">
-                    <article class="download-card featured"><div class="card-icon">◈</div><div class="card-meta"><span class="tag">Recommended</span><span>AMD64 · 84 MB</span></div><h3>Bootable ISO</h3><p>Boot the installer from a USB drive, firmware menu, or a virtual machine.</p><a href="<?= htmlspecialchars($downloads . 'bitCyberos.iso', ENT_QUOTES, 'UTF-8') ?>">Download ISO <span>↓</span></a></article>
-                    <article class="download-card"><div class="card-icon">▣</div><div class="card-meta"><span class="tag">Direct USB</span><span>GPT image · 2.1 GB</span></div><h3>USB Installer Image</h3><p>Write this verified GPT image directly to a USB drive with a compatible imaging tool.</p><a href="<?= htmlspecialchars($downloads . 'bit-os-cyber-1.0-installer.img', ENT_QUOTES, 'UTF-8') ?>">Download USB Installer Image <span>↓</span></a></article>
-                    <article class="download-card"><div class="card-icon">▤</div><div class="card-meta"><span class="tag">Windows companion</span><span>Coming next</span></div><h3>Windows Installer</h3><p>Guided USB creation and install preparation for Windows systems. The signed executable is in development.</p><a href="<?= htmlspecialchars('#guides', ENT_QUOTES, 'UTF-8') ?>">Read install guide <span>→</span></a></article>
+                    <article class="download-card featured"><div class="card-icon">◈</div><div class="card-meta"><span class="tag">Recommended</span><span>AMD64 · 84 MB</span></div><h3>Bootable ISO</h3><p>Boot the installer from a USB drive, firmware menu, or a virtual machine.</p><?php if ($cyberIsoReady): ?><a href="<?= htmlspecialchars($downloads . 'bitCyberos.iso', ENT_QUOTES, 'UTF-8') ?>">Download ISO <span>↓</span></a><?php else: ?><span>Release verification in progress</span><?php endif; ?></article>
+                    <article class="download-card"><div class="card-icon">▣</div><div class="card-meta"><span class="tag">Direct USB</span><span>GPT image · 2.1 GB</span></div><h3>USB Installer Image</h3><p>Write this verified GPT image directly to a USB drive with a compatible imaging tool.</p><?php if ($cyberUsbReady): ?><a href="<?= htmlspecialchars($downloads . 'bit-os-cyber-1.0-installer.img', ENT_QUOTES, 'UTF-8') ?>">Download USB Installer Image <span>↓</span></a><?php else: ?><span>Release verification in progress</span><?php endif; ?></article>
+                    <article class="download-card"><div class="card-icon">▤</div><div class="card-meta"><span class="tag">Windows companion</span><span><?= $cyberWindowsReady ? 'Available' : 'Release verification in progress' ?></span></div><h3>Windows Installer</h3><p>Guided USB creation and install preparation for Windows systems.</p><?php if ($cyberWindowsReady): ?><a href="<?= htmlspecialchars($downloads . 'BITOSInstaller.exe', ENT_QUOTES, 'UTF-8') ?>">Download Windows Installer <span>↓</span></a><?php else: ?><span>Release verification in progress</span><?php endif; ?></article>
                 </div>
             </section>
 

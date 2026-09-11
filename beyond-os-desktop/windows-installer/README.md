@@ -4,7 +4,7 @@
 
 It downloads the selected GPT installer image, verifies its SHA-256 checksum, shows USB disks by physical-disk number, and requires typing `ERASE <number>` before writing. The computer then reboots into the BIT OS installer, which performs the partitioning and installation outside Windows.
 
-The Home download endpoint remains unavailable until that candidate is published. Cyber 1.0 and Core 1.0 use their published HostDeal release paths.
+All edition download endpoints remain unavailable until their artifacts, SHA-256 manifests, and release gates have been published.
 
 Build on Windows:
 

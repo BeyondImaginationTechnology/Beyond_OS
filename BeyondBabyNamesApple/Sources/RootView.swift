@@ -228,6 +228,9 @@ private struct SwipeView: View {
             .padding(20)
             .background(Brand.ink)
             .navigationTitle("Swipe & discover")
+            // A fixed deck does not scroll under a large navigation title; keep the
+            // title in the navigation bar so it cannot overlap the style picker.
+            .navigationBarTitleDisplayMode(.inline)
             .sheet(item: $showMatch) { MatchView(name: $0) }
         }
     }

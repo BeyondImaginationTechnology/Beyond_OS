@@ -23,6 +23,10 @@ action creates these installer candidates:
   workflow.
 - `SHA256SUMS` — hashes for the built artifacts.
 
+## Candidate downloads
+
+Core installer media is published for testing, not as a stable 1.0 release.
+Use the [ISO](https://os.beyondimagination.co.technology/releases/core/1.0/bitCoreos.iso), [USB image](https://os.beyondimagination.co.technology/releases/core/1.0/bit-os-core-1.0-installer.img), and [SHA-256 manifest](https://os.beyondimagination.co.technology/releases/core/1.0/SHA256SUMS). Check `VALIDATION.md` before treating the candidate as install-ready.
 The installer offers a selected Linux partition alongside another operating
 system, or an explicitly confirmed whole non-USB disk. It does not select a
 disk automatically or replace another boot manager.

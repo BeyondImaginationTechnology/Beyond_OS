@@ -1,6 +1,6 @@
 # BIT OS Core validation
 
-Status: **installer candidates were assembled in the remote Linux build environment; Core has not passed its release gates and must not be published as 1.0.**
+Status: **the Core 1.0 installer candidates are published for testing; Core has not passed its release gates and is not a stable 1.0 release.**
 
 ## Candidate evidence
 
@@ -9,7 +9,15 @@ The remote build produced these artifacts in the installer output directory:
 - `bitCoreos.iso` — 84,264,960 bytes.
 - `bit-os-core-1.0-installer.img` — 2,182,107,136 bytes.
 
-The artifacts have not yet been copied into a release store or accompanied by retained logs and checksums in this repository. Treat them as test candidates only.
+The verified test-candidate files are available from the BIT OS release host:
+
+- `https://os.beyondimagination.co.technology/releases/core/1.0/bitCoreos.iso`
+  - SHA-256: `c4085a9d181876e262d6b8ecd729df44b73cf3ddb80dd59dea39fb245b1c255e`
+- `https://os.beyondimagination.co.technology/releases/core/1.0/bit-os-core-1.0-installer.img`
+  - SHA-256: `2ef9f9ab56c5427d41a77244bbdb468b8d1d53e89864a60440f8089f3fe4bae1`
+- `https://os.beyondimagination.co.technology/releases/core/1.0/SHA256SUMS`
+
+The release-host checksums matched the uploaded files. Treat these files as test candidates only until every gate below is complete.
 
 ## Source checks completed
 

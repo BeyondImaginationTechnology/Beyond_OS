@@ -97,7 +97,8 @@ steps:
       for tab in discover swipe favorites together; do
         xcrun simctl terminate "$simulator_udid" technology.co.beyondimagination.beyondbabynames || true
         xcrun simctl launch "$simulator_udid" technology.co.beyondimagination.beyondbabynames -captureScreenshots -screenshotTab "$tab"
-        sleep 3
+        # Allow transient simulator system banners to clear before the store capture.
+        sleep 10
         raw_screenshot="$screenshot_directory/beyond-baby-names-$tab-raw.png"
         store_screenshot="$screenshot_directory/beyond-baby-names-$tab.png"
         xcrun simctl io "$simulator_udid" screenshot "$raw_screenshot"

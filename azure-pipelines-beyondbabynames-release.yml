@@ -98,7 +98,18 @@ steps:
         xcrun simctl terminate "$simulator_udid" technology.co.beyondimagination.beyondbabynames || true
         xcrun simctl launch "$simulator_udid" technology.co.beyondimagination.beyondbabynames -captureScreenshots -screenshotTab "$tab"
         sleep 3
-        xcrun simctl io "$simulator_udid" screenshot "$screenshot_directory/beyond-baby-names-$tab.png"
+        raw_screenshot="$screenshot_directory/beyond-baby-names-$tab-raw.png"
+        store_screenshot="$screenshot_directory/beyond-baby-names-$tab.png"
+        xcrun simctl io "$simulator_udid" screenshot "$raw_screenshot"
+        sips --resampleHeightWidth 2688 1242 "$raw_screenshot" --out "$store_screenshot"
+        rm "$raw_screenshot"
+        pixel_width="$(sips -g pixelWidth "$store_screenshot" | awk '/pixelWidth/ { print $2 }')"
+        pixel_height="$(sips -g pixelHeight "$store_screenshot" | awk '/pixelHeight/ { print $2 }')"
+        if [[ "$pixel_width" != "1242" || "$pixel_height" != "2688" ]]; then
+          echo "##vso[task.logissue type=error]Invalid App Store screenshot dimensions for $tab: ${pixel_width}x${pixel_height}; expected 1242x2688."
+          exit 1
+        fi
+        echo "Captured App Store screenshot for $tab at ${pixel_width}x${pixel_height}."
       done
       gem install bundler -v 2.7.2 --no-document
       bundle _2.7.2_ config set path vendor/bundle

@@ -53,7 +53,9 @@ for (const tradition of ['Tanakh', 'Quran']) {
 }
 assert(settings.includes('Forest Light') && settings.includes('Forest Dark') && !settings.includes('<option value="lilac">'), 'Settings must expose only the forest theme choices.');
 assert(settings.includes('beyond-id/auth/privacy.php'), 'Web settings must link to the public privacy notice.');
-assert(home.includes('#2d694b66') && practices.includes('.hg-fill{background:radial-gradient(circle at 34% 25%,#e6f6ea'), 'Forest overrides are missing from the web experience.');
+assert(home.includes('#2d694b66') && practices.includes('id="hg-frame-gradient"') && practices.includes('stop-color="#173f2c"'), 'Forest styling is missing from the web experience.');
+assert(practices.includes('.breath-stage{min-height:254px') && practices.includes('width:116px;height:148px'), 'Web hourglass must match the iOS component proportions.');
+assert(practices.includes('id="breath-detail"') && practices.includes("p.name==='Exhale'?phaseProgress"), 'Web hourglass phase detail or sand animation is missing.');
 
 console.log(JSON.stringify({
   version,
@@ -70,4 +72,5 @@ console.log(JSON.stringify({
   forestTheme: true,
   interfaithPrayers: true,
   publicPrivacyNotice: true,
+  iosHourglassParity: true,
 }, null, 2));

@@ -273,22 +273,21 @@ $homeLiveCatalogue = json_decode((string)@file_get_contents(__DIR__ . '/beyond-t
 $homeLiveFeatured = json_decode((string)@file_get_contents(__DIR__ . '/beyond-tv/data/featured-channels.json'), true) ?: [];
 $homeLiveChannels = beyond_tv_public_channels($homeLiveCatalogue, $homeLiveFeatured);
 $homeLiveControls = [
-    'beyond-after-dark' => ['theme'=>'after-dark','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=beyond-after-dark','embed'=>'/beyond-tv/embed-player.php?slug=beyond-after-dark','icon'=>'moon-star','label'=>'After Dark','now'=>'Loading the live program...','next'=>'Live schedule connecting'],
-    'beyond-cartoons' => ['theme'=>'cartoons','endpoint'=>'/beyond-tv/api/beyond-cartoons-live.php','icon'=>'tv','label'=>'Kartoons'],
-    'yugioh-tv' => ['theme'=>'anime','endpoint'=>'/beyond-tv/api/anime-live.php','icon'=>'zap','label'=>'Anime'],
-    'classic-cinema' => ['theme'=>'cinema','endpoint'=>'/beyond-tv/api/movies-live.php','embed'=>'/beyond-tv/movie-player.php','icon'=>'clapperboard','label'=>'Movies','now'=>'Loading the live feature...','next'=>'Next movie loading','sync'=>'7200000'],
-    'beyond-comedy' => ['theme'=>'comedy','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=beyond-comedy','embed'=>'/beyond-tv/embed-player.php?slug=beyond-comedy','icon'=>'laugh','label'=>'Comedy','now'=>'Loading the live program...','next'=>'Live schedule connecting'],
-    'beyond-family' => ['theme'=>'family','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=beyond-family','embed'=>'/beyond-tv/embed-player.php?slug=beyond-family','icon'=>'sparkles','label'=>'Family','now'=>'Loading the live program...','next'=>'Live schedule connecting'],
-    'classic-cartoon-theater' => ['theme'=>'classic','endpoint'=>'/beyond-tv/api/classic-live.php','icon'=>'film','label'=>'Classic'],
-    'bubble-guppies' => ['theme'=>'preschool','endpoint'=>'/beyond-tv/api/bluey-live.php','embed'=>'https://www.youtube-nocookie.com/embed/61fSXCbzF1M?autoplay=1&mute=1&playsinline=1&rel=0&enablejsapi=1','icon'=>'paw-print','label'=>'Preschool EN','now'=>"English preschool demo",'next'=>"Bluey, Blue's Clues and more"],
-    'preschool-francais' => ['theme'=>'preschool-fr','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=preschool-francais','embed'=>'/beyond-tv/embed-player.php?slug=preschool-francais','icon'=>'languages','label'=>'Preschool FR','now'=>'Caillou en francais','next'=>'Histoires educatives en francais'],
-    'space-tv' => ['theme'=>'space','endpoint'=>'/beyond-tv/api/space-live.php','icon'=>'satellite','label'=>'Space','now'=>'The Sun & The Milky Way','next'=>'Weekly space rotation'],
-    'beyond-ancient' => ['theme'=>'ancient','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=beyond-ancient','embed'=>'https://www.youtube-nocookie.com/embed/BR2ZMj3o5EU?autoplay=1&mute=1&playsinline=1&rel=0&enablejsapi=1','icon'=>'landmark','label'=>'Ancient','now'=>'Ancient Egypt Documentary','next'=>'Pyramids, pharaohs and archaeology'],
-    'beyond-french' => ['theme'=>'french','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=beyond-french','icon'=>'languages','label'=>'French'],
-    'beyond-health' => ['theme'=>'health','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=beyond-health','icon'=>'heart-pulse','label'=>'Health'],
-    'beyond-trailers' => ['theme'=>'trailers','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=beyond-trailers','icon'=>'popcorn','label'=>'Trailers'],
-    'beyond-sports' => ['theme'=>'sports','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=beyond-sports','icon'=>'trophy','label'=>'Sports'],
-    'beyond-mystery' => ['theme'=>'mystery','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=beyond-mystery','embed'=>'/beyond-tv/embed-player.php?slug=beyond-mystery','icon'=>'search','label'=>'Mystery','now'=>'Loading the live program...','next'=>'Live schedule connecting'],
+    // Playback details belong here; button names always come from channels.json.
+    // That makes a lineup rename visible on the homepage without a second edit.
+    'beyond-after-dark' => ['theme'=>'after-dark','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=beyond-after-dark','embed'=>'/beyond-tv/embed-player.php?slug=beyond-after-dark','icon'=>'moon-star','now'=>'Loading the live program...','next'=>'Live schedule connecting'],
+    'beyond-cartoons' => ['theme'=>'cartoons','endpoint'=>'/beyond-tv/api/beyond-cartoons-live.php','icon'=>'tv'],
+    'yugioh-tv' => ['theme'=>'anime','endpoint'=>'/beyond-tv/api/anime-live.php','icon'=>'zap'],
+    'classic-cinema' => ['theme'=>'cinema','endpoint'=>'/beyond-tv/api/movies-live.php','embed'=>'/beyond-tv/movie-player.php','icon'=>'clapperboard','now'=>'Loading the live feature...','next'=>'Next movie loading','sync'=>'7200000'],
+    'beyond-comedy' => ['theme'=>'comedy','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=beyond-comedy','embed'=>'/beyond-tv/embed-player.php?slug=beyond-comedy','icon'=>'laugh','now'=>'Loading the live program...','next'=>'Live schedule connecting'],
+    'beyond-family' => ['theme'=>'family','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=beyond-family','embed'=>'/beyond-tv/embed-player.php?slug=beyond-family','icon'=>'sparkles','now'=>'Loading the live program...','next'=>'Live schedule connecting'],
+    'bubble-guppies' => ['theme'=>'preschool','endpoint'=>'/beyond-tv/api/bluey-live.php','embed'=>'https://www.youtube-nocookie.com/embed/61fSXCbzF1M?autoplay=1&mute=1&playsinline=1&rel=0&enablejsapi=1','icon'=>'paw-print','now'=>"English preschool demo",'next'=>"Bluey, Blue's Clues and more"],
+    'preschool-francais' => ['theme'=>'preschool-fr','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=preschool-francais','embed'=>'/beyond-tv/embed-player.php?slug=preschool-francais','icon'=>'languages','now'=>'Caillou en francais','next'=>'Histoires educatives en francais'],
+    'space-tv' => ['theme'=>'space','endpoint'=>'/beyond-tv/api/space-live.php','icon'=>'satellite','now'=>'The Sun & The Milky Way','next'=>'Weekly space rotation'],
+    'beyond-health' => ['theme'=>'health','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=beyond-health','icon'=>'heart-pulse'],
+    'mrbeast-tv' => ['theme'=>'daily-breath','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=mrbeast-tv','icon'=>'leaf'],
+    'redbull-tv' => ['theme'=>'tattoo','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=redbull-tv','icon'=>'pen-tool'],
+    'beyond-mystery' => ['theme'=>'technology','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=beyond-mystery','icon'=>'cpu'],
 ];
 ?>
 <section class="home-live-stage" data-channel-theme="after-dark" data-sync-owner="page" aria-labelledby="homeLiveHeading">
@@ -321,11 +320,14 @@ $homeLiveControls = [
         $homeLiveControl = $homeLiveControls[$homeLiveSlug] ?? [
             'theme' => $homeLiveSlug,
             'endpoint' => '/beyond-tv/api/schedule-live.php?slug=' . rawurlencode($homeLiveSlug),
+            // Replace the current player even when a newly listed channel has
+            // no active source yet; never leave the previous channel playing.
+            'embed' => '/beyond-tv/embed-player.php?slug=' . rawurlencode($homeLiveSlug),
             'icon' => 'tv',
-            'label' => (string)($homeLiveChannel['short_name'] ?? $homeLiveChannel['name'] ?? 'Channel'),
         ];
+        $homeLiveLabel = (string)($homeLiveChannel['short_name'] ?? $homeLiveChannel['name'] ?? 'Channel');
       ?>
-      <button type="button"<?=$homeLiveIndex === 0 ? ' class="active"' : ''?> data-home-channel="<?=htmlspecialchars((string)$homeLiveControl['theme'])?>" data-channel-slug="<?=htmlspecialchars($homeLiveSlug)?>" data-channel-number="<?=htmlspecialchars((string)($homeLiveChannel['display_number'] ?? ($homeLiveIndex + 1)))?>" data-channel-name="<?=htmlspecialchars((string)($homeLiveChannel['name'] ?? 'Beyond TV'))?>" data-endpoint="<?=htmlspecialchars((string)$homeLiveControl['endpoint'])?>"<?php if (!empty($homeLiveControl['embed'])): ?> data-embed="<?=htmlspecialchars((string)$homeLiveControl['embed'])?>"<?php endif; ?><?php if (!empty($homeLiveControl['sync'])): ?> data-sync-ms="<?=htmlspecialchars((string)$homeLiveControl['sync'])?>"<?php endif; ?> data-now="<?=htmlspecialchars((string)($homeLiveControl['now'] ?? $homeLiveChannel['now'] ?? 'Loading the live program...'))?>" data-next="<?=htmlspecialchars((string)($homeLiveControl['next'] ?? $homeLiveChannel['up_next'] ?? 'Live schedule connecting'))?>" data-icon-name="<?=htmlspecialchars((string)$homeLiveControl['icon'])?>" data-open="/beyond-tv/channel.php?slug=<?=urlencode($homeLiveSlug)?>"><span class="home-live-switch__icon" aria-hidden="true"><i data-lucide="<?=htmlspecialchars((string)$homeLiveControl['icon'])?>"></i></span><span class="home-live-switch__number"><?=str_pad((string)($homeLiveChannel['display_number'] ?? ($homeLiveIndex + 1)), 2, '0', STR_PAD_LEFT)?></span><span class="home-live-switch__label"><?=htmlspecialchars((string)$homeLiveControl['label'])?></span></button>
+      <button type="button"<?=$homeLiveIndex === 0 ? ' class="active"' : ''?> data-home-channel="<?=htmlspecialchars((string)$homeLiveControl['theme'])?>" data-channel-slug="<?=htmlspecialchars($homeLiveSlug)?>" data-channel-number="<?=htmlspecialchars((string)($homeLiveChannel['display_number'] ?? ($homeLiveIndex + 1)))?>" data-channel-name="<?=htmlspecialchars((string)($homeLiveChannel['name'] ?? 'Beyond TV'))?>" data-endpoint="<?=htmlspecialchars((string)$homeLiveControl['endpoint'])?>"<?php if (!empty($homeLiveControl['embed'])): ?> data-embed="<?=htmlspecialchars((string)$homeLiveControl['embed'])?>"<?php endif; ?><?php if (!empty($homeLiveControl['sync'])): ?> data-sync-ms="<?=htmlspecialchars((string)$homeLiveControl['sync'])?>"<?php endif; ?> data-now="<?=htmlspecialchars((string)($homeLiveControl['now'] ?? $homeLiveChannel['now'] ?? 'Loading the live program...'))?>" data-next="<?=htmlspecialchars((string)($homeLiveControl['next'] ?? $homeLiveChannel['up_next'] ?? 'Live schedule connecting'))?>" data-icon-name="<?=htmlspecialchars((string)$homeLiveControl['icon'])?>" data-open="/beyond-tv/channel.php?slug=<?=urlencode($homeLiveSlug)?>"><span class="home-live-switch__icon" aria-hidden="true"><i data-lucide="<?=htmlspecialchars((string)$homeLiveControl['icon'])?>"></i></span><span class="home-live-switch__number"><?=str_pad((string)($homeLiveChannel['display_number'] ?? ($homeLiveIndex + 1)), 2, '0', STR_PAD_LEFT)?></span><span class="home-live-switch__label"><?=htmlspecialchars($homeLiveLabel)?></span></button>
       <?php endforeach; ?>
     </div>
   </div>

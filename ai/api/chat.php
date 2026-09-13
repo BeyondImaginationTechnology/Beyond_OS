@@ -19,8 +19,11 @@ foreach ($messages as $message) {
 }
 $runtimeUrl = rtrim((string) getenv('JAGUAR_RUNTIME_URL'), '/');
 if ($runtimeUrl === '' || !filter_var($runtimeUrl, FILTER_VALIDATE_URL)) { http_response_code(503); echo json_encode(['error' => 'Jaguar is not available yet.']); exit; }
+$runtimeToken = trim((string) getenv('JAGUAR_RUNTIME_TOKEN'));
+$headers = ['Content-Type: application/json'];
+if ($runtimeToken !== '') { $headers[] = 'Authorization: Bearer ' . $runtimeToken; }
 $request = curl_init($runtimeUrl . '/v1/chat');
-curl_setopt_array($request, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 90, CURLOPT_HTTPHEADER => ['Content-Type: application/json'], CURLOPT_POSTFIELDS => json_encode(['messages' => $messages], JSON_THROW_ON_ERROR)]);
+curl_setopt_array($request, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 90, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode(['messages' => $messages], JSON_THROW_ON_ERROR)]);
 $response = curl_exec($request); $status = (int) curl_getinfo($request, CURLINFO_RESPONSE_CODE); curl_close($request);
 if (!is_string($response) || $status < 200 || $status >= 300) { http_response_code(503); echo json_encode(['error' => 'Jaguar could not complete that request.']); exit; }
 echo $response;

@@ -16,6 +16,8 @@
 **/generated-*
 **/node_modules/
 **/vendor/
+**/__pycache__/
+*.py[cod]
 /.gradle-mobile/
 **/.gradle/
 **/.idea/

@@ -9,6 +9,7 @@ Native Android companion to `DailyBreathApple`, built with Java 17 and the Andro
 - Peace Breath session with phase cues, pause/repeat, and persisted daily completion
 - Shared `dailybreath://today`, `dailybreath://breathe`, `dailybreath://scripture`, `dailybreath://academy`, and `dailybreath://journal` deep links
 - Material-friendly forest visual language matching the web and iOS apps
+- Saved first-launch interface selection for English, French, and Spanish
 
 ## Build
 

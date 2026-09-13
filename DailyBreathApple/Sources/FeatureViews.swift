@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsAboutView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathLanguage") private var languageID = DailyBreathLanguage.english.rawValue
     @AppStorage("encryptedICloudSyncEnabled") private var encryptedICloudSyncEnabled = false
 
     private var versionText: String {
@@ -26,6 +27,11 @@ struct SettingsAboutView: View {
             }
 
             Section("Appearance") {
+                Picker("Language", selection: $languageID) {
+                    ForEach(DailyBreathLanguage.allCases) { language in
+                        Text(language.name).tag(language.rawValue)
+                    }
+                }
                 Picker("Theme", selection: $selectedThemeID) {
                     ForEach(DailyBreathTheme.allCases) { theme in
                         Label(theme.name, systemImage: theme.symbolName).tag(theme.id)

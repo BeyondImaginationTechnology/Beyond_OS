@@ -8,6 +8,7 @@ Bible, Torah, and Quran verses with recovery-centered breathing, reflection, and
 
 DailyBreath 2.0 brings the Bible, Tanakh, and Quran journeys into one calmer forest-themed experience.
 
+- Choose English, French, or Spanish at first launch and change the saved interface language later in Settings.
 - Verse of the Day cards now show the full calendar date.
 - Devotionals now follow a weekly cadence for a steadier reflection rhythm.
 - Forest styling is more consistent across the daily reading, practices, and supporting views.

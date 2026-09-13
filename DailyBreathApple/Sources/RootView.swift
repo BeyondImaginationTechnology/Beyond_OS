@@ -102,8 +102,8 @@ struct RootView: View {
     private func navigationRow(_ tab: DailyBreathTab, title: String, symbol: String, subtitle: String) -> some View {
         Label {
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                Text(subtitle)
+                Text(LocalizedStringKey(title))
+                Text(LocalizedStringKey(subtitle))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }

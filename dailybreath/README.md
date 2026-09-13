@@ -1,5 +1,7 @@
 # Daily Breath Web 2.0
 
+The web interface prompts for English, French, or Spanish on first visit, saves the choice locally and in a cookie, and keeps the language editable from every screen.
+
 Daily Breath is an installable Beyond OS progressive web app for matched daily Bible, Tanakh, and Quran readings; complete local sacred-text libraries and search; devotionals; guided breathing; encrypted reflection journaling; weekly challenges; activity history; and recovery support.
 
 ## Install

@@ -48,6 +48,9 @@ targets:
     resources:
       - path: Resources/Assets.xcassets
       - path: Resources/daily-verses.json
+      - path: Resources/en.lproj
+      - path: Resources/fr.lproj
+      - path: Resources/es.lproj
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.thedailybreath.Clip
@@ -68,6 +71,9 @@ targets:
     resources:
       - path: Resources/daily-verses.json
       - path: Widget/PrivacyInfo.xcprivacy
+      - path: Resources/en.lproj
+      - path: Resources/fr.lproj
+      - path: Resources/es.lproj
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.thedailybreath.widget

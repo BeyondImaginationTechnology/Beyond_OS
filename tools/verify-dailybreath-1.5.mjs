@@ -91,6 +91,7 @@ assert(store.includes('Calendar(identifier: .iso8601)'), 'Weekly devotionals mus
 const androidSource = read('DailyBreathAndroid', 'app', 'src', 'main', 'java', 'technology', 'co', 'beyondimagination', 'dailybreath', 'MainActivity.java');
 const androidManifest = read('DailyBreathAndroid', 'app', 'src', 'main', 'AndroidManifest.xml');
 const androidGradle = read('DailyBreathAndroid', 'app', 'build.gradle');
+const androidLocales = read('DailyBreathAndroid', 'app', 'src', 'main', 'res', 'xml', 'locales_config.xml');
 assert(androidGradle.includes("getOrElse('2.0.0')") && androidGradle.includes('getOrElse(4)'), 'Android version must be 2.0.0 (4).');
 assert(androidSource.includes('DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy"'), 'Android verse of the day must display its full date.');
 assert(androidSource.includes('TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY)'), 'Android weekly reflection must use a stable Monday reading.');
@@ -99,6 +100,12 @@ assert(androidManifest.includes('android:icon="@drawable/dailybreath_app_icon"')
 const launcherIcon = fs.readFileSync(path.join(root, 'DailyBreathAndroid', 'app', 'src', 'main', 'res', 'drawable', 'dailybreath_app_icon.png'));
 const storeIcon = fs.readFileSync(path.join(root, 'DailyBreathAndroid', 'play-store-assets', 'common', 'dailybreath-app-icon-512.png'));
 assert(launcherIcon.equals(storeIcon), 'Android launcher and Play Store icons do not match.');
+for (const locale of ['en', 'fr', 'es']) assert(androidLocales.includes(`android:name="${locale}"`), `Android ${locale} interface locale is missing.`);
+assert(androidSource.includes('showLanguageDialog()') && androidSource.includes('interface_language'), 'Android first-launch language setup is missing.');
+for (const locale of ['en', 'fr', 'es']) {
+  assert(fs.existsSync(path.join(root, 'DailyBreathApple', 'Resources', `${locale}.lproj`, 'Localizable.strings')), `iOS ${locale} localization is missing.`);
+}
+assert(project.includes('Localizable.strings') && project.includes('AppLanguage.swift'), 'iOS localized resources are not in the Xcode project.');
 
 const config = read('DailyBreathApple', 'project.yml');
 assert(config.includes('MARKETING_VERSION: 2.0.0'), 'Marketing version must be 2.0.0.');
@@ -122,4 +129,6 @@ console.log(JSON.stringify({
   androidVersion: '2.0.0 (4)',
   androidIconMatchesStore: true,
   iosAppIconCatalog: true,
+  interfaceLocales: ['en', 'fr', 'es'],
+  firstLaunchLanguageSetup: true,
 }, null, 2));

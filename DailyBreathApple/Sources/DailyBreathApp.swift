@@ -5,11 +5,16 @@ import SwiftUI
 struct DailyBreathApp: App {
     @UIApplicationDelegateAdaptor(DailyBreathAppDelegate.self) private var appDelegate
     @StateObject private var store = DailyBreathStore()
+    @AppStorage("dailyBreathLanguage") private var languageID = ""
 
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environmentObject(store)
+                .environment(\.locale, Locale(identifier: languageID.isEmpty ? "en" : languageID))
+                .fullScreenCover(isPresented: Binding(get: { languageID.isEmpty }, set: { _ in })) {
+                    LanguageSetupView(languageID: $languageID)
+                }
                 .task {
                     DailyBreathLaunchDefaults.seedIfNeeded()
                     await store.load()

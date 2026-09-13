@@ -20,6 +20,7 @@ Native SwiftUI app for DailyBreath 2.0 (build 20).
 - Persistent weekly challenge completion tracking
 - Home Screen and Lock Screen Verse of the Day widget
 - Settings and About hub for reminders, themes, privacy, support, and version details
+- Saved first-launch interface selection for English, French, and Spanish
 - Notification and widget deep links to Today, Breathe, and Journal
 - Persistent Bible highlights, favorite collections, and private notes
 - A gentle 45-day history for daily content, breathing, and reflection

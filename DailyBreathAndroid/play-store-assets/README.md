@@ -6,6 +6,7 @@ Upload the files as follows:
 - `common/dailybreath-feature-graphic-1024x500.png` — Feature graphic
 - `phone/*.png` — Phone screenshots, in numbered order
 - `tablet/*.png` — Tablet screenshots, in numbered order (optional but recommended)
+- `listings/*.md` — French and Spanish localized listing copy for the 2.0 release
 
 The generated phone screenshots are 1242 × 2484 (2:1), and the tablet
 screenshots are 2064 × 2752. All screenshots are opaque 24-bit PNG files.

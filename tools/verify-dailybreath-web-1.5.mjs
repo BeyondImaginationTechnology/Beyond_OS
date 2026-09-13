@@ -32,6 +32,7 @@ const academy = read('dailybreath', 'academy.php');
 const academySubscribe = read('dailybreath', 'academy-subscribe.php');
 const practices = read('dailybreath', 'practices.php');
 const settings = read('dailybreath', 'settings.php');
+const locales = read('dailybreath', 'assets', 'js', 'locales.js');
 const todayApi = read('dailybreath', 'api', 'today.php');
 for (const tradition of ['bible', 'torah', 'quran']) {
   assert(home.includes(`'${tradition}'`), `Homepage ${tradition} selector is missing.`);
@@ -43,7 +44,7 @@ assert(todayApi.includes('dailybreath_interfaith_verse_of_day'), 'Today API must
 assert(todayApi.includes("'reader_url'"), 'Today API reader deep link is missing.');
 assert(version === '2.0', 'Web app version must be 2.0.');
 assert(manifest.version === '2.0.0', 'PWA manifest version must be 2.0.0.');
-assert(home.includes("date('l, F j, Y')"), 'Verse of the day must display its full date.');
+assert(home.includes('dailybreath_web_date()'), 'Verse of the day must display its localized full date.');
 assert(home.includes("strtotime('monday this week')") && home.includes('$weeklyVerse'), 'Weekly reflection must use a stable Monday reading.');
 assert(home.includes('Weekly devotional') && !home.includes('FIRST MODULE FREE'), 'Homepage 2.0 devotional or Academy wording is incorrect.');
 assert(!academy.includes('START FREE') && !academySubscribe.includes('Module 1 stays free'), 'Academy still contains first-module-free wording.');
@@ -56,6 +57,8 @@ assert(settings.includes('beyond-id/auth/privacy.php'), 'Web settings must link 
 assert(home.includes('#2d694b66') && practices.includes('id="hg-frame-gradient"') && practices.includes('stop-color="#173f2c"'), 'Forest styling is missing from the web experience.');
 assert(practices.includes('.breath-stage{min-height:254px') && practices.includes('width:116px;height:148px'), 'Web hourglass must match the iOS component proportions.');
 assert(practices.includes('id="breath-detail"') && practices.includes("p.name==='Exhale'?phaseProgress"), 'Web hourglass phase detail or sand animation is missing.');
+assert(locales.includes("supported=['en','fr','es']") && locales.includes('dailybreath.language'), 'English, French, and Spanish web language setup is missing.');
+assert(webApp.includes("['en','fr','es']") && serviceWorker.includes('/dailybreath/assets/js/locales.js'), 'Localized web settings or offline cache is missing.');
 
 console.log(JSON.stringify({
   version,
@@ -73,4 +76,5 @@ console.log(JSON.stringify({
   interfaithPrayers: true,
   publicPrivacyNotice: true,
   iosHourglassParity: true,
+  interfaceLocales: ['en', 'fr', 'es'],
 }, null, 2));

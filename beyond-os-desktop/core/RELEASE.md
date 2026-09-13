@@ -13,5 +13,4 @@ Current work: `core-dev.1`. Source creation is not a release.
 - [ ] Verify keyboard, mouse, display, filesystem, terminal, network and shutdown behavior.
 - [ ] Validate checksum verification, recovery guidance, licensing notices and support policy.
 
-Do not publish an ISO, USB image or Windows installer profile until applicable
-gates pass.
+Do not label, market, or support an ISO, USB image, or Windows installer profile as stable BIT OS Core 1.0 until the applicable gates pass. Public test-candidate downloads must remain clearly labelled and accompanied by their SHA-256 manifest.

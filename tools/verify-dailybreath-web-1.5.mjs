@@ -28,6 +28,10 @@ assert(matthew === 23145, 'Web Torah/Tanakh edition must contain all 23,145 Hebr
 const sacred = read('dailybreath', 'includes', 'sacred-text.php');
 const reader = read('dailybreath', 'scripture.php');
 const home = read('dailybreath', 'index.php');
+const academy = read('dailybreath', 'academy.php');
+const academySubscribe = read('dailybreath', 'academy-subscribe.php');
+const practices = read('dailybreath', 'practices.php');
+const settings = read('dailybreath', 'settings.php');
 const todayApi = read('dailybreath', 'api', 'today.php');
 for (const tradition of ['bible', 'torah', 'quran']) {
   assert(home.includes(`'${tradition}'`), `Homepage ${tradition} selector is missing.`);
@@ -37,6 +41,19 @@ assert(sacred.includes('dailybreath_search_sacred_text'), 'Sacred-text search is
 assert(reader.includes('data-faith='), 'Reader tradition theme is missing.');
 assert(todayApi.includes('dailybreath_interfaith_verse_of_day'), 'Today API must return the selected faith tradition.');
 assert(todayApi.includes("'reader_url'"), 'Today API reader deep link is missing.');
+assert(version === '2.0', 'Web app version must be 2.0.');
+assert(manifest.version === '2.0.0', 'PWA manifest version must be 2.0.0.');
+assert(home.includes("date('l, F j, Y')"), 'Verse of the day must display its full date.');
+assert(home.includes("strtotime('monday this week')") && home.includes('$weeklyVerse'), 'Weekly reflection must use a stable Monday reading.');
+assert(home.includes('Weekly devotional') && !home.includes('FIRST MODULE FREE'), 'Homepage 2.0 devotional or Academy wording is incorrect.');
+assert(!academy.includes('START FREE') && !academySubscribe.includes('Module 1 stays free'), 'Academy still contains first-module-free wording.');
+assert(practices.includes("$prayer['tradition']='Bible'"), 'Bible specific prayers are missing.');
+for (const tradition of ['Tanakh', 'Quran']) {
+  assert(practices.includes(`'tradition'=>'${tradition}'`), `${tradition} specific prayers are missing.`);
+}
+assert(settings.includes('Forest Light') && settings.includes('Forest Dark') && !settings.includes('<option value="lilac">'), 'Settings must expose only the forest theme choices.');
+assert(settings.includes('beyond-id/auth/privacy.php'), 'Web settings must link to the public privacy notice.');
+assert(home.includes('#2d694b66') && practices.includes('.hg-fill{background:radial-gradient(circle at 34% 25%,#e6f6ea'), 'Forest overrides are missing from the web experience.');
 
 console.log(JSON.stringify({
   version,
@@ -48,4 +65,9 @@ console.log(JSON.stringify({
   search: true,
   readerControls: true,
   pwaCache: `dailybreath-${version}-shell`,
+  fullVerseDate: true,
+  weeklyDevotional: true,
+  forestTheme: true,
+  interfaithPrayers: true,
+  publicPrivacyNotice: true,
 }, null, 2));

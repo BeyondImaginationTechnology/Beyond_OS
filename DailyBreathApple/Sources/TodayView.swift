@@ -21,7 +21,7 @@ struct TodayView: View {
     }
 
     private var todayDevotional: Devotional {
-        store.dailyDevotional(for: selectedTradition)
+        store.weeklyDevotional(for: selectedTradition)
     }
 
     private var todayKey: String {
@@ -120,7 +120,7 @@ struct TodayView: View {
                 } label: {
                     RhythmPill(title: "Study", isComplete: didReadDevotionalToday, theme: selectedTheme)
                 }
-                .accessibilityHint("Opens today’s \(selectedTradition.devotionalName)")
+                .accessibilityHint("Opens this week’s \(selectedTradition.devotionalName)")
 
                 NavigationLink {
                     BreatheView()
@@ -184,6 +184,9 @@ struct TodayView: View {
                 .font(.caption.bold())
                 .tracking(1.4)
                 .foregroundStyle(selectedTheme.accent)
+            Text(Date(), format: .dateTime.weekday(.wide).month(.wide).day().year())
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.78))
             Text("\"\(todayVerse.text)\"")
                 .font(.system(size: 36, weight: .semibold, design: .serif))
                 .foregroundStyle(.white)
@@ -220,7 +223,7 @@ struct TodayView: View {
         } label: {
             HStack(alignment: .top, spacing: 14) {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("TODAY'S \(selectedTradition.devotionalName.uppercased())")
+                    Text("WEEKLY \(selectedTradition.devotionalName.uppercased())")
                         .font(.caption.bold())
                         .tracking(1.6)
                         .foregroundStyle(selectedTheme.primary)
@@ -579,7 +582,7 @@ private struct RecoveryNewsletterView: View {
 
     private var dailyVerse: Verse { store.dailyVerse(for: selectedTradition) }
     private var dailyDevotional: Devotional {
-        store.dailyDevotional(for: selectedTradition)
+        store.weeklyDevotional(for: selectedTradition)
     }
     private var dailyChallenge: RecoveryChallenge? { store.dailyChallenge(for: selectedTradition) }
 

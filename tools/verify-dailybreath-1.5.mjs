@@ -40,6 +40,8 @@ assert(theme.includes('case quranMoon'), 'Quran Moon theme is missing.');
 assert(theme.includes('case .bible: .forest'), 'Bible must restore the Forest theme.');
 
 const store = read('DailyBreathApple', 'Sources', 'DailyBreathStore.swift');
+const todayView = read('DailyBreathApple', 'Sources', 'TodayView.swift');
+const featureViews = read('DailyBreathApple', 'Sources', 'FeatureViews.swift');
 const academyTitles = [
   'Joining the Christian Faith with Chris',
   'Christian Recovery with Chris',
@@ -68,6 +70,10 @@ for (const item of ['ChrisGuide', 'DoviGuide', 'MoeGuide']) {
   assert(fs.existsSync(path.join(assetsRoot, `${item}.imageset`, `${item}.png`)), `${item} image is missing.`);
   JSON.parse(read('DailyBreathApple', 'Resources', 'Assets.xcassets', `${item}.imageset`, 'Contents.json'));
 }
+const appIconCatalog = JSON.parse(read('DailyBreathApple', 'Resources', 'Assets.xcassets', 'AppIcon.appiconset', 'Contents.json'));
+for (const item of appIconCatalog.images) {
+  assert(item.filename && fs.existsSync(path.join(assetsRoot, 'AppIcon.appiconset', item.filename)), `iOS app icon ${item.filename ?? '(missing filename)'} is missing.`);
+}
 
 const notification = read('DailyBreathApple', 'Sources', 'NotificationService.swift');
 assert(notification.includes('@preconcurrency import UserNotifications'), 'Swift 6 UserNotifications compatibility fix is missing.');
@@ -76,12 +82,29 @@ assert(models.includes('resolvedVerseOfTheDay'), 'Scheduled verse precedence res
 assert(models.includes('Let this recovery verse guide your next faithful step.'), 'Recovery verse reflection copy is incorrect.');
 assert(!models.includes('Let this entry.theme verse'), 'Literal entry.theme placeholder remains in the iOS model.');
 assert(store.includes('RecoveryContent.resolvedVerseOfTheDay(for: requestedDate, remoteVerse: today.verse)'), 'Remote refresh can still overwrite the scheduled verse.');
+assert(store.includes('func weeklyDevotional(for tradition: FaithTradition, date: Date = Date())'), 'Weekly devotional resolver is missing.');
+assert(todayView.includes('.dateTime.weekday(.wide).month(.wide).day().year()'), 'Verse of the day must display its full date.');
+assert(todayView.includes('store.weeklyDevotional(for: selectedTradition)'), 'Today view must use the stable weekly devotional.');
+assert(featureViews.includes('beyond-id/auth/privacy.php'), 'Settings must link to the public privacy notice.');
+assert(store.includes('Calendar(identifier: .iso8601)'), 'Weekly devotionals must use a consistent Monday week boundary.');
+
+const androidSource = read('DailyBreathAndroid', 'app', 'src', 'main', 'java', 'technology', 'co', 'beyondimagination', 'dailybreath', 'MainActivity.java');
+const androidManifest = read('DailyBreathAndroid', 'app', 'src', 'main', 'AndroidManifest.xml');
+const androidGradle = read('DailyBreathAndroid', 'app', 'build.gradle');
+assert(androidGradle.includes("getOrElse('2.0.0')") && androidGradle.includes('getOrElse(4)'), 'Android version must be 2.0.0 (4).');
+assert(androidSource.includes('DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy"'), 'Android verse of the day must display its full date.');
+assert(androidSource.includes('TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY)'), 'Android weekly reflection must use a stable Monday reading.');
+assert(androidSource.includes('beyond-id/auth/privacy.php'), 'Android must link to the public privacy notice.');
+assert(androidManifest.includes('android:icon="@drawable/dailybreath_app_icon"'), 'Android launcher icon is not configured.');
+const launcherIcon = fs.readFileSync(path.join(root, 'DailyBreathAndroid', 'app', 'src', 'main', 'res', 'drawable', 'dailybreath_app_icon.png'));
+const storeIcon = fs.readFileSync(path.join(root, 'DailyBreathAndroid', 'play-store-assets', 'common', 'dailybreath-app-icon-512.png'));
+assert(launcherIcon.equals(storeIcon), 'Android launcher and Play Store icons do not match.');
 
 const config = read('DailyBreathApple', 'project.yml');
-assert(config.includes('MARKETING_VERSION: 1.5'), 'Marketing version must be 1.5.');
+assert(config.includes('MARKETING_VERSION: 2.0.0'), 'Marketing version must be 2.0.0.');
 
 console.log(JSON.stringify({
-  version: '1.5',
+  version: '2.0.0',
   quranSurahs: surahs.size,
   quranVerses: quran.length,
   bibleBooks: bibleCodes.size,
@@ -93,4 +116,10 @@ console.log(JSON.stringify({
   academyJourneys: 6,
   xcodeProjectMembership: true,
   notificationCompatibility: true,
+  weeklyDevotional: true,
+  fullVerseDate: true,
+  publicPrivacyNotice: true,
+  androidVersion: '2.0.0 (4)',
+  androidIconMatchesStore: true,
+  iosAppIconCatalog: true,
 }, null, 2));

@@ -76,7 +76,7 @@ struct SettingsAboutView: View {
                 Link(destination: URL(string: "https://www.gutenberg.org/ebooks/16955")!) {
                     Label("Pickthall English meaning · Source", systemImage: "moon.stars")
                 }
-                Link(destination: URL(string: "https://beyondimagination.co.technology/legal/privacy.php")!) {
+                Link(destination: URL(string: "https://beyondimagination.co.technology/beyond-id/auth/privacy.php")!) {
                     Label("Privacy Policy", systemImage: "hand.raised")
                 }
                 Link(destination: URL(string: "https://beyondimagination.co.technology/contact.php")!) {

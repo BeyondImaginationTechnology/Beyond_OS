@@ -427,6 +427,19 @@ final class DailyBreathStore: ObservableObject {
         )
     }
 
+    func weeklyDevotional(for tradition: FaithTradition, date: Date = Date()) -> Devotional {
+        var calendar = Calendar(identifier: .iso8601)
+        calendar.timeZone = .current
+        let weekStart = calendar.dateInterval(of: .weekOfYear, for: date)?.start ?? date
+        let baseDevotional = RecoveryContent.devotionalOfTheDay(for: weekStart) ?? devotional
+        return InterfaithDailyContent.devotional(
+            for: tradition,
+            base: baseDevotional,
+            verse: dailyVerse(for: tradition, date: weekStart),
+            date: weekStart
+        )
+    }
+
     func dailyChallenge(for tradition: FaithTradition, date: Date = Date()) -> RecoveryChallenge? {
         let baseChallenge = Calendar.current.isDateInToday(date)
             ? challenge
@@ -660,7 +673,7 @@ final class DailyBreathStore: ObservableObject {
     var recoveryNewsletterShareText: String {
         let tradition = FaithTradition(rawValue: UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "") ?? .bible
         let sharedVerse = dailyVerse(for: tradition)
-        let sharedDevotional = dailyDevotional(for: tradition)
+        let sharedDevotional = weeklyDevotional(for: tradition)
         let challengeCopy = dailyChallenge(for: tradition).map { item in
             "Weekly challenge: \(item.title). \(item.description) \(item.scriptureReference)"
         } ?? ""

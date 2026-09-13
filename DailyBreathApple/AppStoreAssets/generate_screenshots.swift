@@ -37,7 +37,7 @@ let screens = [
         tab: "Today",
         cards: [
             ("Psalm 46:10", "\"Be still, and know that I am God.\"", "A quiet reflection and one-tap listening experience for daily Scripture."),
-            ("Today's Devotional", "Walk in Quiet Confidence", "A five-minute reading to help you pause before the next step."),
+            ("Weekly Devotional", "Walk in Quiet Confidence", "A five-minute reading to help you pause before the next step."),
             ("Quick Practices", "Bible · Prayer · Breath", "Simple spiritual rhythms for calm, gratitude, and focus.")
         ]
     ),

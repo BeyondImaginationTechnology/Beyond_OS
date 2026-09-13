@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
-home_source=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-image_dir=${1:-"${BEYOND_BUILD_DIR:-$home_source/out}/output/images"}
+cyber_source=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+image_dir=${1:-"${BEYOND_BUILD_DIR:-$cyber_source/out}/output/images"}
 command -v qemu-system-x86_64 >/dev/null || { echo "Install qemu-system-x86_64 on the host." >&2; exit 1; }
 [[ -f "$image_dir/bzImage" && -f "$image_dir/rootfs.ext4" ]] || { echo "Build the kernel and root filesystem first." >&2; exit 1; }
 # Snapshot mode makes every run disposable. Remove -snapshot only on a copied image

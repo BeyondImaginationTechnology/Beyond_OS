@@ -4,9 +4,10 @@ BIT OS Cyber 1.0 is an independent defensive Linux workstation assembled from
 upstream source with Buildroot as the build tool. It is not a flavor of another
 distribution and identifies itself only as BIT OS Cyber.
 
-The current foundation shares the proven UEFI platform work with BIT OS Home,
+The current foundation shares the UEFI platform work with BIT OS Home,
 but has its own Buildroot external tree, product identity, artifact names, and
-defensive defaults. See [CYBER.md](CYBER.md) for scope and release gates.
+defensive defaults. See [CYBER.md](CYBER.md) for scope, [RELEASE.md](RELEASE.md)
+for release gates, and [VALIDATION.md](VALIDATION.md) for current evidence.
 
 ## Current build targets
 
@@ -20,8 +21,8 @@ bash build.sh installer
 
 The regular build produces a QEMU-oriented system image. The installer target
 produces `bitCyberos.iso` for a UEFI live/installer session and
-`bit-os-cyber-1.0-installer.img` for a GPT USB installer image. Both remain
-development candidates until all Cyber release gates pass.
+`bit-os-cyber-1.0-installer.img` for a GUID Partition Table (GPT) USB installer
+image. Both remain development candidates until all Cyber release gates pass.
 
 ## Defensive baseline
 

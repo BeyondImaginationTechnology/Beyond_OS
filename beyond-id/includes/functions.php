@@ -197,11 +197,12 @@ function beyond_profile_slug(string $value): string {
 function beyond_app_catalog(): array {
     return [
         'beyond-id' => ['name' => 'Beyond ID', 'url' => '/beyond-id/dashboard/', 'mark' => 'ID', 'permissions' => ['profile:read', 'security:manage', 'notifications:read']],
+        'beyond-music' => ['name' => 'Beyond Music', 'url' => '/app-store/', 'mark' => 'MU', 'permissions' => ['profile:read', 'email:read', 'wallet:read']],
         'beyond-math' => ['name' => 'Beyond Math', 'url' => '/beyond-math/', 'mark' => 'BM', 'permissions' => ['profile:read', 'progress:write', 'wallet:read']],
-        'beyond-french' => ['name' => 'Beyond French', 'url' => '/beyond-french/', 'mark' => 'FR', 'permissions' => ['profile:read', 'progress:write']],
-        'dailybreath' => ['name' => 'DailyBreath', 'url' => '/dailybreath/', 'mark' => 'DB', 'permissions' => ['profile:read', 'streaks:write']],
+        'beyond-french' => ['name' => 'Beyond French', 'url' => '/beyond-french/', 'mark' => 'FR', 'permissions' => ['profile:read', 'email:read', 'progress:write']],
+        'dailybreath' => ['name' => 'DailyBreath', 'url' => '/dailybreath/', 'mark' => 'DB', 'permissions' => ['profile:read', 'email:read', 'streaks:write']],
         'beyond-health' => ['name' => 'Beyond Health', 'url' => '/beyond-health/', 'mark' => 'H', 'permissions' => ['profile:read', 'wellness:write']],
-        'beyond-tv' => ['name' => 'Beyond TV', 'url' => '/beyond-tv/', 'mark' => 'TV', 'permissions' => ['profile:read', 'watchlist:write']],
+        'beyond-tv' => ['name' => 'Beyond TV', 'url' => '/beyond-tv/', 'mark' => 'TV', 'permissions' => ['profile:read', 'email:read', 'watchlist:write']],
         'beyond-catering' => ['name' => 'Beyond Catering', 'url' => '/contact.php?topic=catering', 'mark' => 'CA', 'permissions' => ['profile:read', 'business:write']],
         'beyond-baby-names' => ['name' => 'Beyond Baby Names', 'url' => '/beyond-baby-names/', 'mark' => 'BN', 'permissions' => ['profile:read', 'favorites:write']],
         'beyond-tattoo' => ['name' => 'Beyond Tattoo', 'url' => '/beyond-tattoo/', 'mark' => 'TT', 'permissions' => ['profile:read', 'private-journal:write']],

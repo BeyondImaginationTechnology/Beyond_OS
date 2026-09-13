@@ -57,6 +57,11 @@ DirectoryIndex index.php index.html
   RewriteEngine On
   RewriteBase /
 
+  # Preserve Bearer credentials when Apache/FastCGI does not expose the
+  # Authorization header to PHP directly.
+  RewriteCond %{HTTP:Authorization} .
+  RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
   # Keep implementation, migration, and database resources off the web.
   RewriteRule ^(?:config|includes|migrations|sql|docs|tools|AppStoreAssets|\.cache|beyond-chromium)(?:/|$) - [F,L,NC]
   RewriteRule ^[A-Za-z0-9_-]+(?:Apple|Android)(?:/|$) - [F,L,NC]

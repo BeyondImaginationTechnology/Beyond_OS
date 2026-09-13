@@ -24,6 +24,10 @@ with tempfile.TemporaryDirectory(prefix="beyond-cyber-hook-") as temporary:
     assert (target / "usr/lib/os-release").read_text() == identity
     assert not (target / "etc/init.d/S40xorg").exists()
     assert (target / "etc/init.d/S99beyond-cyber").exists()
+    assert (target / "etc/init.d/S42bitos-cyber-firewall").exists()
     assert (target / "home/home/Documents/Welcome.txt").exists()
+    assert (target / "home/home/Documents/Cyber/Evidence/README.txt").exists()
+    for mountpoint in ("bit-target-root", "bit-target-esp", "bit-source-esp"):
+        assert (target / "mnt" / mountpoint).is_dir()
     assert (target / "etc/issue").read_text().startswith("BIT OS Cyber Edition")
-print("PASS: target identity, single display startup, and welcome document")
+print("PASS: Cyber identity, startup, firewall, evidence workspace, and installer mount points")

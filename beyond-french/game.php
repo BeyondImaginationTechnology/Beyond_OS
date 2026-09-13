@@ -3,7 +3,7 @@ require_once __DIR__ . '/../includes/ecosystem.php';
 $pageTitle = 'French Quest | The World Tour';
 require __DIR__ . '/includes/header.php';
 ?>
-<div class="quest-game" id="quest-game" data-logo="<?= h($frenchBase) ?>assets/images/beyond-french-logo.webp">
+<div class="quest-game" id="quest-game" data-logo="<?= h($frenchBase) ?>assets/images/beyond-french-logo.webp" data-tutors-base="<?= h($frenchBase) ?>assets/images/tutors/">
     <section class="quest-shell" aria-labelledby="quest-title">
         <header class="quest-header">
             <a class="quest-brand" href="<?= h($frenchBase) ?>"><img src="<?= h($frenchBase) ?>assets/images/beyond-french-logo.webp" alt=""><span><strong>FRENCH QUEST</strong><small>THE WORLD TOUR</small></span></a>

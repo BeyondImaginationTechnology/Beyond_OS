@@ -19,7 +19,12 @@ VERSION_ID="1.0"
 BUILD_ID="cyber-dev.1"
 HOME_URL="https://beyondimagination.co.technology/"
 EOF
-install -d -m 0755 "$target/usr/lib" "$target/home/home/Documents/Cyber/Evidence"
+install -d -m 0755 \
+  "$target/usr/lib" \
+  "$target/home/home/Documents/Cyber/Evidence" \
+  "$target/mnt/bit-target-root" \
+  "$target/mnt/bit-target-esp" \
+  "$target/mnt/bit-source-esp"
 rm -f "$target/usr/lib/os-release"
 cp "$target/etc/os-release" "$target/usr/lib/os-release"
 printf '%s\n' 'Welcome to BIT OS Cyber Edition 1.0.' 'This VM development image is built from upstream Linux components.' > "$target/home/home/Documents/Welcome.txt"

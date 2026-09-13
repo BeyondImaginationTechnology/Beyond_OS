@@ -1,10 +1,8 @@
 {
   "age_groups": [
-    {"slug":"preschool","title":"Preschool","ages":"3–5","icon":"🧸","guidance":"Learn through repetition, gestures, pictures, and a grown-up helper."},
-    {"slug":"kids","title":"Kids","ages":"6–9","icon":"🎨","guidance":"Learn through short role-play, drawing, matching, and speaking aloud."},
-    {"slug":"preteen","title":"Preteen","ages":"10–12","icon":"🚀","guidance":"Use real-life scenarios, memory challenges, and short conversations."},
-    {"slug":"teen","title":"Teen","ages":"13–17","icon":"🎧","guidance":"Practice natural conversation, independence, culture, and confident speaking."},
-    {"slug":"adult","title":"Adult","ages":"18+","icon":"☕","guidance":"Build practical language for everyday life, work, travel, and relationships."}
+    {"slug":"kids","title":"Kids French","level":"Beginner","ages":"3–9","icon":"🧸","guidance":"Begin with the French ABCs, then learn through repetition, pictures, movement, and short role-play."},
+    {"slug":"teen","title":"Teens French","level":"Normal","ages":"10–17","icon":"🎧","guidance":"Build confidence through real-life scenarios, culture, memory challenges, and short conversations."},
+    {"slug":"adult","title":"Adult French","level":"Advanced","ages":"18+","icon":"☕","guidance":"Build practical language for everyday life, work, travel, and relationships."}
   ],
   "modules": [
     {

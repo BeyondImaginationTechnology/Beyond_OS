@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
-home_source=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+cyber_source=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=buildroot.lock
-source "$home_source/buildroot.lock"
+source "$cyber_source/buildroot.lock"
 action=${1:-build}
 case "$action" in configure|build|installer|legal-info) ;; *) echo "Usage: bash build.sh [configure|build|installer|legal-info]" >&2; exit 2 ;; esac
 [[ $(uname -s) == Linux ]] || { echo "Build on a Linux host or Linux VM (not a Windows filesystem)." >&2; exit 1; }
@@ -10,10 +10,10 @@ case "$action" in configure|build|installer|legal-info) ;; *) echo "Usage: bash 
 for command in make gcc g++ curl tar sha256sum python3 rsync cpio unzip patch; do
     command -v "$command" >/dev/null || { echo "Missing host tool: $command" >&2; exit 1; }
 done
-build_area=${BEYOND_BUILD_DIR:-"$home_source/out"}
+build_area=${BEYOND_BUILD_DIR:-"$cyber_source/out"}
 mkdir -p "$build_area"
 build_area=$(cd "$build_area" && pwd)
-case "$home_source:$build_area" in *" "*) echo "Buildroot paths must not contain spaces." >&2; exit 1 ;; esac
+case "$cyber_source:$build_area" in *" "*) echo "Buildroot paths must not contain spaces." >&2; exit 1 ;; esac
 archive="$build_area/buildroot-$BUILDROOT_VERSION.tar.xz"
 if [[ ! -f "$archive" ]]; then
     curl --fail --location --retry 3 "https://buildroot.org/downloads/buildroot-$BUILDROOT_VERSION.tar.xz" -o "$archive.part"
@@ -29,10 +29,10 @@ else
     output="$build_area/output"
     defconfig=beyond_cyber_x86_64_defconfig
 fi
-chmod +x "$home_source/board/x86_64/post-build.sh"
-chmod +x "$home_source/board/x86_64/post-image-uefi.sh"
-make -C "$source_dir" O="$output" BR2_EXTERNAL="$home_source" "$defconfig"
-python3 "$home_source/tools/verify-config.py" "$home_source/configs/$defconfig" "$output/.config"
+chmod +x "$cyber_source/board/x86_64/post-build.sh"
+chmod +x "$cyber_source/board/x86_64/post-image-uefi.sh"
+make -C "$source_dir" O="$output" BR2_EXTERNAL="$cyber_source" "$defconfig"
+python3 "$cyber_source/tools/verify-config.py" "$cyber_source/configs/$defconfig" "$output/.config"
 if [[ "$action" == configure ]]; then
     echo "Configured Beyond OS. No kernel or image has been built."
     exit 0
@@ -42,7 +42,7 @@ if [[ "$action" == installer ]]; then
 else
     target="${action/build/all}"
 fi
-make -C "$source_dir" O="$output" BR2_EXTERNAL="$home_source" "$target"
+make -C "$source_dir" O="$output" BR2_EXTERNAL="$cyber_source" "$target"
 if [[ "$action" == build ]]; then
     (
         cd "$output/images"

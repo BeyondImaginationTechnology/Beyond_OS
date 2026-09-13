@@ -30,7 +30,7 @@ require __DIR__.'/includes/header.php';
 <div class="academy-wrap">
  <a class="academy-back" href="course.php?age=<?=h($age)?>&module=<?=h($module)?>">← <?=h($lesson['module_title'])?></a>
  <article class="reading-card">
-  <span class="eyebrow"><?=h($lesson['age_title'])?> · MODULE <?=array_search($module,array_keys(french_academy_modules()),true)+1?> · LESSON <?=$lessonNumber?></span>
+  <span class="eyebrow"><?=h($lesson['age_title'])?> · <?=h((french_age_groups()[$age]['level']??''))?> · MODULE <?=array_search($module,array_keys(french_academy_modules()),true)+1?> · LESSON <?=$lessonNumber?></span>
   <h1><?=h($lesson['title'])?></h1>
   <div class="phrase-panel"><small><?=h($lesson['english'])?></small><strong lang="fr"><?=h($lesson['french'])?></strong><em><?=h($lesson['pronunciation'])?></em><button class="academy-button secondary" type="button" onclick="speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(<?=json_encode($lesson['french'])?>);u.lang='fr-FR';u.rate=.82;speechSynthesis.speak(u)">🔊 Listen</button></div>
   <div class="lesson-sections"><section><h2>Learn</h2><p><?=h($lesson['teaching'])?></p><p><strong>For <?=h($lesson['age_title'])?>:</strong> <?=h($lesson['age_guidance'])?></p></section><section><h2>Practice</h2><p><?=h($lesson['practice'])?></p><p><strong>Culture:</strong> <?=h($lesson['culture'])?></p></section></div>

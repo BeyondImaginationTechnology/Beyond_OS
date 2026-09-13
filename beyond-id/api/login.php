@@ -6,6 +6,7 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/remember-me.php';
 require_once __DIR__ . '/../../config/roles.php';
 header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-store');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405); echo json_encode(['ok'=>false,'error'=>'Method not allowed']); exit;
@@ -13,6 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $contentType = strtolower((string)($_SERVER['CONTENT_TYPE'] ?? ''));
 if (!str_starts_with($contentType, 'application/json')) {
     http_response_code(415); echo json_encode(['ok'=>false,'error'=>'JSON requests only']); exit;
+}
+if ((int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 16384) {
+    http_response_code(413); echo json_encode(['ok'=>false,'error'=>'Request body is too large']); exit;
 }
 $data = json_decode(file_get_contents('php://input'), true);
 if (!is_array($data)) {

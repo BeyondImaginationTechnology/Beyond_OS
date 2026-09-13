@@ -1,18 +1,39 @@
 <?php
 require __DIR__ . '/../includes/auth-check.php';
 require_once __DIR__ . '/../includes/functions.php';
+require_once __DIR__ . '/../includes/mobile-auth.php';
 require __DIR__ . '/../includes/db.php';
 
 $uid = (int)$_SESSION['user_id'];
 $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 $message = '';
+$error = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf_token($_POST['csrf'] ?? null)) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !verify_csrf_token($_POST['csrf'] ?? null)) {
+    http_response_code(403);
+    $error = 'Your session expired. Reload the page and try again.';
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $slug = beyond_profile_slug((string)($_POST['app_slug'] ?? ''));
-    if ($slug !== '') {
+    $catalog = beyond_app_catalog();
+    if ($slug === '' || !isset($catalog[$slug])) {
+        http_response_code(422);
+        $error = 'That Beyond app is not registered.';
+    } else {
         if (isset($_POST['revoke'])) {
-            $pdo->prepare('UPDATE connected_apps SET revoked_at=' . ($driver === 'sqlite' ? 'CURRENT_TIMESTAMP' : 'NOW()') . ' WHERE user_id=? AND app_slug=?')->execute([$uid, $slug]);
-            $message = 'App access revoked.';
+            try {
+                $pdo->beginTransaction();
+                $pdo->prepare('UPDATE connected_apps SET revoked_at=' . ($driver === 'sqlite' ? 'CURRENT_TIMESTAMP' : 'NOW()') . ' WHERE user_id=? AND app_slug=?')->execute([$uid, $slug]);
+                foreach (beyond_api_audiences_for_app($slug) as $audience) {
+                    $pdo->prepare('UPDATE mobile_access_tokens SET revoked_at=? WHERE user_id=? AND audience=? AND revoked_at IS NULL')->execute([date('Y-m-d H:i:s'), $uid, $audience]);
+                }
+                $pdo->commit();
+                log_activity($pdo, $uid, 'app_access_revoked_' . $slug);
+                $message = 'App access and active API tokens revoked.';
+            } catch (Throwable $exception) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                error_log('App revocation failed: ' . $exception->getMessage());
+                $error = 'App access could not be revoked. Please try again.';
+            }
         } elseif (isset($_POST['connect'])) {
             $meta = beyond_app_meta($slug);
             $permissions = json_encode($meta['permissions'] ?? ['profile:read']);
@@ -23,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf_token($_POST['csrf'] ??
                 $sql = 'INSERT INTO connected_apps(user_id,app_slug,permissions_json,last_used_at,revoked_at) VALUES(?,?,?,?,NULL) ON DUPLICATE KEY UPDATE permissions_json=VALUES(permissions_json),last_used_at=VALUES(last_used_at),revoked_at=NULL';
             }
             $pdo->prepare($sql)->execute([$uid, $slug, $permissions, $now]);
+            log_activity($pdo, $uid, 'app_access_connected_' . $slug);
             $message = 'App connected.';
         }
     }
@@ -55,6 +77,7 @@ $catalog = beyond_app_catalog();
     <a class="back" href="index.php">Back to dashboard</a>
     <section class="hero"><div><span class="muted">PERMISSIONS & ACCESS</span><h1>Connected apps</h1><p class="muted">See which Beyond apps use your ID, what they can access, and jump back into them.</p></div><div class="metric"><strong><?= count(array_filter($connected, static fn($row) => empty($row['revoked_at']))) ?></strong><span class="muted">active connections</span></div></section>
     <?php if ($message): ?><div class="msg"><?= e($message) ?></div><?php endif; ?>
+    <?php if ($error): ?><div class="msg" style="background:#fde8ec;color:#8f2438"><?= e($error) ?></div><?php endif; ?>
 
     <h2 class="section-title">YOUR CONNECTIONS</h2>
     <section class="grid">

@@ -34,6 +34,7 @@ return [
     ],
     'security' => [
         'jwt_secret' => 'replace-with-a-long-random-local-secret',
+        'api_issuer' => 'https://beyondimagination.co.technology/beyond-id',
         'super_admin_emails' => [],
         'admin_emails' => [],
     ],

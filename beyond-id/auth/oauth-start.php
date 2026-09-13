@@ -22,7 +22,7 @@ if ($requestedScheme === '' && $returnTo !== '') {
     $requestedScheme = strtolower(trim((string)($returnQuery['scheme'] ?? '')));
     $codeChallenge = trim((string)($returnQuery['code_challenge'] ?? ''));
 }
-$mobileScheme = in_array($requestedScheme, ['beyondmusic', 'beyondtv', 'frenchquest', 'dailybreath'], true) ? $requestedScheme : '';
+$mobileScheme = beyond_api_client_for_scheme($requestedScheme) !== [] ? $requestedScheme : '';
 if ($codeChallenge !== '' && !preg_match('/^[A-Za-z0-9_-]{43,128}$/', $codeChallenge)) $codeChallenge = '';
 if ($returnTo !== '') $_SESSION['beyond_return_to'] = $returnTo;
 $state = bin2hex(random_bytes(32));

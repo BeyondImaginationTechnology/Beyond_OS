@@ -15,9 +15,13 @@ function french_quest_json(int $status, array $payload): never
 }
 
 try {
-    $userId = beyond_mobile_verify_token(beyond_mobile_bearer_token(), 'french-quest-ios', $pdo)['user_id'];
+    $claims = beyond_mobile_verify_token(beyond_mobile_bearer_token(), 'french-quest-ios', $pdo);
+    beyond_mobile_require_scope($claims, 'progress:write');
+    $userId = $claims['user_id'];
 } catch (Throwable $exception) {
-    french_quest_json(401, ['ok' => false, 'error' => $exception->getMessage()]);
+    error_log('French Quest token validation failed: ' . $exception->getMessage());
+    header('WWW-Authenticate: Bearer realm="Beyond ID", error="invalid_token"');
+    french_quest_json(401, ['ok' => false, 'error' => 'Mobile token is invalid, expired, revoked, or missing the required scope.']);
 }
 
 try {

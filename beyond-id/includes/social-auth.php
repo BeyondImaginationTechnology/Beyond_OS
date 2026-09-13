@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/remember-me.php';
+require_once __DIR__ . '/mobile-auth.php';
 
 final class BeyondSocialUserException extends RuntimeException
 {
@@ -137,7 +138,7 @@ function beyond_social_profile(string $provider, string $accessToken, array $tok
 function beyond_social_destination(array $flow, ?string $returnTo = null): string
 {
     $mobileScheme = strtolower(trim((string)($flow['mobile_scheme'] ?? '')));
-    if (in_array($mobileScheme, ['beyondmusic', 'beyondtv', 'frenchquest', 'dailybreath'], true)) {
+    if (beyond_api_client_for_scheme($mobileScheme) !== []) {
         $destination = '/beyond-id/auth/mobile-complete.php?scheme=' . rawurlencode($mobileScheme);
         $challenge = trim((string)($flow['mobile_code_challenge'] ?? ''));
         if ($challenge !== '' && preg_match('/^[A-Za-z0-9_-]{43,128}$/', $challenge)) {

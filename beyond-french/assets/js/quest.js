@@ -3,6 +3,12 @@
   const content = document.querySelector('#quest-content');
   if (!root || !content) return;
   const key = 'beyond-french-quest-v1';
+  const tutors = [
+    { id:'louis', name:'Louis', label:'French tutor', flag:'🇫🇷' },
+    { id:'irie', name:'Irie', label:'Jamaican Patois tutor', flag:'🇯🇲' },
+    { id:'jazzy', name:'Jazzy', label:'Haitian Kreyòl tutor', flag:'🇭🇹' },
+    { id:'pablo', name:'Pablo', label:'Spanish tutor', flag:'🇪🇸' }
+  ];
   const regions = [
     { id:'port-au-prince', title:'Port-au-Prince', subtitle:'Begin the journey in the colorful Caribbean capital', icon:'⌂', color:'#ff5c9a', missions:[['translate','Choose the French greeting for hello.','Bonjour !','Hello','Use bonjour during the day.'],['listen','What does merci mean?','Thank you.','Merci.','Merci is always useful.'],['translate','Pick the polite word for please.',"S'il vous plait.",'Please',"S'il vous plait is the polite form."]] },
     { id:'haiti-highlands', title:'Haiti Highlands', subtitle:'Climb through markets, waterfalls, and mountain villages', icon:'▲', color:'#36d487', missions:[['translate','How do you ask for water?',"De l'eau, s'il vous plait.",'Water',"De l'eau sounds like duh loh."],['listen','J’ai faim means what?','I am hungry.','J’ai faim.','French uses “I have hunger.”'],['culture','Which phrase asks for the bill?',"L'addition, s'il vous plait.",'The bill',"Ask for l'addition when you are ready to pay."]] },
@@ -10,10 +16,20 @@
     { id:'montreal', title:'Montréal', subtitle:'Navigate the snowy city and reach the river crossing', icon:'✦', color:'#36c9e8', missions:[['listen','A traveler calls out “Salut !” What do they mean?','Hi!','Salut !','Salut is a casual greeting.'],['translate','Choose the phrase that gets you to the metro.','Où est le métro ?','The metro','Où est means where is.'],['culture','Which phrase means it is cold?','Il fait froid.','It is cold','Weather often begins with il fait.']] },
     { id:'france', title:'France', subtitle:'Race from the countryside to the final tower', icon:'★', color:'#5688ff', missions:[['translate','Tell your guide you are ready.','Je suis prêt.','I am ready','Use prêt or prête for the speaker.'],['listen','The guide says “Tout droit.” Which way do you go?','Straight ahead.','Tout droit','Tout droit keeps you moving straight.'],['culture','Choose the victory phrase.','Nous avons réussi !','We did it!','Réussir means to succeed.']] }
   ];
-  const defaults = () => ({ xp:0, hearts:3, streak:0, completed:[] });
+  const defaults = () => ({ xp:0, hearts:3, streak:0, completed:[], character:'' });
   let state = load();
   function load(){ try { return Object.assign(defaults(), JSON.parse(localStorage.getItem(key) || '{}')); } catch(e){ return defaults(); } }
   function save(){ localStorage.setItem(key, JSON.stringify(state)); }
+  function selectedTutor(){ return tutors.find(tutor => tutor.id === state.character) || null; }
+  function tutorImage(tutor){ return `${root.dataset.tutorsBase}${tutor.id}.jpg`; }
+  function renderCharacterSelect(){
+    content.innerHTML=`<section class="quest-character-select"><p class="quest-kicker">PLAYABLE CHARACTERS</p><h1 id="quest-title">Choose your tutor</h1><p>Pick the guide who will join you on the French Quest world tour.</p><div class="quest-character-grid">${tutors.map(tutor=>`<button class="quest-character ${state.character===tutor.id?'selected':''}" data-tutor="${tutor.id}"><img src="${tutorImage(tutor)}" alt="${esc(tutor.name)}"><span>${tutor.flag} ${esc(tutor.label)}</span><strong>${esc(tutor.name)}</strong></button>`).join('')}</div><button class="quest-primary" id="start-quest" ${selectedTutor()?'':'disabled'}>BEGIN WORLD TOUR →</button><button class="quest-back" id="character-menu">← Main menu</button></section>`;
+    document.querySelectorAll('[data-tutor]').forEach(button=>button.onclick=()=>{state.character=button.dataset.tutor;save();renderCharacterSelect();});
+    document.querySelector('#start-quest').onclick=renderMap;document.querySelector('#character-menu').onclick=renderMenu;
+  }
+  function addTutorToScreen(){ const tutor=selectedTutor();if(!tutor||content.querySelector('.quest-active-tutor'))return;const target=content.querySelector('.quest-map-copy,.quest-destination');if(!target)return;const card=document.createElement('div');card.className='quest-active-tutor';card.innerHTML=`<img src="${tutorImage(tutor)}" alt="${esc(tutor.name)}"><span><small>PLAYING AS</small><strong>${esc(tutor.name)}</strong><em>${tutor.flag} ${esc(tutor.label)}</em></span>`;target.prepend(card); }
+  const questObserver=new MutationObserver(()=>addTutorToScreen());questObserver.observe(content,{childList:true,subtree:true});
+  document.addEventListener('click',event=>{if(!event.target.closest('#new-game'))return;event.preventDefault();event.stopImmediatePropagation();state=defaults();save();renderCharacterSelect();},true);
   function esc(value){ return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
   function completed(region){ return region.missions.filter(m => state.completed.includes(region.id + ':' + m[1])).length; }
   function unlocked(index){ return index === 0 || completed(regions[index - 1]) === 3; }
@@ -30,5 +46,5 @@
     e.currentTarget.setAttribute('aria-pressed', enabled);
     if (enabled) music.play().catch(() => {}); else music.pause();
   };
-  renderMenu();
+  renderCharacterSelect();
 })();

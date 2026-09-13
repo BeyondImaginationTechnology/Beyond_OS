@@ -47,18 +47,18 @@ namespace BITOSInstaller
         {
             new ReleaseDefinition {
                 Edition = "BIT OS Cyber", Version = "1.0", Available = false,
-                ImageUrl = "https://beyondimagination.co.technology/downloads/cyber/1.0/bit-os-cyber-1.0-installer.img",
-                ChecksumsUrl = "https://beyondimagination.co.technology/downloads/cyber/1.0/SHA256SUMS"
+                ImageUrl = "https://os.beyondimagination.co.technology/releases/cyber/1.0/bit-os-cyber-1.0-installer.img",
+                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/cyber/1.0/SHA256SUMS"
             },
             new ReleaseDefinition {
                 Edition = "BIT OS Home", Version = "1.0", Available = false,
-                ImageUrl = "https://beyondimagination.co.technology/downloads/home/1.0/bit-os-home-1.0-installer.img",
-                ChecksumsUrl = "https://beyondimagination.co.technology/downloads/home/1.0/SHA256SUMS"
+                ImageUrl = "https://os.beyondimagination.co.technology/releases/home/1.0/bit-os-home-1.0-installer.img",
+                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/home/1.0/SHA256SUMS"
             },
             new ReleaseDefinition {
-                Edition = "BIT OS Core", Version = "1.0", Available = false,
-                ImageUrl = "https://beyondimagination.co.technology/downloads/core/1.0/bit-os-core-1.0-installer.img",
-                ChecksumsUrl = "https://beyondimagination.co.technology/downloads/core/1.0/SHA256SUMS"
+                Edition = "BIT OS Core", Version = "1.0", Available = true,
+                ImageUrl = "https://os.beyondimagination.co.technology/releases/core/1.0/bit-os-core-1.0-installer.img",
+                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/core/1.0/SHA256SUMS"
             }
         };
         private bool verified;

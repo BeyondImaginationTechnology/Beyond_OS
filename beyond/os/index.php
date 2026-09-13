@@ -11,15 +11,16 @@ $returnTo = $osOrigin !== '' ? $osOrigin . '/' : '/beyond/os/';
 $platformOrigin = 'https://beyondimagination.co.technology';
 
 if ($isDedicatedOsHost) {
-    $downloads = $osOrigin . '/downloads/cyber/1.0/';
+    $downloads = $osOrigin . '/releases/cyber/1.0/';
     $releaseRoot = rtrim((string)($_SERVER['DOCUMENT_ROOT'] ?? ''), DIRECTORY_SEPARATOR);
     $hasReleaseFile = static function (string $file) use ($releaseRoot): bool {
-        return $releaseRoot !== '' && is_file($releaseRoot . '/downloads/cyber/1.0/' . $file);
+        return $releaseRoot !== '' && is_file($releaseRoot . '/releases/cyber/1.0/' . $file);
     };
     $cyberIsoReady = $hasReleaseFile('bitCyberos.iso');
     $cyberUsbReady = $hasReleaseFile('bit-os-cyber-1.0-installer.img');
     $cyberChecksumsReady = $hasReleaseFile('SHA256SUMS');
     $cyberWindowsReady = $hasReleaseFile('BITOSInstaller.exe');
+    $cyberMediaReady = $cyberIsoReady && $cyberUsbReady && $cyberChecksumsReady;
     ?>
     <!doctype html>
     <html lang="en">
@@ -61,20 +62,20 @@ if ($isDedicatedOsHost) {
             <section class="section" id="downloads">
                 <div class="section-heading"><div><p class="eyebrow">Choose your starting point</p><h2>Download BIT OS Cyber 1.0</h2></div><?php if ($cyberChecksumsReady): ?><a class="subtle-link" href="<?= htmlspecialchars($downloads . 'SHA256SUMS', ENT_QUOTES, 'UTF-8') ?>">SHA-256 checksums ↗</a><?php else: ?><span class="subtle-link">Checksums publish with the release</span><?php endif; ?></div>
                 <div class="download-grid">
-                    <article class="download-card featured"><div class="card-icon">◈</div><div class="card-meta"><span class="tag">Recommended</span><span>AMD64 · 84 MB</span></div><h3>Bootable ISO</h3><p>Boot the installer from a USB drive, firmware menu, or a virtual machine.</p><?php if ($cyberIsoReady): ?><a href="<?= htmlspecialchars($downloads . 'bitCyberos.iso', ENT_QUOTES, 'UTF-8') ?>">Download ISO <span>↓</span></a><?php else: ?><span>Release verification in progress</span><?php endif; ?></article>
-                    <article class="download-card"><div class="card-icon">▣</div><div class="card-meta"><span class="tag">Direct USB</span><span>GPT image · 2.1 GB</span></div><h3>USB Installer Image</h3><p>Write this verified GPT image directly to a USB drive with a compatible imaging tool.</p><?php if ($cyberUsbReady): ?><a href="<?= htmlspecialchars($downloads . 'bit-os-cyber-1.0-installer.img', ENT_QUOTES, 'UTF-8') ?>">Download USB Installer Image <span>↓</span></a><?php else: ?><span>Release verification in progress</span><?php endif; ?></article>
-                    <article class="download-card"><div class="card-icon">▤</div><div class="card-meta"><span class="tag">Windows companion</span><span><?= $cyberWindowsReady ? 'Available' : 'Release verification in progress' ?></span></div><h3>Windows Installer</h3><p>Guided USB creation and install preparation for Windows systems.</p><?php if ($cyberWindowsReady): ?><a href="<?= htmlspecialchars($downloads . 'BITOSInstaller.exe', ENT_QUOTES, 'UTF-8') ?>">Download Windows Installer <span>↓</span></a><?php else: ?><span>Release verification in progress</span><?php endif; ?></article>
+                    <article class="download-card featured"><div class="card-icon">▤</div><div class="card-meta"><span class="tag">Recommended for most users</span><span>Windows setup wizard</span></div><h3>Windows Installer</h3><p>Create and verify a bootable USB through a guided setup wizard, then restart into the BIT OS installer.</p><?php if ($cyberWindowsReady): ?><a href="<?= htmlspecialchars($downloads . 'BITOSInstaller.exe', ENT_QUOTES, 'UTF-8') ?>">Download Setup Wizard (.exe) <span>↓</span></a><?php else: ?><span>Release verification in progress</span><?php endif; ?></article>
+                    <article class="download-card"><div class="card-icon">◈</div><div class="card-meta"><span class="tag">Manual installation</span><span>AMD64 · Verified at release</span></div><h3>Bootable ISO</h3><p>Boot the installer from a USB drive, firmware menu, or a virtual machine.</p><?php if ($cyberIsoReady): ?><a href="<?= htmlspecialchars($downloads . 'bitCyberos.iso', ENT_QUOTES, 'UTF-8') ?>">Download ISO <span>↓</span></a><?php else: ?><span>Release verification in progress</span><?php endif; ?></article>
+                    <article class="download-card"><div class="card-icon">▣</div><div class="card-meta"><span class="tag">Advanced · Direct USB</span><span>2.1 GB</span></div><h3>USB Installer Image</h3><p>Write this verified GUID Partition Table (GPT) image directly to an entire USB drive with a compatible imaging tool.</p><?php if ($cyberUsbReady): ?><a href="<?= htmlspecialchars($downloads . 'bit-os-cyber-1.0-installer.img', ENT_QUOTES, 'UTF-8') ?>">Download USB Installer Image <span>↓</span></a><?php else: ?><span>Release verification in progress</span><?php endif; ?></article>
                 </div>
             </section>
 
             <section class="split-section" id="companion">
                 <div><p class="eyebrow">One ecosystem, wherever you are</p><h2>Keep your work close.</h2><p>Use the desktop as your focused base, then reach your systems from the Beyond OS companion apps for iPhone, iPad, and macOS.</p><a class="text-link" href="<?= htmlspecialchars($downloads . 'companion/', ENT_QUOTES, 'UTF-8') ?>">Get companion apps <span>→</span></a></div>
-                <div class="platform-list"><div><strong>Linux Desktop</strong><span>ISO and USB Installer Images</span><b>Available now</b></div><div><strong>Windows Installer</strong><span>Guided USB creation</span><b>In progress</b></div><div><strong>iOS · macOS</strong><span>Secure companion</span><b>In progress</b></div></div>
+                <div class="platform-list"><div><strong>Linux Desktop</strong><span>ISO and USB Installer Images</span><b><?= $cyberMediaReady ? 'Candidate available' : 'Release verification in progress' ?></b></div><div><strong>Windows Installer</strong><span>Guided USB creation</span><b><?= $cyberWindowsReady ? 'Candidate available' : 'Release verification in progress' ?></b></div><div><strong>iOS · macOS</strong><span>Secure companion</span><b>In progress</b></div></div>
             </section>
 
             <section class="section guide-section" id="guides">
                 <div class="section-heading"><div><p class="eyebrow">Start safely</p><h2>Release notes and guides</h2></div></div>
-                <div class="guide-grid"><a href="#downloads"><span>01</span><strong>Cyber 1.0 Candidate</strong><small>Release details and checksums →</small></a><a href="#downloads"><span>02</span><strong>Install from ISO</strong><small>USB, dual-boot, and bare-metal setup →</small></a><a href="#downloads"><span>03</span><strong>Write the USB image</strong><small>Direct USB installation image →</small></a></div>
+                <div class="guide-grid"><a href="#downloads"><span>01</span><strong>Use the Windows setup wizard</strong><small>Recommended guided USB creation →</small></a><a href="#downloads"><span>02</span><strong>Install from ISO</strong><small>USB, dual-boot, and bare-metal setup →</small></a><a href="#downloads"><span>03</span><strong>Write the USB image</strong><small>Advanced direct USB installation →</small></a></div>
             </section>
         </main>
         <footer><span>© <?= date('Y') ?> Beyond Imagination Technology</span><span>BIT OS Cyber 1.0 Candidate · Use only on systems you own or are authorized to test.</span></footer>

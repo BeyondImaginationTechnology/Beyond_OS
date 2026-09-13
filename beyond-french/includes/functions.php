@@ -226,6 +226,25 @@ function french_academy_modules(): array {
     }
     return $modules;
 }
+function french_preschool_greetings_lessons(): array {
+    return [
+        ['title'=>'French ABC: A to C','english'=>'A, B, C','french'=>'A, B, C','pronunciation'=>'ah, bay, say','teaching'=>'French uses the same alphabet letters as English, but many names sound different. Start by listening and repeating A, B, and C.','practice'=>'Point to three letter cards and say A, B, C slowly with a grown-up.','culture'=>'French alphabet songs are a playful first step for young learners.'],
+        ['title'=>'French ABC: D to F','english'=>'D, E, F','french'=>'D, E, F','pronunciation'=>'day, uh, eff','teaching'=>'Listen for the short vowel sound in the French letter E.','practice'=>'Clap once for each letter as you say D, E, F.','culture'=>'Singing and clapping helps children remember sound patterns.'],
+        ['title'=>'French ABC: G to I','english'=>'G, H, I','french'=>'G, H, I','pronunciation'=>'zhay, ash, ee','teaching'=>'French G is called zhay, and H is ash.','practice'=>'Trace G, H, and I in the air while saying their French names.','culture'=>'The letter H is often silent inside French words.'],
+        ['title'=>'French ABC: J to L','english'=>'J, K, L','french'=>'J, K, L','pronunciation'=>'zhee, kah, ell','teaching'=>'The French J begins with a soft zhee sound.','practice'=>'Find J, K, and L in a book or on a keyboard. Say each one.','culture'=>'Letter names help children spell names and simple words later.'],
+        ['title'=>'French ABC: M to O','english'=>'M, N, O','french'=>'M, N, O','pronunciation'=>'emm, enn, oh','teaching'=>'M and N have gentle ending sounds in French.','practice'=>'Hum M, then N, then say O with a big round mouth.','culture'=>'Listening closely builds a strong foundation for pronunciation.'],
+        ['title'=>'French ABC: P to R','english'=>'P, Q, R','french'=>'P, Q, R','pronunciation'=>'pay, koo, air','teaching'=>'French Q is called koo and French R has a special throat sound.','practice'=>'Repeat P, Q, R three times like a tiny alphabet parade.','culture'=>'It is okay if French R feels new; it gets easier with practice.'],
+        ['title'=>'French ABC: S to U','english'=>'S, T, U','french'=>'S, T, U','pronunciation'=>'ess, tay, oo','teaching'=>'French U is not the same as English oo, but oo is a helpful first try.','practice'=>'Say S, T, U while tapping your knees three times.','culture'=>'Young learners grow their accent by listening often, not by being perfect.'],
+        ['title'=>'French ABC: V to X','english'=>'V, W, X','french'=>'V, W, X','pronunciation'=>'vay, doo-bluh-vay, eeks','teaching'=>'W is called double V in French.','practice'=>'Make a V shape with your fingers, then repeat V, W, X.','culture'=>'French uses the same 26 letters, with its own names for them.'],
+        ['title'=>'French ABC: Y and Z','english'=>'Y, Z','french'=>'Y, Z','pronunciation'=>'ee-grek, zed','teaching'=>'French Y is called Greek I, and Z is zed.','practice'=>'Wave in the air to make Y, then zigzag for Z.','culture'=>'Zed is used in French and many other languages.'],
+        ['title'=>'Sing the French ABCs','english'=>'The French alphabet','french'=>'L’alphabet français','pronunciation'=>'lah-fah-bay frahn-say','teaching'=>'Put all the letters together and celebrate what you can say.','practice'=>'Sing or say as much of the French alphabet as you remember with a grown-up.','culture'=>'Every new sound you learn prepares you for French words and greetings.'],
+    ];
+}
+function french_course_lessons(string $age,string $module): array {
+    $module=french_valid_module($module);
+    if (french_valid_age_group($age)==='kids' && $module==='greetings') return french_preschool_greetings_lessons();
+    return (array)(french_academy_modules()[$module]['lessons']??[]);
+}
 function french_valid_age_group(string $age): string {
     $age=strtolower(trim($age));
     return isset(french_age_groups()[$age])?$age:'kids';
@@ -238,7 +257,7 @@ function french_course_lesson(string $age,string $module,int $lessonNumber): ?ar
     $age=french_valid_age_group($age);$module=french_valid_module($module);
     $course=french_academy_modules()[$module]??null;$group=french_age_groups()[$age]??null;
     if(!$course||!$group||$lessonNumber<1||$lessonNumber>10)return null;
-    $lesson=$course['lessons'][$lessonNumber-1]??null;
+    $lesson=french_course_lessons($age,$module)[$lessonNumber-1]??null;
     if(!is_array($lesson))return null;
     return $lesson+['age_group'=>$age,'age_title'=>$group['title'],'age_guidance'=>$group['guidance'],'module_slug'=>$module,'module_title'=>$course['title'],'module_icon'=>$course['icon'],'lesson_number'=>$lessonNumber];
 }
@@ -320,7 +339,7 @@ function french_phrase_word(string $phrase,bool $last=false): string {
     return (string)($last?($words[count($words)-1]??''):($words[0]??''));
 }
 function french_lesson_test_questions(string $age,string $module,int $lessonNumber): array {
-    $module=french_valid_module($module);$course=french_academy_modules()[$module];$lessons=$course['lessons'];$target=$lessons[$lessonNumber-1]??$lessons[0];
+    $module=french_valid_module($module);$course=french_academy_modules()[$module];$lessons=french_course_lessons($age,$module);$target=$lessons[$lessonNumber-1]??$lessons[0];
     $others=[];for($i=1;$i<=3;$i++)$others[]=$lessons[($lessonNumber-1+$i)%10];
     $french=array_column($others,'french');$english=array_column($others,'english');$pronunciation=array_column($others,'pronunciation');$titles=array_column($others,'title');
     $lastPool=array_map(static fn(array $l): string=>french_phrase_word((string)$l['french'],true),$others);$firstPool=array_map(static fn(array $l): string=>french_phrase_word((string)$l['french']),$others);
@@ -339,7 +358,7 @@ function french_lesson_test_questions(string $age,string $module,int $lessonNumb
     ];
 }
 function french_module_exam_questions(string $age,string $module): array {
-    $course=french_academy_modules()[french_valid_module($module)];$questions=[];$lessons=$course['lessons'];
+    $course=french_academy_modules()[french_valid_module($module)];$questions=[];$lessons=french_course_lessons($age,$module);
     foreach($lessons as $index=>$lesson){$pool=[];for($i=1;$i<=3;$i++)$pool[]=$lessons[($index+$i)%10]['french'];$questions[]=['prompt'=>'Choose the French for “'.$lesson['english'].'”','answer'=>$lesson['french'],'options'=>french_quiz_options($lesson['french'],$pool,$index+1)];}
     return $questions;
 }

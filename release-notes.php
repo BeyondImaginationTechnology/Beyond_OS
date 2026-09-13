@@ -10,22 +10,49 @@ beyond_nav_bootstrap('Beyond OS');
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#050817">
-  <title>What’s New in Beyond OS</title>
-  <meta name="description" content="The latest app and project updates included in Beyond OS.">
+  <title>What’s New at Beyond Imagination</title>
+  <meta name="description" content="The latest progress across Jaguar AI, Beyond OS, apps, and creator projects.">
   <link rel="manifest" href="<?=e(beyond_url('manifest.webmanifest'))?>">
   <link rel="stylesheet" href="<?=e(beyond_url('assets/css/bos-21.css'))?>">
 </head>
 <body class="bos-page">
 <main class="bos-main whats-new-main">
   <section class="bos-hero whats-new-hero">
-    <span class="bos-kicker">Beyond OS · August 2026</span>
+    <span class="bos-kicker">Beyond Imagination · September 2026</span>
     <h1>What’s new.</h1>
-    <p>A clearer view of the work landing across Beyond apps and creator projects, based on the latest project READMEs.</p>
+    <p>A clearer view of the work landing across Jaguar AI, Beyond OS, connected apps, and creator projects.</p>
     <div class="bos-actions">
-      <a class="bos-btn" href="#apps">Explore app updates</a>
+      <a class="bos-btn" href="#jaguar">Jaguar progress</a>
+      <a class="bos-btn secondary" href="#apps">Explore app updates</a>
       <a class="bos-btn secondary" href="#projects">See creator projects</a>
-      <a class="bos-btn secondary" href="<?=e(beyond_url('app-store/'))?>">Open App Store</a>
     </div>
+  </section>
+
+  <section class="bos-section jaguar-release" id="jaguar">
+    <div class="jaguar-release-copy">
+      <span class="bos-kicker">Jaguar AI · Foundation phase</span>
+      <h2>Jaguar is becoming a real platform.</h2>
+      <p>We have moved beyond the concept stage. Jaguar now has a dedicated AI destination, a defined product voice, an initial local inference runtime, and a secure path for connecting authenticated Beyond experiences to the model.</p>
+      <div class="bos-actions">
+        <a class="bos-btn" href="<?=e(beyond_url('ai/'))?>">Explore Jaguar</a>
+        <a class="bos-btn secondary" href="#jaguar-progress-title">See build progress</a>
+      </div>
+    </div>
+    <div class="jaguar-release-art"><img src="<?=e(beyond_url('ai/assets/jaguar-runner.jpg'))?>" alt="The cybernetic Jaguar visual identity moving through a digital landscape"></div>
+  </section>
+
+  <section class="bos-section jaguar-progress" aria-labelledby="jaguar-progress-title">
+    <span class="bos-kicker">Build status</span>
+    <h2 id="jaguar-progress-title">The path from identity to intelligence</h2>
+    <div class="progress-grid">
+      <article class="progress-card complete"><span>COMPLETE</span><h3>Product identity</h3><p>The Jaguar name, cyber-jaguar visual system, premium AI page, and AI navigation tab are now established.</p></article>
+      <article class="progress-card complete"><span>COMPLETE</span><h3>Model access</h3><p>Access to Meta’s gated Llama 3.1 8B repositories has been approved through Hugging Face. The instruction-tuned model is the selected foundation for the first Jaguar runtime.</p></article>
+      <article class="progress-card active"><span>IN PROGRESS</span><h3>Local runtime</h3><p>A Transformers-based service now defines Jaguar’s system voice, health endpoint, chat contract, generation limits, and environment-only credentials.</p></article>
+      <article class="progress-card active"><span>IN PROGRESS</span><h3>Beyond integration</h3><p>An authenticated PHP proxy is in place so Beyond products can reach Jaguar without exposing the model service or Hugging Face token to visitors.</p></article>
+      <article class="progress-card next"><span>NEXT</span><h3>First live inference</h3><p>Install the Python runtime, add a read-only Hugging Face token, download the weights, and validate performance on suitable GPU hardware.</p></article>
+      <article class="progress-card next"><span>AFTER VALIDATION</span><h3>Guided experiences</h3><p>Connect Jaguar first to focused learning and creator workflows, then evaluate safety, quality, latency, and operating cost before wider release.</p></article>
+    </div>
+    <aside class="jaguar-note"><strong>What Jaguar is today</strong><p>Jaguar is an in-development Beyond AI platform built on an approved third-party foundation model. It is not yet a publicly available chatbot or a separately trained Beyond foundation model.</p></aside>
   </section>
 
   <section class="bos-section" id="apps">
@@ -61,7 +88,7 @@ beyond_nav_bootstrap('Beyond OS');
   </section>
 </main>
 <style>
-.whats-new-main{width:min(1240px,calc(100% - 28px))}.whats-new-hero{background:radial-gradient(circle at 85% 10%,rgba(81,219,120,.25),transparent 28%),radial-gradient(circle at 72% 85%,rgba(242,70,157,.22),transparent 32%),linear-gradient(135deg,#0a1830,#241044 58%,#121b29)}.whats-new-hero h1{max-width:880px}.whats-new-main .bos-section{scroll-margin-top:88px}.release-foundation{padding:clamp(24px,4vw,42px);border:1px solid var(--line);border-radius:24px;background:var(--panel)}
-@media(max-width:560px){.whats-new-main{width:min(100% - 18px,1240px)}.whats-new-hero{padding:30px 18px}.whats-new-main .bos-actions{display:grid;grid-template-columns:1fr}.whats-new-main .bos-btn{width:100%}}
+.whats-new-main{width:min(1240px,calc(100% - 28px))}.whats-new-hero{background:radial-gradient(circle at 85% 10%,rgba(155,73,255,.32),transparent 28%),radial-gradient(circle at 72% 85%,rgba(242,70,157,.22),transparent 32%),linear-gradient(135deg,#0a1024,#251044 58%,#121322)}.whats-new-hero h1{max-width:880px}.whats-new-main .bos-section{scroll-margin-top:88px}.jaguar-release{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;align-items:stretch}.jaguar-release-copy{padding:clamp(28px,5vw,55px);border:1px solid rgba(192,108,255,.42);border-radius:26px;background:radial-gradient(circle at 100% 0,rgba(224,80,255,.18),transparent 34%),linear-gradient(140deg,rgba(31,20,66,.96),rgba(10,12,31,.98))}.jaguar-release-copy h2{max-width:650px;margin:14px 0;font-size:clamp(38px,5vw,68px);line-height:.94;letter-spacing:-.06em}.jaguar-release-copy p{max-width:680px;color:#c9c4d9;font-size:16px;line-height:1.7}.jaguar-release-art{min-height:430px;overflow:hidden;border:1px solid rgba(192,108,255,.42);border-radius:26px;background:#090711}.jaguar-release-art img{display:block;width:100%;height:100%;object-fit:cover}.jaguar-progress>h2{margin-bottom:28px}.progress-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.progress-card{min-height:220px;padding:24px;border:1px solid var(--line);border-radius:20px;background:var(--panel)}.progress-card span{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:9px;font-weight:950;letter-spacing:.12em}.progress-card.complete span{color:#8ff0ae;background:rgba(81,219,120,.13)}.progress-card.active span{color:#dfb2ff;background:rgba(174,92,255,.14)}.progress-card.next span{color:#ffd98c;background:rgba(255,191,50,.13)}.progress-card h3{margin:22px 0 9px;font-size:22px}.progress-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.65}.jaguar-note{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;margin-top:14px;padding:22px 24px;border:1px solid rgba(255,191,50,.3);border-radius:18px;background:rgba(255,191,50,.06)}.jaguar-note strong{color:#ffd98c}.jaguar-note p{margin:0;color:var(--muted);line-height:1.55}.release-foundation{padding:clamp(24px,4vw,42px);border:1px solid var(--line);border-radius:24px;background:var(--panel)}
+@media(max-width:900px){.jaguar-release{grid-template-columns:1fr}.jaguar-release-art{min-height:340px}.progress-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.whats-new-main{width:min(100% - 18px,1240px)}.whats-new-hero{padding:30px 18px}.whats-new-main .bos-actions{display:grid;grid-template-columns:1fr}.whats-new-main .bos-btn{width:100%}.progress-grid{grid-template-columns:1fr}.jaguar-note{grid-template-columns:1fr}.jaguar-release-art{min-height:270px}}
 </style>
 <?php bos_page_end(); ?>

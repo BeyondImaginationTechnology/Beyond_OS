@@ -134,6 +134,17 @@ function safe_return_path(?string $path, string $fallback = '../dashboard/'): st
             && ($returnParts['host'] ?? '') === ($originParts['host'] ?? '')
             && !isset($returnParts['user']) && !isset($returnParts['pass'])) return $path;
     }
+    $aiOrigin = rtrim((string)(getenv('BEYOND_AI_ORIGIN') ?: 'https://ai.beyondimagination.co.technology'), '/');
+    if ($aiOrigin !== '' && str_starts_with($decoded, $aiOrigin . '/')) {
+        $originParts = parse_url($aiOrigin);
+        $returnParts = parse_url($decoded);
+        if ($originParts && $returnParts
+            && ($originParts['scheme'] ?? '') === 'https'
+            && ($returnParts['scheme'] ?? '') === 'https'
+            && ($originParts['host'] ?? '') === 'ai.beyondimagination.co.technology'
+            && ($returnParts['host'] ?? '') === ($originParts['host'] ?? '')
+            && !isset($returnParts['user']) && !isset($returnParts['pass'])) return $path;
+    }
     if (!str_starts_with($decoded, '/') || str_starts_with($decoded, '//') || str_contains($decoded, '\\')) return $fallback;
     $parts = parse_url($decoded);
     if ($parts === false || isset($parts['scheme']) || isset($parts['host']) || isset($parts['user']) || isset($parts['pass'])) return $fallback;

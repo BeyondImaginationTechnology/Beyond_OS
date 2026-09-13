@@ -130,8 +130,8 @@ function beyond_tv_eight_channel_guide(array $classicState, array $cartoonState)
     foreach ($featured as $channel) {
         $slug = (string)($channel['slug'] ?? '');
         $channelMeta = array_merge($catalogueBySlug[$slug] ?? [], $channel);
-        $rows = $schedules[$slug] ?? [];
-        if ($slug === 'classic-cartoon-theater' && !empty($classicState['blocks'])) { $rows = $classicState['blocks']; }
+        $rows = (($channelMeta['source_type'] ?? '') === 'placeholder') ? [] : ($schedules[$slug] ?? []);
+        if ($slug === 'classic-cartoon-theater' && ($channelMeta['source_type'] ?? '') !== 'placeholder' && !empty($classicState['blocks'])) { $rows = $classicState['blocks']; }
         if ($slug === 'beyond-cartoons' && !empty($cartoonState['blocks'])) { $rows = $cartoonState['blocks']; }
         if ($slug === 'beyond-after-dark') { $rows = beyond_tv_after_dark_hourly_rows(); }
         if ($slug === 'yugioh-tv') { $rows = beyond_tv_anime_rows(); }

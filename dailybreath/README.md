@@ -1,6 +1,6 @@
 # Daily Breath Web 2.0
 
-The web interface prompts for English, French, or Spanish on first visit, saves the choice locally and in a cookie, and keeps the language editable from every screen.
+The web interface prompts for English, French, or Spanish on first visit, saves the choice locally and in a cookie, and keeps the language editable from every screen. The scripture reader follows that choice: English uses the World English Bible and Pickthall Quran meaning; French uses Louis Segond 1910 for the Bible and Tanakh; Spanish uses Reina-Valera 1909 for the Bible and Tanakh; and non-English Quran readers use the bundled Arabic Uthmani text rather than falling back to English.
 
 Daily Breath is an installable Beyond OS progressive web app for matched daily Bible, Tanakh, and Quran readings; complete local sacred-text libraries and search; devotionals; guided breathing; encrypted reflection journaling; weekly challenges; activity history; and recovery support.
 
@@ -19,4 +19,4 @@ The app requires HTTPS in production for service workers and installation. Local
 
 ## Content and safety
 
-The Verse or Ayah of the Day uses the existing dated recovery theme and selects the same passage when available or a related Torah/Quran passage. Bible and Torah text use the public-domain World English Bible (WEBP). Quran text uses Marmaduke Pickthall’s English meaning from Project Gutenberg eBook 16955, public domain in the USA. Recovery content is general faith-centered wellness support, not medical care, and the support page links to official 988 and SAMHSA resources.
+The Verse or Ayah of the Day uses the existing dated recovery theme and selects the same passage when available or a related Torah/Quran passage. Scripture editions reuse the version-pinned mobile resources: World English Bible, Louis Segond 1910, Reina-Valera 1909, and the Hebrew Tanakh via eBible.org; Pickthall’s English Quran meaning via Project Gutenberg; and the Arabic Uthmani Quran text under the attribution in `data/QURAN_JSON_LICENSE.txt`. Recovery content is general faith-centered wellness support, not medical care, and the support page links to official 988 and SAMHSA resources.

@@ -60,8 +60,10 @@ struct Channel: Codable, Identifiable, Hashable, Sendable {
         switch slug {
         case "beyond-after-dark":
             "moon.stars.fill"
-        case "beyond-cartoons", "classic-cartoon-theater":
+        case "beyond-cartoons":
             "sparkles.tv.fill"
+        case "classic-cartoon-theater":
+            "sparkles"
         case "yugioh-tv":
             "sparkles.rectangle.stack.fill"
         case "classic-cinema":
@@ -81,11 +83,11 @@ struct Channel: Codable, Identifiable, Hashable, Sendable {
         case "beyond-health":
             "heart.text.square.fill"
         case "mrbeast-tv":
-            "play.rectangle.on.rectangle.fill"
+            "leaf.fill"
         case "redbull-tv":
-            "figure.run"
+            "pencil.and.scribble"
         case "beyond-mystery":
-            "magnifyingglass.circle.fill"
+            "cpu"
         default:
             "play.tv.fill"
         }
@@ -106,7 +108,7 @@ struct Channel: Codable, Identifiable, Hashable, Sendable {
         case "beyond-family":
             [Color(red: 0.08, green: 0.15, blue: 0.40), Color(red: 0.70, green: 0.16, blue: 0.34)]
         case "classic-cartoon-theater":
-            [Color(red: 0.07, green: 0.18, blue: 0.40), Color(red: 0.68, green: 0.14, blue: 0.32)]
+            [Color(red: 0.03, green: 0.04, blue: 0.17), Color(red: 0.24, green: 0.28, blue: 0.90)]
         case "bubble-guppies":
             [Color(red: 0.04, green: 0.27, blue: 0.35), Color(red: 0.11, green: 0.64, blue: 0.72)]
         case "preschool-francais":
@@ -120,11 +122,11 @@ struct Channel: Codable, Identifiable, Hashable, Sendable {
         case "beyond-health":
             [Color(red: 0.07, green: 0.25, blue: 0.18), Color(red: 0.15, green: 0.64, blue: 0.41)]
         case "mrbeast-tv":
-            [Color(red: 0.02, green: 0.18, blue: 0.30), Color(red: 0.0, green: 0.66, blue: 0.91), Color(red: 0.95, green: 0.96, blue: 0.97)]
+            [Color(red: 0.05, green: 0.24, blue: 0.20), Color(red: 0.31, green: 0.66, blue: 0.42)]
         case "redbull-tv":
-            [Color(red: 0.04, green: 0.09, blue: 0.17), Color(red: 0.85, green: 0.04, blue: 0.12), Color(red: 0.95, green: 0.77, blue: 0.0)]
+            [Color(red: 0.13, green: 0.08, blue: 0.18), Color(red: 0.55, green: 0.24, blue: 0.41)]
         case "beyond-mystery":
-            [Color(red: 0.06, green: 0.05, blue: 0.12), Color(red: 0.25, green: 0.16, blue: 0.30)]
+            [Color(red: 0.02, green: 0.16, blue: 0.21), Color(red: 0.05, green: 0.58, blue: 0.53)]
         default:
             [Color(red: 0.46, green: 0.35, blue: 0.94), Color(red: 0.70, green: 0.27, blue: 0.85)]
         }

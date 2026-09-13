@@ -37,6 +37,7 @@ $experiences = [
     'beyond-ancient' => ['Beyond Ancient','Step back into living history','🏺','#d9a441','#704214'],
     'beyond-health/beyond-skate' => ['Beyond Skate','Learn tricks, upload tries and keep progressing','🛹','#28b9ff','#9658ff'],
     'api-hub' => ['Beyond API Hub','Build on the Beyond ecosystem','</>','#08b6a3','#246bfe'],
+    'beyond-ai' => ['Jaguar AI','Intelligence built beyond','J','#b34cff','#f65daa'],
 ];
 $experience = ['Beyond OS','One ID for every possibility','B','#6d66ff','#e044a7'];
 $requestedApp = strtolower(trim((string)($_GET['app'] ?? $_POST['app'] ?? '')));

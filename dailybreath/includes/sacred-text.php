@@ -12,6 +12,68 @@ function dailybreath_tradition_label(string $tradition): string
     return $labels[dailybreath_faith_tradition($tradition)];
 }
 
+function dailybreath_scripture_locale(?string $locale): string
+{
+    $locale = strtolower((string)$locale);
+    return in_array($locale, ['en', 'fr', 'es'], true) ? $locale : 'en';
+}
+
+function dailybreath_bible_path(string $tradition, string $locale): string
+{
+    $locale = dailybreath_scripture_locale($locale);
+    $file = $locale === 'fr' ? 'fraLSG_vpl.txt' : ($locale === 'es' ? 'spaRV1909_vpl.txt' : 'engwebp_vpl.txt');
+    return dirname(__DIR__) . '/data/' . $file;
+}
+
+/** @return Generator<int,array{code:string,chapter:int,verse:int,text:string}> */
+function dailybreath_vpl_verses(string $path): Generator
+{
+    $handle = @fopen($path, 'rb');
+    if (!$handle) return;
+    $current = null;
+    while (($line = fgets($handle)) !== false) {
+        $line = trim($line);
+        if (preg_match('/^([A-Z0-9]{3}) (\d+):(\d+) (.+)$/u', $line, $match)) {
+            if ($current !== null) yield $current;
+            $current = ['code'=>$match[1], 'chapter'=>(int)$match[2], 'verse'=>(int)$match[3], 'text'=>$match[4]];
+        } elseif ($current !== null && $line !== '' && $line[0] !== '#') {
+            $current['text'] .= ' ' . $line;
+        }
+    }
+    if ($current !== null) yield $current;
+    fclose($handle);
+}
+
+function dailybreath_bible_book_name(string $book, string $locale): string
+{
+    $locale = dailybreath_scripture_locale($locale);
+    $maps = [
+        'fr' => [
+            'Genesis'=>'Genèse','Exodus'=>'Exode','Leviticus'=>'Lévitique','Numbers'=>'Nombres','Deuteronomy'=>'Deutéronome','Joshua'=>'Josué','Judges'=>'Juges',
+            '1 Kings'=>'1 Rois','2 Kings'=>'2 Rois','1 Chronicles'=>'1 Chroniques','2 Chronicles'=>'2 Chroniques','Nehemiah'=>'Néhémie','Psalms'=>'Psaumes',
+            'Proverbs'=>'Proverbes','Ecclesiastes'=>'Ecclésiaste','Song of Solomon'=>'Cantique des Cantiques','Isaiah'=>'Ésaïe','Jeremiah'=>'Jérémie',
+            'Ezekiel'=>'Ézékiel','Hosea'=>'Osée','Joel'=>'Joël','Obadiah'=>'Abdias','Jonah'=>'Jonas','Micah'=>'Michée','Habakkuk'=>'Habacuc',
+            'Zephaniah'=>'Sophonie','Haggai'=>'Aggée','Zechariah'=>'Zacharie','Matthew'=>'Matthieu','Mark'=>'Marc','Luke'=>'Luc','John'=>'Jean',
+            'Acts'=>'Actes','Romans'=>'Romains','1 Corinthians'=>'1 Corinthiens','2 Corinthians'=>'2 Corinthiens','Galatians'=>'Galates',
+            'Ephesians'=>'Éphésiens','Philippians'=>'Philippiens','1 Thessalonians'=>'1 Thessaloniciens','2 Thessalonians'=>'2 Thessaloniciens',
+            '1 Timothy'=>'1 Timothée','2 Timothy'=>'2 Timothée','Philemon'=>'Philémon','Hebrews'=>'Hébreux','James'=>'Jacques',
+            '1 Peter'=>'1 Pierre','2 Peter'=>'2 Pierre','1 John'=>'1 Jean','2 John'=>'2 Jean','3 John'=>'3 Jean','Revelation'=>'Apocalypse',
+        ],
+        'es' => [
+            'Genesis'=>'Génesis','Exodus'=>'Éxodo','Leviticus'=>'Levítico','Numbers'=>'Números','Deuteronomy'=>'Deuteronomio','Joshua'=>'Josué','Judges'=>'Jueces',
+            '1 Kings'=>'1 Reyes','2 Kings'=>'2 Reyes','1 Chronicles'=>'1 Crónicas','2 Chronicles'=>'2 Crónicas','Ezra'=>'Esdras','Nehemiah'=>'Nehemías',
+            'Psalms'=>'Salmos','Proverbs'=>'Proverbios','Ecclesiastes'=>'Eclesiastés','Song of Solomon'=>'Cantares','Isaiah'=>'Isaías','Jeremiah'=>'Jeremías',
+            'Ezekiel'=>'Ezequiel','Hosea'=>'Oseas','Obadiah'=>'Abdías','Jonah'=>'Jonás','Micah'=>'Miqueas','Nahum'=>'Nahúm','Zephaniah'=>'Sofonías',
+            'Haggai'=>'Hageo','Zechariah'=>'Zacarías','Matthew'=>'Mateo','Mark'=>'Marcos','Luke'=>'Lucas','John'=>'Juan','Acts'=>'Hechos',
+            'Romans'=>'Romanos','1 Corinthians'=>'1 Corintios','2 Corinthians'=>'2 Corintios','Galatians'=>'Gálatas','Ephesians'=>'Efesios',
+            'Philippians'=>'Filipenses','Colossians'=>'Colosenses','1 Thessalonians'=>'1 Tesalonicenses','2 Thessalonians'=>'2 Tesalonicenses',
+            '1 Timothy'=>'1 Timoteo','2 Timothy'=>'2 Timoteo','Titus'=>'Tito','Philemon'=>'Filemón','Hebrews'=>'Hebreos','James'=>'Santiago',
+            '1 Peter'=>'1 Pedro','2 Peter'=>'2 Pedro','1 John'=>'1 Juan','2 John'=>'2 Juan','3 John'=>'3 Juan','Jude'=>'Judas','Revelation'=>'Apocalipsis',
+        ],
+    ];
+    return $maps[$locale][$book] ?? $book;
+}
+
 function dailybreath_jewish_book_name(string $book): string
 {
     $names = [
@@ -49,6 +111,16 @@ function dailybreath_quran_path(): string
     return dirname(__DIR__) . '/data/quran-pickthall-vpl.txt';
 }
 
+/** @return array<int,array<string,mixed>> */
+function dailybreath_quran_arabic(): array
+{
+    static $chapters = null;
+    if (is_array($chapters)) return $chapters;
+    $decoded = json_decode((string)@file_get_contents(dirname(__DIR__) . '/data/quran-ar.json'), true);
+    $chapters = is_array($decoded) ? $decoded : [];
+    return $chapters;
+}
+
 function dailybreath_quran_name(string $raw): string
 {
     $name = trim(explode(' (', $raw, 2)[0]);
@@ -63,12 +135,22 @@ function dailybreath_text_contains_terms(string $haystack, array $terms): bool
     return true;
 }
 
-/** @return array<int,string> */
-function dailybreath_quran_surahs(): array
+function dailybreath_lower(string $value): string
 {
-    static $surahs = null;
-    if (is_array($surahs)) return $surahs;
+    return function_exists('mb_strtolower') ? mb_strtolower($value, 'UTF-8') : strtolower($value);
+}
+
+/** @return array<int,string> */
+function dailybreath_quran_surahs(string $locale = 'en'): array
+{
+    static $cache = [];
+    $locale = dailybreath_scripture_locale($locale);
+    if (isset($cache[$locale])) return $cache[$locale];
     $surahs = [];
+    if ($locale !== 'en') {
+        foreach (dailybreath_quran_arabic() as $chapter) $surahs[(int)$chapter['id']] = (string)$chapter['name'];
+        return $cache[$locale] = $surahs;
+    }
     $handle = @fopen(dailybreath_quran_path(), 'rb');
     if (!$handle) return $surahs;
     while (($line = fgets($handle)) !== false) {
@@ -80,16 +162,25 @@ function dailybreath_quran_surahs(): array
     }
     fclose($handle);
     ksort($surahs);
-    return $surahs;
+    return $cache[$locale] = $surahs;
 }
 
 /** @return array<int,array{verse_number:int,verse_text:string}> */
-function dailybreath_sacred_chapter(string $tradition, string $book, int $chapter): array
+function dailybreath_sacred_chapter(string $tradition, string $book, int $chapter, string $locale = 'en'): array
 {
     $tradition = dailybreath_faith_tradition($tradition);
+    $locale = dailybreath_scripture_locale($locale);
     $verses = [];
     if ($tradition === 'quran') {
         $surah = max(1, min(114, (int)$book));
+        if ($locale !== 'en') {
+            foreach (dailybreath_quran_arabic() as $item) {
+                if ((int)$item['id'] !== $surah) continue;
+                foreach (($item['verses'] ?? []) as $verse) $verses[] = ['verse_number'=>(int)$verse['id'], 'verse_text'=>(string)$verse['text']];
+                return $verses;
+            }
+            return [];
+        }
         $handle = @fopen(dailybreath_quran_path(), 'rb');
         if (!$handle) return [];
         while (($line = fgets($handle)) !== false) {
@@ -104,29 +195,38 @@ function dailybreath_sacred_chapter(string $tradition, string $book, int $chapte
 
     $codes = dailybreath_bible_book_codes();
     if (!isset($codes[$book])) return [];
-    $handle = @fopen(dirname(__DIR__) . '/data/engwebp_vpl.txt', 'rb');
-    if (!$handle) return [];
     $started = false;
-    while (($line = fgets($handle)) !== false) {
-        if (!preg_match('/^([A-Z0-9]{3}) (\d+):(\d+) (.+)$/u', trim($line), $match)) continue;
-        if ($match[1] === $codes[$book] && (int)$match[2] === $chapter) {
+    foreach (dailybreath_vpl_verses(dailybreath_bible_path($tradition, $locale)) as $item) {
+        if ($item['code'] === $codes[$book] && $item['chapter'] === $chapter) {
             $started = true;
-            $verses[] = ['verse_number'=>(int)$match[3], 'verse_text'=>$match[4]];
+            $verses[] = ['verse_number'=>$item['verse'], 'verse_text'=>$item['text']];
         } elseif ($started) break;
     }
-    fclose($handle);
     return $verses;
 }
 
 /** @return array<int,array{reference:string,text:string,url:string}> */
-function dailybreath_search_sacred_text(string $tradition, string $query, int $limit = 75): array
+function dailybreath_search_sacred_text(string $tradition, string $query, int $limit = 75, string $locale = 'en'): array
 {
     $tradition = dailybreath_faith_tradition($tradition);
-    $terms = array_values(array_filter(preg_split('/\s+/u', strtolower(trim($query))) ?: []));
+    $locale = dailybreath_scripture_locale($locale);
+    $terms = array_values(array_filter(preg_split('/\s+/u', dailybreath_lower(trim($query))) ?: []));
     if (!$terms) return [];
     $matches = [];
     if ($tradition === 'quran') {
-        $surahs = dailybreath_quran_surahs();
+        $surahs = dailybreath_quran_surahs($locale);
+        if ($locale !== 'en') {
+            foreach (dailybreath_quran_arabic() as $chapter) foreach (($chapter['verses'] ?? []) as $verse) {
+                if (count($matches) >= $limit) break 2;
+                $surah = (int)$chapter['id'];
+                $number = (int)$verse['id'];
+                $reference = ($surahs[$surah] ?? ('Surah ' . $surah)) . ' ' . $surah . ':' . $number;
+                $haystack = dailybreath_lower($reference . ' ' . (string)$verse['text']);
+                if (!dailybreath_text_contains_terms($haystack, $terms)) continue;
+                $matches[] = ['reference'=>$reference, 'text'=>(string)$verse['text'], 'url'=>'?tradition=quran&book='.$surah.'&chapter=1#verse-'.$number];
+            }
+            return $matches;
+        }
         $handle = @fopen(dailybreath_quran_path(), 'rb');
         if (!$handle) return [];
         while (($line = fgets($handle)) !== false && count($matches) < $limit) {
@@ -147,18 +247,17 @@ function dailybreath_search_sacred_text(string $tradition, string $query, int $l
     $groups = dailybreath_bible_book_groups($tradition === 'torah');
     $allowedCodes = array_flip(array_intersect_key(dailybreath_bible_book_codes(), array_merge(...array_values($groups))));
     $namesByCode = array_flip(dailybreath_bible_book_codes());
-    $handle = @fopen(dirname(__DIR__) . '/data/engwebp_vpl.txt', 'rb');
-    if (!$handle) return [];
-    while (($line = fgets($handle)) !== false && count($matches) < $limit) {
-        if (!preg_match('/^([A-Z0-9]{3}) (\d+):(\d+) (.+)$/u', trim($line), $match) || !isset($allowedCodes[$match[1]])) continue;
-        $name = $namesByCode[$match[1]];
+    foreach (dailybreath_vpl_verses(dailybreath_bible_path($tradition, $locale)) as $item) {
+        if (count($matches) >= $limit) break;
+        if (!isset($allowedCodes[$item['code']])) continue;
+        $name = $namesByCode[$item['code']];
         $displayName = $tradition === 'torah' ? dailybreath_jewish_book_name($name) : $name;
-        $reference = $displayName . ' ' . (int)$match[2] . ':' . (int)$match[3];
-        $haystack = strtolower($reference . ' ' . $match[4]);
+        if ($tradition === 'bible') $displayName = dailybreath_bible_book_name($name, $locale);
+        $reference = $displayName . ' ' . $item['chapter'] . ':' . $item['verse'];
+        $haystack = dailybreath_lower($reference . ' ' . $item['text']);
         if (!dailybreath_text_contains_terms($haystack, $terms)) continue;
-        $matches[] = ['reference'=>$reference, 'text'=>$match[4], 'url'=>'?tradition='.$tradition.'&book='.rawurlencode($name).'&chapter='.(int)$match[2].'#verse-'.(int)$match[3]];
+        $matches[] = ['reference'=>$reference, 'text'=>$item['text'], 'url'=>'?tradition='.$tradition.'&book='.rawurlencode($name).'&chapter='.$item['chapter'].'#verse-'.$item['verse']];
     }
-    fclose($handle);
     return $matches;
 }
 
@@ -179,7 +278,7 @@ function dailybreath_interfaith_verse_of_day(PDO $pdo, string $tradition, string
         $flat = array_merge(...array_values($groups));
         $book = (string)($bible['book'] ?? 'Psalms');
         if (isset($flat[$book])) {
-            $verses = dailybreath_sacred_chapter('torah', $book, (int)$bible['chapter']);
+            $verses = dailybreath_sacred_chapter('torah', $book, (int)$bible['chapter'], $locale);
             foreach ($verses as $verse) if ($verse['verse_number'] === (int)$bible['verse']) {
                 return ['text'=>$verse['verse_text'],'reference'=>dailybreath_jewish_book_name($book).' '.(int)$bible['chapter'].':'.(int)$bible['verse'],'book'=>$book,'chapter'=>(int)$bible['chapter'],'verse'=>(int)$bible['verse'],'reader_book'=>$book,'reader_chapter'=>(int)$bible['chapter'],'source'=>'matched_torah_theme','tradition'=>'torah'];
             }
@@ -190,7 +289,7 @@ function dailybreath_interfaith_verse_of_day(PDO $pdo, string $tradition, string
             'recovery'=>[['Psalms',40,1],['Psalms',107,14],['Isaiah',43,2],['Proverbs',24,16]],
         ];
         [$book,$chapter,$number] = $pools[$theme][abs(crc32($date)) % count($pools[$theme])];
-        $verses = dailybreath_sacred_chapter('torah', $book, $chapter);
+        $verses = dailybreath_sacred_chapter('torah', $book, $chapter, $locale);
         if (!$verses) {
             return ['text'=>'Be still, and know that I am God.','reference'=>'Tehillim 46:10','book'=>'Psalms','chapter'=>46,'verse'=>10,'reader_book'=>'Psalms','reader_chapter'=>46,'source'=>'tanakh_emergency_fallback','tradition'=>'torah'];
         }
@@ -204,12 +303,12 @@ function dailybreath_interfaith_verse_of_day(PDO $pdo, string $tradition, string
         'recovery'=>[[39,53],[12,87],[3,139],[5,90],[94,6]],
     ];
     [$surah,$number] = $pools[$theme][abs(crc32($date)) % count($pools[$theme])];
-    $verses = dailybreath_sacred_chapter('quran', (string)$surah, 1);
+    $verses = dailybreath_sacred_chapter('quran', (string)$surah, 1, $locale);
     if (!$verses) {
         return ['text'=>'Who have believed and whose hearts have rest in the remembrance of Allah. Verily in the remembrance of Allah do hearts find rest!','reference'=>"Ar-Ra'd 13:28",'book'=>'13','chapter'=>1,'verse'=>28,'reader_book'=>'13','reader_chapter'=>1,'source'=>'quran_emergency_fallback','tradition'=>'quran'];
     }
     $selected = array_values(array_filter($verses, static fn(array $verse): bool => $verse['verse_number'] === $number))[0] ?? $verses[0];
-    $name = dailybreath_quran_surahs()[$surah] ?? ('Surah '.$surah);
+    $name = dailybreath_quran_surahs($locale)[$surah] ?? ('Surah '.$surah);
     return ['text'=>$selected['verse_text'],'reference'=>$name.' '.$surah.':'.$selected['verse_number'],'book'=>$name,'chapter'=>$surah,'verse'=>$selected['verse_number'],'reader_book'=>(string)$surah,'reader_chapter'=>1,'source'=>'quran_theme_match','tradition'=>'quran'];
 }
 

@@ -1,6 +1,11 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/../includes/ecosystem.php';
+$host = strtolower(preg_replace('/:\d+$/', '', (string)($_SERVER['HTTP_HOST'] ?? '')) ?? '');
+if ($host === 'ai.beyondimagination.co.technology') {
+    require __DIR__ . '/chat.php';
+    return;
+}
 beyond_nav_bootstrap('Jaguar AI');
 ?>
 <!doctype html>

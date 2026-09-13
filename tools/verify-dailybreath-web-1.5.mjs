@@ -24,6 +24,14 @@ const bibleLines = read('dailybreath', 'data', 'engwebp_vpl.txt').split(/\r?\n/)
 const matthew = bibleLines.findIndex(line => line.startsWith('MAT '));
 assert(bibleLines.length === 31103, 'Web Bible must contain all 31,103 verses.');
 assert(matthew === 23145, 'Web Torah/Tanakh edition must contain all 23,145 Hebrew Scripture verses.');
+const frenchBible = read('dailybreath', 'data', 'fraLSG_vpl.txt');
+const spanishBible = read('dailybreath', 'data', 'spaRV1909_vpl.txt');
+const hebrewTanakh = read('dailybreath', 'data', 'heb_vpl.txt');
+const arabicQuran = JSON.parse(read('dailybreath', 'data', 'quran-ar.json'));
+assert(frenchBible.startsWith('GEN 1:1 Au commencement'), 'French Louis Segond Bible is missing.');
+assert(spanishBible.startsWith('GEN 1:1 EN el principio'), 'Spanish Reina-Valera Bible is missing.');
+assert(hebrewTanakh.startsWith('GEN 1:1 בראשית'), 'Hebrew Tanakh is missing.');
+assert(arabicQuran.length === 114 && arabicQuran.reduce((count, surah) => count + surah.verses.length, 0) === 6236, 'Arabic Quran must contain 114 surahs and 6,236 ayahs.');
 
 const sacred = read('dailybreath', 'includes', 'sacred-text.php');
 const reader = read('dailybreath', 'scripture.php');
@@ -39,6 +47,8 @@ for (const tradition of ['bible', 'torah', 'quran']) {
 }
 assert(sacred.includes('dailybreath_interfaith_verse_of_day'), 'Interfaith daily matching is missing.');
 assert(sacred.includes('dailybreath_search_sacred_text'), 'Sacred-text search is missing.');
+assert(sacred.includes("'fraLSG_vpl.txt'") && sacred.includes("'spaRV1909_vpl.txt'"), 'Bible and Tanakh readers must follow the French/Spanish locale.');
+assert(sacred.includes('dailybreath_quran_arabic') && reader.includes('data-script-direction'), 'Non-English Quran readers must use the RTL Arabic edition.');
 assert(reader.includes('data-faith='), 'Reader tradition theme is missing.');
 assert(todayApi.includes('dailybreath_interfaith_verse_of_day'), 'Today API must return the selected faith tradition.');
 assert(todayApi.includes("'reader_url'"), 'Today API reader deep link is missing.');
@@ -77,4 +87,5 @@ console.log(JSON.stringify({
   publicPrivacyNotice: true,
   iosHourglassParity: true,
   interfaceLocales: ['en', 'fr', 'es'],
+  scriptureLocales: { bible: ['en', 'fr', 'es'], tanakh: ['en', 'fr', 'es'], quran: ['en', 'ar'] },
 }, null, 2));

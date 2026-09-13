@@ -5,14 +5,14 @@
   {"number":4,"slug":"classic-cinema","name":"Beyond Movies","icon":"🎬","description":"Features, double bills, and weekend marathons.","category":"Movies"},
   {"number":5,"slug":"beyond-comedy","name":"Beyond Comedy","icon":"😂","description":"Sitcoms, teen comedy, and feel-good movies.","category":"Comedy"},
   {"number":6,"slug":"beyond-family","name":"Beyond Family","icon":"✨","description":"Fantasy, storybook classics, and family adventures.","category":"Family"},
-  {"number":7,"slug":"classic-cartoon-theater","name":"Beyond Animated Classics","icon":"⚡","description":"X-Men, Spider-Man, Fantastic Four, Hulk, and Batman animation blocks.","category":"Superheroes"},
+  {"number":7,"slug":"classic-cartoon-theater","name":"Beyond Sci-Fi","icon":"🛸","description":"Science-fiction stories, cosmic adventures, and futuristic worlds.","category":"Sci-Fi"},
   {"number":8,"slug":"bubble-guppies","name":"Preschool English","icon":"🐾","description":"Bluey, Bubble Guppies, Blue's Clues, and English preschool favorites.","category":"Preschool"},
   {"number":9,"slug":"preschool-francais","name":"Préscolaire Français","icon":"🇫🇷","description":"Caillou et des histoires éducatives dans un canal préscolaire entièrement en français.","category":"Preschool"},
   {"number":10,"slug":"space-tv","name":"Beyond Space","icon":"🛰️","description":"Space science, NASA, and cosmic ambience.","category":"Science"},
-  {"number":11,"slug":"beyond-ancient","name":"Beyond Ancient","icon":"🏺","description":"Archaeology, civilizations, and ancient history.","category":"History"},
-  {"number":12,"slug":"beyond-french","name":"Beyond French","icon":"🇫🇷","description":"Lessons, conversation, and French culture.","category":"Education"},
+  {"number":11,"slug":"beyond-ancient","name":"Beyond History","icon":"📜","description":"History, civilizations, archaeology, and the stories that shaped the world.","category":"History"},
+  {"number":12,"slug":"beyond-french","name":"Beyond French","icon":"🇫🇷","description":"Beyond French lessons, daily practice, conversation, and French culture.","category":"Education"},
   {"number":13,"slug":"beyond-health","name":"Beyond Health","icon":"💚","description":"Fitness, nutrition, meditation, and wellness.","category":"Wellness"},
-  {"number":14,"slug":"mrbeast-tv","name":"MrBeast TV","icon":"🦁","description":"Official MrBeast videos, challenges, and new-episode updates.","category":"Entertainment"},
-  {"number":15,"slug":"redbull-tv","name":"Red Bull TV","icon":"🪽","description":"Official Red Bull action sports, events, films, and athlete stories.","category":"Sports"},
-  {"number":16,"slug":"beyond-mystery","name":"Beyond Mystery","icon":"🔎","description":"Detectives, puzzles, thrillers, and mysteries from the curated Beyond TV library.","category":"Mystery"}
+  {"number":14,"slug":"mrbeast-tv","name":"Daily Breath","icon":"🌿","description":"Daily scripture, reflection, prayer, and a moment to breathe.","category":"Faith & Wellness"},
+  {"number":15,"slug":"redbull-tv","name":"Tattoo Channel","icon":"✒️","description":"Tattoo artistry, artist spotlights, and creative ink culture.","category":"Culture"},
+  {"number":16,"slug":"beyond-mystery","name":"Beyond Technology","icon":"💻","description":"Technology, innovation, digital culture, and the ideas shaping tomorrow.","category":"Technology"}
 ]

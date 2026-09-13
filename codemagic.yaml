@@ -1,4 +1,39 @@
 workflows:
+  daily-breath-ios:
+    name: Daily Breath iOS checks
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    working_directory: DailyBreathApple
+    environment:
+      xcode: latest
+    scripts:
+      - name: Run unit tests
+        script: |
+          set -euo pipefail
+          simulator_id="$(xcrun simctl list devices available -j | ruby -rjson -e '
+            devices = JSON.parse(STDIN.read).fetch("devices").values.flatten
+            device = devices.find { |candidate| candidate["isAvailable"] && candidate["name"] == "iPhone 16 Pro Max" }
+            device ||= devices.find { |candidate| candidate["isAvailable"] && candidate["name"].start_with?("iPhone") }
+            abort "No available iPhone simulator found" unless device
+            puts device.fetch("udid")
+          ')"
+          xcodebuild test \
+            -project TheDailyBreath.xcodeproj \
+            -scheme TheDailyBreath \
+            -destination "id=$simulator_id" \
+            CODE_SIGNING_ALLOWED=NO
+      - name: Build simulator app
+        script: |
+          set -euo pipefail
+          xcodebuild build \
+            -project TheDailyBreath.xcodeproj \
+            -scheme TheDailyBreath \
+            -sdk iphonesimulator \
+            -derivedDataPath "$CM_BUILD_DIR/derived-data" \
+            CODE_SIGNING_ALLOWED=NO
+    artifacts:
+      - $CM_BUILD_DIR/derived-data/Build/Products/**/*.app
+
   beyond-baby-names-ios:
     name: Beyond Baby Names iOS checks
     max_build_duration: 60

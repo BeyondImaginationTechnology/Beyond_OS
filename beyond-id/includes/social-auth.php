@@ -2,6 +2,10 @@
 declare(strict_types=1);
 require_once __DIR__ . '/remember-me.php';
 
+final class BeyondSocialUserException extends RuntimeException
+{
+}
+
 function beyond_social_config(string $provider): array
 {
     static $config;
@@ -128,6 +132,26 @@ function beyond_social_profile(string $provider, string $accessToken, array $tok
         'first_name' => trim((string)($profile['given_name'] ?? '')),
         'last_name' => trim((string)($profile['family_name'] ?? '')),
     ];
+}
+
+function beyond_social_destination(array $flow, ?string $returnTo = null): string
+{
+    $mobileScheme = strtolower(trim((string)($flow['mobile_scheme'] ?? '')));
+    if (in_array($mobileScheme, ['beyondmusic', 'beyondtv', 'frenchquest', 'dailybreath'], true)) {
+        $destination = '/beyond-id/auth/mobile-complete.php?scheme=' . rawurlencode($mobileScheme);
+        $challenge = trim((string)($flow['mobile_code_challenge'] ?? ''));
+        if ($challenge !== '' && preg_match('/^[A-Za-z0-9_-]{43,128}$/', $challenge)) {
+            $destination .= '&code_challenge=' . rawurlencode($challenge);
+        }
+        return $destination;
+    }
+
+    if ($returnTo === null) {
+        $returnTo = is_string($_SESSION['beyond_return_to'] ?? null)
+            ? $_SESSION['beyond_return_to']
+            : null;
+    }
+    return safe_return_path($returnTo, '../dashboard/');
 }
 
 function beyond_social_login_session(PDO $pdo, array $user, string $provider, ?string $destinationOverride = null): never

@@ -4,6 +4,9 @@ require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/social-auth.php';
 
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Referrer-Policy: no-referrer');
+
 $provider = strtolower(trim((string)($_GET['provider'] ?? '')));
 if ($provider === 'facebook') $provider = 'meta';
 if (!in_array($provider, ['google', 'meta', 'instagram'], true) || !beyond_social_enabled($provider)) {

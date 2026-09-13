@@ -34,6 +34,9 @@ if (!empty($_SESSION['user_id'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verify_csrf_token($_POST['csrf'] ?? null)) {
         $error = 'Your session expired. Reload this page and try again.';
+    } elseif (!beyond_rate_limit_consume($pdo, 'instagram-complete', (string)$pending['subject'], 10, 600, 900)['allowed']) {
+        http_response_code(429);
+        $error = 'Too many Instagram completion attempts. Please try again later.';
     } elseif (($_POST['action'] ?? '') === 'link_existing') {
         if (!$signedInUser || ($signedInUser['status'] ?? '') !== 'active') {
             $error = 'Sign in to your existing Beyond ID before linking Instagram.';
@@ -41,17 +44,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Verify your Beyond ID email before linking Instagram.';
         } else {
             try {
+                $pdo->beginTransaction();
                 $check = $pdo->prepare('SELECT user_id FROM social_identities WHERE provider=? AND provider_user_id=? LIMIT 1');
                 $check->execute(['instagram', $pending['subject']]);
                 $linkedUserId = (int)($check->fetchColumn() ?: 0);
                 if ($linkedUserId && $linkedUserId !== (int)$signedInUser['id']) {
-                    throw new RuntimeException('This Instagram account is already linked to another Beyond ID.');
+                    throw new BeyondSocialUserException('This Instagram account is already linked to another Beyond ID.');
                 }
                 $existingProvider = $pdo->prepare('SELECT provider_user_id FROM social_identities WHERE user_id=? AND provider=? LIMIT 1');
                 $existingProvider->execute([(int)$signedInUser['id'], 'instagram']);
                 $existingSubject = (string)($existingProvider->fetchColumn() ?: '');
                 if ($existingSubject !== '' && !hash_equals($existingSubject, (string)$pending['subject'])) {
-                    throw new RuntimeException('This Beyond ID already has a different Instagram account linked.');
+                    throw new BeyondSocialUserException('This Beyond ID already has a different Instagram account linked.');
                 }
                 if (!$linkedUserId) {
                     $now = date('Y-m-d H:i:s');
@@ -61,14 +65,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $update = $pdo->prepare('UPDATE social_identities SET email=?,display_name=?,updated_at=? WHERE provider=? AND provider_user_id=?');
                     $update->execute([$signedInUser['email'], $displayName, date('Y-m-d H:i:s'), 'instagram', $pending['subject']]);
                 }
+                $pdo->commit();
                 log_activity($pdo, (int)$signedInUser['id'], 'oauth_link_instagram');
+                beyond_rate_limit_clear($pdo, 'instagram-complete', (string)$pending['subject']);
                 unset($_SESSION['pending_instagram_identity']);
-                $destination = safe_return_path($_SESSION['beyond_return_to'] ?? null, '../dashboard/');
+                $destination = beyond_social_destination($pending, (string)($pending['return_to'] ?? ''));
                 unset($_SESSION['beyond_return_to']);
                 header('Location: ' . $destination);
                 exit;
             } catch (Throwable $exception) {
-                $error = $exception->getMessage();
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                error_log('Instagram account link failed: ' . $exception->getMessage());
+                $error = $exception instanceof BeyondSocialUserException
+                    ? $exception->getMessage()
+                    : 'Beyond ID could not link this Instagram account. Please try again.';
             }
         }
     } elseif (($_POST['action'] ?? '') === 'create_account') {
@@ -82,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $check = $pdo->prepare('SELECT id FROM users WHERE email=? LIMIT 1');
                 $check->execute([$email]);
-                if ($check->fetchColumn()) throw new RuntimeException('A Beyond ID already uses this email. Sign in to it above, then link Instagram.');
+                if ($check->fetchColumn()) throw new BeyondSocialUserException('A Beyond ID already uses this email. Sign in to it above, then link Instagram.');
 
                 $pdo->beginTransaction();
                 $hash = password_hash(bin2hex(random_bytes(32)), PASSWORD_DEFAULT);
@@ -103,19 +113,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 create_notification($pdo, $userId, 'Welcome to Beyond OS', 'Your Beyond ID is connected to Instagram.', '/beyond-id/dashboard/profile.php', 'welcome');
                 log_activity($pdo, $userId, 'register_instagram_terms_accepted_v2.1-beta');
                 $pdo->commit();
+                beyond_rate_limit_clear($pdo, 'instagram-complete', (string)$pending['subject']);
                 unset($_SESSION['pending_instagram_identity']);
                 send_beyond_id_admin_signup_alert(['id' => $userId, 'first_name' => $first, 'last_name' => $last, 'email' => $email, 'created_at' => $now], 'Beyond ID Instagram signup');
                 if ($isSqlite) {
                     $userStatement = $pdo->prepare('SELECT * FROM users WHERE id=? LIMIT 1');
                     $userStatement->execute([$userId]);
-                    beyond_social_login_session($pdo, $userStatement->fetch(PDO::FETCH_ASSOC), 'instagram');
+                    beyond_social_login_session(
+                        $pdo,
+                        $userStatement->fetch(PDO::FETCH_ASSOC),
+                        'instagram',
+                        beyond_social_destination($pending, (string)($pending['return_to'] ?? ''))
+                    );
                 }
                 $success = send_verification_email($email, $token, 'beyond_id', trim($first . ' ' . $last))
                     ? 'Check your inbox to verify your email. After verification, use Continue with Instagram to sign in.'
                     : 'Your account was created, but the verification email could not be sent. Contact support before signing in.';
             } catch (Throwable $exception) {
                 if ($pdo->inTransaction()) $pdo->rollBack();
-                $error = $exception instanceof RuntimeException ? $exception->getMessage() : 'Beyond ID could not connect this Instagram account. Please try again.';
+                $error = $exception instanceof BeyondSocialUserException
+                    ? $exception->getMessage()
+                    : 'Beyond ID could not connect this Instagram account. Please try again.';
                 error_log('Instagram account completion failed: ' . $exception->getMessage());
             }
         }

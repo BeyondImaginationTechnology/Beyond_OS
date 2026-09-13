@@ -46,8 +46,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $sent = send_email($email, 'Reset your Beyond ID password', "<div style='font-family:Arial;padding:28px;background:#10101b;color:#fff'><h2>Reset your Beyond ID</h2><p>This link expires in one hour and can be used once.</p><p><a style='display:inline-block;padding:14px 20px;border-radius:999px;background:#7c3aed;color:#fff;text-decoration:none' href='{$safeUrl}'>Reset password</a></p><p style='font-size:12px;color:#aaa;word-break:break-all'>If the button does not work, copy this link:<br>{$safeUrl}</p></div>");
                     if (!$sent) {
                         error_log('Password reset email failed for user_id=' . $userId);
+                        log_activity($pdo, $userId, 'password_reset_email_failed');
                     } else {
                         error_log('Password reset email queued for user_id=' . $userId);
+                        log_activity($pdo, $userId, 'password_reset_email_sent');
                     }
                 } catch (Throwable $exception) {
                     if ($pdo->inTransaction()) {

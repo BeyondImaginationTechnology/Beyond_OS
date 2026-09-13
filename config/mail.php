@@ -10,25 +10,42 @@ function smtp_read_line($socket): string {
     return $data;
 }
 
-function smtp_command($socket, string $command, array $okCodes): string {
+function smtp_command($socket, string $command, array $okCodes, string $label = ''): string {
     if ($command !== '') fwrite($socket, $command . "\r\n");
     $response = smtp_read_line($socket);
     $code = (int)substr($response, 0, 3);
     if (!in_array($code, $okCodes, true)) {
-        throw new Exception('SMTP error after [' . $command . ']: ' . trim($response));
+        throw new Exception('SMTP error after [' . ($label !== '' ? $label : $command) . ']: ' . trim($response));
     }
     return $response;
 }
 
+function smtp_configuration_issue(): string {
+    if (trim(SMTP_HOST) === '') return 'host is missing';
+    if (SMTP_PORT < 1 || SMTP_PORT > 65535) return 'port is invalid';
+    if (!in_array(strtolower(trim(SMTP_SECURE)), ['', 'ssl', 'tls'], true)) return 'secure mode must be ssl, tls, or empty';
+    if (trim(SMTP_USER) === '') return 'user is missing';
+    if (SMTP_PASS === 'PASTE_EMAIL_PASSWORD_HERE' || SMTP_PASS === '') return 'password is missing';
+    if (!filter_var(SMTP_FROM, FILTER_VALIDATE_EMAIL)) return 'from address is invalid';
+    if (trim(SMTP_REPLY_TO) !== '' && !filter_var(SMTP_REPLY_TO, FILTER_VALIDATE_EMAIL)) return 'reply-to address is invalid';
+    return '';
+}
+
 function smtp_send_html(string $to, string $subject, string $html, string $fromName = SMTP_FROM_NAME): bool {
-    if (SMTP_PASS === 'PASTE_EMAIL_PASSWORD_HERE' || SMTP_PASS === '') {
-        error_log('SMTP_PASS is not configured in /config/smtp.php');
+    $configurationIssue = smtp_configuration_issue();
+    if ($configurationIssue !== '') {
+        error_log('SMTP configuration invalid: ' . $configurationIssue);
+        return false;
+    }
+    if (!filter_var($to, FILTER_VALIDATE_EMAIL)) {
+        error_log('SMTP recipient address is invalid.');
         return false;
     }
 
     $host = SMTP_HOST;
     $port = SMTP_PORT;
-    $remote = (SMTP_SECURE === 'ssl') ? "ssl://{$host}" : $host;
+    $secureMode = strtolower(trim(SMTP_SECURE));
+    $remote = ($secureMode === 'ssl') ? "ssl://{$host}" : $host;
 
     $socket = @fsockopen($remote, $port, $errno, $errstr, 20);
     if (!$socket) {
@@ -42,28 +59,34 @@ function smtp_send_html(string $to, string $subject, string $html, string $fromN
         smtp_command($socket, '', [220]);
         smtp_command($socket, 'EHLO beyondimagination.co.technology', [250]);
 
-        if (SMTP_SECURE === 'tls') {
+        if ($secureMode === 'tls') {
             smtp_command($socket, 'STARTTLS', [220]);
-            stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+            if (stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT) !== true) {
+                throw new RuntimeException('SMTP STARTTLS negotiation failed.');
+            }
             smtp_command($socket, 'EHLO beyondimagination.co.technology', [250]);
         }
 
         smtp_command($socket, 'AUTH LOGIN', [334]);
-        smtp_command($socket, base64_encode(SMTP_USER), [334]);
-        smtp_command($socket, base64_encode(SMTP_PASS), [235]);
+        smtp_command($socket, base64_encode(SMTP_USER), [334], 'AUTH username');
+        smtp_command($socket, base64_encode(SMTP_PASS), [235], 'AUTH password');
 
         smtp_command($socket, 'MAIL FROM:<' . SMTP_FROM . '>', [250]);
         smtp_command($socket, 'RCPT TO:<' . $to . '>', [250, 251]);
         smtp_command($socket, 'DATA', [354]);
 
+        $subject = trim((string)preg_replace('/[\r\n]+/', ' ', $subject));
+        $fromName = trim((string)preg_replace('/[\r\n]+/', ' ', $fromName));
         $safeSubject = function_exists('mb_encode_mimeheader')
             ? mb_encode_mimeheader($subject, 'UTF-8')
             : '=?UTF-8?B?' . base64_encode($subject) . '?=';
         $headers = [];
         $headers[] = 'From: ' . $fromName . ' <' . SMTP_FROM . '>';
-        $headers[] = 'Reply-To: ' . SMTP_REPLY_TO;
+        if (trim(SMTP_REPLY_TO) !== '') $headers[] = 'Reply-To: ' . SMTP_REPLY_TO;
         $headers[] = 'To: <' . $to . '>';
         $headers[] = 'Subject: ' . $safeSubject;
+        $headers[] = 'Date: ' . date(DATE_RFC2822);
+        $headers[] = 'Message-ID: <' . bin2hex(random_bytes(16)) . '@beyondimagination.co.technology>';
         $headers[] = 'MIME-Version: 1.0';
         $headers[] = 'Content-Type: text/html; charset=UTF-8';
         $headers[] = 'Content-Transfer-Encoding: 8bit';

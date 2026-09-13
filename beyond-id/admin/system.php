@@ -13,7 +13,14 @@ $checks['storage'] = [is_dir($varPath)&&is_writable($varPath)?'ok':'warn', is_di
 $smtpConfigured = false;
 try {
     $configFile = rtrim($varPath, '/\\').'/config/live.php';
-    if (is_file($configFile)) { $cfg=require $configFile; $smtpConfigured=!empty($cfg['smtp']['host'])&&!empty($cfg['smtp']['username']); }
+    if (is_file($configFile)) {
+        $cfg = require $configFile;
+        $smtp = is_array($cfg['smtp'] ?? null) ? $cfg['smtp'] : [];
+        $smtpConfigured = !empty($smtp['host'])
+            && !empty($smtp['user'])
+            && !empty($smtp['pass'])
+            && filter_var($smtp['from'] ?? '', FILTER_VALIDATE_EMAIL);
+    }
 } catch(Throwable $exception) {}
 $checks['email'] = [$smtpConfigured?'ok':'warn', $smtpConfigured?'SMTP configuration detected':'Configure SMTP'];
 $extensions = ['pdo'=>extension_loaded('pdo'),'pdo_sqlite'=>extension_loaded('pdo_sqlite'),'pdo_mysql'=>extension_loaded('pdo_mysql'),'openssl'=>extension_loaded('openssl'),'sodium'=>extension_loaded('sodium'),'mbstring'=>extension_loaded('mbstring'),'fileinfo'=>extension_loaded('fileinfo')];

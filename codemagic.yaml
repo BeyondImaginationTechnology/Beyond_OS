@@ -19,7 +19,7 @@ workflows:
           ')"
           xcodebuild test \
             -project TheDailyBreath.xcodeproj \
-            -scheme TheDailyBreath \
+            -scheme "The Daily Breath" \
             -destination "id=$simulator_id" \
             CODE_SIGNING_ALLOWED=NO
       - name: Build simulator app
@@ -27,7 +27,7 @@ workflows:
           set -euo pipefail
           xcodebuild build \
             -project TheDailyBreath.xcodeproj \
-            -scheme TheDailyBreath \
+            -scheme "The Daily Breath" \
             -sdk iphonesimulator \
             -derivedDataPath "$CM_BUILD_DIR/derived-data" \
             CODE_SIGNING_ALLOWED=NO

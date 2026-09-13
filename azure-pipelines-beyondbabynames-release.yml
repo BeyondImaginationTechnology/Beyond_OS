@@ -73,6 +73,16 @@ steps:
         warn "Using #{device.fetch("name")} for tests and screenshots."
         puts device.fetch("udid")
       ')"
+      ipad_simulator_udid="$(xcrun simctl list devices available -j | /usr/bin/ruby -rjson -e '
+        devices = JSON.parse(STDIN.read).fetch("devices").values.flatten
+        device = devices.find { |candidate| candidate["isAvailable"] && candidate["name"].start_with?("iPad Pro 13-inch") }
+        unless device
+          available_ipads = devices.select { |candidate| candidate["isAvailable"] && candidate["name"].start_with?("iPad") }.map { |candidate| candidate["name"] }.uniq.join(", ")
+          abort "No 13-inch iPad Pro simulator was found. Available iPads: #{available_ipads}"
+        end
+        warn "Using #{device.fetch("name")} for App Store iPad screenshots."
+        puts device.fetch("udid")
+      ')"
       xcodebuild test \
         -project BeyondBabyNames.xcodeproj \
         -scheme BeyondBabyNames \
@@ -112,6 +122,40 @@ steps:
         fi
         echo "Captured App Store screenshot for $tab at ${pixel_width}x${pixel_height}."
       done
+      ipad_screenshot_directory="$(Build.ArtifactStagingDirectory)/beyond-baby-names-ipad-screenshots"
+      ipad_screenshot_derived_data="$(Build.SourcesDirectory)/BeyondBabyNamesApple/ipad-screenshot-derived-data"
+      rm -rf "$ipad_screenshot_directory" "$ipad_screenshot_derived_data"
+      mkdir -p "$ipad_screenshot_directory"
+      xcodebuild build \
+        -project BeyondBabyNames.xcodeproj \
+        -scheme BeyondBabyNames \
+        -sdk iphonesimulator \
+        -destination "id=$ipad_simulator_udid" \
+        -derivedDataPath "$ipad_screenshot_derived_data" \
+        CODE_SIGNING_ALLOWED=NO
+      ipad_app_path="$(find "$ipad_screenshot_derived_data/Build/Products/Debug-iphonesimulator" -maxdepth 1 -name 'BeyondBabyNames.app' -print -quit)"
+      test -n "$ipad_app_path"
+      xcrun simctl boot "$ipad_simulator_udid" || true
+      xcrun simctl bootstatus "$ipad_simulator_udid" -b
+      xcrun simctl install "$ipad_simulator_udid" "$ipad_app_path"
+      for tab in discover swipe favorites together; do
+        xcrun simctl terminate "$ipad_simulator_udid" technology.co.beyondimagination.beyondbabynames || true
+        xcrun simctl launch "$ipad_simulator_udid" technology.co.beyondimagination.beyondbabynames -captureScreenshots -screenshotTab "$tab"
+        # Allow transient simulator system banners to clear before the store capture.
+        sleep 10
+        raw_screenshot="$ipad_screenshot_directory/beyond-baby-names-ipad-$tab-raw.png"
+        store_screenshot="$ipad_screenshot_directory/beyond-baby-names-ipad-$tab.png"
+        xcrun simctl io "$ipad_simulator_udid" screenshot "$raw_screenshot"
+        sips --resampleHeightWidth 2752 2064 "$raw_screenshot" --out "$store_screenshot"
+        rm "$raw_screenshot"
+        pixel_width="$(sips -g pixelWidth "$store_screenshot" | awk '/pixelWidth/ { print $2 }')"
+        pixel_height="$(sips -g pixelHeight "$store_screenshot" | awk '/pixelHeight/ { print $2 }')"
+        if [[ "$pixel_width" != "2064" || "$pixel_height" != "2752" ]]; then
+          echo "##vso[task.logissue type=error]Invalid iPad App Store screenshot dimensions for $tab: ${pixel_width}x${pixel_height}; expected 2064x2752."
+          exit 1
+        fi
+        echo "Captured iPad App Store screenshot for $tab at ${pixel_width}x${pixel_height}."
+      done
       gem install bundler -v 2.7.2 --no-document
       bundle _2.7.2_ config set path vendor/bundle
       bundle _2.7.2_ install
@@ -140,3 +184,11 @@ steps:
       artifact: beyond-baby-names-screenshots
       publishLocation: pipeline
     displayName: Publish Beyond Baby Names screenshots
+
+  - task: PublishPipelineArtifact@1
+    condition: succeededOrFailed()
+    inputs:
+      targetPath: $(Build.ArtifactStagingDirectory)/beyond-baby-names-ipad-screenshots
+      artifact: beyond-baby-names-ipad-screenshots
+      publishLocation: pipeline
+    displayName: Publish Beyond Baby Names iPad screenshots

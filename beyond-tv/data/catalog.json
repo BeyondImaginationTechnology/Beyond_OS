@@ -2507,24 +2507,6 @@
     "thumbnail": "https://archive.org/services/img/ben-stiller-movies"
   },
   {
-    "slug": "starsky-and-hutch-2004",
-    "type": "movie",
-    "title": "Starsky & Hutch",
-    "subtitle": "Ben Stiller Collection · Verified Archive file",
-    "description": "Two mismatched detectives pursue a drug kingpin in a comic take on the classic television duo.",
-    "icon": "🚘",
-    "gradient": "linear-gradient(135deg,#16233b,#346b78 55%,#e0a84f)",
-    "rating": "PG-13",
-    "year": "2004",
-    "runtime": "101 min",
-    "genre": "Comedy · Crime · Action",
-    "source_type": "direct_video",
-    "video_url": "https://archive.org/download/ben-stiller-movies/Starsky%20%26%20Hutch%20%282004%29.mp4",
-    "archive_id": "ben-stiller-movies",
-    "source_label": "Internet Archive · Verified Ben Stiller collection",
-    "thumbnail": "https://archive.org/services/img/ben-stiller-movies"
-  },
-  {
     "slug": "the-cable-guy",
     "type": "movie",
     "title": "The Cable Guy",

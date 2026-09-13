@@ -46,12 +46,6 @@ function beyond_movies_catalog(): array {
             'rights_url' => 'https://archive.org/details/ben-stiller-movies',
         ],
         [
-            'title' => 'Starsky & Hutch', 'year' => '2004', 'genre' => 'Comedy · Crime · Action',
-            'runtime' => '1 hr 41 min', 'duration' => 6031, 'rating' => 'PG-13',
-            'url' => 'https://archive.org/download/ben-stiller-movies/Starsky%20%26%20Hutch%20%282004%29.mp4',
-            'rights_url' => 'https://archive.org/details/ben-stiller-movies',
-        ],
-        [
             'title' => 'Meet the Fockers', 'year' => '2004', 'genre' => 'Comedy · Romance',
             'runtime' => '1 hr 55 min', 'duration' => 6917, 'rating' => 'PG-13',
             'url' => 'https://archive.org/download/ben-stiller-movies/Meet%20The%20Fockers%20%282004%29.mp4',

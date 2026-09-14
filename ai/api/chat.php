@@ -53,7 +53,9 @@ $simpleCopy = [
     'fr' => ['hello' => 'Bonjour ! Je suis Jaguar. Qu’aimeriez-vous explorer ?', 'thanks' => 'Avec plaisir. Qu’allons-nous explorer ensuite ?', 'help' => 'Je suis Jaguar, l’assistant IA de Beyond. Je peux expliquer des idées, structurer des projets, travailler sur du code et simplifier des sujets difficiles.', 'version' => 'Vous utilisez Llama-Jaguar v0.2 Preview.'],
     'es' => ['hello' => '¡Hola! Soy Jaguar. ¿Qué te gustaría explorar?', 'thanks' => 'De nada. ¿Qué exploramos ahora?', 'help' => 'Soy Jaguar, el asistente de IA de Beyond. Puedo explicar ideas, organizar proyectos, trabajar con código y enseñar temas difíciles con palabras sencillas.', 'version' => 'Estás usando Llama-Jaguar v0.2 Preview.'],
 ];
-if (preg_match('/^(hi|hello|hey|bonjour|salut|hola|buenas)[\s!.?¿¡]*$/u', $simplePrompt)) {
+// Keep common greeting variations off the scale-to-zero runtime. In particular,
+// "Hello world" is a normal first message, not a request that needs a GPU cold start.
+if (preg_match('/^(hi|hello|hey|bonjour|salut|hola|buenas)(?:\s+(?:world|monde|mundo))?[\s!.?¿¡]*$/u', $simplePrompt)) {
     $simpleReply = $simpleCopy[$language]['hello'];
 } elseif (preg_match('/^(thanks|thank you|merci|gracias)[\s!.?]*$/u', $simplePrompt)) {
     $simpleReply = $simpleCopy[$language]['thanks'];
@@ -82,7 +84,9 @@ $runtimeToken = trim((string) getenv('JAGUAR_RUNTIME_TOKEN'));
 $headers = ['Content-Type: application/json'];
 if ($runtimeToken !== '') { $headers[] = 'Authorization: Bearer ' . $runtimeToken; }
 $request = curl_init($runtimeUrl . '/v1/chat');
-curl_setopt_array($request, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 15, CURLOPT_TIMEOUT => 145, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode(['mode' => $mode, 'language' => $language, 'messages' => $messages], JSON_THROW_ON_ERROR)]);
+// Leave enough time for a warm runtime, but return a usable error before the
+// browser can appear permanently stuck while a cold runtime is unavailable.
+curl_setopt_array($request, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 15, CURLOPT_TIMEOUT => 105, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode(['mode' => $mode, 'language' => $language, 'messages' => $messages], JSON_THROW_ON_ERROR)]);
 $response = curl_exec($request); $status = (int) curl_getinfo($request, CURLINFO_RESPONSE_CODE); curl_close($request);
 if (!is_string($response) || $status < 200 || $status >= 300) { http_response_code(503); echo json_encode(['error' => 'Jaguar could not complete that request.']); exit; }
 echo $response;

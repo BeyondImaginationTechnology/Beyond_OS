@@ -63,21 +63,21 @@ $jaguarModes = jaguar_mode_catalog();
             title: 'Where will we go <span>beyond?</span>',
             intro: 'Ask Jaguar to explain an idea, shape a plan, or help you find a stronger starting point.',
             suggestions: ['Explain AI tokens with a memorable analogy.', 'Help me turn a rough idea into a clear project plan.', 'Teach me something difficult in plain language.'],
-            placeholder: 'Message Jaguar…', fine: 'Jaguar can make mistakes. Check important information.', waking: 'Waking Jaguar…', user: 'YOU',
+            placeholder: 'Message Jaguar…', fine: 'Jaguar can make mistakes. Check important information.', waking: 'Waking Jaguar…', timedOut: 'Jaguar is taking longer than expected. Please try again.', user: 'YOU',
             newChat: '＋ New conversation', verifyTitle: 'One quick check', verifyCopy: 'Verify that you are human, then Jaguar will send your message.', cancel: 'Cancel'
         },
         fr: {
             title: 'Jusqu’où irons-nous <span>au-delà ?</span>',
             intro: 'Demandez à Jaguar d’expliquer une idée, de structurer un plan ou de trouver un meilleur point de départ.',
             suggestions: ['Explique les jetons IA avec une analogie mémorable.', 'Transforme mon idée en plan de projet clair.', 'Enseigne-moi un sujet difficile simplement.'],
-            placeholder: 'Écrivez à Jaguar…', fine: 'Jaguar peut se tromper. Vérifiez les informations importantes.', waking: 'Jaguar se réveille…', user: 'VOUS',
+            placeholder: 'Écrivez à Jaguar…', fine: 'Jaguar peut se tromper. Vérifiez les informations importantes.', waking: 'Jaguar se réveille…', timedOut: 'Jaguar met plus de temps que prévu. Veuillez réessayer.', user: 'VOUS',
             newChat: '＋ Nouvelle conversation', verifyTitle: 'Une vérification rapide', verifyCopy: 'Confirmez que vous êtes une personne, puis Jaguar enverra votre message.', cancel: 'Annuler'
         },
         es: {
             title: '¿Hasta dónde iremos <span>más allá?</span>',
             intro: 'Pídele a Jaguar que explique una idea, organice un plan o encuentre un mejor punto de partida.',
             suggestions: ['Explica los tokens de IA con una analogía memorable.', 'Convierte mi idea en un plan de proyecto claro.', 'Enséñame algo difícil con palabras sencillas.'],
-            placeholder: 'Escribe a Jaguar…', fine: 'Jaguar puede equivocarse. Verifica la información importante.', waking: 'Despertando a Jaguar…', user: 'TÚ',
+            placeholder: 'Escribe a Jaguar…', fine: 'Jaguar puede equivocarse. Verifica la información importante.', waking: 'Despertando a Jaguar…', timedOut: 'Jaguar está tardando más de lo esperado. Inténtalo de nuevo.', user: 'TÚ',
             newChat: '＋ Nueva conversación', verifyTitle: 'Una verificación rápida', verifyCopy: 'Confirma que eres una persona y Jaguar enviará tu mensaje.', cancel: 'Cancelar'
         }
     };
@@ -170,19 +170,25 @@ $jaguarModes = jaguar_mode_catalog();
         input.style.height = 'auto';
         send.disabled = true;
         const thinking = addMessage('assistant', copy[language].waking);
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 115000);
         try {
             const response = await fetch('/api/chat.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf},
-                body: JSON.stringify({mode: modeSelect.value, language, messages: history, turnstile_token: signedIn ? '' : turnstileToken})
+                body: JSON.stringify({mode: modeSelect.value, language, messages: history, turnstile_token: signedIn ? '' : turnstileToken}),
+                signal: controller.signal
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Jaguar is unavailable.');
             thinking.textContent = data.message;
             history.push({role: 'assistant', content: data.message});
         } catch (error) {
-            thinking.textContent = error instanceof Error ? error.message : 'Jaguar is unavailable.';
+            thinking.textContent = error instanceof DOMException && error.name === 'AbortError'
+                ? copy[language].timedOut
+                : error instanceof Error ? error.message : 'Jaguar is unavailable.';
         } finally {
+            window.clearTimeout(timeout);
             if (!signedIn) resetTurnstile();
             send.disabled = false;
             input.focus();

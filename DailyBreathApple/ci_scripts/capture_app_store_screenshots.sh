@@ -50,6 +50,10 @@ capture_set() {
   xcrun simctl bootstatus "$udid" -b
   xcrun simctl uninstall "$udid" "$bundle_id" 2>/dev/null || true
   xcrun simctl install "$udid" "$app_path"
+  # The App Store routes must never be covered by first-launch onboarding.
+  # Seed English in the simulator before the first process launch; the app also
+  # suppresses onboarding whenever the capture-only route argument is present.
+  xcrun simctl spawn "$udid" defaults write "$bundle_id" dailyBreathLanguage -string en
   xcrun simctl launch "$udid" "$bundle_id" >/dev/null
   sleep 5
 
@@ -60,7 +64,12 @@ capture_set() {
     # Launching with a simulator-only route argument keeps every capture in-app.
     xcrun simctl terminate "$udid" "$bundle_id" 2>/dev/null || true
     xcrun simctl launch "$udid" "$bundle_id" -dailyBreathCaptureRoute "$route" >/dev/null
-    sleep 4
+    # Scripture libraries load bundled text on a background task and need more
+    # time than the lightweight Today, Breathe, and Journal destinations.
+    case "$route" in
+      bible*|torah*|quran*) sleep 15 ;;
+      *) sleep 7 ;;
+    esac
     xcrun simctl io "$udid" screenshot "$destination/$filename"
   done <<'ROUTES'
 01-today-bible.png|today?theme=forest

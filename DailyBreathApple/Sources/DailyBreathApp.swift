@@ -12,10 +12,16 @@ struct DailyBreathApp: App {
             RootView()
                 .environmentObject(store)
                 .environment(\.locale, Locale(identifier: languageID.isEmpty ? "en" : languageID))
-                .fullScreenCover(isPresented: Binding(get: { languageID.isEmpty }, set: { _ in })) {
+                .fullScreenCover(isPresented: Binding(
+                    get: { languageID.isEmpty && !DailyBreathCaptureRoute.isActive },
+                    set: { _ in }
+                )) {
                     LanguageSetupView(languageID: $languageID)
                 }
                 .task {
+                    if DailyBreathCaptureRoute.isActive && languageID.isEmpty {
+                        languageID = DailyBreathLanguage.english.rawValue
+                    }
                     DailyBreathLaunchDefaults.seedIfNeeded()
                     await store.load()
                     await DailyBreathNotificationService.refreshScheduledReminderIfEnabled()

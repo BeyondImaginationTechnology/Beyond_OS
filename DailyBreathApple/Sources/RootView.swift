@@ -133,7 +133,11 @@ struct RootView: View {
     }
 }
 
-private enum DailyBreathCaptureRoute {
+enum DailyBreathCaptureRoute {
+    static var isActive: Bool {
+        CommandLine.arguments.contains("-dailyBreathCaptureRoute")
+    }
+
     static var url: URL? {
         guard let flagIndex = CommandLine.arguments.firstIndex(of: "-dailyBreathCaptureRoute"),
               CommandLine.arguments.indices.contains(flagIndex + 1) else {

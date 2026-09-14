@@ -23,10 +23,18 @@ The release-host checksums matched the uploaded files. Treat these files as test
 
 - Core configuration, identity, UEFI artifact names and installer entry are tracked separately from other BIT OS editions.
 - The installer is UEFI-only and requires explicit target input. Selected-partition mode preserves the existing EFI System Partition; whole-disk mode requires an exact destructive confirmation.
-- The installer entry sends output to both the local console and serial console, and installer startup is connected to `/dev/console` for headless QEMU observation.
+- Installer startup is connected to `/dev/console`. The current USB GRUB installer entry selects `console=tty1`; serial interaction must be verified separately and is not yet a passed check.
 - Portable Python tooling compiles successfully. The post-build shell test requires a functioning Linux/POSIX shell and must be rerun on the build VM.
 
 ## Still required
+
+### Google Cloud checkpoint (2026-09-13)
+
+- The Debian test host has nested virtualization enabled, with `/dev/kvm` present, QEMU and OVMF installed.
+- The source build is running from commit `6284764`; the latest observed stage is the initial GCC toolchain compilation. Installer images from this build have not yet been verified.
+- `tests/post-build-test.py` passed on the Linux host before this build; this does not demonstrate boot or installation success.
+- Downloading the previously published ISO returned HTTP 500 after retries. The links and checksums above are historical candidate evidence, not a current availability guarantee.
+- The local QEMU launcher now uses Buildroot's `rootfs.ext2` output filename. UEFI boot, both disposable-disk install modes, installed-system reboot, graphical session, network, input and shutdown remain pending.
 
 Run the following on an x86-64 Linux build host and retain the resulting logs and hashes:
 

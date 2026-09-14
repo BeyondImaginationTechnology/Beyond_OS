@@ -1,14 +1,12 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../includes/ecosystem.php';
+require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/includes/modes.php';
 $signedIn = !empty($_SESSION['user_id']);
 $displayName = trim((string)($_SESSION['first_name'] ?? $_SESSION['name'] ?? ''));
 $csrf = csrf_token();
 $turnstileSiteKey = trim((string) getenv('JAGUAR_TURNSTILE_SITE_KEY'));
-$aiOrigin = 'https://ai.beyondimagination.co.technology/';
-$loginUrl = 'https://beyondimagination.co.technology/beyond-id/auth/login.php?app=beyond-ai&required=1&return=' . rawurlencode($aiOrigin);
 $jaguarModes = jaguar_mode_catalog();
 ?>
 <!doctype html>
@@ -20,8 +18,8 @@ $jaguarModes = jaguar_mode_catalog();
 </style><style>.mode-picker{display:flex;align-items:center;gap:8px;margin:0 0 9px;color:#a9a1b9;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.mode-picker select{min-height:31px;padding:0 28px 0 10px;border:1px solid var(--line);border-radius:9px;color:#f6efff;background:#171027;font:inherit;font-size:11px;letter-spacing:0;text-transform:none;outline:0}.mode-picker select:focus{border-color:var(--purple)}.mode-status{color:#81788e;font-size:10px;font-weight:500;letter-spacing:0;text-transform:none}.brand-mark-image{display:block;width:40px;height:40px;border:1px solid rgba(197,111,255,.54);border-radius:13px;object-fit:cover;object-position:center;box-shadow:0 0 25px rgba(178,75,255,.28)}.gate{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:22px;background:rgba(5,2,10,.84);backdrop-filter:blur(18px)}.gate[hidden]{display:none}.gate-card{width:min(480px,100%);padding:34px;border:1px solid rgba(201,125,255,.3);border-radius:25px;background:linear-gradient(145deg,rgba(29,16,48,.98),rgba(12,7,21,.98));box-shadow:0 30px 90px rgba(0,0,0,.58);text-align:center}.gate-card h2{margin:18px 0 8px;font-size:28px;letter-spacing:-.04em}.gate-card p{margin:0;color:var(--muted);line-height:1.6}.language-options{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:25px}.language-options button,.gate-cancel{min-height:48px;border:1px solid var(--line);border-radius:13px;color:#fff;background:rgba(255,255,255,.05);cursor:pointer;font-weight:800}.language-options button:hover{border-color:var(--purple);background:rgba(179,92,255,.13)}.guest-badge{margin-left:5px;padding:3px 7px;border:1px solid var(--line);border-radius:99px;color:#cfb9df;font-size:9px}.turnstile-slot{display:flex;justify-content:center;min-height:70px;margin:22px 0 10px}.verification-error{min-height:18px;color:#ff9fcf;font-size:11px}.gate-cancel{margin-top:7px;padding:0 18px}.account a{text-decoration:none}.account a:hover{text-decoration:underline}@media(max-width:520px){.language-options{grid-template-columns:1fr}.gate-card{padding:27px 20px}}</style>
 <?php if (!$signedIn && $turnstileSiteKey !== ''): ?><script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script><?php endif; ?>
 </head><body>
-<div class="shell"><aside class="sidebar"><a class="brand" href="/"><img class="brand-mark-image" src="assets/jaguar-eye-v0.2.png" alt="Jaguar eye logo"><span><strong>JAGUAR</strong><small>V0.2 · BEYOND AI</small></span></a><button class="new-chat" id="newChat" type="button">＋ New conversation</button><div class="sidebar-note"><b>Private by design</b>Conversation history is not saved in this preview. Guests verify before sending; Beyond ID members skip verification.</div><nav class="side-links"><a href="https://beyondimagination.co.technology/ai/">About Jaguar</a><a href="https://beyondimagination.co.technology/release-notes.php#jaguar">Build progress</a><a href="https://beyondimagination.co.technology/">Beyond Imagination</a></nav></aside>
-<section class="workspace"><header class="topbar"><div class="model-name"><i class="status"></i> Llama-Jaguar-8B · v0.2 Preview</div><div class="account"><?php if ($signedIn): ?><?=e($displayName !== '' ? $displayName : 'Beyond ID')?><?php else: ?><a href="<?=e($loginUrl)?>">Sign in</a><?php endif; ?></div></header>
+<div class="shell"><aside class="sidebar"><a class="brand" href="/"><img class="brand-mark-image" src="assets/jaguar-eye-v0.2.png" alt="Jaguar eye logo"><span><strong>JAGUAR</strong><small>V0.2 · BEYOND AI</small></span></a><button class="new-chat" id="newChat" type="button">＋ New conversation</button><div class="sidebar-note"><b>Guest chat</b>Conversation history is not saved in this preview. A quick security check protects guest requests.</div><nav class="side-links"><a href="https://beyondimagination.co.technology/ai/">About Jaguar</a><a href="https://beyondimagination.co.technology/release-notes.php#jaguar">Build progress</a><a href="https://beyondimagination.co.technology/">Beyond Imagination</a></nav></aside>
+<section class="workspace"><header class="topbar"><div class="model-name"><i class="status"></i> Llama-Jaguar-8B · v0.2 Preview</div><div class="account">Premium · coming soon</div></header>
 <main class="chat"><div class="messages" id="messages"></div><div class="composer-wrap"><div class="mode-picker"><label for="modeSelect">Jaguar Thinking</label><select id="modeSelect" aria-label="Jaguar Thinking mode"><?php foreach ($jaguarModes as $modeKey => $modeDefinition): ?><option value="<?=e($modeKey)?>" <?=jaguar_mode_is_enabled($modeKey) ? '' : 'disabled'?>><?=e($modeDefinition['label'])?><?=jaguar_mode_is_enabled($modeKey) ? ($modeDefinition['status'] === 'preview' ? ' · preview' : '') : ' · coming next'?></option><?php endforeach; ?></select><span class="mode-status" id="modeStatus">Explain is live · no credits in preview</span></div><form class="composer" id="composer"><textarea id="prompt" rows="1" maxlength="8000" placeholder="Message Jaguar…" aria-label="Message Jaguar" required></textarea><button class="send" id="send" type="submit" aria-label="Send message">↑</button></form><p class="fine" id="finePrint">Jaguar can make mistakes. Check important information.</p></div></main></section></div>
 <div class="gate" id="languageGate" role="dialog" aria-modal="true" aria-labelledby="languageTitle"><div class="gate-card"><img class="brand-mark-image" src="assets/jaguar-eye-v0.2.png" alt="" style="width:58px;height:58px;margin:auto"><h2 id="languageTitle">Choose your language</h2><p>Choose your language · Choisissez votre langue · Elige tu idioma</p><div class="language-options"><button type="button" data-language="en">English</button><button type="button" data-language="fr">Français</button><button type="button" data-language="es">Español</button></div></div></div>
 <?php if (!$signedIn): ?><div class="gate" id="verificationGate" hidden role="dialog" aria-modal="true" aria-labelledby="verificationTitle"><div class="gate-card"><h2 id="verificationTitle">One quick check</h2><p id="verificationCopy">Verify that you are human, then Jaguar will send your message.</p><div class="turnstile-slot" id="turnstileWidget"></div><div class="verification-error" id="verificationError"></div><button class="gate-cancel" id="verificationCancel" type="button">Cancel</button></div></div><?php endif; ?>
@@ -75,7 +73,7 @@ $jaguarModes = jaguar_mode_catalog();
 
     function renderWelcome() {
         const text = copy[language];
-        messages.innerHTML = `<section class="welcome" id="welcome"><div class="jaguar-eye"></div><h1>${text.title}</h1><p>${text.intro}</p><div class="suggestions">${text.suggestions.map(suggestion => `<button type="button">${escapeHtml(suggestion)}</button>`).join('')}</div></section>`;
+        messages.innerHTML = `<section class="welcome" id="welcome"><img class="brand-mark-image" src="assets/jaguar-eye-v0.2.png" width="40" height="40" alt="Jaguar eye logo"><h1>${text.title}</h1><p>${text.intro}</p><div class="suggestions">${text.suggestions.map(suggestion => `<button type="button">${escapeHtml(suggestion)}</button>`).join('')}</div></section>`;
         input.placeholder = text.placeholder;
         finePrint.textContent = text.fine;
         newChat.textContent = text.newChat;
@@ -112,7 +110,10 @@ $jaguarModes = jaguar_mode_catalog();
 
     function resetTurnstile() {
         turnstileToken = '';
-        if (turnstileWidgetId !== null && window.turnstile) window.turnstile.reset(turnstileWidgetId);
+        if (turnstileWidgetId !== null && window.turnstile) {
+            window.turnstile.remove(turnstileWidgetId);
+            turnstileWidgetId = null;
+        }
     }
 
     function showVerification(text) {
@@ -120,7 +121,7 @@ $jaguarModes = jaguar_mode_catalog();
         verificationError.textContent = '';
         verificationGate.hidden = false;
         if (!turnstileSiteKey) {
-            verificationError.textContent = 'Guest verification is not configured yet. You can sign in with Beyond ID.';
+            verificationError.textContent = 'Verification is temporarily unavailable. Please try again later.';
             return;
         }
         if (!window.turnstile) {
@@ -133,6 +134,7 @@ $jaguarModes = jaguar_mode_catalog();
                 theme: 'dark',
                 action: 'jaguar_guest_prompt',
                 callback: token => {
+                    if (!pendingText || verificationGate.hidden) return;
                     turnstileToken = token;
                     verificationGate.hidden = true;
                     const approvedText = pendingText;
@@ -198,6 +200,7 @@ $jaguarModes = jaguar_mode_catalog();
     document.getElementById('verificationCancel')?.addEventListener('click', () => {
         verificationGate.hidden = true;
         pendingText = '';
+        resetTurnstile();
     });
     document.querySelectorAll('[data-language]').forEach(button => button.addEventListener('click', () => {
         language = button.dataset.language;

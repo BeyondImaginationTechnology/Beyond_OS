@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require_once __DIR__ . '/../../includes/ecosystem.php';
+require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/modes.php';
 header('Content-Type: application/json; charset=utf-8');
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); echo json_encode(['error' => 'Method not allowed']); exit; }
@@ -18,7 +18,7 @@ try {
 }
 if (!$signedIn) {
     $turnstileSecret = trim((string) getenv('JAGUAR_TURNSTILE_SECRET_KEY'));
-    if ($turnstileSecret === '') { http_response_code(503); echo json_encode(['error' => 'Guest verification is not configured yet. Sign in with Beyond ID or try again later.']); exit; }
+    if ($turnstileSecret === '') { http_response_code(503); echo json_encode(['error' => 'Verification is temporarily unavailable. Please try again later.']); exit; }
     $turnstileToken = is_string($payload['turnstile_token'] ?? null) ? trim($payload['turnstile_token']) : '';
     if ($turnstileToken === '' || strlen($turnstileToken) > 2048) { http_response_code(403); echo json_encode(['error' => 'Complete the security check and try again.']); exit; }
     $verifyRequest = curl_init('https://challenges.cloudflare.com/turnstile/v0/siteverify');

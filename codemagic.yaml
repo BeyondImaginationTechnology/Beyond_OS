@@ -13,6 +13,10 @@ workflows:
         bundle_identifier: technology.co.beyondimagination.thedailybreath
       xcode: latest
     scripts:
+      - name: Capture App Store screenshots
+        script: |
+          set -euo pipefail
+          bash ci_scripts/capture_app_store_screenshots.sh "$CM_BUILD_DIR/app-store-screenshots"
       - name: Configure signing profiles
         script: xcode-project use-profiles
       - name: Set a unique App Store build number
@@ -28,6 +32,7 @@ workflows:
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
+      - $CM_BUILD_DIR/app-store-screenshots/**/*.png
     publishing:
       app_store_connect:
         auth: integration

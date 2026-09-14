@@ -49,17 +49,19 @@ $lastMessage = $messages[array_key_last($messages)];
 $simplePrompt = mb_strtolower(trim((string) $lastMessage['content']));
 $simpleReply = null;
 $simpleCopy = [
-    'en' => ['hello' => 'Hello! I’m Jaguar. What would you like to explore?', 'thanks' => 'You’re welcome. What should we explore next?', 'help' => 'I’m Jaguar, Beyond’s AI assistant. I can explain ideas, help shape plans, work through code, and teach difficult topics in plain language.', 'version' => 'You’re using Llama-Jaguar v0.2 Preview.'],
-    'fr' => ['hello' => 'Bonjour ! Je suis Jaguar. Qu’aimeriez-vous explorer ?', 'thanks' => 'Avec plaisir. Qu’allons-nous explorer ensuite ?', 'help' => 'Je suis Jaguar, l’assistant IA de Beyond. Je peux expliquer des idées, structurer des projets, travailler sur du code et simplifier des sujets difficiles.', 'version' => 'Vous utilisez Llama-Jaguar v0.2 Preview.'],
-    'es' => ['hello' => '¡Hola! Soy Jaguar. ¿Qué te gustaría explorar?', 'thanks' => 'De nada. ¿Qué exploramos ahora?', 'help' => 'Soy Jaguar, el asistente de IA de Beyond. Puedo explicar ideas, organizar proyectos, trabajar con código y enseñar temas difíciles con palabras sencillas.', 'version' => 'Estás usando Llama-Jaguar v0.2 Preview.'],
+    'en' => ['hello' => 'Hello! I’m Jaguar. What would you like to explore?', 'thanks' => 'You’re welcome. What should we explore next?', 'acknowledgement' => 'I’m here when you’re ready. What should we explore?', 'help' => 'I’m Jaguar, Beyond’s AI assistant. I can explain ideas, help shape plans, work through code, and teach difficult topics in plain language.', 'version' => 'You’re using Llama-Jaguar v0.2 Preview.'],
+    'fr' => ['hello' => 'Bonjour ! Je suis Jaguar. Qu’aimeriez-vous explorer ?', 'thanks' => 'Avec plaisir. Qu’allons-nous explorer ensuite ?', 'acknowledgement' => 'Je suis là quand vous êtes prêt. Qu’allons-nous explorer ?', 'help' => 'Je suis Jaguar, l’assistant IA de Beyond. Je peux expliquer des idées, structurer des projets, travailler sur du code et simplifier des sujets difficiles.', 'version' => 'Vous utilisez Llama-Jaguar v0.2 Preview.'],
+    'es' => ['hello' => '¡Hola! Soy Jaguar. ¿Qué te gustaría explorar?', 'thanks' => 'De nada. ¿Qué exploramos ahora?', 'acknowledgement' => 'Estoy aquí cuando estés listo. ¿Qué exploramos?', 'help' => 'Soy Jaguar, el asistente de IA de Beyond. Puedo explicar ideas, organizar proyectos, trabajar con código y enseñar temas difíciles con palabras sencillas.', 'version' => 'Estás usando Llama-Jaguar v0.2 Preview.'],
 ];
 // Keep common greeting variations off the scale-to-zero runtime. In particular,
 // "Hello world" is a normal first message, not a request that needs a GPU cold start.
-if (preg_match('/^(hi|hello|hey|bonjour|salut|hola|buenas)(?:\s+(?:world|monde|mundo))?[\s!.?¿¡]*$/u', $simplePrompt)) {
+if (preg_match('/^(hi|hello|hey|bonjour|salut|hola|buenas)(?:[\s,]+(?:there|jaguar|world|monde|mundo))?[\s!.?¿¡]*$/u', $simplePrompt)) {
     $simpleReply = $simpleCopy[$language]['hello'];
 } elseif (preg_match('/^(thanks|thank you|merci|gracias)[\s!.?]*$/u', $simplePrompt)) {
     $simpleReply = $simpleCopy[$language]['thanks'];
-} elseif (preg_match('/^(what can you do|who are you|help|que peux-tu faire|qui es-tu|qué puedes hacer|quién eres)[\s!.?¿¡]*$/u', $simplePrompt)) {
+} elseif (preg_match('/^(ok|okay|alright|d[’\']accord|bien|vale|perfecto)[\s!.?¿¡]*$/u', $simplePrompt)) {
+    $simpleReply = $simpleCopy[$language]['acknowledgement'];
+} elseif (preg_match('/^(what can you do|who are you|what[’\']?s your name|what is your name|help|que peux-tu faire|qui es-tu|comment tu t[’\']appelles|qué puedes hacer|quién eres|cómo te llamas)[\s!.?¿¡]*$/u', $simplePrompt)) {
     $simpleReply = $simpleCopy[$language]['help'];
 } elseif (preg_match('/^(what version is this|version|quelle version|qué versión)[\s!.?¿¡]*$/u', $simplePrompt)) {
     $simpleReply = $simpleCopy[$language]['version'];

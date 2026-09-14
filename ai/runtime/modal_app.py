@@ -58,7 +58,10 @@ model_cache = modal.Volume.from_name("jaguar-hf-cache", create_if_missing=True)
     ],
     min_containers=0,
     max_containers=1,
-    scaledown_window=120,
+    # End the paid GPU allocation promptly after a response. The web proxy
+    # handles greetings, identity, acknowledgements, and basic arithmetic
+    # without calling this function.
+    scaledown_window=60,
     timeout=180,
     startup_timeout=900,
 )

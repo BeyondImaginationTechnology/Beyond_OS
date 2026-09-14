@@ -26,18 +26,28 @@ SYSTEM_PROMPT = (
     "is confused. Grade prompts using Score, Issues, Fixed, Why. State uncertainty "
     "rather than inventing facts. Never claim to take actions outside this conversation."
 )
+MODE_INSTRUCTIONS = {
+    "explain": "Teach clearly with plain language, useful analogies, and a practical next step.",
+    "code": "Act as a careful coding partner. Explain assumptions, show secure maintainable code, and call out how to test it.",
+    "research": "When enabled, synthesize sources carefully and distinguish evidence from inference.",
+    "translate": "When enabled, preserve meaning, tone, and cultural context rather than translating word for word.",
+    "speak": "When enabled, write concise, natural spoken responses with clear pacing.",
+    "draw": "When enabled, turn the user intent into a precise visual brief before generation.",
+}
 
 class ChatMessage(BaseModel):
     role: Literal["user", "assistant"]
     content: str = Field(min_length=1, max_length=8000)
 
 class ChatRequest(BaseModel):
+    mode: Literal["explain", "code", "research", "translate", "speak", "draw"] = "explain"
     messages: list[ChatMessage] = Field(min_length=1, max_length=24)
     max_new_tokens: int | None = Field(default=None, ge=1, le=1024)
 
 class ChatResponse(BaseModel):
     model: str
     adapter: str | None = None
+    mode: str
     message: str
 
 @lru_cache(maxsize=1)
@@ -84,7 +94,8 @@ def chat(request: ChatRequest) -> ChatResponse:
         tokenizer, model = load_model()
     except RuntimeError as error:
         raise HTTPException(status_code=503, detail="Jaguar is not configured") from error
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    mode_instruction = MODE_INSTRUCTIONS[request.mode]
+    messages = [{"role": "system", "content": f"{SYSTEM_PROMPT} Current Jaguar Thinking mode: {request.mode}. {mode_instruction}"}]
     messages.extend(message.model_dump() for message in request.messages)
     inputs = tokenizer.apply_chat_template(
         messages,
@@ -107,5 +118,6 @@ def chat(request: ChatRequest) -> ChatResponse:
     return ChatResponse(
         model=MODEL_ID,
         adapter=ADAPTER_PATH or None,
+        mode=request.mode,
         message=tokenizer.decode(generated, skip_special_tokens=True).strip(),
     )

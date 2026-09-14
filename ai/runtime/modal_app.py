@@ -19,6 +19,7 @@ image = (
         "nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04",
         add_python="3.11",
     )
+    .apt_install("build-essential")
     .pip_install(
         "fastapi[standard]>=0.115,<1",
         "transformers>=4.43,<5",

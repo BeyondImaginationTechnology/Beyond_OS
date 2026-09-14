@@ -45,6 +45,8 @@ JAGUAR_TURNSTILE_HOSTNAME=ai.beyondimagination.co.technology
 
 The shared hosting account serves the PHP interface and authenticated proxy. The model runtime must run separately on GPU-capable infrastructure. Set the same non-empty `JAGUAR_RUNTIME_TOKEN` on both hosts: the PHP proxy sends it as a bearer token and the runtime rejects unauthenticated chat requests.
 
+The PHP proxy answers greetings, capability/version questions, thanks, and basic two-number arithmetic through `jaguar-fast-lane`. These requests never start a Modal GPU. Prompts that require language-model reasoning continue to the scale-to-zero L4 runtime.
+
 Unsigned visitors can enter Jaguar without logging in. Their first send opens Cloudflare Turnstile; the API validates the resulting single-use token, action, and hostname before forwarding the prompt. Signed-in Beyond ID members bypass this check. Create the Turnstile widget for `ai.beyondimagination.co.technology`; the site key is public, while the secret key must remain private on the web host.
 
 ## Modal v0.2 deployment and schedule

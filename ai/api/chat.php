@@ -45,6 +45,37 @@ if ($messages === [] || count($messages) > 24) { http_response_code(422); echo j
 foreach ($messages as $message) {
     if (!is_array($message) || !in_array($message['role'] ?? '', ['user', 'assistant'], true) || !is_string($message['content'] ?? null) || trim($message['content']) === '' || mb_strlen($message['content']) > 8000) { http_response_code(422); echo json_encode(['error' => 'Invalid chat message.']); exit; }
 }
+$lastMessage = $messages[array_key_last($messages)];
+$simplePrompt = mb_strtolower(trim((string) $lastMessage['content']));
+$simpleReply = null;
+$simpleCopy = [
+    'en' => ['hello' => 'Hello! I’m Jaguar. What would you like to explore?', 'thanks' => 'You’re welcome. What should we explore next?', 'help' => 'I’m Jaguar, Beyond’s AI assistant. I can explain ideas, help shape plans, work through code, and teach difficult topics in plain language.', 'version' => 'You’re using Llama-Jaguar v0.2 Preview.'],
+    'fr' => ['hello' => 'Bonjour ! Je suis Jaguar. Qu’aimeriez-vous explorer ?', 'thanks' => 'Avec plaisir. Qu’allons-nous explorer ensuite ?', 'help' => 'Je suis Jaguar, l’assistant IA de Beyond. Je peux expliquer des idées, structurer des projets, travailler sur du code et simplifier des sujets difficiles.', 'version' => 'Vous utilisez Llama-Jaguar v0.2 Preview.'],
+    'es' => ['hello' => '¡Hola! Soy Jaguar. ¿Qué te gustaría explorar?', 'thanks' => 'De nada. ¿Qué exploramos ahora?', 'help' => 'Soy Jaguar, el asistente de IA de Beyond. Puedo explicar ideas, organizar proyectos, trabajar con código y enseñar temas difíciles con palabras sencillas.', 'version' => 'Estás usando Llama-Jaguar v0.2 Preview.'],
+];
+if (preg_match('/^(hi|hello|hey|bonjour|salut|hola|buenas)[\s!.?¿¡]*$/u', $simplePrompt)) {
+    $simpleReply = $simpleCopy[$language]['hello'];
+} elseif (preg_match('/^(thanks|thank you|merci|gracias)[\s!.?]*$/u', $simplePrompt)) {
+    $simpleReply = $simpleCopy[$language]['thanks'];
+} elseif (preg_match('/^(what can you do|who are you|help|que peux-tu faire|qui es-tu|qué puedes hacer|quién eres)[\s!.?¿¡]*$/u', $simplePrompt)) {
+    $simpleReply = $simpleCopy[$language]['help'];
+} elseif (preg_match('/^(what version is this|version|quelle version|qué versión)[\s!.?¿¡]*$/u', $simplePrompt)) {
+    $simpleReply = $simpleCopy[$language]['version'];
+} elseif (preg_match('/^(-?\d+(?:\.\d+)?)\s*([+\-*\/])\s*(-?\d+(?:\.\d+)?)\s*(?:=|\?)?$/', $simplePrompt, $math)) {
+    $left = (float) $math[1];
+    $right = (float) $math[3];
+    $result = match ($math[2]) {
+        '+' => $left + $right,
+        '-' => $left - $right,
+        '*' => $left * $right,
+        '/' => $right == 0.0 ? null : $left / $right,
+    };
+    $simpleReply = $result === null ? ['en' => 'Division by zero is undefined.', 'fr' => 'La division par zéro est indéfinie.', 'es' => 'La división por cero no está definida.'][$language] : rtrim(rtrim(number_format($result, 8, '.', ''), '0'), '.');
+}
+if ($simpleReply !== null) {
+    echo json_encode(['model' => 'jaguar-fast-lane', 'adapter' => null, 'mode' => $mode, 'message' => $simpleReply], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
 $runtimeUrl = rtrim((string) getenv('JAGUAR_RUNTIME_URL'), '/');
 if ($runtimeUrl === '' || !filter_var($runtimeUrl, FILTER_VALIDATE_URL)) { http_response_code(503); echo json_encode(['error' => 'Jaguar is not available yet.']); exit; }
 $runtimeToken = trim((string) getenv('JAGUAR_RUNTIME_TOKEN'));

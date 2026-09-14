@@ -37,6 +37,7 @@ Thumbs.db
 /output/
 /.local/
 /ai/runtime/.venv/
+/ai/runtime/.modal-cli/
 /ai/runtime/models/
 
 # Locally staged BIT OS release artifacts (published separately to HostDeal).

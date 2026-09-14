@@ -63,21 +63,21 @@ $jaguarModes = jaguar_mode_catalog();
             title: 'Where will we go <span>beyond?</span>',
             intro: 'Ask Jaguar to explain an idea, shape a plan, or help you find a stronger starting point.',
             suggestions: ['Explain AI tokens with a memorable analogy.', 'Help me turn a rough idea into a clear project plan.', 'Teach me something difficult in plain language.'],
-            placeholder: 'Message Jaguar…', fine: 'Jaguar can make mistakes. Check important information.', waking: 'Waking Jaguar…', timedOut: 'Jaguar is taking longer than expected. Please try again.', user: 'YOU',
+            placeholder: 'Message Jaguar…', fine: 'Jaguar can make mistakes. Check important information.', waking: 'Waking Jaguar…', timedOut: 'Jaguar is taking longer than expected. Please try again.', explicit: 'Jaguar cannot help with explicit sexual content.', cubStatus: 'Cub is instant · no GPU', explainStatus: 'Explain is live · no credits in preview', codeStatus: 'Code preview · no credits in preview', user: 'YOU',
             newChat: '＋ New conversation', verifyTitle: 'One quick check', verifyCopy: 'Verify that you are human, then Jaguar will send your message.', cancel: 'Cancel'
         },
         fr: {
             title: 'Jusqu’où irons-nous <span>au-delà ?</span>',
             intro: 'Demandez à Jaguar d’expliquer une idée, de structurer un plan ou de trouver un meilleur point de départ.',
             suggestions: ['Explique les jetons IA avec une analogie mémorable.', 'Transforme mon idée en plan de projet clair.', 'Enseigne-moi un sujet difficile simplement.'],
-            placeholder: 'Écrivez à Jaguar…', fine: 'Jaguar peut se tromper. Vérifiez les informations importantes.', waking: 'Jaguar se réveille…', timedOut: 'Jaguar met plus de temps que prévu. Veuillez réessayer.', user: 'VOUS',
+            placeholder: 'Écrivez à Jaguar…', fine: 'Jaguar peut se tromper. Vérifiez les informations importantes.', waking: 'Jaguar se réveille…', timedOut: 'Jaguar met plus de temps que prévu. Veuillez réessayer.', explicit: 'Jaguar ne peut pas aider avec du contenu sexuel explicite.', cubStatus: 'Cub est instantané · sans GPU', explainStatus: 'Expliquer est disponible · sans crédits en aperçu', codeStatus: 'Code en aperçu · sans crédits en aperçu', user: 'VOUS',
             newChat: '＋ Nouvelle conversation', verifyTitle: 'Une vérification rapide', verifyCopy: 'Confirmez que vous êtes une personne, puis Jaguar enverra votre message.', cancel: 'Annuler'
         },
         es: {
             title: '¿Hasta dónde iremos <span>más allá?</span>',
             intro: 'Pídele a Jaguar que explique una idea, organice un plan o encuentre un mejor punto de partida.',
             suggestions: ['Explica los tokens de IA con una analogía memorable.', 'Convierte mi idea en un plan de proyecto claro.', 'Enséñame algo difícil con palabras sencillas.'],
-            placeholder: 'Escribe a Jaguar…', fine: 'Jaguar puede equivocarse. Verifica la información importante.', waking: 'Despertando a Jaguar…', timedOut: 'Jaguar está tardando más de lo esperado. Inténtalo de nuevo.', user: 'TÚ',
+            placeholder: 'Escribe a Jaguar…', fine: 'Jaguar puede equivocarse. Verifica la información importante.', waking: 'Despertando a Jaguar…', timedOut: 'Jaguar está tardando más de lo esperado. Inténtalo de nuevo.', explicit: 'Jaguar no puede ayudar con contenido sexual explícito.', cubStatus: 'Cub es instantáneo · sin GPU', explainStatus: 'Explicar está disponible · sin créditos en vista previa', codeStatus: 'Código en vista previa · sin créditos en vista previa', user: 'TÚ',
             newChat: '＋ Nueva conversación', verifyTitle: 'Una verificación rápida', verifyCopy: 'Confirma que eres una persona y Jaguar enviará tu mensaje.', cancel: 'Cancelar'
         }
     };
@@ -89,6 +89,7 @@ $jaguarModes = jaguar_mode_catalog();
         messages.innerHTML = `<section class="welcome" id="welcome"><img class="brand-mark-image" src="assets/jaguar-eye-v0.2.png" width="40" height="40" alt="Jaguar eye logo"><h1>${text.title}</h1><p>${text.intro}</p><div class="suggestions">${text.suggestions.map(suggestion => `<button type="button">${escapeHtml(suggestion)}</button>`).join('')}</div></section>`;
         input.placeholder = text.placeholder;
         finePrint.textContent = text.fine;
+        updateModeStatus();
         newChat.textContent = text.newChat;
         if (verificationGate) {
             document.getElementById('verificationTitle').textContent = text.verifyTitle;
@@ -119,6 +120,17 @@ $jaguarModes = jaguar_mode_catalog();
         history = [];
         renderWelcome();
         input.focus();
+    }
+
+    function updateModeStatus() {
+        const text = copy[language];
+        modeStatus.textContent = modeSelect.value === 'cub'
+            ? text.cubStatus
+            : modeSelect.value === 'code' ? text.codeStatus : text.explainStatus;
+    }
+
+    function looksExplicit(text) {
+        return /\b(porn(?:ography|ographic)?|xxx|nudes?|nudity|naked|onlyfans|blowjob|handjob|masturbat(?:e|ion|ing)|sexual\s+(?:roleplay|story|chat|scene|image|photo|video|content)|explicit(?:ly)?\s+(?:sexual|erotic)|graphic(?:ally)?\s+(?:sexual|erotic))\b/i.test(text);
     }
 
     function resetTurnstile() {
@@ -199,6 +211,10 @@ $jaguarModes = jaguar_mode_catalog();
         event.preventDefault();
         const text = input.value.trim();
         if (!text || send.disabled) return;
+        if (looksExplicit(text)) {
+            addMessage('assistant', copy[language].explicit);
+            return;
+        }
         if (!signedIn && !turnstileToken) showVerification(text);
         else sendMessage(text);
     });
@@ -214,7 +230,7 @@ $jaguarModes = jaguar_mode_catalog();
     });
     newChat.addEventListener('click', resetConversation);
     modeSelect.addEventListener('change', () => {
-        modeStatus.textContent = modeSelect.value === 'code' ? 'Code preview · no credits in preview' : 'Explain is live · no credits in preview';
+        updateModeStatus();
     });
     document.getElementById('verificationCancel')?.addEventListener('click', () => {
         verificationGate.hidden = true;

@@ -47,6 +47,26 @@ foreach ($messages as $message) {
 }
 $lastMessage = $messages[array_key_last($messages)];
 $simplePrompt = mb_strtolower(trim((string) $lastMessage['content']));
+
+// This is a deliberately conservative first safety gate. It runs on the server
+// before fast-lane handling and before the GPU runtime is contacted, so clients
+// cannot bypass it by modifying the browser code.
+$explicitPatterns = [
+    '/\b(?:porn(?:ography|ographic)?|xxx|nudes?|nudity|naked|onlyfans|blowjob|handjob|masturbat(?:e|ion|ing)|sex(?:ual)?\s+(?:roleplay|story|chat|scene|image|photo|video|content)|explicit(?:ly)?\s+(?:sexual|erotic)|graphic(?:ally)?\s+(?:sexual|erotic))\b/iu',
+    '/\b(?:child|minor|underage|teen(?:ager)?|kid)\b.{0,80}\b(?:sex|sexual|nude|naked|porn|explicit|erotic)\b/iu',
+    '/\b(?:sex|sexual|nude|naked|porn|explicit|erotic)\b.{0,80}\b(?:child|minor|underage|teen(?:ager)?|kid)\b/iu',
+];
+foreach ($explicitPatterns as $pattern) {
+    if (preg_match($pattern, (string) $lastMessage['content']) === 1) {
+        http_response_code(422);
+        echo json_encode(['error' => [
+            'en' => 'Jaguar cannot help with explicit sexual content.',
+            'fr' => 'Jaguar ne peut pas aider avec du contenu sexuel explicite.',
+            'es' => 'Jaguar no puede ayudar con contenido sexual explícito.',
+        ][$language]], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+}
 $simpleReply = null;
 $simpleCopy = [
     'en' => ['hello' => 'Hello! I’m Jaguar. What would you like to explore?', 'thanks' => 'You’re welcome. What should we explore next?', 'acknowledgement' => 'I’m here when you’re ready. What should we explore?', 'help' => 'I’m Jaguar, Beyond’s AI assistant. I can explain ideas, help shape plans, work through code, and teach difficult topics in plain language.', 'version' => 'You’re using Llama-Jaguar v0.2 Preview.'],
@@ -78,6 +98,48 @@ if (preg_match('/^(hi|hello|hey|bonjour|salut|hola|buenas)(?:[\s,]+(?:there|jagu
 }
 if ($simpleReply !== null) {
     echo json_encode(['model' => 'jaguar-fast-lane', 'adapter' => null, 'mode' => $mode, 'message' => $simpleReply], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
+if ($mode === 'cub') {
+    $cubCopy = [
+        'en' => [
+            'json' => 'JSON is a lightweight text format for structured data. Example: {"name":"Jaguar","mode":"Cub"}.',
+            'loop' => 'A loop repeats work. In JavaScript: for (let i = 0; i < 3; i++) { console.log(i); }',
+            'variable' => 'A variable stores a value you can reuse. In JavaScript: const name = "Jaguar";.',
+            'default' => 'Jaguar Cub gives instant help without waking the GPU. Try greetings, basic math, JSON, HTTP errors, loops, or variables — switch to Explain for deeper work.',
+        ],
+        'fr' => [
+            'json' => 'JSON est un format texte léger pour des données structurées. Exemple : {"nom":"Jaguar","mode":"Cub"}.',
+            'loop' => 'Une boucle répète une action. En JavaScript : for (let i = 0; i < 3; i++) { console.log(i); }',
+            'variable' => 'Une variable stocke une valeur réutilisable. En JavaScript : const nom = "Jaguar";.',
+            'default' => 'Jaguar Cub répond instantanément sans réveiller le GPU. Essayez les salutations, les calculs simples, JSON, les erreurs HTTP, les boucles ou les variables — passez à Expliquer pour aller plus loin.',
+        ],
+        'es' => [
+            'json' => 'JSON es un formato de texto ligero para datos estructurados. Ejemplo: {"nombre":"Jaguar","modo":"Cub"}.',
+            'loop' => 'Un bucle repite una tarea. En JavaScript: for (let i = 0; i < 3; i++) { console.log(i); }',
+            'variable' => 'Una variable guarda un valor reutilizable. En JavaScript: const nombre = "Jaguar";.',
+            'default' => 'Jaguar Cub ofrece ayuda instantánea sin despertar la GPU. Prueba saludos, cálculos simples, JSON, errores HTTP, bucles o variables; cambia a Explicar para trabajo más profundo.',
+        ],
+    ];
+    if (preg_match('/\bjson\b/u', $simplePrompt)) {
+        $simpleReply = $cubCopy[$language]['json'];
+    } elseif (preg_match('/\b(?:loop|boucle|bucle|for loop)\b/iu', $simplePrompt)) {
+        $simpleReply = $cubCopy[$language]['loop'];
+    } elseif (preg_match('/\b(?:variable|const|let)\b/iu', $simplePrompt)) {
+        $simpleReply = $cubCopy[$language]['variable'];
+    } elseif (preg_match('/\b(401|403|404|500|503)\b/', $simplePrompt, $httpStatus)) {
+        $statusHelp = [
+            '401' => ['en' => '401 means authentication is required or invalid.', 'fr' => '401 signifie que l’authentification est requise ou invalide.', 'es' => '401 significa que la autenticación es obligatoria o no es válida.'],
+            '403' => ['en' => '403 means the server understood the request but refuses access.', 'fr' => '403 signifie que le serveur refuse l’accès.', 'es' => '403 significa que el servidor rechaza el acceso.'],
+            '404' => ['en' => '404 means the requested page or API route was not found.', 'fr' => '404 signifie que la page ou route API demandée est introuvable.', 'es' => '404 significa que no se encontró la página o ruta de API solicitada.'],
+            '500' => ['en' => '500 means the server hit an unexpected internal error.', 'fr' => '500 signifie que le serveur a rencontré une erreur interne inattendue.', 'es' => '500 significa que el servidor encontró un error interno inesperado.'],
+            '503' => ['en' => '503 means the service is temporarily unavailable; retry shortly.', 'fr' => '503 signifie que le service est temporairement indisponible ; réessayez bientôt.', 'es' => '503 significa que el servicio no está disponible temporalmente; inténtalo pronto.'],
+        ];
+        $simpleReply = $statusHelp[$httpStatus[1]][$language];
+    } else {
+        $simpleReply = $cubCopy[$language]['default'];
+    }
+    echo json_encode(['model' => 'jaguar-cub', 'adapter' => null, 'mode' => $mode, 'message' => $simpleReply], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
 $runtimeUrl = rtrim((string) getenv('JAGUAR_RUNTIME_URL'), '/');

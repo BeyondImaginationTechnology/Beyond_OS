@@ -1,6 +1,28 @@
 :root{--db-accent:#1e6b43;--db-ink:#17231b;--db-surface:#fffdf9;--db-line:#d3dfd5}
 html[data-db-theme=dawn]{color-scheme:light;--db-accent:#1e6b43;--db-ink:#17231b;--db-surface:#fffdf9;--db-line:#d3dfd5}
 html[data-db-theme=dusk]{color-scheme:dark;--db-accent:#8fd4a8;--db-ink:#f3fbf5;--db-surface:#0d291b;--db-line:#335b42}
+html[data-db-theme=fall]{color-scheme:dark;--db-accent:#e8a34b;--db-ink:#fff2df;--db-surface:#3a2117;--db-line:#815137}
+html[data-db-theme=fall] body{color:#fff2df!important;background:radial-gradient(circle at 8% 4%,#8d492d 0,transparent 28%),radial-gradient(circle at 92% 8%,#b16a32 0,transparent 25%),linear-gradient(150deg,#24130e,#3a2117 55%,#1b100c)!important}
+html[data-db-theme=fall] .top,html[data-db-theme=fall] .hero,html[data-db-theme=fall] .intro{color:#fff2df!important}
+html[data-db-theme=fall] .muted,html[data-db-theme=fall] .row small,html[data-db-theme=fall] .version{color:#e2bfa0!important}
+html[data-db-theme=fall] .card,html[data-db-theme=fall] .entry{color:#fff2df!important;background:rgba(67,36,24,.9)!important;border-color:#815137!important;box-shadow:0 18px 50px rgba(25,8,2,.3)!important}
+html[data-db-theme=fall] .field,html[data-db-theme=fall] .row select,html[data-db-theme=fall] .row input,html[data-db-theme=fall] .newsletter input{color:#fff2df!important;background:#2a1711!important;border-color:#815137!important}
+html[data-db-theme=fall] .btn{color:#3a2117!important;background:#f0bd67!important}
+html[data-db-theme=fall] .tabs{background:#4a281bd9!important}
+html[data-db-theme=fall] .tabs a{color:#f1d2b2!important}
+html[data-db-theme=fall] .tabs a.active{color:#3a2117!important;background:#f0bd67!important}
+html[data-db-theme=fall] .db-language-button{color:#3a2117;background:#fff2df}
+html[data-db-theme=fall] .welcome-copy .eyebrow,html[data-db-theme=fall] .kicker,html[data-db-theme=fall] .reference,html[data-db-theme=fall] .card-link,html[data-db-theme=fall] .practice a{color:#f0bd67!important}
+html[data-db-theme=fall] .faith-switch,html[data-db-theme=fall] .bottom-dock{background:rgba(67,36,24,.96)!important;border-color:#815137!important}
+html[data-db-theme=fall] .faith-switch a{color:#f1d2b2!important}
+html[data-db-theme=fall] .faith-switch a.active,html[data-db-theme=fall] .bottom-dock .active{color:#3a2117!important;background:#f0bd67!important}
+html[data-db-theme=fall] .rhythm-card{background:rgba(67,36,24,.92)!important;border-color:#815137!important}
+html[data-db-theme=fall] .rhythm-copy h2,html[data-db-theme=fall] .rhythm-ring strong{color:#fff2df!important}
+html[data-db-theme=fall] .rhythm-copy p{color:#e2bfa0!important}
+html[data-db-theme=fall] .rhythm-ring{border-color:#f0bd67!important}
+html[data-db-theme=fall] .rhythm-step{color:#f1d2b2!important;background:#593321!important}
+html[data-db-theme=fall] .rhythm-step.done{color:#3a2117!important;background:#f0bd67!important}
+html[data-db-theme=fall] .dev-art{color:#3a2117!important;background:linear-gradient(145deg,#f0bd67,#bd6b35)!important}
 .db-install{position:fixed;right:18px;bottom:104px;z-index:2147483400;display:none;align-items:center;gap:10px;padding:12px 16px;border:1px solid color-mix(in srgb,var(--db-accent) 52%,transparent);border-radius:999px;background:var(--db-ink);color:#fff;box-shadow:0 14px 40px #1f183a45;font:800 13px Inter,system-ui;cursor:pointer}
 .db-install.show{display:flex}.db-install span{color:var(--db-accent)}
 .db-toast{position:fixed;left:50%;bottom:108px;z-index:2147483450;translate:-50% 0;max-width:min(420px,calc(100% - 32px));padding:12px 16px;border-radius:14px;background:var(--db-ink);color:#fff;box-shadow:0 15px 45px #1f183a55;font:700 13px Inter,system-ui;opacity:0;pointer-events:none;transition:opacity .2s}.db-toast.show{opacity:1}

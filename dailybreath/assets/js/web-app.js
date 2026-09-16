@@ -5,14 +5,21 @@
   const resolvedTheme=normalizedTheme==='system'
     ? (matchMedia('(prefers-color-scheme: dark)').matches?'dusk':'dawn')
     : normalizedTheme;
-  document.documentElement.dataset.dbTheme=['dawn','dusk'].includes(resolvedTheme)?resolvedTheme:'dawn';
+  document.documentElement.dataset.dbTheme=['dawn','dusk','fall'].includes(resolvedTheme)?resolvedTheme:'dawn';
   if(settings.reduceMotion)document.documentElement.style.scrollBehavior='auto';
   window.DailyBreath={settings,save(next){Object.assign(settings,next);localStorage.setItem('dailybreath.settings',JSON.stringify(settings));},toast(message){let el=document.querySelector('.db-toast');if(!el){el=document.createElement('div');el.className='db-toast';el.setAttribute('role','status');document.body.append(el)}el.textContent=message;el.classList.add('show');clearTimeout(el._timer);el._timer=setTimeout(()=>el.classList.remove('show'),2600)}};
-  if('serviceWorker'in navigator)navigator.serviceWorker.register('/dailybreath/service-worker.js',{scope:'/dailybreath/'}).catch(()=>{});
-  let promptEvent=null;const install=document.createElement('button');install.className='db-install';install.type='button';install.innerHTML='<span>＋</span> Install Daily Breath';document.body.append(install);
+  if('serviceWorker'in navigator){
+    navigator.serviceWorker.register('/dailybreath/service-worker.js',{scope:'/dailybreath/',updateViaCache:'none'}).then(reg=>{
+      reg.addEventListener('updatefound',()=>{const worker=reg.installing;if(!worker)return;worker.addEventListener('statechange',()=>{if(worker.state==='installed'&&navigator.serviceWorker.controller)window.DailyBreath.toast('Daily Breath updated. Reload for the latest version.')})});
+    }).catch(()=>{});
+  }
+  let promptEvent=null;const install=document.createElement('button');install.className='db-install';install.type='button';install.setAttribute('aria-label','Install Daily Breath as an app');install.innerHTML='<span aria-hidden="true">＋</span> Install Daily Breath';document.body.append(install);
+  const standalone=matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)&&/safari/i.test(navigator.userAgent)&&!/crios|fxios/i.test(navigator.userAgent);
   addEventListener('beforeinstallprompt',event=>{event.preventDefault();promptEvent=event;install.classList.add('show')});
-  install.addEventListener('click',async()=>{if(!promptEvent)return;promptEvent.prompt();await promptEvent.userChoice;promptEvent=null;install.classList.remove('show')});
-  addEventListener('appinstalled',()=>window.DailyBreath.toast('Daily Breath installed on this device.'));
+  if(ios&&!standalone){install.innerHTML='<span aria-hidden="true">＋</span> Add to Home Screen';install.classList.add('show')}
+  install.addEventListener('click',async()=>{if(promptEvent){promptEvent.prompt();await promptEvent.userChoice;promptEvent=null;install.classList.remove('show');return}if(ios)window.DailyBreath.toast('Open Share, then choose Add to Home Screen.');});
+  addEventListener('appinstalled',()=>{install.classList.remove('show');window.DailyBreath.toast('Daily Breath installed on this device.')});
   const entries=[...document.querySelectorAll('.entry')];
   if(entries.length){
     const heading=document.createElement('div');heading.className='db-journal-tools';heading.style.cssText='display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px';

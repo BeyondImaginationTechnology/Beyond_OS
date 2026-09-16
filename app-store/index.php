@@ -7,13 +7,26 @@ $wallet = beyond_nav_bootstrap('Beyond App Store');
 <main class="bos-main app-store-main">
   <section class="bos-hero app-store-hero">
     <span class="bos-kicker">Beyond ecosystem</span>
-    <h1>Every Beyond app.<br>One store.</h1>
-    <p>Browse the connected tools for living, learning, earning and exploring. Open apps instantly, and install supported web apps on your device.</p>
-    <div class="bos-actions"><a class="bos-btn" href="<?=e(beyond_url('beyond-id/dashboard/wallet.php'))?>">Open Wallet</a><a class="bos-btn secondary" href="<?=e(beyond_url('beyond-market/'))?>">Explore Marketplace</a><a class="bos-btn secondary" href="#featured">Browse all apps</a></div>
+    <h1>Choose your BIT experience.</h1>
+    <p>Find the right Beyond product, see where it works, and open the experience that fits how you want to live, learn, earn, play, or explore.</p>
+    <div class="bos-actions"><a class="bos-btn" href="#catalog-tools">Browse apps</a><a class="bos-btn secondary" href="<?=e(beyond_url('beyond-id/dashboard/wallet.php'))?>">Open Wallet</a><a class="bos-btn secondary" href="<?=e(beyond_url('beyond-market/'))?>">Explore Marketplace</a></div>
+  </section>
+  <section class="platform-tiles" aria-label="Choose a platform">
+    <a href="#catalog-tools" data-platform-choice="Web"><strong>Web</strong><span>Open instantly</span></a>
+    <a href="#catalog-tools" data-platform-choice="Desktop"><strong>Desktop</strong><span>Windows · macOS</span></a>
+    <a href="#catalog-tools" data-platform-choice="Google"><strong>Google</strong><span>Android · Play</span></a>
+    <a href="#catalog-tools" data-platform-choice="Apple"><strong>Apple</strong><span>iPhone · iPad</span></a>
   </section>
   <nav class="store-jump" aria-label="Browse app collections">
     <a href="#featured"><span>01</span>Live</a><a href="#learn"><span>02</span>Learn</a><a href="#earn"><span>03</span>Earn</a><a href="#games"><span>04</span>Games</a><a href="#explore"><span>05</span>Explore</a>
   </nav>
+  <section class="catalog-tools" id="catalog-tools" aria-label="Filter app catalog">
+    <label class="catalog-search"><span>Search apps</span><input id="appSearch" type="search" placeholder="Search products, categories, or platforms…" autocomplete="off"></label>
+    <div class="catalog-filters" role="group" aria-label="Filter by platform">
+      <button type="button" class="catalog-filter active" data-filter="all">All platforms</button><button type="button" class="catalog-filter" data-filter="Web">Web</button><button type="button" class="catalog-filter" data-filter="Desktop">Desktop</button><button type="button" class="catalog-filter" data-filter="Google">Google</button><button type="button" class="catalog-filter" data-filter="Apple">Apple</button>
+    </div>
+    <p class="catalog-result" id="catalogResult" aria-live="polite"></p>
+  </section>
 
   <section class="bos-section" id="featured">
     <span class="bos-kicker">Live</span><h2>Health & daily life</h2><p>Daily guidance, wellness and creative self-expression.</p>
@@ -91,6 +104,19 @@ window.addEventListener('DOMContentLoaded',()=>{
   const observer=new IntersectionObserver((entries)=>entries.forEach(entry=>{if(entry.isIntersecting){reveal(entry.target);observer.unobserve(entry.target);}}),{threshold:.14});
   collections.forEach(collection=>observer.observe(collection));
   document.querySelectorAll('.store-jump a').forEach(link=>link.addEventListener('click',()=>anime({targets:link,scale:[1,.94,1],duration:260,easing:'easeOutQuad'})));
+});
+</script>
+<style>
+.platform-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}.platform-tiles a{display:flex;min-height:96px;flex-direction:column;justify-content:center;padding:18px;border:1px solid #d8ddea;border-radius:18px;background:rgba(255,255,255,.72);color:#252c43;text-decoration:none;box-shadow:0 8px 22px rgba(48,59,106,.06);transition:transform .2s,border-color .2s,box-shadow .2s}.platform-tiles a:hover,.platform-tiles a:focus-visible,.platform-tiles a.is-selected{border-color:#7067e8;box-shadow:0 12px 28px rgba(89,86,214,.14);transform:translateY(-3px)}.platform-tiles strong{font-size:18px}.platform-tiles span{margin-top:5px;color:#68718a;font-size:11px}.catalog-tools{display:grid;grid-template-columns:minmax(240px,.8fr) 1.2fr;align-items:end;gap:16px;margin:28px 0 4px;padding:18px;border:1px solid #d8ddea;border-radius:20px;background:rgba(255,255,255,.72);box-shadow:0 10px 26px rgba(48,59,106,.06)}.catalog-search{display:grid;gap:7px;color:#30364b;font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}.catalog-search input{min-height:45px;padding:0 13px;border:1px solid #cfd5e3;border-radius:12px;background:#fff;color:#171a26;font:14px Inter,system-ui;letter-spacing:0;text-transform:none}.catalog-search input:focus{outline:3px solid rgba(112,103,232,.18);border-color:#7067e8}.catalog-filters{display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap}.catalog-filter{min-height:38px;padding:0 12px;border:1px solid #d1d7e4;border-radius:999px;background:#fff;color:#454d63;font:800 11px Inter,system-ui;cursor:pointer}.catalog-filter:hover,.catalog-filter:focus-visible,.catalog-filter.active{border-color:#7067e8;background:#7067e8;color:#fff}.catalog-result{grid-column:1/-1;min-height:17px;margin:0;color:#68718a;font-size:12px}.app-store-main .bos-card-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:10px}.app-store-main .bos-card-status-chip,.app-store-main .bos-card-platforms{display:inline-flex;align-items:center;min-height:23px;padding:0 8px;border-radius:999px;font-size:9px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}.app-store-main .bos-card-status-chip{background:#fff1d5;color:#966018}.app-store-main .bos-card-status-chip.is-live{background:#e4f6eb;color:#16714f}.app-store-main .bos-card-platforms{background:#eef1f8;color:#58627a}.app-store-main .bos-card.is-hidden{display:none}@media(max-width:760px){.platform-tiles{grid-template-columns:repeat(2,1fr)}.catalog-tools{grid-template-columns:1fr}.catalog-filters{justify-content:flex-start}}@media(max-width:560px){.platform-tiles a{min-height:78px;padding:14px}.platform-tiles strong{font-size:16px}}
+</style>
+<script>
+window.addEventListener('DOMContentLoaded',()=>{
+  const cards=[...document.querySelectorAll('.app-store-main .bos-card')],search=document.getElementById('appSearch'),result=document.getElementById('catalogResult');
+  let filter='all';
+  const render=()=>{const query=(search?.value||'').trim().toLowerCase();let visible=0;cards.forEach(card=>{const matchesPlatform=filter==='all'||(card.dataset.platforms||'').split('|').includes(filter);const matchesQuery=!query||card.textContent.toLowerCase().includes(query);const show=matchesPlatform&&matchesQuery;card.classList.toggle('is-hidden',!show);if(show)visible++;});if(result)result.textContent=`${visible} product${visible===1?'':'s'} shown`};
+  document.querySelectorAll('.catalog-filter').forEach(button=>button.addEventListener('click',()=>{filter=button.dataset.filter||'all';document.querySelectorAll('.catalog-filter').forEach(item=>item.classList.toggle('active',item===button));render();}));
+  document.querySelectorAll('[data-platform-choice]').forEach(tile=>tile.addEventListener('click',()=>{const chosen=tile.dataset.platformChoice;const button=document.querySelector(`.catalog-filter[data-filter="${chosen}"]`);if(button)button.click();document.querySelectorAll('[data-platform-choice]').forEach(item=>item.classList.toggle('is-selected',item===tile));}));
+  search?.addEventListener('input',render);render();
 });
 </script>
 <?php bos_page_end(); ?>

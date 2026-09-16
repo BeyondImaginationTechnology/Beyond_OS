@@ -1,5 +1,5 @@
 <?php
-$updated = 'August 1, 2026';
+$updated = 'September 16, 2026';
 ?><!doctype html>
 <html lang="en">
 <head>
@@ -23,6 +23,10 @@ $updated = 'August 1, 2026';
 
 <h2>Payment and verification providers</h2>
 <p>Payments, subscriptions, refunds, payouts, identity checks, fraud checks, tax forms, and card or wallet features may be processed by third-party providers. We receive limited information from those providers, such as payment status, customer identifiers, transaction metadata, eligibility status, and error messages. We do not intentionally store full payment card numbers on our public web servers.</p>
+
+<h2>Daily Breath Academy</h2>
+<p>Daily Breath may be used to browse free content without signing in. Academy access is a one-time purchase priced where shown at checkout (currently CA$4.99 on the web and in the supported native app stores). Web purchases may be processed by Stripe; native purchases are processed by Apple or Google Play. We receive purchase and entitlement information from these providers, such as a provider transaction or customer identifier, product identifier, purchase status, refund or cancellation status, and relevant timestamps. We use this information to grant, restore, protect, and support Academy access.</p>
+<p>When you purchase Academy access in a native app, sign-in with Beyond ID is required so the entitlement can be linked to your account for restoration and cross-device access. If you continue without signing in, free content and local app features remain available, but Academy purchase linking, progress syncing, and cross-device restoration are unavailable until you sign in. Beyond ID may receive Academy entitlement and progress data needed to provide those account features. Payment card details are handled by the applicable payment provider or app store.</p>
 
 <h2>First-party visitor analytics</h2>
 <p>Beyond OS measures page views, active visits, app usage, device category, operating system, browser family, viewport size, language, timezone, referring domain, country code, and limited network information to understand performance, troubleshoot access, and improve the service. Visitor and session identifiers are one-way hashed using a protected key stored outside the public web root. URL query parameters, referrer query parameters, and full browser user-agent strings are not stored, and browser Do Not Track signals are respected.</p>

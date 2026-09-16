@@ -3,6 +3,7 @@ import StoreKit
 
 struct AcademyView: View {
     @EnvironmentObject private var store: DailyBreathStore
+    @EnvironmentObject private var auth: BeyondIDAuthManager
     @StateObject private var purchaseManager = AcademyPurchaseManager()
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
     @AppStorage("completedAcademyLessonIDs") private var completedLessonIDs = ""
@@ -84,7 +85,14 @@ struct AcademyView: View {
             Text("Get every teen and adult learning path, all modules, saved progress, and exams with one purchase.")
                 .font(.body)
                 .foregroundStyle(.secondary)
-            if let product = purchaseManager.product {
+            if !auth.isSignedIn {
+                Button("Sign in with Beyond-ID") { auth.signIn() }
+                    .buttonStyle(.borderedProminent)
+                    .tint(selectedTheme.academyEmphasis)
+                Text("Sign-in is required to purchase and sync Academy access.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            } else if let product = purchaseManager.product {
                 Button("Unlock for \(product.displayPrice)") {
                     Task { await purchaseManager.purchase() }
                 }

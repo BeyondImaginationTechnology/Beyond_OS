@@ -17,22 +17,20 @@ try {
     error_log('Jaguar rate limiter unavailable: ' . $exception->getMessage());
 }
 if (!$signedIn) {
-    $turnstileSecret = trim((string) getenv('JAGUAR_TURNSTILE_SECRET_KEY'));
-    if ($turnstileSecret === '') { http_response_code(503); echo json_encode(['error' => 'Verification is temporarily unavailable. Please try again later.']); exit; }
-    $turnstileToken = is_string($payload['turnstile_token'] ?? null) ? trim($payload['turnstile_token']) : '';
-    if ($turnstileToken === '' || strlen($turnstileToken) > 2048) { http_response_code(403); echo json_encode(['error' => 'Complete the security check and try again.']); exit; }
-    $verifyRequest = curl_init('https://challenges.cloudflare.com/turnstile/v0/siteverify');
-    curl_setopt_array($verifyRequest, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 4, CURLOPT_TIMEOUT => 8, CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'], CURLOPT_POSTFIELDS => http_build_query(['secret' => $turnstileSecret, 'response' => $turnstileToken, 'remoteip' => (string) ($_SERVER['REMOTE_ADDR'] ?? '')])]);
-    $verifyResponse = curl_exec($verifyRequest);
-    $verifyStatus = (int) curl_getinfo($verifyRequest, CURLINFO_RESPONSE_CODE);
-    curl_close($verifyRequest);
-    $verification = is_string($verifyResponse) ? json_decode($verifyResponse, true) : null;
-    $expectedHostname = trim((string) getenv('JAGUAR_TURNSTILE_HOSTNAME'));
-    if ($expectedHostname === '') { $expectedHostname = preg_replace('/:\d+$/', '', (string) ($_SERVER['HTTP_HOST'] ?? '')); }
-    $validVerification = $verifyStatus >= 200 && $verifyStatus < 300 && is_array($verification) && ($verification['success'] ?? false) === true;
-    $validAction = ($verification['action'] ?? '') === 'jaguar_guest_prompt';
-    $validHostname = $expectedHostname === '' || hash_equals(strtolower($expectedHostname), strtolower((string) ($verification['hostname'] ?? '')));
-    if (!$validVerification || !$validAction || !$validHostname) { http_response_code(403); echo json_encode(['error' => 'Security verification failed or expired. Please try again.']); exit; }
+    $proof = is_array($payload['proof'] ?? null) ? $payload['proof'] : [];
+    $challenge = $_SESSION['jaguar_guest_challenge'] ?? [];
+    $nonce = is_string($proof['challenge'] ?? null) ? trim($proof['challenge']) : '';
+    $counter = is_string($proof['counter'] ?? null) ? trim($proof['counter']) : '';
+    $validShape = preg_match('/^[a-f0-9]{36}$/', $nonce) === 1 && preg_match('/^\d{1,12}$/', $counter) === 1;
+    $validChallenge = is_array($challenge)
+        && empty($challenge['used'])
+        && (int)($challenge['expires'] ?? 0) >= time()
+        && hash_equals((string)($challenge['challenge'] ?? ''), $nonce)
+        && hash('sha256', $nonce . ':' . $counter)[0] === '0';
+    $difficulty = max(1, min(20, (int)($challenge['difficulty'] ?? 16)));
+    $validWork = $validShape && $validChallenge && substr(hash('sha256', $nonce . ':' . $counter), 0, (int)ceil($difficulty / 4)) === str_repeat('0', (int)ceil($difficulty / 4));
+    if (!$validWork) { http_response_code(403); echo json_encode(['error' => 'First-party security check failed or expired. Please try again.']); exit; }
+    $_SESSION['jaguar_guest_challenge']['used'] = true;
 }
 $mode = is_string($payload['mode'] ?? null) ? strtolower(trim($payload['mode'])) : 'core';
 $modeDefinition = jaguar_mode($mode);

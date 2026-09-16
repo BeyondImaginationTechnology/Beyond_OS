@@ -38,16 +38,13 @@ BEYOND_AI_ORIGIN=https://ai.beyondimagination.co.technology
 BEYOND_SESSION_COOKIE_DOMAIN=.beyondimagination.co.technology
 JAGUAR_RUNTIME_URL=https://your-private-jaguar-runtime.example
 JAGUAR_RUNTIME_TOKEN=a-long-random-secret-shared-only-with-the-runtime
-JAGUAR_TURNSTILE_SITE_KEY=your-public-cloudflare-turnstile-site-key
-JAGUAR_TURNSTILE_SECRET_KEY=your-private-cloudflare-turnstile-secret-key
-JAGUAR_TURNSTILE_HOSTNAME=ai.beyondimagination.co.technology
 ```
 
 The shared hosting account serves the PHP interface and authenticated proxy. The model runtime must run separately on GPU-capable infrastructure. Set the same non-empty `JAGUAR_RUNTIME_TOKEN` on both hosts: the PHP proxy sends it as a bearer token and the runtime rejects unauthenticated chat requests.
 
 The PHP proxy answers greetings, capability/version questions, thanks, and basic two-number arithmetic through `jaguar-fast-lane`. These requests never start a Modal GPU. Prompts that require language-model reasoning continue to the scale-to-zero L4 runtime.
 
-Unsigned visitors can enter Jaguar without logging in. Their first send opens Cloudflare Turnstile; the API validates the resulting single-use token, action, and hostname before forwarding the prompt. Signed-in Beyond ID members bypass this check. Create the Turnstile widget for `ai.beyondimagination.co.technology`; the site key is public, while the secret key must remain private on the web host.
+Unsigned visitors can enter Jaguar without logging in. Their first send receives a short-lived, first-party proof-of-work challenge; the PHP API validates the signed session challenge and one-time work result before forwarding the prompt. Signed-in Beyond ID members bypass this check. No third-party verification service is required.
 
 ## Modal v0.2 deployment and schedule
 

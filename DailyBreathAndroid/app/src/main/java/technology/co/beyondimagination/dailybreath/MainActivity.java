@@ -22,6 +22,7 @@ import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.util.Base64;
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
@@ -35,6 +36,11 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.KeyStore;
+import java.security.SecureRandom;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -48,6 +54,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 
 /** Native, offline DailyBreath reader for Bible, Tanakh, and Quran content. */
 public final class MainActivity extends Activity {
@@ -70,6 +80,7 @@ public final class MainActivity extends Activity {
     private BillingClient billingClient;
     private ProductDetails academyProduct;
     private boolean academyUnlocked;
+    private String beyondAccessToken;
 
     private enum Faith {
         BIBLE("Bible", "Bible Verse", "verse"), TANAKH("Tanakh", "Tanakh Passage", "passage"), QURAN("Quran", "Quran Ayah", "ayah");
@@ -80,14 +91,16 @@ public final class MainActivity extends Activity {
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         prefs = getSharedPreferences("daily_breath", MODE_PRIVATE);
+        beyondAccessToken = readProtectedToken();
         academyUnlocked = prefs.getBoolean("academy_purchased", false);
         initBilling();
         applyStoredLanguage();
         faith = readFaith();
-        loadDailyVerses(); loadLibraries(); buildLayout(); openIntent(getIntent());
+        loadDailyVerses(); loadLibraries(); buildLayout(); if (!handleAuthCallback(getIntent())) openIntent(getIntent());
         if (!prefs.contains("interface_language")) page.post(this::showLanguageDialog);
+        else if (!prefs.getBoolean("onboarding_complete", false)) page.post(this::showAccountChoice);
     }
-    @Override protected void onNewIntent(Intent intent) { super.onNewIntent(intent); setIntent(intent); openIntent(intent); }
+    @Override protected void onNewIntent(Intent intent) { super.onNewIntent(intent); setIntent(intent); if (!handleAuthCallback(intent)) openIntent(intent); }
     @Override protected void onPause() { super.onPause(); if (breathing) { breathing = false; handler.removeCallbacks(ticker); refreshBreathControls(); } }
     @Override protected void onDestroy() { handler.removeCallbacks(ticker); super.onDestroy(); }
 
@@ -136,7 +149,8 @@ public final class MainActivity extends Activity {
     }
     private void showAcademyPaywall() {
         addBody("Unlock every Daily Breath Academy module with one purchase.");
-        Button buy=action("Unlock Academy · CA$4.99"); buy.setOnClickListener(v->launchAcademyPurchase()); page.addView(buy,spaced());
+        if (beyondAccessToken.isEmpty()) { Button signIn=action("Sign in with Beyond-ID"); signIn.setOnClickListener(v->beginBeyondIDSignIn()); page.addView(signIn,spaced()); addBody("Sign-in is required to purchase and sync Academy access."); }
+        else { Button buy=action("Unlock Academy · CA$4.99"); buy.setOnClickListener(v->launchAcademyPurchase()); page.addView(buy,spaced()); }
         Button restore=action("Restore purchase"); restore.setOnClickListener(v->{queryAcademyPurchases(); showTab(2);}); page.addView(restore,spaced());
         addBody("Purchases are processed securely by Google Play.");
     }
@@ -191,6 +205,13 @@ public final class MainActivity extends Activity {
     private String readAsset(String name)throws Exception{StringBuilder result=new StringBuilder();try(BufferedReader reader=assetReader(name)){String line;while((line=reader.readLine())!=null)result.append(line).append('\n');}return result.toString();}
     private void applyStoredLanguage(){String code=prefs.getString("interface_language","en");Locale locale=Locale.forLanguageTag(code);Locale.setDefault(locale);Configuration config=new Configuration(getResources().getConfiguration());config.setLocale(locale);getResources().updateConfiguration(config,getResources().getDisplayMetrics());}
     private void showLanguageDialog(){String current=prefs.getString("interface_language","");String[] codes={"en","fr","es"},names={"English","Français","Español"};int checked=current.equals("fr")?1:current.equals("es")?2:0;AlertDialog dialog=new AlertDialog.Builder(this).setTitle("Choose your language · Choisissez votre langue · Elige tu idioma").setSingleChoiceItems(names,checked,(choice,which)->{prefs.edit().putString("interface_language",codes[which]).apply();choice.dismiss();recreate();}).create();dialog.setCanceledOnTouchOutside(!current.isEmpty());dialog.setCancelable(!current.isEmpty());dialog.show();}
+    private void showAccountChoice(){new AlertDialog.Builder(this).setTitle(tr("Choose how to begin")).setMessage(tr("Sign in to sync progress and unlock purchases across your devices, or explore free content locally.")).setPositiveButton(tr("Sign in with Beyond-ID"),(dialog,which)->{prefs.edit().putBoolean("onboarding_complete",true).apply();beginBeyondIDSignIn();}).setNegativeButton(tr("Continue without signing in"),(dialog,which)->prefs.edit().putBoolean("onboarding_complete",true).apply()).setCancelable(false).show();}
+    private void beginBeyondIDSignIn(){try{byte[] bytes=new byte[64];new SecureRandom().nextBytes(bytes);String verifier=Base64.encodeToString(bytes,Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING);String challenge=Base64.encodeToString(java.security.MessageDigest.getInstance("SHA-256").digest(verifier.getBytes(StandardCharsets.UTF_8)),Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING);prefs.edit().putString("beyond_id_verifier",verifier).apply();String returnPath="/beyond-id/auth/mobile-complete.php?scheme=dailybreath&code_challenge="+Uri.encode(challenge);openUrl(Uri.parse("https://beyondimagination.co.technology/beyond-id/auth/login.php").buildUpon().appendQueryParameter("app","dailybreath").appendQueryParameter("return",returnPath).build().toString());}catch(Exception error){Toast.makeText(this,"Beyond-ID sign-in could not be started.",Toast.LENGTH_LONG).show();}}
+    private boolean handleAuthCallback(Intent intent){Uri data=intent==null?null:intent.getData();if(data==null||!"dailybreath".equalsIgnoreCase(data.getScheme())||!"auth".equalsIgnoreCase(data.getHost()))return false;String error=data.getQueryParameter("error"),code=data.getQueryParameter("code");if(error!=null&&!error.isEmpty()){Toast.makeText(this,error,Toast.LENGTH_LONG).show();return true;}String verifier=prefs.getString("beyond_id_verifier","");if(code==null||verifier.isEmpty()){Toast.makeText(this,"Beyond-ID sign-in could not be completed.",Toast.LENGTH_LONG).show();return true;}new Thread(()->exchangeBeyondCode(code,verifier)).start();return true;}
+    private void exchangeBeyondCode(String code,String verifier){try{HttpURLConnection connection=(HttpURLConnection)new URL("https://beyondimagination.co.technology/beyond-id/api/mobile-token.php").openConnection();connection.setRequestMethod("POST");connection.setConnectTimeout(15000);connection.setReadTimeout(15000);connection.setDoOutput(true);connection.setRequestProperty("Content-Type","application/json");byte[] payload=new JSONObject().put("code",code).put("code_verifier",verifier).toString().getBytes(StandardCharsets.UTF_8);try(OutputStream output=connection.getOutputStream()){output.write(payload);}int status=connection.getResponseCode();InputStream body=status>=400?connection.getErrorStream():connection.getInputStream();StringBuilder response=new StringBuilder();try(BufferedReader reader=new BufferedReader(new InputStreamReader(body,StandardCharsets.UTF_8))){String line;while((line=reader.readLine())!=null)response.append(line);}JSONObject json=new JSONObject(response.toString());String token=json.optString("access_token","");if(status<300&&!token.isEmpty()){writeProtectedToken(token);beyondAccessToken=token;prefs.edit().remove("beyond_id_verifier").apply();runOnUiThread(()->{Toast.makeText(this,"Signed in with Beyond-ID.",Toast.LENGTH_SHORT).show();showTab(2);});}else throw new IllegalStateException(json.optString("error","Token exchange failed."));}catch(Exception error){runOnUiThread(()->Toast.makeText(this,"Beyond-ID sign-in could not be completed.",Toast.LENGTH_LONG).show());}}
+    private SecretKey protectedKey()throws Exception{KeyStore store=KeyStore.getInstance("AndroidKeyStore");store.load(null);if(!store.containsAlias("DailyBreathBeyondID")){KeyGenerator generator=KeyGenerator.getInstance("AES","AndroidKeyStore");generator.init(256);generator.generateKey();}return((KeyStore.SecretKeyEntry)store.getEntry("DailyBreathBeyondID",null)).getSecretKey();}
+    private void writeProtectedToken(String token)throws Exception{SecretKey key=protectedKey();Cipher cipher=Cipher.getInstance("AES/GCM/NoPadding");cipher.init(Cipher.ENCRYPT_MODE,key);byte[] encrypted=cipher.doFinal(token.getBytes(StandardCharsets.UTF_8)),iv=cipher.getIV(),combined=new byte[iv.length+encrypted.length];System.arraycopy(iv,0,combined,0,iv.length);System.arraycopy(encrypted,0,combined,iv.length,encrypted.length);prefs.edit().putString("beyond_id_token",Base64.encodeToString(combined,Base64.NO_WRAP)).apply();}
+    private String readProtectedToken(){try{String stored=prefs.getString("beyond_id_token","");if(stored.isEmpty())return "";byte[] combined=Base64.decode(stored,Base64.DEFAULT);int ivLength=12;Cipher cipher=Cipher.getInstance("AES/GCM/NoPadding");cipher.init(Cipher.DECRYPT_MODE,protectedKey(),new GCMParameterSpec(128,java.util.Arrays.copyOfRange(combined,0,ivLength)));return new String(cipher.doFinal(java.util.Arrays.copyOfRange(combined,ivLength,combined.length)),StandardCharsets.UTF_8);}catch(Exception error){return "";}}
     private String tr(String text){String language=prefs==null?"en":prefs.getString("interface_language","en");Map<String,String> values=language.equals("fr")?FR:language.equals("es")?ES:null;return values==null?text:values.getOrDefault(text,text);}
     private Faith readFaith(){try{return Faith.valueOf(prefs.getString("selected_faith",Faith.BIBLE.name()));}catch(Exception ignored){return Faith.BIBLE;}}
     private String todayIntro(){return faith==Faith.TANAKH?"A quiet place for Tanakh, breath, and one honest next step.":faith==Faith.QURAN?"A quiet place for Quran, remembrance, and one sincere next step.":"A little room for truth, rest, and recovery.";}

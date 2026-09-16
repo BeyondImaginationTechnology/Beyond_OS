@@ -6,7 +6,6 @@ require_once __DIR__ . '/includes/modes.php';
 $signedIn = !empty($_SESSION['user_id']);
 $displayName = trim((string)($_SESSION['first_name'] ?? $_SESSION['name'] ?? ''));
 $csrf = csrf_token();
-$turnstileSiteKey = trim((string) getenv('JAGUAR_TURNSTILE_SITE_KEY'));
 $jaguarModes = jaguar_mode_catalog();
 ?>
 <!doctype html>
@@ -29,18 +28,16 @@ $jaguarModes = jaguar_mode_catalog();
 .message.assistant .avatar{transition:box-shadow .3s ease,transform .3s ease}.message.assistant:hover .avatar{box-shadow:0 0 20px rgba(224,79,194,.28);transform:scale(1.04)}
 @media(prefers-reduced-motion:reduce){.suggestions button,.new-chat,.mode-picker select,.side-links a,.message.assistant .avatar{transition:none}.suggestions button::after{display:none}.composer:focus-within{animation:none}}
 </style>
-<?php if (!$signedIn && $turnstileSiteKey !== ''): ?><script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script><?php endif; ?>
 </head><body>
 <div class="shell"><aside class="sidebar"><a class="brand" href="/"><img class="brand-mark-image" src="assets/jaguar-eye-v0.2.png" alt="Jaguar eye logo"><span><strong>JAGUAR</strong><small>V0.3 · BEYOND AI</small></span></a><button class="new-chat" id="newChat" type="button">＋ New conversation</button><div class="sidebar-note"><b>Guest chat</b>Conversation history is not saved in this preview. A quick security check protects guest requests.</div><nav class="side-links"><a href="https://beyondimagination.co.technology/ai/">About Jaguar</a><a href="https://beyondimagination.co.technology/release-notes.php#jaguar">Build progress</a><a href="https://beyondimagination.co.technology/">Beyond Imagination</a></nav></aside>
 <section class="workspace"><header class="topbar"><div class="model-name"><i class="status"></i> Jaguar · v0.3 Preview</div><div class="account">Premium · coming soon</div></header>
 <main class="chat"><div class="messages" id="messages"></div><div class="composer-wrap"><div class="mode-picker"><label for="modeSelect">Jaguar mode</label><select id="modeSelect" aria-label="Jaguar mode"><?php foreach ($jaguarModes as $modeKey => $modeDefinition): ?><option value="<?=e($modeKey)?>" <?=jaguar_mode_is_enabled($modeKey) ? '' : 'disabled'?>><?=e($modeDefinition['label'])?><?=jaguar_mode_is_enabled($modeKey) ? ($modeDefinition['status'] === 'preview' ? ' · preview' : '') : ' · coming soon'?></option><?php endforeach; ?></select><span class="mode-status" id="modeStatus">Core is live · fast lane + deep thinking</span></div><form class="composer" id="composer"><textarea id="prompt" rows="1" maxlength="8000" placeholder="Message Jaguar…" aria-label="Message Jaguar" required></textarea><button class="send" id="send" type="submit" aria-label="Send message">↑</button></form><p class="fine" id="finePrint">Jaguar can make mistakes. Check important information.</p></div></main></section></div>
 <div class="gate" id="languageGate" role="dialog" aria-modal="true" aria-labelledby="languageTitle"><div class="gate-card"><img class="brand-mark-image" src="assets/jaguar-eye-v0.2.png" alt="" style="width:58px;height:58px;margin:auto"><h2 id="languageTitle">Choose your language</h2><p>Choose your language · Choisissez votre langue · Elige tu idioma</p><div class="language-options"><button type="button" data-language="en">English</button><button type="button" data-language="fr">Français</button><button type="button" data-language="es">Español</button></div></div></div>
-<?php if (!$signedIn): ?><div class="gate" id="verificationGate" hidden role="dialog" aria-modal="true" aria-labelledby="verificationTitle"><div class="gate-card"><h2 id="verificationTitle">One quick check</h2><p id="verificationCopy">Verify that you are human, then Jaguar will send your message.</p><div class="turnstile-slot" id="turnstileWidget"></div><div class="verification-error" id="verificationError"></div><button class="gate-cancel" id="verificationCancel" type="button">Cancel</button></div></div><?php endif; ?>
+<?php if (!$signedIn): ?><div class="gate" id="verificationGate" hidden role="dialog" aria-modal="true" aria-labelledby="verificationTitle"><div class="gate-card"><h2 id="verificationTitle">One quick check</h2><p id="verificationCopy">Complete a quick local security check, then Jaguar will send your message.</p><div class="turnstile-slot" id="turnstileWidget" hidden></div><div class="verification-error" id="verificationError"></div><button class="gate-cancel" id="verificationCancel" type="button">Cancel</button></div></div><?php endif; ?>
 <script>
 (() => {
     const signedIn = <?=json_encode($signedIn)?>;
     const csrf = <?=json_encode($csrf)?>;
-    const turnstileSiteKey = <?=json_encode($turnstileSiteKey)?>;
     const form = document.getElementById('composer');
     const input = document.getElementById('prompt');
     const send = document.getElementById('send');
@@ -55,8 +52,7 @@ $jaguarModes = jaguar_mode_catalog();
     let history = [];
     let language = 'en';
     let pendingText = '';
-    let turnstileToken = '';
-    let turnstileWidgetId = null;
+    let proof = null;
 
     const copy = {
         en: {
@@ -64,21 +60,21 @@ $jaguarModes = jaguar_mode_catalog();
             intro: 'Ask Jaguar to explain an idea, shape a plan, or help you find a stronger starting point.',
             suggestions: ['Explain AI tokens with a memorable analogy.', 'Help me turn a rough idea into a clear project plan.', 'Teach me something difficult in plain language.'],
             placeholder: 'Message Jaguar…', fine: 'Jaguar can make mistakes. Check important information.', waking: 'Jaguar is thinking…', timedOut: 'Jaguar is taking longer than expected. Please try again.', explicit: 'Jaguar cannot help with explicit sexual content.', coreStatus: 'Core is live · fast lane + deep thinking', drawStatus: 'Draw · coming soon', videoStatus: 'Video · coming soon', user: 'YOU',
-            newChat: '＋ New conversation', verifyTitle: 'One quick check', verifyCopy: 'Verify that you are human, then Jaguar will send your message.', cancel: 'Cancel'
+            newChat: '＋ New conversation', verifyTitle: 'One quick check', verifyCopy: 'Complete a quick local security check, then Jaguar will send your message.', cancel: 'Cancel'
         },
         fr: {
             title: 'Jusqu’où irons-nous <span>au-delà ?</span>',
             intro: 'Demandez à Jaguar d’expliquer une idée, de structurer un plan ou de trouver un meilleur point de départ.',
             suggestions: ['Explique les jetons IA avec une analogie mémorable.', 'Transforme mon idée en plan de projet clair.', 'Enseigne-moi un sujet difficile simplement.'],
             placeholder: 'Écrivez à Jaguar…', fine: 'Jaguar peut se tromper. Vérifiez les informations importantes.', waking: 'Jaguar réfléchit…', timedOut: 'Jaguar met plus de temps que prévu. Veuillez réessayer.', explicit: 'Jaguar ne peut pas aider avec du contenu sexuel explicite.', coreStatus: 'Core est disponible · voie rapide + réflexion', drawStatus: 'Dessiner · bientôt disponible', videoStatus: 'Vidéo · bientôt disponible', user: 'VOUS',
-            newChat: '＋ Nouvelle conversation', verifyTitle: 'Une vérification rapide', verifyCopy: 'Confirmez que vous êtes une personne, puis Jaguar enverra votre message.', cancel: 'Annuler'
+            newChat: '＋ Nouvelle conversation', verifyTitle: 'Une vérification rapide', verifyCopy: 'Effectuez une vérification locale rapide, puis Jaguar enverra votre message.', cancel: 'Annuler'
         },
         es: {
             title: '¿Hasta dónde iremos <span>más allá?</span>',
             intro: 'Pídele a Jaguar que explique una idea, organice un plan o encuentre un mejor punto de partida.',
             suggestions: ['Explica los tokens de IA con una analogía memorable.', 'Convierte mi idea en un plan de proyecto claro.', 'Enséñame algo difícil con palabras sencillas.'],
             placeholder: 'Escribe a Jaguar…', fine: 'Jaguar puede equivocarse. Verifica la información importante.', waking: 'Jaguar está pensando…', timedOut: 'Jaguar está tardando más de lo esperado. Inténtalo de nuevo.', explicit: 'Jaguar no puede ayudar con contenido sexual explícito.', coreStatus: 'Core está disponible · vía rápida + razonamiento', drawStatus: 'Dibujar · próximamente', videoStatus: 'Video · próximamente', user: 'TÚ',
-            newChat: '＋ Nueva conversación', verifyTitle: 'Una verificación rápida', verifyCopy: 'Confirma que eres una persona y Jaguar enviará tu mensaje.', cancel: 'Cancelar'
+            newChat: '＋ Nueva conversación', verifyTitle: 'Una verificación rápida', verifyCopy: 'Completa una verificación local rápida y Jaguar enviará tu mensaje.', cancel: 'Cancelar'
         }
     };
 
@@ -133,44 +129,37 @@ $jaguarModes = jaguar_mode_catalog();
         return /\b(porn(?:ography|ographic)?|xxx|nudes?|nudity|naked|onlyfans|blowjob|handjob|masturbat(?:e|ion|ing)|sexual\s+(?:roleplay|story|chat|scene|image|photo|video|content)|explicit(?:ly)?\s+(?:sexual|erotic)|graphic(?:ally)?\s+(?:sexual|erotic))\b/i.test(text);
     }
 
-    function resetTurnstile() {
-        turnstileToken = '';
-        if (turnstileWidgetId !== null && window.turnstile) {
-            window.turnstile.remove(turnstileWidgetId);
-            turnstileWidgetId = null;
+    async function solveProofOfWork(challenge, difficulty) {
+        const target = '0'.repeat(Math.ceil(Number(difficulty) / 4));
+        let counter = 0;
+        while (counter < 1000000000000) {
+            const data = new TextEncoder().encode(`${challenge}:${counter}`);
+            const digest = await crypto.subtle.digest('SHA-256', data);
+            const hex = [...new Uint8Array(digest)].map(byte => byte.toString(16).padStart(2, '0')).join('');
+            if (hex.startsWith(target)) return {challenge, counter: String(counter)};
+            counter += 1;
+            if (counter % 500 === 0) await new Promise(resolve => setTimeout(resolve, 0));
         }
+        throw new Error('The local security check could not complete.');
     }
 
-    function showVerification(text) {
+    async function showVerification(text) {
         pendingText = text;
-        verificationError.textContent = '';
+        verificationError.textContent = 'Completing local security check…';
         verificationGate.hidden = false;
-        if (!turnstileSiteKey) {
-            verificationError.textContent = 'Verification is temporarily unavailable. Please try again later.';
-            return;
-        }
-        if (!window.turnstile) {
-            verificationError.textContent = 'The security check is still loading. Please try again in a moment.';
-            return;
-        }
-        if (turnstileWidgetId === null) {
-            turnstileWidgetId = window.turnstile.render('#turnstileWidget', {
-                sitekey: turnstileSiteKey,
-                theme: 'dark',
-                action: 'jaguar_guest_prompt',
-                callback: token => {
-                    if (!pendingText || verificationGate.hidden) return;
-                    turnstileToken = token;
-                    verificationGate.hidden = true;
-                    const approvedText = pendingText;
-                    pendingText = '';
-                    sendMessage(approvedText);
-                },
-                'error-callback': () => { verificationError.textContent = 'Verification could not load. Please try again.'; },
-                'expired-callback': () => { turnstileToken = ''; }
-            });
-        } else {
-            window.turnstile.reset(turnstileWidgetId);
+        try {
+            const response = await fetch('/api/challenge.php', {credentials: 'same-origin', cache: 'no-store'});
+            const data = await response.json();
+            if (!response.ok || !data.challenge) throw new Error('The local security check is unavailable.');
+            proof = await solveProofOfWork(data.challenge, data.difficulty);
+            verificationGate.hidden = true;
+            const approvedText = pendingText;
+            pendingText = '';
+            verificationError.textContent = '';
+            sendMessage(approvedText);
+        } catch (error) {
+            proof = null;
+            verificationError.textContent = error instanceof Error ? error.message : 'The local security check failed. Please try again.';
         }
     }
 
@@ -188,7 +177,7 @@ $jaguarModes = jaguar_mode_catalog();
             const response = await fetch('/api/chat.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf},
-                body: JSON.stringify({mode: modeSelect.value, language, messages: history, turnstile_token: signedIn ? '' : turnstileToken}),
+                body: JSON.stringify({mode: modeSelect.value, language, messages: history, proof: signedIn ? null : proof}),
                 signal: controller.signal
             });
             const data = await response.json();
@@ -201,7 +190,7 @@ $jaguarModes = jaguar_mode_catalog();
                 : error instanceof Error ? error.message : 'Jaguar is unavailable.';
         } finally {
             window.clearTimeout(timeout);
-            if (!signedIn) resetTurnstile();
+            if (!signedIn) proof = null;
             send.disabled = false;
             input.focus();
         }
@@ -215,7 +204,7 @@ $jaguarModes = jaguar_mode_catalog();
             addMessage('assistant', copy[language].explicit);
             return;
         }
-        if (!signedIn && !turnstileToken) showVerification(text);
+        if (!signedIn && !proof) showVerification(text);
         else sendMessage(text);
     });
     input.addEventListener('input', () => {
@@ -235,7 +224,7 @@ $jaguarModes = jaguar_mode_catalog();
     document.getElementById('verificationCancel')?.addEventListener('click', () => {
         verificationGate.hidden = true;
         pendingText = '';
-        resetTurnstile();
+        proof = null;
     });
     document.querySelectorAll('[data-language]').forEach(button => button.addEventListener('click', () => {
         language = button.dataset.language;

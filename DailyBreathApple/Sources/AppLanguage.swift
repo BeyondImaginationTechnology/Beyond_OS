@@ -51,3 +51,56 @@ struct LanguageSetupView: View {
         .interactiveDismissDisabled()
     }
 }
+
+struct AccountChoiceView: View {
+    @EnvironmentObject private var auth: BeyondIDAuthManager
+    @Binding var onboardingComplete: Bool
+
+    var body: some View {
+        VStack(spacing: 22) {
+            Spacer()
+            Image(systemName: "person.crop.circle.badge.checkmark")
+                .font(.system(size: 72))
+                .foregroundStyle(.dailyGreen)
+            VStack(spacing: 8) {
+                Text("Choose how to begin")
+                    .font(.largeTitle.bold())
+                    .multilineTextAlignment(.center)
+                Text("Sign in to sync progress and unlock purchases across your devices, or explore free content locally.")
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            VStack(spacing: 12) {
+                Button {
+                    auth.signIn()
+                } label: {
+                    Label("Sign in with Beyond-ID", systemImage: "person.crop.circle.badge.checkmark")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.dailyGreen)
+                .controlSize(.large)
+                if let message = auth.message {
+                    Text(message).font(.footnote).foregroundStyle(.secondary)
+                }
+
+                Button("Continue without signing in") {
+                    onboardingComplete = true
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+            }
+            .frame(maxWidth: 420)
+            Spacer()
+            Text("You can sign in later from Academy or Settings.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(28)
+        .background(DailyBreathThemeBackground(theme: .forest))
+        .interactiveDismissDisabled()
+        .onChange(of: auth.isSignedIn) { _, signedIn in
+            if signedIn { onboardingComplete = true }
+        }
+    }
+}

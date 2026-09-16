@@ -1,11 +1,16 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/../includes/ecosystem.php';
-$wallet=beyond_app_bootstrap('DailyBreath');
+$wallet=beyond_app_bootstrap('DailyBreath', false);
 $pdo=beyond_db();
 $userId=(int)($_SESSION['user_id']??0);
 $slug=preg_replace('/[^a-z0-9-]/','',strtolower((string)($_GET['course']??$_POST['course']??'bible-module-1')));
 if(!preg_match('/^(?:bible|tanakh|quran)-module-[1-5]$/',$slug)){http_response_code(404);exit('Course not found.');}
+$guest=$userId<1;
+if($guest && ((int)substr($slug,-1)>1 || $_SERVER['REQUEST_METHOD']==='POST')){
+  $_SESSION['beyond_return_to']=beyond_return_url();
+  header('Location: /beyond-id/auth/login.php?app=dailybreath&required=1');exit;
+}
 $lessonNo=max(1,(int)($_GET['lesson']??$_POST['lesson']??1));
 $s=$pdo->prepare('SELECT * FROM academy_courses WHERE slug=? AND is_published=1 LIMIT 1');$s->execute([$slug]);$course=$s->fetch(PDO::FETCH_ASSOC);
 if(!$course){http_response_code(404);exit('Course not found.');}
@@ -64,7 +69,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'&&($_POST['action']??'')==='quiz'){
     if($passed){
       if($driver==='sqlite')$pdo->prepare('INSERT INTO academy_progress(user_id,lesson_id,progress_seconds,completed_at,updated_at) VALUES(?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) ON CONFLICT(user_id,lesson_id) DO UPDATE SET completed_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP')->execute([$userId,$current['id'],(int)($current['duration_seconds']??0)]);
       else $pdo->prepare('INSERT INTO academy_progress(user_id,lesson_id,progress_seconds,completed_at) VALUES(?,?,?,CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE completed_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP')->execute([$userId,$current['id'],(int)($current['duration_seconds']??0)]);
-      $reward=beyond_award_reward($userId,'dailybreath','lesson',(string)$current['id'],10,'Bible Academy lesson completed — '.$current['title']);
+      $reward=beyond_award_reward($userId,'dailybreath','lesson',(string)$current['id'],10,'Sacred Text Academy lesson completed — '.$current['title']);
       $message='Passed with '.$score.'/10. The next lesson is unlocked.'.(!empty($reward['awarded'])?' +10 bit$ earned.':'');
     }else{$message='You scored '.$score.'/10. Review the lesson and try again; 8/10 is required.';}
   }
@@ -73,7 +78,7 @@ $check=$pdo->prepare('SELECT MAX(score) best_score,MAX(passed) passed FROM acade
 $body=trim((string)($current['transcript']??''));if($body==='')$body="This all-ages $textName lesson invites careful reading, honest reflection, and a practical response.\n\nRead the selected passage slowly. Notice one word, image, or teaching that stays with you, and consider what it might mean in daily life.\n\nPractice one small action today that reflects wisdom, compassion, truth, or gratitude.";
 $next=$lessons[$currentIndex+1]??null;$previous=$lessons[$currentIndex-1]??null;
 ?>
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=e($course['title'])?> | Bible Academy</title><link rel="stylesheet" href="/dailybreath/academy.css?v=20260730-1"></head><body class="ba-course-page"><main class="shell"><header class="top"><strong>DailyBreath · Bible Academy</strong><a href="academy.php">← All courses</a></header>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=e($course['title'])?> | Sacred Text Academy</title><link rel="stylesheet" href="/dailybreath/academy.css?v=20260730-2"></head><body class="ba-course-page"><main class="shell"><header class="top"><strong>DailyBreath · Sacred Text Academy</strong><a href="academy.php">← All courses</a></header>
 <div class="layout"><nav class="lessons" aria-label="Course lessons"><?php foreach($lessons as $index=>$lesson):$unlocked=$index===0;if($index>0){$prior=$lessons[$index-1];$g=$pdo->prepare('SELECT 1 FROM academy_quiz_attempts WHERE user_id=? AND lesson_id=? AND passed=1 LIMIT 1');$g->execute([$userId,$prior['id']]);$unlocked=(bool)$g->fetchColumn();}?><?php if($unlocked):?><a class="<?=(int)$lesson['id']===(int)$current['id']?'active':''?>" href="?course=<?=e($slug)?>&lesson=<?=(int)$lesson['lesson_number']?>"><?= (int)$lesson['lesson_number']?>. <?=e($lesson['title'])?></a><?php else:?><span>🔒 <?= (int)$lesson['lesson_number']?>. <?=e($lesson['title'])?></span><?php endif;?><?php endforeach;?></nav>
 <div><article class="lesson"><?php if(isset($_GET['locked'])):?><div class="notice">Pass this lesson’s 10-question test to unlock the next lesson.</div><?php endif;?><span class="eyebrow">LESSON <?= (int)$current['lesson_number']?> OF <?=count($lessons)?></span><h1><?=e($current['title'])?></h1><div class="content"><?=e($body)?></div><div class="next"><?php if($previous):?><a class="btn" href="?course=<?=e($slug)?>&lesson=<?=(int)$previous['lesson_number']?>">← Previous</a><?php else:?><span></span><?php endif;?><?php if($next&&$currentPassed):?><a class="btn" href="?course=<?=e($slug)?>&lesson=<?=(int)$next['lesson_number']?>">Next lesson →</a><?php elseif(!$next&&$currentPassed):?><a class="btn" href="module-exam.php?course=<?=e($slug)?>">Take module exam →</a><?php endif;?></div></article>
 <section class="ba-practice-path" id="practice-path"><header><div><span class="eyebrow">REQUIRED PRACTICE</span><h2>Reflect, apply, and explain.</h2><p>Complete three short responses before the lesson test.</p></div><strong><?=count($practiceResponses)?>/3 complete</strong></header><?php if(isset($_GET['practice_saved'])):?><div class="notice">Practice saved. Continue when you are ready.</div><?php endif;?><div class="ba-practice-grid"><?php $practicePrompts=[['Notice','Write one idea or phrase from the lesson that stood out to you.'],['Apply','Describe one specific action that would put this lesson into practice today.'],['Explain','Summarize the lesson in your own words as if you were teaching someone else.']];foreach($practicePrompts as $index=>$prompt):$round=$index+1;$complete=isset($practiceResponses[$round]);?><form class="ba-practice-card <?=$complete?'complete':''?>" method="post"><input type="hidden" name="csrf" value="<?=e(csrf_token())?>"><input type="hidden" name="action" value="practice"><input type="hidden" name="course" value="<?=e($slug)?>"><input type="hidden" name="lesson" value="<?=(int)$current['lesson_number']?>"><input type="hidden" name="round" value="<?=$round?>"><span>Practice <?=$round?> <?=$complete?'✓':''?></span><h3><?=e($prompt[0])?></h3><p><?=e($prompt[1])?></p><textarea name="response" rows="4" minlength="3" required><?=e((string)($practiceResponses[$round]??''))?></textarea><button class="btn" type="submit"><?=$complete?'Update practice':'Complete practice'?></button></form><?php endforeach;?></div></section>

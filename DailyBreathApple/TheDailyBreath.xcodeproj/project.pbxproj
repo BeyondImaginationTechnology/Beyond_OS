@@ -49,6 +49,7 @@
 		300000000000000000000043 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000049 /* Localizable.strings */; };
 		300000000000000000000044 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000049 /* Localizable.strings */; };
 		300000000000000000000045 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000049 /* Localizable.strings */; };
+		300000000000000000000046 /* BeyondIDAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000050 /* BeyondIDAuth.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -147,6 +148,7 @@
 		100000000000000000000046 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		100000000000000000000047 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		100000000000000000000048 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		100000000000000000000050 /* BeyondIDAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeyondIDAuth.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -196,6 +198,7 @@
 		200000000000000000000002 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				100000000000000000000050 /* BeyondIDAuth.swift */,
 				100000000000000000000045 /* AppLanguage.swift */,
 				100000000000000000000001 /* AcademyView.swift */,
 				100000000000000000000002 /* BibleView.swift */,
@@ -488,6 +491,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				300000000000000000000046 /* BeyondIDAuth.swift in Sources */,
 				300000000000000000000042 /* AppLanguage.swift in Sources */,
 				300000000000000000000001 /* AcademyView.swift in Sources */,
 				300000000000000000000002 /* BibleView.swift in Sources */,
@@ -683,7 +687,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -705,7 +709,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 2.0.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -750,7 +754,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 20;
+				CURRENT_PROJECT_VERSION = 21;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -766,7 +770,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 2.0.0;
+				MARKETING_VERSION = 2.0.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -28,6 +28,24 @@ function bos_feature_enabled(string $key, bool $fallback=true): bool {
 function bos_log(string $event, array $details=[]): void {
     try { $s=beyond_db()->prepare('INSERT INTO platform_events(user_id,event_name,details_json,created_at) VALUES(?,?,?,NOW())'); $s->execute([bos_current_user_id() ?: null,$event,json_encode($details)]); } catch(Throwable $e) {}
 }
+function bos_app_platforms(string $title, string $copy=''): array {
+    $haystack = strtolower($title.' '.$copy);
+    if (str_contains($haystack, 'chromium')) return ['Desktop'];
+    if (str_contains($haystack, 'coding school')) return ['Web','Apple','Google'];
+    if (str_contains($haystack, 'beyond french')) return ['Web','Apple'];
+    if (str_contains($haystack, 'beyond skate')) return ['Desktop','Apple','Google'];
+    if (str_contains($haystack, 'game') || str_contains($haystack, 'runner') || str_contains($haystack, 'kitchen')) return ['Web','Desktop','Apple','Google'];
+    return ['Web'];
+}
+function bos_app_status(string $title, string $status): string {
+    return preg_match('/game plan/i', $status.' '.$title) ? 'Coming soon' : 'Live';
+}
+function bos_app_metadata(string $title, string $copy, string $status, bool $locked=false): array {
+    $platforms = bos_app_platforms($title, $copy);
+    $state = $locked ? 'Coming soon' : bos_app_status($title, $status);
+    $chips = '<span class="bos-card-meta" aria-label="Availability"><b class="bos-card-status-chip '.($state==='Live'?'is-live':'').'">'.e($state).'</b><span class="bos-card-platforms">'.e(implode(' · ', $platforms)).'</span></span>';
+    return ['attributes'=>' data-platforms="'.e(implode('|', $platforms)).'" data-status="'.e(strtolower($state)).'"','markup'=>$chips];
+}
 function bos_app_card(string $title,string $copy,string $href,string $icon='✦',string $status='Open',?string $brandIcon=null): string {
     if ($brandIcon === '@blank') {
         $iconMarkup = '<span class="bos-card-icon bos-card-icon-blank" aria-hidden="true"></span>';
@@ -38,7 +56,8 @@ function bos_app_card(string $title,string $copy,string $href,string $icon='✦'
     } else {
         $iconMarkup = '<span class="bos-card-icon">'.e($icon).'</span>';
     }
-    return '<a class="bos-card" href="'.e(beyond_url($href)).'">'.$iconMarkup.'<div><strong>'.e($title).'</strong><p>'.e($copy).'</p></div><span class="bos-card-status">'.e($status).'</span></a>';
+    $metadata = bos_app_metadata($title, $copy, $status);
+    return '<a class="bos-card" href="'.e(beyond_url($href)).'"'.$metadata['attributes'].'>'.$iconMarkup.'<div><strong>'.e($title).'</strong><p>'.e($copy).'</p>'.$metadata['markup'].'</div><span class="bos-card-status">'.e($status).'</span></a>';
 }
 function bos_locked_app_card(string $title,string $copy,string $icon='✦',?string $brandIcon=null): string {
     if ($brandIcon === '@blank') {
@@ -50,5 +69,6 @@ function bos_locked_app_card(string $title,string $copy,string $icon='✦',?stri
     } else {
         $iconMarkup = '<span class="bos-card-icon">'.e($icon).'</span>';
     }
-    return '<div class="bos-card bos-card-locked" aria-disabled="true">'.$iconMarkup.'<div><strong>'.e($title).'</strong><p>'.e($copy).'</p></div><span class="bos-card-status">Coming soon</span></div>';
+    $metadata = bos_app_metadata($title, $copy, 'Coming soon', true);
+    return '<div class="bos-card bos-card-locked" aria-disabled="true"'.$metadata['attributes'].'>'.$iconMarkup.'<div><strong>'.e($title).'</strong><p>'.e($copy).'</p>'.$metadata['markup'].'</div><span class="bos-card-status">Coming soon</span></div>';
 }

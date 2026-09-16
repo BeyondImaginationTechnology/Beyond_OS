@@ -30,7 +30,7 @@ function bos_log(string $event, array $details=[]): void {
 }
 function bos_app_platforms(string $title, string $copy=''): array {
     $haystack = strtolower($title.' '.$copy);
-    if (str_contains($haystack, 'chromium')) return ['Desktop'];
+    if (str_contains($haystack, 'chromium') || str_contains($haystack, 'beyond ai') || str_contains($haystack, 'bit os')) return ['Desktop'];
     if (str_contains($haystack, 'coding school')) return ['Web','Apple','Google'];
     if (str_contains($haystack, 'beyond french')) return ['Web','Apple'];
     if (str_contains($haystack, 'beyond skate')) return ['Desktop','Apple','Google'];
@@ -46,6 +46,9 @@ function bos_app_metadata(string $title, string $copy, string $status, bool $loc
     $chips = '<span class="bos-card-meta" aria-label="Availability"><b class="bos-card-status-chip '.($state==='Live'?'is-live':'').'">'.e($state).'</b><span class="bos-card-platforms">'.e(implode(' · ', $platforms)).'</span></span>';
     return ['attributes'=>' data-platforms="'.e(implode('|', $platforms)).'" data-status="'.e(strtolower($state)).'"','markup'=>$chips];
 }
+function bos_app_href(string $href): string {
+    return preg_match('#^https?://#i', $href) ? $href : beyond_url($href);
+}
 function bos_app_card(string $title,string $copy,string $href,string $icon='✦',string $status='Open',?string $brandIcon=null): string {
     if ($brandIcon === '@blank') {
         $iconMarkup = '<span class="bos-card-icon bos-card-icon-blank" aria-hidden="true"></span>';
@@ -57,7 +60,7 @@ function bos_app_card(string $title,string $copy,string $href,string $icon='✦'
         $iconMarkup = '<span class="bos-card-icon">'.e($icon).'</span>';
     }
     $metadata = bos_app_metadata($title, $copy, $status);
-    return '<a class="bos-card" href="'.e(beyond_url($href)).'"'.$metadata['attributes'].'>'.$iconMarkup.'<div><strong>'.e($title).'</strong><p>'.e($copy).'</p>'.$metadata['markup'].'</div><span class="bos-card-status">'.e($status).'</span></a>';
+    return '<a class="bos-card" href="'.e(bos_app_href($href)).'"'.$metadata['attributes'].'>'.$iconMarkup.'<div><strong>'.e($title).'</strong><p>'.e($copy).'</p>'.$metadata['markup'].'</div><span class="bos-card-status">'.e($status).'</span></a>';
 }
 function bos_locked_app_card(string $title,string $copy,string $icon='✦',?string $brandIcon=null): string {
     if ($brandIcon === '@blank') {

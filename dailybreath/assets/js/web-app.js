@@ -1,5 +1,5 @@
 (()=>{
-  const settings={theme:'system',reduceMotion:false,...JSON.parse(localStorage.getItem('dailybreath.settings')||'{}')};
+  const settings={theme:'fall',reduceMotion:false,...JSON.parse(localStorage.getItem('dailybreath.settings')||'{}')};
   const requestedTheme=settings.theme||'system';
   const normalizedTheme=requestedTheme==='light'?'dawn':requestedTheme==='dark'?'dusk':requestedTheme==='lilac'?'dawn':requestedTheme;
   const resolvedTheme=normalizedTheme==='system'

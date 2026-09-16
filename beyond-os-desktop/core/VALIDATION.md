@@ -34,7 +34,13 @@ The release-host checksums matched the uploaded files. Treat these files as test
 - The source build is running from commit `6284764`; the latest observed stage is the initial GCC toolchain compilation. Installer images from this build have not yet been verified.
 - `tests/post-build-test.py` passed on the Linux host before this build; this does not demonstrate boot or installation success.
 - Downloading the previously published ISO returned HTTP 500 after retries. The links and checksums above are historical candidate evidence, not a current availability guarantee.
-- The local QEMU launcher now uses Buildroot's `rootfs.ext2` output filename. UEFI boot, both disposable-disk install modes, installed-system reboot, graphical session, network, input and shutdown remain pending.
+- The local QEMU launcher now uses Buildroot's `rootfs.ext2` output filename. UEFI ISO and USB menu/kernel handoff smoke checks are now recorded below; both disposable-disk install modes, installed-system reboot, graphical session, network, input and shutdown remain pending.
+
+### Google Cloud UEFI checkpoint (2026-09-14)
+
+- `bitCoreos.iso` was booted with OVMF and KVM. Firmware loaded the Core GRUB menu and selected `Try BIT OS Core Edition 1.0`; the smoke run was then stopped by its timeout (`124`). This verifies firmware/media discovery and the ISO boot menu, not the installed graphical session.
+- `bit-os-core-1.0-installer.img` initially stopped with `error: unknown filesystem` after its GRUB menu. The GRUB configuration was hardened to load GPT/FAT modules and use an explicit `(hd0,gpt1)/bzImage` path; after rebuilding, the USB image reached `Booting `Try BIT OS Core Edition 1.0'` and remained running until the 25-second smoke timeout (`124`). This verifies UEFI media discovery and kernel handoff, not the installed graphical session.
+- Selected-partition installation, whole-disk installation, reboot without media, graphical session, network, input and shutdown have not passed. Do not use this candidate as the tested base for Cyber or the later editions yet.
 
 Run the following on an x86-64 Linux build host and retain the resulting logs and hashes:
 

@@ -198,7 +198,7 @@ function beyond_nav_bootstrap(string $appName, ?array $wallet = null): array {
             if (!str_contains($html, 'beyond-theme-default.js')) {
                 $themeAssets = '<script src="' . e(beyond_url('assets/js/beyond-theme-default.js?v=20260901-1')) . '"></script>'
                     . '<script src="' . e(beyond_url('assets/js/beyond-locales.js?v=20260901-1')) . '" defer></script>'
-                    . '<link rel="stylesheet" href="' . e(beyond_url('assets/css/beyond-dark-default.css?v=20260828-2')) . '">';
+                    . '<link rel="stylesheet" href="' . e(beyond_url('assets/css/beyond-dark-default.css?v=20260916-1')) . '">';
                 $html = preg_replace('/<\/head>/i', $themeAssets . '</head>', $html, 1) ?? $html;
             }
             return preg_replace('/(<body[^>]*>)/i', '$1' . beyond_shell_markup($appName, $wallet), $html, 1) ?? $html;

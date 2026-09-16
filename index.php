@@ -221,7 +221,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 </section>
 <section class="jaguar-banner wrap" id="jaguar" aria-labelledby="jaguar-title">
     <div><span class="platform-kicker">Jaguar · Beyond-1 model lab</span><h2 id="jaguar-title">AI teaching with a distinctly Beyond voice.</h2><p>Jaguar is our in-development learning model: built to explain AI in plain language, use memorable analogies and help people turn vague prompts into useful work. Its training-data flywheel connects academy lessons and creator content to a growing product capability.</p></div>
-    <a class="ghost" href="/ai/">Explore Jaguar →</a>
+    <a class="ghost" href="https://ai.beyondimagination.co.technology/">Open Jaguar →</a>
 </section>
 <section class="platform-proof wrap" id="platform" aria-labelledby="platform-title">
     <div class="platform-head">

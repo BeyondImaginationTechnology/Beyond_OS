@@ -48,8 +48,8 @@ foreach($courses as $course){
   <nav class="ba-paths" aria-label="Choose a Bible learning path"><?php foreach($catalog as $slug=>[$name,$ages,$icon]):?><a class="<?=$slug===$selected?'active':''?>" href="?age=<?=e($slug)?>"><span><?=$icon?></span><div><strong><?=e($name)?></strong><small>Ages <?=e($ages)?></small></div></a><?php endforeach;?></nav>
   <p class="ba-audience-note"><strong>Audience:</strong> Bible Academy is intentionally designed for Teens and Adults. Adult wellness content remains separately age-gated and is not part of Academy lessons.</p>
   <section class="ba-membership">
-    <div><span class="ba-kicker"><?=$subscribed?'MEMBERSHIP ACTIVE':'START LEARNING'?></span><h2><?=$subscribed?'Every module is unlocked.':'Begin with Module 1.'?></h2><p><?=$subscribed?'Continue any teen or adult pathway and keep your saved progress.':'Start your selected pathway, then view membership options when you are ready for Modules 2–5.'?></p></div>
-    <?php if($subscribed):?><form method="post" action="academy-manage.php"><input type="hidden" name="csrf" value="<?=e(csrf_token())?>"><button class="ba-button secondary" type="submit">Manage membership</button></form><?php else:?><a class="ba-button secondary" href="academy-subscribe.php">View membership</a><?php endif;?>
+    <div><span class="ba-kicker"><?=$subscribed?'ACADEMY UNLOCKED':'START LEARNING'?></span><h2><?=$subscribed?'Every module is unlocked.':'Begin with Module 1.'?></h2><p><?=$subscribed?'Continue any teen or adult pathway and keep your saved progress.':'Start your selected pathway, then unlock every module with a one-time payment.'?></p></div>
+    <?php if(!$subscribed):?><a class="ba-button secondary" href="academy-subscribe.php">Unlock the Academy</a><?php endif;?>
   </section>
   <section class="ba-section-head"><div><span class="ba-kicker"><?=e(strtoupper($selectedName))?> PATHWAY</span><h2>Build understanding one module at a time.</h2></div><p>Every lesson includes three reflection and application practices before its check. Each module closes with one cumulative exam.</p></section>
   <section class="ba-modules">

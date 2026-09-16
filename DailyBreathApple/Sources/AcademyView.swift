@@ -1,7 +1,9 @@
 import SwiftUI
+import StoreKit
 
 struct AcademyView: View {
     @EnvironmentObject private var store: DailyBreathStore
+    @StateObject private var purchaseManager = AcademyPurchaseManager()
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
     @AppStorage("completedAcademyLessonIDs") private var completedLessonIDs = ""
     @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
@@ -42,15 +44,19 @@ struct AcademyView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 18) {
-                hero
-                traditionPicker
-                metricGrid
-                continueCard
-                ForEach(Array(selectedPaths.enumerated()), id: \.element.id) { index, path in
-                    AcademyModuleCard(pathNumber: index + 1, path: path, completedIDs: completedIDs, theme: selectedTheme)
+            if purchaseManager.hasAccess {
+                VStack(alignment: .leading, spacing: 18) {
+                    hero
+                    traditionPicker
+                    metricGrid
+                    continueCard
+                    ForEach(Array(selectedPaths.enumerated()), id: \.element.id) { index, path in
+                        AcademyModuleCard(pathNumber: index + 1, path: path, completedIDs: completedIDs, theme: selectedTheme)
+                    }
+                    certificationCard
                 }
-                certificationCard
+            } else {
+                purchasePaywall
             }
             .padding()
         }
@@ -58,6 +64,7 @@ struct AcademyView: View {
         .navigationTitle("Academy")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear(perform: refreshCertificate)
+        .task { await purchaseManager.load() }
         .onChange(of: completedLessonIDs) { _ in refreshCertificate() }
         .onChange(of: traditionID) { _, value in
             let tradition = FaithTradition(rawValue: value) ?? .bible
@@ -65,6 +72,37 @@ struct AcademyView: View {
             store.publishSelectedFaithContent()
             refreshCertificate()
         }
+    }
+
+    private var purchasePaywall: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Label("Daily Breath Academy", systemImage: "graduationcap.fill")
+                .font(.headline.weight(.black))
+                .foregroundStyle(selectedTheme.accent)
+            Text("Unlock the complete Academy.")
+                .font(.largeTitle.weight(.black))
+            Text("Get every teen and adult learning path, all modules, saved progress, and exams with one purchase.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+            if let product = purchaseManager.product {
+                Button("Unlock for \(product.displayPrice)") {
+                    Task { await purchaseManager.purchase() }
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(selectedTheme.academyEmphasis)
+            } else {
+                ProgressView("Loading purchase…")
+            }
+            Button("Restore purchase") {
+                Task { await purchaseManager.restore() }
+            }
+            .buttonStyle(.bordered)
+            if let message = purchaseManager.message {
+                Text(message).font(.footnote).foregroundStyle(.secondary)
+            }
+        }
+        .padding(22)
+        .background(.background.opacity(0.94), in: RoundedRectangle(cornerRadius: 16))
     }
 
     private var traditionPicker: some View {
@@ -205,6 +243,62 @@ struct AcademyView: View {
             UserDefaults.standard.set(issuedOn.timeIntervalSince1970, forKey: key)
             certificateDate = issuedOn
         }
+    }
+}
+
+@MainActor
+final class AcademyPurchaseManager: ObservableObject {
+    static let productID = "dailybreath.academy.full"
+    @Published private(set) var product: Product?
+    @Published private(set) var hasAccess = UserDefaults.standard.bool(forKey: "dailyBreathAcademyPurchased")
+    @Published private(set) var message: String?
+    private var updatesTask: Task<Void, Never>?
+
+    init() {
+        updatesTask = Task { [weak self] in
+            for await result in Transaction.updates {
+                guard let self else { return }
+                await self.apply(result)
+            }
+        }
+    }
+
+    deinit { updatesTask?.cancel() }
+
+    func load() async {
+        product = try? await Product.products(for: [Self.productID]).first
+        await refreshEntitlement()
+    }
+
+    func purchase() async {
+        guard let product else { return }
+        do {
+            let result = try await product.purchase()
+            switch result {
+            case .success(let verification): await apply(verification)
+            case .userCancelled: message = "Purchase cancelled."
+            case .pending: message = "Purchase is pending approval."
+            @unknown default: message = "Purchase could not be completed."
+            }
+        } catch { message = "Purchase could not be completed." }
+    }
+
+    func restore() async {
+        do { try await AppStore.sync(); await refreshEntitlement(); message = hasAccess ? "Purchase restored." : "No Academy purchase found." }
+        catch { message = "Restore could not be completed." }
+    }
+
+    private func refreshEntitlement() async {
+        for await result in Transaction.currentEntitlements { await apply(result) }
+    }
+
+    private func apply(_ result: VerificationResult<Transaction>) async {
+        guard case .verified(let transaction) = result,
+              transaction.productID == Self.productID,
+              transaction.revocationDate == nil else { return }
+        hasAccess = true
+        UserDefaults.standard.set(true, forKey: "dailyBreathAcademyPurchased")
+        await transaction.finish()
     }
 }
 

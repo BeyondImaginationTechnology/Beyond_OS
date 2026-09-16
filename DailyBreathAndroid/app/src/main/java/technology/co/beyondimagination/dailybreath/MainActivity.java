@@ -22,6 +22,14 @@ import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingFlowParams;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.ProductDetails;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.QueryProductDetailsParams;
+import com.android.billingclient.api.QueryPurchasesParams;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
@@ -45,6 +53,7 @@ import java.util.Set;
 public final class MainActivity extends Activity {
     private static final int INK = Color.rgb(23, 63, 44), FOREST = Color.rgb(45, 105, 75), SAGE = Color.rgb(226, 238, 229), CREAM = Color.rgb(255, 252, 248), FOREST_DARK = Color.rgb(7, 39, 25), GOLD = Color.rgb(205, 173, 116);
     private static final String[] TABS = {"Today", "Scripture", "Academy", "Breathe", "Journal"};
+    private static final String ACADEMY_PRODUCT_ID = "dailybreath.academy.full";
     private static final Set<String> TANAKH_CODES = new HashSet<>(Arrays.asList("GEN","EXO","LEV","NUM","DEU","JOS","JDG","RUT","1SA","2SA","1KI","2KI","1CH","2CH","EZR","NEH","EST","JOB","PSA","PRO","ECC","SOL","ISA","JER","LAM","EZE","DAN","HOS","JOE","AMO","OBA","JON","MIC","NAH","HAB","ZEP","HAG","ZEC","MAL"));
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final List<DailyVerse> dailyVerses = new ArrayList<>();
@@ -58,6 +67,9 @@ public final class MainActivity extends Activity {
     private TextView timerView, phaseView, weekView;
     private Button breathButton;
     private Faith faith;
+    private BillingClient billingClient;
+    private ProductDetails academyProduct;
+    private boolean academyUnlocked;
 
     private enum Faith {
         BIBLE("Bible", "Bible Verse", "verse"), TANAKH("Tanakh", "Tanakh Passage", "passage"), QURAN("Quran", "Quran Ayah", "ayah");
@@ -68,6 +80,8 @@ public final class MainActivity extends Activity {
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         prefs = getSharedPreferences("daily_breath", MODE_PRIVATE);
+        academyUnlocked = prefs.getBoolean("academy_purchased", false);
+        initBilling();
         applyStoredLanguage();
         faith = readFaith();
         loadDailyVerses(); loadLibraries(); buildLayout(); openIntent(getIntent());
@@ -115,9 +129,40 @@ public final class MainActivity extends Activity {
     }
     private void showAcademy() {
         title("ACADEMY","Learn one faithful step"); addFaithPicker();
+        if (!academyUnlocked) { showAcademyPaywall(); return; }
         if(faith==Faith.TANAKH){addLesson("Learning with care","A Jewish pathway for reflection and practice.","Begin with Shema: listen before reacting. Jewish life is lived in community; a rabbi and a welcoming congregation are the right guides for deeper study or conversion.");addLesson("Teshuvah and return","Recovery can include honest repair.","Teshuvah is a movement of return. Name what happened truthfully, repair what you safely can, and reconnect with trusted support.");}
         else if(faith==Faith.QURAN){addLesson("Intention and guidance","A Muslim pathway for reflection and practice.","Begin with sincere intention, remember Allah, and seek guidance through steady, practical action and trusted community.");addLesson("Mercy and patience","A recovery practice grounded in sabr.","Pause before reacting, ask Allah for help, and take the next right step with a trusted person or professional support when needed.");}
         else{addLesson("Joining the Faith","A gentle starter journey.","Stillness is not a delay. Pause, listen, and let one faithful action follow.");addLesson("Recovery","Practical, compassionate tools.","Name one safe person to contact and one immediate pathway away from harm.");}
+    }
+    private void showAcademyPaywall() {
+        addBody("Unlock every Daily Breath Academy module with one purchase.");
+        Button buy=action("Unlock Academy · CA$4.99"); buy.setOnClickListener(v->launchAcademyPurchase()); page.addView(buy,spaced());
+        Button restore=action("Restore purchase"); restore.setOnClickListener(v->{queryAcademyPurchases(); showTab(2);}); page.addView(restore,spaced());
+        addBody("Purchases are processed securely by Google Play.");
+    }
+    private void initBilling() {
+        billingClient=BillingClient.newBuilder(this).setListener((result,purchases)->handlePurchases(result,purchases)).enablePendingPurchases().build();
+        billingClient.startConnection(new BillingClientStateListener() {
+            @Override public void onBillingSetupFinished(BillingResult result) { if(result.getResponseCode()==BillingClient.BillingResponseCode.OK) { queryAcademyProduct(); queryAcademyPurchases(); } }
+            @Override public void onBillingServiceDisconnected() { }
+        });
+    }
+    private void queryAcademyProduct() {
+        QueryProductDetailsParams params=QueryProductDetailsParams.newBuilder().setProductList(java.util.Collections.singletonList(QueryProductDetailsParams.Product.newBuilder().setProductId(ACADEMY_PRODUCT_ID).setProductType(BillingClient.ProductType.INAPP).build())).build();
+        billingClient.queryProductDetailsAsync(params,(result,details)->{if(result.getResponseCode()==BillingClient.BillingResponseCode.OK&&!details.isEmpty())academyProduct=details.get(0);});
+    }
+    private void queryAcademyPurchases() {
+        if(billingClient==null||!billingClient.isReady())return;
+        billingClient.queryPurchasesAsync(QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(),this::handlePurchases);
+    }
+    private void handlePurchases(BillingResult result,List<Purchase> purchases) {
+        if(result.getResponseCode()!=BillingClient.BillingResponseCode.OK||purchases==null)return;
+        for(Purchase purchase:purchases)if(purchase.getPurchaseState()==Purchase.PurchaseState.PURCHASED&&purchase.getProducts().contains(ACADEMY_PRODUCT_ID)){academyUnlocked=true;prefs.edit().putBoolean("academy_purchased",true).apply();if(!purchase.isAcknowledged())billingClient.acknowledgePurchase(com.android.billingclient.api.AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.getPurchaseToken()).build(),acknowledged->{});}
+    }
+    private void launchAcademyPurchase() {
+        if(billingClient==null||!billingClient.isReady()||academyProduct==null){Toast.makeText(this,"Google Play purchase is not ready yet.",Toast.LENGTH_LONG).show();return;}
+        BillingFlowParams.ProductDetailsParams product=BillingFlowParams.ProductDetailsParams.newBuilder().setProductDetails(academyProduct).build();
+        billingClient.launchBillingFlow(this,BillingFlowParams.newBuilder().setProductDetailsParamsList(java.util.Collections.singletonList(product)).build());
     }
     private void addLesson(String heading,String summary,String lesson){LinearLayout item=card(Color.WHITE);item.addView(label(heading,20,INK,true));item.addView(label(summary,14,Color.DKGRAY,false));Button open=action("Open lesson");open.setOnClickListener(v->showDetail(heading,lesson));item.addView(open);page.addView(item,spaced());}
 

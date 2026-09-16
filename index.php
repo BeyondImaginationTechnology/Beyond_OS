@@ -58,7 +58,7 @@ if (is_file($frenchLessonsPath)) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['fall','dark','light','sunset','ocean','forest'].includes(t)?t:'fall';}catch(e){document.documentElement.dataset.theme='fall';}try{const c=localStorage.getItem('beyond-currency');document.documentElement.dataset.currency=['USD','CAD','BITS'].includes(c)?c:'CAD';}catch(e){document.documentElement.dataset.currency='CAD';}})();</script>
+<script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['fall','dark','light','sunset','ocean','forest'].includes(t)?t:'fall';}catch(e){document.documentElement.dataset.theme='fall';}try{const c=localStorage.getItem('beyond-currency');document.documentElement.dataset.currency=['BITS','USD','CAD'].includes(c)?c:'BITS';}catch(e){document.documentElement.dataset.currency='BITS';}})();</script>
 <meta name="theme-color" content="#24140d">
 <title>Beyond Imagination Technology | Live. Learn. Earn. Explore.</title>
 <meta name="description" content="Beyond Imagination Technology connects health, education, creator commerce and entertainment through Beyond ID, with BIT OS environments in development.">
@@ -126,7 +126,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
     <a class="brand" href="./"><b class="brand-atom" aria-hidden="true"><img src="/assets/images/bos-logo-mark.svg?v=20260828-1" alt=""></b>BEYOND <span>IMAGINATION</span><small>TECHNOLOGY · BIT</small></a>
     <nav class="nav" aria-label="Primary navigation">
           <a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="/beyond-market/">Marketplace</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a><a href="/ai/">AI</a><a href="https://os.beyondimagination.co.technology/">OS</a>
-          <label class="currency-picker"><span aria-hidden="true">$</span><span class="visually-hidden">Display currency</span><select id="homeCurrency" aria-label="Display currency"><option value="USD">USD</option><option value="CAD">CAD</option><option value="BITS">bit$</option></select></label>
+          <label class="currency-picker"><span aria-hidden="true">BIT$</span><span class="visually-hidden">Display currency</span><select id="homeCurrency" aria-label="Display currency"><option value="BITS">BIT$</option><option value="USD">USD</option><option value="CAD">CAD</option></select></label>
           <a class="primary" href="/app-store/">App Store</a>
     </nav>
     <button class="menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="mobileNavigation" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
@@ -136,7 +136,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
     <div class="mobile-drawer-head"><strong>BEYOND IMAGINATION</strong><button class="drawer-close" type="button" aria-label="Close navigation menu">×</button></div>
     <nav aria-label="Primary navigation"><a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="/beyond-market/">Marketplace</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a><a href="/ai/">AI</a><a href="https://os.beyondimagination.co.technology/">OS</a></nav>
     <a class="primary" href="/app-store/">Open App Store</a>
-    <label class="mobile-currency">Display currency <span class="currency-picker"><span aria-hidden="true">$</span><select id="mobileCurrency" aria-label="Display currency"><option value="USD">USD</option><option value="CAD">CAD</option><option value="BITS">bit$</option></select></span></label>
+    <label class="mobile-currency">Display currency <span class="currency-picker"><span aria-hidden="true">BIT$</span><select id="mobileCurrency" aria-label="Display currency"><option value="BITS">BIT$</option><option value="USD">USD</option><option value="CAD">CAD</option></select></span></label>
 </aside>
 <main>
 <section class="hero wrap">
@@ -159,8 +159,14 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
                 <radialGradient id="gatewaySurface" cx="38%" cy="30%" r="76%">
                     <stop offset="0" stop-color="#342466"/><stop offset=".58" stop-color="#0b0b1d"/><stop offset="1" stop-color="#050713"/>
                 </radialGradient>
+                <radialGradient id="gatewaySurfaceFall" cx="38%" cy="30%" r="76%">
+                    <stop offset="0" stop-color="#8f4926"/><stop offset=".58" stop-color="#351b13"/><stop offset="1" stop-color="#160d09"/>
+                </radialGradient>
                 <linearGradient id="atomStroke" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0" stop-color="#4f8cff"/><stop offset=".5" stop-color="#8d58ff"/><stop offset="1" stop-color="#4ee097"/>
+                </linearGradient>
+                <linearGradient id="atomStrokeFall" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#ffd166"/><stop offset=".52" stop-color="#e97824"/><stop offset="1" stop-color="#b94e35"/>
                 </linearGradient>
                 <filter id="gatewayGlow" x="-80%" y="-80%" width="260%" height="260%">
                     <feGaussianBlur stdDeviation="13" result="blur"/><feFlood flood-color="#7657ff" flood-opacity=".78"/><feComposite in2="blur" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
@@ -468,7 +474,7 @@ window.addEventListener('DOMContentLoaded',()=>{
  const root=document.documentElement;
 
  function applyCurrency(value,announce=false){
-   const currency=supported.includes(value)?value:'CAD';
+   const currency=supported.includes(value)?value:'BITS';
    root.dataset.currency=currency;
    pickers.forEach(picker=>{picker.value=currency;});
    try{localStorage.setItem('beyond-currency',currency);}catch(error){}
@@ -481,7 +487,7 @@ window.addEventListener('DOMContentLoaded',()=>{
    if(announce)window.dispatchEvent(new CustomEvent('beyond:currencychange',{detail:window.BeyondCurrency}));
  }
 
- applyCurrency(root.dataset.currency||'CAD');
+ applyCurrency(root.dataset.currency||'BITS');
  pickers.forEach(picker=>picker.addEventListener('change',()=>applyCurrency(picker.value,true)));
 })();
 (function(){

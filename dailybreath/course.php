@@ -4,8 +4,8 @@ require_once __DIR__.'/../includes/ecosystem.php';
 $wallet=beyond_app_bootstrap('DailyBreath');
 $pdo=beyond_db();
 $userId=(int)($_SESSION['user_id']??0);
-$slug=preg_replace('/[^a-z0-9-]/','',strtolower((string)($_GET['course']??$_POST['course']??'teen-module-1')));
-if(!preg_match('/^(?:teen|adult)-module-[1-5]$/',$slug)){http_response_code(404);exit('Course not found.');}
+$slug=preg_replace('/[^a-z0-9-]/','',strtolower((string)($_GET['course']??$_POST['course']??'bible-module-1')));
+if(!preg_match('/^(?:bible|tanakh|quran)-module-[1-5]$/',$slug)){http_response_code(404);exit('Course not found.');}
 $lessonNo=max(1,(int)($_GET['lesson']??$_POST['lesson']??1));
 $s=$pdo->prepare('SELECT * FROM academy_courses WHERE slug=? AND is_published=1 LIMIT 1');$s->execute([$slug]);$course=$s->fetch(PDO::FETCH_ASSOC);
 if(!$course){http_response_code(404);exit('Course not found.');}
@@ -18,48 +18,23 @@ if($currentIndex>0){
   $previous=$lessons[$currentIndex-1];$gate=$pdo->prepare('SELECT 1 FROM academy_quiz_attempts WHERE user_id=? AND lesson_id=? AND passed=1 LIMIT 1');$gate->execute([$userId,$previous['id']]);
   if(!$gate->fetchColumn()){header('Location: course.php?course='.rawurlencode($slug).'&lesson='.(int)$previous['lesson_number'].'&locked=1');exit;}
 }
-$commandments=[
-  1=>['You shall have no other gods before Me.','Exodus 20:3','loyalty to God','Put God first in your choices.'],
-  2=>['You shall not make or worship idols.','Exodus 20:4–6','true worship','Do not let possessions, success, or people take God’s place.'],
-  3=>['You shall not misuse the name of the Lord.','Exodus 20:7','reverence','Use God’s name with honor in speech and conduct.'],
-  4=>['Remember the Sabbath day and keep it holy.','Exodus 20:8–11','worship and rest','Make regular time for worship, gratitude, and restorative rest.'],
-  5=>['Honor your father and your mother.','Exodus 20:12','honor','Treat parents and caregivers with respect, truth, and appropriate care.'],
-  6=>['You shall not murder.','Exodus 20:13','the value of life','Protect life and reject hatred, cruelty, and violence.'],
-  7=>['You shall not commit adultery.','Exodus 20:14','faithfulness','Keep promises and practice loyalty, purity, and respect.'],
-  8=>['You shall not steal.','Exodus 20:15','honesty','Respect what belongs to others and give fairly.'],
-  9=>['You shall not bear false witness.','Exodus 20:16','truth','Tell the truth and protect others from lies and harmful rumors.'],
- 10=>['You shall not covet.','Exodus 20:17','contentment','Practice gratitude instead of resenting what someone else has.'],
-];
-function quiz_options(string $correct,array $wrong,int $slot): array {$options=array_slice($wrong,0,3);array_splice($options,$slot%4,0,[$correct]);return [$options,$slot%4];}
-function commandment_quiz(int $lessonNo,array $commandments): array {
-  if($lessonNo===12){$quiz=[];$all=array_column($commandments,0);foreach($commandments as $number=>$fact){$wrong=[];foreach($all as $candidate)if($candidate!==$fact[0])$wrong[]=$candidate;$cut=($number*2)%max(1,count($wrong));$rotated=array_merge(array_slice($wrong,$cut),array_slice($wrong,0,$cut));[$options,$answer]=quiz_options($fact[0],$rotated,$number);$quiz[]=["Which is Commandment $number?",$options,$answer];}return $quiz;}
-  if($lessonNo===11){return [
-    ['What summarizes the first four commandments?',['Love God with your whole life','Seek possessions first','Avoid all relationships','Win every argument'],0],
-    ['What summarizes commandments five through ten?',['Love your neighbor as yourself','Ignore your community','Pursue recognition','Never accept help'],0],
-    ['Which commandment teaches loyalty to God?',[$commandments[1][0],$commandments[5][0],$commandments[8][0],$commandments[10][0]],0],
-    ['Which commandment protects worship and rest?',[$commandments[4][0],$commandments[2][0],$commandments[7][0],$commandments[9][0]],0],
-    ['Which commandment teaches reverence for God’s name?',[$commandments[3][0],$commandments[6][0],$commandments[8][0],$commandments[10][0]],0],
-    ['What should love for God shape?',['The whole life','Only one hour a week','Only private thoughts','Only religious vocabulary'],0],
-    ['How is love for God made visible?',['Through worship and faithful choices','Through status','Through comparison','Through fear'],0],
-    ['What is the correct response to God’s guidance?',['Trust and obedience','Indifference','Pride','Resentment'],0],
-    ['Why memorize the commandments?',['To carry God’s guidance into daily decisions','To impress others','To avoid application','To replace prayer'],0],
-    ['What comes after this review lesson?',['The final Ten Commandments mastery lesson','The course restarts','All progress is erased','No further learning'],0],
-  ];}
-  $n=max(1,min(10,$lessonNo));$fact=$commandments[$n];$other=array_values(array_filter($commandments,fn($v,$k)=>$k!==$n,ARRAY_FILTER_USE_BOTH));
+$tradition=explode('-',$slug)[0];$textName=['bible'=>'Bible','tanakh'=>'Tanakh','quran'=>'Quran'][$tradition]??'sacred text';
+function sacred_text_quiz(string $textName,string $moduleTitle,int $lessonNo): array {
+  $topic=$moduleTitle.' · Lesson '.$lessonNo;
   return [
-    ["Which statement is Commandment $n?",[$fact[0],$other[0][0],$other[1][0],$other[2][0]],0],
-    ['Where is this commandment recorded?',[$fact[1],'Psalm 23:1','Matthew 5:9','Genesis 1:1'],0],
-    ['Which value does this commandment especially teach?',[$fact[2],'self-promotion','competition','avoidance'],0],
-    ['Which action best applies this commandment?',[$fact[3],'Ignore its meaning','Use it to judge others','Practice the opposite'],0],
-    ['Who gave the commandments to guide His people?',['God','Pharaoh','Caesar','Goliath'],0],
-    ['The Ten Commandments are found primarily in which chapter?',['Exodus 20','Psalm 20','Matthew 20','Acts 20'],0],
-    ['How should this commandment be learned?',['Understand it, remember it, and practice it','Repeat words without meaning','Apply it only to others','Forget it after the test'],0],
-    ['What should follow reflection?',['One faithful action','No response','Comparison with others','Skipping ahead'],0],
-    ['What should prayer request?',['Wisdom and courage to obey','Public recognition','Freedom from responsibility','Material success'],0],
-    ["What number is “{$fact[0]}”?",["Commandment $n",'Not one of the commandments','Only a proverb','Only a course suggestion'],0],
+    ["What is the focus of $topic?",[$topic,'A random topic','A score only','A private setting'],0],
+    ["Which source should guide this lesson?",[$textName,'A rumor','A ranking','A sales page'],0],
+    ['What is the best way to approach sacred reading?',['Read slowly and thoughtfully','Rush to finish','Skip reflection','Memorize without understanding'],0],
+    ['What should a learner look for in the text?',['Wisdom, themes, and meaning','Only difficult words','A single correct feeling','A competition'],0],
+    ['What makes reflection useful?',['Connecting insight to life','Avoiding questions','Comparing learners','Repeating a slogan'],0],
+    ['What should follow understanding?',['A thoughtful and compassionate action','Judgment of others','Immediate certainty','No response'],0],
+    ['How can questions support learning?',['With humility and curiosity','By ending the conversation','By mocking others','By skipping the text'],0],
+    ['What belongs in a respectful sacred-text study?',['Careful reading and respect','Pressure and ridicule','Personal attacks','Rushing'],0],
+    ['What does this Academy path welcome?',['Learners of every age','Only one age group','Only experts','Only teachers'],0],
+    ['What is the goal of this lesson?',['Grow in understanding and practice','Win an argument','Finish without reading','Replace personal reflection'],0],
   ];
 }
-$quiz=commandment_quiz((int)$current['lesson_number'],$commandments);
+$quiz=sacred_text_quiz($textName,(string)$current['title'],(int)$current['lesson_number']);
 $message='';$score=null;$passed=false;$reward=null;
 $driver=$pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 if($driver==='sqlite'){
@@ -95,7 +70,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'&&($_POST['action']??'')==='quiz'){
   }
 }
 $check=$pdo->prepare('SELECT MAX(score) best_score,MAX(passed) passed FROM academy_quiz_attempts WHERE user_id=? AND lesson_id=?');$check->execute([$userId,$current['id']]);$quizStatus=$check->fetch(PDO::FETCH_ASSOC)?:[];$currentPassed=!empty($quizStatus['passed']);
-$body=trim((string)($current['transcript']??''));if($body==='')$body="God’s commands are loving guidance for a life shaped by worship, truth, compassion, and wisdom.\n\nRead Exodus 20:1–17 slowly. What invitation do you hear in this lesson?\n\nPractice one small action today that honors God and your neighbor.";
+$body=trim((string)($current['transcript']??''));if($body==='')$body="This all-ages $textName lesson invites careful reading, honest reflection, and a practical response.\n\nRead the selected passage slowly. Notice one word, image, or teaching that stays with you, and consider what it might mean in daily life.\n\nPractice one small action today that reflects wisdom, compassion, truth, or gratitude.";
 $next=$lessons[$currentIndex+1]??null;$previous=$lessons[$currentIndex-1]??null;
 ?>
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=e($course['title'])?> | Bible Academy</title><link rel="stylesheet" href="/dailybreath/academy.css?v=20260730-1"></head><body class="ba-course-page"><main class="shell"><header class="top"><strong>DailyBreath · Bible Academy</strong><a href="academy.php">← All courses</a></header>

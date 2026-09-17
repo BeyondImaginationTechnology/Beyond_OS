@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
 
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+
 require_once __DIR__ . '/includes/bootstrap.php';
 require_once __DIR__ . '/includes/modes.php';
 $signedIn = !empty($_SESSION['user_id']);
@@ -50,6 +53,8 @@ $jaguarModes = jaguar_mode_catalog();
     const form = document.getElementById('composer');
     const input = document.getElementById('prompt');
     const send = document.getElementById('send');
+    let retryTimer = null;
+    let retryUntil = 0;
     const messages = document.getElementById('messages');
     const jumpOldest = document.getElementById('jumpOldest');
     const jumpNewest = document.getElementById('jumpNewest');
@@ -194,6 +199,23 @@ $jaguarModes = jaguar_mode_catalog();
                 window.location.reload();
                 return;
             }
+            if (!response.ok && response.status === 429) {
+                const retryAfter = Math.max(1, Number(response.headers.get('Retry-After') || 10));
+                retryUntil = Date.now() + retryAfter * 1000;
+                thinking.textContent = `${data.error || 'Jaguar is resting for a moment.'}\nTry again in ${retryAfter}s.`;
+                window.clearInterval(retryTimer);
+                retryTimer = window.setInterval(() => {
+                    const remaining = Math.max(0, Math.ceil((retryUntil - Date.now()) / 1000));
+                    if (!remaining) {
+                        window.clearInterval(retryTimer);
+                        retryTimer = null;
+                        send.disabled = false;
+                        return;
+                    }
+                    thinking.textContent = `${data.error || 'Jaguar is resting for a moment.'}\nTry again in ${remaining}s.`;
+                }, 1000);
+                return;
+            }
             if (!response.ok) throw new Error(data.error || 'Jaguar is unavailable.');
             thinking.textContent = data.message;
             history.push({role: 'assistant', content: data.message});
@@ -204,7 +226,7 @@ $jaguarModes = jaguar_mode_catalog();
         } finally {
             window.clearTimeout(timeout);
             window.clearInterval(thinkingTimer);
-            send.disabled = false;
+            if (!retryTimer) send.disabled = false;
             input.focus();
         }
     }

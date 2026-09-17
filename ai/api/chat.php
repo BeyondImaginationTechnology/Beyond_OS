@@ -119,6 +119,11 @@ if ($authorization !== '') {
     http_response_code(403); echo json_encode(['error' => 'Your secure session expired. Refresh Jaguar and try again.']); exit;
 }
 $signedIn = $mobileClaims !== null || !empty($_SESSION['user_id']);
+if (!$signedIn && jaguar_nonce_secret() === '') {
+    http_response_code(503);
+    echo json_encode(['error' => 'Guest chat is temporarily unavailable. Sign in with Beyond ID to continue.']);
+    exit;
+}
 $payload = json_decode((string) file_get_contents('php://input'), true);
 if (!is_array($payload)) { http_response_code(400); echo json_encode(['error' => 'Invalid request.']); exit; }
 try {
@@ -145,7 +150,8 @@ foreach ($messages as $message) {
     if (!is_array($message) || !in_array($message['role'] ?? '', ['user', 'assistant'], true) || !is_string($message['content'] ?? null) || trim($message['content']) === '' || mb_strlen($message['content']) > 8000) { http_response_code(422); echo json_encode(['error' => 'Invalid chat message.']); exit; }
 }
 $lastMessage = $messages[array_key_last($messages)];
-$simplePrompt = mb_strtolower(trim((string) $lastMessage['content']));
+$originalPrompt = trim((string) $lastMessage['content']);
+$simplePrompt = mb_strtolower($originalPrompt);
 $guide = is_string($payload['guide'] ?? null) ? strtolower(trim($payload['guide'])) : '';
 $guideProfiles = [
     'chris' => 'You are Chris, a warm Christian Bible study guide. Answer Bible questions respectfully, distinguish quoted text from interpretation, and avoid presenting theology as settled fact when traditions differ.',
@@ -155,7 +161,9 @@ $guideProfiles = [
 if (isset($guideProfiles[$guide])) {
     $messages[array_key_last($messages)]['content'] = $guideProfiles[$guide] . "\n\nUser question:\n" . (string)$lastMessage['content'];
     $lastMessage = $messages[array_key_last($messages)];
-    $simplePrompt = mb_strtolower(trim((string)$lastMessage['content']));
+    // Keep utility and greeting detection based on the user's actual text;
+    // the guide profile is only context for the model-backed response.
+    $simplePrompt = mb_strtolower($originalPrompt);
 }
 
 // This is a deliberately conservative first safety gate. It runs on the server

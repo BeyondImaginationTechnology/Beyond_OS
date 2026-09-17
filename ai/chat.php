@@ -168,6 +168,10 @@ $jaguarModes = jaguar_mode_catalog();
 
     async function sendMessage(text) {
         if (!text || send.disabled) return;
+        if (!signedIn && !jaguarNonceSignature) {
+            addMessage('assistant', 'Guest chat is temporarily unavailable because the security service is not configured. Sign in with Beyond ID to continue.');
+            return;
+        }
         history.push({role: 'user', content: text});
         addMessage('user', text);
         input.value = '';

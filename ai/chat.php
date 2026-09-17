@@ -189,6 +189,11 @@ $jaguarModes = jaguar_mode_catalog();
             });
             updateNonceFromResponse(response);
             const data = await response.json();
+            if (!response.ok && response.status === 403 && /secure session|security check/i.test(data.error || '')) {
+                sessionStorage.setItem('jaguar_draft', text);
+                window.location.reload();
+                return;
+            }
             if (!response.ok) throw new Error(data.error || 'Jaguar is unavailable.');
             thinking.textContent = data.message;
             history.push({role: 'assistant', content: data.message});
@@ -252,6 +257,8 @@ $jaguarModes = jaguar_mode_catalog();
         languageGate.hidden = true;
     }
     renderWelcome();
+    const restoredDraft = sessionStorage.getItem('jaguar_draft');
+    if (restoredDraft) { input.value = restoredDraft; sessionStorage.removeItem('jaguar_draft'); input.focus(); }
 })();
 </script></body></html>
 

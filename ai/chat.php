@@ -281,6 +281,8 @@ $jaguarModes = jaguar_mode_catalog();
         languageGate.hidden = true;
     }
     renderWelcome();
+    const urlPrompt = new URLSearchParams(window.location.search).get('prompt');
+    if (urlPrompt) { input.value = urlPrompt.slice(0, 8000); input.focus(); }
     const restoredDraft = sessionStorage.getItem('jaguar_draft');
     if (restoredDraft) { input.value = restoredDraft; sessionStorage.removeItem('jaguar_draft'); input.focus(); }
 })();

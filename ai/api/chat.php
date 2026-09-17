@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/modes.php';
+require_once __DIR__ . '/../../beyond-id/includes/mobile-auth.php';
 
 function jaguar_nonce_secret(): string
 {
@@ -100,8 +101,24 @@ function jaguar_weather_label(int $code, string $language): string
 }
 header('Content-Type: application/json; charset=utf-8');
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); echo json_encode(['error' => 'Method not allowed']); exit; }
-if (!verify_csrf_token($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null)) { http_response_code(403); echo json_encode(['error' => 'Your secure session expired. Refresh Jaguar and try again.']); exit; }
-$signedIn = !empty($_SESSION['user_id']);
+$mobileClaims = null;
+$authorization = beyond_mobile_authorization_header();
+if ($authorization !== '') {
+    try {
+        $token = beyond_mobile_bearer_token();
+        $mobileClaims = beyond_mobile_verify_token($token, 'daily-breath-ios', beyond_db());
+        beyond_mobile_require_scope($mobileClaims, 'profile:read');
+        $_SESSION['user_id'] = (int)$mobileClaims['user_id'];
+    } catch (Throwable $exception) {
+        http_response_code(401);
+        header('WWW-Authenticate: Bearer realm="Jaguar", error="invalid_token"');
+        echo json_encode(['error' => 'DailyBreath sign-in is invalid or expired.']);
+        exit;
+    }
+} elseif (!verify_csrf_token($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null)) {
+    http_response_code(403); echo json_encode(['error' => 'Your secure session expired. Refresh Jaguar and try again.']); exit;
+}
+$signedIn = $mobileClaims !== null || !empty($_SESSION['user_id']);
 $payload = json_decode((string) file_get_contents('php://input'), true);
 if (!is_array($payload)) { http_response_code(400); echo json_encode(['error' => 'Invalid request.']); exit; }
 try {
@@ -129,6 +146,17 @@ foreach ($messages as $message) {
 }
 $lastMessage = $messages[array_key_last($messages)];
 $simplePrompt = mb_strtolower(trim((string) $lastMessage['content']));
+$guide = is_string($payload['guide'] ?? null) ? strtolower(trim($payload['guide'])) : '';
+$guideProfiles = [
+    'chris' => 'You are Chris, a warm Christian Bible study guide. Answer Bible questions respectfully, distinguish quoted text from interpretation, and avoid presenting theology as settled fact when traditions differ.',
+    'dovi' => 'You are Dovi, a thoughtful Tanakh study guide. Answer Jewish scripture questions respectfully, note when interpretations vary, and avoid claiming to speak for every Jewish tradition.',
+    'moe' => 'You are Moe, a thoughtful Quran study guide. Answer Quran questions respectfully, distinguish translation from interpretation, and acknowledge differences among Islamic traditions.',
+];
+if (isset($guideProfiles[$guide])) {
+    $messages[array_key_last($messages)]['content'] = $guideProfiles[$guide] . "\n\nUser question:\n" . (string)$lastMessage['content'];
+    $lastMessage = $messages[array_key_last($messages)];
+    $simplePrompt = mb_strtolower(trim((string)$lastMessage['content']));
+}
 
 // This is a deliberately conservative first safety gate. It runs on the server
 // before fast-lane handling and before the GPU runtime is contacted, so clients

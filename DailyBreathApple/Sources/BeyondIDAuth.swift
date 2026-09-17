@@ -10,6 +10,10 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
     @Published private(set) var isSignedIn: Bool
     @Published private(set) var message: String?
 
+    var accessToken: String? {
+        KeychainTokenStore.read(service: "DailyBreath", account: tokenKey)
+    }
+
     private var session: ASWebAuthenticationSession?
     private var verifier = ""
     private let tokenKey = "dailybreath.beyondid.access-token"

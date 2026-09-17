@@ -58,9 +58,9 @@ struct ScriptureLibraryView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                 HStack(spacing: 10) {
-                    scriptureGuideLink("Chris", tradition: "bible", prompt: "Ask Chris a question about the Bible.", symbol: "book.closed.fill")
-                    scriptureGuideLink("Dovi", tradition: "torah", prompt: "Ask Dovi a respectful question about the Tanakh.", symbol: "text.book.closed.fill")
-                    scriptureGuideLink("Moe", tradition: "quran", prompt: "Ask Moe a respectful question about the Quran.", symbol: "moon.stars.fill")
+                    scriptureGuideLink(.chris)
+                    scriptureGuideLink(.dovi)
+                    scriptureGuideLink(.moe)
                 }
             }
 
@@ -137,17 +137,15 @@ struct ScriptureLibraryView: View {
         .background(DailyBreathThemeBackground(theme: theme))
     }
 
-    private func scriptureGuideLink(_ name: String, tradition: String, prompt: String, symbol: String) -> some View {
-        let query = prompt.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        let url = URL(string: "https://ai.beyondimagination.co.technology/chat.php?guide=\(tradition)&prompt=\(query)")!
-        return Link(destination: url) {
-            Label(name, systemImage: symbol)
+    private func scriptureGuideLink(_ guide: JaguarScriptureChatView.ScriptureGuide) -> some View {
+        NavigationLink(destination: JaguarScriptureChatView(guide: guide)) {
+            Label(guide.name, systemImage: guide.icon)
                 .font(.caption.bold())
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 9)
         }
         .buttonStyle(.borderedProminent)
-        .accessibilityLabel("Ask \(name) with Llama Jaguar")
+        .accessibilityLabel("Chat with \(guide.name) in Llama Jaguar")
     }
 
     private var overview: some View {

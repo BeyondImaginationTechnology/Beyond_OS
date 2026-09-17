@@ -1,0 +1,110 @@
+#!/bin/sh
+set -eu
+
+CONFIG=/etc/bit/update.conf
+STATE_DIR=/var/lib/bit-update
+STAGE_DIR="$STATE_DIR/staged"
+PREVIOUS_DIR="$STATE_DIR/previous"
+MANIFEST="$STATE_DIR/manifest.tsv"
+LOCK_FILE=/run/bit-update.lock
+
+[ -r "$CONFIG" ] && . "$CONFIG"
+: "${BIT_UPDATE_MANIFEST_URL:=}"
+: "${BIT_UPDATE_REQUIRE_SIGNATURE:=1}"
+: "${BIT_UPDATE_PUBLIC_KEY:=/etc/bit/update-public-key.pem}"
+
+log() { printf '%s\n' "bit-update: $*" >&2; }
+die() { log "$*"; exit 1; }
+need() { command -v "$1" >/dev/null 2>&1 || die "missing required tool: $1"; }
+
+usage() {
+  cat <<'EOF'
+Usage: bit-update {check|download|status|rollback}
+  check     fetch and verify the signed update manifest
+  download  check, then stage changed component archives
+  status    print the last check and staged component state
+  rollback  restore the previous staged component set
+EOF
+}
+
+init_state() { install -d -m 0750 "$STATE_DIR"; }
+
+verify_manifest() {
+  manifest="$1"
+  signature="$manifest.sig"
+  if [ "${BIT_UPDATE_REQUIRE_SIGNATURE}" = 1 ]; then
+    need openssl
+    [ -r "$BIT_UPDATE_PUBLIC_KEY" ] || die "update public key is not installed"
+    [ -r "$signature" ] || die "signed manifest is missing"
+    openssl dgst -sha256 -verify "$BIT_UPDATE_PUBLIC_KEY" -signature "$signature" "$manifest" >/dev/null \
+      || die "manifest signature verification failed"
+  fi
+  awk -F '\t' 'NF != 4 || $1 !~ /^[a-z0-9][a-z0-9.-]*$/ || $2 !~ /^[0-9]+([.][0-9]+)*$/ || $3 !~ /^https:\/\// || $4 !~ /^[0-9a-fA-F]{64}$/ { bad=1 } END { exit bad }' "$manifest" \
+    || die "manifest format or transport policy check failed"
+}
+
+fetch_manifest() {
+  need wget
+  init_state
+  tmp="$STATE_DIR/manifest.tsv.part"
+  wget -q -O "$tmp" "$BIT_UPDATE_MANIFEST_URL" || die "could not download update manifest"
+  if [ "${BIT_UPDATE_REQUIRE_SIGNATURE}" = 1 ]; then
+    wget -q -O "$tmp.sig" "$BIT_UPDATE_MANIFEST_URL.sig" || die "could not download manifest signature"
+  fi
+  verify_manifest "$tmp"
+  mv "$tmp" "$MANIFEST"
+  [ "${BIT_UPDATE_REQUIRE_SIGNATURE}" = 1 ] && mv "$tmp.sig" "$MANIFEST.sig"
+  date -u +%FT%TZ > "$STATE_DIR/last-check"
+}
+
+stage_updates() {
+  need wget; need sha256sum; need tar
+  [ -r "$MANIFEST" ] || fetch_manifest
+  rm -rf "$STAGE_DIR.next"
+  mkdir -p "$STAGE_DIR.next"
+  while IFS='\t' read -r component version url digest; do
+    [ -n "$component" ] || continue
+    target="$STAGE_DIR.next/$component-$version.tar"
+    wget -q -O "$target.part" "$url" || die "download failed for $component $version"
+    printf '%s  %s\n' "$digest" "$target.part" | sha256sum -c --status \
+      || die "hash verification failed for $component $version"
+    mv "$target.part" "$target"
+    printf '%s\t%s\t%s\n' "$component" "$version" "$digest" >> "$STAGE_DIR.next/index.tsv"
+  done < "$MANIFEST"
+  rm -rf "$PREVIOUS_DIR"
+  if [ -d "$STAGE_DIR" ]; then mv "$STAGE_DIR" "$PREVIOUS_DIR"; fi
+  mv "$STAGE_DIR.next" "$STAGE_DIR"
+  log "updates staged; restart/apply is intentionally separate"
+}
+
+status() {
+  printf 'manifest=%s\n' "$MANIFEST"
+  [ -r "$STATE_DIR/last-check" ] && printf 'last_check=%s\n' "$(cat "$STATE_DIR/last-check")" || printf 'last_check=never\n'
+  [ -r "$STAGE_DIR/index.tsv" ] && { printf 'staged:\n'; cat "$STAGE_DIR/index.tsv"; } || printf 'staged=none\n'
+}
+
+rollback() {
+  [ -d "$PREVIOUS_DIR" ] || die "no rollback set is available"
+  rm -rf "$STAGE_DIR.rollback"
+  mv "$STAGE_DIR" "$STAGE_DIR.rollback"
+  mv "$PREVIOUS_DIR" "$STAGE_DIR"
+  mv "$STAGE_DIR.rollback" "$PREVIOUS_DIR"
+  log "previous staged set restored; apply remains separate"
+}
+
+main() {
+  case "${1:-}" in
+    check) fetch_manifest ;;
+    download) fetch_manifest; stage_updates ;;
+    status) status ;;
+    rollback) rollback ;;
+    *) usage; exit 2 ;;
+  esac
+}
+
+init_state
+if command -v flock >/dev/null 2>&1; then
+  exec 9>"$LOCK_FILE"
+  flock -n 9 || die "another update operation is running"
+fi
+main "$@"

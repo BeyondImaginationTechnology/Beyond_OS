@@ -1,0 +1,29 @@
+#!/bin/sh
+set -eu
+
+case "${1:-}" in
+  start)
+    install -d -m 0750 /var/lib/bit-update
+    # Keep polling outside the desktop process. Failed checks are logged and
+    # never replace a running system automatically in this preview.
+    if [ -x /usr/sbin/bit-update ] && [ -r /etc/bit/update.conf ]; then
+      (
+        . /etc/bit/update.conf
+        interval="${BIT_UPDATE_INTERVAL:-21600}"
+        while :; do
+          /usr/sbin/bit-update download >>/var/log/bit-update.log 2>&1 || true
+          sleep "$interval"
+        done
+      ) &
+      echo $! >/run/bit-update.pid
+    fi
+    ;;
+  stop)
+    if [ -r /run/bit-update.pid ]; then
+      kill "$(cat /run/bit-update.pid)" 2>/dev/null || true
+      rm -f /run/bit-update.pid
+    fi
+    ;;
+  restart) "$0" stop; "$0" start ;;
+  *) echo "Usage: $0 {start|stop|restart}" >&2; exit 1 ;;
+esac

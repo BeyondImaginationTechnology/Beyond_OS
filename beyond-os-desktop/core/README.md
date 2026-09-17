@@ -13,6 +13,16 @@ files, a Core note, a terminal and running-system details. Browser, media,
 accounts, cloud services and optional application bundles belong in later
 profiles, keeping the base image focused and understandable.
 
+## Updates
+
+Core includes the separate `bit-update` service boundary. It polls a signed
+tab-separated manifest, verifies HTTPS downloads and SHA-256 digests, stages
+changed component archives, and preserves the previous staged set for rollback.
+The service is deliberately independent of the desktop process. Applying a
+staged update and rebooting are separate release-gated operations; the preview
+does not silently replace a running system. Configure the manifest URL and
+public key in `/etc/bit/update.conf` before enabling a production channel.
+
 ## Release formats
 
 A successful build produces a QEMU disk image and hashes. The `installer`

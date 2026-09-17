@@ -82,7 +82,7 @@ try {
     error_log('Jaguar rate limiter unavailable: ' . $exception->getMessage());
 }
 if (!$signedIn) {
-    $turnstileSecret = trim((string) getenv('JAGUAR_TURNSTILE_SECRET_KEY'));
+    $turnstileSecret = trim((string) (getenv('JAGUAR_TURNSTILE_SECRET_KEY') ?: beyond_config('security.turnstile.secret_key', beyond_config('security.turnstile_secret_key', ''))));
     if ($turnstileSecret === '') { http_response_code(503); echo json_encode(['error' => 'Verification is temporarily unavailable. Please try again later.']); exit; }
     $turnstileToken = is_string($payload['turnstile_token'] ?? null) ? trim($payload['turnstile_token']) : '';
     if ($turnstileToken === '' || strlen($turnstileToken) > 2048) { http_response_code(403); echo json_encode(['error' => 'Complete the security check and try again.']); exit; }
@@ -92,7 +92,7 @@ if (!$signedIn) {
     $verifyStatus = (int) curl_getinfo($verifyRequest, CURLINFO_RESPONSE_CODE);
     curl_close($verifyRequest);
     $verification = is_string($verifyResponse) ? json_decode($verifyResponse, true) : null;
-    $expectedHostname = trim((string) getenv('JAGUAR_TURNSTILE_HOSTNAME'));
+    $expectedHostname = trim((string) (getenv('JAGUAR_TURNSTILE_HOSTNAME') ?: beyond_config('security.turnstile.hostname', '')));
     if ($expectedHostname === '') { $expectedHostname = preg_replace('/:\d+$/', '', (string) ($_SERVER['HTTP_HOST'] ?? '')); }
     $validVerification = $verifyStatus >= 200 && $verifyStatus < 300 && is_array($verification) && ($verification['success'] ?? false) === true;
     $validAction = ($verification['action'] ?? '') === 'jaguar_guest_prompt';

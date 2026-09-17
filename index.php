@@ -135,7 +135,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 <aside class="mobile-drawer" id="mobileNavigation" aria-label="Mobile navigation" aria-hidden="true">
     <div class="mobile-drawer-head"><strong>BEYOND IMAGINATION</strong><button class="drawer-close" type="button" aria-label="Close navigation menu">×</button></div>
     <nav aria-label="Primary navigation"><a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="/beyond-market/">Marketplace</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a><a href="/ai/">AI</a><a href="https://os.beyondimagination.co.technology/">OS</a></nav>
-    <a class="primary" href="/app-store/">Open App Store</a>
+    <a class="primary" href="/app-store/">Explore OS</a>
     <label class="mobile-currency">Display currency <span class="currency-picker"><span aria-hidden="true">BIT$</span><select id="mobileCurrency" aria-label="Display currency"><option value="BITS">BIT$</option><option value="USD">USD</option><option value="CAD">CAD</option></select></span></label>
 </aside>
 <main>

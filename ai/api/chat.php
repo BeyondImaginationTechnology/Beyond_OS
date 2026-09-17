@@ -2,6 +2,71 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/modes.php';
+
+/** A small cached utility layer for requests that never need the GPU runtime. */
+function jaguar_utility_cache(string $key, int $ttl, callable $resolver): ?array
+{
+    try {
+        $pdo = beyond_db();
+        $pdo->exec('CREATE TABLE IF NOT EXISTS jaguar_utility_cache (cache_key VARCHAR(191) NOT NULL PRIMARY KEY, payload_json LONGTEXT NOT NULL, expires_at BIGINT NOT NULL, updated_at BIGINT NOT NULL)');
+        $cached = $pdo->prepare('SELECT payload_json FROM jaguar_utility_cache WHERE cache_key = ? AND expires_at > ? LIMIT 1');
+        $cached->execute([$key, time()]);
+        $payload = $cached->fetchColumn();
+        if (is_string($payload)) {
+            $decoded = json_decode($payload, true);
+            if (is_array($decoded)) return $decoded;
+        }
+        $result = $resolver();
+        if (!is_array($result)) return null;
+        $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+        $sql = $driver === 'sqlite'
+            ? 'INSERT INTO jaguar_utility_cache(cache_key,payload_json,expires_at,updated_at) VALUES(?,?,?,?) ON CONFLICT(cache_key) DO UPDATE SET payload_json=excluded.payload_json, expires_at=excluded.expires_at, updated_at=excluded.updated_at'
+            : 'INSERT INTO jaguar_utility_cache(cache_key,payload_json,expires_at,updated_at) VALUES(?,?,?,?) ON DUPLICATE KEY UPDATE payload_json=VALUES(payload_json), expires_at=VALUES(expires_at), updated_at=VALUES(updated_at)';
+        $now = time();
+        $pdo->prepare($sql)->execute([$key, json_encode($result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $now + $ttl, $now]);
+        return $result;
+    } catch (Throwable $exception) {
+        error_log('Jaguar utility cache unavailable: ' . $exception->getMessage());
+        return $resolver();
+    }
+}
+
+function jaguar_utility_fetch(string $url): ?array
+{
+    if (!function_exists('curl_init')) return null;
+    $request = curl_init($url);
+    curl_setopt_array($request, [CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 3, CURLOPT_TIMEOUT => 7, CURLOPT_HTTPHEADER => ['Accept: application/json', 'User-Agent: Beyond-Jaguar/0.3 Utility Fast Lane']]);
+    $response = curl_exec($request);
+    $status = (int) curl_getinfo($request, CURLINFO_RESPONSE_CODE);
+    curl_close($request);
+    $decoded = is_string($response) && $status >= 200 && $status < 300 ? json_decode($response, true) : null;
+    return is_array($decoded) ? $decoded : null;
+}
+
+function jaguar_geocode(string $place): ?array
+{
+    $place = trim(preg_replace('/\s+/', ' ', $place) ?? '');
+    if (mb_strlen($place) < 2 || mb_strlen($place) > 80 || preg_match('/[<>\\x00]/', $place)) return null;
+    return jaguar_utility_cache('geocode:' . hash('sha256', mb_strtolower($place)), 86400, static function () use ($place): ?array {
+        $response = jaguar_utility_fetch('https://geocoding-api.open-meteo.com/v1/search?' . http_build_query(['name' => $place, 'count' => 1, 'language' => 'en', 'format' => 'json']));
+        $result = $response['results'][0] ?? null;
+        if (!is_array($result) || !isset($result['latitude'], $result['longitude'], $result['name'])) return null;
+        return [
+            'name' => (string) $result['name'], 'country' => (string) ($result['country'] ?? ''), 'admin1' => (string) ($result['admin1'] ?? ''),
+            'latitude' => (float) $result['latitude'], 'longitude' => (float) $result['longitude'], 'timezone' => (string) ($result['timezone'] ?? 'UTC'),
+        ];
+    });
+}
+
+function jaguar_weather_label(int $code, string $language): string
+{
+    $labels = [
+        'en' => [0 => 'clear sky', 1 => 'mostly clear', 2 => 'partly cloudy', 3 => 'overcast', 45 => 'foggy', 48 => 'rime fog', 51 => 'light drizzle', 53 => 'drizzle', 55 => 'heavy drizzle', 61 => 'light rain', 63 => 'rain', 65 => 'heavy rain', 71 => 'light snow', 73 => 'snow', 75 => 'heavy snow', 80 => 'rain showers', 81 => 'rain showers', 82 => 'heavy showers', 95 => 'thunderstorm'],
+        'fr' => [0 => 'ciel dégagé', 1 => 'plutôt dégagé', 2 => 'partiellement nuageux', 3 => 'couvert', 45 => 'brouillard', 48 => 'brouillard givrant', 51 => 'bruine légère', 53 => 'bruine', 55 => 'forte bruine', 61 => 'pluie légère', 63 => 'pluie', 65 => 'forte pluie', 71 => 'neige légère', 73 => 'neige', 75 => 'forte neige', 80 => 'averses', 81 => 'averses', 82 => 'fortes averses', 95 => 'orage'],
+        'es' => [0 => 'cielo despejado', 1 => 'mayormente despejado', 2 => 'parcialmente nublado', 3 => 'cubierto', 45 => 'niebla', 48 => 'niebla con escarcha', 51 => 'llovizna ligera', 53 => 'llovizna', 55 => 'llovizna intensa', 61 => 'lluvia ligera', 63 => 'lluvia', 65 => 'lluvia intensa', 71 => 'nieve ligera', 73 => 'nieve', 75 => 'nieve intensa', 80 => 'chubascos', 81 => 'chubascos', 82 => 'chubascos intensos', 95 => 'tormenta'],
+    ];
+    return $labels[$language][$code] ?? $labels[$language][3];
+}
 header('Content-Type: application/json; charset=utf-8');
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); echo json_encode(['error' => 'Method not allowed']); exit; }
 if (!verify_csrf_token($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null)) { http_response_code(403); echo json_encode(['error' => 'Your secure session expired. Refresh Jaguar and try again.']); exit; }
@@ -17,20 +82,22 @@ try {
     error_log('Jaguar rate limiter unavailable: ' . $exception->getMessage());
 }
 if (!$signedIn) {
-    $proof = is_array($payload['proof'] ?? null) ? $payload['proof'] : [];
-    $challenge = $_SESSION['jaguar_guest_challenge'] ?? [];
-    $nonce = is_string($proof['challenge'] ?? null) ? trim($proof['challenge']) : '';
-    $counter = is_string($proof['counter'] ?? null) ? trim($proof['counter']) : '';
-    $validShape = preg_match('/^[a-f0-9]{36}$/', $nonce) === 1 && preg_match('/^\d{1,12}$/', $counter) === 1;
-    $validChallenge = is_array($challenge)
-        && empty($challenge['used'])
-        && (int)($challenge['expires'] ?? 0) >= time()
-        && hash_equals((string)($challenge['challenge'] ?? ''), $nonce)
-        && hash('sha256', $nonce . ':' . $counter)[0] === '0';
-    $difficulty = max(1, min(20, (int)($challenge['difficulty'] ?? 16)));
-    $validWork = $validShape && $validChallenge && substr(hash('sha256', $nonce . ':' . $counter), 0, (int)ceil($difficulty / 4)) === str_repeat('0', (int)ceil($difficulty / 4));
-    if (!$validWork) { http_response_code(403); echo json_encode(['error' => 'First-party security check failed or expired. Please try again.']); exit; }
-    $_SESSION['jaguar_guest_challenge']['used'] = true;
+    $turnstileSecret = trim((string) getenv('JAGUAR_TURNSTILE_SECRET_KEY'));
+    if ($turnstileSecret === '') { http_response_code(503); echo json_encode(['error' => 'Verification is temporarily unavailable. Please try again later.']); exit; }
+    $turnstileToken = is_string($payload['turnstile_token'] ?? null) ? trim($payload['turnstile_token']) : '';
+    if ($turnstileToken === '' || strlen($turnstileToken) > 2048) { http_response_code(403); echo json_encode(['error' => 'Complete the security check and try again.']); exit; }
+    $verifyRequest = curl_init('https://challenges.cloudflare.com/turnstile/v0/siteverify');
+    curl_setopt_array($verifyRequest, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 4, CURLOPT_TIMEOUT => 8, CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'], CURLOPT_POSTFIELDS => http_build_query(['secret' => $turnstileSecret, 'response' => $turnstileToken, 'remoteip' => (string) ($_SERVER['REMOTE_ADDR'] ?? '')])]);
+    $verifyResponse = curl_exec($verifyRequest);
+    $verifyStatus = (int) curl_getinfo($verifyRequest, CURLINFO_RESPONSE_CODE);
+    curl_close($verifyRequest);
+    $verification = is_string($verifyResponse) ? json_decode($verifyResponse, true) : null;
+    $expectedHostname = trim((string) getenv('JAGUAR_TURNSTILE_HOSTNAME'));
+    if ($expectedHostname === '') { $expectedHostname = preg_replace('/:\d+$/', '', (string) ($_SERVER['HTTP_HOST'] ?? '')); }
+    $validVerification = $verifyStatus >= 200 && $verifyStatus < 300 && is_array($verification) && ($verification['success'] ?? false) === true;
+    $validAction = ($verification['action'] ?? '') === 'jaguar_guest_prompt';
+    $validHostname = $expectedHostname === '' || hash_equals(strtolower($expectedHostname), strtolower((string) ($verification['hostname'] ?? '')));
+    if (!$validVerification || !$validAction || !$validHostname) { http_response_code(403); echo json_encode(['error' => 'Security verification failed or expired. Please try again.']); exit; }
 }
 $mode = is_string($payload['mode'] ?? null) ? strtolower(trim($payload['mode'])) : 'core';
 $modeDefinition = jaguar_mode($mode);
@@ -67,9 +134,9 @@ foreach ($explicitPatterns as $pattern) {
 }
 $simpleReply = null;
 $simpleCopy = [
-    'en' => ['hello' => 'Hello! I’m Jaguar. What would you like to explore?', 'thanks' => 'You’re welcome. What should we explore next?', 'acknowledgement' => 'I’m here when you’re ready. What should we explore?', 'help' => 'I’m Jaguar, Beyond’s AI assistant. In Core, I can explain ideas, shape plans, work through code, and teach difficult topics in plain language.', 'version' => 'You’re using Jaguar v0.3 Preview.'],
-    'fr' => ['hello' => 'Bonjour ! Je suis Jaguar. Qu’aimeriez-vous explorer ?', 'thanks' => 'Avec plaisir. Qu’allons-nous explorer ensuite ?', 'acknowledgement' => 'Je suis là quand vous êtes prêt. Qu’allons-nous explorer ?', 'help' => 'Je suis Jaguar, l’assistant IA de Beyond. Dans Core, je peux expliquer des idées, structurer des projets, travailler sur du code et simplifier des sujets difficiles.', 'version' => 'Vous utilisez Jaguar v0.3 Preview.'],
-    'es' => ['hello' => '¡Hola! Soy Jaguar. ¿Qué te gustaría explorar?', 'thanks' => 'De nada. ¿Qué exploramos ahora?', 'acknowledgement' => 'Estoy aquí cuando estés listo. ¿Qué exploramos?', 'help' => 'Soy Jaguar, el asistente de IA de Beyond. En Core, puedo explicar ideas, organizar proyectos, trabajar con código y enseñar temas difíciles con palabras sencillas.', 'version' => 'Estás usando Jaguar v0.3 Preview.'],
+    'en' => ['hello' => 'Hello! I’m Jaguar. What would you like to explore?', 'thanks' => 'You’re welcome. What should we explore next?', 'acknowledgement' => 'I’m here when you’re ready. What should we explore?', 'help' => 'I’m Jaguar, Beyond’s AI assistant. Core can explain ideas, shape plans, work through code, and teach difficult topics in plain language. Build, Draw, and Video are locked while we finish them.', 'version' => 'You’re using Jaguar v0.3 Preview.'],
+    'fr' => ['hello' => 'Bonjour ! Je suis Jaguar. Qu’aimeriez-vous explorer ?', 'thanks' => 'Avec plaisir. Qu’allons-nous explorer ensuite ?', 'acknowledgement' => 'Je suis là quand vous êtes prêt. Qu’allons-nous explorer ?', 'help' => 'Je suis Jaguar, l’assistant IA de Beyond. Core peut expliquer des idées, structurer des projets, travailler sur du code et simplifier des sujets difficiles. Build, Dessiner et Vidéo restent verrouillés pendant leur préparation.', 'version' => 'Vous utilisez Jaguar v0.3 Preview.'],
+    'es' => ['hello' => '¡Hola! Soy Jaguar. ¿Qué te gustaría explorar?', 'thanks' => 'De nada. ¿Qué exploramos ahora?', 'acknowledgement' => 'Estoy aquí cuando estés listo. ¿Qué exploramos?', 'help' => 'Soy Jaguar, el asistente de IA de Beyond. Core puede explicar ideas, organizar proyectos, trabajar con código y enseñar temas difíciles con palabras sencillas. Build, Dibujar y Video permanecen bloqueados mientras los terminamos.', 'version' => 'Estás usando Jaguar v0.3 Preview.'],
 ];
 // Keep common greeting variations off the scale-to-zero runtime. In particular,
 // "Hello world" is a normal first message, not a request that needs a GPU cold start.
@@ -99,30 +166,143 @@ if ($simpleReply !== null) {
     exit;
 }
 if ($mode === 'core') {
+    $formatNumber = static fn(float $number): string => rtrim(rtrim(number_format($number, 2, '.', ''), '0'), '.');
+    $conversionPatterns = [
+        '/^(-?\d+(?:\.\d+)?)\s*(?:°\s*)?(?:c|celsius)\s+(?:to|in)\s+(?:°\s*)?(?:f|fahrenheit)[\s?!.]*$/iu' => static fn(float $value): array => [$value * 9 / 5 + 32, '°F'],
+        '/^(-?\d+(?:\.\d+)?)\s*(?:°\s*)?(?:f|fahrenheit)\s+(?:to|in)\s+(?:°\s*)?(?:c|celsius)[\s?!.]*$/iu' => static fn(float $value): array => [($value - 32) * 5 / 9, '°C'],
+        '/^(-?\d+(?:\.\d+)?)\s*(?:km|kilometers?|kilometres?)\s+(?:to|in)\s+(?:mi|miles?)[\s?!.]*$/iu' => static fn(float $value): array => [$value * 0.621371, 'mi'],
+        '/^(-?\d+(?:\.\d+)?)\s*(?:mi|miles?)\s+(?:to|in)\s+(?:km|kilometers?|kilometres?)[\s?!.]*$/iu' => static fn(float $value): array => [$value / 0.621371, 'km'],
+        '/^(-?\d+(?:\.\d+)?)\s*(?:kg|kilograms?)\s+(?:to|in)\s+(?:lb|lbs|pounds?)[\s?!.]*$/iu' => static fn(float $value): array => [$value * 2.20462262, 'lb'],
+        '/^(-?\d+(?:\.\d+)?)\s*(?:lb|lbs|pounds?)\s+(?:to|in)\s+(?:kg|kilograms?)[\s?!.]*$/iu' => static fn(float $value): array => [$value / 2.20462262, 'kg'],
+    ];
+    foreach ($conversionPatterns as $pattern => $convert) {
+        if (preg_match($pattern, $simplePrompt, $conversion)) {
+            [$value, $unit] = $convert((float) $conversion[1]);
+            $simpleReply = $formatNumber($value) . ' ' . $unit;
+            break;
+        }
+    }
+    if ($simpleReply !== null) {
+        echo json_encode(['model' => 'jaguar-utility-fast-lane', 'adapter' => 'local', 'mode' => $mode, 'message' => $simpleReply], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
+    $weatherPattern = '/^(?:what(?:[’\']s| is)?\s+)?(?:the\s+)?(?:weather|temperature|temp|m[ée]t[ée]o|tiempo)(?:\s+(?:like\s+)?(?:in|for|à|en))\s+(.+?)[\s?!.]*$/iu';
+    $timePattern = '/^(?:what\s+time\s+is\s+it|time|quelle\s+heure\s+est-il|hora)\s+(?:in|à|en)\s+(.+?)[\s?!.]*$/iu';
+    $placePattern = '/^(?:where\s+is|find|locate|o[ùu]\s+est|d[óo]nde\s+est[áa])\s+(.+?)[\s?!.]*$/iu';
+    if (preg_match($weatherPattern, $simplePrompt, $utilityMatch)) {
+        $place = jaguar_geocode($utilityMatch[1]);
+        if ($place === null) {
+            $simpleReply = ['en' => 'I could not find that place. Try a city and country, such as “weather in Vancouver, Canada.”', 'fr' => 'Je n’ai pas trouvé ce lieu. Essayez une ville et un pays, par exemple « météo à Vancouver, Canada ».', 'es' => 'No pude encontrar ese lugar. Prueba una ciudad y país, por ejemplo « tiempo en Vancouver, Canadá ».'][$language];
+        } else {
+            $weather = jaguar_utility_cache('weather:' . $place['latitude'] . ':' . $place['longitude'], 600, static function () use ($place): ?array {
+                return jaguar_utility_fetch('https://api.open-meteo.com/v1/forecast?' . http_build_query(['latitude' => $place['latitude'], 'longitude' => $place['longitude'], 'current' => 'temperature_2m,apparent_temperature,weather_code,wind_speed_10m', 'temperature_unit' => 'fahrenheit', 'wind_speed_unit' => 'mph', 'timezone' => 'auto']));
+            });
+            $current = is_array($weather['current'] ?? null) ? $weather['current'] : null;
+            if ($current === null || !isset($current['temperature_2m'], $current['apparent_temperature'], $current['weather_code'], $current['wind_speed_10m'])) {
+                $simpleReply = ['en' => 'Weather lookup is temporarily unavailable. Try again shortly.', 'fr' => 'La météo est temporairement indisponible. Réessayez bientôt.', 'es' => 'La consulta del tiempo no está disponible temporalmente. Inténtalo pronto.'][$language];
+            } else {
+                $locationLabel = $place['name'] . ($place['admin1'] !== '' ? ', ' . $place['admin1'] : '') . ($place['country'] !== '' ? ', ' . $place['country'] : '');
+                $condition = jaguar_weather_label((int) $current['weather_code'], $language);
+                $simpleReply = match ($language) {
+                    'fr' => $locationLabel . ' : ' . $condition . ', ' . $formatNumber((float) $current['temperature_2m']) . ' °F (ressenti ' . $formatNumber((float) $current['apparent_temperature']) . ' °F), vent ' . $formatNumber((float) $current['wind_speed_10m']) . ' mph.',
+                    'es' => $locationLabel . ': ' . $condition . ', ' . $formatNumber((float) $current['temperature_2m']) . ' °F (sensación ' . $formatNumber((float) $current['apparent_temperature']) . ' °F), viento ' . $formatNumber((float) $current['wind_speed_10m']) . ' mph.',
+                    default => $locationLabel . ': ' . $condition . ', ' . $formatNumber((float) $current['temperature_2m']) . '°F (feels like ' . $formatNumber((float) $current['apparent_temperature']) . '°F), wind ' . $formatNumber((float) $current['wind_speed_10m']) . ' mph.',
+                };
+            }
+        }
+    } elseif (preg_match($timePattern, $simplePrompt, $utilityMatch) || preg_match($placePattern, $simplePrompt, $utilityMatch)) {
+        $isTimeRequest = preg_match($timePattern, $simplePrompt) === 1;
+        $place = jaguar_geocode($utilityMatch[1]);
+        if ($place === null) {
+            $simpleReply = ['en' => 'I could not find that place. Try a city and country.', 'fr' => 'Je n’ai pas trouvé ce lieu. Essayez une ville et un pays.', 'es' => 'No pude encontrar ese lugar. Prueba una ciudad y país.'][$language];
+        } elseif ($isTimeRequest) {
+            try {
+                $clock = new DateTimeImmutable('now', new DateTimeZone($place['timezone']));
+                $simpleReply = match ($language) {
+                    'fr' => 'Il est ' . $clock->format('H:i') . ' à ' . $place['name'] . ' (' . $clock->format('T') . ').',
+                    'es' => 'Son las ' . $clock->format('H:i') . ' en ' . $place['name'] . ' (' . $clock->format('T') . ').',
+                    default => 'It is ' . $clock->format('g:i A') . ' in ' . $place['name'] . ' (' . $clock->format('T') . ').',
+                };
+            } catch (Throwable) {
+                $simpleReply = ['en' => 'Time lookup is temporarily unavailable. Try again shortly.', 'fr' => 'L’heure est temporairement indisponible. Réessayez bientôt.', 'es' => 'La consulta de hora no está disponible temporalmente. Inténtalo pronto.'][$language];
+            }
+        } else {
+            $parts = array_filter([$place['name'], $place['admin1'], $place['country']]);
+            $simpleReply = implode(', ', $parts) . ' — ' . $formatNumber($place['latitude']) . '°, ' . $formatNumber($place['longitude']) . '°.';
+        }
+    }
+    if ($simpleReply !== null) {
+        echo json_encode(['model' => 'jaguar-utility-fast-lane', 'adapter' => 'open-meteo', 'mode' => $mode, 'message' => $simpleReply], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
     $coreCopy = [
         'en' => [
             'json' => 'JSON is a lightweight text format for structured data. Example: {"name":"Jaguar","mode":"Core"}.',
             'loop' => 'A loop repeats work. In JavaScript: for (let i = 0; i < 3; i++) { console.log(i); }',
             'variable' => 'A variable stores a value you can reuse. In JavaScript: const name = "Jaguar";.',
+            'api' => 'An API is a defined way for software to request data or an action from another service.',
+            'html' => 'HTML gives a web page its structure and content, such as headings, paragraphs, and buttons.',
+            'css' => 'CSS controls how a web page looks: layout, colors, spacing, and responsive design.',
+            'javascript' => 'JavaScript makes a web page interactive: it can respond to clicks, update content, and call APIs.',
+            'sql' => 'SQL is a language for reading and changing data in relational databases.',
+            'git' => 'Git tracks changes to code so people can review, share, and safely restore versions.',
+            'url' => 'A URL is a web address that points to a page or resource, such as https://example.com.',
+            'boolean' => 'A Boolean is a value with only two states: true or false.',
+            'array' => 'An array is an ordered list of values. In JavaScript: ["Core", "Build", "Draw"].',
+            'function' => 'A function is reusable named code that performs a task, often using inputs and returning a result.',
         ],
         'fr' => [
             'json' => 'JSON est un format texte léger pour des données structurées. Exemple : {"nom":"Jaguar","mode":"Core"}.',
             'loop' => 'Une boucle répète une action. En JavaScript : for (let i = 0; i < 3; i++) { console.log(i); }',
             'variable' => 'Une variable stocke une valeur réutilisable. En JavaScript : const nom = "Jaguar";.',
+            'api' => 'Une API est une manière définie pour un logiciel de demander des données ou une action à un autre service.',
+            'html' => 'HTML donne à une page web sa structure et son contenu : titres, paragraphes et boutons.',
+            'css' => 'CSS contrôle l’apparence d’une page web : mise en page, couleurs, espacements et adaptation mobile.',
+            'javascript' => 'JavaScript rend une page web interactive : clics, contenu dynamique et appels API.',
+            'sql' => 'SQL est un langage pour lire et modifier des données dans des bases relationnelles.',
+            'git' => 'Git suit les changements du code afin de les relire, partager et restaurer des versions.',
+            'url' => 'Une URL est une adresse web qui pointe vers une page ou une ressource, par exemple https://example.com.',
+            'boolean' => 'Un booléen ne possède que deux états : vrai ou faux.',
+            'array' => 'Un tableau est une liste ordonnée de valeurs. En JavaScript : ["Core", "Build", "Draw"].',
+            'function' => 'Une fonction est du code réutilisable nommé qui exécute une tâche, souvent avec des entrées et un résultat.',
         ],
         'es' => [
             'json' => 'JSON es un formato de texto ligero para datos estructurados. Ejemplo: {"nombre":"Jaguar","modo":"Core"}.',
             'loop' => 'Un bucle repite una tarea. En JavaScript: for (let i = 0; i < 3; i++) { console.log(i); }',
             'variable' => 'Una variable guarda un valor reutilizable. En JavaScript: const nombre = "Jaguar";.',
+            'api' => 'Una API es una forma definida para que un programa solicite datos o una acción a otro servicio.',
+            'html' => 'HTML da a una página web su estructura y contenido: títulos, párrafos y botones.',
+            'css' => 'CSS controla cómo se ve una página web: diseño, colores, espaciado y adaptación a pantallas.',
+            'javascript' => 'JavaScript vuelve una página web interactiva: responde a clics, actualiza contenido y llama APIs.',
+            'sql' => 'SQL es un lenguaje para leer y modificar datos en bases de datos relacionales.',
+            'git' => 'Git registra cambios de código para revisarlos, compartirlos y recuperar versiones con seguridad.',
+            'url' => 'Una URL es una dirección web que apunta a una página o recurso, como https://example.com.',
+            'boolean' => 'Un booleano solo tiene dos estados: verdadero o falso.',
+            'array' => 'Un arreglo es una lista ordenada de valores. En JavaScript: ["Core", "Build", "Draw"].',
+            'function' => 'Una función es código reutilizable con nombre que realiza una tarea, a menudo recibe entradas y devuelve un resultado.',
         ],
     ];
-    if (preg_match('/^(?:what(?: is)?|define|explain)\s+(?:a\s+)?json[\s?!.]*$/iu', $simplePrompt)) {
-        $simpleReply = $coreCopy[$language]['json'];
-    } elseif (preg_match('/^(?:what(?: is)?|define|explain)\s+(?:a\s+)?(?:loop|for loop)[\s?!.]*$/iu', $simplePrompt)) {
-        $simpleReply = $coreCopy[$language]['loop'];
-    } elseif (preg_match('/^(?:what(?: is)?|define|explain)\s+(?:a\s+)?variable[\s?!.]*$/iu', $simplePrompt)) {
-        $simpleReply = $coreCopy[$language]['variable'];
-    } elseif (preg_match('/\b(401|403|404|500|503)\b/', $simplePrompt, $httpStatus)) {
+    $definitionTerms = [
+        'json' => 'json', 'loop' => '(?:a\\s+)?(?:loop|for loop)', 'variable' => '(?:a\\s+)?variable',
+        'api' => '(?:an?\\s+)?api', 'html' => 'html', 'css' => 'css', 'javascript' => 'javascript',
+        'sql' => 'sql', 'git' => 'git', 'url' => '(?:a\\s+)?url', 'boolean' => '(?:a\\s+)?boolean',
+        'array' => '(?:an?\\s+)?array', 'function' => '(?:a\\s+)?function',
+    ];
+    foreach ($definitionTerms as $term => $expression) {
+        if (preg_match('/^(?:what(?:\\s+is)?|define|explain)\\s+' . $expression . '[\\s?!.]*$/iu', $simplePrompt)) {
+            $simpleReply = $coreCopy[$language][$term];
+            break;
+        }
+    }
+    if ($simpleReply === null && preg_match('/^what does https? mean[\s?!.]*$/iu', $simplePrompt)) {
+        $simpleReply = [
+            'en' => 'HTTPS is the secure version of HTTP. It encrypts the connection between your browser and a website.',
+            'fr' => 'HTTPS est la version sécurisée de HTTP. Il chiffre la connexion entre votre navigateur et un site web.',
+            'es' => 'HTTPS es la versión segura de HTTP. Cifra la conexión entre tu navegador y un sitio web.',
+        ][$language];
+    } elseif ($simpleReply === null && preg_match('/\b(401|403|404|500|503)\b/', $simplePrompt, $httpStatus)) {
         $statusHelp = [
             '401' => ['en' => '401 means authentication is required or invalid.', 'fr' => '401 signifie que l’authentification est requise ou invalide.', 'es' => '401 significa que la autenticación es obligatoria o no es válida.'],
             '403' => ['en' => '403 means the server understood the request but refuses access.', 'fr' => '403 signifie que le serveur refuse l’accès.', 'es' => '403 significa que el servidor rechaza el acceso.'],
@@ -137,6 +317,10 @@ if ($mode === 'core') {
         exit;
     }
 }
+if ($mode === 'core') {
+    echo json_encode(['model' => 'jaguar-core-fast-lane', 'adapter' => 'local', 'mode' => $mode, 'message' => 'Basic handles fast-lane utilities and concise built-in guidance. Deep thinking is available in a separate Jaguar mode.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
 $runtimeUrl = rtrim((string) getenv('JAGUAR_RUNTIME_URL'), '/');
 if ($runtimeUrl === '' || !filter_var($runtimeUrl, FILTER_VALIDATE_URL)) { http_response_code(503); echo json_encode(['error' => 'Jaguar is not available yet.']); exit; }
 $runtimeToken = trim((string) getenv('JAGUAR_RUNTIME_TOKEN'));
@@ -150,3 +334,7 @@ curl_setopt_array($request, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => tru
 $response = curl_exec($request); $status = (int) curl_getinfo($request, CURLINFO_RESPONSE_CODE); curl_close($request);
 if (!is_string($response) || $status < 200 || $status >= 300) { http_response_code(503); echo json_encode(['error' => 'Jaguar could not complete that request.']); exit; }
 echo $response;
+
+
+
+

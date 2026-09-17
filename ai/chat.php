@@ -195,8 +195,9 @@ $jaguarModes = jaguar_mode_catalog();
             updateNonceFromResponse(response);
             const data = await response.json();
             if (!response.ok && response.status === 403 && /secure session|security check/i.test(data.error || '')) {
-                sessionStorage.setItem('jaguar_draft', text);
-                window.location.reload();
+                thinking.textContent = `${data.error || 'Your secure session expired.'}\nRefresh Jaguar and try again.`;
+                input.value = text;
+                input.focus();
                 return;
             }
             if (!response.ok && response.status === 429) {

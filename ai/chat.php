@@ -7,6 +7,11 @@ $signedIn = !empty($_SESSION['user_id']);
 $displayName = trim((string)($_SESSION['first_name'] ?? $_SESSION['name'] ?? ''));
 $csrf = csrf_token();
 $turnstileSiteKey = trim((string) (getenv('JAGUAR_TURNSTILE_SITE_KEY') ?: beyond_config('security.turnstile.site_key', beyond_config('security.turnstile_site_key', ''))));
+$jaguarNonceSecret = trim((string) (getenv('JAGUAR_NONCE_SECRET') ?: beyond_config('security.jaguar_nonce_secret', beyond_config('security.jwt_secret', ''))));
+$jaguarNonceIssuedAt = time();
+$jaguarNonce = bin2hex(random_bytes(24));
+$jaguarNonceSignature = $jaguarNonceSecret !== '' ? hash_hmac('sha256', $jaguarNonce . ':' . $jaguarNonceIssuedAt, $jaguarNonceSecret) : '';
+$_SESSION['jaguar_nonce'] = ['value' => $jaguarNonce, 'issued_at' => $jaguarNonceIssuedAt, 'used' => false];
 $jaguarModes = jaguar_mode_catalog();
 ?>
 <!doctype html>
@@ -29,7 +34,6 @@ $jaguarModes = jaguar_mode_catalog();
 .message.assistant .avatar{transition:box-shadow .3s ease,transform .3s ease}.message.assistant:hover .avatar{box-shadow:0 0 20px rgba(224,79,194,.28);transform:scale(1.04)}
 @media(prefers-reduced-motion:reduce){.suggestions button,.new-chat,.mode-picker select,.side-links a,.message.assistant .avatar{transition:none}.suggestions button::after{display:none}.composer:focus-within{animation:none}}
 </style>
-<?php if (!$signedIn && $turnstileSiteKey !== ''): ?><script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script><?php endif; ?>
 </head><body>
 <div class="shell"><aside class="sidebar"><a class="brand" href="/"><img class="brand-mark-image" src="assets/jaguar-eye-v0.2.png" alt="Jaguar eye logo"><span><strong>JAGUAR</strong><small>V0.3 · BEYOND AI</small></span></a><button class="new-chat" id="newChat" type="button">＋ New conversation</button><div class="sidebar-note"><b>Guest chat</b>Conversation history is not saved in this preview. A quick security check protects guest requests.</div><nav class="side-links"><a href="https://beyondimagination.co.technology/ai/">About Jaguar</a><a href="https://beyondimagination.co.technology/release-notes.php#jaguar">Build progress</a><a href="https://beyondimagination.co.technology/">Beyond Imagination</a></nav></aside>
 <section class="workspace"><header class="topbar"><div class="model-name"><i class="status"></i> Jaguar · v0.3 Preview</div><div class="account">Premium · coming soon</div></header>
@@ -40,7 +44,9 @@ $jaguarModes = jaguar_mode_catalog();
 (() => {
     const signedIn = <?=json_encode($signedIn)?>;
     const csrf = <?=json_encode($csrf)?>;
-    const turnstileSiteKey = <?=json_encode($turnstileSiteKey)?>;
+    let jaguarNonce = <?=json_encode($jaguarNonce)?>;
+    let jaguarNonceIssuedAt = <?=json_encode($jaguarNonceIssuedAt)?>;
+    let jaguarNonceSignature = <?=json_encode($jaguarNonceSignature)?>;
     const form = document.getElementById('composer');
     const input = document.getElementById('prompt');
     const send = document.getElementById('send');
@@ -57,8 +63,6 @@ $jaguarModes = jaguar_mode_catalog();
     let history = [];
     let language = 'en';
     let pendingText = '';
-    let turnstileToken = '';
-    let turnstileWidgetId = null;
 
     const nearBottom = () => messages.scrollHeight - messages.scrollTop - messages.clientHeight < 56;
     const updateMessageTools = () => {
@@ -150,45 +154,11 @@ $jaguarModes = jaguar_mode_catalog();
         return /\b(porn(?:ography|ographic)?|xxx|nudes?|nudity|naked|onlyfans|blowjob|handjob|masturbat(?:e|ion|ing)|sexual\s+(?:roleplay|story|chat|scene|image|photo|video|content)|explicit(?:ly)?\s+(?:sexual|erotic)|graphic(?:ally)?\s+(?:sexual|erotic))\b/i.test(text);
     }
 
-    function resetTurnstile() {
-        turnstileToken = '';
-        if (turnstileWidgetId !== null && window.turnstile) {
-            window.turnstile.remove(turnstileWidgetId);
-            turnstileWidgetId = null;
-        }
-    }
-
-    function showVerification(text) {
-        pendingText = text;
-        verificationError.textContent = '';
-        verificationGate.hidden = false;
-        if (!turnstileSiteKey) {
-            verificationError.textContent = 'Verification is temporarily unavailable. Please try again later.';
-            return;
-        }
-        if (!window.turnstile) {
-            verificationError.textContent = 'The security check is still loading. Please try again in a moment.';
-            return;
-        }
-        if (turnstileWidgetId === null) {
-            turnstileWidgetId = window.turnstile.render('#turnstileWidget', {
-                sitekey: turnstileSiteKey,
-                theme: 'dark',
-                action: 'jaguar_guest_prompt',
-                callback: token => {
-                    if (!pendingText || verificationGate.hidden) return;
-                    turnstileToken = token;
-                    verificationGate.hidden = true;
-                    const approvedText = pendingText;
-                    pendingText = '';
-                    sendMessage(approvedText);
-                },
-                'error-callback': () => { verificationError.textContent = 'Verification could not load. Please try again.'; },
-                'expired-callback': () => { turnstileToken = ''; }
-            });
-        } else {
-            window.turnstile.reset(turnstileWidgetId);
-        }
+    function updateNonceFromResponse(response) {
+        const next = response.headers.get('X-Jaguar-Nonce');
+        const issuedAt = response.headers.get('X-Jaguar-Nonce-Issued-At');
+        const signature = response.headers.get('X-Jaguar-Nonce-Signature');
+        if (next && issuedAt && signature) { jaguarNonce = next; jaguarNonceIssuedAt = Number(issuedAt); jaguarNonceSignature = signature; }
     }
 
     async function sendMessage(text) {
@@ -214,9 +184,10 @@ $jaguarModes = jaguar_mode_catalog();
             const response = await fetch('/api/chat.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf},
-                body: JSON.stringify({mode: modeSelect.value, language, messages: history, turnstile_token: signedIn ? '' : turnstileToken}),
+                body: JSON.stringify({mode: modeSelect.value, language, messages: history, nonce: signedIn ? '' : jaguarNonce, nonce_issued_at: signedIn ? 0 : jaguarNonceIssuedAt, nonce_signature: signedIn ? '' : jaguarNonceSignature}),
                 signal: controller.signal
             });
+            updateNonceFromResponse(response);
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Jaguar is unavailable.');
             thinking.textContent = data.message;
@@ -228,7 +199,6 @@ $jaguarModes = jaguar_mode_catalog();
         } finally {
             window.clearTimeout(timeout);
             window.clearInterval(thinkingTimer);
-            if (!signedIn) resetTurnstile();
             send.disabled = false;
             input.focus();
         }
@@ -242,8 +212,7 @@ $jaguarModes = jaguar_mode_catalog();
             addMessage('assistant', copy[language].explicit);
             return;
         }
-        if (!signedIn && !turnstileToken) showVerification(text);
-        else sendMessage(text);
+        sendMessage(text);
     });
     input.addEventListener('input', () => {
         input.style.height = 'auto';

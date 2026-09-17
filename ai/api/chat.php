@@ -335,7 +335,7 @@ if ($mode === 'core') {
     }
 }
 if ($mode === 'core') {
-    echo json_encode(['model' => 'jaguar-core-fast-lane', 'adapter' => 'local', 'mode' => $mode, 'message' => 'Basic handles fast-lane utilities and concise built-in guidance. Deep thinking is available in a separate Jaguar mode.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    echo json_encode(['model' => 'jaguar-core-fast-lane', 'adapter' => 'local', 'mode' => $mode, 'message' => 'Explain handles fast-lane utilities and concise built-in guidance. Deep thinking is available in a separate Jaguar mode.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
 $runtimeUrl = rtrim((string) getenv('JAGUAR_RUNTIME_URL'), '/');

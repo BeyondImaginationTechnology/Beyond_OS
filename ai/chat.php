@@ -200,7 +200,8 @@ $jaguarModes = jaguar_mode_catalog();
                 return;
             }
             if (!response.ok && response.status === 429) {
-                const retryAfter = Math.max(1, Number(response.headers.get('Retry-After') || 10));
+                const retryHeader = Number(response.headers.get('Retry-After') || 10);
+                const retryAfter = Number.isFinite(retryHeader) ? Math.max(1, Math.ceil(retryHeader)) : 10;
                 retryUntil = Date.now() + retryAfter * 1000;
                 thinking.textContent = `${data.error || 'Jaguar is resting for a moment.'}\nTry again in ${retryAfter}s.`;
                 window.clearInterval(retryTimer);

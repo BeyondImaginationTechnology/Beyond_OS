@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 enum DailyBreathTab: String, Hashable {
-    case today, scripture, academy, breathe, journal
+    case today, scripture, chat, academy, breathe, journal
 }
 
 struct RootView: View {
@@ -35,6 +35,7 @@ struct RootView: View {
                 Section("Your practice") {
                     navigationRow(.today, title: "Today", symbol: "sun.max.fill", subtitle: "A steady beginning")
                     navigationRow(.scripture, title: "Scripture", symbol: "book.closed.fill", subtitle: "Read and reflect")
+                    navigationRow(.chat, title: "Chat", symbol: "bubble.left.and.bubble.right.fill", subtitle: "Ask your faith guide")
                     navigationRow(.academy, title: "Academy", symbol: "graduationcap.fill", subtitle: "Learn at your pace")
                     navigationRow(.breathe, title: "Breathe", symbol: "wind", subtitle: "Find your next breath")
                     navigationRow(.journal, title: "Journal", symbol: "square.and.pencil", subtitle: "Keep what matters")
@@ -93,6 +94,7 @@ struct RootView: View {
             UserDefaults.standard.set(FaithTradition.quran.id, forKey: "selectedFaithTradition")
             store.publishSelectedFaithContent()
             selectedTab = .scripture
+        case "chat": selectedTab = .chat
         case "academy": selectedTab = .academy
         default: selectedTab = .today
         }
@@ -123,6 +125,8 @@ struct RootView: View {
             NavigationStack { TodayView() }
         case .scripture:
             NavigationStack { ScriptureLibraryView() }
+        case .chat:
+            NavigationStack { DailyBreathChatDestination() }
         case .academy:
             NavigationStack { AcademyView() }
         case .breathe:
@@ -130,6 +134,19 @@ struct RootView: View {
         case .journal:
             NavigationStack { JournalView() }
         }
+    }
+}
+
+private struct DailyBreathChatDestination: View {
+    @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
+
+    private var tradition: FaithTradition {
+        FaithTradition(rawValue: traditionID) ?? .bible
+    }
+
+    var body: some View {
+        JaguarScriptureChatView(guide: .init(tradition: tradition))
+            .id(tradition.id)
     }
 }
 

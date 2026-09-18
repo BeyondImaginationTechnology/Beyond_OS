@@ -53,15 +53,11 @@ struct ScriptureLibraryView: View {
                 .pickerStyle(.menu)
             }
 
-            Section("Ask Jaguar") {
-                Text("Explore your tradition with a dedicated guide powered by Llama Jaguar.")
+            Section("Daily Breath Chat") {
+                Text("Ask your selected faith guide about Daily Breath or this sacred-text tradition.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                HStack(spacing: 10) {
-                    scriptureGuideLink(.chris)
-                    scriptureGuideLink(.dovi)
-                    scriptureGuideLink(.moe)
-                }
+                scriptureGuideLink(.init(tradition: tradition))
             }
 
             if store.isBibleLoading {
@@ -145,7 +141,7 @@ struct ScriptureLibraryView: View {
                 .padding(.vertical, 9)
         }
         .buttonStyle(.borderedProminent)
-        .accessibilityLabel("Chat with \(guide.name) in Llama Jaguar")
+        .accessibilityLabel("Chat with \(guide.name) in Daily Breath")
     }
 
     private var overview: some View {

@@ -50,6 +50,7 @@
 		300000000000000000000044 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000049 /* Localizable.strings */; };
 		300000000000000000000045 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000049 /* Localizable.strings */; };
 		300000000000000000000046 /* BeyondIDAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000050 /* BeyondIDAuth.swift */; };
+		300000000000000000000047 /* JaguarScriptureChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000051 /* JaguarScriptureChatView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -149,6 +150,7 @@
 		100000000000000000000047 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		100000000000000000000048 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		100000000000000000000050 /* BeyondIDAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeyondIDAuth.swift; sourceTree = "<group>"; };
+		100000000000000000000051 /* JaguarScriptureChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JaguarScriptureChatView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -210,6 +212,7 @@
 				100000000000000000000029 /* Info.plist */,
 				100000000000000000000035 /* InterfaithScripture.swift */,
 				100000000000000000000006 /* JournalView.swift */,
+				100000000000000000000051 /* JaguarScriptureChatView.swift */,
 				100000000000000000000007 /* Models.swift */,
 				100000000000000000000020 /* NotificationService.swift */,
 				100000000000000000000021 /* ReminderSettingsView.swift */,
@@ -502,6 +505,7 @@
 				300000000000000000000027 /* FeatureViews.swift in Sources */,
 				300000000000000000000032 /* InterfaithScripture.swift in Sources */,
 				300000000000000000000006 /* JournalView.swift in Sources */,
+				300000000000000000000047 /* JaguarScriptureChatView.swift in Sources */,
 				300000000000000000000007 /* Models.swift in Sources */,
 				300000000000000000000019 /* NotificationService.swift in Sources */,
 				300000000000000000000020 /* ReminderSettingsView.swift in Sources */,
@@ -687,7 +691,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -709,7 +713,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 2.0.1;
+				MARKETING_VERSION = 2.0.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -754,7 +758,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 21;
+				CURRENT_PROJECT_VERSION = 22;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -770,7 +774,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 2.0.1;
+				MARKETING_VERSION = 2.0.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

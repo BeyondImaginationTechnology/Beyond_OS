@@ -1,6 +1,6 @@
 # DailyBreath for iOS
 
-Native SwiftUI app for DailyBreath 2.0 (build 20).
+Native SwiftUI app for DailyBreath 2.0.2 (build 22).
 
 ## Included in this build
 
@@ -14,6 +14,7 @@ Native SwiftUI app for DailyBreath 2.0 (build 20).
 - Matched Bible, Torah, and Quran Verse of the Day themes
 - Exactly two Christian, Jewish, and Muslim Academy journeys—Joining the Faith and Recovery—with saved progress and a Beyond Imagination completion certificate
 - Chris, Dovi, and Moe illustrated Academy guides
+- Main-navigation chat with the selected Chris, Dovi, or Moe guide, localized prompts, and Daily Breath-only/no-GPU request enforcement
 - Olive-era logo plus Torah Light and Quran Moon themes
 - Guided breathing practices and optional daily reminders
 - Private, file-protected reflection journal stored on device
@@ -32,7 +33,7 @@ Native SwiftUI app for DailyBreath 2.0 (build 20).
 
 Generate the Xcode project with `xcodegen generate`, then open `TheDailyBreath.xcodeproj`.
 
-The app works offline with bundled content and refreshes the verse, devotional, and weekly challenge from the DailyBreath web API when available. Private user data remains protected on device unless the user explicitly enables encrypted iCloud sync. No Daily Breath account or subscription is required.
+The reading, practice, Academy, and journal experiences work offline with bundled content and refresh scheduled content from the DailyBreath web API when available. Chat requires a network connection and Beyond-ID sign-in. Private user data remains protected on device unless the user explicitly enables encrypted iCloud sync. No Daily Breath subscription is required.
 
 ## Release checks
 

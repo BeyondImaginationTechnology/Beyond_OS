@@ -22,7 +22,7 @@
     <div id="modePill" class="mode-pill"><span>SCHEDULED · READ ONLY</span><button id="editScheduled" class="btn secondary" type="button">Edit scheduled</button></div>
     <div id="scheduleNav" class="schedule-nav"><button id="previousLesson" class="btn secondary" type="button" aria-label="Previous scheduled lesson">←</button><button id="todayLesson" class="btn secondary" type="button">Today</button><button id="nextLesson" class="btn secondary" type="button" aria-label="Next scheduled lesson">→</button><button id="reloadLesson" class="btn secondary" type="button" aria-label="Reload scheduled lesson">↻</button></div>
     <div id="draftTools" class="draft-tools" hidden><button id="generateTodayPhrase" class="btn primary wide" type="button">✨ Choose from prerecorded bank</button><span class="hint">French stays primary. Italian, German, Russian, and Portuguese use the same visual template.</span></div>
-    <div class="voice-integration"><strong>Azure prerecorded bank <span id="bankProgress">Checking…</span></strong><span>Target: 100 complete phrases × 5 languages.</span><button id="buildBank" class="btn secondary" type="button" style="margin-top:8px">Build next Azure batch</button></div>
+    <div class="voice-integration"><strong>ElevenLabs prerecorded bank <span id="bankProgress">Checking…</span></strong><span>Target: 100 complete phrases × 5 languages.</span><button id="buildBank" class="btn secondary" type="button" style="margin-top:8px">Build next ElevenLabs batch</button></div>
 
     <section class="group">
       <div class="field"><label for="phrase">Today’s English phrase</label><input id="phrase" type="text" placeholder="Loading today’s lesson…"></div>
@@ -46,14 +46,14 @@
       <div class="voice-integration">
         <span class="voice-state __VOICE_STATUS_CLASS__">__VOICE_STATUS__</span>
         <strong>__VOICE_PROVIDER__</strong>
-        <span>Scheduled exports reuse prerecorded audio. Azure usage occurs only when building missing bank tracks.</span>
+        <span>Scheduled exports reuse prerecorded audio. ElevenLabs is used only when rebuilding missing bank tracks.</span>
         <a href="/server/admin/daily-studio/voice-settings.php">Configure premium voices</a>
       </div>
       <div class="grid"><label class="check"><input id="includeNarration" type="checkbox"> Include server audio</label><label class="check"><input id="showBadge" type="checkbox" checked> Show playing badge</label></div>
-      <div class="field" style="margin-top:13px"><label for="narrationProvider">Narration provider for export</label><select id="narrationProvider"><option value="azure">Azure Speech</option></select><div class="hint">This language bank uses Azure Speech for previews, MP3s, and narrated video.</div></div>
+      <div class="field" style="margin-top:13px"><label for="narrationProvider">Narration provider for export</label><select id="narrationProvider"><option value="elevenlabs">ElevenLabs Premium</option><option value="azure">Azure Speech</option></select><div class="hint">ElevenLabs is preferred for previews, MP3s, and narrated video. Uploading an MP3 remains available without a subscription.</div></div>
       <div class="field" style="margin-top:13px"><label for="exportLanguage">Export version</label><select id="exportLanguage"><option value="fr">French</option><option value="it">Italian</option><option value="de">German</option><option value="ru">Russian</option><option value="pt">Portuguese</option></select></div>
       <div class="field" style="margin-top:13px"><label for="narratorLocale">Narrator voice</label><select id="narratorLocale"><option value="fr-FR">French</option><option value="it-IT">Italian</option><option value="de-DE">German</option><option value="ru-RU">Russian</option><option value="pt-PT">Portuguese</option></select></div>
-      <div class="field"><label for="audioFile">Optional narration override</label><input id="audioFile" type="file" accept="audio/*"><div class="hint">Scheduled lessons reuse their prerecorded Azure bank audio automatically.</div></div>
+      <div class="field"><label for="audioFile">Optional narration override</label><input id="audioFile" type="file" accept="audio/*"><div class="hint">Scheduled lessons reuse their prerecorded ElevenLabs bank audio automatically.</div></div>
       <div class="audio-row"><button id="previewAudio" class="btn secondary" type="button">Preview narration</button><button id="stopAudio" class="btn secondary" type="button">Stop</button></div>
     </section>
 
@@ -183,12 +183,12 @@
       let response=await fetch('/server/admin/daily-studio/api/build-multilingual-bank.php?action=random',{cache:'no-store'});
       let data=await response.json();
       if(response.status===404){
-        setStatus('The prerecorded bank is empty. Generating the first French-first phrase and five Azure tracks…');
+        setStatus('The prerecorded bank is empty. Generating the first French-first phrase and five ElevenLabs tracks…');
         response=await fetch('/server/admin/daily-studio/api/build-multilingual-bank.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:'{}'});
         data=await response.json();
         if(response.ok&&data.built)data={...data,item:data.built,remaining:Math.max(0,(data.ready||1)-1)};
       }
-      if(!response.ok||!data.item)throw new Error(data.error||'No prerecorded phrase was returned. Check the Azure settings and build the bank.');
+      if(!response.ok||!data.item)throw new Error(data.error||'No prerecorded phrase was returned. Add the five ElevenLabs voice IDs and build the bank.');
       const item=data.item,date=v('publishDate')||nextAvailableDate||localDateParts().date;populateLesson(item,date);contentMode='draft';updateModeUi();
       setStatus(`Prerecorded phrase selected — ${data.remaining} unused bank phrases remain.`);
     }catch(error){setStatus(error.message||'Phrase generation failed.',true)}finally{button.disabled=false}
@@ -201,19 +201,19 @@
       return data;
     }catch(error){$('bankProgress').textContent='unavailable';throw error}
   }
-  async function buildAzureBank(){
-    if(bankBuilding){bankBuilding=false;$('buildBank').textContent='Resume Azure bank build';return}
+  async function buildElevenLabsBank(){
+    if(bankBuilding){bankBuilding=false;$('buildBank').textContent='Resume ElevenLabs bank build';return}
     bankBuilding=true;const button=$('buildBank');button.textContent='Stop after current phrase';
     try{
       let progress=await refreshBankProgress();
       while(bankBuilding&&progress.ready<progress.target){
-        setStatus(`Generating prerecorded Azure phrase ${progress.ready+1} of ${progress.target}…`);
+        setStatus(`Generating prerecorded ElevenLabs phrase ${progress.ready+1} of ${progress.target}…`);
         const response=await fetch('/server/admin/daily-studio/api/build-multilingual-bank.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:'{}'}),data=await response.json();
-        if(!response.ok||!data.ok)throw new Error(data.error||'The Azure bank build stopped.');
+        if(!response.ok||!data.ok)throw new Error(data.error||'The ElevenLabs bank build stopped.');
         progress={ready:data.ready,target:data.target};$('bankProgress').textContent=`${progress.ready} / ${progress.target} ready`;
       }
-      setStatus(progress.ready>=progress.target?'The 100-phrase Azure bank is complete: 500 prerecorded MP3 tracks are ready.':'Azure bank build paused. You can resume without losing completed phrases.');
-    }catch(error){setStatus(error.message||'The Azure bank build stopped.',true)}finally{bankBuilding=false;button.textContent='Build / resume Azure bank'}
+      setStatus(progress.ready>=progress.target?'The 100-phrase ElevenLabs bank is complete: 500 prerecorded MP3 tracks are ready.':'ElevenLabs bank build paused. You can resume without losing completed phrases.');
+    }catch(error){setStatus(error.message||'The ElevenLabs bank build stopped.',true)}finally{bankBuilding=false;button.textContent='Build / resume ElevenLabs bank'}
   }
   function narrationText(locale=v('narratorLocale')){
     if(locale==='fr-FR')return v('french');
@@ -282,7 +282,7 @@
   async function exportAllLanguagesVideo(){
     if(!window.MediaRecorder||!canvas.captureStream){setStatus('Batch video export is not supported by this browser.',true);return}await ensureBrand();
     const usingBank=Object.keys(scheduledAudioUrls).length===5;
-    if(!usingBank&&!confirm('The prerecorded bank is incomplete. Export may call Azure Speech five times. Continue?'))return;
+    if(!usingBank&&!confirm('The prerecorded bank is incomplete. Export may call ElevenLabs five times. Continue?'))return;
     const button=$('exportAllVideo'),originalLanguage=v('exportLanguage'),originalLocale=v('narratorLocale'),languages=[['fr','fr-FR','French'],['it','it-IT','Italian'],['de','de-DE','German'],['ru','ru-RU','Russian'],['pt','pt-PT','Portuguese']];button.disabled=true;stop();let audioContext=null,running=true,recorder=null;
     try{
       setStatus('Preparing the narrated language video…');const stream=canvas.captureStream(30);audioContext=new (window.AudioContext||window.webkitAudioContext)();await audioContext.resume();const destination=audioContext.createMediaStreamDestination();destination.stream.getAudioTracks().forEach(track=>stream.addTrack(track));
@@ -303,7 +303,7 @@
   async function saveDailyPhrase(){
     if(contentMode!=='draft'&&contentMode!=='edit'){setStatus('Open Create Draft or confirm Edit scheduled before publishing.',true);return false}
     const button=$('saveDailyPhrase');button.disabled=true;setStatus('Saving the lesson and verifying five prerecorded tracks…');
-    const payload={source_id:selectedSourceId,publish_date:v('publishDate'),english:v('phrase'),meaning:v('meaning'),french:v('french'),french_pronunciation:v('frenchPron'),italian:v('italian'),italian_pronunciation:v('italianPron'),german:v('german'),german_pronunciation:v('germanPron'),russian:v('russian'),russian_pronunciation:v('russianPron'),portuguese:v('portuguese'),portuguese_pronunciation:v('portuguesePron'),culture_note:v('culture'),narration_provider:'azure',confirm_overwrite:contentMode==='edit'};
+    const payload={source_id:selectedSourceId,publish_date:v('publishDate'),english:v('phrase'),meaning:v('meaning'),french:v('french'),french_pronunciation:v('frenchPron'),italian:v('italian'),italian_pronunciation:v('italianPron'),german:v('german'),german_pronunciation:v('germanPron'),russian:v('russian'),russian_pronunciation:v('russianPron'),portuguese:v('portuguese'),portuguese_pronunciation:v('portuguesePron'),culture_note:v('culture'),narration_provider:'elevenlabs',confirm_overwrite:contentMode==='edit'};
     try{
       const publish=()=>fetch('/server/admin/daily-studio/api/save-multilingual-phrase.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(payload)});
       let response=await publish(),data=await response.json();
@@ -386,7 +386,7 @@
       if(scheduledAudioMatches()){
         const response=await fetch(scheduledAudioUrls[v('exportLanguage')],{cache:'force-cache'});
         const type=(response.headers.get('content-type')||'').toLowerCase();
-        if(response.ok&&(type.startsWith('audio/')||type==='application/octet-stream')){const blob=await response.blob();if(blob.size>=128){download(blob,baseName()+'.mp3');setStatus('Today’s prerecorded Azure MP3 downloaded.');return}}
+        if(response.ok&&(type.startsWith('audio/')||type==='application/octet-stream')){const blob=await response.blob();if(blob.size>=128){download(blob,baseName()+'.mp3');setStatus('Today’s prerecorded ElevenLabs MP3 downloaded.');return}}
       }
       const response=await fetch('/beyond-id/admin/api/french-narration-export.php',{
         method:'POST',
@@ -406,7 +406,7 @@
       setStatus(savedUrl?'MP3 saved to the French audio library and downloaded.':'MP3 generated and downloaded.');
     }catch(error){setStatus(error.message||'MP3 export failed.',true)}finally{button.disabled=false}
   }
-  updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{if(el.id==='publishDate')setFieldValue('weekday',weekdayForDate(el.value),false);updateAudioUi(el.id);draw()});el.addEventListener('change',()=>{if(el.id==='publishDate'&&(contentMode==='scheduled'||contentMode==='empty')){loadScheduleDate(el.value);return}updateAudioUi(el.id);draw()})});$('scheduledMode').onclick=()=>loadScheduleDate(contentMode==='draft'?localDateParts().date:(v('publishDate')||localDateParts().date));$('createDraft').onclick=enterDraftMode;$('editScheduled').onclick=editScheduledLesson;$('previousLesson').onclick=()=>scheduleNavigation.previous&&loadScheduleDate(scheduleNavigation.previous);$('todayLesson').onclick=()=>loadScheduleDate(localDateParts().date);$('nextLesson').onclick=()=>scheduleNavigation.next&&loadScheduleDate(scheduleNavigation.next);$('reloadLesson').onclick=()=>loadScheduleDate(v('publishDate')||localDateParts().date);$('saveDailyPhrase').onclick=saveDailyPhrase;$('saveAndExportVideo').onclick=saveAndExportVideo;$('exportRemotionVideo').onclick=remotionVideo;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;$('generateTodayPhrase').onclick=generateTodayPhrase;$('buildBank').onclick=buildAzureBank;draw();refreshBankProgress().catch(()=>{});loadScheduleDate();
+  updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{if(el.id==='publishDate')setFieldValue('weekday',weekdayForDate(el.value),false);updateAudioUi(el.id);draw()});el.addEventListener('change',()=>{if(el.id==='publishDate'&&(contentMode==='scheduled'||contentMode==='empty')){loadScheduleDate(el.value);return}updateAudioUi(el.id);draw()})});$('scheduledMode').onclick=()=>loadScheduleDate(contentMode==='draft'?localDateParts().date:(v('publishDate')||localDateParts().date));$('createDraft').onclick=enterDraftMode;$('editScheduled').onclick=editScheduledLesson;$('previousLesson').onclick=()=>scheduleNavigation.previous&&loadScheduleDate(scheduleNavigation.previous);$('todayLesson').onclick=()=>loadScheduleDate(localDateParts().date);$('nextLesson').onclick=()=>scheduleNavigation.next&&loadScheduleDate(scheduleNavigation.next);$('reloadLesson').onclick=()=>loadScheduleDate(v('publishDate')||localDateParts().date);$('saveDailyPhrase').onclick=saveDailyPhrase;$('saveAndExportVideo').onclick=saveAndExportVideo;$('exportRemotionVideo').onclick=remotionVideo;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;$('generateTodayPhrase').onclick=generateTodayPhrase;$('buildBank').onclick=buildElevenLabsBank;draw();refreshBankProgress().catch(()=>{});loadScheduleDate();
 })();
 </script>
 </body>

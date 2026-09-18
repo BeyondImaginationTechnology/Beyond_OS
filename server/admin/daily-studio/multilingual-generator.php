@@ -21,17 +21,20 @@ $rendererPath = __DIR__ . '/assets/beyond-french-remotion-renderer.js';
 $rendererVersion = is_file($rendererPath) ? (string)filemtime($rendererPath) : 'missing';
 $view = str_replace('__FRENCH_RENDERER_VERSION__', rawurlencode($rendererVersion), $view);
 
-$azureReady = false;
+$elevenLabsReady = false;
 try {
-    $azureReady = trim((string)beyond_config('narration.azure.api_key', '')) !== ''
-        && trim((string)beyond_config('narration.azure.region', '')) !== '';
+    $elevenLabsReady = trim((string)beyond_config('narration.elevenlabs.api_key', beyond_config('voice.api_key', ''))) !== '';
+    foreach (['fr-FR', 'it-IT', 'de-DE', 'ru-RU', 'pt-PT'] as $locale) {
+        $voice = beyond_config('narration.elevenlabs.voices.' . $locale, beyond_config('voice.voices.' . $locale, ''));
+        if (!is_string($voice) || trim($voice) === '') $elevenLabsReady = false;
+    }
 } catch (Throwable $error) {
-    error_log('Euro Expansion generator Azure status unavailable: ' . $error->getMessage());
+    error_log('Euro Expansion generator ElevenLabs status unavailable: ' . $error->getMessage());
 }
 
 $view = str_replace(
     ['__VOICE_PROVIDER__', '__VOICE_STATUS__', '__VOICE_STATUS_CLASS__'],
-    ['Azure Speech', $azureReady ? 'Ready' : 'Needs configuration', $azureReady ? 'ready' : 'needs-config'],
+    ['ElevenLabs Premium', $elevenLabsReady ? 'Ready' : 'Needs voice IDs', $elevenLabsReady ? 'ready' : 'needs-config'],
     $view
 );
 

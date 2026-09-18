@@ -27,8 +27,12 @@ function multilingualRussianPronunciation(string $text): string {
 function multilingualScheduleBuiltItem(string $scheduleFile, array $item): string {
     $scheduled = is_file($scheduleFile) ? json_decode((string)file_get_contents($scheduleFile), true) : [];
     if (!is_array($scheduled)) $scheduled = [];
-    foreach ($scheduled as $lesson) {
-        if ((string)($lesson['source_id'] ?? '') === (string)($item['source_id'] ?? '')) return (string)($lesson['date'] ?? '');
+    foreach ($scheduled as $index => $lesson) {
+        if ((string)($lesson['source_id'] ?? '') !== (string)($item['source_id'] ?? '')) continue;
+        $scheduled[$index]['audio_urls'] = (array)($item['audio_urls'] ?? []);
+        $scheduled[$index]['generator'] = [...(array)($lesson['generator'] ?? []), 'provider'=>'elevenlabs', 'audio_rebuilt_at'=>date(DATE_ATOM)];
+        multilingualBankWrite($scheduleFile, $scheduled);
+        return (string)($lesson['date'] ?? '');
     }
     $dates = array_values(array_filter(array_map(static fn(array $lesson): string => (string)($lesson['date'] ?? ''), $scheduled), static fn(string $date): bool => preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) === 1));
     sort($dates);
@@ -38,9 +42,29 @@ function multilingualScheduleBuiltItem(string $scheduleFile, array $item): strin
     $maxId = 0;
     foreach ($scheduled as $lesson) $maxId = max($maxId, (int)($lesson['id'] ?? 0));
     $date = $next->format('Y-m-d');
-    $scheduled[] = [...$item, 'id'=>$maxId+1, 'date'=>$date, 'generator'=>['version'=>'1.3.0','provider'=>'azure','schedule'=>'automatic-bank','scheduled_at'=>date(DATE_ATOM)]];
+    $scheduled[] = [...$item, 'id'=>$maxId+1, 'date'=>$date, 'generator'=>['version'=>'1.4.0','provider'=>'elevenlabs','schedule'=>'automatic-bank','scheduled_at'=>date(DATE_ATOM)]];
     multilingualBankWrite($scheduleFile, $scheduled);
     return $date;
+}
+function multilingualAudioReady(string $root, string $url): bool {
+    $path = rawurldecode((string)(parse_url($url, PHP_URL_PATH) ?: ''));
+    if ($path === '' || str_contains($path, '..')) return false;
+    $file = $root . '/' . ltrim($path, '/');
+    if (!is_file($file) || filesize($file) < 128) return false;
+    try {
+        $audio = file_get_contents($file);
+        studio_assert_mp3(is_string($audio) ? $audio : '');
+        return true;
+    } catch (Throwable) {
+        return false;
+    }
+}
+function multilingualBankItemReady(string $root, array $item): bool {
+    $urls = (array)($item['audio_urls'] ?? []);
+    foreach (['fr','it','de','ru','pt'] as $language) {
+        if (!is_string($urls[$language] ?? null) || !multilingualAudioReady($root, $urls[$language])) return false;
+    }
+    return true;
 }
 function azureTranslatePhrase(string $english): array {
     $key = trim((string)beyond_config('ai.azure_translator.api_key', ''));
@@ -82,15 +106,15 @@ $bankFile = $root . '/beyond-french/data/multilingual-bank.json';
 $scheduleFile = $root . '/beyond-french/data/multilingual-lessons.json';
 $bank = is_file($bankFile) ? json_decode((string)file_get_contents($bankFile), true) : [];
 if (!is_array($bank)) $bank = [];
-$ready = count(array_filter($bank, static fn(array $item): bool => count((array)($item['audio_urls'] ?? [])) === 5));
+$ready = count(array_filter($bank, static fn(array $item): bool => multilingualBankItemReady($root, $item)));
 $action = strtolower((string)($_GET['action'] ?? 'status'));
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'random') {
     $scheduled = is_file($scheduleFile) ? json_decode((string)file_get_contents($scheduleFile), true) : [];
     if (!is_array($scheduled)) $scheduled = [];
     $used = array_fill_keys(array_map(static fn(array $item): string => (string)($item['source_id'] ?? ''), $scheduled), true);
-    $available = array_values(array_filter($bank, static fn(array $item): bool => count((array)($item['audio_urls'] ?? [])) === 5 && !isset($used[(string)($item['source_id'] ?? '')])));
-    if (!$available) multilingualBankResponse(['ok'=>false,'error'=>'No unused prerecorded phrase is ready. Build more of the Azure bank.'], 404);
+    $available = array_values(array_filter($bank, static fn(array $item): bool => multilingualBankItemReady($root, $item) && !isset($used[(string)($item['source_id'] ?? '')])));
+    if (!$available) multilingualBankResponse(['ok'=>false,'error'=>'No unused prerecorded phrase is ready. Build or resume the ElevenLabs bank.'], 404);
     $item = $available[random_int(0, count($available) - 1)];
     multilingualBankResponse(['ok'=>true,'item'=>$item,'remaining'=>count($available)-1,'ready'=>$ready,'target'=>100]);
 }
@@ -113,18 +137,36 @@ try {
         if (count($sources) === 100) break;
     }
     if (count($sources) < 100) throw new RuntimeException('At least 100 unique French source phrases are required.');
-    $existing = array_fill_keys(array_map(static fn(array $item): string => (string)($item['source_id'] ?? ''), $bank), true);
     $built = null;
+    $locales = ['fr'=>'fr-FR','it'=>'it-IT','de'=>'de-DE','ru'=>'ru-RU','pt'=>'pt-PT'];
+    foreach ($bank as $index => $record) {
+        if (multilingualBankItemReady($root, $record)) continue;
+        $texts = ['fr'=>(string)($record['french'] ?? ''), 'it'=>(string)($record['italian'] ?? ''), 'de'=>(string)($record['german'] ?? ''), 'ru'=>(string)($record['russian'] ?? ''), 'pt'=>(string)($record['portuguese'] ?? '')];
+        foreach ($texts as $language=>$text) {
+            if ($text === '') throw new RuntimeException('A saved Euro lesson is missing its ' . $language . ' text.');
+            $generated = studio_narration_generate($text, $locales[$language], 'elevenlabs');
+            $stored = studio_store_mp3((string)$generated['audio_content'], 'beyond-french', date('Y-m-d'), $locales[$language], $text);
+            $record['audio_urls'][$language] = (string)$stored['url'];
+        }
+        $record['audio_provider'] = 'elevenlabs';
+        $record['audio_rebuilt_at'] = date(DATE_ATOM);
+        $bank[$index] = $record;
+        multilingualBankWrite($bankFile, $bank);
+        $record['scheduled_date'] = multilingualScheduleBuiltItem($scheduleFile, $record);
+        $built = $record;
+        break;
+    }
+    $existing = array_fill_keys(array_map(static fn(array $item): string => (string)($item['source_id'] ?? ''), $bank), true);
+    if ($built === null) {
     foreach ($sources as $lesson) {
         $sourceId = (string)($lesson['id'] ?? sha1((string)$lesson['english']));
         if (isset($existing[$sourceId])) continue;
         $translated = azureTranslatePhrase((string)$lesson['english']);
         $texts = ['fr'=>(string)$lesson['french'], 'it'=>$translated['it'], 'de'=>$translated['de'], 'ru'=>$translated['ru'], 'pt'=>$translated['pt']];
-        $locales = ['fr'=>'fr-FR','it'=>'it-IT','de'=>'de-DE','ru'=>'ru-RU','pt'=>'pt-PT'];
         $audioUrls = [];
         foreach ($texts as $language=>$text) {
-            $generated = studio_narration_generate($text, $locales[$language], 'azure');
-            $stored = studio_store_mp3((string)$generated['audio_content'], 'beyond-french', 'bank-' . str_pad($sourceId, 4, '0', STR_PAD_LEFT), $locales[$language], $text);
+            $generated = studio_narration_generate($text, $locales[$language], 'elevenlabs');
+            $stored = studio_store_mp3((string)$generated['audio_content'], 'beyond-french', date('Y-m-d'), $locales[$language], $text);
             $audioUrls[$language] = (string)$stored['url'];
         }
         $built = [
@@ -145,9 +187,10 @@ try {
         $built['scheduled_date'] = multilingualScheduleBuiltItem($scheduleFile, $built);
         break;
     }
-    $ready = count(array_filter($bank, static fn(array $item): bool => count((array)($item['audio_urls'] ?? [])) === 5));
+    }
+    $ready = count(array_filter($bank, static fn(array $item): bool => multilingualBankItemReady($root, $item)));
     multilingualBankResponse(['ok'=>true,'built'=>$built,'ready'=>$ready,'target'=>100,'complete'=>$ready>=100]);
 } catch (Throwable $error) {
-    error_log('Multilingual Azure bank: ' . $error->getMessage());
+    error_log('Multilingual ElevenLabs bank: ' . $error->getMessage());
     multilingualBankResponse(['ok'=>false,'error'=>$error->getMessage(),'ready'=>$ready,'target'=>100], 502);
 }

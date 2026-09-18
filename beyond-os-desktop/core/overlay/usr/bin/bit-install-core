@@ -9,7 +9,10 @@ fail() { printf '%s\n' "Installer stopped: $*" >&2; exit 1; }
 notice() { printf '%s\n' "$*"; }
 partition_disk() { printf '/dev/%s\n' "$(lsblk -n -o PKNAME "$1" | head -n 1)"; }
 partition_type() { lsblk -n -o TYPE "$1"; }
-unmounted() { ! mountpoint -q "$1"; }
+unmounted() {
+  ! findmnt -rn -S "$1" >/dev/null 2>&1 &&
+    ! swapon --show=NAME --noheadings 2>/dev/null | grep -Fxq "$1"
+}
 
 [ "$(id -u)" -eq 0 ] || fail "installer must start from the installer boot entry"
 [ -d /sys/firmware/efi ] || fail "UEFI boot is required"
@@ -52,6 +55,8 @@ case "$mode" in
     [ "$target_root" != "$source_root" ] || fail "the installer media cannot be the install target"
     target_disk=$(partition_disk "$target_root")
     [ "$source_kind" = iso ] || [ "$target_disk" != "$source_disk" ] || fail "the installer USB disk cannot be the install target"
+    root_type=$(blkid -s PART_ENTRY_TYPE -o value "$target_root" || true)
+    [ "$root_type" = "$linux_guid" ] || fail "target must use the Linux filesystem partition type; refusing to overwrite a Windows/basic-data partition"
     unmounted "$target_root" || fail "target partition is mounted"
     [ "$(blockdev --getsize64 "$target_root")" -ge "$source_bytes" ] || fail "target partition is smaller than the Core image"
 

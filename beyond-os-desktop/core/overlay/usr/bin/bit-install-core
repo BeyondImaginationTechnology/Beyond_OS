@@ -55,7 +55,9 @@ case "$mode" in
     [ "$target_root" != "$source_root" ] || fail "the installer media cannot be the install target"
     target_disk=$(partition_disk "$target_root")
     [ "$source_kind" = iso ] || [ "$target_disk" != "$source_disk" ] || fail "the installer USB disk cannot be the install target"
-    root_type=$(blkid -s PART_ENTRY_TYPE -o value "$target_root" || true)
+    # BusyBox blkid reports filesystem metadata but not GPT PART_ENTRY_TYPE.
+    # lsblk exposes the kernel's partition type and is already required here.
+    root_type=$(lsblk -n -o PARTTYPE "$target_root" | head -n 1 | tr '[:upper:]' '[:lower:]')
     [ "$root_type" = "$linux_guid" ] || fail "target must use the Linux filesystem partition type; refusing to overwrite a Windows/basic-data partition"
     unmounted "$target_root" || fail "target partition is mounted"
     [ "$(blockdev --getsize64 "$target_root")" -ge "$source_bytes" ] || fail "target partition is smaller than the Core image"
@@ -65,7 +67,7 @@ case "$mode" in
     [ -b "$target_esp" ] || fail "EFI System Partition is not a block device"
     [ "$(partition_type "$target_esp")" = part ] || fail "EFI System Partition must be a partition"
     [ "$(partition_disk "$target_esp")" = "$target_disk" ] || fail "EFI System Partition is not on the target disk"
-    esp_type=$(blkid -s PART_ENTRY_TYPE -o value "$target_esp" || true)
+    esp_type=$(lsblk -n -o PARTTYPE "$target_esp" | head -n 1 | tr '[:upper:]' '[:lower:]')
     [ "$esp_type" = "$efi_guid" ] || fail "chosen partition is not an EFI System Partition"
     unmounted "$target_esp" || fail "EFI System Partition is mounted"
 

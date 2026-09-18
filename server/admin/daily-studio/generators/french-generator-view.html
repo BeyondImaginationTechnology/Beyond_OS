@@ -13,6 +13,12 @@
   </style>
 </head>
 <body>
+<script>
+  // Mobile Safari can restore this admin page from its back-forward cache,
+  // bypassing the no-store response header. Re-fetch the current generator
+  // when the page is restored from that snapshot.
+  window.addEventListener('pageshow', event => { if (event.persisted) window.location.reload(); });
+</script>
 <main class="shell">
   <aside class="controls">
     <a class="back" href="/server/admin/daily-studio/">&larr; Admin dashboard</a>

@@ -190,17 +190,24 @@ $jaguarModes = jaguar_mode_catalog();
         const controller = new AbortController();
         const timeout = window.setTimeout(() => controller.abort(), 115000);
         try {
-            const response = await fetch('/ai/api/chat.php', {
+            const requestBody = JSON.stringify({mode: modeSelect.value, language, messages: history, nonce: signedIn ? '' : jaguarNonce, nonce_issued_at: signedIn ? 0 : jaguarNonceIssuedAt, nonce_signature: signedIn ? '' : jaguarNonceSignature});
+            const requestOptions = {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf},
-                body: JSON.stringify({mode: modeSelect.value, language, messages: history, nonce: signedIn ? '' : jaguarNonce, nonce_issued_at: signedIn ? 0 : jaguarNonceIssuedAt, nonce_signature: signedIn ? '' : jaguarNonceSignature}),
+                body: requestBody,
+                cache: 'no-store',
                 signal: controller.signal
-            });
-            updateNonceFromResponse(response);
-            const responseType = response.headers.get('Content-Type') || '';
+            };
+            let response = await fetch('/ai/api/chat.php?v=20260918-2', requestOptions);
+            let responseType = response.headers.get('Content-Type') || '';
+            if (!responseType.toLowerCase().includes('application/json')) {
+                response = await fetch(`/ai/api/chat.php?v=20260918-2&retry=${Date.now()}`, requestOptions);
+                responseType = response.headers.get('Content-Type') || '';
+            }
             if (!responseType.toLowerCase().includes('application/json')) {
                 throw new Error(`Jaguar API returned an unexpected ${response.status} response. Refresh the page and try again.`);
             }
+            updateNonceFromResponse(response);
             const data = await response.json();
             if (!response.ok && response.status === 403 && /secure session|security check/i.test(data.error || '')) {
                 thinking.textContent = `${data.error || 'Your secure session expired.'}\nRefresh Jaguar and try again.`;

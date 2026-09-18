@@ -259,7 +259,10 @@
         let blob=await narrationBlob(locale,{allowUpload:false});recorder.resume();try{await playNarrationInto(blob,audioContext,destination)}catch(error){
           // A stale scheduled URL can point to an HTML login page or a removed
           // object. Recover by generating a fresh track for this export.
-          blob=await narrationBlob(locale,{allowUpload:false,preferGenerated:true});await playNarrationInto(blob,audioContext,destination)
+          try{blob=await narrationBlob(locale,{allowUpload:false,preferGenerated:true});await playNarrationInto(blob,audioContext,destination)}catch(recoveryError){
+            // Keep the visual export usable when both audio sources are down.
+            setStatus(`${label} narration unavailable; recording this segment silently.`);await new Promise(resolve=>setTimeout(resolve,4000));
+          }
         }recorder.pause();
       }
       running=false;recorder.stop();await finished;const mime=recorder.mimeType||type||'video/webm',mp4=mime.includes('mp4');download(new Blob(chunks,{type:mime}),`francais-du-jour-all-languages-${v('publishDate')||'post'}${mp4?'.mp4':'.webm'}`);setStatus(mp4?'Narrated language export finished as one MP4.':'Narrated language export finished as one WebM because this browser cannot record MP4.');

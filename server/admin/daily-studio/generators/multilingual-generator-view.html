@@ -172,7 +172,7 @@
   function clearContent(date=''){selectedSourceId='';contentIds.forEach(id=>setFieldValue(id,'',false));setFieldValue('publishDate',date,false);setFieldValue('weekday',weekdayForDate(date),false);draw()}
   function setContentLocked(locked){contentIds.forEach(id=>{$(id).readOnly=locked});$('publishDate').disabled=contentMode==='edit'}
   function updateModeUi(){const scheduled=contentMode==='scheduled',editing=contentMode==='edit',draft=contentMode==='draft',empty=contentMode==='empty',pill=$('modePill');pill.classList.toggle('editing',editing);pill.classList.toggle('draft',draft);pill.querySelector('span').textContent=scheduled?'SCHEDULED · READ ONLY':editing?'SCHEDULED · EDITING':draft?'NEW DRAFT':`NO LESSON ON ${v('publishDate')}`;$('scheduledMode').className=`btn ${scheduled||empty?'primary':'secondary'}`;$('createDraft').className=`btn ${draft||editing?'primary':'secondary'}`;$('editScheduled').hidden=!scheduled;$('draftTools').hidden=!draft;$('saveDailyPhrase').hidden=scheduled||empty;$('saveDailyPhrase').textContent=editing?'Save scheduled changes + audio':'Publish draft + generate audio';$('saveLocal').hidden=!draft;$('saveAndExportVideo').hidden=scheduled||empty;$('saveAndExportVideo').textContent=editing?'Save changes + export Instagram MP4':'Publish draft + export Instagram MP4';$('exportRemotionVideo').hidden=true;$('downloadPng').disabled=empty;$('exportMp3').disabled=empty;$('previewAudio').disabled=empty;$('exportVideo').disabled=empty;$('exportAllVideo').disabled=empty;$('previousLesson').disabled=!scheduleNavigation.previous;$('nextLesson').disabled=!scheduleNavigation.next;setContentLocked(scheduled||empty)}
-  function scheduledAudioMatches(){const language=v('exportLanguage'),settings=exportSettings(language);return !!scheduledAudioUrls[language]&&v('narratorLocale')===settings.locale&&v('publishDate')===scheduledDate&&settings.phrase===scheduledTexts[language]}
+  function scheduledAudioMatches(locale=v('narratorLocale')){const language=languageForLocale(locale),settings=exportSettings(language);return !!scheduledAudioUrls[language]&&locale===settings.locale&&v('publishDate')===scheduledDate&&settings.phrase===scheduledTexts[language]}
   async function loadScheduleDate(date=localDateParts().date){setStatus(`Loading the ${date} schedule…`);try{const response=await fetch(`/server/admin/daily-studio/api/multilingual-schedule.php?date=${encodeURIComponent(date)}`,{cache:'no-store'}),data=await response.json();if(!response.ok||!data.ok)throw new Error(data.error||'The scheduled lesson is unavailable.');scheduleNavigation=data.navigation||{};nextAvailableDate=scheduleNavigation.next_available||'';if(!data.item){contentMode='empty';scheduledAudioUrls={};scheduledTexts={};scheduledDate='';clearContent(date);updateModeUi();setStatus(`No lesson is scheduled for ${date}. Choose Create Draft to use this date.`);return}const item=data.item;contentMode='scheduled';scheduledAudioUrls={};Object.entries(item.audio_urls||{}).forEach(([key,url])=>scheduledAudioUrls[key]=new URL(url,location.origin).href);scheduledTexts={fr:item.french,it:item.italian,de:item.german,ru:item.russian,pt:item.portuguese};scheduledDate=data.date;populateLesson(item,data.date);setFieldValue('exportLanguage','fr',false);setFieldValue('narratorLocale','fr-FR',false);$('includeNarration').checked=Object.keys(scheduledAudioUrls).length===5;updateAudioUi();updateModeUi();draw();setStatus($('includeNarration').checked?`${data.date} is ready with five prerecorded tracks.`:`${data.date} is scheduled but its audio bank is incomplete.`)}catch(error){setStatus(error.message||'The schedule could not be loaded.',true)}}
   function restoreDraft(){try{const data=JSON.parse(localStorage.getItem('beyondMultilingualGeneratorDraft')||'null');if(!data)return false;selectedSourceId=String(data.source_id||'');ids.forEach(id=>{if(!(id in data))return;if($(id).type==='checkbox')$(id).checked=!!data[id];else setFieldValue(id,data[id],false)});return true}catch{return false}}
   function enterDraftMode(){contentMode='draft';scheduledAudioUrls={};scheduledTexts={};scheduledDate='';if(!restoreDraft()){clearContent(nextAvailableDate||localDateParts().date);setFieldValue('meaning','A practical phrase for everyday conversation.',false);setFieldValue('culture','Practice this phrase aloud, then use it in a short conversation of your own.',false)}setFieldValue('weekday',weekdayForDate(v('publishDate')),false);updateModeUi();updateAudioUi();draw();setStatus('Draft mode is separate from the schedule. Choose a prerecorded bank phrase.')}
@@ -223,12 +223,16 @@
     if(locale==='pt-PT')return v('portuguese');
     return v('french');
   }
-  async function narrationBlob(){
-    const file=$('audioFile').files[0];if(file)return file;
-    if(scheduledAudioMatches()){const response=await fetch(scheduledAudioUrls[v('exportLanguage')],{cache:'no-store'});if(!response.ok)throw new Error('Today’s prerecorded audio could not be loaded.');const blob=await response.blob();if(blob.size<128)throw new Error('Today’s prerecorded audio is empty.');return blob}
+  async function narrationBlob(locale=v('narratorLocale'),{allowUpload=true,preferGenerated=false}={}){
+    const file=$('audioFile').files[0];if(allowUpload&&file)return file;
+    const language=languageForLocale(locale);
+    if(!preferGenerated&&scheduledAudioMatches(locale)){
+      const response=await fetch(scheduledAudioUrls[language],{cache:'no-store'}),type=(response.headers.get('content-type')||'').toLowerCase();
+      if(response.ok&&(type.startsWith('audio/')||type==='application/octet-stream')){const blob=await response.blob();if(blob.size>=128)return blob}
+    }
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),70000);
     try{
-      const response=await fetch('/beyond-id/admin/api/verse-narration.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale:v('narratorLocale'),provider:selectedProvider(),voice:selectedVoice()}),signal:controller.signal});
+      const response=await fetch('/beyond-id/admin/api/verse-narration.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(locale),locale,provider:selectedProvider(),voice:selectedVoice()}),signal:controller.signal});
       if(!response.ok){let message='Narration service is unavailable.';try{const data=await response.json();message=data.error||message}catch{}throw new Error(message)}
       const blob=await response.blob();if(blob.size<128)throw new Error('The narration service returned empty audio.');return blob;
     }catch(error){if(error.name==='AbortError')throw new Error('French narration timed out after 70 seconds. Check the configured French voice or upload an MP3.');throw error}finally{clearTimeout(timer)}
@@ -285,7 +289,12 @@
       const type=mimeType(),chunks=[];recorder=new MediaRecorder(stream,type?{mimeType:type,videoBitsPerSecond:6500000}:undefined);recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};const finished=new Promise((resolve,reject)=>{recorder.onstop=resolve;recorder.onerror=()=>reject(recorder.error||new Error('Batch video export failed.'))});const started=performance.now(),animate=now=>{if(!running)return;draw((Math.sin((now-started)/420)+1)/2);requestAnimationFrame(animate)};requestAnimationFrame(animate);recorder.start(250);recorder.pause();
       for(let index=0;index<languages.length;index++){
         const [language,locale,label]=languages[index];$('exportLanguage').value=language;$('narratorLocale').value=locale;draw();setStatus(`Recording ${label} narration (${index+1} of ${languages.length})…`);
-        const blob=await narrationBlob();recorder.resume();await playNarrationInto(blob,audioContext,destination);recorder.pause();
+        recorder.resume();
+        try{
+          let blob=await narrationBlob(locale,{allowUpload:false});
+          try{await playNarrationInto(blob,audioContext,destination)}catch{blob=await narrationBlob(locale,{allowUpload:false,preferGenerated:true});await playNarrationInto(blob,audioContext,destination)}
+        }catch(error){setStatus(`${label} narration unavailable; recording this segment silently.`);await new Promise(resolve=>setTimeout(resolve,4000))}
+        recorder.pause();
       }
       running=false;recorder.stop();await finished;const mime=recorder.mimeType||type||'video/webm',mp4=mime.includes('mp4');download(new Blob(chunks,{type:mime}),`francais-du-jour-all-languages-${v('publishDate')||'post'}${mp4?'.mp4':'.webm'}`);setStatus(mp4?'Narrated language export finished as one MP4.':'Narrated language export finished as one WebM because this browser cannot record MP4.');
     }catch(error){running=false;if(recorder&&recorder.state!=='inactive')recorder.stop();setStatus(error.message||'Batch video export failed.',true)}finally{$('exportLanguage').value=originalLanguage;$('narratorLocale').value=originalLocale;if(audioContext)await audioContext.close().catch(()=>{});draw();updateAudioUi();button.disabled=false}
@@ -376,9 +385,8 @@
       }
       if(scheduledAudioMatches()){
         const response=await fetch(scheduledAudioUrls[v('exportLanguage')],{cache:'force-cache'});
-        if(!response.ok)throw new Error('Today’s prerecorded audio could not be loaded.');
-        const blob=await response.blob();if(blob.size<128)throw new Error('Today’s prerecorded audio is empty.');
-        download(blob,baseName()+'.mp3');setStatus('Today’s prerecorded Azure MP3 downloaded.');return;
+        const type=(response.headers.get('content-type')||'').toLowerCase();
+        if(response.ok&&(type.startsWith('audio/')||type==='application/octet-stream')){const blob=await response.blob();if(blob.size>=128){download(blob,baseName()+'.mp3');setStatus('Today’s prerecorded Azure MP3 downloaded.');return}}
       }
       const response=await fetch('/beyond-id/admin/api/french-narration-export.php',{
         method:'POST',

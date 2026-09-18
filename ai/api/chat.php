@@ -3,6 +3,59 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/modes.php';
 require_once __DIR__ . '/../../beyond-id/includes/mobile-auth.php';
+require_once __DIR__ . '/../../dailybreath/includes/sacred-text.php';
+
+function jaguar_dailybreath_fast_reply(string $guide, string $prompt, string $language): ?string
+{
+    $prompt = trim($prompt);
+    if (!in_array($guide, ['chris', 'dovi', 'moe'], true) || $prompt === '') return null;
+
+    $direction = null;
+    $subject = '';
+    if (preg_match('/\b(?:what|which)\s+(?:book\s+|surah\s+)?comes\s+(after|before)\s+(?:the\s+(?:book\s+|surah\s+)?(?:of\s+)?)?(.+?)[?.!]*$/iu', $prompt, $match)) {
+        $direction = strtolower($match[1]);
+        $subject = trim($match[2]);
+    } elseif (preg_match('/\b(?:comes|is)\s+(after|before)\s+(.+?)[?.!]*$/iu', $prompt, $match)) {
+        $direction = strtolower($match[1]);
+        $subject = trim($match[2]);
+    }
+    if ($direction === null || $subject === '') return null;
+
+    if ($guide === 'moe') {
+        $surahs = dailybreath_quran_surahs('en');
+        $subjectKey = dailybreath_lower(preg_replace('/^surah\s+/iu', '', $subject) ?? $subject);
+        $currentNumber = ctype_digit($subjectKey) ? (int)$subjectKey : 0;
+        if ($currentNumber === 0) {
+            foreach ($surahs as $number => $name) {
+                if (dailybreath_lower($name) === $subjectKey) { $currentNumber = (int)$number; break; }
+            }
+        }
+        $nextNumber = $currentNumber + ($direction === 'after' ? 1 : -1);
+        if ($currentNumber < 1 || !isset($surahs[$nextNumber])) return null;
+        return 'Surah ' . $nextNumber . ', ' . $surahs[$nextNumber] . ', comes ' . $direction . ' Surah ' . $currentNumber . ', ' . $surahs[$currentNumber] . ', in the Quran.';
+    }
+
+    $groups = dailybreath_bible_book_groups($guide === 'dovi');
+    $books = array_keys(array_merge(...array_values($groups)));
+    $subjectKey = dailybreath_lower(preg_replace('/^(?:the\s+)?book\s+of\s+/iu', '', $subject) ?? $subject);
+    $currentIndex = null;
+    foreach ($books as $index => $book) {
+        $names = [$book, dailybreath_bible_book_name($book, $language)];
+        if ($guide === 'dovi') $names[] = dailybreath_jewish_book_name($book);
+        foreach ($names as $name) {
+            if (dailybreath_lower($name) === $subjectKey) { $currentIndex = $index; break 2; }
+        }
+    }
+    if ($currentIndex === null) return null;
+    $nextIndex = $currentIndex + ($direction === 'after' ? 1 : -1);
+    if (!isset($books[$nextIndex])) return null;
+    $currentBook = $books[$currentIndex];
+    $nextBook = $books[$nextIndex];
+    if ($guide === 'dovi') {
+        return dailybreath_jewish_book_name($nextBook) . ' (' . $nextBook . ') comes ' . $direction . ' ' . dailybreath_jewish_book_name($currentBook) . ' (' . $currentBook . ') in the Tanakh library.';
+    }
+    return dailybreath_bible_book_name($nextBook, $language) . ' comes ' . $direction . ' ' . dailybreath_bible_book_name($currentBook, $language) . ' in the Bible.';
+}
 
 function jaguar_nonce_secret(): string
 {
@@ -213,6 +266,11 @@ foreach ($explicitPatterns as $pattern) {
         ][$language]], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
+}
+$dailyBreathReply = jaguar_dailybreath_fast_reply($guide, $originalPrompt, $language);
+if ($dailyBreathReply !== null) {
+    echo json_encode(['model' => 'jaguar-dailybreath-fast-lane', 'adapter' => 'local-sacred-text', 'mode' => $mode, 'message' => $dailyBreathReply], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
 }
 $simpleReply = null;
 $simpleCopy = [

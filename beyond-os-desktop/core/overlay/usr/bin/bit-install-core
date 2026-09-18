@@ -116,38 +116,38 @@ if [ "$source_kind" = usb ]; then
   resize2fs "$target_root"
 else
   mkfs.ext4 -F -L BEYOND_CORE "$target_root"
-  install -d /mnt/bit-target-root
-  mount "$target_root" /mnt/bit-target-root
+  install -d /tmp/bit-target-root
+  mount "$target_root" /tmp/bit-target-root
   tar -C / --one-file-system --exclude=./dev --exclude=./proc --exclude=./sys \
     --exclude=./run --exclude=./tmp --exclude=./mnt --exclude=./media --exclude=./var -cpf - . |
-    tar -C /mnt/bit-target-root -xpf -
-  install -d -m 0755 /mnt/bit-target-root/var/cache /mnt/bit-target-root/var/lib /mnt/bit-target-root/var/log
-  install -d -m 1777 /mnt/bit-target-root/var/tmp
+    tar -C /tmp/bit-target-root -xpf -
+  install -d -m 0755 /tmp/bit-target-root/var/cache /tmp/bit-target-root/var/lib /tmp/bit-target-root/var/log
+  install -d -m 1777 /tmp/bit-target-root/var/tmp
   sync
-  umount /mnt/bit-target-root
+  umount /tmp/bit-target-root
 fi
 
 target_uuid=$(blkid -s PARTUUID -o value "$target_root" || true)
 [ -n "$target_uuid" ] || fail "could not read target partition UUID"
-install -d /mnt/bit-target-esp
+install -d /tmp/bit-target-esp
 if [ "$target_esp_new" = true ]; then
   mkfs.vfat -F 32 -n BITOS_EFI "$target_esp"
 fi
-mount "$target_esp" /mnt/bit-target-esp
-install -d /mnt/bit-target-esp/EFI/BITOS
+mount "$target_esp" /tmp/bit-target-esp
+install -d /tmp/bit-target-esp/EFI/BITOS
 if [ "$source_kind" = usb ]; then
   source_esp=$(lsblk -nrpo NAME,PARTTYPE "$source_disk" | awk -v type="$efi_guid" 'tolower($2) == type { print $1; exit }')
   [ -n "$source_esp" ] && [ -b "$source_esp" ] || fail "could not locate the installer EFI partition"
-  install -d /mnt/bit-source-esp
-  mount -o ro "$source_esp" /mnt/bit-source-esp
-  cp /mnt/bit-source-esp/EFI/BOOT/bootx64.efi /mnt/bit-target-esp/EFI/BITOS/bootx64.efi
-  umount /mnt/bit-source-esp
+  install -d /tmp/bit-source-esp
+  mount -o ro "$source_esp" /tmp/bit-source-esp
+  cp /tmp/bit-source-esp/EFI/BOOT/bootx64.efi /tmp/bit-target-esp/EFI/BITOS/bootx64.efi
+  umount /tmp/bit-source-esp
 else
-  mcopy -o -i /boot/fat.efi ::EFI/BOOT/bootx64.efi /mnt/bit-target-esp/EFI/BITOS/bootx64.efi
+  mcopy -o -i /boot/fat.efi ::EFI/BOOT/bootx64.efi /tmp/bit-target-esp/EFI/BITOS/bootx64.efi
 fi
-sed "s/%PARTUUID%/$target_uuid/g" /usr/share/beyond-core/grub.cfg.in > /mnt/bit-target-esp/EFI/BITOS/grub.cfg
+sed "s/%PARTUUID%/$target_uuid/g" /usr/share/beyond-core/grub.cfg.in > /tmp/bit-target-esp/EFI/BITOS/grub.cfg
 sync
-umount /mnt/bit-target-esp
+umount /tmp/bit-target-esp
 
 esp_number=$(lsblk -n -o PARTN "$target_esp")
 efibootmgr -c -d "$target_disk" -p "$esp_number" -L "BIT OS Core" -l '\\EFI\\BITOS\\bootx64.efi'

@@ -110,7 +110,8 @@ esac
 notice "Making the installer root read-only and copying the Core filesystem..."
 mount -o remount,ro / || fail "could not protect the source filesystem"
 if [ "$source_kind" = usb ]; then
-  dd if="$source_root" of="$target_root" bs=16M conv=fsync status=progress
+  # BusyBox dd in the installer does not implement GNU dd's status=progress.
+  dd if="$source_root" of="$target_root" bs=16M conv=fsync
   e2fsck -pf "$target_root" || [ "$?" -eq 1 ] || fail "filesystem check failed"
   resize2fs "$target_root"
 else

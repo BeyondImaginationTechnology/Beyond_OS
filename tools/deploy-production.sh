@@ -6,13 +6,19 @@ export GIT_TERMINAL_PROMPT=0
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPOSITORY_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 ACCOUNT_ROOT="$(cd -- "${REPOSITORY_ROOT}/.." && pwd)"
-PUBLIC_ROOT="${BEYOND_PUBLIC_ROOT:-${ACCOUNT_ROOT}/public_html}"
+DEFAULT_PUBLIC_ROOT="${ACCOUNT_ROOT}/public_html"
+if [[ "$(basename -- "${REPOSITORY_ROOT}")" == "www" ]]; then
+  DEFAULT_PUBLIC_ROOT="${REPOSITORY_ROOT}"
+fi
+PUBLIC_ROOT="${BEYOND_PUBLIC_ROOT:-${DEFAULT_PUBLIC_ROOT}}"
 PRIVATE_ROOT="${BEYOND_VAR_PATH:-${ACCOUNT_ROOT}/var}"
 
 [[ -d "${REPOSITORY_ROOT}/.git" ]] || { echo "Repository metadata is unavailable." >&2; exit 1; }
 [[ -d "${PUBLIC_ROOT}" ]] || { echo "Public web root does not exist: ${PUBLIC_ROOT}" >&2; exit 1; }
 command -v git >/dev/null 2>&1 || { echo "git is unavailable." >&2; exit 1; }
-command -v rsync >/dev/null 2>&1 || { echo "rsync is unavailable." >&2; exit 1; }
+if [[ "$(cd -- "${PUBLIC_ROOT}" && pwd)" != "${REPOSITORY_ROOT}" ]]; then
+  command -v rsync >/dev/null 2>&1 || { echo "rsync is unavailable." >&2; exit 1; }
+fi
 
 cd "${REPOSITORY_ROOT}"
 CURRENT_BRANCH="$(git symbolic-ref --quiet --short HEAD || true)"
@@ -22,15 +28,17 @@ CURRENT_BRANCH="$(git symbolic-ref --quiet --short HEAD || true)"
 git fetch --prune origin main
 git merge --ff-only origin/main
 
-rsync -a --delay-updates \
-  --exclude='/.git/' --exclude='/.github/' --exclude='/.cache/' \
-  --exclude='/var/' --exclude='/config/live.php' \
-  --exclude='/docs/' --exclude='/tools/' --exclude='/sql/' --exclude='/exports/' \
-  --exclude='/AppStoreAssets/' --exclude='/*Apple/' --exclude='/*Android/' \
-  --exclude='/.gitattributes' --exclude='/.gitignore' \
-  --exclude='/README.md' --exclude='/CONTRIBUTING.md' --exclude='/SECURITY.md' --exclude='/LICENSE' \
-  --exclude='/*.csr' --exclude='/azure-pipelines*.yml' \
-  "${REPOSITORY_ROOT}/" "${PUBLIC_ROOT}/"
+if [[ "$(cd -- "${PUBLIC_ROOT}" && pwd)" != "${REPOSITORY_ROOT}" ]]; then
+  rsync -a --delay-updates \
+    --exclude='/.git/' --exclude='/.github/' --exclude='/.cache/' \
+    --exclude='/var/' --exclude='/config/live.php' \
+    --exclude='/docs/' --exclude='/tools/' --exclude='/sql/' --exclude='/exports/' \
+    --exclude='/AppStoreAssets/' --exclude='/*Apple/' --exclude='/*Android/' \
+    --exclude='/.gitattributes' --exclude='/.gitignore' \
+    --exclude='/README.md' --exclude='/CONTRIBUTING.md' --exclude='/SECURITY.md' --exclude='/LICENSE' \
+    --exclude='/*.csr' --exclude='/azure-pipelines*.yml' \
+    "${REPOSITORY_ROOT}/" "${PUBLIC_ROOT}/"
+fi
 
 DEPLOY_COMMIT="$(git rev-parse HEAD)"
 DEPLOYED_AT="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"

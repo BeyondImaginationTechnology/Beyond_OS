@@ -80,8 +80,31 @@ function jaguar_geocode(string $place): ?array
     $place = trim(preg_replace('/\s+/', ' ', $place) ?? '');
     if (mb_strlen($place) < 2 || mb_strlen($place) > 80 || preg_match('/[<>\\x00]/', $place)) return null;
     return jaguar_utility_cache('geocode:' . hash('sha256', mb_strtolower($place)), 86400, static function () use ($place): ?array {
-        $response = jaguar_utility_fetch('https://geocoding-api.open-meteo.com/v1/search?' . http_build_query(['name' => $place, 'count' => 1, 'language' => 'en', 'format' => 'json']));
-        $result = $response['results'][0] ?? null;
+        $states = ['alabama','alaska','arizona','arkansas','california','colorado','connecticut','delaware','florida','georgia','hawaii','idaho','illinois','indiana','iowa','kansas','kentucky','louisiana','maine','maryland','massachusetts','michigan','minnesota','mississippi','missouri','montana','nebraska','nevada','new hampshire','new jersey','new mexico','new york','north carolina','north dakota','ohio','oklahoma','oregon','pennsylvania','rhode island','south carolina','south dakota','tennessee','texas','utah','vermont','virginia','washington','west virginia','wisconsin','wyoming'];
+        $query = $place;
+        $expectedState = '';
+        $lowerPlace = mb_strtolower($place);
+        foreach ($states as $state) {
+            if ($lowerPlace === $state || !str_ends_with($lowerPlace, ' ' . $state)) continue;
+            $city = trim(mb_substr($place, 0, mb_strlen($place) - mb_strlen($state)));
+            if ($city !== '') {
+                $query = $city . ', ' . ucwords($state);
+                $expectedState = $state;
+            }
+            break;
+        }
+        $response = jaguar_utility_fetch('https://geocoding-api.open-meteo.com/v1/search?' . http_build_query(['name' => $query, 'count' => 10, 'language' => 'en', 'format' => 'json']));
+        $results = is_array($response['results'] ?? null) ? $response['results'] : [];
+        $result = $results[0] ?? null;
+        if ($expectedState !== '') {
+            foreach ($results as $candidate) {
+                if (!is_array($candidate)) continue;
+                if (mb_strtolower((string)($candidate['admin1'] ?? '')) === $expectedState && strtoupper((string)($candidate['country_code'] ?? '')) === 'US') {
+                    $result = $candidate;
+                    break;
+                }
+            }
+        }
         if (!is_array($result) || !isset($result['latitude'], $result['longitude'], $result['name'])) return null;
         return [
             'name' => (string) $result['name'], 'country' => (string) ($result['country'] ?? ''), 'admin1' => (string) ($result['admin1'] ?? ''),
@@ -203,6 +226,12 @@ if (preg_match('/^(hi|hello|hey|bonjour|salut|allo|hola|buenas)(?:[\s,]+(?:there
     $simpleReply = $simpleCopy[$language]['help'];
 } elseif (preg_match('/^(what version is this|version|quelle version|qué versión)[\s!.?¿¡]*$/u', $simplePrompt)) {
     $simpleReply = $simpleCopy[$language]['version'];
+} elseif (preg_match('/^(how old are you|what(?:[’\']s| is) your age|when were you (?:made|created|born)|quel âge as-tu|cuántos años tienes)[\s!.?¿¡]*$/u', $simplePrompt)) {
+    $simpleReply = [
+        'en' => 'I don’t have a human age. I’m Llama Jaguar v0.3 Preview, an AI system being built for the BIT ecosystem.',
+        'fr' => 'Je n’ai pas d’âge humain. Je suis Llama Jaguar v0.3 Preview, un système d’IA conçu pour l’écosystème BIT.',
+        'es' => 'No tengo una edad humana. Soy Llama Jaguar v0.3 Preview, un sistema de IA creado para el ecosistema BIT.',
+    ][$language];
 } elseif (preg_match('/^(-?\d+(?:\.\d+)?)\s*([+\-*\/])\s*(-?\d+(?:\.\d+)?)\s*(?:=|\?)?$/', $simplePrompt, $math)) {
     $left = (float) $math[1];
     $right = (float) $math[3];
@@ -219,6 +248,17 @@ if ($simpleReply !== null) {
     exit;
 }
 if ($mode === 'core') {
+    $previousUserPrompt = '';
+    for ($messageIndex = count($messages) - 2; $messageIndex >= 0; $messageIndex--) {
+        if (($messages[$messageIndex]['role'] ?? '') !== 'user') continue;
+        $previousUserPrompt = mb_strtolower(trim((string)$messages[$messageIndex]['content']));
+        break;
+    }
+    if (!preg_match('/\b(weather|temperature|temp|m[ée]t[ée]o|tiempo)\b/iu', $simplePrompt)
+        && preg_match('/\b(weather|temperature|temp|m[ée]t[ée]o|tiempo)\b/iu', $previousUserPrompt)
+        && preg_match('/^[\p{L} .,’\'-]{2,80}$/u', $originalPrompt)) {
+        $simplePrompt = 'weather in ' . $simplePrompt;
+    }
     $formatNumber = static fn(float $number): string => rtrim(rtrim(number_format($number, 2, '.', ''), '0'), '.');
     $conversionPatterns = [
         '/^(-?\d+(?:\.\d+)?)\s*(?:°\s*)?(?:c|celsius)\s+(?:to|in)\s+(?:°\s*)?(?:f|fahrenheit)[\s?!.]*$/iu' => static fn(float $value): array => [$value * 9 / 5 + 32, '°F'],
@@ -244,8 +284,16 @@ if ($mode === 'core') {
     $timePattern = '/^(?:what\s+time\s+is\s+it|time|quelle\s+heure\s+est-il|hora)\s+(?:in|à|en)\s+(.+?)[\s?!.]*$/iu';
     $placePattern = '/^(?:where\s+is|find|locate|o[ùu]\s+est|d[óo]nde\s+est[áa])\s+(.+?)[\s?!.]*$/iu';
     if (preg_match($weatherPattern, $simplePrompt, $utilityMatch)) {
-        $place = jaguar_geocode($utilityMatch[1]);
-        if ($place === null) {
+        $weatherPlace = trim($utilityMatch[1]);
+        $stateOnly = in_array(mb_strtolower($weatherPlace), ['alabama','alaska','arizona','arkansas','california','colorado','connecticut','delaware','florida','georgia','hawaii','idaho','illinois','indiana','iowa','kansas','kentucky','louisiana','maine','maryland','massachusetts','michigan','minnesota','mississippi','missouri','montana','nebraska','nevada','new hampshire','new jersey','new mexico','new york','north carolina','north dakota','ohio','oklahoma','oregon','pennsylvania','rhode island','south carolina','south dakota','tennessee','texas','utah','vermont','virginia','washington','west virginia','wisconsin','wyoming'], true);
+        $place = $stateOnly ? null : jaguar_geocode($weatherPlace);
+        if ($stateOnly) {
+            $simpleReply = match ($language) {
+                'fr' => 'La météo varie beaucoup dans cet État. Indiquez une ville, par exemple « météo à Los Angeles, Californie ».',
+                'es' => 'El tiempo varía mucho dentro de ese estado. Indica una ciudad, por ejemplo « tiempo en Los Ángeles, California ».',
+                default => 'Weather varies widely across that state. Ask for a city, such as “weather in Los Angeles, California.”',
+            };
+        } elseif ($place === null) {
             $simpleReply = ['en' => 'I could not find that place. Try a city and country, such as “weather in Vancouver, Canada.”', 'fr' => 'Je n’ai pas trouvé ce lieu. Essayez une ville et un pays, par exemple « météo à Vancouver, Canada ».', 'es' => 'No pude encontrar ese lugar. Prueba una ciudad y país, por ejemplo « tiempo en Vancouver, Canadá ».'][$language];
         } else {
             $weather = jaguar_utility_cache('weather:' . $place['latitude'] . ':' . $place['longitude'], 600, static function () use ($place): ?array {

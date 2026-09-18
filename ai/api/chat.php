@@ -176,6 +176,12 @@ $lastMessage = $messages[array_key_last($messages)];
 $originalPrompt = trim((string) $lastMessage['content']);
 $simplePrompt = mb_strtolower($originalPrompt);
 $guide = is_string($payload['guide'] ?? null) ? strtolower(trim($payload['guide'])) : '';
+$isDailyBreathChat = ($_SERVER['HTTP_X_DAILYBREATH_CHAT'] ?? '') === '1';
+if ($isDailyBreathChat && ($mode !== 'core' || !in_array($guide, ['chris', 'dovi', 'moe'], true))) {
+    http_response_code(422);
+    echo json_encode(['error' => 'Daily Breath chat is limited to its sacred-text guides.']);
+    exit;
+}
 $guideProfiles = [
     'chris' => 'You are Chris, a warm Christian Bible study guide. Answer Bible questions respectfully, distinguish quoted text from interpretation, and avoid presenting theology as settled fact when traditions differ.',
     'dovi' => 'You are Dovi, a thoughtful Tanakh study guide. Answer Jewish scripture questions respectfully, note when interpretations vary, and avoid claiming to speak for every Jewish tradition.',
@@ -419,6 +425,12 @@ if ($mode === 'core') {
     }
 }
 if ($mode === 'core') {
+    if ($guide !== '') {
+        $guideNames = ['chris' => 'Chris', 'dovi' => 'Dovi', 'moe' => 'Moe'];
+        $guideName = $guideNames[$guide] ?? 'Daily Breath guide';
+        echo json_encode(['model' => 'jaguar-dailybreath-fast-lane', 'adapter' => 'local', 'mode' => $mode, 'message' => $guideName . ' is available here for Daily Breath and sacred-text questions only. This no-GPU chat can offer concise, best-effort guidance from Jaguar’s built-in knowledge; for a specific passage, include its book, chapter, and verse.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
     echo json_encode(['model' => 'jaguar-core-fast-lane', 'adapter' => 'local', 'mode' => $mode, 'message' => 'Explain handles fast-lane utilities and concise built-in guidance. Deep thinking is available in a separate Jaguar mode.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }

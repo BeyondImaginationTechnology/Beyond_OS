@@ -150,6 +150,12 @@ sync
 umount /tmp/bit-target-esp
 
 esp_number=$(lsblk -n -o PARTN "$target_esp")
+# Buildroot does not mount efivarfs automatically. efibootmgr needs it in
+# order to persist the BIT OS entry in UEFI NVRAM.
+efi_vars=/sys/firmware/efi/efivars
+if ! grep -qs " $efi_vars efivarfs " /proc/mounts; then
+  mount -t efivarfs efivarfs "$efi_vars" || fail "could not mount UEFI variable storage"
+fi
 efibootmgr -c -d "$target_disk" -p "$esp_number" -L "BIT OS Core" -l '\\EFI\\BITOS\\bootx64.efi'
 notice "Installation completed. Remove the USB and choose BIT OS Core from UEFI boot options."
 exec /sbin/reboot -f

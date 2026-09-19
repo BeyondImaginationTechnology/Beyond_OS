@@ -82,8 +82,14 @@ struct SettingsAboutView: View {
                 Link(destination: URL(string: "https://www.gutenberg.org/ebooks/16955")!) {
                     Label("Pickthall English meaning · Source", systemImage: "moon.stars")
                 }
-                Link(destination: URL(string: "https://beyondimagination.co.technology/beyond-id/auth/privacy.php")!) {
+                Link(destination: URL(string: "https://beyondimagination.co.technology/dailybreath/privacy.php")!) {
                     Label("Privacy Policy", systemImage: "hand.raised")
+                }
+                Link(destination: URL(string: "https://beyondimagination.co.technology/dailybreath/terms.php")!) {
+                    Label("Terms & Conditions", systemImage: "doc.text")
+                }
+                Link(destination: URL(string: "https://beyondimagination.co.technology/dailybreath/data-controls.php")!) {
+                    Label("Data & Account Controls", systemImage: "person.crop.circle.badge.minus")
                 }
                 Link(destination: URL(string: "https://beyondimagination.co.technology/contact.php")!) {
                     Label("Support", systemImage: "envelope")

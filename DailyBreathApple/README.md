@@ -15,6 +15,7 @@ Native SwiftUI app for DailyBreath 2.0.2 (build 22).
 - Exactly two Christian, Jewish, and Muslim Academy journeys—Joining the Faith and Recovery—with saved progress and a Beyond Imagination completion certificate
 - Chris, Dovi, and Moe illustrated Academy guides
 - Main-navigation chat with the selected Chris, Dovi, or Moe guide, localized prompts, and Daily Breath-only/no-GPU request enforcement
+- Daily Breath-specific Privacy Policy, Terms & Conditions, and Data & Account Controls links in Settings
 - Olive-era logo plus Torah Light and Quran Moon themes
 - Guided breathing practices and optional daily reminders
 - Private, file-protected reflection journal stored on device

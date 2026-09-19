@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-const DAILYBREATH_WEB_VERSION = '2.0.1';
+const DAILYBREATH_WEB_VERSION = '2.0.2';
 
 function dailybreath_web_locale(): string
 {

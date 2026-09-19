@@ -4,6 +4,8 @@ The web interface prompts for English, French, or Spanish on first visit, saves 
 
 Daily Breath is an installable Beyond OS progressive web app for matched daily Bible, Tanakh, and Quran readings; complete local sacred-text libraries and search; devotionals; guided breathing; encrypted reflection journaling; weekly challenges; activity history; and recovery support.
 
+Daily Breath has product-specific legal pages at `/dailybreath/privacy.php`, `/dailybreath/terms.php`, and `/dailybreath/data-controls.php`. Keep these documents, native store disclosures, and actual data handling synchronized whenever a feature changes.
+
 ## Install
 
 Open `/dailybreath/` from the Beyond OS App Store. In a supported browser, use the **Install Daily Breath** prompt or the browser’s “Add to Home Screen” command. The installed app launches in its own standalone window and includes shortcuts for Today, Scripture, Breathe, Journal, and Weekly Challenge.

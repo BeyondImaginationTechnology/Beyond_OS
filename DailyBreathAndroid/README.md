@@ -7,6 +7,7 @@ Native Android companion to `DailyBreathApple`, built with Java 17 and the Andro
 - Offline Bible, Tanakh, and Quran readers and search, with faith-appropriate daily readings and fallbacks
 - Today, Scripture, Chat, Academy, Breathe, and Journal navigation
 - In-app Chris, Dovi, and Moe chat with illustrated guides, multilingual prompts, and Daily Breath-only/no-GPU request enforcement
+- Daily Breath-specific Privacy Policy, Terms & Conditions, and Data & Account Controls links
 - Peace Breath session with phase cues, pause/repeat, and persisted daily completion
 - Shared `dailybreath://today`, `dailybreath://breathe`, `dailybreath://scripture`, `dailybreath://chat`, `dailybreath://academy`, and `dailybreath://journal` deep links
 - Material-friendly forest visual language matching the web and iOS apps

@@ -37,6 +37,9 @@ DailyBreath 2.0 brings the Bible, Tanakh, and Quran journeys into one calmer for
 - Recovery-focused verse bank for encouragement around cravings, freedom, self-control, and daily habit change
 - Updated offline fallback verse and devotional for one-free-breath-at-a-time support
 - Continued polish for the Daily Breath verse generator and devotional flow
+- Native Daily Breath chat with Chris, Dovi, or Moe for app help and sacred-text questions
+- A new private, session-only reflection trivia experience
+- Direct in-app initiation of Beyond-ID account deletion
 
 ## Description
 
@@ -96,17 +99,17 @@ https://beyondimagination.co.technology/dailybreath/
 
 ## Sign-In Information
 
-Sign-in required: No
+Sign-in required: Yes for Chat and Academy purchasing; no for core reading and wellness features
 
 DailyBreath 2.0 does not require an account to use the Verse of the Day, Bible/Torah/Quran readers, search, Academy starter lessons, breathing practice, or reflection journal.
 
 ## App Review Notes
 
-DailyBreath 2.0 is a self-contained faith-centered wellness app. No sign-in is required for review. The app opens directly to Today and includes dated Bible, Torah, and Quran daily verses; weekly devotionals; complete local text readers and search; starter and recovery Academy paths; breathing; reflection journal; reminders; and an App Clip preview.
+DailyBreath 2.0 is a self-contained faith-centered wellness app. No sign-in is required to review Today, Scripture, Trivia, Breathe, Journal, reminders, or the App Clip. A Beyond-ID review account is required to review Chat and the Academy purchase flow; enter those credentials in App Store Connect's App Review Information fields.
 
-To review the multilingual readers, open Scripture in the tab bar. Switch Faith tradition among Bible, Torah, and Quran, then use Language & edition. Torah defaults to Hebrew and includes תהילים · Tehillim; Quran defaults to Arabic. Open Today and change the tradition picker to verify tradition-specific daily content, then open Academy to inspect the separate Christian, Jewish, and Muslim journeys.
+To review the multilingual readers, open Scripture in the navigation sidebar. Switch Faith tradition among Bible, Torah, and Quran, then use Language & edition. Torah defaults to Hebrew and includes תהילים · Tehillim; Quran defaults to Arabic. Open Today and change the tradition picker to verify tradition-specific daily content. Open Trivia for the five-question local reflection quiz. After signing in with the supplied review account, open Chat to test Chris, Dovi, or Moe and open Academy to inspect the non-consumable full-access purchase.
 
-This version does not include in-app purchases, subscriptions, iMessage features, Game Center, routing coverage, or user-generated public content.
+This version includes one non-consumable in-app purchase, `dailybreath.academy.full`, which unlocks the complete Academy. It does not include subscriptions, iMessage features, Game Center, routing coverage, or user-generated public content.
 
 ## App Clip
 

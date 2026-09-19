@@ -9,6 +9,7 @@ import UIKit
 final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
     @Published private(set) var isSignedIn: Bool
     @Published private(set) var message: String?
+    @Published private(set) var accountDeletionMessage: String?
 
     var accessToken: String? {
         KeychainTokenStore.read(service: "DailyBreath", account: tokenKey)
@@ -19,6 +20,7 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
     private let tokenKey = "dailybreath.beyondid.access-token"
     private let loginURL = URL(string: "https://beyondimagination.co.technology/beyond-id/auth/login.php")!
     private let tokenURL = URL(string: "https://beyondimagination.co.technology/beyond-id/api/mobile-token.php")!
+    private let accountDeletionURL = URL(string: "https://beyondimagination.co.technology/beyond-id/api/account-deletion-request.php")!
 
     override init() {
         isSignedIn = KeychainTokenStore.read(service: "DailyBreath", account: tokenKey) != nil
@@ -58,6 +60,34 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
         KeychainTokenStore.delete(service: "DailyBreath", account: tokenKey)
         isSignedIn = false
         message = "Signed out of Beyond-ID on this device."
+    }
+
+    func requestAccountDeletion() async -> Bool {
+        accountDeletionMessage = nil
+        guard let token = accessToken else {
+            accountDeletionMessage = "Sign in before requesting account deletion."
+            return false
+        }
+
+        var request = URLRequest(url: accountDeletionURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.httpBody = try? JSONSerialization.data(withJSONObject: ["confirm": "DELETE"])
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+                accountDeletionMessage = json?["error"] as? String ?? "The deletion request could not be submitted."
+                return false
+            }
+            accountDeletionMessage = json?["message"] as? String ?? "Your account deletion request was submitted."
+            return true
+        } catch {
+            accountDeletionMessage = "The deletion request could not connect. Please try again."
+            return false
+        }
     }
 
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {

@@ -2,9 +2,12 @@ import SwiftUI
 
 struct SettingsAboutView: View {
     @EnvironmentObject private var store: DailyBreathStore
+    @EnvironmentObject private var auth: BeyondIDAuthManager
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
     @AppStorage("dailyBreathLanguage") private var languageID = DailyBreathLanguage.english.rawValue
     @AppStorage("encryptedICloudSyncEnabled") private var encryptedICloudSyncEnabled = false
+    @State private var showingDeleteConfirmation = false
+    @State private var isRequestingDeletion = false
 
     private var versionText: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
@@ -62,6 +65,26 @@ struct SettingsAboutView: View {
                 Text("Optional. Your protected local data is encrypted before upload. The encryption key uses iCloud Keychain. Turning sync off leaves local data intact.")
             }
 
+            Section("Account") {
+                if auth.isSignedIn {
+                    Button("Sign out of Beyond-ID") { auth.signOut() }
+                    Button("Request Beyond-ID account deletion", role: .destructive) {
+                        showingDeleteConfirmation = true
+                    }
+                    .disabled(isRequestingDeletion)
+                    if isRequestingDeletion {
+                        ProgressView("Submitting deletion request…")
+                    }
+                } else {
+                    Button("Sign in with Beyond-ID") { auth.signIn() }
+                }
+                if let message = auth.accountDeletionMessage ?? auth.message {
+                    Text(message)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             Section {
                 LabeledContent("The Daily Breath", value: versionText)
                 Link(destination: URL(string: "https://ebible.org/web/")!) {
@@ -101,6 +124,22 @@ struct SettingsAboutView: View {
             }
         }
         .navigationTitle("Settings & About")
+        .confirmationDialog(
+            "Delete your Beyond-ID account?",
+            isPresented: $showingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Submit account deletion request", role: .destructive) {
+                isRequestingDeletion = true
+                Task {
+                    _ = await auth.requestAccountDeletion()
+                    isRequestingDeletion = false
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This requests deletion of your entire Beyond-ID account and associated Daily Breath data. Processing may take up to 30 days; legally required transaction records may be retained.")
+        }
     }
 }
 

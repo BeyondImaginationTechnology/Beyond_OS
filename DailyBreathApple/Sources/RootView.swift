@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 enum DailyBreathTab: String, Hashable {
-    case today, scripture, chat, academy, breathe, journal
+    case today, scripture, chat, academy, trivia, breathe, journal
 }
 
 struct RootView: View {
@@ -37,6 +37,7 @@ struct RootView: View {
                     navigationRow(.scripture, title: "Scripture", symbol: "book.closed.fill", subtitle: "Read and reflect")
                     navigationRow(.chat, title: "Chat", symbol: "bubble.left.and.bubble.right.fill", subtitle: "Ask your faith guide")
                     navigationRow(.academy, title: "Academy", symbol: "graduationcap.fill", subtitle: "Learn at your pace")
+                    navigationRow(.trivia, title: "Trivia", symbol: "questionmark.circle.fill", subtitle: "Reflect and learn")
                     navigationRow(.breathe, title: "Breathe", symbol: "wind", subtitle: "Find your next breath")
                     navigationRow(.journal, title: "Journal", symbol: "square.and.pencil", subtitle: "Keep what matters")
                 }
@@ -96,6 +97,7 @@ struct RootView: View {
             selectedTab = .scripture
         case "chat": selectedTab = .chat
         case "academy": selectedTab = .academy
+        case "trivia": selectedTab = .trivia
         default: selectedTab = .today
         }
     }
@@ -129,6 +131,8 @@ struct RootView: View {
             NavigationStack { DailyBreathChatDestination() }
         case .academy:
             NavigationStack { AcademyView() }
+        case .trivia:
+            NavigationStack { DailyBreathTriviaView() }
         case .breathe:
             NavigationStack { BreatheView() }
         case .journal:

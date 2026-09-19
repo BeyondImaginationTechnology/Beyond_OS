@@ -297,15 +297,23 @@ final class AcademyPurchaseManager: ObservableObject {
     }
 
     private func refreshEntitlement() async {
-        for await result in Transaction.currentEntitlements { await apply(result) }
+        var active = false
+        for await result in Transaction.currentEntitlements {
+            guard case .verified(let transaction) = result,
+                  transaction.productID == Self.productID,
+                  transaction.revocationDate == nil else { continue }
+            active = true
+        }
+        hasAccess = active
+        UserDefaults.standard.set(active, forKey: "dailyBreathAcademyPurchased")
     }
 
     private func apply(_ result: VerificationResult<Transaction>) async {
         guard case .verified(let transaction) = result,
-              transaction.productID == Self.productID,
-              transaction.revocationDate == nil else { return }
-        hasAccess = true
-        UserDefaults.standard.set(true, forKey: "dailyBreathAcademyPurchased")
+              transaction.productID == Self.productID else { return }
+        let active = transaction.revocationDate == nil
+        hasAccess = active
+        UserDefaults.standard.set(active, forKey: "dailyBreathAcademyPurchased")
         await transaction.finish()
     }
 }

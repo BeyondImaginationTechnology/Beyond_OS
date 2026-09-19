@@ -12,7 +12,7 @@ settings:
     CURRENT_PROJECT_VERSION: 1
     MARKETING_VERSION: 1.2
     SWIFT_VERSION: 6.0
-    GENERATE_INFOPLIST_FILE: YES
+    GENERATE_INFOPLIST_FILE: NO
     INFOPLIST_KEY_CFBundleIconName: AppIcon
     ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
@@ -24,10 +24,11 @@ targets:
       - path: Sources
     resources:
       - path: Resources
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.beyondfrench
-        PRODUCT_NAME: BeyondFrench
+      settings:
+        base:
+          PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.beyondfrench
+          PRODUCT_NAME: BeyondFrench
+          INFOPLIST_FILE: Info.plist
         CODE_SIGN_ENTITLEMENTS: BeyondFrench.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_CFBundleDisplayName: Beyond French

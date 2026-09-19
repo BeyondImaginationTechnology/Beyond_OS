@@ -40,6 +40,9 @@ final class AppStore: ObservableObject {
     @Published private(set) var statusMessage = "Daily lesson"
     @Published var hasBeyondID = false
     @Published var hasFullAcademyAccess = false
+    @Published var learningLanguage: FrenchLearningLanguage = .french {
+        didSet { UserDefaults.standard.set(learningLanguage.rawValue, forKey: learningLanguageKey) }
+    }
     @Published var appTheme = AppTheme.classic {
         didSet { UserDefaults.standard.set(appTheme.rawValue, forKey: themeKey) }
     }
@@ -52,6 +55,7 @@ final class AppStore: ObservableObject {
     private let completedKey = "BeyondFrench.completedLessonIDs"
     private let practiceKey = "BeyondFrench.correctPracticeCount"
     private let themeKey = "BeyondFrench.appTheme"
+    private let learningLanguageKey = "BeyondFrench.learningLanguage"
 
     var totalAcademyLessons: Int {
         academy.modules.reduce(0) { $0 + $1.lessons.count }
@@ -80,6 +84,7 @@ final class AppStore: ObservableObject {
         loadAcademy()
         loadProgress()
         loadTheme()
+        loadLearningLanguage()
         await refreshLesson()
     }
 
@@ -332,6 +337,11 @@ final class AppStore: ObservableObject {
     private func loadTheme() {
         let savedTheme = UserDefaults.standard.string(forKey: themeKey).flatMap(AppTheme.init(rawValue:))
         appTheme = savedTheme ?? .classic
+    }
+
+    private func loadLearningLanguage() {
+        learningLanguage = UserDefaults.standard.string(forKey: learningLanguageKey)
+            .flatMap(FrenchLearningLanguage.init(rawValue:)) ?? .french
     }
 
     private func saveProgress() {

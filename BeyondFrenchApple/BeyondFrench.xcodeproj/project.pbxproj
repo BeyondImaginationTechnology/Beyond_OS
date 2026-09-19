@@ -22,6 +22,8 @@
 		300000000000000000000013 /* BeyondFrenchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000013 /* BeyondFrenchTests.swift */; };
 		300000000000000000000014 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000016 /* LaunchScreen.storyboard */; };
 		300000000000000000000015 /* Audio in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000018 /* Audio */; };
+		300000000000000000000016 /* TriviaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000019 /* TriviaView.swift */; };
+		300000000000000000000017 /* FrenchHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000020 /* FrenchHomeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +55,8 @@
 		100000000000000000000016 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		100000000000000000000017 /* BeyondFrench.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BeyondFrench.entitlements; sourceTree = "<group>"; };
 		100000000000000000000018 /* Audio */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Audio; sourceTree = "<group>"; };
+		100000000000000000000019 /* TriviaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriviaView.swift; sourceTree = "<group>"; };
+		100000000000000000000020 /* FrenchHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrenchHomeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +100,8 @@
 				100000000000000000000007 /* ProgressView.swift */,
 				100000000000000000000008 /* RootView.swift */,
 				100000000000000000000009 /* TodayView.swift */,
+				100000000000000000000020 /* FrenchHomeView.swift */,
+				100000000000000000000019 /* TriviaView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -234,6 +240,8 @@
 				300000000000000000000007 /* ProgressView.swift in Sources */,
 				300000000000000000000008 /* RootView.swift in Sources */,
 				300000000000000000000009 /* TodayView.swift in Sources */,
+				300000000000000000000016 /* TriviaView.swift in Sources */,
+				300000000000000000000017 /* FrenchHomeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

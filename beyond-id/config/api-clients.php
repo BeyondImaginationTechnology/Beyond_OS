@@ -22,7 +22,13 @@ return [
         'name' => 'French Quest for Apple',
         'app_slug' => 'beyond-french',
         'scheme' => 'frenchquest',
-        'scopes' => ['profile:read', 'email:read', 'progress:write'],
+        'scopes' => ['profile:read', 'email:read', 'progress:write', 'trivia:play'],
+    ],
+    'beyond-french-ios' => [
+        'name' => 'Beyond French for Apple',
+        'app_slug' => 'beyond-french',
+        'scheme' => 'beyondfrench',
+        'scopes' => ['profile:read', 'email:read', 'trivia:play'],
     ],
     'daily-breath-ios' => [
         'name' => 'DailyBreath for Apple',

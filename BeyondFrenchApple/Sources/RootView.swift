@@ -2,22 +2,48 @@ import SwiftUI
 
 struct RootView: View {
     @EnvironmentObject private var store: AppStore
+    @AppStorage("BeyondFrench.hasChosenLearningLanguage") private var hasChosenLearningLanguage = false
 
     var body: some View {
-        TabView {
-            NavigationStack { TodayView() }
-                .tabItem { Label("Today", systemImage: "sun.max.fill") }
-            NavigationStack { AcademyView() }
-                .tabItem { Label("Academy", systemImage: "graduationcap.fill") }
-            NavigationStack { DictionaryView() }
-                .tabItem { Label("Dictionary", systemImage: "character.book.closed.fill") }
-            NavigationStack { PracticeView() }
-                .tabItem { Label("Practice", systemImage: "waveform.and.mic") }
-            NavigationStack { LearningProgressView() }
-                .tabItem { Label("Progress", systemImage: "chart.bar.fill") }
+        Group {
+            if hasChosenLearningLanguage {
+                NavigationStack { FrenchHomeView() }
+            } else {
+                LearningLanguagePickerView { language in
+                    store.learningLanguage = language
+                    hasChosenLearningLanguage = true
+                }
+            }
         }
         .tint(store.appTheme.accent)
         .preferredColorScheme(.dark)
+    }
+}
+
+private struct LearningLanguagePickerView: View {
+    @EnvironmentObject private var store: AppStore
+    let onChoose: (FrenchLearningLanguage) -> Void
+
+    var body: some View {
+        ZStack {
+            store.appTheme.appBackground.ignoresSafeArea()
+            VStack(alignment: .leading, spacing: 20) {
+                BrandHeader()
+                Spacer()
+                Text("WHAT DO YOU WANT TO LEARN?").font(.caption.weight(.black)).tracking(1.8).foregroundStyle(store.appTheme.accent)
+                Text("Choose your language path.").font(.system(size: 36, weight: .black, design: .rounded)).foregroundStyle(.white)
+                Text("You can change this anytime in Settings.").foregroundStyle(.white.opacity(0.72))
+                ForEach(FrenchLearningLanguage.allCases) { language in
+                    Button { onChoose(language) } label: {
+                        HStack { Text(language.symbol).font(.title); Text(language.title).font(.headline.weight(.black)); Spacer(); Image(systemName: "chevron.right") }
+                            .padding(18).background(store.appTheme.cardFill, in: RoundedRectangle(cornerRadius: 18))
+                    }
+                    .buttonStyle(.plain).foregroundStyle(.white)
+                }
+                Spacer()
+            }
+            .padding(24)
+        }
     }
 }
 

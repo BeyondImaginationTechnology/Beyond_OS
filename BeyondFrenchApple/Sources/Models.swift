@@ -18,6 +18,21 @@ enum AppTheme: String, CaseIterable, Identifiable, Codable {
     }
 }
 
+enum FrenchLearningLanguage: String, CaseIterable, Identifiable, Codable {
+    case french, kreyol, patois, spanish
+
+    var id: String { rawValue }
+    var title: String {
+        switch self { case .french: return "French"; case .kreyol: return "Kreyòl"; case .patois: return "Patois"; case .spanish: return "Spanish" }
+    }
+    var symbol: String {
+        switch self { case .french: return "🇫🇷"; case .kreyol: return "🇭🇹"; case .patois: return "🇯🇲"; case .spanish: return "🇪🇸" }
+    }
+    var audioLanguage: DictionaryAudioLanguage {
+        switch self { case .french: return .french; case .kreyol: return .kreyol; case .patois: return .patois; case .spanish: return .spanish }
+    }
+}
+
 struct TodayResponse: Decodable {
     let ok: Bool
     let date: String

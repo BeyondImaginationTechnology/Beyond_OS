@@ -27,9 +27,9 @@ try {
     error_log('Beyond French homepage data unavailable: ' . $error->getMessage());
 }
 ?>
-<style>.french-splash{position:fixed;inset:0;z-index:2147483600;display:grid;place-items:center;padding:24px;color:#fff;background:linear-gradient(135deg,rgba(7,21,47,.94),rgba(23,104,255,.88),rgba(239,51,64,.78));transition:opacity .35s,visibility .35s}.french-splash.hidden{opacity:0;visibility:hidden}.french-splash-inner{width:min(520px,100%);text-align:center}.french-splash img{width:112px;height:112px;border-radius:50%;box-shadow:0 22px 60px #0006}.french-splash h1{font-size:clamp(46px,10vw,78px);line-height:.95;letter-spacing:-.06em;margin:22px 0 12px}.french-splash p{font-size:18px;color:#e9eefc}.french-splash a{display:inline-flex;margin:16px 0 13px;padding:15px 22px;border-radius:999px;color:#07152f;background:#ffbf00;font-weight:900}.french-splash small{display:block;color:#d8e1f5;font-weight:800}.lesson-progress-label{display:inline-flex;margin-bottom:12px;padding:8px 11px;border-radius:999px;color:#fff;background:#1768ff;font-size:12px;font-weight:900}</style>
-<div class="french-splash" id="french-splash"><div class="french-splash-inner"><img src="<?= h($frenchBase) ?>assets/images/beyond-french-logo.webp" alt=""><span class="eyebrow" style="color:#ffbf00">BEYOND FRENCH · DAILY ACADEMY</span><h1>Parlez français.</h1><p><?= $isReturningLearner ? 'Your next lesson is ready.' : 'Start small. Speak with confidence.' ?></p><a id="enter-french" href="<?= h($frenchBase) ?>dictionary.php">Open free dictionary →</a><small>Dictionary · Written translation · No Beyond ID required</small></div></div>
-<script>const frenchSplash=document.getElementById('french-splash');if(sessionStorage.getItem('beyond-french-entered')==='1')frenchSplash.classList.add('hidden');document.getElementById('enter-french').addEventListener('click',()=>sessionStorage.setItem('beyond-french-entered','1'));</script>
+<style>.french-splash{position:fixed;inset:0;z-index:2147483600;display:grid;place-items:center;padding:24px;color:#fff;background:linear-gradient(135deg,rgba(7,21,47,.94),rgba(23,104,255,.88),rgba(239,51,64,.78));transition:opacity .35s,visibility .35s}.french-splash.hidden{opacity:0;visibility:hidden}.french-splash-inner{width:min(520px,100%);text-align:center}.french-splash img{width:112px;height:112px;border-radius:50%;box-shadow:0 22px 60px #0006}.french-splash h1{font-size:clamp(46px,10vw,78px);line-height:.95;letter-spacing:-.06em;margin:22px 0 12px}.french-splash p{font-size:18px;color:#e9eefc}.french-splash small{display:block;color:#d8e1f5;font-weight:800}.language-paths{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:24px 0}.language-paths button{padding:14px;border:1px solid #ffffff55;border-radius:15px;color:#fff;background:#07152f66;font-weight:900;cursor:pointer}.language-paths button:hover{background:#ffbf00;color:#07152f}.lesson-progress-label{display:inline-flex;margin-bottom:12px;padding:8px 11px;border-radius:999px;color:#fff;background:#1768ff;font-size:12px;font-weight:900}</style>
+<div class="french-splash" id="french-splash"><div class="french-splash-inner"><img src="<?= h($frenchBase) ?>assets/images/beyond-french-logo.webp" alt=""><span class="eyebrow" style="color:#ffbf00">BEYOND FRENCH · DAILY ACADEMY</span><h1>Choose your language path.</h1><p><?= $isReturningLearner ? 'Your next lesson is ready.' : 'Start small. Speak with confidence.' ?></p><div class="language-paths"><button data-learning-language="french">🇫🇷 French</button><button data-learning-language="kreyol">🇭🇹 Kreyòl</button><button data-learning-language="patois">🇯🇲 Patois</button><button data-learning-language="spanish">🇪🇸 Spanish</button></div><small>Change this anytime in Settings.</small></div></div>
+<script>const frenchSplash=document.getElementById('french-splash'),savedLanguage=localStorage.getItem('beyond-french.learning-language');if(sessionStorage.getItem('beyond-french-entered')==='1'&&savedLanguage)frenchSplash.classList.add('hidden');document.querySelectorAll('[data-learning-language]').forEach(button=>button.addEventListener('click',()=>{localStorage.setItem('beyond-french.learning-language',button.dataset.learningLanguage);sessionStorage.setItem('beyond-french-entered','1');frenchSplash.classList.add('hidden')}));</script>
 <section class="section app-today-intro" aria-labelledby="today-app-title">
     <div class="app-today-copy">
         <span class="eyebrow">FRANÇAIS DU JOUR</span>
@@ -38,9 +38,10 @@ try {
     </div>
     <div class="app-today-actions">
         <button class="button secondary install-app" id="install-beyond-french" type="button" hidden>Install app</button>
-        <a class="button secondary" href="<?= h($frenchBase) ?>archive.php">Past lessons</a>
-        <a class="button primary" href="<?= h($frenchBase) ?>game.php">Play French Quest</a>
-        <a class="button secondary" href="<?= h($frenchBase) ?>challenge.php<?= $lesson ? '?id=' . (int)$lesson['id'] : '' ?>">Start practice</a>
+        <a class="button primary" href="<?= h($frenchBase) ?>challenge.php<?= $lesson ? '?id=' . (int)$lesson['id'] : '' ?>">Continue learning</a>
+        <a class="button secondary" href="<?= h($frenchBase) ?>academy.php">Academy</a>
+        <a class="button secondary" href="<?= h($frenchBase) ?>game.php">French Quest</a>
+        <a class="button secondary" href="<?= h($frenchBase) ?>settings.php">Settings</a>
     </div>
 </section>
 
@@ -138,8 +139,10 @@ try {
         <div><span class="eyebrow">KEEP LEARNING</span><h2>Continue from here</h2></div>
     </div>
     <div class="app-tool-grid">
-        <a href="<?= h($frenchBase) ?>challenge.php<?= $lesson ? '?id=' . (int)$lesson['id'] : '' ?>"><span>💬</span><strong>Practice today’s phrase</strong><small>Complete the conversation challenge.</small></a>
-        <a href="<?= h($frenchBase) ?>archive.php"><span>📚</span><strong>Browse lessons</strong><small>Review previous phrases anytime.</small></a>
+        <a href="<?= h($frenchBase) ?>challenge.php<?= $lesson ? '?id=' . (int)$lesson['id'] : '' ?>"><span>▶</span><strong>Continue learning</strong><small>Resume today’s phrase challenge.</small></a>
+        <a href="<?= h($frenchBase) ?>academy.php"><span>🎓</span><strong>Academy</strong><small>Follow your guided learning path.</small></a>
+        <a href="<?= h($frenchBase) ?>game.php"><span>🗺️</span><strong>French Quest</strong><small>Story mode, routes, and trivia.</small></a>
+        <a href="<?= h($frenchBase) ?>settings.php"><span>⚙️</span><strong>Settings</strong><small>Change your learning language.</small></a>
     </div>
 </section>
 <section class="section" id="modules"><div class="section-heading"><div><span class="eyebrow">LEARNING PATH</span><h2>Five practical course modules</h2></div><a class="button primary" href="<?= h($frenchBase) ?>academy.php">Open French Academy</a></div><div class="archive-grid"><?php foreach(french_modules() as $slug=>$module):?><a class="archive-card" href="<?= h($frenchBase) ?>academy.php"><span style="font-size:2rem"><?= h($module['icon']) ?></span><small>MODULE <?= array_search($slug,array_keys(french_modules()),true)+1 ?></small><h3><?= h($module['title']) ?></h3><p><?= h($module['description']) ?></p></a><?php endforeach;?></div></section>

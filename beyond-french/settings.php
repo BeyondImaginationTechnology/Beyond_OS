@@ -1,0 +1,8 @@
+<?php
+require_once __DIR__ . '/../includes/ecosystem.php';
+$pageTitle = 'Settings | Beyond French';
+require __DIR__ . '/includes/header.php';
+?>
+<style>#language-settings button{padding:20px;border:1px solid #d7e1f5;border-radius:16px;color:#10224b;background:#fff;font:inherit;font-weight:850;cursor:pointer}#language-settings button.selected{color:#fff;background:#1768ff;border-color:#1768ff}</style><section class="section" style="max-width:760px;margin:36px auto"><div class="section-heading"><div><span class="eyebrow">YOUR EXPERIENCE</span><h1>Settings</h1><p>Choose the language path you want Beyond French to highlight.</p></div></div><div class="lesson-card"><h2>Learning language</h2><div class="app-tool-grid" id="language-settings"><button data-language="french">🇫🇷 French</button><button data-language="kreyol">🇭🇹 Kreyòl</button><button data-language="patois">🇯🇲 Patois</button><button data-language="spanish">🇪🇸 Spanish</button></div><p id="language-status" aria-live="polite">Your choice is saved on this device.</p></div></section>
+<script>const status=document.getElementById('language-status'),current=localStorage.getItem('beyond-french.learning-language')||'french';const set=value=>{localStorage.setItem('beyond-french.learning-language',value);document.querySelectorAll('[data-language]').forEach(button=>button.classList.toggle('selected',button.dataset.language===value));status.textContent='Learning path set to '+value.charAt(0).toUpperCase()+value.slice(1)+'.'};document.querySelectorAll('[data-language]').forEach(button=>button.addEventListener('click',()=>set(button.dataset.language)));set(current);</script>
+<?php require __DIR__ . '/includes/footer.php'; ?>

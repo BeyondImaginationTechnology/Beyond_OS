@@ -24,11 +24,11 @@ targets:
       - path: Sources
     resources:
       - path: Resources
-      settings:
-        base:
-          PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.beyondfrench
-          PRODUCT_NAME: BeyondFrench
-          INFOPLIST_FILE: Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.beyondfrench
+        PRODUCT_NAME: BeyondFrench
+        INFOPLIST_FILE: Info.plist
         CODE_SIGN_ENTITLEMENTS: BeyondFrench.entitlements
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_CFBundleDisplayName: Beyond French

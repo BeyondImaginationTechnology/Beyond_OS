@@ -12,7 +12,7 @@ dailybreath_legal_start(
 <p>These Terms &amp; Conditions form an agreement between you and Beyond Imagination Technology for Daily Breath. By accessing or using Daily Breath, you agree to these Terms and the <a href="/dailybreath/privacy.php">Daily Breath Privacy Policy</a>. If you do not agree, do not use the service. You must be legally able to enter this agreement; a parent or guardian must authorize use where applicable.</p>
 
 <h2>What Daily Breath provides</h2>
-<p>Daily Breath provides sacred-text reading, devotionals, faith-centered learning, guided breathing, private reflection tools, recovery-oriented prompts, optional reminders, activity history, Academy content, and a scoped chat guide. Features vary by platform, language, account status, store, location, and release version.</p>
+<p>Daily Breath provides sacred-text reading, devotionals, faith-centered learning and trivia, guided breathing, private reflection tools, recovery-oriented prompts, optional reminders, activity history, Academy content, and a scoped chat guide. Features vary by platform, language, account status, store, location, and release version.</p>
 
 <h2>Spiritual, wellness, and recovery disclaimer</h2>
 <p>Daily Breath offers general educational, spiritual, and wellness information. It is not medical or mental-health care, diagnosis, treatment, emergency support, legal advice, or a substitute for a qualified clinician, counselor, rabbi, pastor, imam, educator, sponsor, or other appropriate professional. Sacred-text explanations and faith guidance are informational and may not represent every denomination, movement, school, or community.</p>

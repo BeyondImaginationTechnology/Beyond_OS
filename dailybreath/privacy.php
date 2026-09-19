@@ -14,6 +14,9 @@ dailybreath_legal_start(
 <h2>Information you choose to provide</h2>
 <p>You may provide reflection journal text, scripture notes and highlights, favorite collections, breathing and challenge activity, Academy progress, chat questions, support messages, and newsletter details. Some of this information can reveal personal wellness or religious interests. Please do not place medical records, passwords, payment-card numbers, or information you are not authorized to share in notes, journals, support requests, or chat.</p>
 
+<h2>Trivia answers and scores</h2>
+<p>Daily Breath uses your trivia answers only to calculate and display your result for the current quiz session. The web version processes answers during the current request, and the Apple app keeps quiz progress in memory while you play. Daily Breath does not save general trivia answers or scores to your Beyond ID, create a trivia leaderboard, or use trivia responses for advertising.</p>
+
 <h2>Beyond ID and account-connected features</h2>
 <p>Most reading and local practice features can be used without an account. If you sign in with Beyond ID, Daily Breath receives or uses an account identifier, name, email address, authorization token, connected-app status, and the minimum account information needed to authenticate you, restore eligible purchases, sync supported progress, prevent abuse, and provide support. Native authorization tokens are stored in the platform’s protected credential storage. You may sign out from the app or manage account data through Beyond ID.</p>
 

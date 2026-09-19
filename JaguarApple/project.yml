@@ -20,32 +20,13 @@ targets:
     platform: iOS
     sources: [Sources]
     resources: [Resources]
-    info:
-      path: Resources/Info.plist
-      properties:
-        CFBundleDisplayName: Jaguar
-        CFBundleIconName: AppIcon
-        CFBundleIconFiles:
-          - AppIcon-60
-          - AppIcon-76
-          - AppIcon-83.5
-        CFBundleURLTypes:
-          - CFBundleTypeRole: Editor
-            CFBundleURLName: technology.co.beyondimagination.jaguar.auth
-            CFBundleURLSchemes: [jaguar]
-        LSApplicationCategoryType: public.app-category.productivity
-        UILaunchScreen: {}
-        UIApplicationSupportsIndirectInputEvents: true
-        UISupportedInterfaceOrientations:
-          - UIInterfaceOrientationPortrait
-          - UIInterfaceOrientationPortraitUpsideDown
-          - UIInterfaceOrientationLandscapeLeft
-          - UIInterfaceOrientationLandscapeRight
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.jaguar
         PRODUCT_MODULE_NAME: Jaguar
         PRODUCT_NAME: Jaguar
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Resources/Info.plist
         TARGETED_DEVICE_FAMILY: "1,2"
         SUPPORTS_MACCATALYST: YES
     scheme:

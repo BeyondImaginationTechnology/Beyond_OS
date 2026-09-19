@@ -20,11 +20,6 @@ struct RootView: View {
         .tint(JaguarTheme.magenta)
         .background(JaguarTheme.ink.ignoresSafeArea())
         .sheet(isPresented: $showingAccount) { JaguarAccountView() }
-        .alert("Jaguar", isPresented: Binding(get: { auth.message != nil }, set: { if !$0 { auth.clearMessage() } })) {
-            Button("OK") { auth.clearMessage() }
-        } message: {
-            Text(auth.message ?? "")
-        }
     }
 
     private var conversationList: some View {
@@ -72,20 +67,28 @@ private struct JaguarWelcomeView: View {
                     Text("Where will we go\nbeyond?")
                         .font(.system(size: 46, weight: .black, design: .rounded))
                         .multilineTextAlignment(.center)
-                    Text("AI fuel for the BIT ecosystem. Explain ideas, shape plans, and learn in plain language.")
+                    Text("Explain ideas, shape plans, and learn in plain language.")
                         .font(.title3)
                         .foregroundStyle(JaguarTheme.secondaryText)
                         .multilineTextAlignment(.center)
                 }
                 Button(action: auth.signIn) {
-                    Label("Continue with Beyond ID", systemImage: "person.crop.circle.badge.checkmark")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(JaguarTheme.gradient, in: RoundedRectangle(cornerRadius: 18))
+                    if auth.isSigningIn {
+                        HStack(spacing: 10) { ProgressView().tint(.white); Text("Securing your session…") }
+                    } else {
+                        Label("Continue with Beyond ID", systemImage: "person.crop.circle.badge.checkmark")
+                    }
                 }
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(JaguarTheme.gradient, in: RoundedRectangle(cornerRadius: 18))
                 .buttonStyle(.plain)
-                Text("Jaguar uses Beyond ID so your native session never depends on browser cookies or a guest security check.")
+                .disabled(auth.isSigningIn)
+                if let message = auth.message {
+                    JaguarSignInNotice(message: message, detail: auth.signInDetail, retry: auth.signIn, dismiss: auth.clearMessage)
+                }
+                Text("Jaguar uses Beyond ID for a secure native session. Your conversations stay on this device.")
                     .font(.footnote)
                     .foregroundStyle(JaguarTheme.secondaryText)
                     .multilineTextAlignment(.center)
@@ -93,6 +96,46 @@ private struct JaguarWelcomeView: View {
             .padding(28)
             .frame(maxWidth: 620)
         }
+    }
+}
+
+private struct JaguarSignInNotice: View {
+    let message: String
+    let detail: String?
+    let retry: () -> Void
+    let dismiss: () -> Void
+    @State private var showingDetails = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: "lock.trianglebadge.exclamationmark")
+                    .foregroundStyle(JaguarTheme.mint)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(message).font(.subheadline.weight(.bold))
+                    Text("Nothing was changed to your Beyond ID account.")
+                        .font(.footnote).foregroundStyle(JaguarTheme.secondaryText)
+                }
+                Spacer()
+                Button(action: dismiss) { Image(systemName: "xmark").font(.caption.weight(.bold)) }
+                    .accessibilityLabel("Dismiss sign-in message")
+            }
+            HStack(spacing: 14) {
+                Button("Try again", action: retry).font(.subheadline.weight(.bold))
+                if detail != nil {
+                    Button(showingDetails ? "Hide details" : "Details") { showingDetails.toggle() }
+                        .font(.subheadline)
+                }
+            }
+            if showingDetails, let detail {
+                Text(detail).font(.footnote).foregroundStyle(JaguarTheme.secondaryText)
+            }
+        }
+        .padding(16)
+        .background(JaguarTheme.panelRaised.opacity(0.88), in: RoundedRectangle(cornerRadius: 18))
+        .overlay(RoundedRectangle(cornerRadius: 18).stroke(JaguarTheme.mint.opacity(0.35)))
+        .frame(maxWidth: 620, alignment: .leading)
+        .accessibilityElement(children: .contain)
     }
 }
 
@@ -128,7 +171,7 @@ private struct JaguarChatView: View {
                 Text("Llama Jaguar").font(.headline)
                 HStack(spacing: 5) {
                     Circle().fill(JaguarTheme.mint).frame(width: 7, height: 7)
-                    Text("v0.3 Preview · Explain")
+                    Text("v0.2 · Explain preview")
                 }
                 .font(.caption)
                 .foregroundStyle(JaguarTheme.secondaryText)
@@ -155,32 +198,42 @@ private struct JaguarChatView: View {
 
     private var suggestions: some View {
         ScrollView {
-            VStack(spacing: 18) {
+            VStack(spacing: 20) {
                 Spacer(minLength: 48)
                 JaguarMark(size: 64)
-                Text("Where will we go beyond?")
+                Text("Start somewhere good.")
                     .font(.system(size: 36, weight: .black, design: .rounded))
                     .multilineTextAlignment(.center)
-                Text("Ask Jaguar to explain an idea, shape a plan, or help you find a stronger starting point.")
+                Text("Choose a starting point, then make it yours. Jaguar is ready to explain, shape, and clarify.")
                     .font(.title3)
                     .foregroundStyle(JaguarTheme.secondaryText)
                     .multilineTextAlignment(.center)
-                ForEach([
-                    "Explain AI tokens with a memorable analogy.",
-                    "Help me turn a rough idea into a clear project plan.",
-                    "Teach me something difficult in plain language."
-                ], id: \.self) { prompt in
+                VStack(spacing: 10) {
+                    ForEach(JaguarStarter.allCases) { starter in
                     Button {
-                        store.draft = prompt
+                        store.draft = starter.prompt
                         Task { await send() }
                     } label: {
-                        HStack { Text(prompt).multilineTextAlignment(.leading); Spacer(); Image(systemName: "arrow.up.right") }
+                        HStack(spacing: 14) {
+                            Image(systemName: starter.icon)
+                                .font(.title3.weight(.semibold))
+                                .foregroundStyle(JaguarTheme.mint)
+                                .frame(width: 34, height: 34)
+                                .background(JaguarTheme.panelRaised, in: RoundedRectangle(cornerRadius: 11))
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(starter.title).font(.headline)
+                                Text(starter.detail).font(.footnote).foregroundStyle(JaguarTheme.secondaryText)
+                            }
+                            Spacer()
+                            Image(systemName: "arrow.up.right").foregroundStyle(JaguarTheme.secondaryText)
+                        }
                             .padding(18)
                             .frame(maxWidth: 620)
                             .background(JaguarTheme.panel, in: RoundedRectangle(cornerRadius: 18))
                             .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.white.opacity(0.13)))
                     }
                     .buttonStyle(.plain)
+                    }
                 }
             }
             .padding(24)
@@ -288,6 +341,46 @@ private struct JaguarChatView: View {
     }
 }
 
+private enum JaguarStarter: String, CaseIterable, Identifiable {
+    case explain
+    case plan
+    case learn
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .explain: "Explain an idea"
+        case .plan: "Shape a plan"
+        case .learn: "Learn it simply"
+        }
+    }
+
+    var detail: String {
+        switch self {
+        case .explain: "Use a memorable analogy and plain language."
+        case .plan: "Turn a rough thought into clear next steps."
+        case .learn: "Break a difficult topic into manageable pieces."
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .explain: "sparkles"
+        case .plan: "point.3.connected.trianglepath.dotted"
+        case .learn: "graduationcap.fill"
+        }
+    }
+
+    var prompt: String {
+        switch self {
+        case .explain: "Explain AI tokens with a memorable analogy."
+        case .plan: "Help me turn a rough idea into a clear project plan."
+        case .learn: "Teach me something difficult in plain language."
+        }
+    }
+}
+
 private struct JaguarBottomPreferenceKey: PreferenceKey {
     static let defaultValue: CGFloat = .greatestFiniteMagnitude
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
@@ -338,7 +431,7 @@ private struct JaguarAccountView: View {
                 }
                 Section("About") {
                     LabeledContent("App", value: "Beyond-1 AI")
-                    LabeledContent("Version", value: "0.1 (v0.3 Preview service)")
+                    LabeledContent("Version", value: "0.2 (Explain preview)")
                     Text("Conversation history stays on this device. Messages are sent to Jaguar when you ask a question.")
                 }
             }

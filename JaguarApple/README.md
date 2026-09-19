@@ -2,6 +2,14 @@
 
 Native SwiftUI app powered by the Llama Jaguar v0.3 Preview service.
 
+## v0.2
+
+- A resilient Beyond ID sign-in experience with a native in-progress state,
+  retry action, and safe troubleshooting detail rather than a blocking alert.
+- A guided native start screen with clear Explain, Plan, and Learn entry points.
+- Private diagnostic logging for failed token exchanges, including their HTTP
+  status, without exposing server responses or account data in the UI.
+
 ## First release scope
 
 - Beyond ID sign-in with ASWebAuthenticationSession, PKCE, and Keychain storage

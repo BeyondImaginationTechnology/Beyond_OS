@@ -26,6 +26,7 @@ struct DailyBreathApp: App {
                     set: { _ in }
                 )) {
                     AccountChoiceView(onboardingComplete: $onboardingComplete)
+                        .environmentObject(auth)
                 }
                 .task {
                     if DailyBreathCaptureRoute.isActive && languageID.isEmpty {

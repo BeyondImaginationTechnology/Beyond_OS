@@ -1,4 +1,42 @@
 workflows:
+  jaguar-ios-testflight:
+    name: Jaguar iOS TestFlight
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    working_directory: JaguarApple
+    integrations:
+      app_store_connect: beyond-apple-api
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: technology.co.beyondimagination.jaguar
+      xcode: latest
+    scripts:
+      - name: Generate Xcode project
+        script: |
+          set -euo pipefail
+          command -v xcodegen >/dev/null || brew install xcodegen
+          xcodegen generate
+      - name: Configure signing profiles
+        script: xcode-project use-profiles
+      - name: Set a unique App Store build number
+        script: |
+          set -euo pipefail
+          agvtool new-version -all "$(date +%s)"
+      - name: Build signed IPA
+        script: |
+          set -euo pipefail
+          xcode-project build-ipa \
+            --project "$CM_BUILD_DIR/JaguarApple/Jaguar.xcodeproj" \
+            --scheme Jaguar
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+
   jaguar-ios:
     name: Jaguar iOS checks
     max_build_duration: 60

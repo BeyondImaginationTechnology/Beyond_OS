@@ -25,6 +25,10 @@ targets:
       properties:
         CFBundleDisplayName: Jaguar
         CFBundleIconName: AppIcon
+        CFBundleIconFiles:
+          - AppIcon-60
+          - AppIcon-76
+          - AppIcon-83.5
         CFBundleURLTypes:
           - CFBundleTypeRole: Editor
             CFBundleURLName: technology.co.beyondimagination.jaguar.auth
@@ -34,6 +38,7 @@ targets:
         UIApplicationSupportsIndirectInputEvents: true
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
     settings:

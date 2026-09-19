@@ -1,6 +1,6 @@
-# Llama Jaguar for iOS
+# Beyond-1 AI for iOS
 
-Native SwiftUI client for the Jaguar v0.3 Preview service.
+Native SwiftUI app powered by the Llama Jaguar v0.3 Preview service.
 
 ## First release scope
 

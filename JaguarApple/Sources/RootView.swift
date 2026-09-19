@@ -54,7 +54,7 @@ struct RootView: View {
         }
         .scrollContentBackground(.hidden)
         .background(JaguarTheme.ink)
-        .navigationTitle("Jaguar")
+        .navigationTitle("Beyond-1 AI")
     }
 }
 
@@ -337,7 +337,7 @@ private struct JaguarAccountView: View {
                     Button("Sign out", role: .destructive) { auth.signOut(); dismiss() }
                 }
                 Section("About") {
-                    LabeledContent("App", value: "Llama Jaguar")
+                    LabeledContent("App", value: "Beyond-1 AI")
                     LabeledContent("Version", value: "0.1 (v0.3 Preview service)")
                     Text("Conversation history stays on this device. Messages are sent to Jaguar when you ask a question.")
                 }

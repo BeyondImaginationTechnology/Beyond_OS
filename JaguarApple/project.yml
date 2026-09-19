@@ -24,6 +24,7 @@ targets:
       path: Resources/Info.plist
       properties:
         CFBundleDisplayName: Jaguar
+        CFBundleIconName: AppIcon
         CFBundleURLTypes:
           - CFBundleTypeRole: Editor
             CFBundleURLName: technology.co.beyondimagination.jaguar.auth

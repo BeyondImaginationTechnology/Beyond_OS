@@ -239,12 +239,12 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
     <div class="product-grid" aria-label="Explore flagship Beyond Imagination Technology web products">
         <a class="product-card health" href="/dailybreath/">
             <span class="product-number">01 · LIVE</span><h3>DailyBreath</h3>
-            <p>Daily readings, breathing practices, recovery support and private reflection in an installable web experience.</p>
+            <p>Daily readings, breathing practices, recovery support, private reflection, and a gentle Trivia mode in an installable web experience.</p>
             <span class="product-link">Open DailyBreath →</span>
         </a>
         <a class="product-card education" href="/academy/">
             <span class="product-number">02 · LEARN</span><h3>Beyond Academy</h3>
-            <p>A growing learning layer spanning French, mathematics, history, space and coding pathways.</p>
+            <p>A growing learning layer spanning French, mathematics, history, space and coding pathways. Beyond French now brings daily lessons, Academy, French Quest and trivia together in one learning path.</p>
             <span class="product-link">Enter the Academy →</span>
         </a>
         <a class="product-card wallet" href="/beyond-market/">
@@ -262,9 +262,9 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
         <div><span class="platform-kicker">The connected loop</span><h3>Every app builds the foundation for what comes next.</h3></div>
         <div class="loop-steps" aria-label="Beyond Imagination Technology engagement loop">
             <div class="loop-step"><b>Discover</b><span>TV, games &amp; daily content</span></div>
-            <div class="loop-step"><b>Participate</b><span>Learn, create &amp; practice</span></div>
+            <div class="loop-step"><b>Participate</b><span>Learn, create, practice &amp; play</span></div>
             <div class="loop-step"><b>Earn</b><span>Shared rewards &amp; progress</span></div>
-            <div class="loop-step"><b>Return</b><span>One identity across the system</span></div>
+            <div class="loop-step"><b>Return</b><span>Daily habits, shared identity &amp; progress</span></div>
         </div>
     </div>
 </section>

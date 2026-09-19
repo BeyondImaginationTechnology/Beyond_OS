@@ -45,19 +45,21 @@ struct AcademyView: View {
 
     var body: some View {
         ScrollView {
-            if purchaseManager.hasAccess {
-                VStack(alignment: .leading, spacing: 18) {
-                    hero
-                    traditionPicker
-                    metricGrid
-                    continueCard
-                    ForEach(Array(selectedPaths.enumerated()), id: \.element.id) { index, path in
-                        AcademyModuleCard(pathNumber: index + 1, path: path, completedIDs: completedIDs, theme: selectedTheme)
+            Group {
+                if purchaseManager.hasAccess {
+                    VStack(alignment: .leading, spacing: 18) {
+                        hero
+                        traditionPicker
+                        metricGrid
+                        continueCard
+                        ForEach(Array(selectedPaths.enumerated()), id: \.element.id) { index, path in
+                            AcademyModuleCard(pathNumber: index + 1, path: path, completedIDs: completedIDs, theme: selectedTheme)
+                        }
+                        certificationCard
                     }
-                    certificationCard
+                } else {
+                    purchasePaywall
                 }
-            } else {
-                purchasePaywall
             }
             .padding()
         }
@@ -264,7 +266,7 @@ final class AcademyPurchaseManager: ObservableObject {
 
     init() {
         updatesTask = Task { [weak self] in
-            for await result in Transaction.updates {
+            for await result in StoreKit.Transaction.updates {
                 guard let self else { return }
                 await self.apply(result)
             }
@@ -298,7 +300,7 @@ final class AcademyPurchaseManager: ObservableObject {
 
     private func refreshEntitlement() async {
         var active = false
-        for await result in Transaction.currentEntitlements {
+        for await result in StoreKit.Transaction.currentEntitlements {
             guard case .verified(let transaction) = result,
                   transaction.productID == Self.productID,
                   transaction.revocationDate == nil else { continue }
@@ -308,7 +310,7 @@ final class AcademyPurchaseManager: ObservableObject {
         UserDefaults.standard.set(active, forKey: "dailyBreathAcademyPurchased")
     }
 
-    private func apply(_ result: VerificationResult<Transaction>) async {
+    private func apply(_ result: VerificationResult<StoreKit.Transaction>) async {
         guard case .verified(let transaction) = result,
               transaction.productID == Self.productID else { return }
         let active = transaction.revocationDate == nil

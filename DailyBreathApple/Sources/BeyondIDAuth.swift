@@ -30,7 +30,7 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
     func signIn() {
         message = nil
         verifier = randomURLSafe(count: 64)
-        let challenge = base64URL(SHA256.hash(data: Data(verifier.utf8)))
+        let challenge = base64URL(Data(SHA256.hash(data: Data(verifier.utf8))))
         var components = URLComponents(url: loginURL, resolvingAgainstBaseURL: false)!
         let returnPath = "/beyond-id/auth/mobile-complete.php?scheme=dailybreath&code_challenge=\(challenge)"
         components.queryItems = [

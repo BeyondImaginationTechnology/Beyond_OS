@@ -61,7 +61,7 @@ struct AccountChoiceView: View {
             Spacer()
             Image(systemName: "person.crop.circle.badge.checkmark")
                 .font(.system(size: 72))
-                .foregroundStyle(.dailyGreen)
+                .foregroundStyle(Color.dailyGreen)
             VStack(spacing: 8) {
                 Text("Choose how to begin")
                     .font(.largeTitle.bold())

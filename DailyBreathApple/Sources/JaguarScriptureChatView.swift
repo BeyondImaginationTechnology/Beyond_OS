@@ -117,6 +117,6 @@ struct JaguarScriptureChatView: View {
             }
             guard let answer = json?["message"] as? String else { throw URLError(.cannotParseResponse) }
             messages.append(("assistant", answer))
-        } catch { error = "Daily Breath chat could not respond. Please try again." }
+        } catch { self.error = "Daily Breath chat could not respond. Please try again." }
     }
 }

@@ -18,8 +18,15 @@ targets:
   Jaguar:
     type: application
     platform: iOS
-    sources: [Sources]
-    resources: [Resources]
+    sources:
+      - path: Sources
+      - path: Resources/Assets.xcassets
+      - path: Resources/PrivacyInfo.xcprivacy
+      - path: Resources/AppIcon-60@2x.png
+      - path: Resources/AppIcon-60@3x.png
+      - path: Resources/AppIcon-76.png
+      - path: Resources/AppIcon-76@2x.png
+      - path: Resources/AppIcon-83.5@2x.png
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.jaguar

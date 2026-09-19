@@ -30,4 +30,10 @@ return [
         'scheme' => 'dailybreath',
         'scopes' => ['profile:read', 'email:read', 'streaks:write'],
     ],
+    'jaguar-ios' => [
+        'name' => 'Llama Jaguar for Apple',
+        'app_slug' => 'jaguar',
+        'scheme' => 'jaguar',
+        'scopes' => ['profile:read'],
+    ],
 ];

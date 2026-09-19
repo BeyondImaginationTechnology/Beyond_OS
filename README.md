@@ -19,6 +19,8 @@ Current release: **Beyond OS 2.4**
 - **Beyond Tattoo Apple 1.2** adds asset-backed daily stencils, real downloads,
   healing milestones, bit$ rewards, and a location-aware Canadian studio
   directory.
+- **Llama Jaguar for Apple** is a native SwiftUI chat client with Beyond ID,
+  local conversations, visible response timing, and the live Explain mode.
 - **Beyond Studio + Remotion** adds a local trusted-project preview and H.264
   rendering bridge, while the **Beyond French African Expansion** project adds
   reusable vertical and feed campaign compositions.

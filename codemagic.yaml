@@ -1,4 +1,45 @@
 workflows:
+  jaguar-ios:
+    name: Jaguar iOS checks
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    working_directory: JaguarApple
+    environment:
+      xcode: latest
+    scripts:
+      - name: Generate Xcode project
+        script: |
+          set -euo pipefail
+          command -v xcodegen >/dev/null || brew install xcodegen
+          xcodegen generate
+      - name: Run unit tests
+        script: |
+          set -euo pipefail
+          simulator_id="$(xcrun simctl list devices available -j | ruby -rjson -e '
+            devices = JSON.parse(STDIN.read).fetch("devices").values.flatten
+            device = devices.find { |candidate| candidate["isAvailable"] && candidate["name"] == "iPhone 16 Pro Max" }
+            device ||= devices.find { |candidate| candidate["isAvailable"] && candidate["name"].start_with?("iPhone") }
+            abort "No available iPhone simulator found" unless device
+            puts device.fetch("udid")
+          ')"
+          xcodebuild test \
+            -project Jaguar.xcodeproj \
+            -scheme Jaguar \
+            -destination "id=$simulator_id" \
+            CODE_SIGNING_ALLOWED=NO
+      - name: Build simulator app
+        script: |
+          set -euo pipefail
+          xcodebuild build \
+            -project Jaguar.xcodeproj \
+            -scheme Jaguar \
+            -sdk iphonesimulator \
+            -derivedDataPath "$CM_BUILD_DIR/derived-data" \
+            CODE_SIGNING_ALLOWED=NO
+    artifacts:
+      - $CM_BUILD_DIR/derived-data/Build/Products/**/*.app
+      - /tmp/xcodebuild_logs/*.log
+
   daily-breath-testflight:
     name: Daily Breath iOS TestFlight
     max_build_duration: 120

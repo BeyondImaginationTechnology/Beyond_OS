@@ -17,27 +17,27 @@ function mobile_token_json(int $status, array $payload): never
 
 if (strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? '')) !== 'POST') {
     header('Allow: POST');
-    mobile_token_json(405, ['ok' => false, 'error' => 'Method not allowed.']);
+    mobile_token_json(405, ['ok' => false, 'error' => 'Method not allowed.', 'error_code' => 'method_not_allowed']);
 }
 $contentType = strtolower(trim((string)($_SERVER['CONTENT_TYPE'] ?? '')));
 if (!str_starts_with($contentType, 'application/json')) {
-    mobile_token_json(415, ['ok' => false, 'error' => 'JSON requests only.']);
+    mobile_token_json(415, ['ok' => false, 'error' => 'JSON requests only.', 'error_code' => 'json_required']);
 }
 if ((int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 16384) {
-    mobile_token_json(413, ['ok' => false, 'error' => 'Request body is too large.']);
+    mobile_token_json(413, ['ok' => false, 'error' => 'Request body is too large.', 'error_code' => 'request_too_large']);
 }
 $limit = beyond_rate_limit_consume($pdo, 'mobile-token-exchange', '', 30, 300, 900);
 if (!$limit['allowed']) {
     header('Retry-After: ' . $limit['retry_after']);
-    mobile_token_json(429, ['ok' => false, 'error' => 'Too many token exchanges. Try again later.', 'retry_after' => $limit['retry_after']]);
+    mobile_token_json(429, ['ok' => false, 'error' => 'Too many token exchanges. Try again later.', 'error_code' => 'token_exchange_rate_limited', 'retry_after' => $limit['retry_after']]);
 }
 
 $input = json_decode((string)file_get_contents('php://input'), true);
-if (!is_array($input)) mobile_token_json(400, ['ok' => false, 'error' => 'A JSON authorization exchange is required.']);
+if (!is_array($input)) mobile_token_json(400, ['ok' => false, 'error' => 'A JSON authorization exchange is required.', 'error_code' => 'invalid_exchange_request']);
 $code = trim((string)($input['code'] ?? ''));
 $verifier = trim((string)($input['code_verifier'] ?? ''));
 if (!preg_match('/^[A-Za-z0-9_-]{43,128}$/', $code) || !preg_match('/^[A-Za-z0-9._~-]{43,128}$/', $verifier)) {
-    mobile_token_json(422, ['ok' => false, 'error' => 'Invalid authorization exchange.']);
+    mobile_token_json(422, ['ok' => false, 'error' => 'Invalid authorization exchange.', 'error_code' => 'invalid_exchange_request']);
 }
 
 try {
@@ -48,13 +48,13 @@ try {
     $challenge = rtrim(strtr(base64_encode(hash('sha256', $verifier, true)), '+/', '-_'), '=');
     if (!$record || !hash_equals((string)$record['code_challenge'], $challenge)) {
         $pdo->rollBack();
-        mobile_token_json(401, ['ok' => false, 'error' => 'Authorization code is invalid or expired.']);
+        mobile_token_json(401, ['ok' => false, 'error' => 'Authorization code is invalid or expired.', 'error_code' => 'authorization_code_rejected']);
     }
     $consume = $pdo->prepare('UPDATE mobile_authorization_codes SET used_at=? WHERE code_hash=? AND used_at IS NULL');
     $consume->execute([date('Y-m-d H:i:s'), hash('sha256', $code)]);
     if ($consume->rowCount() !== 1) {
         $pdo->rollBack();
-        mobile_token_json(401, ['ok' => false, 'error' => 'Authorization code is already used.']);
+        mobile_token_json(401, ['ok' => false, 'error' => 'Authorization code is already used.', 'error_code' => 'authorization_code_rejected']);
     }
     $token = beyond_mobile_issue_token((int)$record['user_id'], 3600, (string)$record['audience'], $pdo);
     $pdo->commit();
@@ -70,5 +70,5 @@ try {
 } catch (Throwable $exception) {
     if ($pdo->inTransaction()) $pdo->rollBack();
     error_log('Mobile token exchange failed: ' . $exception->getMessage());
-    mobile_token_json(503, ['ok' => false, 'error' => 'Mobile sign-in is temporarily unavailable.']);
+    mobile_token_json(503, ['ok' => false, 'error' => 'Mobile sign-in is temporarily unavailable.', 'error_code' => 'token_service_unavailable']);
 }

@@ -107,15 +107,35 @@ final class JaguarAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
                   let token = json?["access_token"] as? String, !token.isEmpty else {
                 let status = http.statusCode
                 let serverCode = (json?["error"] as? String) ?? "No error payload"
+                let errorCode = (json?["error_code"] as? String) ?? "unknown"
                 logger.error("Beyond ID token exchange failed with HTTP \(status, privacy: .public): \(serverCode, privacy: .private(mask: .hash))")
-                let detail: String
-                switch status {
-                case 401: detail = "The secure sign-in code expired or was already used."
-                case 429: detail = "Too many sign-in attempts were made. Please wait a few minutes."
-                case 500...599: detail = "Beyond ID is temporarily unavailable."
-                default: detail = "The secure token exchange was declined (HTTP \(status))."
+                switch errorCode {
+                case "authorization_code_rejected":
+                    finishSignInFailure(
+                        "Google sign-in finished, but Jaguar couldn’t verify the secure handoff.",
+                        detail: "The one-time Beyond ID code expired, was already used, or did not match this sign-in attempt. Tap Try again and complete Google sign-in in the same session."
+                    )
+                case "token_exchange_rate_limited":
+                    finishSignInFailure(
+                        "Too many sign-in attempts.",
+                        detail: "Beyond ID temporarily paused token exchanges to protect your account. Wait a few minutes, then try again once."
+                    )
+                case "token_service_unavailable":
+                    finishSignInFailure(
+                        "Beyond ID sign-in is temporarily unavailable.",
+                        detail: "Your Google account was not changed. Jaguar could not create its secure session; please try again later."
+                    )
+                case "invalid_exchange_request":
+                    finishSignInFailure(
+                        "Jaguar couldn’t prepare the secure sign-in exchange.",
+                        detail: "Close this message, then start a new Beyond ID sign-in attempt."
+                    )
+                default:
+                    finishSignInFailure(
+                        "Jaguar couldn’t finish Beyond ID sign-in.",
+                        detail: "The secure token exchange was declined (HTTP \(status))."
+                    )
                 }
-                finishSignInFailure("Sign-in needs another try.", detail: detail)
                 return
             }
             JaguarKeychain.save(token, service: service, account: tokenKey)

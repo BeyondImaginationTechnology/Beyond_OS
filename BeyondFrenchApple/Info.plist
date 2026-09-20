@@ -18,12 +18,19 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>AppIcon-60</string>
+		<string>AppIcon-120</string>
+		<string>AppIcon-180</string>
+	</array>
 	<key>CFBundleIcons</key>
 	<dict>
 		<key>CFBundlePrimaryIcon</key>
 		<dict>
 			<key>CFBundleIconFiles</key>
 			<array>
+				<string>AppIcon-60</string>
 				<string>AppIcon-120</string>
 				<string>AppIcon-180</string>
 			</array>

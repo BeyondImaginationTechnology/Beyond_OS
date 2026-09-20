@@ -18,39 +18,6 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
-	<key>CFBundleIconFiles</key>
-	<array>
-		<string>AppIcon-60</string>
-		<string>AppIcon-120</string>
-		<string>AppIcon-180</string>
-	</array>
-	<key>CFBundleIcons</key>
-	<dict>
-		<key>CFBundlePrimaryIcon</key>
-		<dict>
-			<key>CFBundleIconFiles</key>
-			<array>
-				<string>AppIcon-60</string>
-				<string>AppIcon-120</string>
-				<string>AppIcon-180</string>
-			</array>
-			<key>CFBundleIconName</key>
-			<string>AppIcon</string>
-		</dict>
-	</dict>
-	<key>CFBundleIcons~ipad</key>
-	<dict>
-		<key>CFBundlePrimaryIcon</key>
-		<dict>
-			<key>CFBundleIconFiles</key>
-			<array>
-				<string>AppIcon-152</string>
-				<string>AppIcon-167</string>
-			</array>
-			<key>CFBundleIconName</key>
-			<string>AppIcon</string>
-		</dict>
-	</dict>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.education</string>
 	<key>UISupportedInterfaceOrientations</key>

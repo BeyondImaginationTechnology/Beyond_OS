@@ -57,9 +57,17 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
     }
 
     func signOut() {
+        clearSession(message: "Signed out of Beyond-ID on this device.")
+    }
+
+    func handleAuthenticationExpired() {
+        clearSession(message: "Your Beyond-ID session expired. Sign in again to continue.")
+    }
+
+    private func clearSession(message: String) {
         KeychainTokenStore.delete(service: "DailyBreath", account: tokenKey)
         isSignedIn = false
-        message = "Signed out of Beyond-ID on this device."
+        self.message = message
     }
 
     func requestAccountDeletion() async -> Bool {

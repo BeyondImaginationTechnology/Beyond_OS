@@ -103,7 +103,7 @@ struct JaguarScriptureChatView: View {
         prompt = ""; messages.append(("user", text)); isSending = true; error = nil
         defer { isSending = false }
         guard let token = auth.accessToken else { error = "Sign in with Beyond ID to chat."; return }
-        var request = URLRequest(url: URL(string: "https://ai.beyondimagination.co.technology/api/chat.php")!)
+        var request = URLRequest(url: URL(string: "https://beyondimagination.co.technology/ai/api/chat.php")!)
         request.httpMethod = "POST"; request.setValue("application/json", forHTTPHeaderField: "Content-Type"); request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization"); request.setValue("dailybreath", forHTTPHeaderField: "X-Beyond-App"); request.setValue("1", forHTTPHeaderField: "X-DailyBreath-Chat")
         let language = DailyBreathLanguage(rawValue: languageID)?.rawValue ?? "en"
         let body: [String: Any] = ["mode": "core", "language": language, "guide": guide.rawValue, "messages": messages.map { ["role": $0.role, "content": $0.text] }]
@@ -111,7 +111,15 @@ struct JaguarScriptureChatView: View {
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
             let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+            guard let http = response as? HTTPURLResponse else {
+                throw URLError(.badServerResponse)
+            }
+            if http.statusCode == 401 {
+                auth.handleAuthenticationExpired()
+                error = json?["error"] as? String ?? "Your Beyond-ID session expired. Sign in again to continue."
+                return
+            }
+            guard (200..<300).contains(http.statusCode) else {
                 error = json?["error"] as? String ?? "Daily Breath chat could not respond."
                 return
             }

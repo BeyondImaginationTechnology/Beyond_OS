@@ -5,37 +5,6 @@ require_once __DIR__ . '/../includes/modes.php';
 require_once __DIR__ . '/../../beyond-id/includes/mobile-auth.php';
 require_once __DIR__ . '/../../dailybreath/includes/chat-guide.php';
 
-function jaguar_nonce_secret(): string
-{
-    return trim((string) (getenv('JAGUAR_NONCE_SECRET') ?: beyond_config('security.jaguar_nonce_secret', beyond_config('security.jwt_secret', ''))));
-}
-
-function jaguar_rotate_nonce(): void
-{
-    $value = bin2hex(random_bytes(24));
-    $issuedAt = time();
-    $_SESSION['jaguar_nonce'] = ['value' => $value, 'issued_at' => $issuedAt, 'used' => false];
-    $secret = jaguar_nonce_secret();
-    if ($secret === '') return;
-    header('X-Jaguar-Nonce: ' . $value);
-    header('X-Jaguar-Nonce-Issued-At: ' . $issuedAt);
-    header('X-Jaguar-Nonce-Signature: ' . hash_hmac('sha256', $value . ':' . $issuedAt, $secret));
-}
-
-function jaguar_verify_nonce(array $payload): bool
-{
-    $secret = jaguar_nonce_secret();
-    $nonce = is_string($payload['nonce'] ?? null) ? trim($payload['nonce']) : '';
-    $signature = is_string($payload['nonce_signature'] ?? null) ? trim($payload['nonce_signature']) : '';
-    $issuedAt = filter_var($payload['nonce_issued_at'] ?? null, FILTER_VALIDATE_INT);
-    $sessionNonce = is_array($_SESSION['jaguar_nonce'] ?? null) ? $_SESSION['jaguar_nonce'] : [];
-    if ($secret === '' || !is_string($issuedAt) && !is_int($issuedAt) || $nonce === '' || !preg_match('/^[a-f0-9]{48}$/', $nonce) || !preg_match('/^[a-f0-9]{64}$/', $signature)) return false;
-    if ((int)$issuedAt < time() - 900 || (int)$issuedAt > time() + 60 || !empty($sessionNonce['used']) || !hash_equals((string)($sessionNonce['value'] ?? ''), $nonce) || (int)($sessionNonce['issued_at'] ?? 0) !== (int)$issuedAt) return false;
-    $valid = hash_equals(hash_hmac('sha256', $nonce . ':' . $issuedAt, $secret), $signature);
-    if ($valid) $_SESSION['jaguar_nonce']['used'] = true;
-    return $valid;
-}
-
 /** A small cached utility layer for requests that never need the GPU runtime. */
 function jaguar_utility_cache(string $key, int $ttl, callable $resolver): ?array
 {
@@ -145,11 +114,6 @@ if ($authorization !== '') {
     http_response_code(403); echo json_encode(['error' => 'Your secure session expired. Refresh Jaguar and try again.']); exit;
 }
 $signedIn = $mobileClaims !== null || !empty($_SESSION['user_id']);
-if (!$signedIn && jaguar_nonce_secret() === '') {
-    http_response_code(503);
-    echo json_encode(['error' => 'Guest chat is temporarily unavailable. Sign in with Beyond ID to continue.']);
-    exit;
-}
 $payload = json_decode((string) file_get_contents('php://input'), true);
 if (!is_array($payload)) { http_response_code(400); echo json_encode(['error' => 'Invalid request.']); exit; }
 try {
@@ -161,8 +125,18 @@ try {
     error_log('Jaguar rate limiter unavailable: ' . $exception->getMessage());
 }
 if (!$signedIn) {
-    if (!jaguar_verify_nonce($payload)) { http_response_code(403); echo json_encode(['error' => 'Security check expired. Refresh Jaguar and try again.']); exit; }
-    jaguar_rotate_nonce();
+    $proof = is_array($payload['proof'] ?? null) ? $payload['proof'] : [];
+    $challenge = is_array($_SESSION['jaguar_guest_challenge'] ?? null) ? $_SESSION['jaguar_guest_challenge'] : [];
+    $challengeValue = is_string($proof['challenge'] ?? null) ? trim($proof['challenge']) : '';
+    $counter = is_string($proof['counter'] ?? null) ? trim($proof['counter']) : '';
+    $difficulty = max(1, min(20, (int)($challenge['difficulty'] ?? 16)));
+    $requiredPrefix = str_repeat('0', (int)ceil($difficulty / 4));
+    $validShape = preg_match('/^[a-f0-9]{36}$/', $challengeValue) === 1 && preg_match('/^\d{1,12}$/', $counter) === 1;
+    $validChallenge = $validShape && empty($challenge['used']) && (int)($challenge['expires'] ?? 0) >= time()
+        && hash_equals((string)($challenge['challenge'] ?? ''), $challengeValue);
+    $validWork = $validChallenge && str_starts_with(hash('sha256', $challengeValue . ':' . $counter), $requiredPrefix);
+    if (!$validWork) { http_response_code(403); echo json_encode(['error' => 'Security check failed or expired. Please try again.']); exit; }
+    $_SESSION['jaguar_guest_challenge']['used'] = true;
 }
 $mode = is_string($payload['mode'] ?? null) ? strtolower(trim($payload['mode'])) : 'core';
 $modeDefinition = jaguar_mode($mode);

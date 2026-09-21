@@ -9,12 +9,6 @@ require_once __DIR__ . '/includes/modes.php';
 $signedIn = !empty($_SESSION['user_id']);
 $displayName = trim((string)($_SESSION['first_name'] ?? $_SESSION['name'] ?? ''));
 $csrf = csrf_token();
-$turnstileSiteKey = trim((string) (getenv('JAGUAR_TURNSTILE_SITE_KEY') ?: beyond_config('security.turnstile.site_key', beyond_config('security.turnstile_site_key', ''))));
-$jaguarNonceSecret = trim((string) (getenv('JAGUAR_NONCE_SECRET') ?: beyond_config('security.jaguar_nonce_secret', beyond_config('security.jwt_secret', ''))));
-$jaguarNonceIssuedAt = time();
-$jaguarNonce = bin2hex(random_bytes(24));
-$jaguarNonceSignature = $jaguarNonceSecret !== '' ? hash_hmac('sha256', $jaguarNonce . ':' . $jaguarNonceIssuedAt, $jaguarNonceSecret) : '';
-$_SESSION['jaguar_nonce'] = ['value' => $jaguarNonce, 'issued_at' => $jaguarNonceIssuedAt, 'used' => false];
 $jaguarModes = jaguar_mode_catalog();
 ?>
 <!doctype html>
@@ -47,9 +41,6 @@ $jaguarModes = jaguar_mode_catalog();
 (() => {
     const signedIn = <?=json_encode($signedIn)?>;
     const csrf = <?=json_encode($csrf)?>;
-    let jaguarNonce = <?=json_encode($jaguarNonce)?>;
-    let jaguarNonceIssuedAt = <?=json_encode($jaguarNonceIssuedAt)?>;
-    let jaguarNonceSignature = <?=json_encode($jaguarNonceSignature)?>;
     const form = document.getElementById('composer');
     const input = document.getElementById('prompt');
     const send = document.getElementById('send');
@@ -68,6 +59,7 @@ $jaguarModes = jaguar_mode_catalog();
     let history = [];
     let language = 'en';
     let pendingText = '';
+    let guestProof = null;
 
     const nearBottom = () => messages.scrollHeight - messages.scrollTop - messages.clientHeight < 56;
     const updateMessageTools = () => {
@@ -159,19 +151,45 @@ $jaguarModes = jaguar_mode_catalog();
         return /\b(porn(?:ography|ographic)?|xxx|nudes?|nudity|naked|onlyfans|blowjob|handjob|masturbat(?:e|ion|ing)|sexual\s+(?:roleplay|story|chat|scene|image|photo|video|content)|explicit(?:ly)?\s+(?:sexual|erotic)|graphic(?:ally)?\s+(?:sexual|erotic))\b/i.test(text);
     }
 
-    function updateNonceFromResponse(response) {
-        const next = response.headers.get('X-Jaguar-Nonce');
-        const issuedAt = response.headers.get('X-Jaguar-Nonce-Issued-At');
-        const signature = response.headers.get('X-Jaguar-Nonce-Signature');
-        if (next && issuedAt && signature) { jaguarNonce = next; jaguarNonceIssuedAt = Number(issuedAt); jaguarNonceSignature = signature; }
+    async function solveProofOfWork(challenge, difficulty) {
+        const requiredZeros = Math.ceil(Number(difficulty) / 4);
+        for (let counter = 0; counter < 1_000_000_000; counter += 1) {
+            const input = new TextEncoder().encode(`${challenge}:${counter}`);
+            const digest = await crypto.subtle.digest('SHA-256', input);
+            const bytes = new Uint8Array(digest);
+            let valid = true;
+            for (let index = 0; index < requiredZeros; index += 1) {
+                const nibble = index % 2 === 0 ? bytes[Math.floor(index / 2)] >> 4 : bytes[Math.floor(index / 2)] & 0x0f;
+                if (nibble !== 0) { valid = false; break; }
+            }
+            if (valid) return {challenge, counter: String(counter)};
+            if (counter % 500 === 0) await new Promise(resolve => window.setTimeout(resolve, 0));
+        }
+        throw new Error('The local security check could not complete.');
+    }
+
+    async function showVerification(text) {
+        pendingText = text;
+        verificationError.textContent = 'Completing local security check…';
+        verificationGate.hidden = false;
+        try {
+            const response = await fetch('/ai/api/challenge.php?v=20260921-1', {credentials: 'same-origin', cache: 'no-store'});
+            const data = await response.json();
+            if (!response.ok || !data.challenge) throw new Error(data.error || 'The local security check is unavailable.');
+            guestProof = await solveProofOfWork(data.challenge, data.difficulty);
+            verificationGate.hidden = true;
+            const approvedText = pendingText;
+            pendingText = '';
+            verificationError.textContent = '';
+            await sendMessage(approvedText);
+        } catch (error) {
+            guestProof = null;
+            verificationError.textContent = error instanceof Error ? error.message : 'The local security check failed. Please try again.';
+        }
     }
 
     async function sendMessage(text) {
         if (!text || send.disabled) return;
-        if (!signedIn && !jaguarNonceSignature) {
-            addMessage('assistant', 'Guest chat is temporarily unavailable because the security service is not configured. Sign in with Beyond ID to continue.');
-            return;
-        }
         history.push({role: 'user', content: text});
         addMessage('user', text);
         input.value = '';
@@ -190,7 +208,7 @@ $jaguarModes = jaguar_mode_catalog();
         const controller = new AbortController();
         const timeout = window.setTimeout(() => controller.abort(), 115000);
         try {
-            const requestBody = JSON.stringify({mode: modeSelect.value, language, messages: history, nonce: signedIn ? '' : jaguarNonce, nonce_issued_at: signedIn ? 0 : jaguarNonceIssuedAt, nonce_signature: signedIn ? '' : jaguarNonceSignature});
+            const requestBody = JSON.stringify({mode: modeSelect.value, language, messages: history, proof: signedIn ? null : guestProof});
             const requestOptions = {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf},
@@ -198,17 +216,17 @@ $jaguarModes = jaguar_mode_catalog();
                 cache: 'no-store',
                 signal: controller.signal
             };
-            let response = await fetch('/ai/api/chat.php?v=20260918-2', requestOptions);
-            let responseType = response.headers.get('Content-Type') || '';
-            if (!responseType.toLowerCase().includes('application/json')) {
-                response = await fetch(`/ai/api/chat.php?v=20260918-2&retry=${Date.now()}`, requestOptions);
-                responseType = response.headers.get('Content-Type') || '';
-            }
-            if (!responseType.toLowerCase().includes('application/json')) {
+            const response = await fetch('/ai/api/chat.php?v=20260921-1', {...requestOptions, credentials: 'same-origin'});
+            const responseText = await response.text();
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (error) {
+                // Some hosting/CDN paths label valid JSON as text/html. Parse the
+                // body instead of retrying a one-time guest nonce and only reject
+                // responses that truly are not JSON.
                 throw new Error(`Jaguar API returned an unexpected ${response.status} response. Refresh the page and try again.`);
             }
-            updateNonceFromResponse(response);
-            const data = await response.json();
             if (!response.ok && response.status === 403 && /secure session|security check/i.test(data.error || '')) {
                 thinking.textContent = `${data.error || 'Your secure session expired.'}\nRefresh Jaguar and try again.`;
                 input.value = text;
@@ -243,6 +261,7 @@ $jaguarModes = jaguar_mode_catalog();
         } finally {
             window.clearTimeout(timeout);
             window.clearInterval(thinkingTimer);
+            if (!signedIn) guestProof = null;
             if (!retryTimer) send.disabled = false;
             input.focus();
         }
@@ -256,7 +275,8 @@ $jaguarModes = jaguar_mode_catalog();
             addMessage('assistant', copy[language].explicit);
             return;
         }
-        sendMessage(text);
+        if (!signedIn) showVerification(text);
+        else sendMessage(text);
     });
     input.addEventListener('input', () => {
         input.style.height = 'auto';
@@ -278,7 +298,8 @@ $jaguarModes = jaguar_mode_catalog();
     document.getElementById('verificationCancel')?.addEventListener('click', () => {
         verificationGate.hidden = true;
         pendingText = '';
-        resetTurnstile();
+        guestProof = null;
+        verificationError.textContent = '';
     });
     document.querySelectorAll('[data-language]').forEach(button => button.addEventListener('click', () => {
         language = button.dataset.language;

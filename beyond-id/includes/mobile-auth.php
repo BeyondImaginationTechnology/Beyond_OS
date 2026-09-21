@@ -178,6 +178,9 @@ function beyond_mobile_verify_token(string $token, ?string $requiredAudience = n
             if (is_array($grantedScopes)) {
                 $scopes = array_values(array_intersect($scopes, array_map('strval', $grantedScopes)));
             }
+            $pdo->prepare('UPDATE connected_apps SET last_used_at=? WHERE user_id=? AND app_slug=?')->execute([
+                date('Y-m-d H:i:s'), $userId, $appSlug,
+            ]);
         }
     }
 

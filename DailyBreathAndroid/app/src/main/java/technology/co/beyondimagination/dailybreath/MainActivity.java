@@ -165,9 +165,8 @@ public final class MainActivity extends Activity {
 
         chatThread=new LinearLayout(this); chatThread.setOrientation(LinearLayout.VERTICAL); page.addView(chatThread,spaced()); renderChatMessages();
         if(beyondAccessToken.isEmpty()){
-            addBody("Sign in with Beyond-ID to use Daily Breath chat.");
+            addBody("Chat is open to everyone. Sign in with Beyond-ID only for Academy purchase and sync.");
             Button signIn=action("Sign in with Beyond-ID"); signIn.setOnClickListener(v->beginBeyondIDSignIn()); page.addView(signIn,spaced());
-            return;
         }
 
         LinearLayout composer=new LinearLayout(this); composer.setOrientation(LinearLayout.HORIZONTAL); composer.setGravity(Gravity.BOTTOM);
@@ -201,11 +200,13 @@ public final class MainActivity extends Activity {
 
     private void requestChat(String requestGuide,List<ChatMessage> requestMessages){
         try{
-            HttpURLConnection connection=(HttpURLConnection)new URL("https://ai.beyondimagination.co.technology/api/chat.php").openConnection();
+            HttpURLConnection connection=(HttpURLConnection)new URL("https://beyondimagination.co.technology/dailybreath/api/jaguar-chat.php").openConnection();
             connection.setRequestMethod("POST"); connection.setConnectTimeout(15000); connection.setReadTimeout(20000); connection.setDoOutput(true);
-            connection.setRequestProperty("Content-Type","application/json"); connection.setRequestProperty("Authorization","Bearer "+beyondAccessToken); connection.setRequestProperty("X-Beyond-App","dailybreath"); connection.setRequestProperty("X-DailyBreath-Chat","1");
+            connection.setRequestProperty("Content-Type","application/json"); connection.setRequestProperty("X-Beyond-App","dailybreath"); connection.setRequestProperty("X-DailyBreath-Chat","1");
+            if(beyondAccessToken!=null&&!beyondAccessToken.isEmpty()) connection.setRequestProperty("Authorization","Bearer "+beyondAccessToken);
             JSONArray messages=new JSONArray(); for(ChatMessage message:requestMessages)messages.put(new JSONObject().put("role",message.role).put("content",message.text));
             JSONObject payload=new JSONObject().put("mode","core").put("language",prefs.getString("interface_language","en")).put("guide",requestGuide).put("messages",messages);
+            if(beyondAccessToken==null||beyondAccessToken.isEmpty()) payload.put("proof", guestProof());
             try(OutputStream output=connection.getOutputStream()){output.write(payload.toString().getBytes(StandardCharsets.UTF_8));}
             int status=connection.getResponseCode(); InputStream stream=status>=400?connection.getErrorStream():connection.getInputStream(); StringBuilder body=new StringBuilder();
             if(stream!=null)try(BufferedReader reader=new BufferedReader(new InputStreamReader(stream,StandardCharsets.UTF_8))){String line;while((line=reader.readLine())!=null)body.append(line);}
@@ -213,6 +214,26 @@ public final class MainActivity extends Activity {
             String answer=response.optString("message",""); if(answer.isEmpty())throw new IllegalStateException("Daily Breath chat returned no answer.");
             runOnUiThread(()->{if(guideKey().equals(requestGuide))chatMessages.add(new ChatMessage("assistant",answer));renderChatMessages();finishChatRequest();});
         }catch(Exception error){runOnUiThread(()->{Toast.makeText(this,error.getMessage()==null?"Daily Breath chat could not respond.":error.getMessage(),Toast.LENGTH_LONG).show();finishChatRequest();});}
+    }
+
+    private JSONObject guestProof() throws Exception {
+        HttpURLConnection connection=(HttpURLConnection)new URL("https://beyondimagination.co.technology/ai/api/challenge.php").openConnection();
+        connection.setRequestMethod("GET"); connection.setConnectTimeout(15000); connection.setReadTimeout(15000);
+        int status=connection.getResponseCode(); InputStream stream=status>=400?connection.getErrorStream():connection.getInputStream(); StringBuilder body=new StringBuilder();
+        if(stream!=null)try(BufferedReader reader=new BufferedReader(new InputStreamReader(stream,StandardCharsets.UTF_8))){String line;while((line=reader.readLine())!=null)body.append(line);}
+        JSONObject challengeResponse=new JSONObject(body.toString()); String challenge=challengeResponse.optString("challenge",""); int difficulty=challengeResponse.optInt("difficulty",16);
+        if(challenge.isEmpty()) throw new IllegalStateException("Security challenge unavailable.");
+        int requiredZeros=(int)Math.ceil(difficulty/4.0); String prefix=new String(new char[requiredZeros]).replace('\0','0');
+        for(long counter=0; counter<1000000000L; counter++){
+            byte[] digest=java.security.MessageDigest.getInstance("SHA-256").digest((challenge+":"+counter).getBytes(StandardCharsets.UTF_8));
+            String hex=toHex(digest);
+            if(hex.startsWith(prefix)) return new JSONObject().put("challenge",challenge).put("counter",String.valueOf(counter));
+        }
+        throw new IllegalStateException("Security challenge could not be completed.");
+    }
+
+    private String toHex(byte[] bytes){
+        StringBuilder output=new StringBuilder(bytes.length*2); for(byte item:bytes){int value=item&0xff; if(value<16)output.append('0'); output.append(Integer.toHexString(value));} return output.toString();
     }
 
     private void finishChatRequest(){if(chatSend!=null){chatSend.setEnabled(true);chatSend.setText(tr("Send"));}}

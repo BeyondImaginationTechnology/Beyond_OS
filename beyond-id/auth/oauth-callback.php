@@ -75,8 +75,15 @@ try {
         $now = date('Y-m-d H:i:s');
         $link->execute([$userId, $provider, $profile['subject'], $profile['email'], $profile['name'], $now, $now]);
     } elseif ($provider === 'instagram') {
-        $update = $pdo->prepare('UPDATE social_identities SET display_name=?,updated_at=? WHERE provider=? AND provider_user_id=?');
-        $update->execute([$profile['name'], date('Y-m-d H:i:s'), $provider, $profile['subject']]);
+        // The identity is already linked, so a profile-label refresh must not
+        // prevent authentication if an older database schema is missing one
+        // of the optional metadata columns.
+        try {
+            $update = $pdo->prepare('UPDATE social_identities SET display_name=?,updated_at=? WHERE provider=? AND provider_user_id=?');
+            $update->execute([$profile['name'], date('Y-m-d H:i:s'), $provider, $profile['subject']]);
+        } catch (Throwable $metadataException) {
+            error_log('OAuth Instagram metadata refresh skipped class=' . get_class($metadataException) . ': ' . $metadataException->getMessage());
+        }
     } else {
         $update = $pdo->prepare('UPDATE social_identities SET email=?,display_name=?,updated_at=? WHERE provider=? AND provider_user_id=?');
         $update->execute([$profile['email'], $profile['name'], date('Y-m-d H:i:s'), $provider, $profile['subject']]);

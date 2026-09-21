@@ -1,5 +1,8 @@
 (()=>{
-  const settings={theme:'fall',reduceMotion:false,...JSON.parse(localStorage.getItem('dailybreath.settings')||'{}')};
+  const defaults={theme:'fall',reduceMotion:false};
+  let stored={};
+  try{const parsed=JSON.parse(localStorage.getItem('dailybreath.settings')||'{}');if(parsed&&typeof parsed==='object')stored=parsed}catch(error){localStorage.removeItem('dailybreath.settings')}
+  const settings={...defaults,...stored};
   const requestedTheme=settings.theme||'system';
   const normalizedTheme=requestedTheme==='light'?'dawn':requestedTheme==='dark'?'dusk':requestedTheme==='lilac'?'dawn':requestedTheme;
   const resolvedTheme=normalizedTheme==='system'

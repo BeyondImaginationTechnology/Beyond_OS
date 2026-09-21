@@ -139,7 +139,7 @@ html[data-faith=bible] .rhythm-card,html[data-faith=torah] .rhythm-card{backgrou
 <nav class="bottom-dock" aria-label="Daily Breath navigation">
   <a class="active" href="index.php"><svg viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/></svg><span>Home</span></a>
   <a href="devotionals.php"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.4-9-9.2C1.3 7.7 4 4 8 4c2 0 3.3 1 4 2 0.7-1 2-2 4-2 4 0 6.7 3.7 5 7.8C19 16.6 12 21 12 21Z"/></svg><span>Devotionals</span></a>
-  <a class="bible" href="scripture.php?tradition=<?= e($faithTradition) ?>"><svg viewBox="0 0 24 24"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H12v18H7.5A3.5 3.5 0 0 0 4 23V5.5ZM20 5.5A3.5 3.5 0 0 0 16.5 2H12v18h4.5A3.5 3.5 0 0 1 20 23V5.5Z"/></svg><span>Scripture</span></a>
+  <a class="bible" href="scripture.php?tradition=<?= e($faithTradition) ?>"><svg viewBox="0 0 24 24"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H12v18H7.5A3.5 3.5 0 0 0 4 23V5.5ZM20 5.5A3.5 3.5 0 0 0 16.5 2H12v18h4.5A3.5 3.5 0 0 1 20 23V5.5Z"/></svg><span>Read</span></a>
   <button class="home-chat-open" id="home-chat-open" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2h9A3.5 3.5 0 0 1 20 5.5v6A3.5 3.5 0 0 1 16.5 15H11l-4 4v-4.2A3.5 3.5 0 0 1 4 11.5Z"/><path d="M8 8.5h8M8 11.5h5"/></svg><span>Chat</span></button>
   <a href="academy.php"><svg viewBox="0 0 24 24"><path d="m3 9 9-5 9 5-9 5-9-5Z"/><path d="M7 12v4c2.8 2.2 7.2 2.2 10 0v-4M21 9v6"/></svg><span>Academy</span></a>
   <a href="trivia.php?faith=<?= e($faithTradition) ?>"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4.2 1.8c-.95.87-1.7 1.35-1.7 2.7M12 17h.01"/></svg><span>Trivia</span></a>

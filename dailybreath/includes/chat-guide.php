@@ -223,6 +223,60 @@ function dailybreath_chat_order_reply(string $guide, string $prompt, string $lan
     return $display($books[$next]) . ' comes ' . $direction . ' ' . $display($books[$current]) . ' in the ' . ($guide === 'dovi' ? 'Tanakh' : 'Bible') . ' library.';
 }
 
+function dailybreath_chat_quran_history_reply(string $guide, string $prompt, string $language): ?string
+{
+    if ($guide !== 'moe' || !preg_match('/\b(?:when|what year|how long|date|made|created|written|revealed|compiled|collected|standardized)\b.{0,50}\b(?:qur[\'’]?an|koran|revelation|scripture)\b|\b(?:qur[\'’]?an|koran)\b.{0,50}\b(?:when|what year|how long|made|created|written|revealed|compiled|collected|standardized)\b/iu', $prompt)) {
+        return null;
+    }
+
+    return match (dailybreath_scripture_locale($language)) {
+        'fr' => "Le Coran a ete revele au prophete Muhammad sur environ 23 ans, vers 610-632 de notre ere. Dans la tradition musulmane, il s'agit d'une revelation d'Allah. Historiquement, son texte a ete rassemble en codex peu apres la mort de Muhammad, puis des copies de reference ont ete standardisees sous le calife Uthman, vers 650. Ainsi, selon le sens de votre question, la revelation date de 610-632, la compilation vient apres 632 et la standardisation date d'environ 650.",
+        'es' => "El Coran fue revelado al profeta Muhammad durante unos 23 anos, aproximadamente entre 610 y 632 d. C. En la tradicion musulmana, es una revelacion de Allah. Historicamente, su texto fue reunido en un codice poco despues de la muerte de Muhammad, y se estandarizaron copias de referencia durante el califato de Uthman, hacia el ano 650. Asi que, segun lo que quieras decir, la revelacion fue entre 610 y 632, la recopilacion ocurrio despues de 632 y la estandarizacion alrededor de 650.",
+        default => "The Quran was revealed to the Prophet Muhammad over about 23 years, beginning around 610 CE and ending in 632 CE. In Islamic belief, it is revelation from Allah. Historically, its text was collected into a written codex soon after Muhammad's death, and reference copies were standardized during Caliph Uthman's caliphate, around 650 CE. So the answer depends on what you mean: revelation (610-632), compilation (after 632), or standardization (about 650).",
+    };
+}
+
+function dailybreath_chat_learning_reply(string $guide, string $prompt, string $language): ?string
+{
+    $history = preg_match('/\b(?:when|what year|how long|date|made|created|written|compiled|collected|preserved)\b.{0,55}\b(?:bible|tanakh|torah|scripture|testament|gospel|nevi.?im|ketuvim)\b|\b(?:bible|tanakh|torah|scripture)\b.{0,55}\b(?:when|what year|how long|made|created|written|compiled|collected|preserved)\b/iu', $prompt) === 1;
+    if ($history) {
+        if ($guide === 'chris' && preg_match('/\b(?:bible|testament|gospel)\b/iu', $prompt)) return "The Bible was written and compiled over many centuries, roughly from the first millennium BCE through the first century CE. It is a collection of books written by different authors in different historical settings, not a single book written on one date. Christian traditions also differ somewhat in which books they include.";
+        if ($guide === 'dovi' && preg_match('/\b(?:tanakh|torah|nevi.?im|ketuvim)\b/iu', $prompt)) return "The Tanakh was written and compiled over many centuries. Its books are traditionally grouped as Torah, Nevi'im (Prophets), and Ketuvim (Writings). The Torah is traditionally connected with Moses, while Jewish historical and scholarly discussions recognize a longer process of composition, editing, and preservation across Israelite and Jewish history.";
+    }
+
+    if ($guide === 'moe' && preg_match('/\b(?:what is|define|explain|meaning of)\b.{0,30}\b(?:tawhid|ramadan|salah|salat|prayer|mercy)\b|\b(?:tawhid|ramadan|salah|salat)\b/iu', $prompt)) {
+        if (preg_match('/\btawhid\b/iu', $prompt)) return 'Tawhid is the Islamic concept of the oneness and uniqueness of Allah. It is central to Islamic belief and is expressed through worship directed to Allah alone.';
+        if (preg_match('/\bramadan\b/iu', $prompt)) return 'Ramadan is the ninth month of the Islamic lunar calendar. Muslims commonly fast from dawn to sunset during it, while emphasizing prayer, generosity, Quran reading, self-discipline, and care for others. Practices and exemptions vary, so people should follow trusted local guidance.';
+        if (preg_match('/\b(?:salah|salat|prayer)\b/iu', $prompt)) return 'Salah is the formal ritual prayer in Islam. Muslims pray at prescribed times, with bodily movements and Quran recitation, as an act of worship and remembrance of Allah.';
+        return 'Mercy is a major theme in the Quran and Islamic teaching. Quran passages often connect Allah\'s mercy with repentance, forgiveness, compassion, justice, and hope.';
+    }
+    if ($guide === 'chris' && preg_match('/\b(?:what is|define|explain|meaning of)\b.{0,30}\b(?:gospel|psalm|epistle|salvation|testament)\b|\b(?:gospel|psalm|epistle|salvation|testament)\b/iu', $prompt)) {
+        if (preg_match('/\bgospel\b/iu', $prompt)) return 'Gospel means good news. In the New Testament it can refer to the message about Jesus and also to the four books traditionally associated with Matthew, Mark, Luke, and John.';
+        if (preg_match('/\bpsalm\b/iu', $prompt)) return 'A psalm is a sacred song or poem. The biblical Book of Psalms includes prayers and poetry expressing praise, grief, trust, confession, and hope.';
+        if (preg_match('/\bepistle\b/iu', $prompt)) return 'An epistle is a letter. In the New Testament, many epistles address early Christian communities and discuss belief, ethics, worship, and community life.';
+        if (preg_match('/\bsalvation\b/iu', $prompt)) return 'Salvation is a central Christian concept, but its meaning and emphasis vary among Christian traditions. It commonly concerns rescue from sin and restored relationship with God through faith and grace.';
+        return 'The Bible has two major sections in most Christian traditions: the Old Testament and the New Testament. Their names, ordering, and included books can vary among Christian communities.';
+    }
+    if ($guide === 'dovi' && preg_match('/\b(?:what is|define|explain|meaning of)\b.{0,30}\b(?:tanakh|torah|nevi.?im|ketuvim|shabbat|teshuvah|parashah)\b|\b(?:tanakh|torah|nevi.?im|ketuvim|shabbat|teshuvah|parashah)\b/iu', $prompt)) {
+        if (preg_match('/\btanakh\b/iu', $prompt)) return 'Tanakh is an acronym for Torah, Nevi\'im (Prophets), and Ketuvim (Writings), the three traditional divisions of Jewish Scripture.';
+        if (preg_match('/\b(?:nevi.?im|ketuvim)\b/iu', $prompt)) return 'Nevi\'im means Prophets and Ketuvim means Writings. Together with Torah, they form the three divisions of the Tanakh.';
+        if (preg_match('/\bshabbat\b/iu', $prompt)) return 'Shabbat is the Jewish Sabbath, a weekly period of holiness and rest from before sunset Friday until after nightfall Saturday. Observance differs among Jewish communities.';
+        if (preg_match('/\bteshuvah\b/iu', $prompt)) return 'Teshuvah is often translated as repentance or return. It involves recognizing harm, turning away from wrongdoing, making repair where possible, and returning toward a better path.';
+        if (preg_match('/\bparashah\b/iu', $prompt)) return 'A parashah is a section of the Torah selected for public reading, usually as part of the weekly synagogue reading cycle.';
+        return 'The Torah is the first division of the Tanakh. It refers to the Five Books of Moses and is central to Jewish learning, practice, and communal reading.';
+    }
+    if (preg_match('/\b(?:what is|define|explain|meaning of)\b.{0,30}\b(?:prayer|mercy|compassion)\b|\b(?:prayer|mercy|compassion)\b/iu', $prompt)) {
+        if ($guide === 'chris') return 'Prayer is communication with God and may include praise, thanksgiving, confession, lament, and requests. Christian traditions differ in their forms of prayer. Mercy means compassionate forgiveness and care toward people in need.';
+        if ($guide === 'dovi') return 'Prayer is a way of turning toward God through words, song, study, gratitude, and petition. Jewish traditions use different forms and languages of prayer. Mercy and compassion are recurring ethical and spiritual themes in Jewish Scripture.';
+    }
+
+    if (preg_match('/\b(?:breathe|breathing|calm down|panic|overwhelmed|anxious|anxiety|stressed|stress)\b/iu', $prompt)) return 'Try this now: inhale gently for 4 counts, exhale slowly for 6 counts, and repeat five times. Keep your shoulders relaxed and stop if you feel uncomfortable. If you are in immediate danger or having a medical emergency, contact local emergency services.';
+    if (preg_match('/\b(?:reflect|reflection|journal|today\'s reflection|give me a reflection)\b/iu', $prompt)) return 'Take one quiet minute: notice one word or idea from today\'s reading, name one feeling it brings up, and choose one small action that expresses wisdom, compassion, honesty, or gratitude.';
+    if (preg_match('/\b(?:relapse|relapsed|craving|cravings|using again|used again|addiction|recovery)\b/iu', $prompt)) return 'You do not have to handle this moment alone. Pause, move away from immediate access to harm, contact a trusted person or recovery support, and take the next safe step. If you may hurt yourself or someone else, contact local emergency services or a crisis line now. Daily Breath is not a substitute for professional care.';
+    if (preg_match('/\b(?:show|find|give|suggest)\b.{0,35}\b(?:passage|verse|ayah|reading)\b.{0,35}\b(?:peace|patience|hope|grief|forgiveness|mercy|courage|wisdom|anxiety)\b/iu', $prompt)) return null;
+    return null;
+}
+
 function dailybreath_chat_local_reply(string $guide, string $prompt, string $language): ?string
 {
     $prompt = trim($prompt);
@@ -243,6 +297,8 @@ function dailybreath_chat_local_reply(string $guide, string $prompt, string $lan
     }
     return dailybreath_chat_app_help($prompt)
         ?? dailybreath_chat_order_reply($guide, $prompt, $language)
+        ?? dailybreath_chat_quran_history_reply($guide, $prompt, $language)
+        ?? dailybreath_chat_learning_reply($guide, $prompt, $language)
         ?? dailybreath_chat_passage_reply($guide, $prompt, $language)
         ?? dailybreath_chat_search_reply($guide, $prompt, $language);
 }

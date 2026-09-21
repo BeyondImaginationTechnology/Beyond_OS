@@ -42,7 +42,7 @@ Beyond ID stores the Instagram account identifier and username, but does not sto
 - The Beyond ID login page shows an active **Continue with Instagram** button.
 - Starting the flow reaches Instagram with `instagram_business_basic` and the exact callback URL above.
 - A Business or Creator test account can consent and return to Beyond ID.
-- The callback fetches the profile from `https://graph.instagram.com/{graph_version}/me?fields=user_id,username,account_type`; do not replace `/me` with the returned `user_id` path.
+- The callback fetches the profile from `https://graph.instagram.com/{graph_version}/me?fields=user_id,username`; do not replace `/me` with the returned `user_id` path.
 - A signed-in Beyond ID can link Instagram from **Dashboard → Security**.
 - A first-time Instagram user is asked for a verified Beyond ID email because Instagram does not provide one.
 - Cancelling or denying consent returns a readable error and does not create or link an account.

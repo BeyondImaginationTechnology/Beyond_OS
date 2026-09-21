@@ -92,7 +92,7 @@ try {
     beyond_social_login_session($pdo, $user, $provider, beyond_social_destination($flow));
 } catch (Throwable $exception) {
     if ($pdo->inTransaction()) $pdo->rollBack();
-    error_log('OAuth callback failed: ' . $exception->getMessage());
+    error_log('OAuth callback failed provider=' . $provider . ' class=' . get_class($exception) . ': ' . $exception->getMessage());
     $_SESSION['oauth_error'] = $exception instanceof BeyondSocialUserException
         ? $exception->getMessage()
         : 'Social sign-in could not be completed. Please try again.';

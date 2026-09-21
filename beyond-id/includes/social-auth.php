@@ -97,8 +97,10 @@ function beyond_social_profile(string $provider, string $accessToken, array $tok
         // Instagram Login returns an Instagram-scoped user_id, but the profile
         // lookup is intentionally made through /me. Calling /{user_id} with
         // this token can return Meta's misleading "Unsupported post request".
+        // Keep this to the stable Instagram Login fields. Some newer API
+        // versions reject account_type even though the account is valid.
         $url = rtrim((string)$config['userinfo_url'], '/')
-            . '?' . http_build_query(['fields' => 'user_id,username,account_type'], '', '&', PHP_QUERY_RFC3986);
+            . '?' . http_build_query(['fields' => 'user_id,username'], '', '&', PHP_QUERY_RFC3986);
         $profile = beyond_social_http($url, ['access_token' => $accessToken]);
         $username = trim((string)($profile['username'] ?? ''));
         return [

@@ -198,17 +198,18 @@ $jaguarModes = jaguar_mode_catalog();
                 cache: 'no-store',
                 signal: controller.signal
             };
-            let response = await fetch('/ai/api/chat.php?v=20260918-2', requestOptions);
-            let responseType = response.headers.get('Content-Type') || '';
-            if (!responseType.toLowerCase().includes('application/json')) {
-                response = await fetch(`/ai/api/chat.php?v=20260918-2&retry=${Date.now()}`, requestOptions);
-                responseType = response.headers.get('Content-Type') || '';
-            }
-            if (!responseType.toLowerCase().includes('application/json')) {
+            const response = await fetch('/ai/api/chat.php?v=20260921-1', {...requestOptions, credentials: 'same-origin'});
+            updateNonceFromResponse(response);
+            const responseText = await response.text();
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (error) {
+                // Some hosting/CDN paths label valid JSON as text/html. Parse the
+                // body instead of retrying a one-time guest nonce and only reject
+                // responses that truly are not JSON.
                 throw new Error(`Jaguar API returned an unexpected ${response.status} response. Refresh the page and try again.`);
             }
-            updateNonceFromResponse(response);
-            const data = await response.json();
             if (!response.ok && response.status === 403 && /secure session|security check/i.test(data.error || '')) {
                 thinking.textContent = `${data.error || 'Your secure session expired.'}\nRefresh Jaguar and try again.`;
                 input.value = text;

@@ -5,6 +5,7 @@ struct TodayView: View {
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
     @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
+    @AppStorage("dailyReadingDayKeys") private var dailyReadingDayKeys = ""
     @AppStorage("devotionalReadDayKeys") private var devotionalReadDayKeys = ""
     @AppStorage("completedBreathDayKeys") private var completedBreathDayKeys = ""
 
@@ -32,6 +33,10 @@ struct TodayView: View {
         devotionalReadDayKeys.split(separator: ",").contains(Substring(todayKey))
     }
 
+    private var didReadToday: Bool {
+        dailyReadingDayKeys.split(separator: ",").contains(Substring(todayKey))
+    }
+
     private var didBreatheToday: Bool {
         completedBreathDayKeys.split(separator: ",").contains(Substring(todayKey))
     }
@@ -41,7 +46,7 @@ struct TodayView: View {
     }
 
     private var dailyProgressCount: Int {
-        [true, didReadDevotionalToday, didBreatheToday, didReflectToday].filter(\.self).count
+        [didReadToday, didReadDevotionalToday, didBreatheToday, didReflectToday].filter(\.self).count
     }
 
     var body: some View {
@@ -111,7 +116,7 @@ struct TodayView: View {
                 NavigationLink {
                     VerseDetailView(verse: todayVerse, tradition: selectedTradition)
                 } label: {
-                    RhythmPill(title: "Read", isComplete: true, theme: selectedTheme)
+                    RhythmPill(title: "Read", isComplete: didReadToday, theme: selectedTheme)
                 }
                 .accessibilityHint("Opens today’s \(selectedTradition.dailyReadingName)")
 
@@ -416,6 +421,7 @@ private struct QuickAction: View {
 private struct VerseDetailView: View {
     let verse: Verse
     let tradition: FaithTradition
+    @AppStorage("dailyReadingDayKeys") private var dailyReadingDayKeys = ""
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
 
     private var selectedTheme: DailyBreathTheme {
@@ -461,7 +467,30 @@ private struct VerseDetailView: View {
         .background(DailyBreathThemeBackground(theme: selectedTheme))
         .navigationTitle(verse.reference)
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            markRead()
+        }
     }
+
+    private func markRead() {
+        let todayKey = Self.dayFormatter.string(from: Date())
+        var keys = dailyReadingDayKeys
+            .split(separator: ",")
+            .map(String.init)
+            .filter { !$0.isEmpty }
+        if !keys.contains(todayKey) {
+            keys.append(todayKey)
+        }
+        dailyReadingDayKeys = keys.suffix(366).joined(separator: ",")
+    }
+
+    private static let dayFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
 }
 
 private struct DevotionalDetailView: View {

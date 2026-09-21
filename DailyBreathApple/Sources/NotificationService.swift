@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 import UIKit
 @preconcurrency import UserNotifications
 
@@ -38,6 +39,7 @@ final class DailyBreathAppDelegate: NSObject, UIApplicationDelegate, UNUserNotif
 
 enum DailyBreathNotificationService {
     private static let reminderPrefix = "dailybreath.daily-reminder"
+    private static let logger = Logger(subsystem: "technology.co.beyondimagination.thedailybreath", category: "notifications")
 
     static let reminderMessages = [
         ("A minute for yourself?", "Open Daily Breath for today's verse, breath, or reflection."),
@@ -109,7 +111,12 @@ enum DailyBreathNotificationService {
         guard status == .authorized || status == .provisional || status == .ephemeral else { return }
         let hour = defaults.object(forKey: "dailyReminderHour") == nil ? 8 : defaults.integer(forKey: "dailyReminderHour")
         let minute = defaults.integer(forKey: "dailyReminderMinute")
-        try? await scheduleDailyReminder(hour: hour, minute: minute)
+        do {
+            try await scheduleDailyReminder(hour: hour, minute: minute)
+        } catch {
+            defaults.set(false, forKey: "dailyReminderEnabled")
+            logger.error("Failed to reschedule enabled daily reminder: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     private static var reminderIdentifiers: [String] {

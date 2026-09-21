@@ -1,6 +1,6 @@
 # DailyBreath for iOS
 
-Native SwiftUI app for DailyBreath 2.0.2 (build 22).
+Native SwiftUI app for DailyBreath 2.1 (build 1).
 
 ## Included in this build
 
@@ -34,7 +34,7 @@ Native SwiftUI app for DailyBreath 2.0.2 (build 22).
 
 Generate the Xcode project with `xcodegen generate`, then open `TheDailyBreath.xcodeproj`.
 
-The reading, practice, Academy, and journal experiences work offline with bundled content and refresh scheduled content from the DailyBreath web API when available. Chat requires a network connection and Beyond-ID sign-in. Private user data remains protected on device unless the user explicitly enables encrypted iCloud sync. No Daily Breath subscription is required.
+The reading, practice, Academy, and journal experiences work offline with bundled content and refresh scheduled content from the DailyBreath web API when available. Chat requires a network connection but is available to guests through the Daily Breath scoped guide service; Beyond-ID sign-in is optional. Private user data remains protected on device unless the user explicitly enables encrypted iCloud sync. No Daily Breath subscription is required.
 
 ## Release checks
 

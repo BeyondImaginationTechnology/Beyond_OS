@@ -1,4 +1,4 @@
-/* BIT OS Core: native development desktop. */
+/* Beyond Imagination OS Core: native development desktop. */
 #define _POSIX_C_SOURCE 200809L
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
@@ -202,7 +202,7 @@ static void launch_terminal(void)
                "-fg", "#eff2ff", "-fa", "DejaVu Sans Mono", "-fs", "12",
                "-e", "bit-cyber-menu", (char *)NULL);
 #else
-        execlp("xterm", "xterm", "-T", "BIT OS Core Terminal", "-bg", "#090d16",
+        execlp("xterm", "xterm", "-T", "Beyond Imagination OS Core Terminal", "-bg", "#090d16",
                "-fg", "#eff2ff", "-fa", "DejaVu Sans Mono", "-fs", "12", (char *)NULL);
 #endif
         _exit(127);
@@ -278,7 +278,7 @@ static void draw(void)
     for (int y = 0; y < H; y++) box(0, y, W, 1, 9 + y/110, 13 + y/100, 22 + y/60);
     box(0, 0, W, 64, 12, 18, 30);
     orbit(35, 32, 20);
-    text(font, "BIT OS", 68, 18, white);
+    text(font, "Beyond Imagination OS", 68, 18, white);
     text(small_font, EDITION_LABEL, 224, 24, muted);
     time_t now = time(NULL);
     struct tm *local = localtime(&now);
@@ -329,7 +329,7 @@ static void draw(void)
 #ifdef BIT_EDITION_CYBER
             paragraph("BIT OS Cyber Edition 1.0\nDevelopment build: cyber-dev.1\n\nAn independent Linux workspace for authorized assessment, evidence handling and reporting.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2 / Nmap\n\nThe inventory launcher requires a local authorization record and runs a limited TCP connect inventory. Packet capture, browser research, user setup, installation and signed updates are still in development.",
 #else
-            paragraph("BIT OS Core Edition 1.0\nDevelopment build: core-dev.1\n\nAn independent Linux system, assembled from upstream source.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2\n\nLocal Files and Notes work in this preview. Modern browsing, media,\nuser setup, installation and signed updates are still in development.",
+            paragraph("Beyond Imagination OS Core Edition 1.0\nDevelopment build: core-dev.1\n\nAn independent Linux system, assembled from upstream source.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2\n\nLocal Files and Notes work in this preview. Modern browsing, media,\nuser setup, installation and signed updates are still in development.",
 #endif
                       54, 236, 1150, 365);
 #ifndef _WIN32
@@ -380,7 +380,7 @@ int main(int argc, char **argv)
     SDL_DisplayMode display = {0};
     SDL_GetCurrentDisplayMode(0, &display);
     SDL_SetHint(SDL_HINT_X11_WINDOW_TYPE, "desktop");
-    SDL_Window *window = SDL_CreateWindow("BIT OS " EDITION_LABEL, 0, 0,
+    SDL_Window *window = SDL_CreateWindow("Beyond Imagination OS " EDITION_LABEL, 0, 0,
                          preview || !display.w ? W : display.w,
                          preview || !display.h ? H : display.h,
                          SDL_WINDOW_BORDERLESS | (preview ? SDL_WINDOW_HIDDEN : 0));

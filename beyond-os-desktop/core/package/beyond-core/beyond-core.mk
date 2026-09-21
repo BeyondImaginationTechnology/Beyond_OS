@@ -1,5 +1,5 @@
 ################################################################################
-# BIT OS Core
+# Beyond Imagination OS Core
 ################################################################################
 BEYOND_CORE_VERSION = 1.0.0-dev.1
 BEYOND_CORE_SITE = $(BR2_EXTERNAL_BEYOND_CORE_PATH)/src

@@ -1,8 +1,9 @@
-"""Render the Beyond orbital mark and startup title; requires Pillow.
-The geometry extends assets/images/bit-os-logo-v1.png. No font files are shipped.
+"""Render the Beyond Imagination OS startup artwork; requires Pillow.
+
+The startup mark is the shared jaguar-eye asset from ``ai/assets``. No font
+files are shipped.
 """
 import argparse
-import math
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
@@ -18,29 +19,17 @@ d = ImageDraw.Draw(im)
 def xy(x, y):
     return round(x * scale), round(y * scale)
 
-# Original Beyond orbital gateway, enlarged from the repository's vector mark.
-cx, cy = 320, 105
-for angle in (0, math.pi / 3, 2 * math.pi / 3):
-    points = []
-    for i in range(241):
-        t = i * 2 * math.pi / 240
-        ex, ey = 65 * math.cos(t), 23 * math.sin(t)
-        points.append(xy(cx + ex * math.cos(angle) - ey * math.sin(angle),
-                         cy + ex * math.sin(angle) + ey * math.cos(angle)))
-    for i in range(240):
-        ratio = i / 240
-        color = (round(98 + 80 * ratio), round(165 - 56 * ratio), 255)
-        d.line([points[i], points[i + 1]], fill=color, width=3 * scale)
-d.ellipse([xy(cx - 12, cy - 18), xy(cx + 12, cy + 6)], outline=(215, 209, 255), width=3 * scale)
-d.polygon([xy(cx - 5, cy + 2), xy(cx - 13, cy + 24),
-           xy(cx + 13, cy + 24), xy(cx + 5, cy + 2)], fill=(9, 13, 22))
-d.line([xy(cx - 6, cy + 3), xy(cx - 13, cy + 24), xy(cx + 13, cy + 24),
-        xy(cx + 6, cy + 3)], fill=(215, 209, 255), width=3 * scale)
+asset = Image.open(Path(__file__).resolve().parents[3] / "ai/assets/jaguar-eye-v0.2.png").convert("RGBA")
+logo_size = 150 * scale
+asset.thumbnail((logo_size, logo_size), Image.Resampling.LANCZOS)
+logo_x = (640 * scale - asset.width) // 2
+logo_y = 24 * scale
+im.paste(asset, (logo_x, logo_y), asset)
 
 def text(value, y, size, color):
     font = ImageFont.truetype(str(args.font), size * scale)
     d.text(xy(320, y), value, font=font, fill=color, anchor="mt")
-text("BIT OS", 193, 40, (245, 247, 255))
+text("Beyond Imagination OS", 193, 29, (245, 247, 255))
 text("CORE EDITION  1.0", 250, 12, (163, 175, 200))
 for index in range(3):
     x = 307 + index * 13

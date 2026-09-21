@@ -1,0 +1,34 @@
+{
+  "creator": {
+    "base": "core",
+    "displayName": "Beyond Imagination OS Creator",
+    "packages": ["blender", "gimp", "krita", "vscode", "git", "audacity", "ffmpeg"],
+    "integrations": {
+      "adobeCreativeCloud": {
+        "enabled": true,
+        "delivery": "web",
+        "url": "https://creativecloud.adobe.com/",
+        "nativeDesktopInstaller": "unsupported-on-linux"
+      }
+    },
+    "defaults": ["creative-workspace", "hardware-acceleration-when-available", "large-file-workflow"]
+  },
+  "academy": {
+    "base": "core",
+    "displayName": "Beyond Imagination OS Academy",
+    "packages": ["firefox", "libreoffice", "python3", "vscode", "git"],
+    "defaults": ["student-account-boundary", "teacher-admin-boundary", "offline-course-content", "safe-search"]
+  },
+  "sentinel": {
+    "base": "core",
+    "displayName": "Beyond Imagination OS Sentinel",
+    "packages": ["nftables", "audit", "osquery"],
+    "defaults": ["deny-inbound", "signed-updates", "audit-logging", "fleet-enrollment-opt-in", "no-remote-login"]
+  },
+  "gaming": {
+    "base": "core",
+    "displayName": "Beyond Imagination OS Gaming",
+    "packages": ["steam", "lutris", "gamescope", "pipewire", "vulkan", "xboxdrv"],
+    "defaults": ["controller-support", "performance-mode-opt-in", "low-latency-audio", "gpu-driver-choice-at-install"]
+  }
+}

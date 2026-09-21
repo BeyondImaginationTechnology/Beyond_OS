@@ -1,4 +1,4 @@
-# BIT OS Core validation
+# Beyond Imagination OS Core validation
 
 Status: **the Core 1.0 installer candidates are published for testing; Core has not passed its release gates and is not a stable 1.0 release.**
 
@@ -9,7 +9,7 @@ The remote build produced these artifacts in the installer output directory:
 - `bitCoreos.iso` — 84,264,960 bytes.
 - `bit-os-core-1.0-installer.img` — 2,182,107,136 bytes.
 
-The verified test-candidate files are available from the BIT OS release host:
+The verified test-candidate files are available from the Beyond Imagination OS release host:
 
 - `https://os.beyondimagination.co.technology/releases/core/1.0/bitCoreos.iso`
   - SHA-256: `c4085a9d181876e262d6b8ecd729df44b73cf3ddb80dd59dea39fb245b1c255e`
@@ -21,7 +21,7 @@ The release-host checksums matched the uploaded files. Treat these files as test
 
 ## Source checks completed
 
-- Core configuration, identity, UEFI artifact names and installer entry are tracked separately from other BIT OS editions.
+- Core configuration, identity, UEFI artifact names and installer entry are tracked separately from other Beyond Imagination OS editions.
 - The installer is UEFI-only and requires explicit target input. Selected-partition mode preserves the existing EFI System Partition; whole-disk mode requires an exact destructive confirmation.
 - Installer startup is connected to `/dev/console`. The current USB GRUB installer entry selects `console=tty1`; serial interaction must be verified separately and is not yet a passed check.
 - Portable Python tooling compiles successfully. The post-build shell test requires a functioning Linux/POSIX shell and must be rerun on the build VM.
@@ -38,7 +38,7 @@ The release-host checksums matched the uploaded files. Treat these files as test
 
 ### Google Cloud UEFI checkpoint (2026-09-14)
 
-- `bitCoreos.iso` was booted with OVMF and KVM. Firmware loaded the Core GRUB menu and selected `Try BIT OS Core Edition 1.0`; the smoke run was then stopped by its timeout (`124`). This verifies firmware/media discovery and the ISO boot menu, not the installed graphical session.
+- `bitCoreos.iso` was booted with OVMF and KVM. Firmware loaded the Core GRUB menu and selected `Try Beyond Imagination OS Core Edition 1.0`; the smoke run was then stopped by its timeout (`124`). This verifies firmware/media discovery and the ISO boot menu, not the installed graphical session.
 - `bit-os-core-1.0-installer.img` initially stopped with `error: unknown filesystem` after its GRUB menu. The GRUB configuration was hardened to load GPT/FAT modules and use an explicit `(hd0,gpt1)/bzImage` path; after rebuilding, the USB image reached `Booting `Try BIT OS Core Edition 1.0'` and remained running until the 25-second smoke timeout (`124`). This verifies UEFI media discovery and kernel handoff, not the installed graphical session.
 - Selected-partition installation, whole-disk installation, reboot without media, graphical session, network, input and shutdown have not passed. Do not use this candidate as the tested base for Cyber or the later editions yet.
 

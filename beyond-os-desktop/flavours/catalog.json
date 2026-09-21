@@ -1,0 +1,64 @@
+{
+  "product": "Beyond Imagination OS",
+  "version": "1.0",
+  "flavours": [
+    {
+      "id": "home",
+      "name": "Home",
+      "purpose": "Daily computing, entertainment, and family accounts.",
+      "buildTree": "../home",
+      "status": "buildable"
+    },
+    {
+      "id": "core",
+      "name": "Core",
+      "purpose": "Small stable base for custom systems, older hardware, and VMs.",
+      "buildTree": "../core",
+      "status": "buildable",
+      "cloudAccess": {
+        "browserDesktop": "noVNC",
+        "transport": "IAP-authenticated-HTTPS",
+        "publicPorts": []
+      }
+    },
+    {
+      "id": "creator",
+      "name": "Creator",
+      "purpose": "Design, code, music, and production work.",
+      "base": "core",
+      "profile": "creator",
+      "status": "profile-defined"
+    },
+    {
+      "id": "academy",
+      "name": "Academy",
+      "purpose": "Managed learning environments for students and teachers.",
+      "base": "core",
+      "profile": "academy",
+      "status": "profile-defined"
+    },
+    {
+      "id": "cyber",
+      "name": "Cyber",
+      "purpose": "Defensive and authorized security workspaces.",
+      "buildTree": "../cyber",
+      "status": "buildable"
+    },
+    {
+      "id": "sentinel",
+      "name": "Sentinel",
+      "purpose": "Long-term stability, policy, and fleet visibility.",
+      "base": "core",
+      "profile": "sentinel",
+      "status": "profile-defined"
+    },
+    {
+      "id": "gaming",
+      "name": "Gaming",
+      "purpose": "Controller-ready performance profiles and play.",
+      "base": "core",
+      "profile": "gaming",
+      "status": "profile-defined"
+    }
+  ]
+}

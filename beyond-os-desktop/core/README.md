@@ -1,6 +1,6 @@
-# BIT OS Core Edition 1.0
+# Beyond Imagination OS Core Edition 1.0
 
-BIT OS Core is a lean, independent Linux system for custom machines, older
+Beyond Imagination OS Core is a lean, independent Linux system for custom machines, older
 hardware and virtual machines. It is assembled from upstream source with
 Buildroot as build tooling; it does not ship another distribution's root
 filesystem or branding.

@@ -5,6 +5,8 @@ core_source=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 source "$core_source/buildroot.lock"
 action=${1:-build}
 case "$action" in configure|build|installer|legal-info) ;; *) echo "Usage: bash build.sh [configure|build|installer|legal-info]" >&2; exit 2 ;; esac
+profile=${BEYOND_FLAVOUR:-core}
+case "$profile" in core|creator|academy|sentinel|gaming) ;; *) echo "This Core builder supports core, creator, academy, sentinel, and gaming; use the Home or Cyber builder for those editions." >&2; exit 2 ;; esac
 [[ $(uname -s) == Linux ]] || { echo "Build on a Linux host or Linux VM (not a Windows filesystem)." >&2; exit 1; }
 [[ $EUID -ne 0 ]] || { echo "Run Buildroot as a normal user." >&2; exit 1; }
 for command in make gcc g++ curl tar sha256sum python3 rsync cpio unzip patch; do
@@ -31,10 +33,10 @@ else
 fi
 chmod +x "$core_source/board/x86_64/post-build.sh"
 chmod +x "$core_source/board/x86_64/post-image-uefi.sh"
-make -C "$source_dir" O="$output" BR2_EXTERNAL="$core_source" "$defconfig"
+make -C "$source_dir" O="$output" BR2_EXTERNAL="$core_source" "$defconfig" BR2_BEYOND_PROFILE_ID="$profile"
 python3 "$core_source/tools/verify-config.py" "$core_source/configs/$defconfig" "$output/.config"
 if [[ "$action" == configure ]]; then
-    echo "Configured BIT OS. No kernel or image has been built."
+    echo "Configured Beyond Imagination OS. No kernel or image has been built."
     exit 0
 fi
 if [[ "$action" == installer ]]; then
@@ -42,18 +44,18 @@ if [[ "$action" == installer ]]; then
 else
     target="${action/build/all}"
 fi
-make -C "$source_dir" O="$output" BR2_EXTERNAL="$core_source" "$target"
+make -C "$source_dir" O="$output" BR2_EXTERNAL="$core_source" BR2_BEYOND_PROFILE_ID="$profile" "$target"
 if [[ "$action" == build ]]; then
     (
         cd "$output/images"
         sha256sum bzImage rootfs.ext2 > SHA256SUMS
     )
     cp "$output/.config" "$output/images/beyond-core.config"
-    printf 'BIT OS Core 1.0 images: %s/images\n' "$output"
+    printf 'Beyond Imagination OS %s 1.0 images: %s/images\n' "$profile" "$output"
 elif [[ "$action" == installer ]]; then
     test -s "$output/images/bit-os-core-1.0-installer.img"
     test -s "$output/images/bitCoreos.iso"
     test -s "$output/images/SHA256SUMS"
     cp "$output/.config" "$output/images/beyond-core-installer.config"
-    printf 'BIT OS Core 1.0 UEFI installer candidate: %s/images\n' "$output"
+    printf 'Beyond Imagination OS %s 1.0 UEFI installer candidate: %s/images\n' "$profile" "$output"
 fi

@@ -1,0 +1,12 @@
+config BR2_PACKAGE_BEYOND_PROFILE
+	bool "Beyond Imagination OS flavour profile"
+	default y
+	help
+	  Installs the selected Beyond Imagination OS flavour manifest.
+
+config BR2_BEYOND_PROFILE_ID
+	string "Beyond Imagination OS flavour ID"
+	default "core"
+	depends on BR2_PACKAGE_BEYOND_PROFILE
+	help
+	  The flavour ID written into the image metadata.

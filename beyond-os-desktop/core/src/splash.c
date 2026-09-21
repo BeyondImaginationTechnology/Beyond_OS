@@ -1,4 +1,4 @@
-/* BIT OS framebuffer splash. Original source: MIT; artwork separately reserved. */
+/* Beyond Imagination OS framebuffer splash. Original source: MIT; artwork separately reserved. */
 #define _POSIX_C_SOURCE 200809L
 #include <errno.h>
 #include <fcntl.h>

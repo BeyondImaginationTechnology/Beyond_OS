@@ -11,8 +11,8 @@ chmod 0755 "$target/usr/bin/beyond-session" "$target/usr/bin/beyond-user-session
 # The skeleton may use a symlink; remove it inside the target before writing.
 rm -f "$target/etc/os-release"
 cat > "$target/etc/os-release" <<'EOF'
-NAME="BIT OS Core Edition"
-PRETTY_NAME="BIT OS Core Edition 1.0 (Development)"
+NAME="Beyond Imagination OS Core Edition"
+PRETTY_NAME="Beyond Imagination OS Core Edition 1.0 (Development)"
 ID=beyond-os
 VERSION="1.0 (Development)"
 VERSION_ID="1.0"
@@ -22,6 +22,6 @@ EOF
 install -d -m 0755 "$target/usr/lib" "$target/home/home/Documents"
 rm -f "$target/usr/lib/os-release"
 cp "$target/etc/os-release" "$target/usr/lib/os-release"
-printf '%s\n' 'Welcome to BIT OS Core Edition 1.0.' 'This VM development image is built from upstream Linux components.' > "$target/home/home/Documents/Welcome.txt"
-printf '%s\n' 'BIT OS Core Edition 1.0 (Development)' > "$target/etc/issue"
-printf '%s\n' 'BIT OS Core Edition 1.0 (Development)' > "$target/etc/motd"
+printf '%s\n' 'Welcome to Beyond Imagination OS Core Edition 1.0.' 'This VM development image is built from upstream Linux components.' > "$target/home/home/Documents/Welcome.txt"
+printf '%s\n' 'Beyond Imagination OS Core Edition 1.0 (Development)' > "$target/etc/issue"
+printf '%s\n' 'Beyond Imagination OS Core Edition 1.0 (Development)' > "$target/etc/motd"

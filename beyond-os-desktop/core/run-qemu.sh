@@ -8,11 +8,20 @@ command -v qemu-system-x86_64 >/dev/null || { echo "Install qemu-system-x86_64 o
 # when explicitly testing persistence. No host disk or host folder is exposed.
 accelerator=tcg
 [[ -r /dev/kvm && -w /dev/kvm ]] && accelerator=kvm
+qemu_display_args=()
+if [[ -n "${BEYOND_QEMU_VNC_LISTEN:-}" ]]; then
+    case "$BEYOND_QEMU_VNC_LISTEN" in
+        127.0.0.1:*|localhost:*) ;;
+        *) echo "BEYOND_QEMU_VNC_LISTEN must bind to loopback." >&2; exit 1 ;;
+    esac
+    qemu_display_args=(-display none -vnc "$BEYOND_QEMU_VNC_LISTEN" -k en-us)
+fi
 exec qemu-system-x86_64 -machine q35 -accel "$accelerator" -m 2048 -smp 2 \
     -kernel "$image_dir/bzImage" \
     -append "root=/dev/vda rw rootwait console=ttyS0 quiet loglevel=3" \
     -drive "file=$image_dir/rootfs.ext2,if=virtio,format=raw" -snapshot \
     -device virtio-vga,xres=1280,yres=800 \
     -device qemu-xhci -device usb-tablet -device usb-kbd \
+    "${qemu_display_args[@]}" \
     -netdev user,id=net0 -device virtio-net-pci,netdev=net0 \
     -serial stdio -monitor none -no-reboot

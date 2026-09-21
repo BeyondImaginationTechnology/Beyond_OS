@@ -110,7 +110,7 @@ if ($authorization !== '') {
         echo json_encode(['error' => 'Beyond ID sign-in is invalid or expired.']);
         exit;
     }
-} elseif (!verify_csrf_token($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null)) {
+} elseif (!$isDailyBreathChat && !verify_csrf_token($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null)) {
     http_response_code(403); echo json_encode(['error' => 'Your secure session expired. Refresh Jaguar and try again.']); exit;
 }
 $signedIn = $mobileClaims !== null || !empty($_SESSION['user_id']);
@@ -432,7 +432,6 @@ curl_setopt_array($request, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => tru
 $response = curl_exec($request); $status = (int) curl_getinfo($request, CURLINFO_RESPONSE_CODE); curl_close($request);
 if (!is_string($response) || $status < 200 || $status >= 300) { http_response_code(503); echo json_encode(['error' => 'Jaguar could not complete that request.']); exit; }
 echo $response;
-
 
 
 

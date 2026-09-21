@@ -1,3 +1,4 @@
+import CryptoKit
 import SwiftUI
 
 struct JaguarScriptureChatView: View {
@@ -23,6 +24,7 @@ struct JaguarScriptureChatView: View {
             case .torah: self = .dovi
             case .quran: self = .moe
             }
+
         }
     }
 
@@ -69,8 +71,7 @@ struct JaguarScriptureChatView: View {
                 }
             }
             if let error { Text(error).font(.caption).foregroundStyle(.red).padding(.horizontal) }
-            if auth.isSignedIn {
-                HStack(alignment: .bottom, spacing: 8) {
+            HStack(alignment: .bottom, spacing: 8) {
                     TextField("Ask \(guide.name)…", text: $prompt, axis: .vertical)
                         .textFieldStyle(.roundedBorder)
                         .lineLimit(1...5)
@@ -82,17 +83,8 @@ struct JaguarScriptureChatView: View {
                     .disabled(isSending || prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     .accessibilityLabel("Send message")
                 }
-                .padding()
-            } else {
-                VStack(spacing: 8) {
-                    Text("Sign in with Beyond-ID to use Daily Breath chat.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                    Button("Sign in with Beyond-ID") { auth.signIn() }
-                        .buttonStyle(.borderedProminent)
-                }
-                .padding()
             }
+            .padding()
         }
         .navigationTitle("\(guide.name) · \(guide.tradition)")
     }
@@ -102,11 +94,17 @@ struct JaguarScriptureChatView: View {
         if messages.count >= 23 { messages.removeFirst(messages.count - 22) }
         prompt = ""; messages.append(("user", text)); isSending = true; error = nil
         defer { isSending = false }
-        guard let token = auth.accessToken else { error = "Sign in with Beyond ID to chat."; return }
-        var request = URLRequest(url: URL(string: "https://beyondimagination.co.technology/ai/api/chat.php")!)
-        request.httpMethod = "POST"; request.setValue("application/json", forHTTPHeaderField: "Content-Type"); request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization"); request.setValue("dailybreath", forHTTPHeaderField: "X-Beyond-App"); request.setValue("1", forHTTPHeaderField: "X-DailyBreath-Chat")
+        var request = URLRequest(url: URL(string: "https://beyondimagination.co.technology/dailybreath/api/jaguar-chat.php")!)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        if let token = auth.accessToken {
+            request.setValue("Bearer \\(token)", forHTTPHeaderField: "Authorization")
+        }
         let language = DailyBreathLanguage(rawValue: languageID)?.rawValue ?? "en"
-        let body: [String: Any] = ["mode": "core", "language": language, "guide": guide.rawValue, "messages": messages.map { ["role": $0.role, "content": $0.text] }]
+        var body: [String: Any] = ["mode": "core", "language": language, "guide": guide.rawValue, "messages": messages.map { ["role": $0.role, "content": $0.text] }]
+        if auth.accessToken == nil {
+            body["proof"] = try await guestProof()
+        }
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
@@ -114,7 +112,7 @@ struct JaguarScriptureChatView: View {
             guard let http = response as? HTTPURLResponse else {
                 throw URLError(.badServerResponse)
             }
-            if http.statusCode == 401 {
+            if http.statusCode == 401, auth.isSignedIn {
                 auth.handleAuthenticationExpired()
                 error = json?["error"] as? String ?? "Your Beyond-ID session expired. Sign in again to continue."
                 return
@@ -126,5 +124,32 @@ struct JaguarScriptureChatView: View {
             guard let answer = json?["message"] as? String else { throw URLError(.cannotParseResponse) }
             messages.append(("assistant", answer))
         } catch { self.error = "Daily Breath chat could not respond. Please try again." }
+    }
+
+    private func guestProof() async throws -> [String: String] {
+        let challengeURL = URL(string: "https://beyondimagination.co.technology/ai/api/challenge.php")!
+        let (data, response) = try await URLSession.shared.data(from: challengeURL)
+        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode),
+              let payload = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let challenge = payload["challenge"] as? String,
+              let difficulty = payload["difficulty"] as? Int else {
+            throw URLError(.badServerResponse)
+        }
+        let requiredZeros = Int(ceil(Double(difficulty) / 4.0))
+        for counter in 0..<1_000_000_000 {
+            let digest = SHA256.hash(data: Data("\(challenge):\(counter)".utf8))
+            let bytes = Array(digest)
+            var valid = true
+            for index in 0..<requiredZeros {
+                let nibble = index.isMultiple(of: 2) ? bytes[index / 2] >> 4 : bytes[index / 2] & 0x0f
+                if nibble != 0 {
+                    valid = false
+                    break
+                }
+            }
+            if valid { return ["challenge": challenge, "counter": String(counter)] }
+            if counter.isMultiple(of: 500) { await Task.yield() }
+        }
+        throw URLError(.cannotDecodeContentData)
     }
 }

@@ -217,6 +217,7 @@ $jaguarModes = jaguar_mode_catalog();
                 signal: controller.signal
             };
             const response = await fetch('/ai/api/chat.php?v=20260921-1', {...requestOptions, credentials: 'same-origin'});
+            updateNonceFromResponse(response);
             const responseText = await response.text();
             let data;
             try {

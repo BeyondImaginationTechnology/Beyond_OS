@@ -50,7 +50,19 @@ if ($user) {
     }
 }
 if (!$valid) {
-    http_response_code(401); echo json_encode(['ok'=>false,'error'=>'Invalid email or password']); exit;
+    $socialAccount = false;
+    if ($user) {
+        try {
+            $social = $pdo->prepare('SELECT 1 FROM social_identities WHERE user_id=? LIMIT 1');
+            $social->execute([(int)$user['id']]);
+            $socialAccount = (bool)$social->fetchColumn();
+        } catch (Throwable $exception) {}
+    }
+    http_response_code(401);
+    echo json_encode(['ok'=>false,'error'=>$socialAccount
+        ? 'This email uses social sign-in. Use password reset to create a Beyond password, then sign in here.'
+        : 'Invalid email or password']);
+    exit;
 }
 if ($matchedHash !== (string)($user['password_hash'] ?? '') || password_needs_rehash($matchedHash, PASSWORD_DEFAULT)) {
     $freshHash = password_hash($password, PASSWORD_DEFAULT);

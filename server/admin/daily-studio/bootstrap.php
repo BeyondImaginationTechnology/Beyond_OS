@@ -82,6 +82,9 @@ final class DailyStudio
         $db->exec("CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY AUTOINCREMENT, channel_key TEXT NOT NULL, title TEXT NOT NULL, content_type TEXT NOT NULL DEFAULT 'daily', content_json TEXT NOT NULL DEFAULT '{}', scheduled_at TEXT NOT NULL, ends_at TEXT, timezone TEXT NOT NULL DEFAULT 'America/Vancouver', recurrence_rule TEXT, status TEXT NOT NULL DEFAULT 'draft', requires_approval INTEGER NOT NULL DEFAULT 1, approved_by INTEGER, approved_at TEXT, published_at TEXT, attempts INTEGER NOT NULL DEFAULT 0, last_error TEXT, created_by INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);");
         $db->exec("CREATE INDEX IF NOT EXISTS idx_events_schedule ON events(status, scheduled_at);");
         $db->exec("CREATE TABLE IF NOT EXISTS publish_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, event_id INTEGER NOT NULL, status TEXT NOT NULL, detail TEXT, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);");
+        $db->exec("CREATE TABLE IF NOT EXISTS jaguar_training_examples (id INTEGER PRIMARY KEY AUTOINCREMENT, instruction TEXT NOT NULL, input_text TEXT NOT NULL DEFAULT '', output_text TEXT NOT NULL, example_type TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'draft', created_by INTEGER NOT NULL DEFAULT 0, reviewed_by INTEGER, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);");
+        $db->exec("CREATE INDEX IF NOT EXISTS idx_jaguar_training_status ON jaguar_training_examples(status, updated_at);");
+        $db->exec("CREATE INDEX IF NOT EXISTS idx_jaguar_training_type ON jaguar_training_examples(example_type);");
 
         $count = (int)$db->query('SELECT COUNT(*) FROM channels')->fetchColumn();
         if (!$count) {

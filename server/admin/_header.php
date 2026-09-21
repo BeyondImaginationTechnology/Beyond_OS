@@ -4,6 +4,7 @@ $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '';
 $isStudio = strpos($currentPath, '/server/admin/daily-studio/') === 0;
 $studioGroups = [
     'DailyBreath' => [
+        ['/server/admin/daily-studio/jaguar-training.php', 'Jaguar training', 'J'],
         ['/server/admin/daily-studio/dailybreath-content.php', 'Content manager', '📖'],
         ['/server/admin/daily-studio/breath-generator.php', 'Verse generator', '✨'],
         ['/server/admin/daily-studio/recovery-newsletter.php', 'Recovery newsletter', '📰'],

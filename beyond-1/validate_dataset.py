@@ -8,7 +8,19 @@ import sys
 from pathlib import Path
 
 REQUIRED_FIELDS = {"instruction", "input", "output", "type"}
-VALID_TYPES = {"lesson_qa", "prompt_grading", "socratic_tutor", "debug_ai"}
+VALID_TYPES = {
+    "lesson_qa",
+    "prompt_grading",
+    "socratic_tutor",
+    "debug_ai",
+    "sacred_text_history",
+    "terminology",
+    "concept_explanation",
+    "passage_theme",
+    "app_help",
+    "breath_reflection",
+    "sensitive_support",
+}
 
 
 def validate(path: Path) -> list[str]:
@@ -69,4 +81,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

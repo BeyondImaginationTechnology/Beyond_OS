@@ -68,6 +68,10 @@ struct AcademyView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear(perform: refreshCertificate)
         .task { await purchaseManager.load() }
+        .onChange(of: auth.isSignedIn) { _, signedIn in
+            guard signedIn else { return }
+            Task { await purchaseManager.load() }
+        }
         .onChange(of: completedLessonIDs) { _ in refreshCertificate() }
         .onChange(of: traditionID) { _, value in
             let tradition = FaithTradition(rawValue: value) ?? .bible
@@ -95,19 +99,28 @@ struct AcademyView: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             } else if let product = purchaseManager.product {
+                Label("Signed in with Beyond-ID", systemImage: "checkmark.seal.fill")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.green)
                 Button("Unlock for \(product.displayPrice)") {
                     Task { await purchaseManager.purchase() }
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(selectedTheme.academyEmphasis)
             } else {
-                ProgressView("Loading purchase…")
+                Label("Signed in with Beyond-ID", systemImage: "checkmark.seal.fill")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.green)
+                ProgressView("Loading Academy purchase…")
             }
             Button("Restore purchase") {
                 Task { await purchaseManager.restore() }
             }
             .buttonStyle(.bordered)
             if let message = purchaseManager.message {
+                Text(message).font(.footnote).foregroundStyle(.secondary)
+            }
+            if let message = auth.message, !auth.isSignedIn {
                 Text(message).font(.footnote).foregroundStyle(.secondary)
             }
         }

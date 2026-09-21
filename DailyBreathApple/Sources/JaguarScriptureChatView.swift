@@ -83,7 +83,6 @@ struct JaguarScriptureChatView: View {
                     .disabled(isSending || prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                     .accessibilityLabel("Send message")
                 }
-            }
             .padding()
         }
         .navigationTitle("\(guide.name) · \(guide.tradition)")

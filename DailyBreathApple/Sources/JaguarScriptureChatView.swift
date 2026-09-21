@@ -102,7 +102,12 @@ struct JaguarScriptureChatView: View {
         let language = DailyBreathLanguage(rawValue: languageID)?.rawValue ?? "en"
         var body: [String: Any] = ["mode": "core", "language": language, "guide": guide.rawValue, "messages": messages.map { ["role": $0.role, "content": $0.text] }]
         if auth.accessToken == nil {
-            body["proof"] = try await guestProof()
+            do {
+                body["proof"] = try await guestProof()
+            } catch {
+                self.error = "Daily Breath chat could not connect. Please try again."
+                return
+            }
         }
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
         do {

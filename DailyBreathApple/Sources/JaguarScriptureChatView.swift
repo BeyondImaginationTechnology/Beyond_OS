@@ -24,7 +24,6 @@ struct JaguarScriptureChatView: View {
             case .torah: self = .dovi
             case .quran: self = .moe
             }
-
         }
     }
 
@@ -37,6 +36,7 @@ struct JaguarScriptureChatView: View {
                     .frame(width: 72, height: 82)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .accessibilityLabel("\(guide.name), Daily Breath guide")
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text(guide.name).font(.title2.bold())
                     Text("Daily Breath \(guide.tradition) guide · no GPU")
@@ -46,6 +46,7 @@ struct JaguarScriptureChatView: View {
                         .font(.caption2.weight(.semibold))
                         .foregroundStyle(.secondary)
                 }
+
                 Spacer()
             }
             .padding()
@@ -53,7 +54,11 @@ struct JaguarScriptureChatView: View {
             Divider()
 
             if messages.isEmpty {
-                ContentUnavailableView("Ask \(guide.name)", systemImage: guide.icon, description: Text("Ask about Daily Breath or the \(guide.tradition). Answers stay inside this app and use Daily Breath’s grounded guide service."))
+                ContentUnavailableView(
+                    "Ask \(guide.name)",
+                    systemImage: guide.icon,
+                    description: Text("Ask about Daily Breath or the \(guide.tradition). Answers stay inside this app and use Daily Breath’s grounded guide service.")
+                )
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 14) {
@@ -62,33 +67,52 @@ struct JaguarScriptureChatView: View {
                                 Text(item.role == "user" ? "You" : guide.name)
                                     .font(.caption.bold())
                                     .frame(width: 52, alignment: .leading)
-                                Text(item.text).frame(maxWidth: .infinity, alignment: .leading)
+                                Text(item.text)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .padding(12)
-                            .background(item.role == "user" ? Color.secondary.opacity(0.12) : Color.accentColor.opacity(0.12), in: RoundedRectangle(cornerRadius: 14))
+                            .background(
+                                item.role == "user" ? Color.secondary.opacity(0.12) : Color.accentColor.opacity(0.12),
+                                in: RoundedRectangle(cornerRadius: 14)
+                            )
                         }
-                    }.padding()
+                    }
+                    .padding()
                 }
             }
-            if let error { Text(error).font(.caption).foregroundStyle(.red).padding(.horizontal) }
+
+            if let error {
+                Text(error)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .padding(.horizontal)
+            }
+
             HStack(alignment: .bottom, spacing: 8) {
-                    TextField("Ask \(guide.name)…", text: $prompt, axis: .vertical)
-                        .textFieldStyle(.roundedBorder)
-                        .lineLimit(1...5)
-                        .submitLabel(.send)
-                        .onSubmit { Task { await send() } }
-                    Button { Task { await send() } } label: {
-                        if isSending { ProgressView() } else { Image(systemName: "arrow.up.circle.fill").font(.title2) }
+                TextField("Ask \(guide.name)…", text: $prompt, axis: .vertical)
+                    .textFieldStyle(.roundedBorder)
+                    .lineLimit(1...5)
+                    .submitLabel(.send)
+                    .onSubmit { Task { await send() } }
+
+                Button {
+                    Task { await send() }
+                } label: {
+                    if isSending {
+                        ProgressView()
+                    } else {
+                        Image(systemName: "arrow.up.circle.fill").font(.title2)
                     }
-                    .disabled(isSending || prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    .accessibilityLabel("Send message")
                 }
+                .disabled(isSending || prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .accessibilityLabel("Send message")
             }
             .padding()
         }
         .navigationTitle("\(guide.name) · \(guide.tradition)")
     }
 
+    @MainActor
     private func send() async {
         let text = prompt.trimmingCharacters(in: .whitespacesAndNewlines); guard !text.isEmpty else { return }
         if messages.count >= 23 { messages.removeFirst(messages.count - 22) }
@@ -98,7 +122,7 @@ struct JaguarScriptureChatView: View {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         if let token = auth.accessToken {
-            request.setValue("Bearer \\(token)", forHTTPHeaderField: "Authorization")
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         let language = DailyBreathLanguage(rawValue: languageID)?.rawValue ?? "en"
         var body: [String: Any] = ["mode": "core", "language": language, "guide": guide.rawValue, "messages": messages.map { ["role": $0.role, "content": $0.text] }]

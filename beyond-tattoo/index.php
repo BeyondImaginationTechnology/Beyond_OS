@@ -191,7 +191,7 @@ if (!empty($stencilDay['iso_date'])) {
 
   <section class="bt-values-section" id="about">
     <div class="bt-wrap bt-values-grid">
-      <div><b>🎁</b><span><strong>Free every day</strong><small>Fresh public stencil drops</small></span></div>
+      <div><b>🎁</b><span><strong>Daily releases</strong><small>Fresh public stencil drops</small></span></div>
       <div><b>◇</b><span><strong>Premium quality</strong><small>Professional high-detail files</small></span></div>
       <div><b>✍</b><span><strong>For studios</strong><small>Built for real shop workflows</small></span></div>
       <div><b>◎</b><span><strong>Community driven</strong><small>Part of the Beyond ecosystem</small></span></div>

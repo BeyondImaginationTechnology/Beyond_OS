@@ -67,8 +67,14 @@ a { color: inherit; }
 .bt-main-lead, .bt-trust-row, .bt-studio-product-copy>p, .bt-values-grid small { color: var(--bt20-muted); }
 .bt-package-stage, .bt-category-grid, .bt-daily-card, .bt-section-frame, .bt-studio-product-shell, .bt-values-grid { background: var(--bt20-surface); border-color: var(--bt20-border); box-shadow: var(--bt20-shadow); }
 .bt-package-stage img { background: #EFEAE3; }
-.bt-category-grid a, .bt-studio-product-grid article { border-color: var(--bt20-border); color: var(--bt20-ink); }
+.bt-section-frame { background: var(--bt20-surface); }
+.bt-category-grid a, .bt-studio-product-grid article { border-color: var(--bt20-border); color: var(--bt20-ink); background: #FAF8F5; }
 .bt-category-grid a:hover { background: #F0EAFB; }
+.bt-category-grid span { color: var(--bt20-ink); }
+.bt-daily-copy { background: var(--bt20-surface); color: var(--bt20-ink); }
+.bt-daily-copy h2, .bt-daily-features span { color: var(--bt20-ink); }
+.bt-collection-tag { color: var(--bt20-gold); border-color: #DCC9A4; }
+.bt-daily-copy small { color: var(--bt20-muted); }
 .bt-studio-product-grid article p { color: var(--bt20-muted); }
 .bt-values-grid>div { border-color: var(--bt20-border); }
 

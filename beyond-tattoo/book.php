@@ -4,6 +4,7 @@ require __DIR__ . '/includes/config.php';
 
 $slug = trim((string)($_GET['studio'] ?? $_POST['studio'] ?? 'beyond-studio-nanaimo'));
 $studio = bt_get_studio($slug) ?: bt_get_studio('beyond-studio-nanaimo');
+if ($studio && $studio['slug'] === 'beyond-studio-nanaimo') { $studio['city'] = 'Web Ink Studio'; $studio['province'] = ''; }
 $submitted = false;
 $errors = [];
 

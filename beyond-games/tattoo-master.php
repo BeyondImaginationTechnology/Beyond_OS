@@ -8,10 +8,12 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
   foreach ($collection['stencils'] as $index => [$title, $releaseDate]) {
     $folder = sprintf('%02d-%s', $index + 1, strtolower(trim(preg_replace('/[^a-z0-9]+/i', '-', $title), '-')));
     $file = __DIR__ . '/../beyond-tattoo/assets/stencils/' . $collectionSlug . '/' . $folder . '/preview-watermarked.png';
-    if (is_file($file)) $studioStencils[] = ['title' => $title, 'collection' => $collection['name'], 'style' => $collectionSlug === 'beyond-studio-japanese' ? 'Japanese-inspired' : ($collectionSlug === 'beyond-studio-originals' ? 'Gothic blackwork' : 'Beyond library'), 'image' => '../beyond-tattoo/assets/stencils/' . $collectionSlug . '/' . $folder . '/preview-watermarked.png'];
+    $image = '../beyond-tattoo/assets/stencils/' . $collectionSlug . '/' . $folder . '/preview-watermarked.png';
+    if (!is_file($file)) { $file = __DIR__ . '/../beyond-tattoo/assets/stencils/' . $collectionSlug . '/' . $folder . '/preview-watermarked.jpg'; $image = '../beyond-tattoo/assets/stencils/' . $collectionSlug . '/' . $folder . '/preview-watermarked.jpg'; }
+    if (is_file($file)) $studioStencils[] = ['title' => $title, 'collection' => $collection['name'], 'style' => $collectionSlug === 'beyond-studio-japanese' ? 'Japanese-inspired' : ($collectionSlug === 'beyond-studio-originals' ? 'Gothic blackwork' : 'Beyond library'), 'image' => $image];
   }
 }
-$studioStencils = array_slice($studioStencils, 0, 10);
+$studioStencils = array_slice($studioStencils, 0, 55);
 $studioStencilsJson = json_encode($studioStencils, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
 ?>
 <!doctype html>
@@ -55,7 +57,7 @@ $studioStencilsJson = json_encode($studioStencils, JSON_UNESCAPED_SLASHES | JSON
       <aside class="tm-panel"><h1>Studio <span>Shift</span></h1><p class="tm-brief">You’re the founding artist at Beyond Studio, Nanaimo. Choose a real studio stencil, prepare the placement, and make the client feel looked after.</p>
         <div class="tm-panel-grid">
           <div class="tm-full"><div class="tm-label"><span>Client request</span><span id="clientType">First visit</span></div><select class="tm-select" id="clientSelect"><option value="nervous">Nervous first-timer · small forearm</option><option value="collector">Decisive collector · shoulder</option><option value="coverup">Cover-up client · calf</option><option value="rush">Walk-in rush · forearm</option><option value="large">Large custom session · back</option></select></div>
-          <div class="tm-full"><div class="tm-label"><span>Beyond Studio stencil</span><span id="stencilCount">10 featured</span></div><div class="tm-designs" id="stencilPicker"></div><div class="tm-selected-stencil" id="selectedStencil">Loading studio collection…</div></div>
+          <div class="tm-full"><div class="tm-label"><span>Beyond Studio stencil</span><span id="stencilCount">55 scheduled</span></div><div class="tm-designs" id="stencilPicker"></div><div class="tm-selected-stencil" id="selectedStencil">Loading studio collection…</div></div>
           <div class="tm-full"><div class="tm-label"><span>Placement & scale</span><span id="placementText">Forearm · 80%</span></div><div class="tm-placements"><button class="active" data-placement="forearm">Forearm</button><button data-placement="shoulder">Shoulder</button><button data-placement="calf">Calf</button><button data-placement="back">Back</button><button data-placement="ribs">Ribs</button></div></div>
           <div><div class="tm-label"><span>Needle pressure</span><span id="pressureText">Medium · ideal</span></div><div class="tm-pressure"><button data-pressure="light">Light</button><button class="active" data-pressure="medium">Medium</button><button data-pressure="heavy">Heavy</button></div></div>
           <div><div class="tm-label"><span>Line coverage</span><span id="coverageText">0%</span></div><div class="tm-meter"><i id="coverageBar"></i></div><div class="tm-label"><span>Client comfort</span><span id="comfortText">100%</span></div><div class="tm-meter comfort"><i id="comfortBar"></i></div><div class="tm-label"><span>Current accuracy</span></div><div class="tm-accuracy" id="accuracy">0%</div></div>

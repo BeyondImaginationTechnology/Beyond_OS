@@ -4,6 +4,10 @@ require __DIR__ . '/includes/config.php';
 $query = trim((string)($_GET['q'] ?? ''));
 $studios = bt_list_studios($query);
 $featuredStudio = $query === '' ? bt_get_studio('beyond-studio-nanaimo') : null;
+if ($featuredStudio && $featuredStudio['slug'] === 'beyond-studio-nanaimo') {
+    $featuredStudio['city'] = 'Web Ink Studio';
+    $featuredStudio['province'] = '';
+}
 $pageTitle = 'Studios — Beyond Tattoo';
 require __DIR__ . '/includes/header.php';
 ?>

@@ -1,0 +1,73 @@
+/* Beyond Tattoo 0.2 — light studio theme */
+:root {
+  --bt20-bg: #F7F4EF;
+  --bt20-surface: #FFFFFF;
+  --bt20-ink: #17131A;
+  --bt20-muted: #756D78;
+  --bt20-violet: #6D3CC8;
+  --bt20-gold: #B88732;
+  --bt20-border: #E5DED4;
+  --bt20-shadow: 0 18px 50px rgba(45, 32, 20, .10);
+}
+
+html, body { background: var(--bt20-bg); color: var(--bt20-ink); }
+body { background: var(--bt20-bg); }
+a { color: inherit; }
+.topbar, .app-header { background: rgba(255,255,255,.90); border-color: var(--bt20-border); }
+.brand-badge, .artist-avatar { background: linear-gradient(145deg, #8A62DD, var(--bt20-violet)); box-shadow: 0 8px 22px rgba(109,60,200,.20); }
+.nav-links, .meta, .small, .section-copy, .hero p, .card p { color: var(--bt20-muted); }
+.btn-primary { background: var(--bt20-violet); box-shadow: 0 8px 22px rgba(109,60,200,.22); }
+.btn-secondary { background: var(--bt20-surface); color: var(--bt20-ink); border-color: var(--bt20-border); }
+.panel, .card, .auth-card, .artist-card, .tattoo-mini, .modal-card { background: var(--bt20-surface); border-color: var(--bt20-border); box-shadow: var(--bt20-shadow); }
+.input { background: var(--bt20-surface); color: var(--bt20-ink); border-color: var(--bt20-border); }
+.input:focus { border-color: var(--bt20-violet); box-shadow: 0 0 0 4px rgba(109,60,200,.12); }
+.eyebrow, .role-badge, .verified { color: var(--bt20-violet); background: #F0EAFB; border-color: #D9C9F3; }
+.chip-row span, .stat, .task, .role-option { background: #FAF8F5; color: var(--bt20-muted); border-color: var(--bt20-border); }
+.role-option.selected, .role-option:has(input:checked) { border-color: var(--bt20-violet); background: #F4EFFC; box-shadow: 0 0 0 3px rgba(109,60,200,.08); }
+.bottom-nav { background: rgba(255,255,255,.94); border-color: var(--bt20-border); box-shadow: var(--bt20-shadow); }
+.bottom-nav a.active { background: #F0EAFB; color: var(--bt20-violet); }
+.footer { border-color: var(--bt20-border); color: var(--bt20-muted); }
+
+/* Public Beyond Tattoo storefront */
+.bt-storefront, .bt-home, .bt-library-page { background: var(--bt20-bg); color: var(--bt20-ink); }
+.bt-announcement { background: var(--bt20-ink); color: #fff; }
+.bt-site-header { background: rgba(255,255,255,.92); border-color: var(--bt20-border); }
+.bt-desktop-nav { color: var(--bt20-muted); }
+.bt-desktop-nav a:hover, .bt-desktop-nav a.is-active { color: var(--bt20-violet); }
+.bt-header-download, .bt-glow-button, .bt-btn-primary { background: var(--bt20-violet); border-color: var(--bt20-violet); box-shadow: 0 8px 22px rgba(109,60,200,.20); }
+.bt-login-link, .bt-outline-button, .bt-btn-ghost { color: var(--bt20-violet); background: var(--bt20-surface); border-color: var(--bt20-border); }
+.bt-page-hero, .bt-hero { background: radial-gradient(circle at 78% 18%, #E9DDF9 0, transparent 32%), var(--bt20-bg); border-color: var(--bt20-border); }
+.bt-page-hero h1, .bt-hero h1, .bt-featured-copy h2, .bt-section-title { color: var(--bt20-ink); }
+.bt-page-hero h1 strong, .bt-hero h1 span, .bt-kicker, .bt-gold-kicker { color: var(--bt20-violet); }
+.bt-page-hero>div>p:last-of-type, .bt-lead, .bt-main-lead, .bt-featured-copy p { color: var(--bt20-muted); }
+.bt-package-stage, .bt-hero-art, .bt-featured-card, .bt-daily-card, .bt-collection-detail, .bt-license-panel, .bt-process-panel { background: var(--bt20-surface); border-color: var(--bt20-border); box-shadow: var(--bt20-shadow); }
+.bt-collection-name, .bt-gold, .bt-library-heading p, .bt-schedule-card time { color: var(--bt20-gold); }
+.bt-category-row, .bt-category-row a, .bt-category-browser, .bt-category-browser a { background: var(--bt20-surface); border-color: var(--bt20-border); color: var(--bt20-ink); }
+.bt-category-row a:hover, .bt-category-browser a.is-active, .bt-category-browser a:hover { background: #F0EAFB; color: var(--bt20-violet); }
+.bt-category-row b, .bt-category-browser b { color: var(--bt20-violet); }
+.bt-library-heading, .bt-schedule-card, .bt-collection-detail-copy, .bt-pack-grid, .bt-pack-grid>div { border-color: var(--bt20-border); }
+.bt-schedule-card { background: var(--bt20-surface); }
+.bt-schedule-card h3, .bt-schedule-card p, .bt-name-list span { color: var(--bt20-ink); }
+.bt-schedule-card>span { background: #F0EAFB; color: var(--bt20-violet); }
+.bt-save-stencil { border: 1px solid var(--bt20-border); border-radius: 999px; padding: 6px 9px; background: var(--bt20-surface); color: var(--bt20-violet); font-size: .68rem; font-weight: 800; cursor: pointer; }
+.bt-save-stencil[aria-pressed="true"] { background: #F0EAFB; border-color: #CDB8EE; }
+.bt-stencil-viewer-backdrop { background: rgba(23,19,26,.58); }
+.bt-stencil-viewer-dialog { background: var(--bt20-surface); border-color: var(--bt20-border); box-shadow: 0 30px 90px rgba(23,19,26,.25); }
+.bt-stencil-viewer-art { background: #EFEAE3; }
+.bt-stencil-viewer-copy>p:first-child { color: var(--bt20-gold); }
+.bt-stencil-viewer-note { color: var(--bt20-muted); }
+.bt-store-footer { background: #EFEAE3; border-color: var(--bt20-border); }
+.bt-footer-links, .bt-footer-brand small { color: var(--bt20-muted); }
+
+/* Keep dark mode available for a future preference toggle. */
+body[data-theme="dark"] { background: #07060C; color: #F7F4FF; }
+body[data-theme="dark"] .panel, body[data-theme="dark"] .card, body[data-theme="dark"] .auth-card { background: #11101A; border-color: rgba(255,255,255,.09); color: #F7F4FF; }
+
+@media (max-width: 760px) {
+  .bt-mobile-menu { background: var(--bt20-surface); border-color: var(--bt20-border); }
+  .bt-mobile-menu a { color: var(--bt20-ink); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

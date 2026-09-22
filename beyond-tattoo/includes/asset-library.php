@@ -14,8 +14,12 @@ function bt_asset_library_file(string $uploadedFolder, string $bundledFolder, st
 {
     $root = dirname(__DIR__);
     foreach ([$uploadedFolder, $bundledFolder] as $folder) {
-        $relative = $folder . '/' . $file;
-        if (is_file($root . '/' . $relative)) return ['path' => $root . '/' . $relative, 'url' => $relative, 'file' => $file];
+        $candidates = [$file];
+        if (str_ends_with($file, '.png') || str_ends_with($file, '.webp')) $candidates[] = substr($file, 0, -4) . '.jpg';
+        foreach ($candidates as $candidate) {
+            $relative = $folder . '/' . $candidate;
+            if (is_file($root . '/' . $relative)) return ['path' => $root . '/' . $relative, 'url' => $relative, 'file' => $candidate];
+        }
     }
     return null;
 }
@@ -76,6 +80,7 @@ function bt_asset_library(): array
                 'style' => trim((string)($metadata['style'] ?? $styleDefaults[$collectionSlug] ?? 'Tattoo linework')),
                 'placement' => trim((string)($metadata['placement'] ?? 'Artist-selected placement')),
                 'difficulty' => trim((string)($metadata['difficulty'] ?? 'Advanced')),
+                'license' => trim((string)($metadata['license'] ?? 'Professional use')),
                 'status' => $publicationStatus,
                 'rights_confirmed' => (bool)($metadata['rights_confirmed'] ?? false),
                 'reward_bits' => 25,

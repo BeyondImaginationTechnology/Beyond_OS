@@ -3,6 +3,7 @@ declare(strict_types=1);
 require __DIR__ . '/includes/config.php';
 $slug = trim((string)($_GET['slug'] ?? ''));
 $studio = bt_get_studio($slug);
+if ($studio && $studio['slug'] === 'beyond-studio-nanaimo') { $studio['city'] = 'Web Ink Studio'; $studio['province'] = ''; $studio['postal_code'] = ''; $studio['address_line1'] = 'Online studio'; }
 if (!$studio) { http_response_code(404); $pageTitle='Studio not found — Beyond Tattoo'; require __DIR__.'/includes/header.php'; echo '<main class="container dashboard"><div class="panel"><h1>Studio not found</h1><a href="studios.php">Back to studios</a></div></main>'; require __DIR__.'/includes/footer.php'; exit; }
 $artists = bt_list_artists((int)$studio['id']);
 $pageTitle = $studio['name'] . ' — Beyond Tattoo';

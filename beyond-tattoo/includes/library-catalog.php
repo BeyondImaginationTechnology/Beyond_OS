@@ -4,6 +4,19 @@ declare(strict_types=1);
 function bt_library_collections(): array
 {
     return [
+        'season-one-opening' => [
+            'name' => 'Season One Opening Releases', 'count' => 6, 'dates' => 'Jul 14–21, 2026',
+            'image' => 'assets/stencils/season-one-opening/01-celestial-rose/preview-watermarked.jpg',
+            'description' => 'The original opening drops that established the Beyond Tattoo daily stencil season.',
+            'stencils' => [
+                ['Celestial Rose', '2026-07-14'],
+                ['Eye of Horus Anubis', '2026-07-16'],
+                ['Sacred Heart', '2026-07-18'],
+                ['Archangel Michael', '2026-07-19'],
+                ['Praying Hands & Rosary', '2026-07-20'],
+                ['Guardian Angel', '2026-07-21'],
+            ],
+        ],
         'divine-realism' => [
             'name' => 'Divine Realism',
             'count' => 10,
@@ -11,8 +24,7 @@ function bt_library_collections(): array
             'image' => 'assets/img/storefront/collection-divine.webp',
             'description' => 'Biblical portraiture, angels and sacred iconography composed for black-and-grey realism.',
             'stencils' => [
-                ['Biblical Realism', '2026-07-17'], ['Archangel Michael', '2026-07-18'], ['Sacred Heart', '2026-07-19'],
-                ['Praying Hands & Rosary', '2026-07-20'], ['Guardian Angel', '2026-07-21'], ['Dove & Radiant Cross', '2026-07-22'],
+                ['Biblical Realism', '2026-07-17'], ['Dove & Radiant Cross', '2026-07-22'],
                 ['Cherub & Clouds', '2026-07-23'], ['Gates of Heaven', '2026-07-24'], ['Crown & Cross', '2026-07-25'], ['Angel of Light', '2026-07-26'],
             ],
         ],

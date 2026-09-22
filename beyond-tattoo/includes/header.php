@@ -11,8 +11,10 @@ $bodyClass = $bodyClass ?? '';
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#09070f">
+  <link rel="manifest" href="/manifest.webmanifest">
   <title><?= e($pageTitle) ?></title>
   <link rel="stylesheet" href="/beyond-tattoo/assets/css/app.css?v=<?= rawurlencode((string) (@filemtime(__DIR__ . '/../assets/css/app.css') ?: '20260716')) ?>">
+  <link rel="stylesheet" href="/beyond-tattoo/assets/css/theme-02.css?v=<?= rawurlencode((string) (@filemtime(__DIR__ . '/../assets/css/theme-02.css') ?: '20260922')) ?>">
   <link rel="stylesheet" href="/beyond-tattoo/assets/css/studio-upgrades.css?v=<?= rawurlencode((string) (@filemtime(__DIR__ . '/../assets/css/studio-upgrades.css') ?: '20260727')) ?>">
 </head>
 <body class="<?= e($bodyClass) ?>">

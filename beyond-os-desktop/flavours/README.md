@@ -12,10 +12,11 @@ The seven official 1.0 flavours are defined in `catalog.json`:
 | Sentinel | Profile defined | Add fleet/policy profile and management boundary |
 | Gaming | Profile defined | Add graphics/input/performance profile |
 
-The profile-defined flavours are specifications, not images yet. Each one
-should inherit the Core platform boundary, add a product-specific
-Buildroot configuration and overlay, then pass the same identity, storage,
-UEFI, QEMU, and release checks already required by Home, Core, and Cyber.
+All seven tracks can now be driven through `../build-all.sh`, which gives each
+flavour its own Buildroot output directory. The four Core-based profiles share
+the Core platform boundary and carry their flavour identity and metadata into
+the image. Product-specific package overlays and release gates remain separate
+work for each profile; a successful build is not by itself a stable release.
 
 Creator exposes Adobe Creative Cloud through its web experience. Adobe's
 current Creative Cloud desktop requirements list Windows and macOS, not Linux;

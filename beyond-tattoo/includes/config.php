@@ -12,6 +12,7 @@ define('APP_ROOT', dirname(__DIR__));
 define('DATA_DIR', APP_ROOT . '/data');
 define('UPLOAD_DIR', beyond_private_root() . '/uploads/beyond-tattoo/healing');
 require_once __DIR__ . '/repository.php';
+require_once __DIR__ . '/google-places.php';
 
 if (!function_exists('e')) {
     function e($value): string {

@@ -35,6 +35,8 @@ workflows:
     environment:
       android_signing:
         - daily-breath-play-upload
+      groups:
+        - google_play
       vars:
         PACKAGE_NAME: technology.co.beyondimagination.dailybreath
         ANDROID_VERSION_NAME: 2.1
@@ -52,13 +54,18 @@ workflows:
           else
             version_code=3
           fi
-          ./gradlew --no-daemon \
+          sh ./gradlew --no-daemon \
             -PversionCode="$version_code" \
             -PversionName="$ANDROID_VERSION_NAME" \
             lintPlayRelease bundlePlayRelease
     artifacts:
       - app/build/outputs/bundle/playRelease/*.aab
       - app/build/outputs/mapping/playRelease/mapping.txt
+    publishing:
+      google_play:
+        credentials: $GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS
+        track: production
+        submit_as_draft: true
 
   daily-breath-android-debug:
     name: Daily Breath Android Debug APK

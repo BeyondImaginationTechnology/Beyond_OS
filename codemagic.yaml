@@ -1,4 +1,71 @@
 workflows:
+  daily-breath-keystore-bootstrap:
+    name: Daily Breath Keystore Bootstrap
+    max_build_duration: 30
+    instance_type: linux_x2
+    environment:
+      groups:
+        - daily-breath-keystore-bootstrap
+      vars:
+        BOOTSTRAP_KEY_ALIAS: daily-breath-upload
+    scripts:
+      - name: Generate upload keystore
+        script: |
+          set -euo pipefail
+          : "${BOOTSTRAP_KEYSTORE_PASSWORD:?Set BOOTSTRAP_KEYSTORE_PASSWORD as a Codemagic secret}"
+          : "${BOOTSTRAP_KEY_PASSWORD:?Set BOOTSTRAP_KEY_PASSWORD as a Codemagic secret}"
+          keytool -genkeypair -v \
+            -keystore "$CM_BUILD_DIR/daily-breath-upload.jks" \
+            -storetype JKS \
+            -storepass "$BOOTSTRAP_KEYSTORE_PASSWORD" \
+            -keypass "$BOOTSTRAP_KEY_PASSWORD" \
+            -alias "$BOOTSTRAP_KEY_ALIAS" \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Daily Breath, OU=Mobile, O=Beyond Imagination, L=Seattle, ST=Washington, C=US"
+    artifacts:
+      - daily-breath-upload.jks
+
+  daily-breath-android-play:
+    name: Daily Breath Android Google Play
+    max_build_duration: 60
+    instance_type: linux_x2
+    working_directory: DailyBreathAndroid
+    environment:
+      android_signing:
+        - daily-breath-play-upload
+      groups:
+        - google_play
+      vars:
+        PACKAGE_NAME: technology.co.beyondimagination.dailybreath
+        ANDROID_VERSION_NAME: 2.1
+    scripts:
+      - name: Set Android SDK location
+        script: |
+          set -euo pipefail
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/DailyBreathAndroid/local.properties"
+      - name: Build signed Google Play App Bundle
+        script: |
+          set -euo pipefail
+          latest_build_number="$(google-play get-latest-build-number --package-name "$PACKAGE_NAME" || true)"
+          if [[ "$latest_build_number" =~ ^[0-9]+$ ]]; then
+            version_code=$((latest_build_number + 1))
+          else
+            version_code=3
+          fi
+          ./gradlew --no-daemon \
+            -PversionCode="$version_code" \
+            -PversionName="$ANDROID_VERSION_NAME" \
+            lintPlayRelease bundlePlayRelease
+    artifacts:
+      - app/build/outputs/bundle/playRelease/*.aab
+      - app/build/outputs/mapping/playRelease/mapping.txt
+    publishing:
+      google_play:
+        credentials: $GOOGLE_PLAY_SERVICE_ACCOUNT_CREDENTIALS
+        track: production
+
   jaguar-ios-testflight:
     name: Jaguar iOS TestFlight
     max_build_duration: 120

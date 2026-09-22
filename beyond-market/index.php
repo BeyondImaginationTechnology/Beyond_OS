@@ -41,7 +41,7 @@ if (!$marketListings) {
 
   <form class="market-search" id="marketSearch" role="search"><label for="marketQuery">Search Beyond Market</label><input id="marketQuery" type="search" placeholder="Search mugs, posters, stickers, SVGs…"><select id="marketCategory" aria-label="Product category"><option value="all">All categories</option><option>Apparel</option><option>Accessories</option><option>Wall Art</option><option>Home &amp; Living</option><option>Stickers</option><option>Digital</option></select><button type="submit">Search</button></form>
 
-  <nav class="market-jump" aria-label="Beyond Market sections"><a href="#shop">Shop &amp; discover</a><a href="#starter-art">Original artwork</a><a href="#live-listings">Live listings</a><a href="#seller-tools">Sell</a><a href="<?=e(beyond_url('beyond-sell/orders.php'))?>">My orders</a><a href="<?=e(beyond_url('beyond-id/dashboard/wallet.php'))?>">Wallet</a></nav>
+  <nav class="market-jump" aria-label="Beyond Market sections"><a href="#shop">Shop &amp; discover</a><a href="<?=e(beyond_url('beyond-tattoo/store.php'))?>">Tattoo supplies</a><a href="#starter-art">Original artwork</a><a href="#live-listings">Live listings</a><a href="#seller-tools">Sell</a><a href="<?=e(beyond_url('beyond-sell/orders.php'))?>">My orders</a><a href="<?=e(beyond_url('beyond-id/dashboard/wallet.php'))?>">Wallet</a></nav>
 
   <section class="product-market" id="shop">
     <header class="market-heading"><div><span class="bos-kicker">Curated commerce</span><h2>Shop products that exist.</h2><p>Physical collections link to live Redbubble inventory. Prices, availability, payment, shipping and returns are shown and handled by Redbubble.</p></div><a href="https://www.redbubble.com/" target="_blank" rel="external noopener">Open Redbubble <span>↗</span></a></header>
@@ -61,6 +61,7 @@ if (!$marketListings) {
     <?=bos_app_card('Tattoo Stencil Library','Browse tattoo artwork, transfer files and studio-ready designs.','beyond-tattoo/stencils.php','INK','Browse library','assets/icons/app-store/beyond-tattoo.jpg')?>
     <?=bos_app_card('Stencil of the Day','Discover today’s featured tattoo artwork and downloadable formats.','beyond-tattoo/stencil-of-day.php','DAY','View release','assets/icons/app-store/beyond-tattoo.jpg')?>
     <?=bos_app_card('Find Tattoo Artists','Explore artists, studios and collaboration opportunities.','beyond-tattoo/studios.php','ART','Find artists','assets/icons/app-store/beyond-tattoo.jpg')?>
+    <?=bos_app_card('Tattoo Supply Store','Shop fake skin, stencil transfer paper and artist practice kits.','beyond-tattoo/store.php','SHOP','Open store','assets/icons/app-store/beyond-tattoo.jpg')?>
   </div></section>
 
   <section class="live-listings" id="live-listings"><header class="market-heading"><div><span class="bos-kicker">Live storefronts</span><h2><?=!empty($marketListings[0]['external']) ? 'Curated on Redbubble' : 'Live Beyond listings'?></h2><p><?=!empty($marketListings[0]['external']) ? 'Real collections from independent artists. Open any collection to see current products, prices and availability on Redbubble.' : 'Community items published through Beyond Sell appear here automatically.'?></p></div><a href="<?=e(beyond_url('beyond-sell/'))?>">Beyond seller listings <span>↗</span></a></header><div class="listing-grid"><?php foreach($marketListings as $listing):?><?php

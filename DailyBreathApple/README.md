@@ -1,6 +1,6 @@
 # DailyBreath for iOS
 
-Native SwiftUI app for DailyBreath 2.1 (build 1).
+Native SwiftUI app for DailyBreath 2.1 (build 2).
 
 ## Included in this build
 

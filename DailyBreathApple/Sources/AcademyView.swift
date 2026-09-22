@@ -83,6 +83,26 @@ struct AcademyView: View {
 
     private var purchasePaywall: some View {
         VStack(alignment: .leading, spacing: 16) {
+            Image("AcademyLearningPoster")
+                .resizable()
+                .scaledToFill()
+                .frame(maxWidth: .infinity)
+                .frame(height: 245)
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .overlay(alignment: .bottomLeading) {
+                    LinearGradient(
+                        colors: [.clear, .black.opacity(0.72)],
+                        startPoint: .center,
+                        endPoint: .bottom
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                    .overlay(alignment: .bottomLeading) {
+                        Text("Learn with Chris, Dovi, and Moe")
+                            .font(.headline.weight(.black))
+                            .foregroundStyle(.white)
+                            .padding(16)
+                    }
+                }
             Label("Daily Breath Academy", systemImage: "graduationcap.fill")
                 .font(.headline.weight(.black))
                 .foregroundStyle(selectedTheme.accent)
@@ -107,11 +127,23 @@ struct AcademyView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(selectedTheme.academyEmphasis)
-            } else {
+            } else if purchaseManager.isLoading {
                 Label("Signed in with Beyond-ID", systemImage: "checkmark.seal.fill")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(.green)
                 ProgressView("Loading Academy purchase…")
+            } else {
+                Label("Signed in with Beyond-ID", systemImage: "checkmark.seal.fill")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.green)
+                Text(purchaseManager.loadError ?? "Academy purchasing is temporarily unavailable.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                Button("Try again") {
+                    Task { await purchaseManager.load() }
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(selectedTheme.academyEmphasis)
             }
             Button("Restore purchase") {
                 Task { await purchaseManager.restore() }
@@ -275,6 +307,8 @@ final class AcademyPurchaseManager: ObservableObject {
     @Published private(set) var product: Product?
     @Published private(set) var hasAccess = UserDefaults.standard.bool(forKey: "dailyBreathAcademyPurchased")
     @Published private(set) var message: String?
+    @Published private(set) var isLoading = false
+    @Published private(set) var loadError: String?
     private var updatesTask: Task<Void, Never>?
 
     init() {
@@ -289,7 +323,19 @@ final class AcademyPurchaseManager: ObservableObject {
     deinit { updatesTask?.cancel() }
 
     func load() async {
-        product = try? await Product.products(for: [Self.productID]).first
+        guard !isLoading else { return }
+        isLoading = true
+        loadError = nil
+        defer { isLoading = false }
+        do {
+            product = try await Product.products(for: [Self.productID]).first
+            if product == nil {
+                loadError = "The Academy purchase is not available from the App Store right now. You can try again or restore an existing purchase."
+            }
+        } catch {
+            product = nil
+            loadError = "The Academy could not connect to the App Store. Check your connection and try again."
+        }
         await refreshEntitlement()
     }
 
@@ -324,12 +370,20 @@ final class AcademyPurchaseManager: ObservableObject {
     }
 
     private func apply(_ result: VerificationResult<StoreKit.Transaction>) async {
-        guard case .verified(let transaction) = result,
-              transaction.productID == Self.productID else { return }
-        let active = transaction.revocationDate == nil
-        hasAccess = active
-        UserDefaults.standard.set(active, forKey: "dailyBreathAcademyPurchased")
-        await transaction.finish()
+        switch result {
+        case .verified(let transaction):
+            guard transaction.productID == Self.productID else {
+                message = "The App Store returned a different purchase. Please try again or restore your Academy purchase."
+                return
+            }
+            let active = transaction.revocationDate == nil
+            hasAccess = active
+            UserDefaults.standard.set(active, forKey: "dailyBreathAcademyPurchased")
+            message = active ? "Academy unlocked." : "This Academy purchase is no longer active."
+            await transaction.finish()
+        case .unverified:
+            message = "The App Store could not verify this purchase. No access was changed; please try again or restore your purchase."
+        }
     }
 }
 

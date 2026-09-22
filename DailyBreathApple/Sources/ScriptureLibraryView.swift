@@ -64,7 +64,16 @@ struct ScriptureLibraryView: View {
                 ProgressView("Loading sacred texts…")
                     .frame(maxWidth: .infinity)
             } else if library.books.isEmpty {
-                ContentUnavailableView("Text unavailable", systemImage: "book.closed", description: Text("The local text could not be loaded."))
+                ContentUnavailableView {
+                    Label("Text unavailable", systemImage: "book.closed")
+                } description: {
+                    Text("The local text could not be loaded. Choose another edition or try loading it again.")
+                } actions: {
+                    Button("Try Again") {
+                        Task { await store.reloadScriptureEdition(edition) }
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
             } else if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 overview
                 ForEach(library.books) { book in
@@ -93,6 +102,8 @@ struct ScriptureLibraryView: View {
                             NavigationLink {
                                 if let chapter = library.chapter(bookCode: verse.bookCode, number: verse.chapter) {
                                     SacredTextChapterView(chapter: chapter, highlightedVerseID: verse.id)
+                                } else {
+                                    ContentUnavailableView("Passage unavailable", systemImage: "book.closed", description: Text("Return to search and choose another passage."))
                                 }
                             } label: {
                                 VStack(alignment: .leading, spacing: 5) {

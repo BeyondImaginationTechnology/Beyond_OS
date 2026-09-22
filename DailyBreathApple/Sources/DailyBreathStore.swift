@@ -391,6 +391,24 @@ final class DailyBreathStore: ObservableObject {
         scriptureLibraries[edition] = library
     }
 
+    func reloadScriptureEdition(_ edition: ScriptureEdition) async {
+        scriptureLibraries[edition] = nil
+        await loadScriptureEdition(edition)
+        publishSelectedFaithContent()
+    }
+
+    func reloadBibleLibrary() async {
+        isBibleLoading = true
+        defer { isBibleLoading = false }
+        let loaded = await Task.detached(priority: .userInitiated) {
+            BibleLibrary.loadWorldEnglishBible()
+        }.value
+        bibleLibrary = loaded
+        bibleScriptureLibrary = SacredTextLibrary.bible(from: loaded)
+        scriptureLibraries[.bibleEnglish] = bibleScriptureLibrary
+        publishSelectedFaithContent()
+    }
+
     func dailyVerse(for tradition: FaithTradition, date: Date = Date()) -> Verse {
         let baseVerse: Verse
         if Calendar.current.isDateInToday(date) {

@@ -34,7 +34,6 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
         var components = URLComponents(url: loginURL, resolvingAgainstBaseURL: false)!
         let returnPath = "/beyond-id/auth/mobile-complete.php?scheme=dailybreath&code_challenge=\(challenge)"
         components.queryItems = [
-            URLQueryItem(name: "app", value: "dailybreath"),
             URLQueryItem(name: "return", value: returnPath)
         ]
         session = ASWebAuthenticationSession(url: components.url!, callbackURLScheme: "dailybreath") { [weak self] callback, error in
@@ -44,8 +43,17 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
                     if (error as? ASWebAuthenticationSessionError)?.code != .canceledLogin { self.message = "Beyond-ID sign-in could not be completed." }
                     return
                 }
-                guard let callback, let code = URLComponents(url: callback, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "code" })?.value else {
-                    self.message = "Beyond-ID sign-in returned no authorization code."
+                guard let callback else {
+                    self.message = "Beyond ID sign-in did not return to the app."
+                    return
+                }
+                let queryItems = URLComponents(url: callback, resolvingAgainstBaseURL: false)?.queryItems ?? []
+                if let returnedError = queryItems.first(where: { $0.name == "error" })?.value, !returnedError.isEmpty {
+                    self.message = returnedError
+                    return
+                }
+                guard let code = queryItems.first(where: { $0.name == "code" })?.value else {
+                    self.message = "Beyond ID sign-in returned no authorization code. Please try again."
                     return
                 }
                 await self.exchange(code: code)
@@ -109,10 +117,10 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
         request.httpBody = try? JSONSerialization.data(withJSONObject: ["code": code, "code_verifier": verifier])
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
+            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
             guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode),
-                  let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-                  let token = json["access_token"] as? String, !token.isEmpty else {
-                message = "Beyond-ID sign-in could not be exchanged securely."
+                  let token = json?["access_token"] as? String, !token.isEmpty else {
+                message = json?["error"] as? String ?? "Beyond ID sign-in could not be completed. Please try again."
                 return
             }
             KeychainTokenStore.save(token, service: "DailyBreath", account: tokenKey)

@@ -31,12 +31,7 @@ struct JaguarScriptureChatView: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 14) {
-                Image(guide.assetName)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 72, height: 82)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .accessibilityLabel("\(guide.name), Daily Breath guide")
+                ChatGuideAvatar(guide: guide)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(guide.name).font(.title2.bold())
                     Text("Daily Breath \(guide.tradition) guide · no GPU")
@@ -97,7 +92,7 @@ struct JaguarScriptureChatView: View {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         if let token = auth.accessToken {
-            request.setValue("Bearer \\(token)", forHTTPHeaderField: "Authorization")
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         let language = DailyBreathLanguage(rawValue: languageID)?.rawValue ?? "en"
         var body: [String: Any] = ["mode": "core", "language": language, "guide": guide.rawValue, "messages": messages.map { ["role": $0.role, "content": $0.text] }]
@@ -105,6 +100,7 @@ struct JaguarScriptureChatView: View {
             do {
                 body["proof"] = try await guestProof()
             } catch {
+                restoreFailedPrompt(text)
                 self.error = "Daily Breath chat could not connect. Please try again."
                 return
             }
@@ -117,17 +113,29 @@ struct JaguarScriptureChatView: View {
                 throw URLError(.badServerResponse)
             }
             if http.statusCode == 401, auth.isSignedIn {
+                restoreFailedPrompt(text)
                 auth.handleAuthenticationExpired()
                 error = json?["error"] as? String ?? "Your Beyond-ID session expired. Sign in again to continue."
                 return
             }
             guard (200..<300).contains(http.statusCode) else {
+                restoreFailedPrompt(text)
                 error = json?["error"] as? String ?? "Daily Breath chat could not respond."
                 return
             }
             guard let answer = json?["message"] as? String else { throw URLError(.cannotParseResponse) }
             messages.append(("assistant", answer))
-        } catch { self.error = "Daily Breath chat could not respond. Please try again." }
+        } catch {
+            restoreFailedPrompt(text)
+            self.error = "Daily Breath chat could not respond. Your message is ready to resend."
+        }
+    }
+
+    private func restoreFailedPrompt(_ text: String) {
+        if let last = messages.last, last.role == "user", last.text == text {
+            messages.removeLast()
+        }
+        if prompt.isEmpty { prompt = text }
     }
 
     private func guestProof() async throws -> [String: String] {
@@ -155,5 +163,26 @@ struct JaguarScriptureChatView: View {
             if counter.isMultiple(of: 500) { await Task.yield() }
         }
         throw URLError(.cannotDecodeContentData)
+    }
+}
+
+private struct ChatGuideAvatar: View {
+    let guide: JaguarScriptureChatView.ScriptureGuide
+
+    var body: some View {
+        Image(guide.assetName)
+            .resizable()
+            .scaledToFill()
+            .frame(width: 72, height: 82)
+            .scaleEffect(2.2)
+            .offset(y: 30)
+            .frame(width: 72, height: 82)
+            .background(Color(.secondarySystemBackground))
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .overlay {
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(.primary.opacity(0.12), lineWidth: 1)
+            }
+            .accessibilityLabel("\(guide.name), Daily Breath guide")
     }
 }

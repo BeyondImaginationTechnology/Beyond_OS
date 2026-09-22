@@ -27,6 +27,10 @@ struct BibleView: View {
                     systemImage: "book.closed",
                     description: Text("The local Bible text could not be loaded.")
                 )
+                Button("Try Again") {
+                    Task { await store.reloadBibleLibrary() }
+                }
+                .buttonStyle(.borderedProminent)
             } else if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 continueReadingSection
                 favoritesSection
@@ -128,6 +132,8 @@ struct BibleView: View {
                     NavigationLink {
                         if let chapter = store.bibleLibrary.chapter(bookCode: verse.bookCode, number: verse.chapter) {
                             BibleChapterView(chapter: chapter, highlightedVerseID: verse.id)
+                        } else {
+                            ContentUnavailableView("Passage unavailable", systemImage: "book.closed", description: Text("Return to Favorites and choose another passage."))
                         }
                     } label: {
                         VStack(alignment: .leading, spacing: 5) {
@@ -161,6 +167,8 @@ struct BibleView: View {
                     NavigationLink {
                         if let chapter = store.bibleLibrary.chapter(bookCode: verse.bookCode, number: verse.chapter) {
                             BibleChapterView(chapter: chapter, highlightedVerseID: verse.id)
+                        } else {
+                            ContentUnavailableView("Passage unavailable", systemImage: "book.closed", description: Text("Return to search and choose another passage."))
                         }
                     } label: {
                         VStack(alignment: .leading, spacing: 6) {
@@ -202,6 +210,8 @@ private struct FavoriteCollectionView: View {
             NavigationLink {
                 if let chapter = store.bibleLibrary.chapter(bookCode: verse.bookCode, number: verse.chapter) {
                     BibleChapterView(chapter: chapter, highlightedVerseID: verse.id)
+                } else {
+                    ContentUnavailableView("Passage unavailable", systemImage: "book.closed", description: Text("Return to this collection and choose another passage."))
                 }
             } label: {
                 VStack(alignment: .leading, spacing: 5) {

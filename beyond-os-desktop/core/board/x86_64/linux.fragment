@@ -2,6 +2,13 @@ CONFIG_LOCALVERSION="-beyond-core"
 CONFIG_FB=y
 CONFIG_DRM_FBDEV_EMULATION=y
 CONFIG_FRAMEBUFFER_CONSOLE=y
+# Keep the fbdev Xorg session usable on the virtual GPUs used by QEMU and
+# Compute Engine's serial/UEFI test path.
+CONFIG_DRM_SIMPLEDRM=y
+CONFIG_DRM_BOCHS=y
+CONFIG_DRM_VIRTIO_GPU=y
+CONFIG_FB_EFI=y
+CONFIG_FB_VESA=y
 # CONFIG_LOGO is not set
 CONFIG_VT=y
 CONFIG_VT_CONSOLE=y

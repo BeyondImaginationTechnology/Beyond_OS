@@ -14,7 +14,7 @@ require __DIR__ . '/includes/header.php';
 <div class="app-shell">
   <header class="app-header"><div class="container app-header-inner"><a class="brand" href="index.php"><span class="brand-badge">B</span><span>Studios</span></a><?php if(is_logged_in()): ?><a class="btn btn-secondary" href="dashboard.php">Dashboard</a><?php endif; ?></div></header>
   <main class="container dashboard">
-    <section class="panel studios-hero"><span class="eyebrow">Beyond Studio • Nanaimo, BC</span><h1>Find your studio</h1><p class="section-copy">Discover verified tattoo studios, meet the artists behind the work, and start your next piece with a clear booking inquiry.</p>
+    <section class="panel studios-hero"><span class="eyebrow">Beyond Studio • Nanaimo, BC</span><h1>Find your studio</h1><p class="section-copy">Discover tattoo studios, meet the artists behind the work, and start your next piece with a clear booking inquiry.</p>
       <form class="filter-row" method="get"><label class="sr-only" for="studio-search">Search studios</label><input id="studio-search" class="input" name="q" value="<?= e($query) ?>" placeholder="Search city, province, studio, or service"><button class="btn btn-primary" type="submit">Search</button></form>
       <div class="chip-row" aria-label="Quick studio filters"><a href="studios.php?q=Nanaimo">Nanaimo, BC</a><a href="studios.php?q=Ottawa">Ottawa</a><a href="studios.php?q=Ontario">Ontario</a><a href="studios.php?q=Quebec">Quebec</a><a href="studios.php?q=Alberta">Alberta</a><a href="studios.php?q=Canada">All Canada</a><?php if ($query !== ''): ?><a href="studios.php">Clear filter</a><?php endif; ?></div>
     </section>
@@ -28,7 +28,7 @@ require __DIR__ . '/includes/header.php';
       <?php foreach ($studios as $studio): ?>
       <article class="artist-card">
         <div class="artist-avatar"><?= e(strtoupper(substr((string)$studio['name'], 0, 1))) ?></div>
-        <div class="artist-card-body"><div class="artist-heading"><div><h2><?= e($studio['name']) ?></h2><p class="meta"><?= e($studio['city']) ?><?= $studio['province'] ? ', ' . e($studio['province']) : '' ?></p></div><div class="chip-row"><?php if(($studio['verification_status'] ?? '') === 'verified'): ?><span class="verified">Verified</span><?php endif; ?><?php if((int)$studio['walk_ins']===1): ?><span class="verified">Walk-ins</span><?php endif; ?></div></div>
+        <div class="artist-card-body"><div class="artist-heading"><div><h2><?= e($studio['name']) ?></h2><p class="meta"><?= e($studio['city']) ?><?= $studio['province'] ? ', ' . e($studio['province']) : '' ?></p></div><div class="chip-row"><?php if((int)$studio['walk_ins']===1): ?><span>Walk-ins</span><?php endif; ?></div></div>
           <p><?= e($studio['description']) ?></p><div class="chip-row"><span><?= (int)$studio['artist_count'] ?> listed artists</span><span><?= e($studio['services']) ?></span></div>
           <div class="artist-actions"><a class="btn btn-primary" href="studio-profile.php?slug=<?= urlencode($studio['slug']) ?>">View studio</a><a class="btn btn-secondary" href="<?= e($studio['website_url'] ?? $studio['instagram_url']) ?>" target="_blank" rel="noopener">Studio link ↗</a></div>
         </div>

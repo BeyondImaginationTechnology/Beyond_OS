@@ -19,6 +19,7 @@ Native SwiftUI app powered by the Llama Jaguar v0.3 Preview service.
 - Visible thinking stage and elapsed time
 - Mobile transcript scrolling with a jump-to-latest control
 - Rate-limit, expired-session, network, and server error states
+- Reviewer demo mode with local responses when Beyond ID credentials are unavailable
 - iPhone, iPad, and Mac Catalyst layouts
 
 ## Generate and run
@@ -34,3 +35,5 @@ open Jaguar.xcodeproj
 Choose the **Jaguar** scheme and an iOS 17 or newer simulator. The app requires a live Beyond ID account for chat. Tokens expire after one hour; an expired token returns the user to sign-in.
 
 The checked-in privacy manifest declares the Beyond ID user identifier and chat prompts used for app functionality. App Store privacy answers must match the deployed service before distribution.
+
+For App Review, tap **Try the reviewer demo** on the welcome screen. This opens the full conversation interface without an account and uses clearly labeled local responses; normal users can still use **Continue with Beyond ID** for live Jaguar responses.

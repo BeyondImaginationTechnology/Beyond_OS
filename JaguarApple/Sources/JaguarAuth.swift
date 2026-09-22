@@ -9,6 +9,7 @@ import UIKit
 @MainActor
 final class JaguarAuthManager: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
     @Published private(set) var isSignedIn: Bool
+    @Published private(set) var isDemoMode = false
     @Published private(set) var isSigningIn = false
     @Published private(set) var message: String?
     @Published private(set) var signInDetail: String?
@@ -21,6 +22,8 @@ final class JaguarAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
     private let tokenURL = URL(string: "https://beyondimagination.co.technology/beyond-id/api/mobile-token.php")!
     private var webSession: ASWebAuthenticationSession?
     private var verifier = ""
+    private var activeAttemptID: UUID?
+    private var retryAvailableAt: Date?
     private let logger = Logger(subsystem: "technology.co.beyondimagination.jaguar", category: "authentication")
 
     override init() {
@@ -30,9 +33,19 @@ final class JaguarAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
 
     func signIn() {
         guard !isSigningIn else { return }
+        if let retryAvailableAt, retryAvailableAt > Date() {
+            let seconds = max(1, Int(retryAvailableAt.timeIntervalSinceNow.rounded(.up)))
+            finishSignInFailure("Too many sign-in attempts.", detail: "Beyond ID asked Jaguar to wait before trying again. Please wait about \(seconds) seconds, then try once.")
+            return
+        }
+        webSession?.cancel()
+        webSession = nil
+        isDemoMode = false
         message = nil
         signInDetail = nil
         isSigningIn = true
+        let attemptID = UUID()
+        activeAttemptID = attemptID
         verifier = randomURLSafe(count: 64)
         let challenge = base64URL(Data(SHA256.hash(data: Data(verifier.utf8))))
         var components = URLComponents(url: loginURL, resolvingAgainstBaseURL: false)!
@@ -48,11 +61,13 @@ final class JaguarAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
         webSession = ASWebAuthenticationSession(url: url, callbackURLScheme: "jaguar") { [weak self] callback, error in
             guard let self else { return }
             Task { @MainActor in
+                guard self.activeAttemptID == attemptID else { return }
                 if let error {
                     if (error as? ASWebAuthenticationSessionError)?.code != .canceledLogin {
                         self.finishSignInFailure("We couldn’t finish sign-in.", detail: "The authorization session ended before Beyond ID returned a code.")
                     } else {
                         self.isSigningIn = false
+                        self.webSession = nil
                     }
                     return
                 }
@@ -72,9 +87,25 @@ final class JaguarAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
     }
 
     func signOut(message: String? = nil) {
+        webSession?.cancel()
+        webSession = nil
+        activeAttemptID = nil
+        retryAvailableAt = nil
         JaguarKeychain.delete(service: service, account: tokenKey)
         isSignedIn = false
+        isDemoMode = false
         self.message = message
+        signInDetail = nil
+    }
+
+    func enterDemoMode() {
+        webSession?.cancel()
+        webSession = nil
+        activeAttemptID = nil
+        retryAvailableAt = nil
+        isDemoMode = true
+        isSignedIn = false
+        message = nil
         signInDetail = nil
     }
 
@@ -116,9 +147,11 @@ final class JaguarAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
                         detail: "The one-time Beyond ID code expired, was already used, or did not match this sign-in attempt. Tap Try again and complete Google sign-in in the same session."
                     )
                 case "token_exchange_rate_limited":
+                    let retryAfter = (json?["retry_after"] as? Int) ?? http.value(forHTTPHeaderField: "Retry-After").flatMap(Int.init) ?? 60
+                    retryAvailableAt = Date().addingTimeInterval(TimeInterval(max(1, retryAfter)))
                     finishSignInFailure(
                         "Too many sign-in attempts.",
-                        detail: "Beyond ID temporarily paused token exchanges to protect your account. Wait a few minutes, then try again once."
+                        detail: "Beyond ID temporarily paused token exchanges to protect your account. Wait about \(max(1, retryAfter)) seconds, then try once."
                     )
                 case "token_service_unavailable":
                     finishSignInFailure(
@@ -141,6 +174,9 @@ final class JaguarAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
             JaguarKeychain.save(token, service: service, account: tokenKey)
             isSignedIn = true
             isSigningIn = false
+            retryAvailableAt = nil
+            activeAttemptID = nil
+            webSession = nil
             message = nil
             signInDetail = nil
         } catch {
@@ -151,6 +187,8 @@ final class JaguarAuthManager: NSObject, ObservableObject, ASWebAuthenticationPr
 
     private func finishSignInFailure(_ userMessage: String, detail: String) {
         isSigningIn = false
+        activeAttemptID = nil
+        webSession = nil
         message = userMessage
         signInDetail = detail
     }

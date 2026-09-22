@@ -7,7 +7,7 @@ struct RootView: View {
 
     var body: some View {
         Group {
-            if auth.isSignedIn {
+            if auth.isSignedIn || auth.isDemoMode {
                 NavigationSplitView {
                     conversationList
                 } detail: {
@@ -85,6 +85,11 @@ private struct JaguarWelcomeView: View {
                 .background(JaguarTheme.gradient, in: RoundedRectangle(cornerRadius: 18))
                 .buttonStyle(.plain)
                 .disabled(auth.isSigningIn)
+                Button("Try the reviewer demo") {
+                    auth.enterDemoMode()
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(JaguarTheme.mint)
                 if let message = auth.message {
                     JaguarSignInNotice(message: message, detail: auth.signInDetail, retry: auth.signIn, dismiss: auth.clearMessage)
                 }
@@ -329,6 +334,10 @@ private struct JaguarChatView: View {
     }
 
     private func send() async {
+        if auth.isDemoMode {
+            _ = await store.sendDemo()
+            return
+        }
         guard let token = auth.accessToken else {
             auth.signOut(message: "Your Beyond ID session expired. Sign in again to continue.")
             return
@@ -426,7 +435,11 @@ private struct JaguarAccountView: View {
         NavigationStack {
             List {
                 Section("Beyond ID") {
-                    Label("Signed in securely", systemImage: "checkmark.shield.fill").foregroundStyle(JaguarTheme.mint)
+                    if auth.isDemoMode {
+                        Label("Reviewer demo mode", systemImage: "checkmark.seal.fill").foregroundStyle(JaguarTheme.mint)
+                    } else {
+                        Label("Signed in securely", systemImage: "checkmark.shield.fill").foregroundStyle(JaguarTheme.mint)
+                    }
                     Button("Sign out", role: .destructive) { auth.signOut(); dismiss() }
                 }
                 Section("About") {

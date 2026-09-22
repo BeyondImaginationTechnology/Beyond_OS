@@ -28,4 +28,15 @@ final class JaguarTests: XCTestCase {
         let decoded = try JSONDecoder().decode(JaguarConversation.self, from: JSONEncoder().encode(original))
         XCTAssertEqual(decoded, original)
     }
+
+    func testReviewerDemoReturnsLocalResponse() async {
+        let client = JaguarAPIClient(endpoint: URL(string: "https://example.invalid")!)
+        let response = await client.sendDemo(
+            messages: [JaguarMessage(role: .user, content: "Explain photosynthesis")],
+            language: .english
+        )
+        XCTAssertEqual(response.model, "jaguar-reviewer-demo")
+        XCTAssertTrue(response.message.contains("Explain photosynthesis"))
+        XCTAssertTrue(response.message.contains("runs locally"))
+    }
 }

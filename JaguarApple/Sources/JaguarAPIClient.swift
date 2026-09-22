@@ -59,4 +59,20 @@ struct JaguarAPIClient: Sendable {
             throw JaguarAPIError.invalidResponse
         }
     }
+
+    func sendDemo(messages: [JaguarMessage], language: JaguarLanguage) async -> JaguarChatResponse {
+        let latest = messages.last(where: { $0.role == .user })?.content ?? "your question"
+        let languageNote: String
+        switch language {
+        case .english: languageNote = "This reviewer demo runs locally and does not send your message to a server."
+        case .french: languageNote = "Cette démonstration fonctionne localement et n’envoie pas votre message à un serveur."
+        case .spanish: languageNote = "Esta demostración funciona localmente y no envía tu mensaje a un servidor."
+        }
+        return JaguarChatResponse(
+            model: "jaguar-reviewer-demo",
+            adapter: "local",
+            mode: "core",
+            message: "Demo response for: \"\(latest)\"\n\nJaguar can explain an idea, shape a plan, and break down a difficult topic into plain language. Try changing the language menu, starting a new conversation, and reopening this conversation from the list.\n\n\(languageNote)"
+        )
+    }
 }

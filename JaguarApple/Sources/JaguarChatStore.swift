@@ -83,6 +83,24 @@ final class JaguarChatStore: ObservableObject {
         }
     }
 
+    func sendDemo() async -> Bool {
+        let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty, !isThinking, let selectedID else { return false }
+        draft = ""
+        errorMessage = nil
+        let outgoing = JaguarMessage(role: .user, content: String(text.prefix(8000)))
+        update(id: selectedID) { conversation in
+            conversation.messages.append(outgoing)
+            if conversation.messages.count == 1 { conversation.title = String(text.prefix(46)) }
+        }
+        guard let conversation = conversations.first(where: { $0.id == selectedID }) else { return false }
+        startThinking()
+        let response = await client.sendDemo(messages: conversation.messages, language: conversation.language)
+        update(id: selectedID) { $0.messages.append(JaguarMessage(role: .assistant, content: response.message)) }
+        stopThinking()
+        return true
+    }
+
     private func startThinking() {
         isThinking = true
         elapsedSeconds = 0

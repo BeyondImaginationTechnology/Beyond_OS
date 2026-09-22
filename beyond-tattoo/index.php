@@ -10,7 +10,7 @@ require_once __DIR__ . '/includes/stencil-content.php';
 
 // The public storefront uses its own compact navigation instead of the full OS shell.
 $disableBeyondShell = true;
-$pageTitle = 'Beyond Tattoo — Free Stencil Drops';
+$pageTitle = 'Beyond Tattoo — Daily Stencil Releases';
 require __DIR__ . '/includes/header.php';
 
 $stencilDay = bt_stencil_content();
@@ -40,7 +40,7 @@ if (!empty($stencilDay['iso_date'])) {
       <span>✦ Asset library</span>
       <span>◆ Premium quality</span>
       <span>Studio ready</span>
-      <a href="<?= e($downloadFile) ?>" download>Free stencil packs →</a>
+      <span>Daily release calendar</span>
     </div>
   </div>
 
@@ -64,8 +64,9 @@ if (!empty($stencilDay['iso_date'])) {
       </nav>
 
       <div class="bt-header-actions">
-        <a class="bt-header-download" href="<?= e($downloadFile) ?>" download>↓ Free pack</a>
-        <a class="bt-login-link" href="login.php">Studio login</a>
+        <a class="bt-header-download" href="stencils.php">View release calendar</a>
+        <a class="bt-login-link" href="login.php?workspace=artist">Artist login</a>
+        <a class="bt-login-link" href="login.php?workspace=studio">Studio login</a>
         <details class="bt-mobile-menu">
           <summary aria-label="Open menu">☰</summary>
           <div>
@@ -74,7 +75,8 @@ if (!empty($stencilDay['iso_date'])) {
             <a href="store.php">Store</a>
             <a href="studios.php">Studios</a>
             <a href="about.php">About</a>
-            <a href="login.php">Studio login</a>
+            <a href="login.php?workspace=artist">Artist login</a>
+            <a href="login.php?workspace=studio">Studio login</a>
           </div>
         </details>
       </div>
@@ -84,13 +86,13 @@ if (!empty($stencilDay['iso_date'])) {
   <section class="bt-main-hero">
     <div class="bt-wrap bt-main-hero-grid">
       <div class="bt-main-copy">
-        <p class="bt-gold-kicker">✦ FREE. EVERY. DAY.</p>
+        <p class="bt-gold-kicker">✦ DAILY RELEASES · STUDIO WORKSPACE</p>
         <h1><span>BEYOND</span><strong>TATTOO</strong></h1>
         <p class="bt-stencil-drop">STENCIL DROP</p>
         <p class="bt-main-lead">Premium tattoo stencils plus a focused operating workspace for modern shop owners.</p>
         <div class="bt-main-actions">
           <a class="bt-glow-button" href="<?= e($downloadFile) ?>" download>↓ Download today’s stencil</a>
-          <a class="bt-outline-button" href="login.php">Studio owner login</a>
+          <a class="bt-outline-button" href="login.php?workspace=artist">Artist login</a>
         </div>
         <div class="bt-trust-row" aria-label="Stencil package features">
           <span><i>▣</i> Printer ready</span>
@@ -99,13 +101,13 @@ if (!empty($stencilDay['iso_date'])) {
         </div>
       </div>
 
-      <a class="bt-package-stage" href="<?= e($downloadFile) ?>" download aria-label="Download today's free stencil package">
+      <a class="bt-package-stage" href="stencils.php" aria-label="Browse the stencil release calendar">
         <span class="bt-package-glow" aria-hidden="true"></span>
         <img
           src="<?= e($packImage) ?>?v=<?= e((string)($stencilDay['updated_at'] ?: '1')) ?>"
           alt="<?= e($stencilDay['title']) ?> generated stencil package"
         >
-        <span class="bt-package-cta">Download free stencil</span>
+        <span class="bt-package-cta">Browse release</span>
       </a>
     </div>
   </section>
@@ -141,8 +143,8 @@ if (!empty($stencilDay['iso_date'])) {
           <span>✦ Easy-transfer clean lines</span>
           <span>▣ Verified print-ready master</span>
         </div>
-        <a class="bt-glow-button bt-full-button" href="<?= e($downloadFile) ?>" download>↓ Download free stencil pack</a>
-        <small>Actual approved asset · 100% free · No login required</small>
+        <a class="bt-glow-button bt-full-button" href="stencils.php">Open stencil details</a>
+        <small>Approved studio asset · Release details and formats</small>
       </div>
     </div>
   </section>
@@ -172,7 +174,8 @@ if (!empty($stencilDay['iso_date'])) {
         <h2 id="studio-product-title">Run the shop.<br><strong>Grow the roster.</strong></h2>
         <p>Beyond Tattoo gives shop owners one focused workspace for artist recruiting, studio discovery and production-ready stencil resources—all connected to an existing Beyond ID.</p>
         <div class="bt-main-actions">
-          <a class="bt-glow-button" href="login.php">Open studio workspace</a>
+          <a class="bt-glow-button" href="login.php?workspace=studio">Open studio workspace</a>
+          <a class="bt-outline-button" href="login.php?workspace=artist">Artist workspace</a>
           <a class="bt-outline-button" href="about.php">See how it works</a>
         </div>
         <small>No separate Tattoo account required.</small>
@@ -203,10 +206,10 @@ if (!empty($stencilDay['iso_date'])) {
         </span>
         <div><strong>Beyond Tattoo</strong><small>Beyond imagination. Beyond limits.</small></div>
       </div>
-      <div class="bt-footer-links"><a href="../">Beyond OS</a><a href="login.php">Studio login</a><a href="../legal/terms.php">Terms</a><a href="../legal/privacy.php">Privacy</a></div>
+      <div class="bt-footer-links"><a href="../">Beyond OS</a><a href="login.php?workspace=artist">Artist login</a><a href="login.php?workspace=studio">Studio login</a><a href="../legal/terms.php">Terms</a><a href="../legal/privacy.php">Privacy</a></div>
     </div>
   </footer>
 
-  <a class="bt-mobile-sticky-download" href="<?= e($downloadFile) ?>" download>↓ Download today’s free stencil</a>
+  <a class="bt-mobile-sticky-download" href="stencils.php">Browse release calendar</a>
 </main>
 <?php require __DIR__ . '/includes/footer.php'; ?>

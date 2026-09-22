@@ -5,10 +5,12 @@ require_login();
 
 $user = bt_current_user();
 $allowedRoles = ['client', 'artist', 'owner'];
-$studioSetup = (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' ? ($_POST['workspace'] ?? '') : ($_GET['workspace'] ?? '')) === 'studio';
+$workspace = (string)(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' ? ($_POST['workspace'] ?? '') : ($_GET['workspace'] ?? ''));
+$studioSetup = $workspace === 'studio';
+$artistSetup = $workspace === 'artist';
 $role = $studioSetup
     ? 'owner'
-    : (string)(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' ? ($_POST['account_type'] ?? 'client') : ($user['account_type'] ?? 'client'));
+    : ($artistSetup ? 'artist' : (string)(($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' ? ($_POST['account_type'] ?? 'client') : ($user['account_type'] ?? 'client')));
 if (!in_array($role, $allowedRoles, true)) $role = 'client';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -40,7 +42,7 @@ require __DIR__ . '/includes/header.php';
   <?php if (isset($error)): ?><div class="notice error-notice"><?= e($error) ?></div><?php endif; ?>
   <form class="form-grid" method="post">
     <input type="hidden" name="_csrf" value="<?= e(bt_csrf_token()) ?>">
-    <?php if ($studioSetup): ?><input type="hidden" name="workspace" value="studio"><input type="hidden" name="account_type" value="owner"><?php endif; ?>
+    <?php if ($studioSetup): ?><input type="hidden" name="workspace" value="studio"><input type="hidden" name="account_type" value="owner"><?php elseif ($artistSetup): ?><input type="hidden" name="workspace" value="artist"><input type="hidden" name="account_type" value="artist"><?php endif; ?>
     <?php if (!$studioSetup): ?>
     <div class="role-picker">
       <label class="role-option <?= $role === 'client' ? 'selected' : '' ?>"><input type="radio" name="account_type" value="client" <?= $role === 'client' ? 'checked' : '' ?>><span class="role-symbol">🖼️</span><strong>Canvas</strong><small>Find artists, plan tattoos, and track healing.</small></label>

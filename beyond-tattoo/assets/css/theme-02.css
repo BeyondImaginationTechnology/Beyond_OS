@@ -59,6 +59,19 @@ a { color: inherit; }
 .bt-store-footer { background: #EFEAE3; border-color: var(--bt20-border); }
 .bt-footer-links, .bt-footer-brand small { color: var(--bt20-muted); }
 
+/* The public home page uses legacy dark storefront rules; keep 0.2 light mode consistent. */
+.bt-main-hero, .bt-category-section, .bt-daily-section, .bt-collections-section, .bt-studio-product, .bt-values-section { background: var(--bt20-bg); color: var(--bt20-ink); }
+.bt-main-hero { background: radial-gradient(circle at 78% 22%, #E9DDF9 0, transparent 32%), var(--bt20-bg); }
+.bt-main-copy h1, .bt-main-copy h1 strong, .bt-stencil-drop, .bt-category-section h2, .bt-section-heading-row h2, .bt-studio-product h2, .bt-values-grid strong { color: var(--bt20-ink); }
+.bt-main-copy h1 span { color: var(--bt20-violet); }
+.bt-main-lead, .bt-trust-row, .bt-studio-product-copy>p, .bt-values-grid small { color: var(--bt20-muted); }
+.bt-package-stage, .bt-category-grid, .bt-daily-card, .bt-section-frame, .bt-studio-product-shell, .bt-values-grid { background: var(--bt20-surface); border-color: var(--bt20-border); box-shadow: var(--bt20-shadow); }
+.bt-package-stage img { background: #EFEAE3; }
+.bt-category-grid a, .bt-studio-product-grid article { border-color: var(--bt20-border); color: var(--bt20-ink); }
+.bt-category-grid a:hover { background: #F0EAFB; }
+.bt-studio-product-grid article p { color: var(--bt20-muted); }
+.bt-values-grid>div { border-color: var(--bt20-border); }
+
 /* Keep dark mode available for a future preference toggle. */
 body[data-theme="dark"] { background: #07060C; color: #F7F4FF; }
 body[data-theme="dark"] .panel, body[data-theme="dark"] .card, body[data-theme="dark"] .auth-card { background: #11101A; border-color: rgba(255,255,255,.09); color: #F7F4FF; }

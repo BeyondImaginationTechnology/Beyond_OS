@@ -31,8 +31,11 @@ function beyond_social_http(string $url, array $options = []): array
 {
     if (!extension_loaded('curl')) throw new RuntimeException('The cURL PHP extension is required for social sign-in.');
     $curl = curl_init($url);
-    $headers = ['Accept: application/json'];
+    $headers = ['Accept: application/json', 'User-Agent: Beyond-ID/0.1'];
     if (!empty($options['access_token'])) $headers[] = 'Authorization: Bearer ' . $options['access_token'];
+    foreach (($options['headers'] ?? []) as $header) {
+        if (is_string($header) && $header !== '') $headers[] = $header;
+    }
     curl_setopt_array($curl, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => false,
@@ -72,6 +75,9 @@ function beyond_social_authorization_url(string $provider, string $state, string
     } elseif ($provider === 'instagram') {
         $parameters['scope'] = implode(',', $config['scopes'] ?? []);
         $parameters['enable_fb_login'] = '0';
+    } elseif ($provider === 'apple') {
+        $parameters['response_mode'] = 'form_post';
+        $parameters['nonce'] = hash('sha256', $state);
     }
     return $config['authorize_url'] . '?' . http_build_query($parameters, '', '&', PHP_QUERY_RFC3986);
 }
@@ -93,6 +99,54 @@ function beyond_social_exchange_code(string $provider, string $code, string $cod
 function beyond_social_profile(string $provider, string $accessToken, array $tokens = []): array
 {
     $config = beyond_social_config($provider);
+    if ($provider === 'apple') {
+        $claims = beyond_social_verify_apple_id_token(
+            (string)($tokens['id_token'] ?? ''),
+            (string)$config['client_id'],
+            (string)($tokens['_expected_nonce'] ?? '')
+        );
+        $email = strtolower(trim((string)($claims['email'] ?? '')));
+        return [
+            'subject' => (string)($claims['sub'] ?? ''),
+            'email' => $email,
+            'email_verified' => filter_var($claims['email_verified'] ?? false, FILTER_VALIDATE_BOOLEAN),
+            'name' => $email !== '' ? strtok($email, '@') : 'Apple member',
+            'first_name' => '',
+            'last_name' => '',
+        ];
+    }
+    if ($provider === 'github') {
+        $profile = beyond_social_http($config['userinfo_url'], ['access_token' => $accessToken]);
+        $email = strtolower(trim((string)($profile['email'] ?? '')));
+        $verified = false;
+        if ($email !== '') {
+            $emails = beyond_social_http($config['emails_url'], ['access_token' => $accessToken]);
+            foreach ($emails as $candidate) {
+                if (!is_array($candidate) || empty($candidate['verified'])) continue;
+                $candidateEmail = strtolower(trim((string)($candidate['email'] ?? '')));
+                if ($candidateEmail === $email) { $verified = true; break; }
+            }
+        } else {
+            $emails = beyond_social_http($config['emails_url'], ['access_token' => $accessToken]);
+            foreach ($emails as $candidate) {
+                if (!is_array($candidate) || empty($candidate['verified'])) continue;
+                $candidateEmail = strtolower(trim((string)($candidate['email'] ?? '')));
+                if ($candidateEmail !== '' && (!empty($candidate['primary']) || $email === '')) $email = $candidateEmail;
+                if (!empty($candidate['primary'])) break;
+            }
+            $verified = $email !== '';
+        }
+        $name = trim((string)($profile['name'] ?? $profile['login'] ?? 'GitHub member'));
+        $parts = preg_split('/\s+/', $name, 2) ?: [];
+        return [
+            'subject' => (string)($profile['id'] ?? ''),
+            'email' => $email,
+            'email_verified' => $verified,
+            'name' => $name,
+            'first_name' => (string)($parts[0] ?? ''),
+            'last_name' => (string)($parts[1] ?? ''),
+        ];
+    }
     if ($provider === 'instagram') {
         // Instagram Login returns an Instagram-scoped user_id, but the profile
         // lookup is intentionally made through /me. Calling /{user_id} with
@@ -135,6 +189,64 @@ function beyond_social_profile(string $provider, string $accessToken, array $tok
         'first_name' => trim((string)($profile['given_name'] ?? '')),
         'last_name' => trim((string)($profile['family_name'] ?? '')),
     ];
+}
+
+function beyond_social_base64url_decode(string $value): string
+{
+    $decoded = base64_decode(strtr($value, '-_', '+/') . str_repeat('=', (4 - strlen($value) % 4) % 4), true);
+    if ($decoded === false) throw new RuntimeException('The identity token is malformed.');
+    return $decoded;
+}
+
+function beyond_social_asn1_length(int $length): string
+{
+    if ($length < 128) return chr($length);
+    $bytes = ltrim(pack('N', $length), "\0");
+    return chr(0x80 | strlen($bytes)) . $bytes;
+}
+
+function beyond_social_asn1(string $tag, string $value): string
+{
+    return $tag . beyond_social_asn1_length(strlen($value)) . $value;
+}
+
+function beyond_social_rsa_jwk_pem(array $jwk): string
+{
+    $modulus = ltrim(beyond_social_base64url_decode((string)($jwk['n'] ?? '')), "\0");
+    $exponent = ltrim(beyond_social_base64url_decode((string)($jwk['e'] ?? '')), "\0");
+    if ($modulus === '' || $exponent === '') throw new RuntimeException('Apple returned an invalid signing key.');
+    if ((ord($modulus[0]) & 0x80) !== 0) $modulus = "\0" . $modulus;
+    if ((ord($exponent[0]) & 0x80) !== 0) $exponent = "\0" . $exponent;
+    $rsa = beyond_social_asn1("\x30", beyond_social_asn1("\x02", $modulus) . beyond_social_asn1("\x02", $exponent));
+    $algorithm = hex2bin('300d06092a864886f70d0101010500');
+    $subjectPublicKey = beyond_social_asn1("\x30", $algorithm . beyond_social_asn1("\x03", "\0" . $rsa));
+    return "-----BEGIN PUBLIC KEY-----\n" . chunk_split(base64_encode($subjectPublicKey), 64, "\n") . "-----END PUBLIC KEY-----\n";
+}
+
+function beyond_social_verify_apple_id_token(string $token, string $clientId, string $expectedNonce): array
+{
+    $parts = explode('.', $token);
+    if (count($parts) !== 3) throw new BeyondSocialUserException('Apple did not return a valid identity token.');
+    $header = json_decode(beyond_social_base64url_decode($parts[0]), true);
+    $claims = json_decode(beyond_social_base64url_decode($parts[1]), true);
+    if (!is_array($header) || !is_array($claims) || ($header['alg'] ?? '') !== 'RS256') {
+        throw new BeyondSocialUserException('Apple returned an invalid identity token.');
+    }
+    $keys = beyond_social_http('https://appleid.apple.com/auth/keys');
+    $matchingKey = null;
+    foreach (($keys['keys'] ?? []) as $key) {
+        if (is_array($key) && ($key['kid'] ?? '') === ($header['kid'] ?? '')) { $matchingKey = $key; break; }
+    }
+    if (!is_array($matchingKey) || openssl_verify($parts[0] . '.' . $parts[1], beyond_social_base64url_decode($parts[2]), beyond_social_rsa_jwk_pem($matchingKey), OPENSSL_ALGO_SHA256) !== 1) {
+        throw new BeyondSocialUserException('Apple identity verification failed.');
+    }
+    $audience = $claims['aud'] ?? '';
+    $audienceValid = is_array($audience) ? in_array($clientId, $audience, true) : hash_equals($clientId, (string)$audience);
+    $nonceValid = $expectedNonce !== '' && hash_equals($expectedNonce, (string)($claims['nonce'] ?? ''));
+    if (($claims['iss'] ?? '') !== 'https://appleid.apple.com' || !$audienceValid || !$nonceValid || (int)($claims['exp'] ?? 0) < time()) {
+        throw new BeyondSocialUserException('Apple returned an expired or invalid identity token.');
+    }
+    return $claims;
 }
 
 function beyond_social_destination(array $flow, ?string $returnTo = null): string

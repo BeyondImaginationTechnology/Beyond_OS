@@ -13,14 +13,16 @@ $flow = is_array($_SESSION['oauth_flow'] ?? null) ? $_SESSION['oauth_flow'] : []
 $provider = strtolower(trim((string)($_GET['provider'] ?? ($flow['provider'] ?? ''))));
 unset($_SESSION['oauth_flow']);
 try {
-    if (!in_array($provider, ['google', 'meta', 'instagram'], true) || ($flow['provider'] ?? '') !== $provider) throw new BeyondSocialUserException('Social sign-in session is invalid.');
+    if (!in_array($provider, ['google', 'github', 'apple'], true) || ($flow['provider'] ?? '') !== $provider) throw new BeyondSocialUserException('Social sign-in session is invalid.');
     if (time() - (int)($flow['created_at'] ?? 0) > 600) throw new BeyondSocialUserException('Social sign-in expired. Please try again.');
-    $state = (string)($_GET['state'] ?? '');
+    $response = $_SERVER['REQUEST_METHOD'] === 'POST' ? $_POST : $_GET;
+    $state = (string)($response['state'] ?? '');
     if ($state === '' || !hash_equals((string)$flow['state'], $state)) throw new BeyondSocialUserException('Social sign-in security check failed.');
-    if (!empty($_GET['error'])) throw new BeyondSocialUserException('Social sign-in was cancelled or denied.');
-    $code = (string)($_GET['code'] ?? '');
+    if (!empty($response['error'])) throw new BeyondSocialUserException('Social sign-in was cancelled or denied.');
+    $code = (string)($response['code'] ?? '');
     if ($code === '') throw new BeyondSocialUserException('The provider did not return an authorization code.');
     $tokens = beyond_social_exchange_code($provider, $code, (string)($flow['verifier'] ?? ''));
+    if ($provider === 'apple') $tokens['_expected_nonce'] = hash('sha256', $state);
     $accessToken = (string)($tokens['access_token'] ?? '');
     if ($accessToken === '') throw new BeyondSocialUserException('The provider did not return an access token.');
     $profile = beyond_social_profile($provider, $accessToken, $tokens);
@@ -63,7 +65,7 @@ try {
             $insert = $pdo->prepare("INSERT INTO users (first_name,last_name,name,email,password,password_hash,email_verified,email_verified_at,verification_token,role,status) VALUES (?,?,?,?,?,?,1,?,NULL,?,'active')");
             $insert->execute([$first, $last, $name, $profile['email'], $randomPassword, $randomPassword, date('Y-m-d H:i:s'), $role]);
             $userId = (int)$pdo->lastInsertId();
-            try { $pdo->prepare("UPDATE users SET terms_accepted_at=?,terms_version='2.1-beta-social' WHERE id=?")->execute([date('Y-m-d H:i:s'), $userId]); } catch (Throwable $exception) {}
+            try { $pdo->prepare("UPDATE users SET terms_accepted_at=?,terms_version='beyond-id-0.1' WHERE id=?")->execute([date('Y-m-d H:i:s'), $userId]); } catch (Throwable $exception) {}
             try { $pdo->prepare('INSERT INTO profiles (user_id) VALUES (?)')->execute([$userId]); } catch (Throwable $exception) {}
             try {
                 $sql = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite' ? "INSERT OR IGNORE INTO beyond_wallets (user_id,balance,currency,status) VALUES (?,0,'BITS','active')" : "INSERT IGNORE INTO beyond_wallets (user_id,balance,currency,status) VALUES (?,0,'BITS','active')";

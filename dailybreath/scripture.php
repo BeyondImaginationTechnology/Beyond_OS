@@ -20,7 +20,7 @@ $traditionLabel = dailybreath_tradition_label($tradition);
 $jaguarGuide = $tradition === 'quran' ? 'Moe' : ($tradition === 'torah' ? 'Dovi' : 'Chris');
 $jaguarGuideKey = strtolower($jaguarGuide);
 $jaguarCsrf = csrf_token();
-$jaguarNonceSecret = trim((string) (getenv('JAGUAR_NONCE_SECRET') ?: beyond_config('security.jaguar_nonce_secret', beyond_config('security.jwt_secret', ''))));
+$jaguarNonceSecret = trim((string) (getenv('JAGUAR_NONCE_SECRET') ?: beyond_optional_config('security.jaguar_nonce_secret', beyond_optional_config('security.jwt_secret', ''))));
 $jaguarNonceIssuedAt = time();
 $jaguarNonce = bin2hex(random_bytes(24));
 $jaguarNonceSignature = $jaguarNonceSecret !== '' ? hash_hmac('sha256', $jaguarNonce . ':' . $jaguarNonceIssuedAt, $jaguarNonceSecret) : '';

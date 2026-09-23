@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/includes/config.php';
 
-$elevenVoices = (array)beyond_config('narration.elevenlabs.voices', beyond_config('voice.voices', []));
+$elevenVoices = (array)beyond_optional_config('narration.elevenlabs.voices', beyond_optional_config('voice.voices', []));
 $azureDefaults = [
     'en-US' => ['en-US-AriaNeural', 'Aria - English (United States)'],
     'fr-CA' => ['fr-CA-SylvieNeural', 'Sylvie - French (Canada)'],
@@ -17,7 +17,7 @@ $azureDefaults = [
     'ar-EG' => ['ar-EG-ShakirNeural', 'Shakir - Egyptian Arabic'],
     'sw-KE' => ['sw-KE-ZuriNeural', 'Zuri - Kiswahili (Kenya)'],
 ];
-$configuredAzureVoices = (array)beyond_config('narration.azure.voices', []);
+$configuredAzureVoices = (array)beyond_optional_config('narration.azure.voices', []);
 $azureVoices = [];
 foreach ($azureDefaults as $azureLocale => [$defaultVoice, $defaultLabel]) {
     $configuredVoices = $configuredAzureVoices[$azureLocale] ?? [];
@@ -54,22 +54,22 @@ return [
     'public_storage_url' => '/beyond-french/storage/narration',
     'providers' => [
         'openai' => [
-            'api_key' => (string)beyond_config('narration.openai.api_key', getenv('OPENAI_API_KEY') ?: ''),
+            'api_key' => (string)beyond_optional_config('narration.openai.api_key', getenv('OPENAI_API_KEY') ?: ''),
             'endpoint' => 'https://api.openai.com/v1/audio/speech',
-            'model' => (string)beyond_config('narration.openai.model', 'gpt-4o-mini-tts'),
+            'model' => (string)beyond_optional_config('narration.openai.model', 'gpt-4o-mini-tts'),
             'timeout' => 45,
         ],
         'elevenlabs' => [
-            'api_key' => (string)beyond_config('narration.elevenlabs.api_key', beyond_config('voice.api_key', '')),
+            'api_key' => (string)beyond_optional_config('narration.elevenlabs.api_key', beyond_optional_config('voice.api_key', '')),
             'endpoint' => 'https://api.elevenlabs.io/v1/text-to-speech',
-            'model' => (string)beyond_config('narration.elevenlabs.model', beyond_config('voice.model_id', 'eleven_multilingual_v2')),
+            'model' => (string)beyond_optional_config('narration.elevenlabs.model', beyond_optional_config('voice.model_id', 'eleven_multilingual_v2')),
             'output_format' => 'mp3_44100_128',
             'voices' => $elevenVoices,
             'timeout' => 45,
         ],
         'azure' => [
-            'api_key' => (string)beyond_config('narration.azure.api_key', getenv('AZURE_SPEECH_KEY') ?: ''),
-            'region' => (string)beyond_config('narration.azure.region', getenv('AZURE_SPEECH_REGION') ?: ''),
+            'api_key' => (string)beyond_optional_config('narration.azure.api_key', getenv('AZURE_SPEECH_KEY') ?: ''),
+            'region' => (string)beyond_optional_config('narration.azure.region', getenv('AZURE_SPEECH_REGION') ?: ''),
             'output_format' => 'audio-24khz-48kbitrate-mono-mp3',
             'voices' => $azureVoices,
             'timeout' => 45,

@@ -45,4 +45,23 @@ return [
         'userinfo_url' => 'https://graph.instagram.com/' . $instagramGraphVersion . '/me',
         'scopes' => ['instagram_business_basic'],
     ],
+    'github' => [
+        'client_id' => $read('BEYOND_GITHUB_CLIENT_ID', 'github', 'client_id'),
+        'client_secret' => $read('BEYOND_GITHUB_CLIENT_SECRET', 'github', 'client_secret'),
+        'authorize_url' => 'https://github.com/login/oauth/authorize',
+        'token_url' => 'https://github.com/login/oauth/access_token',
+        'userinfo_url' => 'https://api.github.com/user',
+        'emails_url' => 'https://api.github.com/user/emails',
+        'scopes' => ['read:user', 'user:email'],
+    ],
+    'apple' => [
+        'client_id' => $read('BEYOND_APPLE_CLIENT_ID', 'apple', 'client_id'),
+        // Apple calls this a client secret, but it is a signed JWT generated
+        // from the Sign in with Apple private key and must be rotated.
+        'client_secret' => $read('BEYOND_APPLE_CLIENT_SECRET', 'apple', 'client_secret'),
+        'authorize_url' => 'https://appleid.apple.com/auth/authorize',
+        'token_url' => 'https://appleid.apple.com/auth/token',
+        'userinfo_url' => '',
+        'scopes' => ['name', 'email'],
+    ],
 ];

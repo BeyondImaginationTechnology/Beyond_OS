@@ -102,7 +102,7 @@ try {
 function public_voice_id(string $provider, string $locale, array $voices): string
 {
     if ($provider === 'openai') {
-        $configured = trim((string)beyond_config('narration.openai.voices.' . $locale, beyond_config('voice.openai_voice', 'coral')));
+        $configured = trim((string)beyond_optional_config('narration.openai.voices.' . $locale, beyond_optional_config('voice.openai_voice', 'coral')));
         return $configured !== '' ? $configured : 'coral';
     }
     $first = trim((string)($voices[0]['id'] ?? ''));

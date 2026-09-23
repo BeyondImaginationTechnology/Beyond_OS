@@ -40,3 +40,24 @@ function beyond_config(string $path, $default = null)
     }
     return $value;
 }
+
+/**
+ * Read configuration for an optional integration or public-page preference.
+ *
+ * Public apps should remain available when the protected configuration mount
+ * is temporarily unavailable. Authentication, database, and other required
+ * services must continue to use beyond_config() so they fail closed.
+ */
+function beyond_optional_config(string $path, $default = null)
+{
+    try {
+        return beyond_config($path, $default);
+    } catch (Throwable $exception) {
+        static $reported = false;
+        if (!$reported) {
+            error_log('Optional protected configuration is unavailable: ' . $exception->getMessage());
+            $reported = true;
+        }
+        return $default;
+    }
+}

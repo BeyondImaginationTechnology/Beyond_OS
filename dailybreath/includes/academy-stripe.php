@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 require_once dirname(__DIR__,2).'/config/bootstrap.php';
-function academy_stripe_secret(): string{return trim((string)beyond_config('stripe.secret_key',getenv('STRIPE_SECRET_KEY')?:''));}
-function academy_stripe_webhook_secret(): string{return trim((string)beyond_config('stripe.academy_webhook_secret',getenv('STRIPE_ACADEMY_WEBHOOK_SECRET')?:''));}
-function academy_stripe_price(): string{return trim((string)beyond_config('stripe.academy_price_id',getenv('STRIPE_ACADEMY_PRICE_ID')?:''));}
+function academy_stripe_secret(): string{return trim((string)beyond_optional_config('stripe.secret_key',getenv('STRIPE_SECRET_KEY')?:''));}
+function academy_stripe_webhook_secret(): string{return trim((string)beyond_optional_config('stripe.academy_webhook_secret',getenv('STRIPE_ACADEMY_WEBHOOK_SECRET')?:''));}
+function academy_stripe_price(): string{return trim((string)beyond_optional_config('stripe.academy_price_id',getenv('STRIPE_ACADEMY_PRICE_ID')?:''));}
 function academy_stripe_request(string $method,string $path,array $data=[]): array{
   $secret=academy_stripe_secret();if($secret==='')throw new RuntimeException('Stripe secret key is not configured.');if(!function_exists('curl_init'))throw new RuntimeException('The PHP cURL extension is required.');
   $curl=curl_init('https://api.stripe.com/v1/'.ltrim($path,'/'));$options=[CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>30,CURLOPT_CUSTOMREQUEST=>$method,CURLOPT_HTTPHEADER=>['Authorization: Bearer '.$secret]];if($data)$options[CURLOPT_POSTFIELDS]=http_build_query($data);curl_setopt_array($curl,$options);$body=curl_exec($curl);$status=(int)curl_getinfo($curl,CURLINFO_HTTP_CODE);$error=curl_error($curl);curl_close($curl);if($body===false)throw new RuntimeException('Stripe request failed: '.$error);$json=json_decode((string)$body,true);if($status<200||$status>=300)throw new RuntimeException((string)($json['error']['message']??'Stripe request failed.'));return is_array($json)?$json:[];

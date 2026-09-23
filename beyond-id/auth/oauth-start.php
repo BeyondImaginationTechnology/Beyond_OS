@@ -9,7 +9,7 @@ header('Referrer-Policy: no-referrer');
 
 $provider = strtolower(trim((string)($_GET['provider'] ?? '')));
 if ($provider === 'facebook') $provider = 'meta';
-if (!in_array($provider, ['google', 'meta', 'instagram'], true) || !beyond_social_enabled($provider)) {
+if (!in_array($provider, ['google', 'github', 'apple'], true) || !beyond_social_enabled($provider)) {
     $_SESSION['oauth_error'] = 'That social sign-in provider is not configured yet.';
     header('Location: login.php');
     exit;
@@ -28,6 +28,13 @@ if ($returnTo !== '') $_SESSION['beyond_return_to'] = $returnTo;
 $state = bin2hex(random_bytes(32));
 $verifier = rtrim(strtr(base64_encode(random_bytes(64)), '+/', '-_'), '=');
 $challenge = rtrim(strtr(base64_encode(hash('sha256', $verifier, true)), '+/', '-_'), '=');
+$isSecureRequest = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+if ($provider === 'apple' && !$isSecureRequest) {
+    $_SESSION['oauth_error'] = 'Apple sign-in requires HTTPS.';
+    header('Location: login.php');
+    exit;
+}
 $_SESSION['oauth_flow'] = [
     'provider' => $provider,
     'state' => $state,
@@ -36,5 +43,17 @@ $_SESSION['oauth_flow'] = [
     'mobile_scheme' => $mobileScheme,
     'mobile_code_challenge' => $codeChallenge,
 ];
+if ($provider === 'apple') {
+    // Apple returns authorization data with a cross-site POST. Reissue this
+    // short-lived session cookie with SameSite=None so the state check survives.
+    setcookie(session_name(), session_id(), [
+        'expires' => 0,
+        'path' => '/',
+        'domain' => (string)ini_get('session.cookie_domain'),
+        'secure' => true,
+        'httponly' => true,
+        'samesite' => 'None',
+    ]);
+}
 header('Location: ' . beyond_social_authorization_url($provider, $state, $challenge));
 exit;

@@ -1,4 +1,5 @@
 <?php
+$beyondIdVersion = require __DIR__ . '/../config/version.php';
 $adminNavGroups = [
     'Workspace' => [
         ['index.php', 'Overview', 'overview'],
@@ -61,7 +62,7 @@ $adminIcon = static function (string $name) use ($adminIconPaths): string {
         <circle cx="24" cy="18" r="2.4" fill="var(--brand-core)"/>
       </svg>
     </span>
-    <span><strong>Beyond ID</strong><small>Admin Console</small></span>
+    <span><strong>Beyond ID</strong><small>Admin Console · <?= e($beyondIdVersion) ?></small></span>
   </a>
 
   <nav class="admin-nav" aria-label="Primary">

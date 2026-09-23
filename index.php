@@ -126,8 +126,8 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
     <a class="brand" href="./"><b class="brand-atom" aria-hidden="true"><img src="/assets/images/bos-logo-mark.svg?v=20260828-1" alt=""></b>BEYOND <span>IMAGINATION</span><small>TECHNOLOGY · BIT</small></a>
     <nav class="nav" aria-label="Primary navigation">
           <a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a><a href="/ai/">AI</a><a href="https://os.beyondimagination.co.technology/">OS</a>
-          <label class="currency-picker"><span aria-hidden="true">BIT$</span><span class="visually-hidden">Display currency</span><select id="homeCurrency" aria-label="Display currency"><option value="BITS">BIT$</option><option value="USD">USD</option><option value="CAD">CAD</option></select></label>
           <a href="/beyond-market/">Store</a>
+          <label class="currency-picker"><span aria-hidden="true">BIT$</span><span class="visually-hidden">Display currency</span><select id="homeCurrency" aria-label="Display currency"><option value="BITS">BIT$</option><option value="USD">USD</option><option value="CAD">CAD</option></select></label>
     </nav>
     <button class="menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="mobileNavigation" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 </header>

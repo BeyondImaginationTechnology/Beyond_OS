@@ -49,7 +49,7 @@ struct RootView: View {
         }
         .scrollContentBackground(.hidden)
         .background(JaguarTheme.ink)
-        .navigationTitle("Beyond-1 AI")
+        .navigationTitle("Beyond-1")
     }
 }
 
@@ -63,7 +63,7 @@ private struct JaguarWelcomeView: View {
             VStack(spacing: 24) {
                 JaguarMark(size: 82)
                 VStack(spacing: 10) {
-                    Text("LLAMA JAGUAR").font(.caption.weight(.bold)).tracking(3).foregroundStyle(JaguarTheme.mint)
+                    Text("BEYOND-1").font(.caption.weight(.bold)).tracking(3).foregroundStyle(JaguarTheme.mint)
                     Text("Where will we go\nbeyond?")
                         .font(.system(size: 46, weight: .black, design: .rounded))
                         .multilineTextAlignment(.center)
@@ -93,7 +93,7 @@ private struct JaguarWelcomeView: View {
                 if let message = auth.message {
                     JaguarSignInNotice(message: message, detail: auth.signInDetail, retry: auth.signIn, dismiss: auth.clearMessage)
                 }
-                Text("Jaguar uses Beyond ID for a secure native session. Your conversations stay on this device.")
+                Text("Beyond-1 uses Beyond ID for a secure native session. Your conversations stay on this device.")
                     .font(.footnote)
                     .foregroundStyle(JaguarTheme.secondaryText)
                     .multilineTextAlignment(.center)
@@ -173,7 +173,7 @@ private struct JaguarChatView: View {
         HStack(spacing: 12) {
             JaguarMark(size: 38)
             VStack(alignment: .leading, spacing: 2) {
-                Text("Llama Jaguar").font(.headline)
+                Text("Beyond-1").font(.headline)
                 HStack(spacing: 5) {
                     Circle().fill(JaguarTheme.mint).frame(width: 7, height: 7)
                     Text("v0.2 · Explain preview")
@@ -209,7 +209,7 @@ private struct JaguarChatView: View {
                 Text("Start somewhere good.")
                     .font(.system(size: 36, weight: .black, design: .rounded))
                     .multilineTextAlignment(.center)
-                Text("Choose a starting point, then make it yours. Jaguar is ready to explain, shape, and clarify.")
+                Text("Choose a starting point, then make it yours. Beyond-1 is ready to explain, shape, and clarify.")
                     .font(.title3)
                     .foregroundStyle(JaguarTheme.secondaryText)
                     .multilineTextAlignment(.center)
@@ -309,7 +309,7 @@ private struct JaguarChatView: View {
                 .foregroundStyle(.pink)
             }
             HStack(alignment: .bottom, spacing: 10) {
-                TextField("Message Jaguar…", text: $store.draft, axis: .vertical)
+                TextField("Message Beyond-1…", text: $store.draft, axis: .vertical)
                     .lineLimit(1...6)
                     .focused($composerFocused)
                     .padding(.horizontal, 16)
@@ -324,7 +324,7 @@ private struct JaguarChatView: View {
                 .disabled(store.isThinking || store.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .accessibilityLabel("Send message")
             }
-            Text("Explain is the live fast lane. Jaguar can make mistakes; check important information.")
+            Text("Explain is the live fast lane. Beyond-1 can make mistakes; check important information.")
                 .font(.caption2)
                 .foregroundStyle(JaguarTheme.secondaryText)
                 .multilineTextAlignment(.center)
@@ -409,7 +409,7 @@ private struct JaguarMessageView: View {
             Spacer(minLength: 0)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel(message.role == .assistant ? "Jaguar" : "You")
+        .accessibilityLabel(message.role == .assistant ? "Beyond-1" : "You")
     }
 }
 
@@ -443,9 +443,9 @@ private struct JaguarAccountView: View {
                     Button("Sign out", role: .destructive) { auth.signOut(); dismiss() }
                 }
                 Section("About") {
-                    LabeledContent("App", value: "Beyond-1 AI")
+                    LabeledContent("App", value: "Beyond-1")
                     LabeledContent("Version", value: "0.2 (Explain preview)")
-                    Text("Conversation history stays on this device. Messages are sent to Jaguar when you ask a question.")
+                    Text("Conversation history stays on this device. Messages are sent to Beyond-1 when you ask a question.")
                 }
             }
             .navigationTitle("Account")

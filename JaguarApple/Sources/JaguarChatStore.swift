@@ -77,7 +77,7 @@ final class JaguarChatStore: ObservableObject {
             stopThinking()
             return true
         } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription ?? "Jaguar could not complete that request."
+            errorMessage = (error as? LocalizedError)?.errorDescription ?? "Beyond-1 could not complete that request."
             stopThinking()
             return false
         }

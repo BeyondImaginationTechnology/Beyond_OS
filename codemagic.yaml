@@ -72,8 +72,8 @@ workflows:
     artifacts:
       - app/build/outputs/apk/play/debug/*.apk
 
-  jaguar-ios-testflight:
-    name: Jaguar iOS TestFlight
+  beyond1-ios-testflight:
+    name: Beyond-1 iOS TestFlight
     max_build_duration: 120
     instance_type: mac_mini_m2
     working_directory: JaguarApple
@@ -82,7 +82,7 @@ workflows:
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: technology.co.beyondimagination.jaguar
+        bundle_identifier: technology.co.beyondimagination.beyond1
       xcode: latest
     scripts:
       - name: Generate Xcode project
@@ -100,8 +100,8 @@ workflows:
         script: |
           set -euo pipefail
           xcode-project build-ipa \
-            --project "$CM_BUILD_DIR/JaguarApple/Jaguar.xcodeproj" \
-            --scheme Jaguar
+            --project "$CM_BUILD_DIR/JaguarApple/Beyond1.xcodeproj" \
+            --scheme Beyond1
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
@@ -109,8 +109,8 @@ workflows:
       app_store_connect:
         auth: integration
 
-  jaguar-ios:
-    name: Jaguar iOS checks
+  beyond1-ios:
+    name: Beyond-1 iOS checks
     max_build_duration: 60
     instance_type: mac_mini_m2
     working_directory: JaguarApple
@@ -140,16 +140,16 @@ workflows:
             puts device.fetch("udid")
           ')"
           xcodebuild test \
-            -project Jaguar.xcodeproj \
-            -scheme Jaguar \
+            -project Beyond1.xcodeproj \
+            -scheme Beyond1 \
             -destination "id=$simulator_id" \
             CODE_SIGNING_ALLOWED=NO
       - name: Build simulator app
         script: |
           set -euo pipefail
           xcodebuild build \
-            -project Jaguar.xcodeproj \
-            -scheme Jaguar \
+            -project Beyond1.xcodeproj \
+            -scheme Beyond1 \
             -sdk iphonesimulator \
             -derivedDataPath "$CM_BUILD_DIR/derived-data" \
             CODE_SIGNING_ALLOWED=NO

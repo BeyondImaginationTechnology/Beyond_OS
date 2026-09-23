@@ -1,6 +1,6 @@
-# Beyond-1 AI for iOS
+# Beyond-1 for iOS
 
-Native SwiftUI app powered by the Llama Jaguar v0.3 Preview service.
+Native SwiftUI app powered by the Beyond-1 v0.3 Preview service.
 
 ## v0.2
 
@@ -29,10 +29,10 @@ Install XcodeGen on macOS, then:
 ```sh
 cd JaguarApple
 xcodegen generate
-open Jaguar.xcodeproj
+open Beyond1.xcodeproj
 ```
 
-Choose the **Jaguar** scheme and an iOS 17 or newer simulator. The app requires a live Beyond ID account for chat. Tokens expire after one hour; an expired token returns the user to sign-in.
+Choose the **Beyond1** scheme and an iOS 17 or newer simulator. The app requires a live Beyond ID account for chat. Tokens expire after one hour; an expired token returns the user to sign-in.
 
 The checked-in privacy manifest declares the Beyond ID user identifier and chat prompts used for app functionality. App Store privacy answers must match the deployed service before distribution.
 

@@ -10,10 +10,10 @@ enum JaguarAPIError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .authenticationExpired: "Your Beyond ID session expired. Sign in again to continue."
-        case let .rateLimited(seconds): seconds.map { "Jaguar is resting. Try again in about \($0) seconds." } ?? "Jaguar is resting for a moment. Please try again shortly."
+        case let .rateLimited(seconds): seconds.map { "Beyond-1 is resting. Try again in about \($0) seconds." } ?? "Beyond-1 is resting for a moment. Please try again shortly."
         case let .server(message): message
-        case .invalidResponse: "Jaguar returned an unreadable response. Please try again."
-        case .connection: "Jaguar could not connect. Check your network and try again."
+        case .invalidResponse: "Beyond-1 returned an unreadable response. Please try again."
+        case .connection: "Beyond-1 could not connect. Check your network and try again."
         }
     }
 }
@@ -50,7 +50,7 @@ struct JaguarAPIClient: Sendable {
             throw JaguarAPIError.rateLimited(retryAfter: http.value(forHTTPHeaderField: "Retry-After").flatMap(Int.init))
         }
         guard (200..<300).contains(http.statusCode) else {
-            let message = (try? JSONDecoder().decode(JaguarAPIErrorResponse.self, from: data).error) ?? "Jaguar is temporarily unavailable."
+            let message = (try? JSONDecoder().decode(JaguarAPIErrorResponse.self, from: data).error) ?? "Beyond-1 is temporarily unavailable."
             throw JaguarAPIError.server(message)
         }
         do {
@@ -72,7 +72,7 @@ struct JaguarAPIClient: Sendable {
             model: "jaguar-reviewer-demo",
             adapter: "local",
             mode: "core",
-            message: "Demo response for: \"\(latest)\"\n\nJaguar can explain an idea, shape a plan, and break down a difficult topic into plain language. Try changing the language menu, starting a new conversation, and reopening this conversation from the list.\n\n\(languageNote)"
+            message: "Demo response for: \"\(latest)\"\n\nBeyond-1 can explain an idea, shape a plan, and break down a difficult topic into plain language. Try changing the language menu, starting a new conversation, and reopening this conversation from the list.\n\n\(languageNote)"
         )
     }
 }

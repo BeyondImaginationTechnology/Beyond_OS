@@ -2,10 +2,18 @@ import SwiftUI
 
 struct AcademyView: View {
     @EnvironmentObject private var store: AppStore
-    @State private var selectedAge = "kids"
+    @AppStorage("BeyondFrench.academyDifficulty") private var selectedDifficulty = "beginner"
 
     private var selectedGroup: AgeGroup {
-        store.academy.ageGroups.first { $0.slug == selectedAge } ?? store.academy.ageGroups.first ?? AcademyCatalog.fallback.ageGroups[0]
+        let trackSlug: String
+        switch selectedDifficulty {
+        case "normal": trackSlug = "teen"
+        case "advanced": trackSlug = "adult"
+        default: trackSlug = "kids"
+        }
+        return store.academy.ageGroups.first { $0.slug == trackSlug }
+            ?? store.academy.ageGroups.first
+            ?? AcademyCatalog.fallback.ageGroups[0]
     }
 
     private var nextLesson: (module: AcademyModule, lesson: AcademyLesson, index: Int)? {
@@ -27,10 +35,10 @@ struct AcademyView: View {
                     Text(selectedGroup.guidance)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    Picker("Learner age", selection: $selectedAge) {
-                        ForEach(store.academy.ageGroups) { group in
-                            Text("\(group.title) \(group.ages)").tag(group.slug)
-                        }
+                    Picker("Difficulty", selection: $selectedDifficulty) {
+                        Text("Beginner").tag("beginner")
+                        Text("Normal").tag("normal")
+                        Text("Advanced").tag("advanced")
                     }
                     .pickerStyle(.menu)
                 }
@@ -40,8 +48,8 @@ struct AcademyView: View {
                 .overlay(RoundedRectangle(cornerRadius: 22).stroke(store.appTheme.accent.opacity(0.18), lineWidth: 1))
 
                 LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 12) {
-                    MetricTile(title: "\(selectedGroup.title) Done", value: "\(store.completedAcademyLessons(ageGroup: selectedGroup))/\(store.totalAcademyLessons)", systemImage: "checkmark.seal.fill", color: .green)
-                    MetricTile(title: "\(selectedGroup.title) Open", value: "\(store.unlockedAcademyLessons(ageGroup: selectedGroup))", systemImage: "lock.open.fill", color: store.appTheme.accent)
+                    MetricTile(title: "Lessons Done", value: "\(store.completedAcademyLessons(ageGroup: selectedGroup))/\(store.totalAcademyLessons)", systemImage: "checkmark.seal.fill", color: .green)
+                    MetricTile(title: "Modules Open", value: "\(store.academy.modules.filter { $0.isFree || store.hasFullAcademyAccess }.count)", systemImage: "lock.open.fill", color: store.appTheme.accent)
                 }
 
                 if let nextLesson {

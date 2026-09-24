@@ -13,7 +13,7 @@ $academyCssVersion = (string)(@filemtime(__DIR__ . '/../assets/css/academy.css')
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= h($pageTitle) ?></title>
-    <meta name="description" content="French first. Five languages. Every day.">
+    <meta name="description" content="French first. 12 language bridges. Every day.">
     <meta name="theme-color" content="#1768ff">
     <meta name="application-name" content="Beyond French">
     <meta name="apple-mobile-web-app-capable" content="yes">

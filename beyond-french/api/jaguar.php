@@ -14,6 +14,12 @@ $from = trim((string)($payload['from'] ?? 'english'));
 $to = trim((string)($payload['to'] ?? 'french'));
 $mode = trim((string)($payload['mode'] ?? 'translate'));
 $supportedLanguages = ['english','french','spanish','kreyol','patois','italian','german','portuguese','russian','lingala','swahili','arabic'];
+$supportedModes = ['translate','dictionary','question'];
+if (!in_array($mode, $supportedModes, true)) {
+    http_response_code(422);
+    echo json_encode(['ok'=>false,'assistant'=>'Beyond-1 Llama Jaguar','status'=>'unsupported_mode','message'=>'Choose Translate, Dictionary, or Ask.']);
+    exit;
+}
 if (!in_array($from, $supportedLanguages, true) || !in_array($to, $supportedLanguages, true)) {
     http_response_code(422);
     echo json_encode(['ok'=>false,'assistant'=>'Beyond-1 Llama Jaguar','status'=>'unsupported_language','message'=>'Choose languages offered in Beyond French.','supported_languages'=>$supportedLanguages]);
@@ -22,6 +28,11 @@ if (!in_array($from, $supportedLanguages, true) || !in_array($to, $supportedLang
 if ($input === '') {
     http_response_code(422);
     echo json_encode(['ok'=>false,'assistant'=>'Beyond-1 Llama Jaguar','message'=>'Enter a phrase first.']);
+    exit;
+}
+if (function_exists('mb_strlen') ? mb_strlen($input, 'UTF-8') > 1000 : strlen($input) > 4000) {
+    http_response_code(413);
+    echo json_encode(['ok'=>false,'assistant'=>'Beyond-1 Llama Jaguar','status'=>'input_too_long','message'=>'Keep your request under 1,000 characters.']);
     exit;
 }
 

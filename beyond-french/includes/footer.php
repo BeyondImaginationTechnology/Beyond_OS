@@ -15,7 +15,7 @@
     <a class="<?= $isFrenchSettings ? 'active' : '' ?>" href="<?= h($frenchBase) ?>settings.php"><span>○</span><small>Settings</small></a>
 </nav>
 <footer class="site-footer">
-    <p>© <?= date('Y') ?> Beyond French · French first. Five languages. Every day.</p>
+    <p>© <?= date('Y') ?> Beyond French · French first. 12 language bridges. Every day.</p>
 </footer>
 <script src="<?= h($frenchBase) ?>assets/js/app.js?v=<?= h((string)(@filemtime(__DIR__ . '/../assets/js/app.js') ?: time())) ?>"></script>
 <script>if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register(<?= json_encode($frenchBase . 'service-worker.js', JSON_UNESCAPED_SLASHES) ?>,{scope:<?= json_encode($frenchBase, JSON_UNESCAPED_SLASHES) ?>}).catch(()=>{}))}</script>

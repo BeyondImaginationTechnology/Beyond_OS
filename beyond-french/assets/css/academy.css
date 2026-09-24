@@ -24,6 +24,11 @@ body.app-shell .tutor-introduction h2{color:#fff;font-size:clamp(1.8rem,6vw,2.8r
 body.app-shell .tutor-introduction-copy p{color:#c6d7f2;font-size:.88rem}
 body.app-shell .tutor-grid{grid-template-columns:repeat(2,1fr);gap:9px;margin-top:17px}
 body.app-shell .tutor-card{border-color:#ffffff22;background:#0d2249;box-shadow:none}
+body.app-shell .tutor-card:nth-child(1){background:#123c7a;border-color:#2d72df}
+body.app-shell .tutor-card:nth-child(2){background:#0d514b;border-color:#168f72}
+body.app-shell .tutor-card:nth-child(3){background:#402b52;border-color:#8f4a77}
+body.app-shell .tutor-card:nth-child(4){background:#503b28;border-color:#986a36}
+body.app-shell .tutor-card div{background:inherit}
 body.app-shell .tutor-card div{padding:11px}
 body.app-shell .tutor-card span{color:#a9c6e9;font-size:.65rem}
 body.app-shell .tutor-card h3{color:#fff;margin:4px 0 2px;font-size:1.05rem}

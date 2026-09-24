@@ -244,7 +244,7 @@ public final class MainActivity extends Activity {
         addBody("Purchases are processed securely by Google Play.");
     }
     private void initBilling() {
-        billingClient=BillingClient.newBuilder(this).setListener((result,purchases)->handlePurchases(result,purchases)).enablePendingPurchases().build();
+        billingClient=BillingClient.newBuilder(this).setListener((result,purchases)->handlePurchases(result,purchases)).enablePendingPurchases(com.android.billingclient.api.PendingPurchasesParams.newBuilder().enableOneTimeProducts().build()).enableAutoServiceReconnection().build();
         billingClient.startConnection(new BillingClientStateListener() {
             @Override public void onBillingSetupFinished(BillingResult result) { if(result.getResponseCode()==BillingClient.BillingResponseCode.OK) { queryAcademyProduct(); queryAcademyPurchases(); } }
             @Override public void onBillingServiceDisconnected() { }
@@ -252,7 +252,7 @@ public final class MainActivity extends Activity {
     }
     private void queryAcademyProduct() {
         QueryProductDetailsParams params=QueryProductDetailsParams.newBuilder().setProductList(java.util.Collections.singletonList(QueryProductDetailsParams.Product.newBuilder().setProductId(ACADEMY_PRODUCT_ID).setProductType(BillingClient.ProductType.INAPP).build())).build();
-        billingClient.queryProductDetailsAsync(params,(result,details)->{if(result.getResponseCode()==BillingClient.BillingResponseCode.OK&&!details.isEmpty())academyProduct=details.get(0);});
+        billingClient.queryProductDetailsAsync(params,(result,details)->{if(result.getResponseCode()==BillingClient.BillingResponseCode.OK&&!details.getProductDetailsList().isEmpty())academyProduct=details.getProductDetailsList().get(0);});
     }
     private void queryAcademyPurchases() {
         if(billingClient==null||!billingClient.isReady())return;

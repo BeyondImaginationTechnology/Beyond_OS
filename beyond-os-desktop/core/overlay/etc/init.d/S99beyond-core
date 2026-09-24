@@ -15,8 +15,9 @@ case "${1:-}" in
     xauth -f "$XAUTHORITY" add :0 . "$(mcookie)"
     chown home:home "$XAUTHORITY"
     start-stop-daemon -S -b -m -p /run/beyond-core.pid \
-      -x /usr/bin/xinit -- /usr/bin/beyond-session -- /usr/bin/Xorg :0 vt1 \
-      -nolisten tcp -auth "$XAUTHORITY" >> /var/log/beyond-core.log 2>&1
+      -x /usr/bin/xinit /usr/bin/beyond-session -- /usr/bin/Xorg :0 vt1 \
+      -logfile /home/home/Xorg.0.log -nolisten tcp -auth "$XAUTHORITY" \
+      >> /var/log/beyond-core.log 2>&1
     ;;
   stop)
     start-stop-daemon -K -p /run/beyond-core.pid || true

@@ -59,3 +59,21 @@ python3 tests/post-build-test.py
 ```
 
 Then complete the UEFI and disposable-disk checks in `RELEASE.md`, including the installed-system reboot and graphical-session checks. Only after those checks and artifact checksum publication may Core be offered for download.
+
+### Google Cloud resume checkpoint (2026-09-24)
+
+- VM `bit-os-core-test-a` in project `project-79ff0164-14f2-4be2-ba5`, zone `northamerica-northeast2-a`, was started and is currently running (e2-standard-4, 16 GiB RAM).
+- Serial port 1 shows the Debian 13 test host booting its `graphical.target`; the system starts `getty@tty1` and `serial-getty@ttyS0`. This verifies the host VM boot only, not the Core guest.
+- The attached `bit-os-core-test-target` disk remains present as a 20 GiB standard persistent disk.
+- The browser SSH launch did not open an interactive session in this run. Resume with browser SSH or Cloud Shell, then inspect the Core build artifacts and continue the noVNC/guest graphical-session checks. Keep VNC/noVNC bound to loopback as specified above.
+
+### Google Cloud Core v0.2 candidate smoke test (2026-09-24)
+
+- The remote Core checkout contains uncommitted changes to `board/x86_64/post-build.sh` and `board/x86_64/post-image-uefi.sh`, plus untracked `tests/uefi/`. Preserve these changes when resuming.
+- Fresh outputs are present: `bitCoreos.iso` (83 MiB), `bit-os-core-0.2-installer.img` (2.1 GiB), and `rootfs.ext2` (2.0 GiB). `tests/post-build-test.py` passed on the VM. `sha256sum -c out/installer-output/images/SHA256SUMS` passed for all three artifacts.
+- Manifest hashes: installer `7526d3b6190729ba19ab7dbaead914115b35019e03eee3dd1b070121c92468ad`; ISO `01d81362d2c5988972c086dd8b3754f528bb6410eb01b5bd75dec8dfff2916b9`; root filesystem `28a4e2a819898b3d019df39475ae5067186c41e901d91278e9114c50d849b405`.
+- The disposable QEMU guest booted in software emulation (`/dev/kvm` unavailable). Its serial log shows Buildroot services starting and DHCP lease `10.0.2.15`; DNS `10.0.2.3` was assigned but resolution was not checked.
+- QEMU VNC and websockify/noVNC listened on `127.0.0.1:5900` and `127.0.0.1:6080`. An SSH tunnel through Cloud Shell exposed the viewer on local port 8080; the viewer loaded and connected.
+- **Graphical gate failed:** noVNC displayed the Core v0.2 splash, then the main VT showed a blank dark screen instead of the desktop. Ctrl+Alt+F2 switched to the splash VT and Ctrl+Alt+F1 returned to the blank screen, confirming keyboard/virtual-terminal delivery but not usable desktop input. The Core desktop and mouse acceptance remain pending.
+- Selected-partition and whole-disk installation, installed-system reboot, DNS resolution, usable desktop, guest input, and clean shutdown remain unverified. Do not mark the graphical or release gates passed.
+

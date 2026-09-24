@@ -24,7 +24,7 @@ $academyCssVersion = (string)(@filemtime(__DIR__ . '/../assets/css/academy.css')
     <link rel="stylesheet" href="<?= h($frenchBase) ?>assets/css/style.css?v=<?= h($frenchCssVersion) ?>">
     <link rel="stylesheet" href="<?= h($frenchBase) ?>assets/css/academy.css?v=<?= h($academyCssVersion) ?>">
 </head>
-<body data-beyond-french-base="<?= h($frenchBase) ?>">
+<body class="<?= !empty($appShell) ? 'app-shell' : '' ?>" data-beyond-french-base="<?= h($frenchBase) ?>">
 <header class="site-header">
     <a class="brand" href="<?= h($frenchBase) ?>">
         <img src="<?= h($frenchBase) ?>assets/images/beyond-french-logo.webp" alt="Beyond French logo">
@@ -39,7 +39,6 @@ $academyCssVersion = (string)(@filemtime(__DIR__ . '/../assets/css/academy.css')
         <a href="<?= h($frenchBase) ?>archive.php">Daily Lessons</a>
         <a href="<?= h($frenchBase) ?>challenge.php">Challenge</a>
         <a href="<?= h($frenchBase) ?>settings.php">Settings</a>
-        <a href="<?= h($frenchBase) ?>ios-beta.php">iOS Beta</a>
         <a class="nav-cta" href="<?= h($frenchBase) ?>challenge.php">Practice</a>
     </nav>
 </header>

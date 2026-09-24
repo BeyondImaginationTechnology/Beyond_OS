@@ -329,7 +329,7 @@ static void draw(void)
 #ifdef BIT_EDITION_CYBER
             paragraph("BIT OS Cyber Edition 1.0\nDevelopment build: cyber-dev.1\n\nAn independent Linux workspace for authorized assessment, evidence handling and reporting.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2 / Nmap\n\nThe inventory launcher requires a local authorization record and runs a limited TCP connect inventory. Packet capture, browser research, user setup, installation and signed updates are still in development.",
 #else
-            paragraph("Beyond Imagination OS Core Edition 1.0\nDevelopment build: core-dev.1\n\nAn independent Linux system, assembled from upstream source.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2\n\nLocal Files and Notes work in this preview. Modern browsing, media,\nuser setup, installation and signed updates are still in development.",
+            paragraph("BIT OS Core v.02\nDevelopment build: core-dev.1\n\nAn independent Linux system, assembled from upstream source.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2\n\nLocal Files and Notes work in this preview. Modern browsing, media,\nuser setup, installation and signed updates are still in development.",
 #endif
                       54, 236, 1150, 365);
 #ifndef _WIN32

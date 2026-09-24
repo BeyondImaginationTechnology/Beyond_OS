@@ -1,6 +1,6 @@
 # Beyond Imagination OS Core validation
 
-Status: **the Core 1.0 installer candidates are published for testing; Core has not passed its release gates and is not a stable 1.0 release.**
+Status: **the BIT OS Core v.02 installer candidates are published for testing; Core has not passed its release gates and is not a stable v.02 release.**
 
 ## Candidate evidence
 
@@ -34,13 +34,13 @@ Treat the VM artifacts as test candidates only until the release-host files and 
 - The Core checkout is present at `/home/goldenghostog/Beyond_OS/beyond-os-desktop/core` on VM `bit-os-core-test-a`. Installer output is present in `out/installer-output/images`.
 - `tests/post-build-test.py` passed on the Linux host: `PASS: target identity, single display startup, and welcome document`.
 - The current installer manifest reports ISO SHA-256 `63586535422c959c38f2acea8261513497649757e2997ac51263c031e5ec9ef5` and USB SHA-256 `356fd963c02ccdc68ec5edc3b8c390b8ff45b382c3a5855c5fd9d8de6496356d`.
-- Downloading the previously published ISO returned HTTP 500 after retries. The links and checksums above are historical candidate evidence, not a current availability guarantee.
+- Revalidation of the published SHA-256 manifest and ISO currently returns HTTP 500 after retries. The links and checksums above are historical candidate evidence, not a current availability guarantee.
 - The local QEMU launcher now uses Buildroot's `rootfs.ext2` output filename. Both UEFI media smoke checks are now recorded below; both disposable-disk install modes, installed-system reboot, graphical session, network, input and shutdown remain pending.
 
 ### Google Cloud UEFI checkpoint (2026-09-22)
 
-- `bitCoreos.iso` was booted with OVMF and software emulation. Firmware loaded the Core GRUB menu and selected `Try BIT OS Core Edition 1.0`; the smoke run reached `Booting `Try BIT OS Core Edition 1.0'` before the 20-second timeout. This verifies firmware/media discovery and the ISO boot menu/kernel handoff, not the installed graphical session.
-- `bit-os-core-1.0-installer.img` was booted with OVMF in QEMU snapshot mode so the source image remained unchanged. It reached the Core GRUB menu and `Booting `Try BIT OS Core Edition 1.0'` before the 20-second timeout. This verifies UEFI media discovery and kernel handoff, not the installed graphical session.
+- `bitCoreos.iso` was booted with OVMF and software emulation. Firmware loaded the Core GRUB menu and selected `Try BIT OS Core v.02`; the smoke run reached `Booting `Try BIT OS Core v.02'` before the 20-second timeout. This verifies firmware/media discovery and the ISO boot menu/kernel handoff, not the installed graphical session.
+- `bit-os-core-1.0-installer.img` was booted with OVMF in QEMU snapshot mode so the source image remained unchanged. It reached the Core GRUB menu and `Booting `Try BIT OS Core v.02'` before the 20-second timeout. This verifies UEFI media discovery and kernel handoff, not the installed graphical session.
 - Selected-partition installation, whole-disk installation, reboot without media, graphical session, network, input and shutdown have not passed. Do not use this candidate as the tested base for Cyber or the later editions yet.
 
 ### Google Cloud noVNC checkpoint (2026-09-22)

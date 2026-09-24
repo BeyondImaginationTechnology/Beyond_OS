@@ -1,7 +1,7 @@
 # Boot artwork
 
 The startup screen uses `ai/assets/jaguar-eye-v0.2.png` at the repository root,
-with Beyond Imagination OS Core Edition 1.0 typography. `boot.ppm` is the
+with BIT OS Core v.02 typography. `boot.ppm` is the
 actual RGB framebuffer asset.
 `boot-preview.png` shows it centered on a 1440 × 900 display; it is an artwork
 preview, not evidence of a booted VM. The three dots are decorative, not a

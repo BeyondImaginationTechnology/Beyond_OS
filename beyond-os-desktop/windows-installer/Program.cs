@@ -66,7 +66,7 @@ namespace BITOSInstaller
                 ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/home/1.0/SHA256SUMS"
             },
             new ReleaseDefinition {
-                Edition = "BIT OS Core", Version = "1.0", Available = true,
+                Edition = "BIT OS Core", Version = "v.02", Available = true,
                 ImageUrl = "https://os.beyondimagination.co.technology/releases/core/1.0/bit-os-core-1.0-installer.img",
                 ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/core/1.0/SHA256SUMS"
             },

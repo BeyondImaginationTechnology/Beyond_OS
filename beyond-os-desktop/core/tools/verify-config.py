@@ -1,7 +1,35 @@
 """Fail if Buildroot silently drops a requested setting or enables root login."""
+import os
 import re
 import sys
 from pathlib import Path
+
+CORE_ROOT = Path(__file__).resolve().parents[1]
+
+def default_configs():
+    candidates = [
+        CORE_ROOT / "out/output/.config",
+        CORE_ROOT / "out/installer-output/.config",
+    ]
+    build_dir = os.environ.get("BEYOND_BUILD_DIR")
+    if build_dir:
+        base = Path(build_dir)
+        candidates.extend((base / "output/.config", base / "installer-output/.config"))
+    return tuple(dict.fromkeys(candidates))
+
+def resolved_config(argument=None):
+    if argument:
+        path = Path(argument)
+        if not path.is_absolute() and not path.is_file():
+            path = CORE_ROOT / path
+        if path.is_file():
+            return path
+        raise SystemExit(f"resolved Buildroot config does not exist: {path}")
+    for path in default_configs():
+        if path.is_file():
+            return path
+    choices = ", ".join(str(path) for path in default_configs())
+    raise SystemExit(f"no generated Buildroot config found; checked: {choices}")
 
 def parse(path):
     result = {}
@@ -12,7 +40,11 @@ def parse(path):
             result[match[1]] = "n"
     return result
 
-requested, resolved = map(parse, sys.argv[1:3])
+if len(sys.argv) not in (2, 3):
+    raise SystemExit("usage: verify-config.py REQUESTED_DEFCONFIG [RESOLVED_CONFIG]")
+
+requested = parse(sys.argv[1])
+resolved = parse(resolved_config(sys.argv[2] if len(sys.argv) == 3 else None))
 errors = []
 for key, expected in requested.items():
     actual = resolved.get(key, "n")

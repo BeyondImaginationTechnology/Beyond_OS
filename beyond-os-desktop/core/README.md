@@ -1,4 +1,4 @@
-# Beyond Imagination OS Core Edition 1.0
+# BIT OS Core v.02
 
 Beyond Imagination OS Core is a lean, independent Linux system for custom machines, older
 hardware and virtual machines. It is assembled from upstream source with
@@ -35,7 +35,7 @@ action creates these installer candidates:
 
 ## Candidate downloads
 
-Core installer media is published for testing, not as a stable 1.0 release.
+Core installer media is published for testing, not as a stable v.02 release.
 Use the [ISO](https://os.beyondimagination.co.technology/releases/core/1.0/bitCoreos.iso), [USB image](https://os.beyondimagination.co.technology/releases/core/1.0/bit-os-core-1.0-installer.img), and [SHA-256 manifest](https://os.beyondimagination.co.technology/releases/core/1.0/SHA256SUMS). Check `VALIDATION.md` before treating the candidate as install-ready.
 The installer offers a selected Linux partition alongside another operating
 system, or an explicitly confirmed whole non-USB disk. It does not select a
@@ -60,8 +60,20 @@ not yet passed them and must not be published as a stable 1.0 image.
 
 ## Local checks
 
+Install the native-test host dependencies first (on Debian/Ubuntu this uses
+`apt-get`; Fedora and Arch are supported by the helper as well):
+
+```sh
+sh tests/install-test-deps.sh
+```
+
 ```sh
 python3 tests/post-build-test.py
+python3 tools/verify-config.py configs/beyond_core_x86_64_defconfig
+# For an out-of-tree build, set BEYOND_BUILD_DIR or pass the .config path:
+BEYOND_BUILD_DIR=/path/to/build-area python3 tools/verify-config.py configs/beyond_core_x86_64_defconfig
+sh tests/verify-release-artifacts.sh
+tests/run-installer-qemu.sh out/installer-output/images/bitCoreos.iso
 cc -std=c11 -Wall -Wextra -Werror tests/storage-test.c -o /tmp/bitos-core-storage \
   $(pkg-config --cflags --libs sdl2 SDL2_ttf) -lm
 ```

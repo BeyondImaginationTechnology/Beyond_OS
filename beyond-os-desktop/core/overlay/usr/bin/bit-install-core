@@ -10,8 +10,14 @@ notice() { printf '%s\n' "$*"; }
 partition_disk() { printf '/dev/%s\n' "$(lsblk -n -o PKNAME "$1" | head -n 1)"; }
 partition_type() { lsblk -n -o TYPE "$1"; }
 unmounted() {
-  ! findmnt -rn -S "$1" >/dev/null 2>&1 &&
-    ! swapon --show=NAME --noheadings 2>/dev/null | grep -Fxq "$1"
+  # A whole-disk target may contain mounted partitions, LVM/dm-crypt
+  # mappings, RAID members, or swap. Check the complete lsblk descendant
+  # tree so none of those devices can be overwritten underneath us.
+  for device in $(lsblk -nrpo NAME "$1"); do
+    findmnt -rn -S "$device" >/dev/null 2>&1 && return 1
+    swapon --show=NAME --noheadings 2>/dev/null | grep -Fxq "$device" && return 1
+  done
+  return 0
 }
 
 [ "$(id -u)" -eq 0 ] || fail "installer must start from the installer boot entry"
@@ -34,7 +40,7 @@ case "$source_root" in
     ;;
 esac
 
-notice "BIT OS Core Edition 1.0 installer"
+notice "BIT OS Core v.02 installer"
 notice "Choose where Core will be installed. The installer never chooses a disk automatically."
 notice "\nAvailable block devices:"
 lsblk -o NAME,SIZE,TYPE,FSTYPE,PARTTYPE,MODEL,MOUNTPOINTS
@@ -84,10 +90,14 @@ case "$mode" in
     [ -b "$target_disk" ] || fail "target is not a block device"
     [ "$(partition_type "$target_disk")" = disk ] || fail "choose a whole disk for this installation mode"
     [ "$source_kind" = iso ] || [ "$target_disk" != "$source_disk" ] || fail "the installer USB disk cannot be erased"
-    [ "$(blockdev --getsize64 "$target_disk")" -gt "$source_bytes" ] || fail "disk is too small for Core"
-    for device in $(lsblk -nrpo NAME,TYPE "$target_disk" | awk '$2 == "part" { print $1 }'); do
-      unmounted "$device" || fail "refusing to erase mounted partition $device"
-    done
+    # The layout consumes a 512 MiB EFI partition in addition to the image,
+    # plus a small alignment margin. Validate the complete footprint before
+    # any wipe operation; the old check could erase a disk and only then
+    # discover that the root partition could not hold the image.
+    layout_overhead=$((512 * 1024 * 1024 + 4 * 1024 * 1024))
+    required_bytes=$((source_bytes + layout_overhead))
+    [ "$(blockdev --getsize64 "$target_disk")" -ge "$required_bytes" ] || fail "disk is too small for the Core image and EFI layout"
+    unmounted "$target_disk" || fail "refusing to erase a disk with mounted or active descendant devices"
     printf 'Type exactly: ERASE %s\n> ' "$target_disk"
     IFS= read -r confirmation
     [ "$confirmation" = "ERASE $target_disk" ] || fail "confirmation did not match"

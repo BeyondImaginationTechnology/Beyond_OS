@@ -6,10 +6,10 @@ set timeout=8
 insmod part_gpt
 insmod fat
 
-menuentry "Try Beyond Imagination OS Core Edition 1.0" {
+menuentry "Try BIT OS Core v.02" {
     linux (hd0,gpt1)/bzImage root=PARTUUID=%PARTUUID% rootwait quiet loglevel=3
 }
 
-menuentry "Install Beyond Imagination OS Core Edition 1.0" {
+menuentry "Install BIT OS Core v.02" {
     linux (hd0,gpt1)/bzImage root=PARTUUID=%PARTUUID% rootwait bit.install=1 console=tty1 loglevel=3
 }

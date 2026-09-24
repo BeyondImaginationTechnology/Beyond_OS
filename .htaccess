@@ -68,6 +68,11 @@ DirectoryIndex index.php index.html
   RewriteRule ^server/(?:classes|cron|lib)(?:/|$) - [F,L,NC]
   RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L]
 
+  # Release artifacts are static files. Never send a missing artifact through
+  # the PHP application controller; a missing object must return 404 rather
+  # than an application-generated 500.
+  RewriteRule ^releases(?:/|$) - [END]
+
   # Serve real application files and folders directly.
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d

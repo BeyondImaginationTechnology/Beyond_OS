@@ -1,6 +1,6 @@
 """Render the Beyond Imagination OS startup artwork; requires Pillow.
 
-The startup mark is the official BIT OS shield from ``os/assets``. No font
+The startup mark is the Core v0.2 shield from ``assets``. No font
 files are shipped.
 """
 import argparse
@@ -19,7 +19,7 @@ d = ImageDraw.Draw(im)
 def xy(x, y):
     return round(x * scale), round(y * scale)
 
-asset = Image.open(Path(__file__).resolve().parents[3] / "os/assets/bit-os-logo-v1.png").convert("RGBA")
+asset = Image.open(root / "assets/bit-os-core-logo-v0.2.png").convert("RGBA")
 logo_size = 150 * scale
 asset.thumbnail((logo_size, logo_size), Image.Resampling.LANCZOS)
 logo_x = (640 * scale - asset.width) // 2

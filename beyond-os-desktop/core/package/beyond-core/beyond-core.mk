@@ -22,7 +22,7 @@ define BEYOND_CORE_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/beyond-splash $(TARGET_DIR)/usr/bin/beyond-splash
 	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_CORE_PATH)/assets/boot.ppm \
 		$(TARGET_DIR)/usr/share/beyond-core/boot.ppm
-	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_CORE_PATH)/../../os/assets/bit-os-logo-v1.png \
+	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_CORE_PATH)/assets/bit-os-core-logo-v0.2.png \
 		$(TARGET_DIR)/usr/share/beyond-core/bit-os-logo.png
 	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_CORE_PATH)/board/x86_64/grub.cfg.in \
 		$(TARGET_DIR)/usr/share/beyond-core/grub.cfg.in

@@ -1,6 +1,7 @@
 # Boot artwork
 
-The startup screen uses the official `os/assets/bit-os-logo-v1.png` at the repository root,
+The startup screen uses `assets/bit-os-core-logo-v0.2.png`, the Core-specific
+blue/silver hexagonal jaguar-eye and crystalline-kernel mark,
 with BIT OS Core v0.2 typography. `boot.ppm` is the
 actual RGB framebuffer asset.
 `boot-preview.png` shows it centered on a 1440 × 900 display; it is an artwork

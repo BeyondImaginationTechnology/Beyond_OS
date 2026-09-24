@@ -44,3 +44,6 @@ body.app-shell .lesson-card .speech-match strong{color:#8fc0ff}
 body.app-shell .lesson-card .voice-lab,body.app-shell .lesson-card .voice-lab h3,body.app-shell .lesson-card .voice-lab strong{color:#fff}
 body.app-shell .lesson-card .voice-lab p,body.app-shell .lesson-card .voice-lab small{color:#bdc8dc}
 body.app-shell .lesson-card .lesson-next,body.app-shell .lesson-card .lesson-next strong{color:#fff}
+.lesson-next .daily-challenge-button{justify-self:start;display:inline-flex;align-items:center;gap:9px;margin-top:9px;padding:12px 17px;border:1px solid #ffcf45;border-radius:13px;background:#ffbf00;color:#07152f;font-weight:900;box-shadow:0 8px 20px #0003;transition:background .18s ease,transform .18s ease}
+.lesson-next .daily-challenge-button:hover{background:#ffd34d;transform:translateY(-1px)}
+.lesson-next .daily-challenge-button:focus-visible{outline:3px solid #fff;outline-offset:3px}

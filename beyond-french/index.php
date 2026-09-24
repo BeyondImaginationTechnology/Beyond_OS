@@ -147,7 +147,7 @@ body.app-shell{background:#061633;color:#fff}body.app-shell>.site-header{backgro
         <div class="lesson-next">
             <span>Next step</span>
             <strong>Use the phrase in a real conversation challenge.</strong>
-            <a href="challenge.php?id=<?= (int)$lesson['id'] ?>">Daily challenge</a>
+            <a class="button daily-challenge-button" href="challenge.php?id=<?= (int)$lesson['id'] ?>">Start daily challenge <span aria-hidden="true">→</span></a>
         </div>
     </article>
 </section>

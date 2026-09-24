@@ -19,6 +19,13 @@ function beyond_live_config(): array
     }
     $file = beyond_private_root() . '/config/live.php';
     if (!is_file($file)) {
+        $defaultFile = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'live.php';
+        if ($defaultFile !== $file && is_file($defaultFile)) {
+            error_log('Configured protected configuration file is unavailable; using the default private configuration path.');
+            $file = $defaultFile;
+        }
+    }
+    if (!is_file($file)) {
         throw new RuntimeException('Protected configuration is unavailable.');
     }
     $loaded = require $file;

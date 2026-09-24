@@ -43,13 +43,6 @@ return [
             'client_id' => '',
             'client_secret' => '',
         ],
-        'instagram' => [
-            // Credentials from Meta's "API setup with Instagram login" use case.
-            // These are the Instagram App credentials, not the Facebook Login ID.
-            'app_id' => '',
-            'app_secret' => '',
-            'graph_version' => 'v23.0',
-        ],
         'github' => [
             'client_id' => '',
             'client_secret' => '',

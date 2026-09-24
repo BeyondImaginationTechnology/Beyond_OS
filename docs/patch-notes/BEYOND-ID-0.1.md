@@ -9,7 +9,7 @@ Beyond ID 0.1 introduces a focused social sign-in experience.
 - Adds Sign in with Apple authorization, callback, token validation, and identity handling.
 - Keeps unconfigured providers visible in a consistent disabled state.
 - Fixes the collapsed social-button layout on the hosted sign-in page.
-- Removes Instagram from the active Beyond ID sign-in allowlist; its legacy configuration is retained but no longer used.
+- Limits Beyond ID sign-in to Google, GitHub, and Apple. Meta and Instagram credentials are not required.
 - Displays the Beyond ID 0.1 version in sign-in and admin branding.
 
 ## Configuration

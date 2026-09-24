@@ -18,8 +18,6 @@ $read = static function (string $env, string $provider, string $key, string $def
     if (is_string($environment) && trim($environment) !== '') return trim($environment);
     return trim((string)($liveOauth[$provider][$key] ?? $default));
 };
-$instagramGraphVersion = preg_replace('/[^A-Za-z0-9.]/', '', $read('BEYOND_INSTAGRAM_GRAPH_VERSION', 'instagram', 'graph_version', 'v23.0')) ?: 'v23.0';
-
 return [
     'google' => [
         'client_id' => $read('BEYOND_GOOGLE_CLIENT_ID', 'google', 'client_id'),
@@ -28,22 +26,6 @@ return [
         'token_url' => 'https://oauth2.googleapis.com/token',
         'userinfo_url' => 'https://openidconnect.googleapis.com/v1/userinfo',
         'scopes' => ['openid', 'email', 'profile'],
-    ],
-    'meta' => [
-        'client_id' => $read('BEYOND_META_APP_ID', 'meta', 'app_id'),
-        'client_secret' => $read('BEYOND_META_APP_SECRET', 'meta', 'app_secret'),
-        'authorize_url' => 'https://www.facebook.com/dialog/oauth',
-        'token_url' => 'https://graph.facebook.com/oauth/access_token',
-        'userinfo_url' => 'https://graph.facebook.com/me',
-        'scopes' => ['email', 'public_profile'],
-    ],
-    'instagram' => [
-        'client_id' => $read('BEYOND_INSTAGRAM_APP_ID', 'instagram', 'app_id'),
-        'client_secret' => $read('BEYOND_INSTAGRAM_APP_SECRET', 'instagram', 'app_secret'),
-        'authorize_url' => 'https://www.instagram.com/oauth/authorize',
-        'token_url' => 'https://api.instagram.com/oauth/access_token',
-        'userinfo_url' => 'https://graph.instagram.com/' . $instagramGraphVersion . '/me',
-        'scopes' => ['instagram_business_basic'],
     ],
     'github' => [
         'client_id' => $read('BEYOND_GITHUB_CLIENT_ID', 'github', 'client_id'),

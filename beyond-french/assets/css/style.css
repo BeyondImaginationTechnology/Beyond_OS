@@ -47,3 +47,20 @@ body.app-shell .lesson-card .lesson-next,body.app-shell .lesson-card .lesson-nex
 .lesson-next .daily-challenge-button{justify-self:start;display:inline-flex;align-items:center;gap:9px;margin-top:9px;padding:12px 17px;border:1px solid #ffcf45;border-radius:13px;background:#ffbf00;color:#07152f;font-weight:900;box-shadow:0 8px 20px #0003;transition:background .18s ease,transform .18s ease}
 .lesson-next .daily-challenge-button:hover{background:#ffd34d;transform:translateY(-1px)}
 .lesson-next .daily-challenge-button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+/* Gold app navigation: keep every destination visually consistent, without a default Translate highlight. */
+body.app-shell .mobile-tabbar a,body.app-shell .mobile-tabbar a.tab-primary{background:#ffbf00!important;border:1px solid #ffe080!important;color:#07152f!important;opacity:1!important;box-shadow:0 5px 14px rgba(255,191,0,.14)!important}
+body.app-shell .mobile-tabbar a small,body.app-shell .mobile-tabbar a.active small,body.app-shell .mobile-tabbar a.tab-primary small{color:#07152f!important}
+body.app-shell .mobile-tabbar a.active,body.app-shell .mobile-tabbar a.tab-primary.active{background:#ffbf00!important;border-color:#ffe080!important;box-shadow:0 5px 14px rgba(255,191,0,.14)!important}
+body.app-shell .nav{gap:8px}
+body.app-shell .nav a,body.app-shell .nav a.nav-cta{padding:10px 14px;border:1px solid #ffe080;border-radius:12px;background:#ffbf00;color:#07152f!important;font-weight:850}
+body.app-shell .nav a:hover,body.app-shell .nav a:focus-visible{background:#ffd34d;color:#07152f!important}
+/* Give the speech check the same dark-and-gold treatment as the rest of the learning UI. */
+body.app-shell .lesson-card .speech-check{border-color:#80651e;background:linear-gradient(145deg,#2b2819,#1d2334)}
+body.app-shell .lesson-card .speech-check .eyebrow{color:#ffbf00}
+body.app-shell .lesson-card .speech-check h3{color:#fff1bf}
+body.app-shell .lesson-card .speech-check p{color:#d5cda9}
+body.app-shell .lesson-card .speech-check #record-phrase{border:1px solid #ffe080;background:#ffbf00;color:#07152f;box-shadow:none}
+body.app-shell .lesson-card .speech-check #record-phrase:hover{background:#ffd34d}
+body.app-shell .lesson-card .speech-check #record-phrase.recording{border-color:#ff8991;background:#ef3340;color:#fff}
+body.app-shell .lesson-card .speech-match{border:1px solid #66551f;background:#171d2c;color:#e5d9a7}
+body.app-shell .lesson-card .speech-match strong{color:#ffcf45}

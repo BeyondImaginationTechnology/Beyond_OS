@@ -83,3 +83,60 @@ body.app-shell .academy-module-row a{color:#ffcf45;font-size:.78rem;font-weight:
 body.app-shell .academy-module-locked{color:#9cabc0;font-size:.72rem}
 body.app-shell .academy-guides .tutor-grid{padding:0 12px 12px}
 @media(max-width:560px){body.app-shell .academy-start-card{grid-template-columns:1fr;gap:12px;padding:19px}body.app-shell .academy-start-card .academy-button{justify-self:start}body.app-shell .academy-id-note{font-size:.72rem}}
+
+/* Academy catalog follows the mobile learning path: difficulty, progress, then lessons. */
+body.app-shell .academy-wrap{width:min(760px,calc(100% - 36px));padding:28px 0 120px;color:#fff}
+body.app-shell .academy-page-title{margin:8px 0 22px;color:#fff;font-size:clamp(2.4rem,8vw,4rem);line-height:1;letter-spacing:-.05em}
+body.app-shell .academy-hero{padding:22px 24px;border:1px solid #274a79;border-radius:27px;background:linear-gradient(145deg,#112d57,#172d55);box-shadow:0 20px 46px rgba(0,0,0,.24)}
+body.app-shell .academy-free-badge{display:inline-flex;align-items:center;padding:8px 13px;border-radius:999px;background:#145441;color:#50e27a;font-size:.72rem;font-weight:950;letter-spacing:.07em}
+body.app-shell .academy-hero h2{max-width:520px;margin:22px 0 10px;color:#fff;font-size:clamp(2rem,7vw,3.2rem);line-height:1.12;letter-spacing:-.04em}
+body.app-shell .academy-hero p{margin:0;color:#aebed7;font-size:1rem;line-height:1.55}
+body.app-shell .academy-difficulty{display:flex;align-items:center;gap:12px;margin-top:22px}
+body.app-shell .academy-difficulty label{color:#9eb2ce;font-size:.8rem;font-weight:850}
+body.app-shell .academy-difficulty select{min-width:190px;padding:11px 38px 11px 14px;border:1px solid #345786;border-radius:13px;background:#102747;color:#65a0ff;font:inherit;font-size:1rem;font-weight:800}
+body.app-shell .academy-difficulty select:focus-visible{outline:3px solid #ffbf0080;outline-offset:2px}
+body.app-shell .academy-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+body.app-shell .academy-stat{display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center;padding:16px;border:1px solid #2456a0;border-radius:19px;background:linear-gradient(145deg,#12366b,#142954)}
+body.app-shell .academy-stat.is-done{border-color:#13785d;background:linear-gradient(145deg,#075647,#0c3e47)}
+body.app-shell .academy-stat>span{grid-row:1/3;color:#50e27a;font-size:1.7rem}
+body.app-shell .academy-stat:not(.is-done)>span{color:#428cff}
+body.app-shell .academy-stat strong{color:#fff;font-size:1.55rem;line-height:1.1}
+body.app-shell .academy-stat small{margin-top:5px;color:#b9c9df;font-size:.68rem;font-weight:900;letter-spacing:.08em}
+body.app-shell .academy-continue{margin:15px 0;padding:15px 17px;border:1px solid #284b7c;border-radius:18px;background:#12284b}
+body.app-shell .academy-continue>span{display:block;margin-bottom:8px;color:#aebed7;font-size:.71rem;font-weight:900;letter-spacing:.08em}
+body.app-shell .academy-continue>a{display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:12px;color:#fff;text-decoration:none}
+body.app-shell .academy-continue>a>span:first-child{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#1768ff;color:#fff}
+body.app-shell .academy-continue>a>span:nth-child(2){display:grid;gap:4px}
+body.app-shell .academy-continue strong{font-size:.98rem}
+body.app-shell .academy-continue small{color:#b9c9df;font-size:.82rem}
+body.app-shell .academy-continue b{color:#aebed7;font-size:1.8rem;font-weight:500}
+body.app-shell .academy-id-note{margin:14px 0;padding:10px 13px;border:1px solid #685723;border-radius:13px;background:#282716;color:#e5d9a7;font-size:.77rem;line-height:1.5}
+body.app-shell .academy-id-note>span{margin-right:5px;color:#ffbf00}
+body.app-shell .academy-id-note strong{color:#fff1bf}
+body.app-shell .academy-id-note a{color:#ffcf45;font-weight:800;text-decoration:underline;text-underline-offset:2px}
+body.app-shell .academy-catalog{display:grid;gap:18px;margin-top:18px}
+body.app-shell .academy-course-card{overflow:hidden;padding:20px 18px 11px;border:1px solid #244c88;border-radius:25px;background:linear-gradient(155deg,#102d58,#14274c);box-shadow:0 16px 38px rgba(0,0,0,.2)}
+body.app-shell .academy-course-card.is-locked{border-color:#253e65;background:linear-gradient(155deg,#10284d,#111f3c)}
+body.app-shell .academy-course-head{display:grid;grid-template-columns:84px minmax(0,1fr) auto;align-items:start;gap:14px}
+body.app-shell .academy-course-icon{display:grid;place-items:center;width:76px;height:76px;border-radius:19px;background:#173c72;font-size:2.1rem}
+body.app-shell .academy-course-head h2{margin:0 0 5px;color:#fff;font-size:1.55rem;line-height:1.15}
+body.app-shell .academy-course-head p{margin:0;color:#b9c9df;font-size:.88rem;line-height:1.5}
+body.app-shell .academy-course-lock{padding-top:5px;color:#8094b4;font-size:1.1rem}
+body.app-shell .academy-course-meter{display:flex;align-items:center;gap:12px;margin:17px 0 14px}
+body.app-shell .academy-course-meter>span{height:6px;flex:1;overflow:hidden;border-radius:9px;background:#40506c}
+body.app-shell .academy-course-meter i{display:block;height:100%;border-radius:inherit;background:#2784ff}
+body.app-shell .academy-course-meter small{color:#aebed7;font-size:.72rem;font-weight:800}
+body.app-shell .academy-lesson-list{display:grid}
+body.app-shell .academy-lesson-item{display:grid;grid-template-columns:56px minmax(0,1fr) 28px;align-items:center;gap:13px;min-height:72px;padding:8px 0;border-top:1px solid #ffffff08;color:#fff;text-decoration:none}
+body.app-shell .academy-lesson-number{display:grid;place-items:center;width:50px;height:50px;border-radius:50%;background:#173c72;color:#368dff;font-size:1.15rem;font-weight:900}
+body.app-shell .academy-lesson-copy{display:grid;gap:4px;min-width:0}
+body.app-shell .academy-lesson-copy strong{overflow:hidden;color:#fff;font-size:1.03rem;text-overflow:ellipsis;white-space:nowrap}
+body.app-shell .academy-lesson-copy small{color:#aebed7;font-size:.82rem}
+body.app-shell .academy-lesson-state{color:#aebed7;text-align:center;font-size:1.35rem}
+body.app-shell .academy-lesson-item.is-open .academy-lesson-state{color:#4b9aff;font-size:1.65rem}
+body.app-shell .academy-lesson-item.is-complete .academy-lesson-state{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#31c85b;color:#082e32;font-size:1rem;font-weight:950}
+body.app-shell .academy-lesson-item.is-locked .academy-lesson-number{background:#142743;color:#607895}
+body.app-shell .academy-lesson-item.is-locked .academy-lesson-copy strong,body.app-shell .academy-lesson-item.is-locked .academy-lesson-copy small{color:#607895}
+body.app-shell .academy-lesson-item.is-locked .academy-lesson-state{color:#637894;font-size:1rem}
+body.app-shell .academy-guides{margin-top:18px}
+@media(max-width:560px){body.app-shell .academy-wrap{width:min(100% - 28px,760px);padding-top:24px}body.app-shell .academy-page-title{margin-bottom:18px}body.app-shell .academy-hero{padding:20px 18px}body.app-shell .academy-difficulty{justify-content:space-between}body.app-shell .academy-difficulty select{min-width:0}body.app-shell .academy-course-card{padding:17px 14px 9px;border-radius:22px}body.app-shell .academy-course-head{grid-template-columns:72px minmax(0,1fr) auto;gap:11px}body.app-shell .academy-course-icon{width:64px;height:64px;font-size:1.8rem}body.app-shell .academy-course-head h2{font-size:1.35rem}body.app-shell .academy-course-head p{font-size:.82rem}body.app-shell .academy-lesson-item{grid-template-columns:48px minmax(0,1fr) 23px;gap:10px;min-height:68px}body.app-shell .academy-lesson-number{width:44px;height:44px;font-size:1rem}body.app-shell .academy-lesson-copy strong{font-size:.96rem}body.app-shell .academy-lesson-copy small{font-size:.76rem}}

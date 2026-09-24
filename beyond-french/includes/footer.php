@@ -4,13 +4,12 @@
     $currentFrenchPage = basename($_SERVER['SCRIPT_NAME'] ?? '');
     $isFrenchHome = in_array($currentFrenchPage, ['index.php', ''], true);
     $isFrenchAcademy = in_array($currentFrenchPage, ['academy.php', 'archive.php', 'progress.php'], true);
-    $isFrenchTranslate = in_array($currentFrenchPage, ['translate.php', 'dictionary.php', 'challenge.php'], true);
     $isFrenchTrivia = $currentFrenchPage === 'game.php';
     $isFrenchSettings = $currentFrenchPage === 'settings.php';
     ?>
     <a class="<?= $isFrenchHome ? 'active' : '' ?>" href="<?= h($frenchBase) ?>"><span>⌂</span><small>Home</small></a>
     <a class="<?= $isFrenchAcademy ? 'active' : '' ?>" href="<?= h($frenchBase) ?>academy.php"><span>▤</span><small>Academy</small></a>
-    <a class="tab-primary <?= $isFrenchTranslate ? 'active' : '' ?>" href="<?= h($frenchBase) ?>translate.php"><span>文</span><small>Translate</small></a>
+    <a href="<?= h($frenchBase) ?>translate.php"><span>文</span><small>Translate</small></a>
     <a class="<?= $isFrenchTrivia ? 'active' : '' ?>" href="<?= h($frenchBase) ?>game.php"><span>✧</span><small>Trivia</small></a>
     <a class="<?= $isFrenchSettings ? 'active' : '' ?>" href="<?= h($frenchBase) ?>settings.php"><span>○</span><small>Settings</small></a>
 </nav>

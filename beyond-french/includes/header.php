@@ -30,7 +30,6 @@ $academyCssVersion = (string)(@filemtime(__DIR__ . '/../assets/css/academy.css')
         <img src="<?= h($frenchBase) ?>assets/images/beyond-french-logo.webp" alt="Beyond French logo">
         <span><strong>Beyond French</strong><small>Daily Academy</small></span>
     </a>
-    <button class="menu-toggle" type="button" aria-label="Open menu">☰</button>
     <nav class="nav">
         <a href="<?= h($frenchBase) ?>">Home</a>
         <a href="<?= h($frenchBase) ?>academy.php">Academy</a>

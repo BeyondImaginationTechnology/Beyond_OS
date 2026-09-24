@@ -18,8 +18,8 @@ function beyond_live_config(): array
         return $config;
     }
     $file = beyond_private_root() . '/config/live.php';
+    $defaultFile = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'live.php';
     if (!is_file($file)) {
-        $defaultFile = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'live.php';
         if ($defaultFile !== $file && is_file($defaultFile)) {
             error_log('Configured protected configuration file is unavailable; using the default private configuration path.');
             $file = $defaultFile;
@@ -31,6 +31,32 @@ function beyond_live_config(): array
     $loaded = require $file;
     if (!is_array($loaded)) {
         throw new RuntimeException('Protected configuration is invalid.');
+    }
+
+    $hasOAuthCredentials = static function (array $candidate): bool {
+        foreach (['google', 'github', 'apple', 'instagram', 'meta'] as $provider) {
+            $credentials = $candidate['oauth'][$provider] ?? null;
+            if (!is_array($credentials)) {
+                continue;
+            }
+            $clientId = trim((string)($credentials['client_id'] ?? $credentials['app_id'] ?? ''));
+            $clientSecret = trim((string)($credentials['client_secret'] ?? $credentials['app_secret'] ?? ''));
+            if ($clientId !== '' && $clientSecret !== '') {
+                return true;
+            }
+        }
+        return false;
+    };
+    if ($defaultFile !== $file && is_file($defaultFile) && !$hasOAuthCredentials($loaded)) {
+        try {
+            $defaultConfig = require $defaultFile;
+            if (is_array($defaultConfig) && $hasOAuthCredentials($defaultConfig)) {
+                $loaded['oauth'] = $defaultConfig['oauth'];
+                error_log('OAuth configuration loaded from the default private configuration path.');
+            }
+        } catch (Throwable $exception) {
+            error_log('Default private OAuth configuration could not be loaded: ' . $exception->getMessage());
+        }
     }
     $config = $loaded;
     return $config;

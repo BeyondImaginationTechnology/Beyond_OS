@@ -3,6 +3,7 @@ declare(strict_types=1);
 require __DIR__.'/includes/functions.php';
 $age=french_valid_age_group((string)($_GET['age']??($_SESSION['french_academy_age']??'kids')));$_SESSION['french_academy_age']=$age;
 $groups=french_age_groups();$modules=french_academy_modules();$pageTitle='French Academy | Beyond French';
+$appShell = true;
 require __DIR__.'/includes/header.php';
 if($age==='kids'){$modules['greetings']['title']='French ABC Foundations';$modules['greetings']['description']='Start with the French alphabet through sound, movement, and repetition.';}
 $tutorSets=[

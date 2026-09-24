@@ -18,3 +18,23 @@ body.app-shell .mobile-tabbar{position:fixed;left:50%;transform:translateX(-50%)
 body.app-shell .mobile-tabbar a.active{opacity:1;color:#fff}
 body.app-shell .mobile-tabbar a.active small{color:#a9c6ff}
 body.app-shell>.site-footer{display:none}
+/* iOS Today contrast: use layered blue surfaces instead of a white lesson card. */
+body.app-shell .lesson-card{background:linear-gradient(145deg,#102e64,#173d73);color:#fff;border:1px solid #2f68c6;box-shadow:0 20px 46px rgba(0,0,0,.28)}
+body.app-shell .lesson-card h2,body.app-shell .lesson-card h3,body.app-shell .lesson-card strong{color:#fff}
+body.app-shell .lesson-card p,body.app-shell .lesson-card em,body.app-shell .lesson-card .english-phrase small{color:#c6d7f2}
+body.app-shell .lesson-card .translation strong{color:#fff}
+body.app-shell .lesson-card .translation em{color:#c6d7f2}
+body.app-shell .translation-fr{background:#123c7a;border-color:#2d72df}
+body.app-shell .translation-ht{background:#402b52;border-color:#8f4a77}
+body.app-shell .translation-jm{background:#0d514b;border-color:#168f72}
+body.app-shell .translation-es{background:#503b28;border-color:#986a36}
+body.app-shell .lesson-card .culture-note{color:#fff;background:#0d2249;border:1px solid #2b5ba2}
+body.app-shell .lesson-card .culture-note strong{color:#fff}
+body.app-shell .lesson-card .speech-check{background:#0d2249;border-color:#2b5ba2}
+body.app-shell .lesson-card .speech-check h3{color:#fff}
+body.app-shell .lesson-card .speech-check p{color:#c6d7f2}
+body.app-shell .lesson-card .speech-match{background:#173d73;color:#c6d7f2}
+body.app-shell .lesson-card .speech-match strong{color:#8fc0ff}
+body.app-shell .lesson-card .voice-lab,body.app-shell .lesson-card .voice-lab h3,body.app-shell .lesson-card .voice-lab strong{color:#fff}
+body.app-shell .lesson-card .voice-lab p,body.app-shell .lesson-card .voice-lab small{color:#bdc8dc}
+body.app-shell .lesson-card .lesson-next,body.app-shell .lesson-card .lesson-next strong{color:#fff}

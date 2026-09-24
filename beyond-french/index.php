@@ -16,6 +16,7 @@ $continueLesson = null;
 $continuePosition = [];
 $learningProgress = [];
 $isReturningLearner = false;
+$academyCompletedCount = 0;
 try {
     $lesson = todays_lesson();
     $lessonAudio = $lesson ? lesson_audio_map((int)$lesson['id']) : [];
@@ -24,6 +25,8 @@ try {
     $continuePosition = lesson_position((int)($continueLesson['id'] ?? 1));
     $learningProgress = french_progress((int)($_SESSION['user_id'] ?? 0));
     $isReturningLearner = !empty($learningProgress['last_lesson_id']);
+    $completedLessons = json_decode((string)($learningProgress['completed_lessons_json'] ?? '[]'), true);
+    $academyCompletedCount = is_array($completedLessons) ? count($completedLessons) : 0;
 } catch (Throwable $error) {
     error_log('Beyond French homepage data unavailable: ' . $error->getMessage());
 }
@@ -36,14 +39,21 @@ body.app-shell .lesson-card{padding:18px;border-radius:28px;box-shadow:0 12px 34
 body.app-shell .voice-lab{margin-top:14px;padding:15px;border-radius:20px}body.app-shell .voice-lab-head{align-items:center}body.app-shell .voice-lab-head h3{font-size:1.05rem;margin:3px 0}body.app-shell .voice-lab-head p,body.app-shell .voice-stop,body.app-shell .voice-controls,body.app-shell .voice-status,body.app-shell .voice-lab>small{display:none}body.app-shell .voice-grid{grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}body.app-shell .voice-card{padding:10px;border-radius:13px;grid-template-columns:auto 1fr auto}body.app-shell .voice-flag{font-size:1.35rem}body.app-shell .voice-card strong{font-size:.82rem}body.app-shell .voice-card small{font-size:.65rem}body.app-shell .voice-card i{font-size:.85rem}body.app-shell .culture-note{margin-top:12px;padding:12px;font-size:.82rem}body.app-shell .lesson-actions{margin-top:14px}body.app-shell .lesson-actions .speak-phrase,body.app-shell .lesson-actions .copy-phrase{display:none}body.app-shell .lesson-actions .primary{width:100%;padding:13px}body.app-shell .lesson-next{margin-top:12px;padding:12px;font-size:.8rem}body.app-shell .lesson-next a{font-size:.82rem}
 body.app-shell #academy,body.app-shell #modules{display:none}body.app-shell .mobile-tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));width:min(680px,calc(100% - 24px));height:74px;padding:8px 10px;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;background:rgba(7,21,47,.96);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.16);border-radius:24px;box-shadow:0 18px 45px rgba(7,21,47,.32);z-index:100}body.app-shell .mobile-tabbar a{color:#fff;display:grid;place-items:center;gap:2px;font-weight:800}body.app-shell .mobile-tabbar span{font-size:1.2rem}body.app-shell .mobile-tabbar small{font-size:.66rem}body.app-shell .mobile-tabbar .tab-primary{transform:translateY(-12px);width:62px;height:62px;justify-self:center;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--red));box-shadow:0 8px 24px rgba(23,104,255,.35)}body.app-shell>.site-footer{display:none}
 @media(max-width:560px){body.app-shell .app-today-intro{padding:24px 18px 8px}body.app-shell #today{padding-left:18px;padding-right:18px}body.app-shell .lesson-card{padding:14px}.french-splash h1{font-size:3rem}}
+body.app-shell .translation{border:1px solid transparent;box-shadow:inset 0 3px 0 var(--language-accent)}body.app-shell .translation small{color:var(--language-accent);font-weight:900}body.app-shell .translation-fr{--language-accent:#1768ff;background:#edf4ff;border-color:#cfe0ff}body.app-shell .translation-ht{--language-accent:#e44761;background:#fff0f2;border-color:#ffd4da}body.app-shell .translation-jm{--language-accent:#079b69;background:#e9f9f2;border-color:#c6efdd}body.app-shell .translation-es{--language-accent:#c47b18;background:#fff7e8;border-color:#f6dfb1}
+ .difficulty-paths{display:grid;gap:10px;margin:24px 0}.difficulty-paths button{display:grid;gap:5px;text-align:left;padding:16px 18px;border:1px solid #ffffff55;border-radius:17px;color:#fff;background:#07152f66;cursor:pointer}.difficulty-paths button:hover,.difficulty-paths button:focus{background:#1768ff;border-color:#83b0ff}.difficulty-paths strong{font-size:1.05rem}.difficulty-paths small{color:#d8e1f5}.difficulty-cast,.language-choice{display:none}.difficulty-cast.visible,.language-choice.visible{display:block}.difficulty-cast{grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}.difficulty-cast.visible{display:grid}.difficulty-cast figure{margin:0}.difficulty-cast img{width:100%;aspect-ratio:1;object-fit:cover;object-position:top;border-radius:14px;border:1px solid #ffffff44}.difficulty-cast figcaption{font-size:.7rem;color:#fff;font-weight:800;margin-top:4px}.language-choice{padding-top:14px;border-top:1px solid #ffffff33}.language-choice>strong{color:#fff;font-size:.9rem}.language-choice .language-paths{margin:12px 0}.language-choice small{color:#d8e1f5}
+body.app-shell .speech-check{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-top:14px;padding:15px;border:1px solid #dbe4f1;border-radius:20px;background:#f7faff}body.app-shell .speech-check h3{margin:4px 0;font-size:1rem}body.app-shell .speech-check p{margin:0;color:var(--muted);font-size:.78rem;line-height:1.4}body.app-shell .speech-check .eyebrow{font-size:.62rem}body.app-shell #record-phrase{padding:11px 13px;white-space:nowrap}body.app-shell #record-phrase.recording{background:#ef3340;color:#fff}body.app-shell .speech-match{grid-column:1/-1;padding:10px 12px;border-radius:12px;background:#fff;color:var(--muted);font-size:.82rem}body.app-shell .speech-match strong{color:var(--blue);font-size:1.15rem}@media(max-width:560px){body.app-shell .speech-check{grid-template-columns:1fr}.speech-check #record-phrase{width:100%}}
+body.app-shell .language-set-control{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 10px;align-items:center;max-width:720px;margin:0 auto 10px;padding:0 20px;color:var(--muted);font-size:.78rem}body.app-shell .language-set-control label{font-weight:900;color:var(--text)}body.app-shell .language-set-control select{min-width:0;border:1px solid #d6dfec;background:#fff;color:var(--text);border-radius:12px;padding:9px 11px;font-size:.78rem}body.app-shell .language-set-control small{grid-column:2}@media(max-width:560px){body.app-shell .language-set-control{padding:0 18px;grid-template-columns:1fr}.language-set-control small{grid-column:auto}}
+body.app-shell .today-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}body.app-shell .today-stats span{padding:8px 10px;border:1px solid #dce4ef;border-radius:999px;background:#fff;color:var(--muted);font-size:.76rem;font-weight:800}body.app-shell .today-stats strong{color:var(--text)}
+body.app-shell .mobile-tabbar .tab-primary{transform:none;width:auto;height:auto;border-radius:14px;background:rgba(255,255,255,.1);box-shadow:none;color:#fff;padding:8px 10px}body.app-shell .mobile-tabbar a{opacity:.72}body.app-shell .mobile-tabbar a:hover,body.app-shell .mobile-tabbar a:focus-visible{opacity:1}
 </style>
-<div class="french-splash" id="french-splash"><div class="french-splash-inner"><img src="<?= h($frenchBase) ?>assets/images/beyond-french-logo.webp" alt=""><span class="eyebrow" style="color:#ffbf00">BEYOND FRENCH · DAILY ACADEMY</span><h1>Choose your language path.</h1><p><?= $isReturningLearner ? 'Your next lesson is ready.' : 'Start small. Speak with confidence.' ?></p><div class="language-paths"><button data-learning-language="french">🇫🇷 French</button><button data-learning-language="kreyol">🇭🇹 Kreyòl</button><button data-learning-language="patois">🇯🇲 Patois</button><button data-learning-language="spanish">🇪🇸 Spanish</button></div><small>Change this anytime in Settings.</small></div></div>
-<script>const frenchSplash=document.getElementById('french-splash'),savedLanguage=localStorage.getItem('beyond-french.learning-language');if(sessionStorage.getItem('beyond-french-entered')==='1'&&savedLanguage)frenchSplash.classList.add('hidden');document.querySelectorAll('[data-learning-language]').forEach(button=>button.addEventListener('click',()=>{localStorage.setItem('beyond-french.learning-language',button.dataset.learningLanguage);sessionStorage.setItem('beyond-french-entered','1');frenchSplash.classList.add('hidden')}));</script>
+<div class="french-splash" id="french-splash"><div class="french-splash-inner"><img src="<?= h($frenchBase) ?>assets/images/beyond-french-logo.webp" alt=""><span class="eyebrow" style="color:#ffbf00">BEYOND FRENCH · DAILY ACADEMY</span><h1>Choose your learning level.</h1><p><?= $isReturningLearner ? 'Your next lesson is ready.' : 'Your guide and lesson style will follow your choice.' ?></p><div class="difficulty-paths" role="list"><button data-difficulty="beginner" data-age="kids"><strong>Beginner</strong><small>Friendly chibbi guides · start with confidence</small></button><button data-difficulty="intermediate" data-age="teen"><strong>Intermediate</strong><small>Teen and young-adult chibbis · build fluency</small></button><button data-difficulty="advanced" data-age="adult"><strong>Advanced</strong><small>Realistic guides · conversation and culture</small></button></div><div class="difficulty-cast" id="difficulty-cast" aria-live="polite"></div><div class="language-choice" id="language-choice"><strong>Choose your bridge language</strong><div class="language-paths"><button data-learning-language="french">🇫🇷 French</button><button data-learning-language="kreyol">🇭🇹 Kreyòl</button><button data-learning-language="patois">🇯🇲 Patois</button><button data-learning-language="spanish">🇪🇸 Spanish</button></div><small>Change this anytime in Settings.</small></div></div></div>
+<script>(function(){const frenchSplash=document.getElementById('french-splash'),savedLanguage=localStorage.getItem('beyond-french.learning-language'),savedDifficulty=localStorage.getItem('beyond-french.difficulty'),cast=document.getElementById('difficulty-cast'),languageChoice=document.getElementById('language-choice'),castBase='<?= h($frenchBase) ?>assets/images/tutors/';const castByAge={kids:[['Louis','louis.jpg'],['Irie','irie.jpg'],['Jazzy','jazzy.jpg'],['Pablo','pablo.jpg']],teen:[['Louis','louis.jpg'],['Irie','irie.jpg'],['Jazzy','jazzy.jpg'],['Pablo','pablo.jpg']],adult:[['Louis','louis.jpg'],['Irie','irie.jpg'],['Jazzy','jazzy.jpg'],['Pablo','pablo.jpg']]};function choose(button){const age=button.dataset.age,difficulty=button.dataset.difficulty;localStorage.setItem('beyond-french.difficulty',difficulty);localStorage.setItem('beyond-french.age',age);cast.innerHTML=castByAge[age].map((t)=>'<figure><img src="'+castBase+(age==='kids'?'':age==='teen'?'high-school/':'advanced/')+t[1]+'" alt="'+t[0]+'"><figcaption>'+t[0]+'</figcaption></figure>').join('');cast.classList.add('visible');languageChoice.classList.add('visible')}document.querySelectorAll('[data-difficulty]').forEach(button=>button.addEventListener('click',()=>choose(button)));document.querySelectorAll('[data-learning-language]').forEach(button=>button.addEventListener('click',()=>{localStorage.setItem('beyond-french.learning-language',button.dataset.learningLanguage);sessionStorage.setItem('beyond-french-entered','1');frenchSplash.classList.add('hidden')}));if(savedDifficulty&&savedLanguage)frenchSplash.classList.add('hidden');})();</script>
 <section class="section app-today-intro" aria-labelledby="today-app-title">
     <div class="app-today-copy">
         <span class="eyebrow">FRANÇAIS DU JOUR</span>
         <h1 id="today-app-title">Today’s lesson</h1>
         <p>Learn the phrase, hear the supported voices, then practice it.</p>
+        <div class="today-stats"><span>🔥 <strong data-daily-streak>0</strong> day streak</span><span>🎓 <strong><?= (int)$academyCompletedCount ?></strong> Academy lessons</span></div>
     </div>
     <div class="app-today-actions">
         <button class="button secondary install-app" id="install-beyond-french" type="button" hidden>Install app</button>
@@ -63,6 +73,7 @@ body.app-shell #academy,body.app-shell #modules{display:none}body.app-shell .mob
         </div>
         <span class="date-badge"><?= h(date('M j', strtotime($lesson['date']))) ?></span>
     </div>
+    <div class="language-set-control"><label for="language-set">Compare with</label><select id="language-set"><option value="core">Caribbean bridge · Kreyòl, Patois, Español</option><option value="euro">Euro expansion · coming next</option><option value="africa">African expansion · coming next</option></select><small id="language-set-note">Four voices, one daily phrase.</small></div>
 
     <article class="lesson-card">
         <div class="english-phrase">
@@ -70,20 +81,20 @@ body.app-shell #academy,body.app-shell #modules{display:none}body.app-shell .mob
             <h3>“<?= h($lesson['english']) ?>”</h3>
         </div>
         <div class="translation-grid">
-            <div class="translation">
+            <div class="translation translation-fr">
                 <span class="flag">🇫🇷</span><small>Français</small>
                 <strong><?= h($lesson['french']) ?></strong>
                 <em><?= h($lesson['french_pronunciation']) ?></em>
             </div>
-            <div class="translation">
+            <div class="translation translation-jm">
                 <span class="flag">🇯🇲</span><small>Patois</small>
                 <strong><?= h($lesson['patois']) ?></strong>
             </div>
-            <div class="translation">
+            <div class="translation translation-ht">
                 <span class="flag">🇭🇹</span><small>Kreyòl</small>
                 <strong><?= h($lesson['kreyol']) ?></strong>
             </div>
-            <div class="translation">
+            <div class="translation translation-es">
                 <span class="flag">🇪🇸</span><small>Español</small>
                 <strong><?= h($lesson['spanish']) ?></strong>
             </div>
@@ -124,6 +135,11 @@ body.app-shell #academy,body.app-shell #modules{display:none}body.app-shell .mob
             <button class="button secondary copy-phrase" type="button" data-copy="<?= h($lesson['french']) ?>">Copy French</button>
             <a class="button primary" href="challenge.php?id=<?= (int)$lesson['id'] ?>">Practice now →</a>
         </div>
+        <section class="speech-check" aria-labelledby="speech-check-title">
+            <div><span class="eyebrow">SPEAK IT BACK</span><h3 id="speech-check-title">Can you match the phrase?</h3><p>Tap record, say the French phrase, and compare your speech-to-text match.</p></div>
+            <button class="button secondary" id="record-phrase" type="button">● Record yourself</button>
+            <div class="speech-match" id="speech-match" role="status" aria-live="polite">Match rate will appear here.</div>
+        </section>
         <div class="lesson-next">
             <span>Next step</span>
             <strong>Use the phrase in a real conversation challenge.</strong>
@@ -155,4 +171,6 @@ body.app-shell #academy,body.app-shell #modules{display:none}body.app-shell .mob
     </div>
 </section>
 <section class="section" id="modules"><div class="section-heading"><div><span class="eyebrow">LEARNING PATH</span><h2>Five practical course modules</h2></div><a class="button primary" href="<?= h($frenchBase) ?>academy.php">Open French Academy</a></div><div class="archive-grid"><?php foreach(french_modules() as $slug=>$module):?><a class="archive-card" href="<?= h($frenchBase) ?>academy.php"><span style="font-size:2rem"><?= h($module['icon']) ?></span><small>MODULE <?= array_search($slug,array_keys(french_modules()),true)+1 ?></small><h3><?= h($module['title']) ?></h3><p><?= h($module['description']) ?></p></a><?php endforeach;?></div></section>
+<script>(function(){const record=document.getElementById('record-phrase'),match=document.getElementById('speech-match');if(!record||!match)return;const target='<?= h($lesson['french']??'') ?>';const normalize=(value)=>value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();const score=(heard)=>{const expected=normalize(target).split(' '),actual=normalize(heard).split(' ');if(!expected.length)return 0;let hits=0;expected.forEach((word,index)=>{if(actual[index]===word||actual.includes(word))hits++});return Math.round((hits/expected.length)*100)};const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Recognition){record.addEventListener('click',()=>{match.textContent='Speech-to-text is not supported in this browser. Try Chrome, Edge, iOS, or Android.'});return}const recognition=new Recognition();recognition.lang='fr-FR';recognition.interimResults=false;recognition.maxAlternatives=1;recognition.onstart=()=>{record.textContent='■ Listening…';record.classList.add('recording');match.textContent='Speak the French phrase now.'};recognition.onresult=(event)=>{const heard=event.results[0][0].transcript,rate=score(heard);match.innerHTML='<strong>'+rate+'% match</strong> · “'+heard+'”'};recognition.onerror=()=>{record.textContent='● Record yourself';record.classList.remove('recording');match.textContent='We could not hear that. Try again in a quiet place.'};recognition.onend=()=>{record.textContent='● Record yourself';record.classList.remove('recording')};record.addEventListener('click',()=>{if(record.classList.contains('recording'))recognition.stop();else recognition.start()})})();</script>
+<script>(function(){const select=document.getElementById('language-set'),note=document.getElementById('language-set-note');if(!select||!note)return;select.addEventListener('change',()=>{note.textContent=select.value==='core'?'Four voices, one daily phrase.':select.value==='euro'?'Euro comparison set is queued for the next language expansion.':'African expansion set is queued for the next language expansion.'})})();</script>
 <?php require __DIR__ . '/includes/footer.php'; ?>

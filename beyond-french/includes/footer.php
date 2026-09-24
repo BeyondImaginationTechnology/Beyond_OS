@@ -1,10 +1,11 @@
 </main>
 <nav class="mobile-tabbar" aria-label="Beyond French navigation">
-    <a href="<?= h($frenchBase) ?>"><span>🏠</span><small>Today</small></a>
-    <a href="<?= h($frenchBase) ?>academy.php"><span>🎓</span><small>Academy</small></a>
-    <a class="tab-primary" href="<?= h($frenchBase) ?>challenge.php"><span>💬</span><small>Practice</small></a>
-    <a href="<?= h($frenchBase) ?>archive.php"><span>📚</span><small>Daily</small></a>
-    <a href="<?= h($frenchBase) ?>archive.php"><span>🔥</span><small>Streak</small></a>
+    <?php $currentFrenchPage = basename($_SERVER['SCRIPT_NAME'] ?? ''); ?>
+    <a class="<?= $currentFrenchPage === 'index.php' ? 'active' : '' ?>" href="<?= h($frenchBase) ?>"><span>⌂</span><small>Home</small></a>
+    <a class="<?= $currentFrenchPage === 'academy.php' ? 'active' : '' ?>" href="<?= h($frenchBase) ?>academy.php"><span>▤</span><small>Academy</small></a>
+    <a class="tab-primary <?= $currentFrenchPage === 'translate.php' ? 'active' : '' ?>" href="<?= h($frenchBase) ?>translate.php"><span>文</span><small>Translate</small></a>
+    <a class="<?= $currentFrenchPage === 'game.php' ? 'active' : '' ?>" href="<?= h($frenchBase) ?>game.php"><span>✧</span><small>Trivia</small></a>
+    <a class="<?= $currentFrenchPage === 'settings.php' ? 'active' : '' ?>" href="<?= h($frenchBase) ?>settings.php"><span>○</span><small>Settings</small></a>
 </nav>
 <footer class="site-footer">
     <p>© <?= date('Y') ?> Beyond French · French first. Five languages. Every day.</p>

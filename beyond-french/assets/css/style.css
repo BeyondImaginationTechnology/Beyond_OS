@@ -64,3 +64,13 @@ body.app-shell .lesson-card .speech-check #record-phrase:hover{background:#ffd34
 body.app-shell .lesson-card .speech-check #record-phrase.recording{border-color:#ff8991;background:#ef3340;color:#fff}
 body.app-shell .lesson-card .speech-match{border:1px solid #66551f;background:#171d2c;color:#e5d9a7}
 body.app-shell .lesson-card .speech-match strong{color:#ffcf45}
+/* Give each language voice its own unmistakable color. */
+body.app-shell .voice-card.voice-fr{border-color:#e85d67;background:linear-gradient(145deg,#b82c36,#8f1f31);color:#fff}
+body.app-shell .voice-card.voice-es{border-color:#ffe080;background:linear-gradient(145deg,#f2bd32,#d99509);color:#17213a}
+body.app-shell .voice-card.voice-es small,body.app-shell .voice-card.voice-es i{color:#26324a}
+body.app-shell .voice-card.voice-ht{border-color:#68a5ff;background:linear-gradient(145deg,#2369cb,#17499d);color:#fff}
+body.app-shell .voice-card.voice-jm{border-color:#51d99b;background:linear-gradient(145deg,#16985f,#087048);color:#fff}
+body.app-shell .voice-card.voice-fr:hover{background:linear-gradient(145deg,#d43843,#a92336)}
+body.app-shell .voice-card.voice-es:hover{background:linear-gradient(145deg,#ffd34d,#e9a915)}
+body.app-shell .voice-card.voice-ht:hover{background:linear-gradient(145deg,#347de0,#205ab2)}
+body.app-shell .voice-card.voice-jm:hover{background:linear-gradient(145deg,#1caf71,#0a8552)}

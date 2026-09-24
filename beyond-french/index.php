@@ -113,16 +113,16 @@ body.app-shell{background:#061633;color:#fff}body.app-shell>.site-header{backgro
                 <button class="voice-stop" type="button" aria-label="Stop audio">■ Stop</button>
             </div>
             <div class="voice-grid">
-                <button class="voice-card active" type="button" data-locale="fr-FR" data-language="French" data-label="French · France" data-speak="<?= h($lesson['french']) ?>" data-audio-url="<?= h($frenchAudioUrl) ?>">
+                <button class="voice-card voice-fr active" type="button" data-locale="fr-FR" data-language="French" data-label="French · France" data-speak="<?= h($lesson['french']) ?>" data-audio-url="<?= h($frenchAudioUrl) ?>">
                     <span class="voice-flag">🇫🇷</span><span><strong>Français</strong><small>France voice</small></span><i>▶</i>
                 </button>
-                <button class="voice-card" type="button" data-locale="es-ES" data-language="Spanish" data-label="Spanish · Spain" data-speak="<?= h($lesson['spanish']) ?>" data-audio-url="<?= h((string)($lessonAudio['es-ES'] ?? '')) ?>">
+                <button class="voice-card voice-es" type="button" data-locale="es-ES" data-language="Spanish" data-label="Spanish · Spain" data-speak="<?= h($lesson['spanish']) ?>" data-audio-url="<?= h((string)($lessonAudio['es-ES'] ?? '')) ?>">
                     <span class="voice-flag">🇪🇸</span><span><strong>Español</strong><small>Spanish voice</small></span><i>▶</i>
                 </button>
-                <button class="voice-card" type="button" data-locale="ht-HT" data-language="Kreyòl" data-label="Haitian Creole" data-speak="<?= h($lesson['kreyol']) ?>" data-audio-url="<?= h((string)($lessonAudio['ht-HT'] ?? '')) ?>">
+                <button class="voice-card voice-ht" type="button" data-locale="ht-HT" data-language="Kreyòl" data-label="Haitian Creole" data-speak="<?= h($lesson['kreyol']) ?>" data-audio-url="<?= h((string)($lessonAudio['ht-HT'] ?? '')) ?>">
                     <span class="voice-flag">🇭🇹</span><span><strong>Kreyòl</strong><small>Haitian voice</small></span><i>▶</i>
                 </button>
-                <button class="voice-card" type="button" data-locale="en-JM" data-language="Patois" data-label="Jamaican Patois" data-speak="<?= h($lesson['patois']) ?>" data-audio-url="<?= h((string)($lessonAudio['en-JM'] ?? '')) ?>">
+                <button class="voice-card voice-jm" type="button" data-locale="en-JM" data-language="Patois" data-label="Jamaican Patois" data-speak="<?= h($lesson['patois']) ?>" data-audio-url="<?= h((string)($lessonAudio['en-JM'] ?? '')) ?>">
                     <span class="voice-flag">🇯🇲</span><span><strong>Patois</strong><small>Jamaican voice</small></span><i>▶</i>
                 </button>
             </div>

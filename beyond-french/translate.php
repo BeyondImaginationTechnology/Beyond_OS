@@ -70,6 +70,7 @@ body.app-shell .translate-modes{grid-template-columns:repeat(3,1fr);gap:7px;marg
 body.app-shell .translate-modes button{min-height:42px;color:#b8c8df;font-size:.86rem}
 body.app-shell .translate-modes button.active{background:#ffbf00;color:#101b2d;box-shadow:0 5px 16px #ffbf0033}
 body.app-shell .translate-toolbar{grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr);gap:10px}
+body.app-shell .translate-toolbar[hidden]{display:none!important}
 body.app-shell .language-choice{display:grid;gap:7px;min-width:0;padding:11px 13px;border:1px solid #344968;border-radius:15px;background:#0b1930}
 body.app-shell .language-choice>span,.translate-input-label{color:#9eb2ce;font-size:.65rem;font-weight:900;letter-spacing:.12em}
 body.app-shell .translate-toolbar .language-choice select{width:100%;padding:0;border:0;background:transparent;font-size:1rem;font-weight:800}

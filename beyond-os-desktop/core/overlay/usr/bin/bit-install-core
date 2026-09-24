@@ -128,7 +128,7 @@ else
   mkfs.ext4 -F -L BEYOND_CORE "$target_root"
   install -d /tmp/bit-target-root
   mount "$target_root" /tmp/bit-target-root
-  tar -C / --one-file-system --exclude=./dev --exclude=./proc --exclude=./sys \
+  tar -C / --exclude=./dev --exclude=./proc --exclude=./sys \
     --exclude=./run --exclude=./tmp --exclude=./mnt --exclude=./media --exclude=./var -cpf - . |
     tar -C /tmp/bit-target-root -xpf -
   install -d -m 0755 /tmp/bit-target-root/var/cache /tmp/bit-target-root/var/lib /tmp/bit-target-root/var/log

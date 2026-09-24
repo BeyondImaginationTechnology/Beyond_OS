@@ -1,6 +1,6 @@
 """Render the Beyond Imagination OS startup artwork; requires Pillow.
 
-The startup mark is the shared jaguar-eye asset from ``ai/assets``. No font
+The startup mark is the official BIT OS shield from ``os/assets``. No font
 files are shipped.
 """
 import argparse
@@ -19,7 +19,7 @@ d = ImageDraw.Draw(im)
 def xy(x, y):
     return round(x * scale), round(y * scale)
 
-asset = Image.open(Path(__file__).resolve().parents[3] / "ai/assets/jaguar-eye-v0.2.png").convert("RGBA")
+asset = Image.open(Path(__file__).resolve().parents[3] / "os/assets/bit-os-logo-v1.png").convert("RGBA")
 logo_size = 150 * scale
 asset.thumbnail((logo_size, logo_size), Image.Resampling.LANCZOS)
 logo_x = (640 * scale - asset.width) // 2
@@ -30,7 +30,7 @@ def text(value, y, size, color):
     font = ImageFont.truetype(str(args.font), size * scale)
     d.text(xy(320, y), value, font=font, fill=color, anchor="mt")
 text("Beyond Imagination OS", 193, 29, (245, 247, 255))
-text("CORE EDITION  1.0", 250, 12, (163, 175, 200))
+text("CORE EDITION  v0.2", 250, 12, (163, 175, 200))
 for index in range(3):
     x = 307 + index * 13
     d.ellipse([xy(x - 2, 309), xy(x + 2, 313)], fill=(115 + index * 25, 142, 230))

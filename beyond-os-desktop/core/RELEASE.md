@@ -1,6 +1,6 @@
-# BIT OS Core v.02 release gates
+# BIT OS Core v0.2 release gates
 
-Current work: `core-dev.1`. Source creation is not a release.
+Current work: `core-0.2`. Source creation is not a release.
 
 Run the following host-side checks after a clean build. They produce deterministic
 failures when the generated config, release files, or required test tools are
@@ -34,4 +34,4 @@ For the HTTP 500 blocker, follow `RELEASE-HOST.md` and rerun
 - [ ] Verify keyboard, mouse, display, filesystem, terminal, network and shutdown behavior.
 - [ ] Validate checksum verification, recovery guidance, licensing notices and support policy.
 
-Do not label, market, or support an ISO, USB image, or Windows installer profile as stable BIT OS Core v.02 until the applicable gates pass. Public test-candidate downloads must remain clearly labelled and accompanied by their SHA-256 manifest.
+Do not label, market, or support an ISO, USB image, or Windows installer profile as stable BIT OS Core v0.2 until the applicable gates pass. Public test-candidate downloads must remain clearly labelled and accompanied by their SHA-256 manifest.

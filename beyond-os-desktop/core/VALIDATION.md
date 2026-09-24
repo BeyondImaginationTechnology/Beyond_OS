@@ -1,21 +1,21 @@
 # Beyond Imagination OS Core validation
 
-Status: **the BIT OS Core v.02 installer candidates are published for testing; Core has not passed its release gates and is not a stable v.02 release.**
+Status: **the BIT OS Core v0.2 candidate is being rebuilt and remains blocked until the fresh artifacts pass every release gate.**
 
 ## Candidate evidence
 
 The remote build produced these artifacts in the installer output directory:
 
 - `bitCoreos.iso` — 81 MiB (filesystem listing on the test VM).
-- `bit-os-core-1.0-installer.img` — 2.1 GiB (filesystem listing on the test VM).
+- `bit-os-core-0.2-installer.img` — fresh size and digest pending rebuild.
 
 The release-host URLs are retained as candidate endpoints, but the current VM artifacts have not yet been confirmed rehosted there:
 
-- `https://os.beyondimagination.co.technology/releases/core/1.0/bitCoreos.iso`
-- SHA-256: `63586535422c959c38f2acea8261513497649757e2997ac51263c031e5ec9ef5`
-- `https://os.beyondimagination.co.technology/releases/core/1.0/bit-os-core-1.0-installer.img`
-- SHA-256: `356fd963c02ccdc68ec5edc3b8c390b8ff45b382c3a5855c5fd9d8de6496356d`
-- `https://os.beyondimagination.co.technology/releases/core/1.0/SHA256SUMS`
+- `https://os.beyondimagination.co.technology/releases/core/0.2/bitCoreos.iso`
+- SHA-256: pending fresh v0.2 rebuild.
+- `https://os.beyondimagination.co.technology/releases/core/0.2/bit-os-core-0.2-installer.img`
+- SHA-256: pending fresh v0.2 rebuild.
+- `https://os.beyondimagination.co.technology/releases/core/0.2/SHA256SUMS`
 
 Treat the VM artifacts as test candidates only until the release-host files and every gate below are revalidated.
 
@@ -39,8 +39,7 @@ Treat the VM artifacts as test candidates only until the release-host files and 
 
 ### Google Cloud UEFI checkpoint (2026-09-22)
 
-- `bitCoreos.iso` was booted with OVMF and software emulation. Firmware loaded the Core GRUB menu and selected `Try BIT OS Core v.02`; the smoke run reached `Booting `Try BIT OS Core v.02'` before the 20-second timeout. This verifies firmware/media discovery and the ISO boot menu/kernel handoff, not the installed graphical session.
-- `bit-os-core-1.0-installer.img` was booted with OVMF in QEMU snapshot mode so the source image remained unchanged. It reached the Core GRUB menu and `Booting `Try BIT OS Core v.02'` before the 20-second timeout. This verifies UEFI media discovery and kernel handoff, not the installed graphical session.
+- The previous candidate ISO and USB image both reached the Core GRUB menu and kernel handoff under OVMF. These results must be repeated for the rebuilt v0.2 artifacts.
 - Selected-partition installation, whole-disk installation, reboot without media, graphical session, network, input and shutdown have not passed. Do not use this candidate as the tested base for Cyber or the later editions yet.
 
 ### Google Cloud noVNC checkpoint (2026-09-22)

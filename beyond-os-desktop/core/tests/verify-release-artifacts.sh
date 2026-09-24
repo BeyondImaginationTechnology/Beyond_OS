@@ -2,7 +2,7 @@
 # Revalidate that the published candidate files are reachable and match SHA256SUMS.
 set -eu
 
-base_url=${1:-https://os.beyondimagination.co.technology/releases/core/1.0}
+base_url=${1:-https://os.beyondimagination.co.technology/releases/core/0.2}
 command -v curl >/dev/null 2>&1 || { echo "Missing host tool: curl" >&2; exit 1; }
 command -v sha256sum >/dev/null 2>&1 || { echo "Missing host tool: sha256sum" >&2; exit 1; }
 
@@ -25,7 +25,7 @@ fetch "$base_url/SHA256SUMS" "$work_dir/SHA256SUMS"
 while IFS='  ' read -r digest name; do
     [ -n "$digest" ] || continue
     case "$name" in
-        bitCoreos.iso|bit-os-core-1.0-installer.img) ;;
+        bitCoreos.iso|bit-os-core-0.2-installer.img) ;;
         *) continue ;;
     esac
     fetch "$base_url/$name" "$work_dir/$name"

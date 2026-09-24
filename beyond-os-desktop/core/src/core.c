@@ -2,6 +2,7 @@
 #define _POSIX_C_SOURCE 200809L
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
+#include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <dirent.h>
 #include <errno.h>
@@ -31,6 +32,7 @@
 enum Page { HOME, FILES, NOTES, ABOUT, VIEWER };
 typedef struct { char name[256]; bool directory; } Entry;
 static SDL_Renderer *renderer;
+static SDL_Texture *brand_logo;
 static TTF_Font *small_font, *font, *title_font;
 static enum Page page = HOME;
 static char note[NOTE_CAP], status[256], directory[PATH_CAP], note_path[PATH_CAP];
@@ -52,7 +54,7 @@ static const char *titles[] = {"Scope & Inventory", "Evidence", "Terminal", "Abo
 static const char *subtitles[] = {"Record authorization before network discovery", "Keep local findings together",
                                   "Your Linux command line", "Your system, at a glance"};
 #else
-#define EDITION_LABEL "CORE EDITION 1.0"
+#define EDITION_LABEL "CORE EDITION v0.2"
 #define HOME_KICKER "A SMALLER, STEADIER FOUNDATION"
 #define HOME_TITLE "Start with the essentials."
 #define HOME_COPY "A focused system for custom machines and virtual environments."
@@ -101,23 +103,15 @@ static void paragraph(const char *value, int x, int y, int width, int height)
     SDL_FreeSurface(surface);
 }
 
-static void orbit(int cx, int cy, double radius)
+static void logo(int cx, int cy, int size)
 {
-    for (int ring = 0; ring < 3; ring++) {
-        double angle = ring * 3.141592653589793 / 3.0;
-        for (int i = 0; i < 180; i++) {
-            double a = i * 6.283185307179586 / 180.0;
-            double b = (i + 1) * 6.283185307179586 / 180.0;
-            double ax = radius * cos(a), ay = radius * 0.345 * sin(a);
-            double bx = radius * cos(b), by = radius * 0.345 * sin(b);
-            SDL_SetRenderDrawColor(renderer, (Uint8)(105 + i / 3), 150, 250, 255);
-            SDL_RenderDrawLine(renderer, cx + (int)(ax*cos(angle)-ay*sin(angle)),
-                              cy + (int)(ax*sin(angle)+ay*cos(angle)),
-                              cx + (int)(bx*cos(angle)-by*sin(angle)),
-                              cy + (int)(bx*sin(angle)+by*cos(angle)));
-        }
+    SDL_Rect dest = {cx - size / 2, cy - size / 2, size, size};
+    if (brand_logo) {
+        SDL_RenderCopy(renderer, brand_logo, NULL, &dest);
+    } else {
+        box(dest.x, dest.y, dest.w, dest.h, 20, 31, 54);
+        text(font, "BIT", dest.x + size / 5, dest.y + size / 3, white);
     }
-    box(cx - 2, cy - 5, 4, 10, 219, 215, 255);
 }
 
 static bool join_path(char *dest, size_t size, const char *base, const char *name)
@@ -277,7 +271,7 @@ static void draw(void)
 {
     for (int y = 0; y < H; y++) box(0, y, W, 1, 9 + y/110, 13 + y/100, 22 + y/60);
     box(0, 0, W, 64, 12, 18, 30);
-    orbit(35, 32, 20);
+    logo(35, 32, 42);
     text(font, "Beyond Imagination OS", 68, 18, white);
     text(small_font, EDITION_LABEL, 224, 24, muted);
     time_t now = time(NULL);
@@ -290,7 +284,7 @@ static void draw(void)
         text(small_font, HOME_KICKER, 74, 133, accent);
         text(title_font, HOME_TITLE, 70, 170, white);
         text(font, HOME_COPY, 74, 232, muted);
-        orbit(1060, 217, 93);
+        logo(1060, 217, 190);
         for (int i = 0; i < 4; i++) {
             int x = 74 + (i % 2)*575, y = 320 + (i/2)*153;
             box(x, y, 551, 130, i == selected ? 35 : 23, i == selected ? 46 : 33, i == selected ? 70 : 49);
@@ -329,7 +323,7 @@ static void draw(void)
 #ifdef BIT_EDITION_CYBER
             paragraph("BIT OS Cyber Edition 1.0\nDevelopment build: cyber-dev.1\n\nAn independent Linux workspace for authorized assessment, evidence handling and reporting.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2 / Nmap\n\nThe inventory launcher requires a local authorization record and runs a limited TCP connect inventory. Packet capture, browser research, user setup, installation and signed updates are still in development.",
 #else
-            paragraph("BIT OS Core v.02\nDevelopment build: core-dev.1\n\nAn independent Linux system, assembled from upstream source.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2\n\nLocal Files and Notes work in this preview. Modern browsing, media,\nuser setup, installation and signed updates are still in development.",
+            paragraph("BIT OS Core v0.2\nRelease candidate: core-0.2\n\nAn independent Linux system, assembled from upstream source.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2\n\nCore intentionally remains minimal. Local Files, Notes and Terminal are included; browser and application bundles belong to later editions.",
 #endif
                       54, 236, 1150, 365);
 #ifndef _WIN32
@@ -367,7 +361,7 @@ int main(int argc, char **argv)
     signal(SIGCHLD, SIG_IGN);
 #endif
     SDL_SetMainReady();
-    if (SDL_Init(SDL_INIT_VIDEO) || TTF_Init()) {
+    if (SDL_Init(SDL_INIT_VIDEO) || TTF_Init() || !(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
         fprintf(stderr, "Display initialization: %s\n", SDL_GetError()); return 1;
     }
     small_font = TTF_OpenFont(font_path, 16);
@@ -387,6 +381,7 @@ int main(int argc, char **argv)
     if (!window) { fprintf(stderr, "%s\n", SDL_GetError()); return 1; }
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
     if (!renderer) { fprintf(stderr, "%s\n", SDL_GetError()); return 1; }
+    brand_logo = IMG_LoadTexture(renderer, "/usr/share/beyond-core/bit-os-logo.png");
     SDL_RenderSetLogicalSize(renderer, W, H);
     if (preview) {
         draw();
@@ -449,8 +444,9 @@ int main(int argc, char **argv)
             SDL_Delay(33);
         }
     }
+    SDL_DestroyTexture(brand_logo);
     TTF_CloseFont(small_font); TTF_CloseFont(font); TTF_CloseFont(title_font);
     SDL_DestroyRenderer(renderer); SDL_DestroyWindow(window);
-    TTF_Quit(); SDL_Quit();
+    IMG_Quit(); TTF_Quit(); SDL_Quit();
     return 0;
 }

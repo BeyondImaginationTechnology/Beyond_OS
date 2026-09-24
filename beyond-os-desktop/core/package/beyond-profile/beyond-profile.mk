@@ -1,7 +1,7 @@
 ################################################################################
 # Beyond Imagination OS flavour profile
 ################################################################################
-BEYOND_PROFILE_VERSION = 1.0.0-dev.1
+BEYOND_PROFILE_VERSION = 0.2.0
 BEYOND_PROFILE_SITE = $(BR2_EXTERNAL_BEYOND_CORE_PATH)/../flavours
 BEYOND_PROFILE_SITE_METHOD = local
 BEYOND_PROFILE_LICENSE = proprietary (product profile metadata)

@@ -51,11 +51,11 @@ if [[ "$action" == build ]]; then
         sha256sum bzImage rootfs.ext2 > SHA256SUMS
     )
     cp "$output/.config" "$output/images/beyond-core.config"
-    printf 'Beyond Imagination OS %s 1.0 images: %s/images\n' "$profile" "$output"
+    printf 'BIT OS %s v0.2 images: %s/images\n' "$profile" "$output"
 elif [[ "$action" == installer ]]; then
-    test -s "$output/images/bit-os-core-1.0-installer.img"
+    test -s "$output/images/bit-os-core-0.2-installer.img"
     test -s "$output/images/bitCoreos.iso"
     test -s "$output/images/SHA256SUMS"
     cp "$output/.config" "$output/images/beyond-core-installer.config"
-    printf 'Beyond Imagination OS %s 1.0 UEFI installer candidate: %s/images\n' "$profile" "$output"
+    printf 'BIT OS %s v0.2 UEFI installer candidate: %s/images\n' "$profile" "$output"
 fi

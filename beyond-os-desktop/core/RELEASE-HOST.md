@@ -1,4 +1,4 @@
-# Core v.02 release-host handoff
+# Core v0.2 release-host handoff
 
 The release host must serve the candidate files as static objects. A proxy or
 application error on `/releases/` is a release blocker.
@@ -9,22 +9,22 @@ From the clean Linux build output:
 
 ```sh
 cd out/installer-output/images
-sha256sum bitCoreos.iso bit-os-core-1.0-installer.img > SHA256SUMS
+sha256sum bitCoreos.iso bit-os-core-0.2-installer.img > SHA256SUMS
 ```
 
 Copy all three files into the host's static document root at:
 
 ```text
-releases/core/1.0/
+releases/core/0.2/
 ```
 
 The directory must be readable by the web server and must not be routed to a
 dynamic application handler. Confirm from an external network:
 
 ```sh
-curl --fail --location --head https://os.beyondimagination.co.technology/releases/core/1.0/SHA256SUMS
-curl --fail --location --head https://os.beyondimagination.co.technology/releases/core/1.0/bitCoreos.iso
-curl --fail --location --head https://os.beyondimagination.co.technology/releases/core/1.0/bit-os-core-1.0-installer.img
+curl --fail --location --head https://os.beyondimagination.co.technology/releases/core/0.2/SHA256SUMS
+curl --fail --location --head https://os.beyondimagination.co.technology/releases/core/0.2/bitCoreos.iso
+curl --fail --location --head https://os.beyondimagination.co.technology/releases/core/0.2/bit-os-core-0.2-installer.img
 ```
 
 Then run `tests/verify-release-artifacts.sh`. Do not publish if any request is

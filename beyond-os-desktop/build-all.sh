@@ -26,7 +26,7 @@ run_tree() {
     local images="$output/installer-output/images"
     # The shared Core builder deliberately keeps its stable internal names;
     # release bundles get the selected flavour name at the orchestration edge.
-    cp "$images/bit-os-core-1.0-installer.img" "$images/bit-os-$flavour-1.0-installer.img"
+    cp "$images/bit-os-core-0.2-installer.img" "$images/bit-os-$flavour-1.0-installer.img"
     cp "$images/bitCoreos.iso" "$images/bit${flavour^}os.iso"
     sha256sum "$images/bit-os-$flavour-1.0-installer.img" "$images/bit${flavour^}os.iso" > "$images/SHA256SUMS"
   fi
@@ -34,7 +34,7 @@ run_tree() {
     local images="$output/installer-output/images"
     local iso image sums
     case "$flavour" in
-      core) iso="$images/bitCoreos.iso"; image="$images/bit-os-core-1.0-installer.img" ;;
+      core) iso="$images/bitCoreos.iso"; image="$images/bit-os-core-0.2-installer.img" ;;
       home) iso="$images/bitHomeos.iso"; image="$images/bit-os-home-1.0-installer.img" ;;
       cyber) iso="$images/bitCyberos.iso"; image="$images/bit-os-cyber-1.0-installer.img" ;;
       *) iso="$images/bit${flavour^}os.iso"; image="$images/bit-os-$flavour-1.0-installer.img" ;;

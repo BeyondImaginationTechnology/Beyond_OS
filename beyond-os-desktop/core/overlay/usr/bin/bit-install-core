@@ -40,7 +40,7 @@ case "$source_root" in
     ;;
 esac
 
-notice "BIT OS Core v.02 installer"
+notice "BIT OS Core v0.2 installer"
 notice "Choose where Core will be installed. The installer never chooses a disk automatically."
 notice "\nAvailable block devices:"
 lsblk -o NAME,SIZE,TYPE,FSTYPE,PARTTYPE,MODEL,MOUNTPOINTS

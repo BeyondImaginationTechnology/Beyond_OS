@@ -40,6 +40,15 @@ if [[ "$(cd -- "${PUBLIC_ROOT}" && pwd)" != "${REPOSITORY_ROOT}" ]]; then
     "${REPOSITORY_ROOT}/" "${PUBLIC_ROOT}/"
 fi
 
+# The private umask protects deployment state, but Git may create newly checked-out
+# public assets with those same restrictive permissions. Make only the provider
+# sign-in artwork readable by the web server.
+for asset in assets/icons/apple-continue-button.png assets/icons/github-invertocat-white.png; do
+  ASSET_PATH="${PUBLIC_ROOT}/${asset}"
+  [[ -f "${ASSET_PATH}" ]] || { echo "Required public sign-in asset is missing: ${ASSET_PATH}" >&2; exit 1; }
+  chmod 0644 "${ASSET_PATH}"
+done
+
 DEPLOY_COMMIT="$(git rev-parse HEAD)"
 DEPLOYED_AT="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 DEPLOY_STATE_DIR="${PRIVATE_ROOT}/deployments"

@@ -54,6 +54,10 @@ $providers = [
     'github' => ['GitHub'],
     'apple' => ['Apple'],
 ];
+
+$providerAssetDirectory = dirname(__DIR__, 2) . '/assets/icons/';
+$githubLogo = 'data:image/png;base64,' . base64_encode((string)file_get_contents($providerAssetDirectory . 'github-invertocat-white.png'));
+$appleLogo = 'data:image/png;base64,' . base64_encode((string)file_get_contents($providerAssetDirectory . 'apple-continue-button.png'));
 ?>
 <!doctype html>
 <html lang="en">
@@ -89,8 +93,8 @@ $providers = [
 <div class="providers">
 <?php foreach ($providers as $provider => [$label]): ?>
 <?php $icon = match ($provider) {
-    'github' => '<img src="../../assets/icons/github-invertocat-white.png" alt="">',
-    'apple' => '<img src="../../assets/icons/apple-continue-button.png" alt="Continue with Apple">',
+    'github' => '<img src="' . $githubLogo . '" alt="">',
+    'apple' => '<img src="' . $appleLogo . '" alt="Continue with Apple">',
     default => 'G',
 }; ?>
 <?php if (beyond_social_enabled($provider)): ?>

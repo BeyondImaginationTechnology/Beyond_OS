@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TodayView: View {
-    var onHome: () -> Void = {}
+    var onNavigate: (DailyBreathTab) -> Void = { _ in }
     @EnvironmentObject private var store: DailyBreathStore
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
@@ -65,28 +65,20 @@ struct TodayView: View {
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button(action: onHome) {
-                    Label("Home", systemImage: "house.fill")
+                Menu {
+                    Button { onNavigate(.home) } label: { Label("Home", systemImage: "house.fill") }
+                    Button { onNavigate(.scripture) } label: { Label("Scripture", systemImage: "book.closed.fill") }
+                    Button { onNavigate(.chat) } label: { Label("Chat", systemImage: "bubble.left.and.bubble.right.fill") }
+                    Button { onNavigate(.academy) } label: { Label("Academy", systemImage: "graduationcap.fill") }
+                    Button { onNavigate(.trivia) } label: { Label("Trivia", systemImage: "questionmark.circle.fill") }
+                    Button { onNavigate(.breathe) } label: { Label("Breathe", systemImage: "wind") }
+                    Button { onNavigate(.journal) } label: { Label("Journal", systemImage: "square.and.pencil") }
+                    Button { onNavigate(.settings) } label: { Label("Settings", systemImage: "gearshape.fill") }
+                } label: {
+                    Label("Menu", systemImage: "line.3.horizontal")
                 }
+                .accessibilityHint("Opens Daily Breath navigation")
             }
-        }
-        .safeAreaInset(edge: .top, spacing: 0) {
-            HStack(spacing: 7) {
-                if store.isRefreshing { ProgressView().controlSize(.small) }
-                else { Image(systemName: store.dailyContentAvailability.systemImage) }
-                Text(store.dailyContentAvailability.title)
-                    .font(.caption.weight(.semibold))
-                    .lineLimit(2)
-                Spacer(minLength: 0)
-                if !store.isRefreshing {
-                    Button("Refresh") { Task { await store.refreshToday() } }
-                        .font(.caption.weight(.bold))
-                        .accessibilityHint("Refreshes today’s verse and devotional")
-                }
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            .background(.background.opacity(0.94))
         }
         .refreshable { await store.refreshToday() }
         .onChange(of: scenePhase) { _, phase in

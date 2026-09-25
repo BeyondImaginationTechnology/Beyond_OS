@@ -128,9 +128,9 @@ struct RootView: View {
     private func detailView(for tab: DailyBreathTab) -> some View {
         switch tab {
         case .home:
-            NavigationStack { DailyBreathHomeView() }
+            NavigationStack { DailyBreathHomeView(onNavigate: { selectedTab = $0 }) }
         case .today:
-            NavigationStack { TodayView(onHome: { selectedTab = .home }) }
+            NavigationStack { TodayView(onNavigate: { selectedTab = $0 }) }
         case .settings:
             NavigationStack { SettingsAboutView() }
         case .scripture:
@@ -150,8 +150,8 @@ struct RootView: View {
 }
 
 private struct DailyBreathHomeView: View {
+    var onNavigate: (DailyBreathTab) -> Void = { _ in }
     @EnvironmentObject private var store: DailyBreathStore
-    @Environment(\.dismiss) private var dismiss
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
     @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
     @AppStorage("dailyReadingDayKeys") private var readDays = ""
@@ -187,11 +187,12 @@ private struct DailyBreathHomeView: View {
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(.background.opacity(0.88), in: RoundedRectangle(cornerRadius: 16))
-                NavigationLink { TodayView(onHome: { dismiss() }) } label: {
+                Button { onNavigate(.today) } label: {
                     Label("Open Today · \(store.dailyVerse(for: tradition).reference)", systemImage: "sun.max.fill")
                         .font(.headline).frame(maxWidth: .infinity, alignment: .leading)
                         .padding().background(DailyBreathTheme(id: selectedThemeID).primary.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
                 }
+                .buttonStyle(.plain)
                 ScriptureContinueReadingLink()
                 NavigationLink { ScriptureLibraryView() } label: {
                     Label("Explore Scripture", systemImage: "book.closed.fill")

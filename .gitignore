@@ -46,5 +46,12 @@ Thumbs.db
 # Locally staged BIT OS release artifacts (published separately to HostDeal).
 /exports/bit-os-cyber-1.0/
 
+# Published core images are uploaded to the server and retained outside Git.
+/os/releases/
+/releases/core/
+
+# Legacy host-side copy; the canonical helper is under DailyBreathAndroid/scripts/.
+/DailyBreathAndroid/generate-upload-keystore.ps1
+
 # Generated build caches stay out of the web root and repository.
 /.cache/

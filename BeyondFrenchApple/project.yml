@@ -22,8 +22,13 @@ targets:
     platform: iOS
     sources:
       - path: Sources
+      - path: Resources/Assets.xcassets
     resources:
-      - path: Resources
+      - path: Resources/Audio
+        type: folder
+      - path: Resources/academy.json
+      - path: Resources/dictionary.json
+      - path: Resources/LaunchScreen.storyboard
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.beyondfrench

@@ -8,6 +8,7 @@ import UIKit
 @MainActor
 final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthenticationPresentationContextProviding {
     @Published private(set) var isSignedIn: Bool
+    @Published private(set) var isSigningIn = false
     @Published private(set) var message: String?
     @Published private(set) var accountDeletionMessage: String?
 
@@ -33,7 +34,9 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
     }
 
     func signIn() {
+        guard !isSigningIn else { return }
         message = nil
+        isSigningIn = true
         verifier = randomURLSafe(count: 64)
         let challenge = base64URL(Data(SHA256.hash(data: Data(verifier.utf8))))
         var components = URLComponents(url: loginURL, resolvingAgainstBaseURL: false)!
@@ -46,19 +49,23 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
             Task { @MainActor in
                 if let error {
                     if (error as? ASWebAuthenticationSessionError)?.code != .canceledLogin { self.message = "Beyond-ID sign-in could not be completed." }
+                    self.isSigningIn = false
                     return
                 }
                 guard let callback else {
                     self.message = "Beyond ID sign-in did not return to the app."
+                    self.isSigningIn = false
                     return
                 }
                 let queryItems = URLComponents(url: callback, resolvingAgainstBaseURL: false)?.queryItems ?? []
                 if let returnedError = queryItems.first(where: { $0.name == "error" })?.value, !returnedError.isEmpty {
-                    self.message = returnedError
+                    self.message = "\(returnedError) If this keeps happening, try again in a moment or contact support."
+                    self.isSigningIn = false
                     return
                 }
                 guard let code = queryItems.first(where: { $0.name == "code" })?.value else {
                     self.message = "Beyond ID sign-in returned no authorization code. Please try again."
+                    self.isSigningIn = false
                     return
                 }
                 await self.exchange(code: code)
@@ -66,7 +73,10 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
         }
         session?.presentationContextProvider = self
         session?.prefersEphemeralWebBrowserSession = false
-        if session?.start() != true { message = "Beyond-ID sign-in could not be started." }
+        if session?.start() != true {
+            isSigningIn = false
+            message = "Beyond-ID sign-in could not be started. Check your connection and try again."
+        }
     }
 
     func signOut() {
@@ -136,6 +146,7 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
         UserDefaults.standard.removeObject(forKey: tokenExpiresAtKey)
         isSignedIn = false
         self.message = message
+        isSigningIn = false
     }
 
     func requestAccountDeletion() async -> Bool {

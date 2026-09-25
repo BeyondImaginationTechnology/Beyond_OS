@@ -1,4 +1,4 @@
-const CACHE='dailybreath-2.0.2-shell-v2';
+const CACHE='dailybreath-2.2.0-shell-v1';
 const SHELL=['/dailybreath/offline.html','/dailybreath/manifest.webmanifest','/dailybreath/assets/css/web-app.css','/dailybreath/assets/js/locales.js','/dailybreath/assets/js/web-app.js','/dailybreath/assets/icons/dailybreath-mark-v2.png'];
 const OFFLINE_PAGES=new Set(['/dailybreath/','/dailybreath/index.php','/dailybreath/bible.php','/dailybreath/scripture.php','/dailybreath/devotionals.php','/dailybreath/privacy.php','/dailybreath/terms.php','/dailybreath/data-controls.php']);
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting())));

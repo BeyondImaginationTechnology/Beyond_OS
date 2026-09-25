@@ -13,7 +13,7 @@ $flow = is_array($_SESSION['oauth_flow'] ?? null) ? $_SESSION['oauth_flow'] : []
 $provider = strtolower(trim((string)($_GET['provider'] ?? ($flow['provider'] ?? ''))));
 unset($_SESSION['oauth_flow']);
 try {
-    if (!in_array($provider, ['google', 'github', 'apple'], true) || ($flow['provider'] ?? '') !== $provider) throw new BeyondSocialUserException('Social sign-in session is invalid.');
+    if (!in_array($provider, ['google', 'github', 'apple', 'x'], true) || ($flow['provider'] ?? '') !== $provider) throw new BeyondSocialUserException('Social sign-in session is invalid.');
     if (time() - (int)($flow['created_at'] ?? 0) > 600) throw new BeyondSocialUserException('Social sign-in expired. Please try again.');
     $response = $_SERVER['REQUEST_METHOD'] === 'POST' ? $_POST : $_GET;
     $state = (string)($response['state'] ?? '');
@@ -27,13 +27,26 @@ try {
     if ($accessToken === '') throw new BeyondSocialUserException('The provider did not return an access token.');
     $profile = beyond_social_profile($provider, $accessToken, $tokens);
     if ($profile['subject'] === '') throw new BeyondSocialUserException('The provider account is missing an identifier.');
-    if ($provider !== 'instagram' && (!$profile['email_verified'] || !filter_var($profile['email'], FILTER_VALIDATE_EMAIL))) {
+    if ($provider !== 'x' && $provider !== 'instagram' && (!$profile['email_verified'] || !filter_var($profile['email'], FILTER_VALIDATE_EMAIL))) {
         throw new BeyondSocialUserException('A verified email address is required. Make sure your social account shares its email with Beyond ID.');
     }
 
     $identity = $pdo->prepare('SELECT user_id FROM social_identities WHERE provider=? AND provider_user_id=? LIMIT 1');
     $identity->execute([$provider, $profile['subject']]);
     $userId = (int)($identity->fetchColumn() ?: 0);
+    if ($provider === 'x' && !$userId && (!$profile['email_verified'] || !filter_var($profile['email'], FILTER_VALIDATE_EMAIL))) {
+        $_SESSION['pending_x_identity'] = [
+            'subject' => $profile['subject'],
+            'username' => $profile['username'] ?? '',
+            'name' => $profile['name'],
+            'created_at' => time(),
+            'return_to' => is_string($_SESSION['beyond_return_to'] ?? null) ? $_SESSION['beyond_return_to'] : '',
+            'mobile_scheme' => $flow['mobile_scheme'] ?? '',
+            'mobile_code_challenge' => $flow['mobile_code_challenge'] ?? '',
+        ];
+        header('Location: x-complete.php');
+        exit;
+    }
     if ($provider === 'instagram' && !$userId) {
         $_SESSION['pending_instagram_identity'] = [
             'subject' => $profile['subject'],
@@ -86,6 +99,9 @@ try {
         } catch (Throwable $metadataException) {
             error_log('OAuth Instagram metadata refresh skipped class=' . get_class($metadataException) . ': ' . $metadataException->getMessage());
         }
+    } elseif ($provider === 'x') {
+        $update = $pdo->prepare('UPDATE social_identities SET display_name=?,updated_at=? WHERE provider=? AND provider_user_id=?');
+        $update->execute([$profile['name'], date('Y-m-d H:i:s'), $provider, $profile['subject']]);
     } else {
         $update = $pdo->prepare('UPDATE social_identities SET email=?,display_name=?,updated_at=? WHERE provider=? AND provider_user_id=?');
         $update->execute([$profile['email'], $profile['name'], date('Y-m-d H:i:s'), $provider, $profile['subject']]);
@@ -94,8 +110,8 @@ try {
     $userStatement->execute([$userId]);
     $user = $userStatement->fetch(PDO::FETCH_ASSOC);
     if (!$user || ($user['status'] ?? 'active') !== 'active') throw new BeyondSocialUserException('This Beyond ID is not active.');
-    if ($provider === 'instagram' && empty($user['email_verified']) && empty($user['email_verified_at'])) {
-        throw new BeyondSocialUserException('Verify your Beyond ID email before signing in with Instagram.');
+    if (in_array($provider, ['instagram', 'x'], true) && empty($user['email_verified']) && empty($user['email_verified_at'])) {
+        throw new BeyondSocialUserException('Verify your Beyond ID email before signing in with ' . ($provider === 'x' ? 'X' : 'Instagram') . '.');
     }
     $pdo->commit();
     beyond_social_login_session($pdo, $user, $provider, beyond_social_destination($flow));

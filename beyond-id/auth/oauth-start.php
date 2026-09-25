@@ -9,7 +9,7 @@ header('Referrer-Policy: no-referrer');
 
 $provider = strtolower(trim((string)($_GET['provider'] ?? '')));
 if ($provider === 'facebook') $provider = 'meta';
-if (!in_array($provider, ['google', 'github', 'apple'], true) || !beyond_social_enabled($provider)) {
+if (!in_array($provider, ['google', 'github', 'apple', 'x'], true) || !beyond_social_enabled($provider)) {
     $_SESSION['oauth_error'] = 'That social sign-in provider is not configured yet.';
     header('Location: login.php');
     exit;

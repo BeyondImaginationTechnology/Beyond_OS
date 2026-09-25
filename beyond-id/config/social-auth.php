@@ -50,4 +50,12 @@ return [
         'userinfo_url' => '',
         'scopes' => ['name', 'email'],
     ],
+    'x' => [
+        'client_id' => $read('BEYOND_X_CLIENT_ID', 'x', 'client_id'),
+        'client_secret' => $read('BEYOND_X_CLIENT_SECRET', 'x', 'client_secret'),
+        'authorize_url' => 'https://x.com/i/oauth2/authorize',
+        'token_url' => 'https://api.x.com/2/oauth2/token',
+        'userinfo_url' => 'https://api.x.com/2/users/me',
+        'scopes' => ['users.read', 'tweet.read', 'users.email'],
+    ],
 ];

@@ -21,7 +21,12 @@ if (!in_array($method, ['GET', 'PUT'], true)) {
 }
 
 try {
-    $claims = beyond_mobile_verify_token(beyond_mobile_bearer_token(), 'beyond-french-ios', $pdo);
+    $token = beyond_mobile_bearer_token();
+    $audience = beyond_mobile_token_audience($token);
+    if (!in_array($audience, ['beyond-french-ios', 'beyond-french-android'], true)) {
+        throw new RuntimeException('Token is not for Beyond French.');
+    }
+    $claims = beyond_mobile_verify_token($token, $audience, $pdo);
     beyond_mobile_require_scope($claims, $method === 'GET' ? 'progress:read' : 'progress:write');
     $userId = (int)$claims['user_id'];
 } catch (Throwable $error) {

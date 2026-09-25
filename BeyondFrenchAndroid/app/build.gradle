@@ -1,6 +1,19 @@
 plugins { id 'com.android.application' }
 android { namespace 'technology.co.beyondimagination.beyondfrench'; compileSdk 37
- defaultConfig { applicationId 'technology.co.beyondimagination.beyondfrench'; minSdk 26; targetSdk 37; versionCode 1; versionName '1.2.0' }
+ defaultConfig { applicationId 'technology.co.beyondimagination.beyondfrench'; minSdk 26; targetSdk 37; versionCode 2; versionName '1.2.0' }
  buildTypes { release { minifyEnabled true; shrinkResources true; proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro' } }
  compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
+
+def releaseKeyStorePath = System.getenv('CM_KEYSTORE_PATH')
+if (releaseKeyStorePath) {
+    android.signingConfigs {
+        release {
+            storeFile file(releaseKeyStorePath)
+            storePassword System.getenv('CM_KEYSTORE_PASSWORD')
+            keyAlias System.getenv('CM_KEY_ALIAS')
+            keyPassword System.getenv('CM_KEY_PASSWORD')
+        }
+    }
+    android.buildTypes.release.signingConfig = android.signingConfigs.release
 }

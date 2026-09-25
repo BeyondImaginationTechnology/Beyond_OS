@@ -2,7 +2,7 @@
   "id": "/dailybreath/",
   "name": "Daily Breath",
   "short_name": "Daily Breath",
-  "version": "2.0.2",
+  "version": "2.2.0",
   "description": "Bible, Torah, and Quran daily readings, complete local sacred-text libraries, devotionals, chat, breathing, reflection, and recovery support.",
   "start_url": "/dailybreath/?source=pwa",
   "scope": "/dailybreath/",

@@ -59,11 +59,17 @@ final class NavIconView extends View {
                 path.moveTo(2, 16); path.lineTo(15, 16); path.cubicTo(20, 16, 20, 21, 16, 21);
                 path.cubicTo(14, 21, 13, 20, 13, 19); canvas.drawPath(path, pen);
                 break;
-            default: // Journal: pencil on page
+            case 5: // Journal: pencil on page
                 canvas.drawRoundRect(4, 2, 18, 22, 2, 2, pen);
                 path.moveTo(8, 8); path.lineTo(14, 8); path.moveTo(8, 12); path.lineTo(12, 12);
                 path.moveTo(11, 18); path.lineTo(20, 9); path.lineTo(22, 11); path.lineTo(13, 20);
                 path.lineTo(10, 21); path.close(); canvas.drawPath(path, pen);
+                break;
+            default: // Home: roof and doorway
+                path.moveTo(2, 11); path.lineTo(12, 3); path.lineTo(22, 11);
+                path.moveTo(5, 10); path.lineTo(5, 21); path.lineTo(19, 21); path.lineTo(19, 10);
+                path.moveTo(10, 21); path.lineTo(10, 14); path.lineTo(14, 14); path.lineTo(14, 21);
+                canvas.drawPath(path, pen);
                 break;
         }
         canvas.restore();

@@ -77,7 +77,7 @@ function beyond_live_config(): array
     }
 
     $hasOAuthCredentials = static function (array $candidate): bool {
-        foreach (['google', 'github', 'apple'] as $provider) {
+        foreach (['google', 'github', 'apple', 'x'] as $provider) {
             $credentials = $candidate['oauth'][$provider] ?? null;
             if (!is_array($credentials)) {
                 continue;

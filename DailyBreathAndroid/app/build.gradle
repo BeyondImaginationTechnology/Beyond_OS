@@ -11,8 +11,8 @@ android {
         applicationId 'technology.co.beyondimagination.dailybreath'
         minSdk 26
         targetSdk 37
-        versionCode providers.gradleProperty('versionCode').map { it.toInteger() }.getOrElse(4)
-        versionName providers.gradleProperty('versionName').getOrElse('2.1.1')
+        versionCode providers.gradleProperty('versionCode').map { it.toInteger() }.getOrElse(5)
+        versionName providers.gradleProperty('versionName').getOrElse('2.2.0')
     }
     flavorDimensions += 'store'
     productFlavors {

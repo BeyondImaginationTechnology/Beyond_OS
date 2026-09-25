@@ -68,7 +68,7 @@ public final class MainActivity extends Activity {
     private static final String[] THEME_NAMES={"Forest","Botanical","Dawn","Rose","Torah Light","Quran Moon"};
     private String themeId="forest";
     private int surface=Color.WHITE, bodyInk=Color.DKGRAY;
-    private static final String[] TABS = {"Today", "Scripture", "Chat", "Academy", "Breathe", "Journal"};
+    private static final String[] TABS = {"Home", "Today", "Scripture", "Chat", "Academy", "Breathe", "Journal"};
     private static final String ACADEMY_PRODUCT_ID = "dailybreath.academy.full";
     private static final Set<String> TANAKH_CODES = new HashSet<>(Arrays.asList("GEN","EXO","LEV","NUM","DEU","JOS","JDG","RUT","1SA","2SA","1KI","2KI","1CH","2CH","EZR","NEH","EST","JOB","PSA","PRO","ECC","SOL","ISA","JER","LAM","EZE","DAN","HOS","JOE","AMO","OBA","JON","MIC","NAH","HAB","ZEP","HAG","ZEC","MAL"));
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -91,6 +91,7 @@ public final class MainActivity extends Activity {
     private ProductDetails academyProduct;
     private boolean academyUnlocked;
     private String beyondAccessToken;
+    private String beyondSignInError="";
     private LinearLayout chatThread;
     private EditText chatInput;
     private Button chatSend;
@@ -126,16 +127,16 @@ public final class MainActivity extends Activity {
         header.addView(label("DAILY BREATH",20,INK,true)); header.addView(label("Sacred reading, breath, and reflection",13,Color.DKGRAY,false)); root.addView(header);
         ScrollView scroll = new ScrollView(this); scroll.setFillViewport(true); page = new LinearLayout(this); page.setOrientation(LinearLayout.VERTICAL); page.setPadding(dp(20),dp(16),dp(20),dp(28)); scroll.addView(page); root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         nav = new LinearLayout(this); nav.setOrientation(LinearLayout.HORIZONTAL); nav.setBackgroundColor(FOREST_DARK); nav.setPadding(dp(3),dp(5),dp(3),dp(3)); root.addView(nav,new LinearLayout.LayoutParams(-1,dp(68)));
-        setContentView(root); showTab(0);
+        setContentView(root); showTab(6);
     }
-    private void showTab(int value) { tab=Math.max(0,Math.min(5,value)); page.removeAllViews(); renderNav(); if(tab==0)showToday();else if(tab==1)showScripture();else if(tab==2)showChat();else if(tab==3)showAcademy();else if(tab==4)showBreathe();else showJournal(); }
+    private void showTab(int value) { tab=Math.max(0,Math.min(6,value)); page.removeAllViews(); renderNav(); if(tab==6)showHome();else if(tab==0)showToday();else if(tab==1)showScripture();else if(tab==2)showChat();else if(tab==3)showAcademy();else if(tab==4)showBreathe();else showJournal(); }
     private void renderNav() {
         nav.removeAllViews();
         for(int index=0;index<TABS.length;index++){
-            final int destination=index; boolean selected=index==tab;
+            final int destination=index==0?6:index-1; boolean selected=destination==tab;
             LinearLayout item=new LinearLayout(this); item.setOrientation(LinearLayout.VERTICAL); item.setGravity(Gravity.CENTER);
             item.setBackground(round(selected?(themeId.equals("quranMoon")?Color.rgb(18,79,87):FOREST):FOREST_DARK,12));
-            NavIconView icon=new NavIconView(this,index,selected?GOLD:Color.WHITE);
+            NavIconView icon=new NavIconView(this,destination,selected?GOLD:Color.WHITE);
             item.addView(icon,new LinearLayout.LayoutParams(dp(25),dp(25)));
             TextView caption=label(tr(TABS[index]),10,selected?GOLD:Color.WHITE,selected);
             caption.setGravity(Gravity.CENTER); caption.setSingleLine(true); caption.setEllipsize(TextUtils.TruncateAt.END);
@@ -146,13 +147,13 @@ public final class MainActivity extends Activity {
     }
     private void addFaithPicker() {
         LinearLayout picker=new LinearLayout(this); picker.setOrientation(LinearLayout.HORIZONTAL); picker.setPadding(dp(4),dp(4),dp(4),dp(4)); picker.setBackground(round(SAGE,16));
-        for(Faith candidate:Faith.values()){ Button button=new Button(this); button.setText(tr(candidate.title)); button.setTextSize(13); button.setAllCaps(false); button.setTypeface(Typeface.DEFAULT,Typeface.BOLD); boolean selected=candidate==faith; button.setTextColor(selected?(themeId.equals("quranMoon")?CREAM:Color.WHITE):INK); button.setBackground(round(selected?FOREST:Color.TRANSPARENT,12)); button.setContentDescription(tr("Choose")+" "+tr(candidate.title)); button.setOnClickListener(v->{if(faith==candidate)return;faith=candidate;chatMessages.clear();prefs.edit().putString("selected_faith",faith.name()).apply();setThemeId(recommendedTheme(candidate));}); picker.addView(button,new LinearLayout.LayoutParams(0,dp(46),1)); }
+        for(Faith candidate:Faith.values()){ Button button=new Button(this); button.setText(tr(candidate.title)); button.setTextSize(13); button.setAllCaps(false); button.setTypeface(Typeface.DEFAULT,Typeface.BOLD); boolean selected=candidate==faith; button.setTextColor(selected?(themeId.equals("quranMoon")?CREAM:Color.WHITE):INK); button.setBackground(round(selected?FOREST:Color.TRANSPARENT,12)); button.setContentDescription(tr("Choose")+" "+tr(candidate.title)); button.setOnClickListener(v->{if(faith==candidate)return;faith=candidate;chatMessages.clear();prefs.edit().putString("selected_faith",faith.name()).apply();setThemeId(recommendedTheme(candidate));}); picker.addView(button,new LinearLayout.LayoutParams(0,dp(48),1)); }
         page.addView(picker,spaced());
     }
     private void addThemePicker(){
         int current=java.util.Arrays.asList(THEME_IDS).indexOf(themeId);
         TextView choice=label("Theme: "+THEME_NAMES[Math.max(0,current)]+"  ▾",14,INK,true);
-        choice.setPadding(dp(13),dp(8),dp(13),dp(8));choice.setBackground(round(surface,14));
+        choice.setPadding(dp(13),dp(8),dp(13),dp(8));choice.setMinHeight(dp(48));choice.setGravity(Gravity.CENTER_VERTICAL);choice.setBackground(round(surface,14));
         choice.setContentDescription("Choose appearance theme");choice.setOnClickListener(v->showThemeDialog());
         page.addView(choice,spaced());
     }
@@ -163,7 +164,7 @@ public final class MainActivity extends Activity {
         for(int index=0;index<THEME_IDS.length;index++){
             final int selected=index;boolean active=THEME_IDS[index].equals(themeId);
             TextView row=label((active?"●  ":"○  ")+THEME_NAMES[index],17,active?INK:bodyInk,active);
-            row.setPadding(dp(12),dp(10),dp(12),dp(10));row.setBackground(round(active?SAGE:surface,10));
+            row.setPadding(dp(12),dp(10),dp(12),dp(10));row.setMinHeight(dp(48));row.setGravity(Gravity.CENTER_VERTICAL);row.setBackground(round(active?SAGE:surface,10));
             row.setOnClickListener(v->{dialog.dismiss();setThemeId(THEME_IDS[selected]);});list.addView(row,spaced());
         }
         dialog.show();if(dialog.getWindow()!=null)dialog.getWindow().setBackgroundDrawable(round(surface,20));
@@ -186,15 +187,26 @@ public final class MainActivity extends Activity {
         bodyInk=themeId.equals("quranMoon")?Color.rgb(217,228,238):Color.DKGRAY;
     }
 
+    private void showHome(){
+        title("DAILY BREATH","A steady beginning");
+        addFaithPicker();addThemePicker();
+        Button language=action("Language / Langue / Idioma");language.setOnClickListener(v->showLanguageDialog());page.addView(language,spaced());
+        addBody("Choose a small faithful step for today.");
+        addBody("Offline-ready · your reading is saved on this device.");
+        Button today=action("Today’s reading and daily rhythm");today.setOnClickListener(v->showTab(0));page.addView(today,spaced());
+        String savedFaith=prefs.getString("scripture_last_faith","");String savedCode=prefs.getString("scripture_last_code","");int savedChapter=prefs.getInt("scripture_last_chapter",0);
+        if(!savedFaith.isEmpty()&&!savedCode.isEmpty()&&savedChapter>0){Button resume=action("Continue reading · "+prefs.getString("scripture_last_title","Last chapter"));resume.setOnClickListener(v->{try{faith=Faith.valueOf(savedFaith);prefs.edit().putString("selected_faith",savedFaith).apply();showScriptureChapter(savedCode,savedChapter);}catch(Exception ignored){showTab(1);}});page.addView(resume,spaced());}
+        else{Button scripture=action("Explore Scripture");scripture.setOnClickListener(v->showTab(1));page.addView(scripture,spaced());}
+        Button breathe=action("Begin a breathing practice");breathe.setOnClickListener(v->showTab(4));page.addView(breathe,spaced());
+    }
     private void showToday() {
-        title("TODAY","A steadier next step"); addFaithPicker(); addThemePicker(); addBody(todayIntro()); Reading reading=readingOfTheDay(), weeklyReading=readingFor(LocalDate.now().with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY)));
+        title("TODAY","A steadier next step"); addBody(todayIntro()); Reading reading=readingOfTheDay(), weeklyReading=readingFor(LocalDate.now().with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY)));
         LinearLayout card=card(faith==Faith.QURAN?FOREST_DARK:INK); card.addView(label(faith.dailyLabel.toUpperCase(Locale.US)+" OF THE DAY",12,GOLD,true)); TextView date=label(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy",Locale.getDefault())),14,Color.LTGRAY,true); date.setPadding(0,dp(7),0,0); card.addView(date); TextView quote=label("“"+reading.text+"”",27,Color.WHITE,true); quote.setPadding(0,dp(14),0,dp(12)); card.addView(quote); card.addView(label(reading.reference,18,GOLD,true)); page.addView(card,spaced());
         LinearLayout reflection=card(Color.WHITE); reflection.addView(label(faith==Faith.TANAKH?"Weekly Jewish reflection":faith==Faith.QURAN?"Weekly Quran reflection":"Weekly devotional",19,INK,true)); reflection.addView(label(weeklyReflectionCopy(weeklyReading),14,Color.DKGRAY,false)); Button read=action("Read this week’s reflection"); read.setOnClickListener(v->showDetail("Weekly "+faith.dailyLabel,weeklyReflectionCopy(weeklyReading))); reflection.addView(read); page.addView(reflection,spaced());
         Button challenge=action("Begin a breathing practice"); challenge.setOnClickListener(v->showTab(4)); page.addView(challenge,spaced());
         Button sources=action("Scripture sources and translations"); sources.setOnClickListener(v->showSources()); page.addView(sources,spaced());
         Button saved=action("Saved scripture"); saved.setOnClickListener(v->showFavorites()); page.addView(saved,spaced());
         Button recovery=action("Recovery support and challenges"); recovery.setOnClickListener(v->showRecovery()); page.addView(recovery,spaced());
-        Button language=action("Language / Langue / Idioma"); language.setOnClickListener(v->showLanguageDialog()); page.addView(language,spaced());
     }
     private void showScripture() {
         title(faith.title.toUpperCase(Locale.US),faith==Faith.TANAKH?"Complete local Tanakh":faith==Faith.QURAN?"Complete local Quran":"Complete local Bible"); addFaithPicker();
@@ -235,6 +247,7 @@ public final class MainActivity extends Activity {
     private void showScriptureChapter(String code,int chapter){
         page.removeAllViews();List<ScriptureVerse> library=libraryFor(faith);ScriptureVerse first=null;for(ScriptureVerse verse:library)if(verse.code.equals(code)&&verse.chapter==chapter){first=verse;break;}
         if(first==null){showTab(1);return;}String name=scriptureBookName(first);title(faith.title.toUpperCase(Locale.US),faith==Faith.QURAN?name:name+" "+chapter);
+        prefs.edit().putString("scripture_last_faith",faith.name()).putString("scripture_last_code",code).putInt("scripture_last_chapter",chapter).putString("scripture_last_title",faith==Faith.QURAN?name:name+" "+chapter).apply();
         TextView back=label("‹  "+(faith==Faith.QURAN?"All surahs":name),14,FOREST,true);back.setPadding(0,dp(3),0,dp(9));back.setOnClickListener(v->{if(faith==Faith.QURAN)showTab(1);else showScriptureBook(code);});page.addView(back,spaced());
         for(ScriptureVerse verse:library)if(verse.code.equals(code)&&verse.chapter==chapter){
             LinearLayout row=new LinearLayout(this);row.setOrientation(LinearLayout.HORIZONTAL);row.setPadding(dp(2),dp(7),dp(2),dp(7));
@@ -261,7 +274,7 @@ public final class MainActivity extends Activity {
         ImageView portrait=new ImageView(this);
         portrait.setImageResource(guideDrawable());
         portrait.setAdjustViewBounds(true);
-        portrait.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        portrait.setScaleType(ImageView.ScaleType.FIT_CENTER);
         portrait.setContentDescription(guide+", Daily Breath guide");
         guideCard.addView(portrait,new LinearLayout.LayoutParams(dp(116),dp(132)));
         TextView identity=label(guide,24,INK,true); identity.setGravity(Gravity.CENTER); guideCard.addView(identity);
@@ -280,6 +293,9 @@ public final class MainActivity extends Activity {
         composer.addView(chatInput,new LinearLayout.LayoutParams(0,-2,1));
         chatSend=action("Send"); chatSend.setOnClickListener(v->sendChat()); LinearLayout.LayoutParams sendParams=new LinearLayout.LayoutParams(-2,dp(56)); sendParams.leftMargin=dp(8); composer.addView(chatSend,sendParams);
         page.addView(composer,spaced());
+        LinearLayout suggestions=new LinearLayout(this);suggestions.setOrientation(LinearLayout.VERTICAL);
+        for(String question:new String[]{"Help me understand a passage","How can I build a prayer habit?","What is one small step I can take today?"}){Button suggestion=action(question);suggestion.setOnClickListener(v->{chatInput.setText(question);chatInput.requestFocus();});suggestions.addView(suggestion,spaced());}
+        page.addView(suggestions,spaced());
     }
 
     private void renderChatMessages(){
@@ -334,7 +350,7 @@ public final class MainActivity extends Activity {
     }
     private void showAcademyPaywall() {
         addBody("Unlock every Daily Breath Academy module with one purchase.");
-        if (beyondAccessToken.isEmpty()) { Button signIn=action("Sign in with Beyond-ID"); signIn.setOnClickListener(v->beginBeyondIDSignIn()); page.addView(signIn,spaced()); addBody("Sign-in is required to purchase and sync Academy access."); }
+        if (beyondAccessToken.isEmpty()) { if(!beyondSignInError.isEmpty())addBody(beyondSignInError);Button signIn=action(beyondSignInError.isEmpty()?"Sign in with Beyond-ID":"Try sign-in again"); signIn.setOnClickListener(v->beginBeyondIDSignIn()); page.addView(signIn,spaced()); addBody("Sign-in is required to purchase and sync Academy access."); }
         else { Button buy=action("Unlock Academy · CA$4.99"); buy.setOnClickListener(v->launchAcademyPurchase()); page.addView(buy,spaced()); }
         Button restore=action("Restore purchase"); restore.setOnClickListener(v->{queryAcademyPurchases(); showTab(3);}); page.addView(restore,spaced());
         addBody("Purchases are processed securely by Google Play.");
@@ -356,7 +372,9 @@ public final class MainActivity extends Activity {
     }
     private void handlePurchases(BillingResult result,List<Purchase> purchases) {
         if(result.getResponseCode()!=BillingClient.BillingResponseCode.OK||purchases==null)return;
+        boolean hadAccess=academyUnlocked;
         for(Purchase purchase:purchases)if(purchase.getPurchaseState()==Purchase.PurchaseState.PURCHASED&&purchase.getProducts().contains(ACADEMY_PRODUCT_ID)){academyUnlocked=true;prefs.edit().putBoolean("academy_purchased",true).apply();if(!purchase.isAcknowledged())billingClient.acknowledgePurchase(com.android.billingclient.api.AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.getPurchaseToken()).build(),acknowledged->{});}
+        if(!hadAccess&&academyUnlocked)runOnUiThread(()->{if(tab==3)showTab(3);});
     }
     private void launchAcademyPurchase() {
         if(billingClient==null||!billingClient.isReady()||academyProduct==null){Toast.makeText(this,"Google Play purchase is not ready yet.",Toast.LENGTH_LONG).show();return;}
@@ -419,9 +437,9 @@ public final class MainActivity extends Activity {
     private void applyStoredLanguage(){String code=prefs.getString("interface_language","en");Locale locale=Locale.forLanguageTag(code);Locale.setDefault(locale);Configuration config=new Configuration(getResources().getConfiguration());config.setLocale(locale);getResources().updateConfiguration(config,getResources().getDisplayMetrics());}
     private void showLanguageDialog(){String current=prefs.getString("interface_language","");String[] codes={"en","fr","es"},names={"English","Français","Español"};int checked=current.equals("fr")?1:current.equals("es")?2:0;AlertDialog dialog=new AlertDialog.Builder(this).setTitle("Choose your language · Choisissez votre langue · Elige tu idioma").setSingleChoiceItems(names,checked,(choice,which)->{prefs.edit().putString("interface_language",codes[which]).apply();choice.dismiss();recreate();}).create();dialog.setCanceledOnTouchOutside(!current.isEmpty());dialog.setCancelable(!current.isEmpty());dialog.show();}
     private void showAccountChoice(){new AlertDialog.Builder(this).setTitle(tr("Choose how to begin")).setMessage(tr("Sign in to sync progress and unlock purchases across your devices, or explore free content locally.")).setPositiveButton(tr("Sign in with Beyond-ID"),(dialog,which)->{prefs.edit().putBoolean("onboarding_complete",true).apply();beginBeyondIDSignIn();}).setNegativeButton(tr("Continue without signing in"),(dialog,which)->prefs.edit().putBoolean("onboarding_complete",true).apply()).setCancelable(false).show();}
-    private void beginBeyondIDSignIn(){try{byte[] bytes=new byte[64];new SecureRandom().nextBytes(bytes);String verifier=Base64.encodeToString(bytes,Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING);String challenge=Base64.encodeToString(java.security.MessageDigest.getInstance("SHA-256").digest(verifier.getBytes(StandardCharsets.UTF_8)),Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING);prefs.edit().putString("beyond_id_verifier",verifier).apply();String returnPath="/beyond-id/auth/mobile-complete.php?scheme=dailybreath&code_challenge="+Uri.encode(challenge);openUrl(Uri.parse("https://beyondimagination.co.technology/beyond-id/auth/login.php").buildUpon().appendQueryParameter("app","dailybreath").appendQueryParameter("return",returnPath).build().toString());}catch(Exception error){Toast.makeText(this,"Beyond-ID sign-in could not be started.",Toast.LENGTH_LONG).show();}}
-    private boolean handleAuthCallback(Intent intent){Uri data=intent==null?null:intent.getData();if(data==null||!"dailybreath".equalsIgnoreCase(data.getScheme())||!"auth".equalsIgnoreCase(data.getHost()))return false;String error=data.getQueryParameter("error"),code=data.getQueryParameter("code");if(error!=null&&!error.isEmpty()){Toast.makeText(this,error,Toast.LENGTH_LONG).show();return true;}String verifier=prefs.getString("beyond_id_verifier","");if(code==null||verifier.isEmpty()){Toast.makeText(this,"Beyond-ID sign-in could not be completed.",Toast.LENGTH_LONG).show();return true;}new Thread(()->exchangeBeyondCode(code,verifier)).start();return true;}
-    private void exchangeBeyondCode(String code,String verifier){try{HttpURLConnection connection=(HttpURLConnection)new URL("https://beyondimagination.co.technology/beyond-id/api/mobile-token.php").openConnection();connection.setRequestMethod("POST");connection.setConnectTimeout(15000);connection.setReadTimeout(15000);connection.setDoOutput(true);connection.setRequestProperty("Content-Type","application/json");byte[] payload=new JSONObject().put("code",code).put("code_verifier",verifier).toString().getBytes(StandardCharsets.UTF_8);try(OutputStream output=connection.getOutputStream()){output.write(payload);}int status=connection.getResponseCode();InputStream body=status>=400?connection.getErrorStream():connection.getInputStream();StringBuilder response=new StringBuilder();try(BufferedReader reader=new BufferedReader(new InputStreamReader(body,StandardCharsets.UTF_8))){String line;while((line=reader.readLine())!=null)response.append(line);}JSONObject json=new JSONObject(response.toString());String token=json.optString("access_token","");if(status<300&&!token.isEmpty()){writeProtectedToken(token);beyondAccessToken=token;prefs.edit().remove("beyond_id_verifier").apply();runOnUiThread(()->{Toast.makeText(this,"Signed in with Beyond-ID.",Toast.LENGTH_SHORT).show();showTab(tab);});}else throw new IllegalStateException(json.optString("error","Token exchange failed."));}catch(Exception error){runOnUiThread(()->Toast.makeText(this,"Beyond-ID sign-in could not be completed.",Toast.LENGTH_LONG).show());}}
+    private void beginBeyondIDSignIn(){beyondSignInError="";try{byte[] bytes=new byte[64];new SecureRandom().nextBytes(bytes);String verifier=Base64.encodeToString(bytes,Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING);String challenge=Base64.encodeToString(java.security.MessageDigest.getInstance("SHA-256").digest(verifier.getBytes(StandardCharsets.UTF_8)),Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING);prefs.edit().putString("beyond_id_verifier",verifier).apply();String returnPath="/beyond-id/auth/mobile-complete.php?scheme=dailybreath&code_challenge="+Uri.encode(challenge);openUrl(Uri.parse("https://beyondimagination.co.technology/beyond-id/auth/login.php").buildUpon().appendQueryParameter("app","dailybreath").appendQueryParameter("return",returnPath).build().toString());}catch(Exception error){beyondSignInError="Sign-in could not start. Check your connection and try again.";Toast.makeText(this,beyondSignInError,Toast.LENGTH_LONG).show();}}
+    private boolean handleAuthCallback(Intent intent){Uri data=intent==null?null:intent.getData();if(data==null||!"dailybreath".equalsIgnoreCase(data.getScheme())||!"auth".equalsIgnoreCase(data.getHost()))return false;String error=data.getQueryParameter("error"),code=data.getQueryParameter("code");if(error!=null&&!error.isEmpty()){beyondSignInError=error+" Return to Academy and try again.";Toast.makeText(this,beyondSignInError,Toast.LENGTH_LONG).show();if(tab==3)showTab(3);return true;}String verifier=prefs.getString("beyond_id_verifier","");if(code==null||verifier.isEmpty()){beyondSignInError="Beyond-ID sign-in could not be completed. Return to Academy and try again.";Toast.makeText(this,beyondSignInError,Toast.LENGTH_LONG).show();if(tab==3)showTab(3);return true;}new Thread(()->exchangeBeyondCode(code,verifier)).start();return true;}
+    private void exchangeBeyondCode(String code,String verifier){try{HttpURLConnection connection=(HttpURLConnection)new URL("https://beyondimagination.co.technology/beyond-id/api/mobile-token.php").openConnection();connection.setRequestMethod("POST");connection.setConnectTimeout(15000);connection.setReadTimeout(15000);connection.setDoOutput(true);connection.setRequestProperty("Content-Type","application/json");byte[] payload=new JSONObject().put("code",code).put("code_verifier",verifier).toString().getBytes(StandardCharsets.UTF_8);try(OutputStream output=connection.getOutputStream()){output.write(payload);}int status=connection.getResponseCode();InputStream body=status>=400?connection.getErrorStream():connection.getInputStream();StringBuilder response=new StringBuilder();if(body!=null)try(BufferedReader reader=new BufferedReader(new InputStreamReader(body,StandardCharsets.UTF_8))){String line;while((line=reader.readLine())!=null)response.append(line);}JSONObject json=new JSONObject(response.toString());String token=json.optString("access_token","");if(status<300&&!token.isEmpty()){writeProtectedToken(token);beyondAccessToken=token;prefs.edit().remove("beyond_id_verifier").apply();queryAcademyPurchases();runOnUiThread(()->{Toast.makeText(this,"Signed in with Beyond-ID.",Toast.LENGTH_SHORT).show();showTab(tab);});}else throw new IllegalStateException(json.optString("error","Token exchange failed."));}catch(Exception error){runOnUiThread(()->{beyondSignInError="Sign-in is temporarily unavailable. Check your connection, then try again. If it keeps failing, contact Daily Breath support.";Toast.makeText(this,beyondSignInError,Toast.LENGTH_LONG).show();if(tab==3)showTab(3);});}}
     private SecretKey protectedKey()throws Exception{KeyStore store=KeyStore.getInstance("AndroidKeyStore");store.load(null);if(!store.containsAlias("DailyBreathBeyondID")){KeyGenerator generator=KeyGenerator.getInstance("AES","AndroidKeyStore");generator.init(256);generator.generateKey();}return((KeyStore.SecretKeyEntry)store.getEntry("DailyBreathBeyondID",null)).getSecretKey();}
     private void writeProtectedToken(String token)throws Exception{SecretKey key=protectedKey();Cipher cipher=Cipher.getInstance("AES/GCM/NoPadding");cipher.init(Cipher.ENCRYPT_MODE,key);byte[] encrypted=cipher.doFinal(token.getBytes(StandardCharsets.UTF_8)),iv=cipher.getIV(),combined=new byte[iv.length+encrypted.length];System.arraycopy(iv,0,combined,0,iv.length);System.arraycopy(encrypted,0,combined,iv.length,encrypted.length);prefs.edit().putString("beyond_id_token",Base64.encodeToString(combined,Base64.NO_WRAP)).apply();}
     private String readProtectedToken(){try{String stored=prefs.getString("beyond_id_token","");if(stored.isEmpty())return "";byte[] combined=Base64.decode(stored,Base64.DEFAULT);int ivLength=12;Cipher cipher=Cipher.getInstance("AES/GCM/NoPadding");cipher.init(Cipher.DECRYPT_MODE,protectedKey(),new GCMParameterSpec(128,java.util.Arrays.copyOfRange(combined,0,ivLength)));return new String(cipher.doFinal(java.util.Arrays.copyOfRange(combined,ivLength,combined.length)),StandardCharsets.UTF_8);}catch(Exception error){return "";}}

@@ -9,6 +9,16 @@ struct JaguarScriptureChatView: View {
     @State private var messages: [(role: String, text: String)] = []
     @State private var isSending = false
     @State private var error: String?
+    @FocusState private var promptFocused: Bool
+
+    private var suggestedQuestions: [String] {
+        [
+            "What is Daily Breath for?",
+            "Help me understand a passage",
+            "How can I begin a breathing practice?",
+            "Where can I find recovery support?"
+        ]
+    }
 
     enum ScriptureGuide: String, CaseIterable, Identifiable {
         case chris, dovi, moe
@@ -30,25 +40,64 @@ struct JaguarScriptureChatView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 14) {
+            HStack(alignment: .center, spacing: 12) {
                 ChatGuideAvatar(guide: guide)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(guide.name).font(.title2.bold())
                     Text("Daily Breath \(guide.tradition) guide · no GPU")
                         .font(.caption)
+                        .fixedSize(horizontal: false, vertical: true)
                         .foregroundStyle(.secondary)
                     Text("App help and sacred-text questions only")
                         .font(.caption2.weight(.semibold))
+                        .fixedSize(horizontal: false, vertical: true)
                         .foregroundStyle(.secondary)
                 }
-                Spacer()
             }
-            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+            .padding(.vertical, 10)
 
             Divider()
 
             if messages.isEmpty {
-                ContentUnavailableView("Ask \(guide.name)", systemImage: guide.icon, description: Text("Ask about Daily Breath or the \(guide.tradition). Answers stay inside this app and use Daily Breath’s grounded guide service."))
+                ScrollView {
+                    VStack(spacing: 14) {
+                        Image(systemName: guide.icon)
+                            .font(.system(size: 34, weight: .medium))
+                            .foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
+                        Text("Ask \(guide.name)")
+                            .font(.title2.bold())
+                        Text("Ask about Daily Breath or the \(guide.tradition). Answers stay inside this app and use Daily Breath’s grounded guide service.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 8)], spacing: 8) {
+                            ForEach(suggestedQuestions, id: \.self) { question in
+                                Button {
+                                    prompt = question
+                                    promptFocused = true
+                                } label: {
+                                    Text(question)
+                                        .font(.subheadline.weight(.medium))
+                                        .multilineTextAlignment(.leading)
+                                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 12))
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityHint("Adds this question to the message field")
+                            }
+                        }
+                        .padding(.top, 2)
+                    }
+                    .frame(maxWidth: 520)
+                    .frame(maxWidth: .infinity)
+                    .padding(16)
+                }
             } else {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 14) {
@@ -71,6 +120,8 @@ struct JaguarScriptureChatView: View {
                         .textFieldStyle(.roundedBorder)
                         .lineLimit(1...5)
                         .submitLabel(.send)
+                        .focused($promptFocused)
+                        .accessibilityLabel("Message to \(guide.name)")
                         .onSubmit { Task { await send() } }
                     Button { Task { await send() } } label: {
                         if isSending { ProgressView() } else { Image(systemName: "arrow.up.circle.fill").font(.title2) }
@@ -173,10 +224,7 @@ private struct ChatGuideAvatar: View {
     var body: some View {
         Image(guide.assetName)
             .resizable()
-            .scaledToFill()
-            .frame(width: 72, height: 82)
-            .scaleEffect(2.2)
-            .offset(y: 30)
+            .scaledToFit()
             .frame(width: 72, height: 82)
             .background(Color(.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 16))

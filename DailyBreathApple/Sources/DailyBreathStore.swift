@@ -9,6 +9,31 @@ enum DailyBreathAPIError: Error, Equatable {
     case staleDate(expected: String, received: String)
 }
 
+enum DailyContentAvailability: Equatable {
+    case awaitingRefresh
+    case refreshing
+    case current
+    case offline
+
+    var title: String {
+        switch self {
+        case .awaitingRefresh: "Awaiting refresh"
+        case .refreshing: "Checking for today’s update…"
+        case .current: "Current · synced today"
+        case .offline: "Offline · saved reading available"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .awaitingRefresh: "clock"
+        case .refreshing: "arrow.triangle.2.circlepath"
+        case .current: "checkmark.icloud.fill"
+        case .offline: "wifi.slash"
+        }
+    }
+}
+
 struct DailyBreathTodayResponse: Decodable, Equatable, Sendable {
     let date: String
     let verse: Verse
@@ -60,7 +85,8 @@ final class DailyBreathStore: ObservableObject {
     @Published private(set) var devotional = RecoveryContent.devotionalOfTheDay() ?? .today
     @Published private(set) var challenge = RecoveryContent.challengeOfTheDay()
     @Published private(set) var isRefreshing = false
-    @Published private(set) var statusMessage = "Bundled daily content"
+    @Published private(set) var dailyContentAvailability: DailyContentAvailability = .awaitingRefresh
+    @Published private(set) var statusMessage = DailyContentAvailability.awaitingRefresh.title
     @Published var breathPhase = "Inhale"
     @Published var journalText = ""
     @Published var journalPrompt = DailyBreathStore.promptOfTheDay()
@@ -472,6 +498,8 @@ final class DailyBreathStore: ObservableObject {
 
     func refreshToday() async {
         isRefreshing = true
+        dailyContentAvailability = .refreshing
+        statusMessage = DailyContentAvailability.refreshing.title
         defer { isRefreshing = false }
         let requestedDate = Date()
         let requestedDateKey = Self.dateKey(requestedDate)
@@ -483,10 +511,12 @@ final class DailyBreathStore: ObservableObject {
             challenge = today.challenge ?? RecoveryContent.challengeOfTheDay(for: requestedDate)
             updateCurrentChallengeProgress()
             recordDailyContent(for: requestedDate)
-            statusMessage = "Synced daily content"
+            dailyContentAvailability = .current
+            statusMessage = DailyContentAvailability.current.title
         } catch {
             loadBundledDailyContent(for: requestedDate)
-            statusMessage = "Offline daily content"
+            dailyContentAvailability = .offline
+            statusMessage = DailyContentAvailability.offline.title
         }
     }
 

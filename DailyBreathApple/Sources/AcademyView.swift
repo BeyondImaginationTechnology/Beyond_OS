@@ -9,6 +9,7 @@ struct AcademyView: View {
     @AppStorage("completedAcademyLessonIDs") private var completedLessonIDs = ""
     @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
     @State private var certificateDate = Date()
+    @Environment(\.scenePhase) private var scenePhase
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -72,6 +73,10 @@ struct AcademyView: View {
             guard signedIn else { return }
             Task { await purchaseManager.load() }
         }
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active, auth.isSignedIn else { return }
+            Task { await purchaseManager.load() }
+        }
         .onChange(of: completedLessonIDs) { _ in refreshCertificate() }
         .onChange(of: traditionID) { _, value in
             let tradition = FaithTradition(rawValue: value) ?? .bible
@@ -112,9 +117,18 @@ struct AcademyView: View {
                 .font(.body)
                 .foregroundStyle(.secondary)
             if !auth.isSignedIn {
-                Button("Sign in with Beyond-ID") { auth.signIn() }
-                    .buttonStyle(.borderedProminent)
-                    .tint(selectedTheme.academyEmphasis)
+                Button {
+                    auth.signIn()
+                } label: {
+                    if auth.isSigningIn {
+                        ProgressView("Connecting to Beyond-ID…")
+                    } else {
+                        Label(auth.message == nil ? "Sign in with Beyond-ID" : "Retry sign-in", systemImage: "person.crop.circle.badge.checkmark")
+                    }
+                }
+                .disabled(auth.isSigningIn)
+                .buttonStyle(.borderedProminent)
+                .tint(selectedTheme.academyEmphasis)
                 Text("Sign-in is required to purchase and sync Academy access.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)

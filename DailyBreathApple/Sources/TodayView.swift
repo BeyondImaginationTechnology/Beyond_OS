@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct TodayView: View {
+    var onHome: () -> Void = {}
     @EnvironmentObject private var store: DailyBreathStore
     @Environment(\.scenePhase) private var scenePhase
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
@@ -61,12 +62,31 @@ struct TodayView: View {
         .background(DailyBreathThemeBackground(theme: selectedTheme))
         .navigationTitle("Today")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .navigationBarBackButton)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink { SettingsAboutView() } label: {
-                    Label("Settings", systemImage: "gearshape.fill")
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: onHome) {
+                    Label("Home", systemImage: "house.fill")
                 }
             }
+        }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            HStack(spacing: 7) {
+                if store.isRefreshing { ProgressView().controlSize(.small) }
+                else { Image(systemName: store.dailyContentAvailability.systemImage) }
+                Text(store.dailyContentAvailability.title)
+                    .font(.caption.weight(.semibold))
+                    .lineLimit(2)
+                Spacer(minLength: 0)
+                if !store.isRefreshing {
+                    Button("Refresh") { Task { await store.refreshToday() } }
+                        .font(.caption.weight(.bold))
+                        .accessibilityHint("Refreshes today’s verse and devotional")
+                }
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+            .background(.background.opacity(0.94))
         }
         .refreshable { await store.refreshToday() }
         .onChange(of: scenePhase) { _, phase in

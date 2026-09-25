@@ -72,6 +72,9 @@ function beyond_social_authorization_url(string $provider, string $state, string
         $parameters['code_challenge'] = $codeChallenge;
         $parameters['code_challenge_method'] = 'S256';
         $parameters['prompt'] = 'select_account';
+    } elseif ($provider === 'x') {
+        $parameters['code_challenge'] = $codeChallenge;
+        $parameters['code_challenge_method'] = 'S256';
     } elseif ($provider === 'instagram') {
         $parameters['scope'] = implode(',', $config['scopes'] ?? []);
         $parameters['enable_fb_login'] = '0';
@@ -92,8 +95,14 @@ function beyond_social_exchange_code(string $provider, string $code, string $cod
         'code' => $code,
         'grant_type' => 'authorization_code',
     ];
-    if ($provider === 'google') $post['code_verifier'] = $codeVerifier;
-    return beyond_social_http($config['token_url'], ['post' => $post]);
+    if (in_array($provider, ['google', 'x'], true)) $post['code_verifier'] = $codeVerifier;
+    $options = ['post' => $post];
+    if ($provider === 'x') {
+        $options['headers'] = ['Authorization: Basic ' . base64_encode((string)$config['client_id'] . ':' . (string)$config['client_secret'])];
+        unset($post['client_secret']);
+        $options['post'] = $post;
+    }
+    return beyond_social_http($config['token_url'], $options);
 }
 
 function beyond_social_profile(string $provider, string $accessToken, array $tokens = []): array
@@ -178,6 +187,22 @@ function beyond_social_profile(string $provider, string $accessToken, array $tok
             'name' => trim((string)($profile['name'] ?? '')),
             'first_name' => trim((string)($profile['first_name'] ?? '')),
             'last_name' => trim((string)($profile['last_name'] ?? '')),
+        ];
+    }
+    if ($provider === 'x') {
+        $profile = beyond_social_http($config['userinfo_url'] . '?' . http_build_query(['user.fields' => 'id,name,username,confirmed_email'], '', '&', PHP_QUERY_RFC3986), ['access_token' => $accessToken]);
+        $data = is_array($profile['data'] ?? null) ? $profile['data'] : [];
+        $username = trim((string)($data['username'] ?? ''));
+        $email = strtolower(trim((string)($data['confirmed_email'] ?? '')));
+        $emailValid = $email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+        return [
+            'subject' => (string)($data['id'] ?? ''),
+            'email' => $emailValid ? $email : '',
+            'email_verified' => $emailValid,
+            'name' => trim((string)($data['name'] ?? '')) ?: ($username !== '' ? '@' . $username : 'X member'),
+            'first_name' => '',
+            'last_name' => '',
+            'username' => $username,
         ];
     }
     $profile = beyond_social_http($config['userinfo_url'], ['access_token' => $accessToken]);

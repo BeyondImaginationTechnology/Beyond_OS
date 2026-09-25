@@ -23,6 +23,10 @@ struct ScriptureLibraryView: View {
         return value.tradition == tradition ? value : ScriptureEdition.defaultEdition(for: tradition)
     }
     private var library: SacredTextLibrary { store.scriptureLibrary(for: tradition, edition: edition) }
+    private var lastReadMatches: Bool {
+        UserDefaults.standard.string(forKey: ScriptureResumeKeys.tradition) == tradition.rawValue
+            && UserDefaults.standard.string(forKey: ScriptureResumeKeys.edition) == edition.rawValue
+    }
     private var editionBinding: Binding<String> {
         Binding {
             edition.id
@@ -75,6 +79,19 @@ struct ScriptureLibraryView: View {
                     .buttonStyle(.borderedProminent)
                 }
             } else if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                if lastReadMatches, let code = UserDefaults.standard.string(forKey: ScriptureResumeKeys.book),
+                   let chapterNumber = UserDefaults.standard.object(forKey: ScriptureResumeKeys.chapter) as? Int,
+                   let chapter = library.chapter(bookCode: code, number: chapterNumber) {
+                    Section("Pick up where you left off") {
+                        NavigationLink {
+                            SacredTextChapterView(chapter: chapter)
+                        } label: {
+                            Label("Continue · \(chapter.title) · \(library.translation)", systemImage: "bookmark.fill")
+                                .lineLimit(2)
+                        }
+                        .accessibilityHint("Reopens the last chapter you read in this translation")
+                    }
+                }
                 overview
                 ForEach(library.books) { book in
                     NavigationLink {
@@ -189,6 +206,43 @@ struct ScriptureLibraryView: View {
     }
 }
 
+private enum ScriptureResumeKeys {
+    static let tradition = "scripture.lastRead.tradition"
+    static let edition = "scripture.lastRead.edition"
+    static let book = "scripture.lastRead.book"
+    static let chapter = "scripture.lastRead.chapter"
+}
+
+struct ScriptureContinueReadingLink: View {
+    @EnvironmentObject private var store: DailyBreathStore
+    @AppStorage(ScriptureResumeKeys.tradition) private var traditionID = ""
+    @AppStorage(ScriptureResumeKeys.edition) private var editionID = ""
+    @AppStorage(ScriptureResumeKeys.book) private var bookCode = ""
+    @AppStorage(ScriptureResumeKeys.chapter) private var chapterNumber = 0
+
+    private var destination: SacredTextChapter? {
+        guard let tradition = FaithTradition(rawValue: traditionID),
+              let edition = ScriptureEdition(rawValue: editionID), edition.tradition == tradition,
+              !bookCode.isEmpty, chapterNumber > 0 else { return nil }
+        return store.scriptureLibrary(for: tradition, edition: edition).chapter(bookCode: bookCode, number: chapterNumber)
+    }
+
+    var body: some View {
+        if let destination {
+            NavigationLink {
+                SacredTextChapterView(chapter: destination)
+            } label: {
+                Label("Continue reading · \(destination.title)", systemImage: "bookmark.fill")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .background(.background.opacity(0.88), in: RoundedRectangle(cornerRadius: 16))
+            }
+            .accessibilityHint("Continues your last chapter using the same translation")
+        }
+    }
+}
+
 private struct SacredTextBookView: View {
     let book: SacredTextBook
 
@@ -265,6 +319,12 @@ private struct SacredTextChapterView: View {
             .onAppear {
                 if let highlightedVerseID { proxy.scrollTo(highlightedVerseID, anchor: .center) }
             }
+        }
+        .onAppear {
+            UserDefaults.standard.set(chapter.tradition.rawValue, forKey: ScriptureResumeKeys.tradition)
+            UserDefaults.standard.set(store.selectedEdition(for: chapter.tradition).rawValue, forKey: ScriptureResumeKeys.edition)
+            UserDefaults.standard.set(chapter.bookCode, forKey: ScriptureResumeKeys.book)
+            UserDefaults.standard.set(chapter.number, forKey: ScriptureResumeKeys.chapter)
         }
     }
 

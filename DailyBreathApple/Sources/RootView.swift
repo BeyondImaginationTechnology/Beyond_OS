@@ -2,13 +2,13 @@ import Foundation
 import SwiftUI
 
 enum DailyBreathTab: String, Hashable {
-    case today, scripture, chat, academy, trivia, breathe, journal
+    case home, today, settings, scripture, chat, academy, trivia, breathe, journal
 }
 
 struct RootView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
-    @State private var selectedTab: DailyBreathTab? = .today
+    @State private var selectedTab: DailyBreathTab? = .home
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -33,6 +33,7 @@ struct RootView: View {
                 }
 
                 Section("Your practice") {
+                    navigationRow(.home, title: "Home", symbol: "house.fill", subtitle: "Your daily space")
                     navigationRow(.today, title: "Today", symbol: "sun.max.fill", subtitle: "A steady beginning")
                     navigationRow(.scripture, title: "Scripture", symbol: "book.closed.fill", subtitle: "Read and reflect")
                     navigationRow(.chat, title: "Chat", symbol: "bubble.left.and.bubble.right.fill", subtitle: "Ask your faith guide")
@@ -40,6 +41,9 @@ struct RootView: View {
                     navigationRow(.trivia, title: "Trivia", symbol: "questionmark.circle.fill", subtitle: "Reflect and learn")
                     navigationRow(.breathe, title: "Breathe", symbol: "wind", subtitle: "Find your next breath")
                     navigationRow(.journal, title: "Journal", symbol: "square.and.pencil", subtitle: "Keep what matters")
+                }
+                Section {
+                    navigationRow(.settings, title: "Settings", symbol: "gearshape.fill", subtitle: "Personalize your practice")
                 }
             }
             .listStyle(.sidebar)
@@ -123,8 +127,12 @@ struct RootView: View {
     @ViewBuilder
     private func detailView(for tab: DailyBreathTab) -> some View {
         switch tab {
+        case .home:
+            NavigationStack { DailyBreathHomeView() }
         case .today:
-            NavigationStack { TodayView() }
+            NavigationStack { TodayView(onHome: { selectedTab = .home }) }
+        case .settings:
+            NavigationStack { SettingsAboutView() }
         case .scripture:
             NavigationStack { ScriptureLibraryView() }
         case .chat:
@@ -139,6 +147,79 @@ struct RootView: View {
             NavigationStack { JournalView() }
         }
     }
+}
+
+private struct DailyBreathHomeView: View {
+    @EnvironmentObject private var store: DailyBreathStore
+    @Environment(\.dismiss) private var dismiss
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
+    @AppStorage("dailyReadingDayKeys") private var readDays = ""
+    @AppStorage("devotionalReadDayKeys") private var studyDays = ""
+    @AppStorage("completedBreathDayKeys") private var breathDays = ""
+
+    private var todayKey: String { DateFormatter.dailyBreathDay.string(from: Date()) }
+    private var todayCount: Int {
+        [readDays, studyDays, breathDays].filter { $0.split(separator: ",").contains(Substring(todayKey)) }.count
+            + (store.entries.contains { Calendar.current.isDateInToday($0.createdAt) } ? 1 : 0)
+    }
+    private var tradition: FaithTradition { FaithTradition(rawValue: traditionID) ?? .bible }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                BrandHeader()
+                Text("A steady beginning").font(.largeTitle.bold())
+                Text("Make room for a small faithful step today.")
+                    .font(.title3).foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Label("Today’s rhythm", systemImage: "checklist.checked").font(.headline)
+                        Spacer()
+                        Text("\(todayCount) of 4").font(.caption.bold())
+                    }
+                    Text("Read, study, breathe, and reflect at your own pace.")
+                        .font(.subheadline).foregroundStyle(.secondary)
+                    Label(store.dailyContentAvailability.title, systemImage: store.dailyContentAvailability.systemImage)
+                        .font(.caption.weight(.semibold))
+                        .accessibilityLabel("Daily content status: \(store.dailyContentAvailability.title)")
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(.background.opacity(0.88), in: RoundedRectangle(cornerRadius: 16))
+                NavigationLink { TodayView(onHome: { dismiss() }) } label: {
+                    Label("Open Today · \(store.dailyVerse(for: tradition).reference)", systemImage: "sun.max.fill")
+                        .font(.headline).frame(maxWidth: .infinity, alignment: .leading)
+                        .padding().background(DailyBreathTheme(id: selectedThemeID).primary.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
+                }
+                ScriptureContinueReadingLink()
+                NavigationLink { ScriptureLibraryView() } label: {
+                    Label("Explore Scripture", systemImage: "book.closed.fill")
+                        .font(.headline).frame(maxWidth: .infinity, alignment: .leading)
+                        .padding().background(.background.opacity(0.7), in: RoundedRectangle(cornerRadius: 16))
+                }
+                NavigationLink { SettingsAboutView() } label: {
+                    Label("Settings", systemImage: "gearshape.fill")
+                        .font(.headline).frame(maxWidth: .infinity, alignment: .leading)
+                        .padding().background(.background.opacity(0.7), in: RoundedRectangle(cornerRadius: 16))
+                }
+            }
+            .padding()
+        }
+        .background(DailyBreathThemeBackground(theme: DailyBreathTheme(id: selectedThemeID)))
+        .navigationTitle("Home")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private extension DateFormatter {
+    static let dailyBreathDay: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
 }
 
 private struct DailyBreathChatDestination: View {
@@ -191,12 +272,6 @@ struct BrandHeader: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Text(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "")
-                .font(.caption.bold())
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .foregroundStyle(selectedTheme.primary)
-                .background(selectedTheme.primary.opacity(0.12), in: Capsule())
         }
     }
 }

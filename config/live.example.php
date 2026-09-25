@@ -52,6 +52,10 @@ return [
             'client_id' => '',
             'client_secret' => '',
         ],
+        'x' => [
+            'client_id' => '',
+            'client_secret' => '',
+        ],
     ],
     'remotion' => [
         'bridge_url' => 'https://render.beyondimagination.co.technology',

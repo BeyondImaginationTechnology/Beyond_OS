@@ -42,3 +42,6 @@ Thumbs.db
 
 # Locally staged BIT OS release artifacts (published separately to HostDeal).
 /exports/bit-os-cyber-1.0/
+
+# Generated build caches stay out of the web root and repository.
+/.cache/

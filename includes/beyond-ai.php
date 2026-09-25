@@ -45,9 +45,10 @@ function beyond_ai_config(string $key, $default = null)
 
 function beyond_ai_usage_file(): string
 {
-    $dir = beyond_private_root() . '/data';
+    $file = beyond_private_file('data/beyond-ai/usage.json', 'data/beyond-ai-usage.json');
+    $dir = dirname($file);
     if (!is_dir($dir)) @mkdir($dir, 0750, true);
-    return $dir . '/beyond-ai-usage.json';
+    return $file;
 }
 
 function beyond_ai_read_usage(): array

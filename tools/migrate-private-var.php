@@ -40,6 +40,7 @@ $databases = [
 $files = [
     'data/africa-expansion.json' => 'data/daily-studio/africa-expansion.json',
     'data/beyond-tattoo-stencil-day.json' => 'data/beyond-tattoo/stencil-day.json',
+    'data/beyond-ai-usage.json' => 'data/beyond-ai/usage.json',
     'tv/channel-1-library-state.json' => 'data/beyond-tv/channel-1-library-state.json',
 ];
 $directories = [

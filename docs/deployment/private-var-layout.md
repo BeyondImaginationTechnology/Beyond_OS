@@ -11,6 +11,7 @@ committed to Git.
 | `data/daily-studio/` | Studio content and published channel snapshots |
 | `data/beyond-tattoo/` | Stencil settings |
 | `data/beyond-tv/` | Channel progress |
+| `data/beyond-ai/` | AI usage records |
 | `data/` | Other private app data |
 | `cache/` | Regenerable caches |
 | `uploads/` | User and generated media |

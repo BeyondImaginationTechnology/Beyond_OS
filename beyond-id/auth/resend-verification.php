@@ -30,7 +30,7 @@ if($_SERVER['REQUEST_METHOD']==='POST'){
                         $error='Please wait five minutes before requesting another message.';
                     }else{
                         $token=bin2hex(random_bytes(32));
-                        $pdo->prepare('UPDATE users SET verification_token=?,verification_sent_at=NOW() WHERE id=?')->execute([$token,$u['id']]);
+                        $pdo->prepare('UPDATE users SET verification_token=?,verification_sent_at=CURRENT_TIMESTAMP WHERE id=?')->execute([$token,$u['id']]);
                         send_verification_email($email,$token,'beyond_id',trim(($u['first_name']??'').' '.($u['last_name']??'')));
                     }
                 }

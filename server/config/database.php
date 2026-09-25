@@ -1,8 +1,5 @@
 <?php
-return [
-    'host' => 'sdb-84.hosting.stackcp.net',
-    'database' => 'BeyondImagination-3530393677b6',
-    'username' => 'beyondadmin',
-    'password' => 'ZatchBell232$',
-    'charset' => 'utf8mb4',
-];
+declare(strict_types=1);
+
+// Legacy callers share the Beyond ID database configuration.
+return require dirname(__DIR__, 2) . '/beyond-id/config/database.php';

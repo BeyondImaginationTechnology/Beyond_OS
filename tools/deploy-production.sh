@@ -31,7 +31,7 @@ git merge --ff-only origin/main
 if [[ "$(cd -- "${PUBLIC_ROOT}" && pwd)" != "${REPOSITORY_ROOT}" ]]; then
   rsync -a --delay-updates \
     --exclude='/.git/' --exclude='/.github/' --exclude='/.cache/' \
-    --exclude='/var/' --exclude='/config/live.php' \
+    --exclude='/var/' --exclude='/.tmp-dailybreath-var/' --exclude='/config/live.php' \
     --exclude='/docs/' --exclude='/tools/' --exclude='/sql/' --exclude='/exports/' \
     --exclude='/AppStoreAssets/' --exclude='/*Apple/' --exclude='/*Android/' \
     --exclude='/.gitattributes' --exclude='/.gitignore' \

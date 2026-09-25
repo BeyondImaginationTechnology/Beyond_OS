@@ -4,6 +4,7 @@
 /config.toml
 /config/live.php
 /var/
+/.tmp-dailybreath-var/
 **/*.sqlite
 **/*.sqlite3
 **/*.db

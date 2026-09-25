@@ -26,7 +26,7 @@ function bos_feature_enabled(string $key, bool $fallback=true): bool {
     try { $s=beyond_db()->prepare('SELECT enabled FROM feature_flags WHERE flag_key=? LIMIT 1'); $s->execute([$key]); $v=$s->fetchColumn(); return $v===false?$fallback:(bool)$v; } catch(Throwable $e) { return $fallback; }
 }
 function bos_log(string $event, array $details=[]): void {
-    try { $s=beyond_db()->prepare('INSERT INTO platform_events(user_id,event_name,details_json,created_at) VALUES(?,?,?,NOW())'); $s->execute([bos_current_user_id() ?: null,$event,json_encode($details)]); } catch(Throwable $e) {}
+    try { $s=beyond_db()->prepare('INSERT INTO platform_events(user_id,event_name,details_json,created_at) VALUES(?,?,?,CURRENT_TIMESTAMP)'); $s->execute([bos_current_user_id() ?: null,$event,json_encode($details)]); } catch(Throwable $e) {}
 }
 function bos_app_platforms(string $title, string $copy=''): array {
     $haystack = strtolower($title.' '.$copy);

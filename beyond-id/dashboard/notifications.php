@@ -7,9 +7,9 @@ $filter = ($_GET['filter'] ?? 'all') === 'unread' ? 'unread' : 'all';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && verify_csrf_token($_POST['csrf'] ?? null)) {
     if (isset($_POST['read_all'])) {
-        $pdo->prepare('UPDATE user_notifications SET read_at=COALESCE(read_at,NOW()) WHERE user_id=?')->execute([$uid]);
+        $pdo->prepare('UPDATE user_notifications SET read_at=COALESCE(read_at,CURRENT_TIMESTAMP) WHERE user_id=?')->execute([$uid]);
     } elseif (!empty($_POST['notification_id'])) {
-        $pdo->prepare('UPDATE user_notifications SET read_at=COALESCE(read_at,NOW()) WHERE id=? AND user_id=?')->execute([(int)$_POST['notification_id'], $uid]);
+        $pdo->prepare('UPDATE user_notifications SET read_at=COALESCE(read_at,CURRENT_TIMESTAMP) WHERE id=? AND user_id=?')->execute([(int)$_POST['notification_id'], $uid]);
     }
     header('Location: notifications.php?filter=' . $filter);
     exit;

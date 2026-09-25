@@ -3,7 +3,7 @@ class Auth {
     public static function check(): bool { return !empty($_SESSION['user_id']); }
     public static function user(): ?array {
         if (!self::check()) return null;
-        $stmt = Database::conn()->prepare("SELECT id,name,email,role,status,last_login FROM users WHERE id=? LIMIT 1");
+        $stmt = Database::conn()->prepare("SELECT id,name,email,role,status,last_login_at AS last_login FROM users WHERE id=? LIMIT 1");
         $stmt->execute([$_SESSION['user_id']]);
         return $stmt->fetch() ?: null;
     }
@@ -39,7 +39,7 @@ class Auth {
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_name'] = $user['name'];
         $_SESSION['user_role'] = $role;
-        Database::conn()->prepare("UPDATE users SET last_login=NOW() WHERE id=?")->execute([$user['id']]);
+        Database::conn()->prepare("UPDATE users SET last_login_at=CURRENT_TIMESTAMP WHERE id=?")->execute([$user['id']]);
         self::log((int)$user['id'], 'login_success', $user['email']);
         return ['ok'=>true];
     }
@@ -60,7 +60,7 @@ class Auth {
     public static function verifyCsrf(?string $token): bool { return is_string($token) && hash_equals($_SESSION['csrf'] ?? '', $token); }
     public static function log(?int $userId, string $action, string $detail=''): void {
         try {
-            $stmt = Database::conn()->prepare("INSERT INTO activity_logs (user_id, action, detail, ip_address, created_at) VALUES (?,?,?,?,NOW())");
+            $stmt = Database::conn()->prepare("INSERT INTO activity_logs (user_id, action, detail, ip_address, created_at) VALUES (?,?,?,?,CURRENT_TIMESTAMP)");
             $stmt->execute([$userId, $action, $detail, $_SERVER['REMOTE_ADDR'] ?? '']);
         } catch (Throwable $e) { error_log($e->getMessage()); }
     }

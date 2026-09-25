@@ -46,6 +46,9 @@ fi
 for asset in \
   assets/icons/apple-continue-button.png \
   assets/icons/github-invertocat-white.png \
+  dailybreath/assets/js/web-app.js \
+  dailybreath/manifest.webmanifest \
+  dailybreath/service-worker.js \
   dailybreath/assets/css/bible-forest.css \
   dailybreath/assets/css/tanakh-forest.css \
   dailybreath/assets/css/quran-forest.css \

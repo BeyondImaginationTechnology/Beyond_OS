@@ -6,8 +6,10 @@ require_once __DIR__ . '/../includes/functions.php';
 require __DIR__ . '/../includes/db.php';
 require_once dirname(__DIR__, 2) . '/server/lib/deployment.php';
 
-$notice = '';
-$noticeType = '';
+$flash = $_SESSION['deployment_notice'] ?? null;
+unset($_SESSION['deployment_notice']);
+$notice = is_array($flash) ? (string)($flash['message'] ?? '') : '';
+$noticeType = is_array($flash) ? (string)($flash['type'] ?? '') : '';
 $admin = [
     'id' => (int)($_SESSION['user_id'] ?? 0),
     'email' => (string)($_SESSION['email'] ?? 'admin'),
@@ -25,6 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'queue
             log_activity($pdo, $admin['id'] ?: null, 'deployment_queued');
         }
     }
+    $_SESSION['deployment_notice'] = ['message' => $notice, 'type' => $noticeType];
+    header('Location: deployments.php', true, 303);
+    exit;
 }
 
 $repository = beyond_git_state(dirname(__DIR__, 2));
@@ -73,7 +78,10 @@ require __DIR__ . '/../includes/admin-sidebar.php';
       </form>
       <a class="btn btn-secondary" href="<?= e($startCpUrl) ?>" target="_blank" rel="noopener noreferrer">Open StartCP Deploy ↗</a>
     </div>
-    <p class="muted deployment-note">This page only writes a protected queue request. A locked CLI cron worker performs deployment, preserving <code>var/</code>, live configuration, repository metadata, and development-only files.</p>
+    <p class="muted deployment-note">This page queues a protected deployment request. The scheduled worker runs it within a minute; this status refreshes automatically while it is queued or running. The worker preserves <code>var/</code>, live configuration, and repository metadata.</p>
   </section>
 </section>
+<?php if (in_array($result, ['queued', 'running'], true)): ?>
+<script>window.setTimeout(() => window.location.replace('deployments.php'), 10000);</script>
+<?php endif; ?>
 <?php require __DIR__ . '/../includes/admin-footer.php'; ?>

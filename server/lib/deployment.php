@@ -114,10 +114,14 @@ function beyond_queue_deployment(array $requester): array
         flock($lock, LOCK_UN); fclose($lock);
         return ['ok' => false, 'message' => 'The deployment request could not be queued.'];
     }
-    beyond_deployment_write_json($paths['status'], $request + [
+    if (!beyond_deployment_write_json($paths['status'], $request + [
         'result' => 'queued', 'message' => 'Waiting for the deployment cron worker.',
         'commit' => '', 'started_at' => '', 'finished_at' => '',
-    ]);
+    ])) {
+        @unlink($paths['queue']);
+        flock($lock, LOCK_UN); fclose($lock);
+        return ['ok' => false, 'message' => 'The deployment request was not saved. Check the private status file permissions.'];
+    }
     flock($lock, LOCK_UN); fclose($lock);
     return ['ok' => true, 'message' => 'Deployment queued. The cron worker will start it shortly.'];
 }

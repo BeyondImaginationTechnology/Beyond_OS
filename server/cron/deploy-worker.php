@@ -34,7 +34,11 @@ try {
 
 $git = beyond_git_state($projectRoot); $finishedAt = gmdate(DATE_ATOM); $success = $exitCode === 0;
 $status['result'] = $success ? 'success' : 'failed';
-$status['message'] = $success ? 'Deployment completed successfully.' : 'Deployment failed. Review the protected deployment log.';
+$status['message'] = $success ? 'Deployment completed successfully.' : (
+    str_contains($stderr, 'Refusing to deploy a repository with local changes or untracked files.')
+        ? 'Deployment blocked: the live checkout has local changes or untracked files. Review the protected deployment log.'
+        : 'Deployment failed. Review the protected deployment log.'
+);
 $status['branch'] = $git['branch'] ?: 'main'; $status['commit'] = $git['commit'];
 $status['finished_at'] = $finishedAt; $status['exit_code'] = $exitCode;
 beyond_deployment_write_json($paths['status'], $status);

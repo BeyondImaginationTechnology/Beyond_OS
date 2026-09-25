@@ -16,7 +16,11 @@ try {
 $read = static function (string $env, string $provider, string $key, string $default = '') use ($liveOauth): string {
     $environment = getenv($env);
     if (is_string($environment) && trim($environment) !== '') return trim($environment);
-    return trim((string)($liveOauth[$provider][$key] ?? $default));
+    $credentials = is_array($liveOauth[$provider] ?? null) ? $liveOauth[$provider] : [];
+    $value = trim((string)($credentials[$key] ?? ''));
+    if ($value !== '') return $value;
+    $alias = ['client_id' => 'app_id', 'client_secret' => 'app_secret'][$key] ?? '';
+    return trim((string)($credentials[$alias] ?? $default));
 };
 return [
     'google' => [

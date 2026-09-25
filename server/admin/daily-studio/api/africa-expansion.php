@@ -176,7 +176,7 @@ function africaGenerateTracks(array $values,string $date): array {
 }
 
 $legacyFile=dirname(__DIR__,4).'/beyond-french/data/africa-expansion.json';
-$file=beyond_private_root().'/data/africa-expansion.json';
+$file=beyond_private_file('data/daily-studio/africa-expansion.json','data/africa-expansion.json');
 if(!is_dir(dirname($file))&&!mkdir(dirname($file),0750,true)&&!is_dir(dirname($file)))throw new RuntimeException('The protected Africa expansion data directory could not be created.');
 if(!is_file($file)&&is_file($legacyFile)){
     $legacyItems=json_decode((string)file_get_contents($legacyFile),true);

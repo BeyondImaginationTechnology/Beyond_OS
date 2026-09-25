@@ -62,7 +62,7 @@ final class DailyStudio
             return $pdo;
         }
 
-        $path = dirname(__DIR__, 4) . '/var/daily-studio.sqlite';
+        $path = beyond_private_file('db/daily-studio.sqlite', 'daily-studio.sqlite');
         if (!is_dir(dirname($path))) {
             mkdir(dirname($path), 0755, true);
         }

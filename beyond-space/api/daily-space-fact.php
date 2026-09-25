@@ -4,7 +4,8 @@ declare(strict_types=1);
 header('Content-Type: application/json; charset=UTF-8');
 header('Cache-Control: public, max-age=300, stale-while-revalidate=600');
 $date = (new DateTimeImmutable('today', new DateTimeZone('America/Vancouver')))->format('Y-m-d');
-$dbPath = dirname(__DIR__, 2) . '/var/daily-studio.sqlite';
+require_once dirname(__DIR__, 2) . '/config/bootstrap.php';
+$dbPath = beyond_private_file('db/daily-studio.sqlite', 'daily-studio.sqlite');
 $fact = null;
 if (is_file($dbPath)) {
     try {

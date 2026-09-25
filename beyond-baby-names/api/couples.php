@@ -32,7 +32,7 @@ function database(): PDO
         return $pdo;
     }
 
-    $default = beyond_private_root() . '/beyond-baby-names/couples.sqlite';
+    $default = beyond_private_file('db/beyond-baby-names.sqlite', 'beyond-baby-names/couples.sqlite');
     $path = getenv('BEYOND_BABY_NAMES_DB') ?: $default;
     $directory = dirname($path);
     if (!is_dir($directory) && !mkdir($directory, 0770, true) && !is_dir($directory)) {

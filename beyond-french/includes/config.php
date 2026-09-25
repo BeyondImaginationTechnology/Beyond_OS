@@ -19,6 +19,7 @@ define('DATA_DIR', dirname(__DIR__) . '/data');
 define('LESSONS_FILE', DATA_DIR . '/lessons.json');
 define('FRENCH_ACADEMY_FILE', DATA_DIR . '/academy.json');
 define('PRIVATE_DATA_DIR', beyond_private_root() . '/data');
-define('SQLITE_FILE', PRIVATE_DATA_DIR . '/beyond.sqlite');
+define('SQLITE_FILE', beyond_private_file('db/beyond-french.sqlite', 'data/beyond.sqlite'));
+if (!is_dir(dirname(SQLITE_FILE))) mkdir(dirname(SQLITE_FILE), 0700, true);
 define('ADMIN_USERNAME', (string)beyond_optional_config('security.admin_username', 'admin'));
 define('ADMIN_PASSWORD_HASH', (string)beyond_optional_config('security.admin_password_hash', ''));

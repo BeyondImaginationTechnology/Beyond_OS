@@ -53,7 +53,8 @@ function la_module(array $config,string $age,string $slug): ?array{foreach(la_mo
 function la_db(): PDO{
  static $pdo=null;
  if($pdo instanceof PDO)return $pdo;
- $path=beyond_private_root().'/learning-academy.sqlite';
+ $path=beyond_private_file('db/learning-academy.sqlite','learning-academy.sqlite');
+ if(!is_dir(dirname($path)))mkdir(dirname($path),0770,true);
  $pdo=new PDO('sqlite:'.$path,null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]);
  $pdo->exec('PRAGMA busy_timeout=5000; PRAGMA journal_mode=WAL;');
  $pdo->exec("CREATE TABLE IF NOT EXISTS learning_academy_progress(app_slug TEXT NOT NULL,learner_key TEXT NOT NULL,age_group TEXT NOT NULL,module_slug TEXT NOT NULL,lesson_number INTEGER NOT NULL,best_score INTEGER NOT NULL DEFAULT 0,passed INTEGER NOT NULL DEFAULT 0,completed_at TEXT NULL,updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(app_slug,learner_key,age_group,module_slug,lesson_number))");

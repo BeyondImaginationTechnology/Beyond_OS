@@ -340,11 +340,12 @@ function academy_db(): PDO
     if ($pdo instanceof PDO) {
         return $pdo;
     }
-    $root = beyond_private_root();
-    if (!is_dir($root) && !mkdir($root, 0770, true) && !is_dir($root)) {
+    $path = beyond_private_file('db/learning-academy.sqlite', 'learning-academy.sqlite');
+    $directory = dirname($path);
+    if (!is_dir($directory) && !mkdir($directory, 0770, true) && !is_dir($directory)) {
         throw new RuntimeException('Academy storage is unavailable.');
     }
-    $pdo = new PDO('sqlite:' . $root . '/learning-academy.sqlite', null, null, [
+    $pdo = new PDO('sqlite:' . $path, null, null, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);

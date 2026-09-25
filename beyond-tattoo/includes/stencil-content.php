@@ -11,8 +11,8 @@ function bt_stencil_defaults(): array
 
 function bt_stencil_data_file(): string
 {
-    if (function_exists('beyond_private_root')) return beyond_private_root() . '/data/beyond-tattoo-stencil-day.json';
-    return dirname(__DIR__, 3) . '/var/data/beyond-tattoo-stencil-day.json';
+    require_once dirname(__DIR__, 2) . '/config/bootstrap.php';
+    return beyond_private_file('data/beyond-tattoo/stencil-day.json', 'data/beyond-tattoo-stencil-day.json');
 }
 
 function bt_stencil_content(): array

@@ -66,6 +66,62 @@ try {
         }
     }
 
+    // Keep a point-in-time copy of every item being moved. The exclusive lock
+    // prevents updated web requests and cron jobs from writing during this copy.
+    $backupRoot = $root . '/backups/private-var-' . gmdate('Ymd-His');
+    if (!mkdir($backupRoot, 0700, true)) {
+        throw new RuntimeException('Cannot create a private migration backup.');
+    }
+    $backupFile = static function (string $relative) use ($root, $backupRoot): void {
+        $source = $root . '/' . $relative;
+        if (!is_file($source)) {
+            return;
+        }
+        $target = $backupRoot . '/' . $relative;
+        $directory = dirname($target);
+        if (!is_dir($directory) && !mkdir($directory, 0700, true) && !is_dir($directory)) {
+            throw new RuntimeException("Cannot create backup directory for {$relative}");
+        }
+        if (!copy($source, $target)) {
+            throw new RuntimeException("Cannot back up {$relative}");
+        }
+    };
+    foreach ($databases as $old => $new) {
+        $source = $root . '/' . $old;
+        if (!is_file($source)) {
+            continue;
+        }
+        $db = new PDO('sqlite:' . $source, null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $db->exec('PRAGMA busy_timeout=5000');
+        $checkpoint = $db->query('PRAGMA wal_checkpoint(TRUNCATE)')->fetch(PDO::FETCH_NUM);
+        if ($checkpoint !== false && (int)$checkpoint[0] !== 0) {
+            throw new RuntimeException("SQLite checkpoint is busy: {$old}");
+        }
+        $db = null;
+        $backupFile($old);
+    }
+    foreach ($files as $old => $new) {
+        $backupFile($old);
+    }
+    foreach ($directories as $old => $new) {
+        $source = $root . '/' . $old;
+        if (!is_dir($source)) {
+            continue;
+        }
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($source, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+        foreach ($iterator as $entry) {
+            if (!$entry->isFile()) {
+                throw new RuntimeException("Unsupported item in {$old} backup");
+            }
+            $relative = $old . '/' . substr($entry->getPathname(), strlen($source) + 1);
+            $backupFile($relative);
+        }
+    }
+    echo "Private backup created in {$backupRoot}\n";
+
     foreach ($databases as $old => $new) {
         $source = $root . '/' . $old;
         $target = $root . '/' . $new;

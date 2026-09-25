@@ -17,11 +17,14 @@ committed to Git.
 | `uploads/` | User and generated media |
 | `tmp/` | Temporary work and the layout lock |
 | `logs/`, `deployments/`, `analytics/` | Operational records |
+| `backups/` | Private snapshots made before storage moves |
 
-After taking a fresh webspace snapshot and deploying the compatible code, run
+After deploying the compatible code, run
 `php tools/migrate-private-var.php --apply` once from the hosting CLI. It waits
-for requests using private storage to finish, checkpoints SQLite WAL files, and
-moves the known databases and data files. It can be rerun if an individual move
+for requests using private storage to finish, checkpoints SQLite WAL files,
+copies the files being moved into a dated `backups/` directory, and moves the
+known databases and data files. A current hosting webspace snapshot is also
+recommended. The script can be rerun if an individual move
 fails. The compatible code keeps reading the legacy path until each file moves.
 
 The migration intentionally leaves `beyond-health.sqlite`, `android_keys/`,

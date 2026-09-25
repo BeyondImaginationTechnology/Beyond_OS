@@ -1,15 +1,15 @@
 set default="0"
 set timeout=8
 
-# The USB image is a GPT disk; keep the kernel path on its EFI boot partition
-# explicit because this minimal GRUB build does not include the search command.
+# Resolve the kernel relative to this EFI executable so USB enumeration order
+# does not select another disk's first partition.
 insmod part_gpt
 insmod fat
 
 menuentry "Try BIT OS Core v0.2" {
-    linux (hd0,gpt1)/bzImage root=PARTUUID=%PARTUUID% rootwait quiet loglevel=3
+    linux $cmdpath/../../bzImage root=PARTUUID=%PARTUUID% rootwait quiet loglevel=3
 }
 
 menuentry "Install BIT OS Core v0.2" {
-    linux (hd0,gpt1)/bzImage root=PARTUUID=%PARTUUID% rootwait bit.install=1 console=tty1 loglevel=3
+    linux $cmdpath/../../bzImage root=PARTUUID=%PARTUUID% rootwait bit.install=1 console=tty1 console=ttyS0,115200 loglevel=3
 }

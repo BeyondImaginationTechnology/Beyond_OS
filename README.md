@@ -52,8 +52,18 @@ paths clear without exposing production secrets or user data.
   configuration helpers.
 - `server/` admin, cron, helpers, and backend classes.
 - `sql/` database migrations and schema snapshots.
-- `docs/` deployment notes, patch notes, and security hardening notes.
+- `docs/` deployment notes, patch notes, security hardening notes, mobile rollout
+  guidance, and internal project handoffs.
+- `tools/` protected build/deployment utilities and supporting files that are
+  excluded from production sync. Buildroot helpers live under `tools/buildroot/`.
+- `exports/` generated media only; source generators belong with the protected
+  build tools that create them.
 - `Beyond*Apple/` Swift/Xcode companion app projects.
+- `*Android/` native Android companion app projects and their project-local
+  scripts.
+
+See [`docs/website-root-structure.md`](docs/website-root-structure.md) for the
+web-root map and production deployment constraints.
 
 ## Requirements
 

@@ -14,10 +14,11 @@ case "${1:-}" in
     touch "$XAUTHORITY"
     xauth -f "$XAUTHORITY" add :0 . "$(mcookie)"
     chown home:home "$XAUTHORITY"
+    # BusyBox closes inherited output when daemonizing; -O preserves diagnostics.
     start-stop-daemon -S -b -m -p /run/beyond-core.pid \
-      -x /usr/bin/xinit /usr/bin/beyond-session -- /usr/bin/Xorg :0 vt1 \
-      -logfile /home/home/Xorg.0.log -nolisten tcp -auth "$XAUTHORITY" \
-      >> /var/log/beyond-core.log 2>&1
+      -O /home/home/beyond-core.log \
+      -x /usr/bin/xinit -- /usr/bin/beyond-session -- /usr/bin/Xorg :0 vt1 \
+      -logfile /home/home/Xorg.0.log -nolisten tcp -auth "$XAUTHORITY"
     ;;
   stop)
     start-stop-daemon -K -p /run/beyond-core.pid || true

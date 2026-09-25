@@ -1,7 +1,7 @@
 @echo off
 setlocal
 
-set "KEYSTORE=%~dp0DailyBreathAndroid\app\upload-keystore.jks"
+set "KEYSTORE=%~dp0..\app\upload-keystore.jks"
 set "ALIAS=daily-breath-upload"
 
 if exist "%KEYSTORE%" (

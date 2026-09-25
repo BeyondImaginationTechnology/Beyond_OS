@@ -72,11 +72,12 @@ static void box(int x, int y, int w, int h, int r, int g, int b)
     SDL_RenderFillRect(renderer, &rect);
 }
 
-static void text(TTF_Font *face, const char *value, int x, int y, SDL_Color color)
+static int text(TTF_Font *face, const char *value, int x, int y, SDL_Color color)
 {
-    if (!*value) return;
+    if (!*value) return 0;
     SDL_Surface *surface = TTF_RenderUTF8_Blended(face, value, color);
-    if (!surface) return;
+    if (!surface) return 0;
+    int width = surface->w;
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
     if (texture) {
         SDL_Rect dest = {x, y, surface->w, surface->h};
@@ -84,6 +85,7 @@ static void text(TTF_Font *face, const char *value, int x, int y, SDL_Color colo
         SDL_DestroyTexture(texture);
     }
     SDL_FreeSurface(surface);
+    return width;
 }
 
 static void paragraph(const char *value, int x, int y, int width, int height)
@@ -272,8 +274,8 @@ static void draw(void)
     for (int y = 0; y < H; y++) box(0, y, W, 1, 9 + y/110, 13 + y/100, 22 + y/60);
     box(0, 0, W, 64, 12, 18, 30);
     logo(35, 32, 42);
-    text(font, "Beyond Imagination OS", 68, 18, white);
-    text(small_font, EDITION_LABEL, 224, 24, muted);
+    int brand_width = text(font, "Beyond Imagination OS", 68, 18, white);
+    text(small_font, EDITION_LABEL, 68 + brand_width + 24, 24, muted);
     time_t now = time(NULL);
     struct tm *local = localtime(&now);
     char clock[80] = "";

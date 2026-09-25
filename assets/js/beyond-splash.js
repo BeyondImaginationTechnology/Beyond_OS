@@ -20,7 +20,6 @@
     ['/beyond-media/', 'Beyond Media', '#ff73ba'],
     ['/beyond-jobs/', 'Beyond Jobs', '#ffd16b'],
     ['/beyond-casino/', 'Beyond Casino', '#f7c948'],
-    ['/beyond-chromium/', 'Beyond Chromium', '#91a7ff'],
     ['/app-store/', 'Beyond App Store', '#c69cff'],
     ['/academy/', 'Beyond Academy', '#ffd16b'],
     ['/coding-school/', 'Beyond Coding School', '#8ee5ff'],

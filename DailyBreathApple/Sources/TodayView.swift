@@ -62,7 +62,7 @@ struct TodayView: View {
         .background(DailyBreathThemeBackground(theme: selectedTheme))
         .navigationTitle("Today")
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.hidden, for: .navigationBarBackButton)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button(action: onHome) {

@@ -28,7 +28,9 @@ project or in a protected operations folder.
 - `tools/daily-space-carousel/` contains the carousel generator and source
   backgrounds; generated PNGs go to `exports/daily-space-4-of-55/`.
 - Personal document generators and personal data belong outside the web
-  repository, in the private workspace.
+  repository. Locally they live in `Beyond_OS_private/resume-builder/`; the
+  live generator is kept under `/var/private-builders/`, outside the public
+  document root.
 
 ## Deployment constraints
 

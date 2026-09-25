@@ -16,7 +16,12 @@ if (strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? '')) !== 'POST') {
 }
 
 try {
-    $claims = beyond_mobile_verify_token(beyond_mobile_bearer_token(), 'daily-breath-ios', $pdo);
+    $claims = beyond_mobile_verify_token(beyond_mobile_bearer_token(), null, $pdo);
+    $source = match ((string)$claims['audience']) {
+        'daily-breath-ios' => 'dailybreath-ios',
+        'beyond-french-ios' => 'beyond-french-ios',
+        default => throw new RuntimeException('Account deletion request is unavailable for this app.'),
+    };
     $body = json_decode((string)file_get_contents('php://input'), true);
     if (!is_array($body) || !hash_equals('DELETE', (string)($body['confirm'] ?? ''))) {
         http_response_code(422);
@@ -53,13 +58,13 @@ try {
     $status = $existing->fetchColumn();
     if ($status === false) {
         $insert = $pdo->prepare('INSERT INTO account_deletion_requests(user_id,source,status,requested_at,updated_at) VALUES (?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)');
-        $insert->execute([$userId, 'dailybreath-ios', 'pending']);
+        $insert->execute([$userId, $source, 'pending']);
     } elseif (!hash_equals('completed', (string)$status)) {
         $update = $pdo->prepare('UPDATE account_deletion_requests SET source=?,status=?,requested_at=CURRENT_TIMESTAMP,updated_at=CURRENT_TIMESTAMP WHERE user_id=?');
-        $update->execute(['dailybreath-ios', 'pending', $userId]);
+        $update->execute([$source, 'pending', $userId]);
     }
 
-    log_activity($pdo, $userId, 'account_deletion_requested_dailybreath_ios');
+    log_activity($pdo, $userId, 'account_deletion_requested_' . str_replace('-', '_', $source));
     echo json_encode([
         'ok' => true,
         'status' => 'pending',

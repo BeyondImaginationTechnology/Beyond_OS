@@ -261,18 +261,45 @@ workflows:
     artifacts:
       - $CM_BUILD_DIR/derived-data/Build/Products/**/*.app
 
+  beyond-french-ios-checks:
+    name: Beyond French iOS beta checks
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    working_directory: BeyondFrenchApple
+    environment:
+      xcode: latest
+    scripts:
+      - name: Generate Xcode project
+        script: |
+          set -euo pipefail
+          command -v xcodegen >/dev/null || brew install xcodegen
+          xcodegen generate
+      - name: Build and test on iPhone simulator
+        script: |
+          set -euo pipefail
+          simulator_id="$(xcrun simctl list devices available -j | ruby -rjson -e '
+            devices = JSON.parse(STDIN.read).fetch("devices").values.flatten
+            device = devices.find { |candidate| candidate["isAvailable"] && candidate["name"].start_with?("iPhone") }
+            abort "No available iPhone simulator found" unless device
+            puts device.fetch("udid")
+          ')"
+          xcodebuild test \
+            -project BeyondFrench.xcodeproj \
+            -scheme BeyondFrench \
+            -destination "id=$simulator_id" \
+            -derivedDataPath "$CM_BUILD_DIR/derived-data" \
+            CODE_SIGNING_ALLOWED=NO
+    artifacts:
+      - $CM_BUILD_DIR/derived-data/Logs/Test/*.xcresult
+      - $CM_BUILD_DIR/derived-data/Build/Products/**/*.app
+
   beyond-french-ios-testflight:
     name: Beyond French iOS TestFlight
     max_build_duration: 120
     instance_type: mac_mini_m2
     working_directory: BeyondFrenchApple
     triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: main
-          include: true
-          source: true
+      events: []
     integrations:
       app_store_connect: beyond-apple-api
     environment:

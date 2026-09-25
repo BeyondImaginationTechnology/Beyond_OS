@@ -28,7 +28,7 @@ return [
         'name' => 'Beyond French for Apple',
         'app_slug' => 'beyond-french',
         'scheme' => 'beyondfrench',
-        'scopes' => ['profile:read', 'email:read', 'trivia:play'],
+        'scopes' => ['profile:read', 'email:read', 'progress:read', 'progress:write', 'trivia:play'],
     ],
     'daily-breath-ios' => [
         'name' => 'DailyBreath for Apple',

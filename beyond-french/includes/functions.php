@@ -108,6 +108,13 @@ function sqlite_db(): PDO {
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_french_audio_lesson ON french_lesson_audio(lesson_id)');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_french_audio_status ON french_lesson_audio(generation_status)');
     $pdo->exec("CREATE TABLE IF NOT EXISTS french_learning_progress (user_id INTEGER PRIMARY KEY,current_lesson_id INTEGER NOT NULL DEFAULT 1,last_lesson_id INTEGER NOT NULL DEFAULT 0,completed_lessons_json TEXT NOT NULL DEFAULT '[]',updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS french_native_progress (
+        user_id INTEGER PRIMARY KEY,
+        completed_lesson_ids_json TEXT NOT NULL DEFAULT '[]',
+        completed_daily_lesson_ids_json TEXT NOT NULL DEFAULT '[]',
+        correct_practice_count INTEGER NOT NULL DEFAULT 0,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )");
     $pdo->exec("CREATE TABLE IF NOT EXISTS french_academy_progress (
         learner_key TEXT NOT NULL,
         age_group TEXT NOT NULL,

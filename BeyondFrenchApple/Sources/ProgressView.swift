@@ -11,16 +11,16 @@ struct LearningProgressView: View {
                 ThemePicker()
 
                 LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 12) {
-                    MetricTile(title: "Age Paths", value: "\(store.academy.ageGroups.count)", systemImage: "person.3.fill", color: .green)
+                    MetricTile(title: "Difficulty Levels", value: "3", systemImage: "chart.bar.fill", color: .green)
                     MetricTile(title: "Practice", value: "\(store.correctPracticeCount)", systemImage: "bolt.fill", color: .orange)
                     MetricTile(title: "Dictionary", value: "\(store.dictionary.count)", systemImage: "character.book.closed.fill", color: .teal)
-                    MetricTile(title: "Academy", value: store.hasFullAcademyAccess ? "Full" : "Greetings", systemImage: "lock.shield.fill", color: store.appTheme.accent)
+                    MetricTile(title: "Academy", value: "Free Beta", systemImage: "lock.open.fill", color: store.appTheme.accent)
                 }
 
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Age Path Progress")
+                    Text("Difficulty Progress")
                         .font(.title3.weight(.black))
-                    ForEach(store.academy.ageGroups) { ageGroup in
+                    ForEach(store.academy.ageGroups.filter { ["kids", "teen", "adult"].contains($0.slug) }) { ageGroup in
                         AgeProgressRow(ageGroup: ageGroup)
                     }
                 }
@@ -47,7 +47,7 @@ private struct AgeProgressRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("\(ageGroup.title) · \(ageGroup.ages)")
+                Text(ageGroup.slug == "kids" ? "Beginner" : ageGroup.slug == "teen" ? "Intermediate" : "Advanced")
                     .font(.subheadline.weight(.bold))
                 Spacer()
                 Text("\(completed)/\(store.totalAcademyLessons)")

@@ -20,6 +20,19 @@
 	<string>AppIcon</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.education</string>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>technology.co.beyondimagination.beyondfrench.auth</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>beyondfrench</string>
+			</array>
+		</dict>
+	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

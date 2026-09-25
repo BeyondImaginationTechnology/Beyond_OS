@@ -12,6 +12,43 @@ private struct PremiumVoiceResult {
     let provider: String?
 }
 
+private struct LocalProgress {
+    let lessons: Set<String>
+    let daily: Set<Int>
+    let practice: Int
+}
+
+private struct CloudProgressWrite: Encodable {
+    let completedLessonIDs: [String]
+    let completedDailyLessonIDs: [Int]
+    let correctPracticeCount: Int
+
+    enum CodingKeys: String, CodingKey {
+        case completedLessonIDs = "completed_lesson_ids"
+        case completedDailyLessonIDs = "completed_daily_lesson_ids"
+        case correctPracticeCount = "correct_practice_count"
+    }
+}
+
+private struct CloudProgressResponse: Decodable {
+    let ok: Bool
+    let completedLessonIDs: [String]?
+    let completedDailyLessonIDs: [Int]?
+    let correctPracticeCount: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case ok
+        case completedLessonIDs = "completed_lesson_ids"
+        case completedDailyLessonIDs = "completed_daily_lesson_ids"
+        case correctPracticeCount = "correct_practice_count"
+    }
+}
+
+private enum CloudProgressError: Error {
+    case unauthorized
+    case invalidResponse
+}
+
 private enum PremiumVoiceError: LocalizedError {
     case invalidResponse
     case serverStatus(Int, String)
@@ -35,27 +72,34 @@ final class AppStore: ObservableObject {
     @Published private(set) var dictionary: [DictionaryWord] = []
     @Published private(set) var academy = AcademyCatalog.fallback
     @Published private(set) var completedLessonIDs: Set<String> = []
+    @Published private(set) var completedDailyLessonIDs: Set<Int> = []
     @Published private(set) var correctPracticeCount = 0
+    @Published private(set) var cloudStatus: String?
     @Published private(set) var isRefreshing = false
     @Published private(set) var statusMessage = "Daily lesson"
-    @Published var hasBeyondID = false
-    @Published var hasFullAcademyAccess = false
-    @Published var learningLanguage: FrenchLearningLanguage = .french {
-        didSet { UserDefaults.standard.set(learningLanguage.rawValue, forKey: learningLanguageKey) }
-    }
     @Published var appTheme = AppTheme.classic {
         didSet { UserDefaults.standard.set(appTheme.rawValue, forKey: themeKey) }
     }
 
     private let endpoint = URL(string: "https://beyondimagination.co.technology/beyond-french/api/today.php")!
     private let voiceEndpoint = URL(string: "https://beyondimagination.co.technology/beyond-french/api/voice.php")!
+    private let progressEndpoint = URL(string: "https://beyondimagination.co.technology/beyond-french/api/progress.php")!
     private let siteEndpoint = URL(string: "https://beyondimagination.co.technology")!
     private let speaker = AVSpeechSynthesizer()
     private var premiumVoicePlayer: AVAudioPlayer?
     private let completedKey = "BeyondFrench.completedLessonIDs"
     private let practiceKey = "BeyondFrench.correctPracticeCount"
     private let themeKey = "BeyondFrench.appTheme"
-    private let learningLanguageKey = "BeyondFrench.learningLanguage"
+    private weak var auth: BeyondFrenchAuth?
+    private var activeProgressOwner: Int?
+    private var isSyncing = false
+    private var syncAgain = false
+
+    var completedAcademyLessonCount: Int { completedLessonIDs.count }
+
+    func configureAuth(_ auth: BeyondFrenchAuth) {
+        self.auth = auth
+    }
 
     var totalAcademyLessons: Int {
         academy.modules.reduce(0) { $0 + $1.lessons.count }
@@ -84,8 +128,53 @@ final class AppStore: ObservableObject {
         loadAcademy()
         loadProgress()
         loadTheme()
-        loadLearningLanguage()
         await refreshLesson()
+    }
+
+    func switchProgressAccount(to userID: Int?) {
+        guard activeProgressOwner != userID else { return }
+        saveProgress()
+        activeProgressOwner = userID
+        apply(snapshot: localProgress(for: userID))
+        if userID != nil { mergeGuestProgress() }
+    }
+
+    func syncProgress() async {
+        guard let auth, auth.isSignedIn, let token = auth.accessToken,
+              let userID = auth.userID else { return }
+        if isSyncing { syncAgain = true; return }
+        isSyncing = true
+        defer {
+            isSyncing = false
+            if syncAgain {
+                syncAgain = false
+                Task { await syncProgress() }
+            }
+        }
+
+        switchProgressAccount(to: userID)
+        do {
+            let remote = try await cloudProgress(method: "GET", token: token)
+            guard auth.isSignedIn, auth.userID == userID, activeProgressOwner == userID else { return }
+            completedLessonIDs.formUnion(remote.completedLessonIDs ?? [])
+            completedDailyLessonIDs.formUnion(remote.completedDailyLessonIDs ?? [])
+            correctPracticeCount = max(correctPracticeCount, remote.correctPracticeCount ?? 0)
+            saveProgress()
+            let merged = try await cloudProgress(method: "PUT", token: token)
+            guard auth.isSignedIn, auth.userID == userID, activeProgressOwner == userID else { return }
+            completedLessonIDs.formUnion(merged.completedLessonIDs ?? [])
+            completedDailyLessonIDs.formUnion(merged.completedDailyLessonIDs ?? [])
+            correctPracticeCount = max(correctPracticeCount, merged.correctPracticeCount ?? 0)
+            saveProgress()
+            cloudStatus = "Progress synced with Beyond ID."
+        } catch CloudProgressError.unauthorized {
+            guard auth.isSignedIn, auth.userID == userID, activeProgressOwner == userID else { return }
+            cloudStatus = "Sign in again to sync. Progress is saved on this device."
+            auth.handleExpiredToken()
+            switchProgressAccount(to: nil)
+        } catch {
+            cloudStatus = "Offline. Progress is saved on this device and will sync later."
+        }
     }
 
     func refreshLesson() async {
@@ -285,34 +374,43 @@ final class AppStore: ObservableObject {
     }
 
     func isLessonUnlocked(module: AcademyModule, lessonIndex: Int) -> Bool {
-        guard lessonIndex > 0 else { return module.isFree || hasFullAcademyAccess }
-        if !module.isFree && !hasFullAcademyAccess { return false }
+        guard lessonIndex > 0 else { return true }
         return isLessonCompleted(module: module, lessonIndex: lessonIndex - 1)
     }
 
     func isLessonUnlocked(module: AcademyModule, lessonIndex: Int, ageGroup: AgeGroup) -> Bool {
-        guard lessonIndex > 0 else { return module.isFree || hasFullAcademyAccess }
-        if !module.isFree && !hasFullAcademyAccess { return false }
-        return isLessonCompleted(module: module, lessonIndex: lessonIndex - 1, ageGroup: ageGroup)
+        if lessonIndex > 0 {
+            return isLessonCompleted(module: module, lessonIndex: lessonIndex - 1, ageGroup: ageGroup)
+        }
+        guard let moduleIndex = academy.modules.firstIndex(where: { $0.slug == module.slug }),
+              moduleIndex > 0 else { return true }
+        let previous = academy.modules[moduleIndex - 1]
+        return previous.lessons.indices.allSatisfy {
+            isLessonCompleted(module: previous, lessonIndex: $0, ageGroup: ageGroup)
+        }
     }
 
     func completeLesson(module: AcademyModule, lessonIndex: Int) {
         completedLessonIDs.insert(lessonID(module: module, lessonIndex: lessonIndex))
         saveProgress()
+        Task { await syncProgress() }
     }
 
     func completeLesson(module: AcademyModule, lessonIndex: Int, ageGroup: AgeGroup) {
         completedLessonIDs.insert(lessonID(module: module, lessonIndex: lessonIndex, ageGroup: ageGroup))
         saveProgress()
+        Task { await syncProgress() }
     }
 
     func checkAnswer(_ answer: String, expected: String) -> Bool {
         normalized(answer) == normalized(expected)
     }
 
-    func recordCorrectPractice() {
+    func recordCorrectPractice(dailyLessonID: Int? = nil) {
         correctPracticeCount += 1
+        if let dailyLessonID { completedDailyLessonIDs.insert(dailyLessonID) }
         saveProgress()
+        Task { await syncProgress() }
     }
 
     private func loadDictionary() {
@@ -330,8 +428,15 @@ final class AppStore: ObservableObject {
     }
 
     private func loadProgress() {
-        completedLessonIDs = Set(UserDefaults.standard.stringArray(forKey: completedKey) ?? [])
-        correctPracticeCount = UserDefaults.standard.integer(forKey: practiceKey)
+        let defaults = UserDefaults.standard
+        if !defaults.bool(forKey: "BeyondFrench.progressMigrated.v1") {
+            defaults.set(defaults.stringArray(forKey: completedKey) ?? [], forKey: progressKey(nil, "lessons"))
+            defaults.set(defaults.integer(forKey: practiceKey), forKey: progressKey(nil, "practice"))
+            defaults.set(true, forKey: "BeyondFrench.progressMigrated.v1")
+        }
+        activeProgressOwner = auth?.userID
+        apply(snapshot: localProgress(for: activeProgressOwner))
+        if activeProgressOwner != nil { mergeGuestProgress() }
     }
 
     private func loadTheme() {
@@ -339,14 +444,70 @@ final class AppStore: ObservableObject {
         appTheme = savedTheme ?? .classic
     }
 
-    private func loadLearningLanguage() {
-        learningLanguage = UserDefaults.standard.string(forKey: learningLanguageKey)
-            .flatMap(FrenchLearningLanguage.init(rawValue:)) ?? .french
+    private func saveProgress() {
+        save(snapshot: LocalProgress(
+            lessons: completedLessonIDs,
+            daily: completedDailyLessonIDs,
+            practice: correctPracticeCount
+        ), for: activeProgressOwner)
     }
 
-    private func saveProgress() {
-        UserDefaults.standard.set(Array(completedLessonIDs), forKey: completedKey)
-        UserDefaults.standard.set(correctPracticeCount, forKey: practiceKey)
+    private func progressKey(_ owner: Int?, _ field: String) -> String {
+        "BeyondFrench.progress.\(owner.map { String($0) } ?? "guest").\(field)"
+    }
+
+    private func localProgress(for owner: Int?) -> LocalProgress {
+        let defaults = UserDefaults.standard
+        return LocalProgress(
+            lessons: Set(defaults.stringArray(forKey: progressKey(owner, "lessons")) ?? []),
+            daily: Set(defaults.array(forKey: progressKey(owner, "daily")) as? [Int] ?? []),
+            practice: defaults.integer(forKey: progressKey(owner, "practice"))
+        )
+    }
+
+    private func save(snapshot: LocalProgress, for owner: Int?) {
+        let defaults = UserDefaults.standard
+        defaults.set(Array(snapshot.lessons), forKey: progressKey(owner, "lessons"))
+        defaults.set(Array(snapshot.daily), forKey: progressKey(owner, "daily"))
+        defaults.set(snapshot.practice, forKey: progressKey(owner, "practice"))
+    }
+
+    private func apply(snapshot: LocalProgress) {
+        completedLessonIDs = snapshot.lessons
+        completedDailyLessonIDs = snapshot.daily
+        correctPracticeCount = snapshot.practice
+    }
+
+    private func mergeGuestProgress() {
+        let guest = localProgress(for: nil)
+        guard !guest.lessons.isEmpty || !guest.daily.isEmpty || guest.practice > 0 else { return }
+        completedLessonIDs.formUnion(guest.lessons)
+        completedDailyLessonIDs.formUnion(guest.daily)
+        correctPracticeCount = max(correctPracticeCount, guest.practice)
+        saveProgress()
+        save(snapshot: LocalProgress(lessons: [], daily: [], practice: 0), for: nil)
+    }
+
+    private func cloudProgress(method: String, token: String) async throws -> CloudProgressResponse {
+        var request = URLRequest(url: progressEndpoint)
+        request.httpMethod = method
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        if method == "PUT" {
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = try JSONEncoder().encode(CloudProgressWrite(
+                completedLessonIDs: Array(completedLessonIDs),
+                completedDailyLessonIDs: Array(completedDailyLessonIDs),
+                correctPracticeCount: correctPracticeCount
+            ))
+        }
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else { throw CloudProgressError.invalidResponse }
+        if http.statusCode == 401 { throw CloudProgressError.unauthorized }
+        guard http.statusCode == 200 else { throw CloudProgressError.invalidResponse }
+        let progress = try JSONDecoder().decode(CloudProgressResponse.self, from: data)
+        guard progress.ok else { throw CloudProgressError.invalidResponse }
+        return progress
     }
 
     private func lessonID(module: AcademyModule, lessonIndex: Int) -> String {

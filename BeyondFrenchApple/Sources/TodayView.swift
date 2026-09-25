@@ -37,17 +37,21 @@ struct TodayView: View {
                 .overlay(RoundedRectangle(cornerRadius: 22).stroke(store.appTheme.accent.opacity(0.24), lineWidth: 1))
                 .shadow(color: store.appTheme.accent.opacity(0.18), radius: 20, y: 10)
 
+                Text("FOUR GUIDES · ONE FRENCH LESSON")
+                    .font(.caption.weight(.black))
+                    .tracking(1.5)
+                    .foregroundStyle(store.appTheme.accent)
                 LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 12) {
-                    LanguageTile(flag: "FR", name: "Francais", value: store.lesson.french, color: store.appTheme.accent) {
+                    LanguageTile(flag: "FR", name: "Louis · French", value: store.lesson.french, color: store.appTheme.accent) {
                         store.speakLesson(store.lesson)
                     }
-                    LanguageTile(flag: "HT", name: "Kreyòl", value: store.lesson.kreyol, color: .red) {
+                    LanguageTile(flag: "HT", name: "Jazzy · Kreyòl", value: store.lesson.kreyol, color: .red) {
                         store.speakLesson(store.lesson, language: .kreyol)
                     }
-                    LanguageTile(flag: "JM", name: "Patois", value: store.lesson.patois, color: .green) {
+                    LanguageTile(flag: "JM", name: "Irie · Patois", value: store.lesson.patois, color: .green) {
                         store.speakLesson(store.lesson, language: .patois)
                     }
-                    LanguageTile(flag: "ES", name: "Espanol", value: store.lesson.spanish, color: .orange) {
+                    LanguageTile(flag: "ES", name: "Pablo · Spanish", value: store.lesson.spanish, color: .orange) {
                         store.speakLesson(store.lesson, language: .spanish)
                     }
                 }

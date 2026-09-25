@@ -3,12 +3,19 @@ import SwiftUI
 @main
 struct BeyondFrenchApp: App {
     @StateObject private var store = AppStore()
+    @StateObject private var auth = BeyondFrenchAuth()
 
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environmentObject(store)
-                .task { await store.load() }
+                .environmentObject(auth)
+                .task {
+                    store.configureAuth(auth)
+                    await auth.restoreSession()
+                    await store.load()
+                    await store.syncProgress()
+                }
         }
     }
 }

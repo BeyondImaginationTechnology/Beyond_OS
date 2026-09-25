@@ -18,21 +18,6 @@ enum AppTheme: String, CaseIterable, Identifiable, Codable {
     }
 }
 
-enum FrenchLearningLanguage: String, CaseIterable, Identifiable, Codable {
-    case french, kreyol, patois, spanish
-
-    var id: String { rawValue }
-    var title: String {
-        switch self { case .french: return "French"; case .kreyol: return "Kreyòl"; case .patois: return "Patois"; case .spanish: return "Spanish" }
-    }
-    var symbol: String {
-        switch self { case .french: return "🇫🇷"; case .kreyol: return "🇭🇹"; case .patois: return "🇯🇲"; case .spanish: return "🇪🇸" }
-    }
-    var audioLanguage: DictionaryAudioLanguage {
-        switch self { case .french: return .french; case .kreyol: return .kreyol; case .patois: return .patois; case .spanish: return .spanish }
-    }
-}
-
 struct TodayResponse: Decodable {
     let ok: Bool
     let date: String
@@ -364,30 +349,30 @@ extension AcademyLesson {
             )
         case "kids":
             return AcademyLessonExperience(
-                teaching: "\(teaching) Listen once in French, then compare it with Spanish, Kreyol, and Patois.",
-                practice: "\(practice) Pick one Beyond language and say that version too.",
-                checkPrompt: "Choose a language and type the phrase for: \(english)",
+                teaching: "\(teaching) Listen once in French, then compare it with the guides' Spanish, Kreyòl, and Patois bridges.",
+                practice: "\(practice) Then say the French phrase aloud.",
+                checkPrompt: "Type the French phrase for: \(english)",
                 supportLine: "Try it like a mini role-play."
             )
         case "preteen":
             return AcademyLessonExperience(
-                teaching: "\(teaching) Compare the phrase across French, Spanish, Kreyol, and Patois. Notice what changes and what stays familiar.",
-                practice: "\(practice) Then say the same idea in two languages back to back.",
-                checkPrompt: "Choose a language and type the complete phrase from memory.",
+                teaching: "\(teaching) Use the guides' familiar expressions to notice what changes in French.",
+                practice: "\(practice) Then say the French phrase from memory.",
+                checkPrompt: "Type the complete French phrase from memory.",
                 supportLine: "Look for patterns, not just translation."
             )
         case "teen":
             return AcademyLessonExperience(
-                teaching: "\(teaching) Practice it in French, then decide which Spanish, Kreyol, or Patois version feels closest in tone.",
-                practice: "\(practice) Add a follow-up sentence you might actually use in any one language.",
-                checkPrompt: "Choose a language and type the phrase exactly enough to use in conversation.",
+                teaching: "\(teaching) Practice it in French and use the guides' cultural context to understand its tone.",
+                practice: "\(practice) Add a French follow-up sentence you might actually use.",
+                checkPrompt: "Type the French phrase you would use in conversation.",
                 supportLine: "Aim for usable conversation, not classroom perfection."
             )
         case "adult":
             return AcademyLessonExperience(
-                teaching: "\(teaching) Compare formality across French, Spanish, Kreyol, and Patois before choosing the version you would use.",
+                teaching: "\(teaching) Notice French formality and how the guides explain the same situation from their cultures.",
                 practice: "\(practice) Say it once slowly, once at normal speed, and once in a real-life scenario.",
-                checkPrompt: "Choose a language and type the phrase you would use in this situation: \(english)",
+                checkPrompt: "Type the French phrase you would use in this situation: \(english)",
                 supportLine: "Build one practical phrase you can use today."
             )
         default:

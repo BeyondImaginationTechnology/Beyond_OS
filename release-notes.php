@@ -23,6 +23,7 @@ beyond_nav_bootstrap('Beyond OS');
     <p>A clearer view of the work landing across Jaguar AI, Beyond OS, connected apps, and creator projects.</p>
     <div class="bos-actions">
       <a class="bos-btn" href="#jaguar">Jaguar progress</a>
+      <a class="bos-btn secondary" href="#core-v02">BIT OS Core v0.2</a>
       <a class="bos-btn secondary" href="#apps">Explore app updates</a>
       <a class="bos-btn secondary" href="#projects">See creator projects</a>
     </div>
@@ -53,6 +54,19 @@ beyond_nav_bootstrap('Beyond OS');
       <article class="progress-card next"><span>AFTER VALIDATION</span><h3>Guided experiences</h3><p>Connect Jaguar first to focused learning and creator workflows, then evaluate safety, quality, latency, and operating cost before wider release.</p></article>
     </div>
     <aside class="jaguar-note"><strong>What Jaguar is today</strong><p>Jaguar is an in-development Beyond AI platform built on an approved third-party foundation model. It is not yet a publicly available chatbot or a separately trained Beyond foundation model.</p></aside>
+  </section>
+
+  <section class="bos-section core-release" id="core-v02" aria-labelledby="core-v02-title">
+    <span class="bos-kicker">BIT OS Core · v0.2 test candidate</span>
+    <h2 id="core-v02-title">From UEFI installer to Core dashboard.</h2>
+    <p class="core-release-intro">Core v0.2 now has published ISO and USB downloads, a Windows USB setup wizard, and a matching SHA-256 manifest. The installation paths were exercised end to end in a disposable QEMU virtual machine.</p>
+    <div class="progress-grid">
+      <article class="progress-card complete"><span>VALIDATED</span><h3>ISO and USB installs</h3><p>UEFI ISO and USB media both completed selected-partition and whole-disk installations on disposable QEMU disks.</p></article>
+      <article class="progress-card complete"><span>VALIDATED</span><h3>Boot without installer media</h3><p>All four installed-disk combinations restarted without the ISO or USB attached and reached the Core dashboard.</p></article>
+      <article class="progress-card complete"><span>AVAILABLE</span><h3>Windows USB wizard</h3><p>The wizard verifies the compressed USB image against its SHA-256 checksum, expands it, and prepares the raw image for USB writing.</p></article>
+    </div>
+    <aside class="core-release-note"><strong>Validation scope</strong><p>These results come from QEMU software emulation with UEFI firmware. Physical hardware compatibility and Secure Boot were not validated. Core v0.2 remains a test candidate.</p></aside>
+    <div class="bos-actions"><a class="bos-btn" href="https://os.beyondimagination.co.technology/#core-downloads">Get Core v0.2 downloads and checksums</a></div>
   </section>
 
   <section class="bos-section" id="apps">
@@ -89,6 +103,7 @@ beyond_nav_bootstrap('Beyond OS');
 </main>
 <style>
 .whats-new-main{width:min(1240px,calc(100% - 28px))}.whats-new-hero{background:radial-gradient(circle at 85% 10%,rgba(155,73,255,.32),transparent 28%),radial-gradient(circle at 72% 85%,rgba(242,70,157,.22),transparent 32%),linear-gradient(135deg,#0a1024,#251044 58%,#121322)}.whats-new-hero h1{max-width:880px}.whats-new-main .bos-section{scroll-margin-top:88px}.jaguar-release{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;align-items:stretch}.jaguar-release-copy{padding:clamp(28px,5vw,55px);border:1px solid rgba(192,108,255,.42);border-radius:26px;background:radial-gradient(circle at 100% 0,rgba(224,80,255,.18),transparent 34%),linear-gradient(140deg,rgba(31,20,66,.96),rgba(10,12,31,.98))}.jaguar-release-copy h2{max-width:650px;margin:14px 0;font-size:clamp(38px,5vw,68px);line-height:.94;letter-spacing:-.06em}.jaguar-release-copy p{max-width:680px;color:#c9c4d9;font-size:16px;line-height:1.7}.jaguar-release-art{min-height:430px;overflow:hidden;border:1px solid rgba(192,108,255,.42);border-radius:26px;background:#090711}.jaguar-release-art img{display:block;width:100%;height:100%;object-fit:cover}.jaguar-progress>h2{margin-bottom:28px}.progress-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.progress-card{min-height:220px;padding:24px;border:1px solid var(--line);border-radius:20px;background:var(--panel)}.progress-card span{display:inline-flex;padding:6px 9px;border-radius:999px;font-size:9px;font-weight:950;letter-spacing:.12em}.progress-card.complete span{color:#8ff0ae;background:rgba(81,219,120,.13)}.progress-card.active span{color:#dfb2ff;background:rgba(174,92,255,.14)}.progress-card.next span{color:#ffd98c;background:rgba(255,191,50,.13)}.progress-card h3{margin:22px 0 9px;font-size:22px}.progress-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.65}.jaguar-note{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;margin-top:14px;padding:22px 24px;border:1px solid rgba(255,191,50,.3);border-radius:18px;background:rgba(255,191,50,.06)}.jaguar-note strong{color:#ffd98c}.jaguar-note p{margin:0;color:var(--muted);line-height:1.55}.release-foundation{padding:clamp(24px,4vw,42px);border:1px solid var(--line);border-radius:24px;background:var(--panel)}
-@media(max-width:900px){.jaguar-release{grid-template-columns:1fr}.jaguar-release-art{min-height:340px}.progress-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.whats-new-main{width:min(100% - 18px,1240px)}.whats-new-hero{padding:30px 18px}.whats-new-main .bos-actions{display:grid;grid-template-columns:1fr}.whats-new-main .bos-btn{width:100%}.progress-grid{grid-template-columns:1fr}.jaguar-note{grid-template-columns:1fr}.jaguar-release-art{min-height:270px}}
+.core-release-intro{max-width:850px;color:var(--muted);font-size:16px;line-height:1.7}.core-release-note{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;margin-top:14px;padding:22px 24px;border:1px solid rgba(69,231,255,.28);border-radius:18px;background:rgba(69,231,255,.05)}.core-release-note strong{color:var(--blue)}.core-release-note p{margin:0;color:var(--muted);line-height:1.55}
+@media(max-width:900px){.jaguar-release{grid-template-columns:1fr}.jaguar-release-art{min-height:340px}.progress-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:560px){.whats-new-main{width:min(100% - 18px,1240px)}.whats-new-hero{padding:30px 18px}.whats-new-main .bos-actions{display:grid;grid-template-columns:1fr}.whats-new-main .bos-btn{width:100%}.progress-grid{grid-template-columns:1fr}.jaguar-note{grid-template-columns:1fr}.core-release-note{grid-template-columns:1fr}.jaguar-release-art{min-height:270px}}
 </style>
 <?php bos_page_end(); ?>

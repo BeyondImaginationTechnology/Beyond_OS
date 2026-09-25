@@ -25,7 +25,7 @@ fetch "$base_url/SHA256SUMS" "$work_dir/SHA256SUMS"
 while IFS='  ' read -r digest name; do
     [ -n "$digest" ] || continue
     case "$name" in
-        bitCoreos.iso|bit-os-core-0.2-installer.img) ;;
+        bitCoreos.iso.gz|bit-os-core-0.2-installer.img.gz) ;;
         *) continue ;;
     esac
     fetch "$base_url/$name" "$work_dir/$name"

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO.Compression;
 using System.Drawing;
 using System.IO;
 using System.Management;
@@ -17,6 +18,7 @@ namespace BITOSInstaller
         public string Version;
         public string ImageUrl;
         public string ChecksumsUrl;
+        public bool CompressedImage;
         public bool Available;
         public override string ToString() { return Edition + " " + Version + (Available ? "" : " (coming soon)"); }
     }
@@ -66,9 +68,10 @@ namespace BITOSInstaller
                 ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/home/1.0/SHA256SUMS"
             },
             new ReleaseDefinition {
-                Edition = "BIT OS Core", Version = "v.02", Available = true,
-                ImageUrl = "https://os.beyondimagination.co.technology/releases/core/1.0/bit-os-core-1.0-installer.img",
-                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/core/1.0/SHA256SUMS"
+                Edition = "BIT OS Core", Version = "v0.2 Candidate", Available = true,
+                ImageUrl = "https://os.beyondimagination.co.technology/releases/core/0.2/bit-os-core-0.2-installer.img.gz",
+                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/core/0.2/SHA256SUMS",
+                CompressedImage = true
             },
             new ReleaseDefinition {
                 Edition = "BIT OS Gaming", Version = "1.0", Available = false,
@@ -105,9 +108,9 @@ namespace BITOSInstaller
             var subtitle = new Label { Text = "Verified USB media for BIT OS. Installation and partitioning finish after restart.", ForeColor = Color.FromArgb(184, 203, 219), AutoSize = true, Location = new Point(34, 67) };
             Controls.Add(title); Controls.Add(subtitle);
 
-            var grid = new TableLayoutPanel { Location = new Point(32, 110), Size = new Size(710, 345), ColumnCount = 2, RowCount = 6, BackColor = BackColor };
+            var grid = new TableLayoutPanel { Location = new Point(32, 110), Size = new Size(710, 225), ColumnCount = 2, RowCount = 5, BackColor = BackColor };
             grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 175)); grid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-            for (var i = 0; i < 6; i++) grid.RowStyles.Add(new RowStyle(SizeType.Absolute, i == 2 ? 68 : 48));
+            for (var i = 0; i < 5; i++) grid.RowStyles.Add(new RowStyle(SizeType.Absolute, i == 2 ? 20 : 48));
             AddRow(grid, 0, "Edition", editions); AddRow(grid, 1, "Installer image", imagePath); AddRow(grid, 3, "USB drive", disks); AddRow(grid, 4, "Confirm erase", confirmation);
             imagePath.ReadOnly = true; imagePath.BackColor = Color.FromArgb(27, 40, 55); imagePath.ForeColor = Color.White; imagePath.BorderStyle = BorderStyle.FixedSingle;
             editions.DropDownStyle = ComboBoxStyle.DropDownList; disks.DropDownStyle = ComboBoxStyle.DropDownList;
@@ -117,11 +120,11 @@ namespace BITOSInstaller
             download.Text = "Download and verify"; choose.Text = "Use local image"; verify.Text = "Verify selected image"; refresh.Text = "Refresh USB drives"; write.Text = "Write USB installer";
             var buttons = new[] { download, choose, verify, refresh, write };
             for (var i = 0; i < buttons.Length; i++) { StyleButton(buttons[i], i == 4 ? Color.FromArgb(183, 60, 64) : Color.FromArgb(29, 104, 145)); }
-            download.Location = new Point(32, 470); choose.Location = new Point(198, 470); verify.Location = new Point(360, 470); refresh.Location = new Point(32, 518); write.Location = new Point(198, 518);
+            download.Location = new Point(32, 380); choose.Location = new Point(198, 380); verify.Location = new Point(360, 380); refresh.Location = new Point(32, 424); write.Location = new Point(198, 424);
             Controls.AddRange(buttons);
 
-            status.Location = new Point(32, 575); status.Size = new Size(710, 40); status.ForeColor = Color.FromArgb(171, 223, 194); status.Text = "Choose an edition and download or select a local installer image."; Controls.Add(status);
-            var warning = new Label { Text = "Writing erases the selected USB drive. Confirm the exact physical-disk number shown above; internal disks are not listed.", Location = new Point(32, 545), Size = new Size(710, 22), ForeColor = Color.FromArgb(242, 190, 108) }; Controls.Add(warning);
+            var warning = new Label { Text = "Writing erases the selected USB drive. Confirm the exact physical-disk number shown above; internal disks are not listed.", Location = new Point(32, 474), Size = new Size(710, 38), ForeColor = Color.FromArgb(242, 190, 108) }; Controls.Add(warning);
+            status.Location = new Point(32, 518); status.Size = new Size(710, 50); status.ForeColor = Color.FromArgb(171, 223, 194); status.Text = "Choose an edition and download or select a local installer image."; Controls.Add(status);
 
             editions.DataSource = releases;
             editions.SelectedIndexChanged += delegate { verified = false; imagePath.Text = ""; var r = CurrentRelease(); status.Text = r.Available ? r.Edition + " " + r.Version + " is available." : r.Edition + " is not published yet."; };
@@ -147,12 +150,30 @@ namespace BITOSInstaller
         {
             var release = CurrentRelease();
             if (!release.Available) { status.Text = release.Edition + " is not published yet."; return; }
-            using (var dialog = new SaveFileDialog { FileName = Path.GetFileName(new Uri(release.ImageUrl).LocalPath), Filter = "BIT OS image (*.img)|*.img" })
+            using (var dialog = new SaveFileDialog { FileName = release.CompressedImage ? Path.GetFileNameWithoutExtension(new Uri(release.ImageUrl).LocalPath) : Path.GetFileName(new Uri(release.ImageUrl).LocalPath), Filter = "BIT OS image (*.img)|*.img" })
             {
                 if (dialog.ShowDialog(this) != DialogResult.OK) return;
                 Toggle(false); status.Text = "Downloading " + release.Edition + " installer image…";
-                try { using (var client = new WebClient()) { await client.DownloadFileTaskAsync(new Uri(release.ImageUrl), dialog.FileName); } imagePath.Text = dialog.FileName; await VerifyAsync(); }
-                catch (Exception ex) { status.Text = "Download failed: " + ex.Message; }
+                try
+                {
+                    var downloadPath = dialog.FileName + (release.CompressedImage ? ".gz" : "");
+                    using (var client = new WebClient()) { await client.DownloadFileTaskAsync(new Uri(release.ImageUrl), downloadPath); }
+                    if (release.CompressedImage)
+                    {
+                        imagePath.Text = downloadPath;
+                        await VerifyAsync();
+                        if (!verified) throw new InvalidOperationException("The compressed image failed its published checksum.");
+                        Toggle(false);
+                        status.Text = "Expanding verified installer image…";
+                        using (var input = File.OpenRead(downloadPath))
+                        using (var gzip = new GZipStream(input, CompressionMode.Decompress))
+                        using (var output = File.Create(dialog.FileName)) gzip.CopyTo(output);
+                        File.Delete(downloadPath);
+                    }
+                    imagePath.Text = dialog.FileName;
+                    if (!release.CompressedImage) await VerifyAsync();
+                }
+                catch (Exception ex) { verified = false; status.Text = "Download failed: " + ex.Message; }
                 finally { Toggle(true); }
             }
         }

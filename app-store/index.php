@@ -82,7 +82,6 @@ $wallet = beyond_nav_bootstrap('Beyond App Store');
       <?=bos_app_card('BIT OS','The planned Beyond operating environment for connected home, learning, creating, and organizational work.','https://os.beyondimagination.co.technology/','OS','Explore OS','@blank')?>
       <?=bos_locked_app_card('Beyond Audio','Listen across the Beyond universe.','BA','@blank')?>
       <?=bos_app_card('Beyond Media','Watch Beyond TV, preview private media and find licensed downloads.','beyond-media/','MEDIA','Open media hub','@blank')?>
-      <?=bos_locked_app_card('Beyond Chromium','A controller-first desktop browser built around Beyond OS.','BC','@blank')?>
       <?=bos_app_card('Canvas in Beyond Market','Customize mugs, posters, stickers, apparel and visual products.','beyond-market/#canvas-studio','CAN','Shop & create','@blank')?>
       <?=bos_locked_app_card('Beyond Skate','Skate culture, media and community.','SK8','@blank')?>
       <?=bos_app_card('Beyond Casino — Social Play','Demo bit$ games for entertainment only. No purchase necessary and no cash value.','beyond-casino/','BC','Play demo','@blank')?>

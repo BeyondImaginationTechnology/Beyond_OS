@@ -63,7 +63,7 @@ DirectoryIndex index.php index.html
   RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
   # Keep implementation, migration, and database resources off the web.
-  RewriteRule ^(?:config|includes|migrations|sql|docs|tools|AppStoreAssets|\.cache|beyond-chromium)(?:/|$) - [F,L,NC]
+  RewriteRule ^(?:config|includes|migrations|sql|docs|tools|AppStoreAssets|\.cache)(?:/|$) - [F,L,NC]
   RewriteRule ^[A-Za-z0-9_-]+(?:Apple|Android)(?:/|$) - [F,L,NC]
   RewriteRule ^server/(?:classes|cron|lib)(?:/|$) - [F,L,NC]
   RewriteRule (^|/)\.(?!well-known(?:/|$)) - [F,L]

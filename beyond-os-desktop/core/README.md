@@ -30,13 +30,13 @@ action creates these installer candidates:
 
 - `bitCoreos.iso` — UEFI live-session and VM ISO.
 - `bit-os-core-0.2-installer.img` — GPT USB image with a separate installer
-  workflow.
+  workflow (about 2.1 GiB raw; gzip-compressible for hosting).
 - `SHA256SUMS` — hashes for the built artifacts.
 
 ## Candidate downloads
 
 Core installer media is published for testing, not as a stable v0.2 release.
-Use the [ISO](https://os.beyondimagination.co.technology/releases/core/0.2/bitCoreos.iso), [USB image](https://os.beyondimagination.co.technology/releases/core/0.2/bit-os-core-0.2-installer.img), and [SHA-256 manifest](https://os.beyondimagination.co.technology/releases/core/0.2/SHA256SUMS). Check `VALIDATION.md` before treating the candidate as install-ready.
+Use the [compressed ISO](https://os.beyondimagination.co.technology/releases/core/0.2/bitCoreos.iso.gz), [compressed USB image](https://os.beyondimagination.co.technology/releases/core/0.2/bit-os-core-0.2-installer.img.gz), [Windows wizard](https://os.beyondimagination.co.technology/releases/core/0.2/coreOS.exe), and [SHA-256 manifest](https://os.beyondimagination.co.technology/releases/core/0.2/SHA256SUMS). Extract the ISO before booting it; the wizard verifies and expands the compressed USB image before writing USB. Check `VALIDATION.md`; v0.2 remains a test candidate.
 The installer offers a selected Linux partition alongside another operating
 system, or an explicitly confirmed whole non-USB disk. It does not select a
 disk automatically or replace another boot manager.

@@ -21,6 +21,14 @@ if ($isDedicatedOsHost) {
     $cyberChecksumsReady = $hasReleaseFile('SHA256SUMS');
     $cyberWindowsReady = $hasReleaseFile('BITOSInstaller.exe');
     $cyberMediaReady = $cyberIsoReady && $cyberUsbReady && $cyberChecksumsReady;
+    $coreDownloads = $osOrigin . '/releases/core/0.2/';
+    $hasCoreReleaseFile = static function (string $file) use ($releaseRoot): bool {
+        return $releaseRoot !== '' && is_file($releaseRoot . '/releases/core/0.2/' . $file);
+    };
+    $coreIsoReady = $hasCoreReleaseFile('bitCoreos.iso');
+    $coreUsbReady = $hasCoreReleaseFile('bit-os-core-0.2-installer.img');
+    $coreExeReady = $hasCoreReleaseFile('coreOS.exe');
+    $coreChecksumsReady = $hasCoreReleaseFile('SHA256SUMS');
     ?>
     <!doctype html>
     <html lang="en">
@@ -66,6 +74,16 @@ if ($isDedicatedOsHost) {
                     <article class="download-card"><div class="card-icon">◈</div><div class="card-meta"><span class="tag">Manual installation</span><span>AMD64 · Verified at release</span></div><h3>Bootable ISO</h3><p>Boot the installer from a USB drive, firmware menu, or a virtual machine.</p><?php if ($cyberIsoReady): ?><a href="<?= htmlspecialchars($downloads . 'bitCyberos.iso', ENT_QUOTES, 'UTF-8') ?>">Download ISO <span>↓</span></a><?php else: ?><span>Release verification in progress</span><?php endif; ?></article>
                     <article class="download-card"><div class="card-icon">▣</div><div class="card-meta"><span class="tag">Advanced · Direct USB</span><span>2.1 GB</span></div><h3>USB Installer Image</h3><p>Write this verified GUID Partition Table (GPT) image directly to an entire USB drive with a compatible imaging tool.</p><?php if ($cyberUsbReady): ?><a href="<?= htmlspecialchars($downloads . 'bit-os-cyber-1.0-installer.img', ENT_QUOTES, 'UTF-8') ?>">Download USB Installer Image <span>↓</span></a><?php else: ?><span>Release verification in progress</span><?php endif; ?></article>
                 </div>
+            </section>
+
+            <section class="section" id="core-downloads">
+                <div class="section-heading"><div><p class="eyebrow">Independent edition · Test candidate</p><h2>BIT OS Core v0.2</h2></div><?php if ($coreChecksumsReady): ?><a class="subtle-link" href="<?= htmlspecialchars($coreDownloads . 'SHA256SUMS', ENT_QUOTES, 'UTF-8') ?>">SHA-256 checksums ↗</a><?php else: ?><span class="subtle-link">Candidate files not published yet</span><?php endif; ?></div>
+                <div class="download-grid">
+                    <article class="download-card featured"><div class="card-icon">▤</div><div class="card-meta"><span class="tag">Windows setup wizard</span><span>Core v0.2 Candidate</span></div><h3>coreOS.exe</h3><p>Download and verify the Core USB image, then create bootable installation media through the guided wizard.</p><?php if ($coreExeReady): ?><a href="<?= htmlspecialchars($coreDownloads . 'coreOS.exe', ENT_QUOTES, 'UTF-8') ?>">Download coreOS.exe <span>↓</span></a><?php else: ?><span>Candidate files not published yet</span><?php endif; ?></article>
+                    <article class="download-card"><div class="card-icon">◈</div><div class="card-meta"><span class="tag">UEFI boot media</span><span>ISO</span></div><h3>Bootable ISO</h3><p>Try BIT OS Core or launch its installer from UEFI media or a virtual machine.</p><?php if ($coreIsoReady): ?><a href="<?= htmlspecialchars($coreDownloads . 'bitCoreos.iso', ENT_QUOTES, 'UTF-8') ?>">Download Core ISO <span>↓</span></a><?php else: ?><span>Candidate files not published yet</span><?php endif; ?></article>
+                    <article class="download-card"><div class="card-icon">▣</div><div class="card-meta"><span class="tag">Direct USB writing</span><span>IMG</span></div><h3>USB Installer Image</h3><p>Write this image to a USB drive with a compatible imaging tool.</p><?php if ($coreUsbReady): ?><a href="<?= htmlspecialchars($coreDownloads . 'bit-os-core-0.2-installer.img', ENT_QUOTES, 'UTF-8') ?>">Download Core IMG <span>↓</span></a><?php else: ?><span>Candidate files not published yet</span><?php endif; ?></article>
+                </div>
+                <p class="lede">Core v0.2 is a test candidate while UEFI installation and installed-system checks are completed.</p>
             </section>
 
             <section class="split-section" id="companion">

@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 
-$projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$projectRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $androidApp = Join-Path $projectRoot 'DailyBreathAndroid\app'
 if (-not (Test-Path -LiteralPath $androidApp)) {
     throw "Could not find DailyBreathAndroid\app under $projectRoot. Run this script from the workspace root."

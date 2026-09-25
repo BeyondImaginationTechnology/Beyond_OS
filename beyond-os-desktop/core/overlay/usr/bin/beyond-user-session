@@ -4,7 +4,6 @@ export DISPLAY=:0
 export XAUTHORITY=/home/home/.Xauthority
 export SDL_VIDEODRIVER=x11
 cd "$HOME" || exit 1
-openbox &
-wm_pid=$!
-trap 'kill "$wm_pid" 2>/dev/null || true' EXIT HUP INT TERM
-beyond-core
+# Openbox runs this after claiming the display and initializing window management.
+# Starting the SDL desktop concurrently can leave its first window waiting to map.
+exec openbox --startup '/bin/sh -c "beyond-core; openbox --exit"'

@@ -28,6 +28,8 @@
 **/xcuserdata/
 *.xcuserstate
 **/local.properties
+**/*.jks
+**/*.keystore
 Thumbs.db
 *.zip
 /build/
@@ -36,6 +38,7 @@ Thumbs.db
 /tmp/
 /output/
 /.local/
+/.cache/
 /ai/runtime/.venv/
 /ai/runtime/.modal-cli/
 /ai/runtime/models/

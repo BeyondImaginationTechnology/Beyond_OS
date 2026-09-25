@@ -2,7 +2,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 
-ROOT = Path(__file__).resolve().parent
+SOURCE_ROOT = Path(__file__).resolve().parent
+OUTPUT_ROOT = Path(__file__).resolve().parents[2] / "exports" / "daily-space-4-of-55"
 SIZE = (1080, 1350)
 
 NAVY = "#071B4B"
@@ -24,7 +25,7 @@ def font(path: str, size: int) -> ImageFont.FreeTypeFont:
 
 
 def load_background(index: int) -> Image.Image:
-    image = Image.open(ROOT / f"slide-{index}-background.webp").convert("RGB")
+    image = Image.open(SOURCE_ROOT / f"slide-{index}-background.webp").convert("RGB")
     return image.resize(SIZE, Image.Resampling.LANCZOS).convert("RGBA")
 
 
@@ -70,7 +71,7 @@ def slide_one():
     centered(d, "Opposite of Earth skies", 492, font(FONT_BOLD, 34), PALE_BLUE)
     base.alpha_composite(overlay)
     footer(base, "4/55")
-    base.convert("RGB").save(ROOT / "daily-space-4-of-55-slide-1.png", optimize=True)
+    base.convert("RGB").save(OUTPUT_ROOT / "daily-space-4-of-55-slide-1.png", optimize=True)
 
 
 def slide_two():
@@ -94,7 +95,7 @@ def slide_two():
         d.text((160, y), fact, font=bullet_font, fill=CREAM)
     base.alpha_composite(overlay)
     footer(base, "4/55")
-    base.convert("RGB").save(ROOT / "daily-space-4-of-55-slide-2.png", optimize=True)
+    base.convert("RGB").save(OUTPUT_ROOT / "daily-space-4-of-55-slide-2.png", optimize=True)
 
 
 def slide_three():
@@ -111,7 +112,7 @@ def slide_three():
                      spacing=6, align="left")
     base.alpha_composite(overlay)
     footer(base, "4/55")
-    base.convert("RGB").save(ROOT / "daily-space-4-of-55-slide-3.png", optimize=True)
+    base.convert("RGB").save(OUTPUT_ROOT / "daily-space-4-of-55-slide-3.png", optimize=True)
 
 
 def slide_four():
@@ -127,19 +128,20 @@ def slide_four():
     centered(d, "Explore more with Beyond Space", 562, font(FONT_BOLD, 36), NAVY)
     base.alpha_composite(overlay)
     footer(base, "4/55")
-    base.convert("RGB").save(ROOT / "daily-space-4-of-55-slide-4.png", optimize=True)
+    base.convert("RGB").save(OUTPUT_ROOT / "daily-space-4-of-55-slide-4.png", optimize=True)
 
 
 def contact_sheet():
     thumb_w, thumb_h = 432, 540
     sheet = Image.new("RGB", (thumb_w * 4, thumb_h), DEEP_NAVY)
     for i in range(1, 5):
-        slide = Image.open(ROOT / f"daily-space-4-of-55-slide-{i}.png").convert("RGB")
+        slide = Image.open(OUTPUT_ROOT / f"daily-space-4-of-55-slide-{i}.png").convert("RGB")
         sheet.paste(slide.resize((thumb_w, thumb_h), Image.Resampling.LANCZOS), ((i - 1) * thumb_w, 0))
-    sheet.save(ROOT / "daily-space-4-of-55-contact-sheet.png", optimize=True)
+    sheet.save(OUTPUT_ROOT / "daily-space-4-of-55-contact-sheet.png", optimize=True)
 
 
 if __name__ == "__main__":
+    OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
     slide_one()
     slide_two()
     slide_three()

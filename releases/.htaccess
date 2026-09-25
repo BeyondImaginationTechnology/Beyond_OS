@@ -6,7 +6,11 @@ Options -Indexes
   Header set Cache-Control "public, max-age=300, must-revalidate"
 </IfModule>
 
-<FilesMatch "^(?:SHA256SUMS|bitCoreos\.iso|bit-os-core-1\.0-installer\.img)$">
+<IfModule mod_mime.c>
+  AddType application/gzip .gz
+</IfModule>
+
+<FilesMatch "^(?:SHA256SUMS|bitCoreos\.iso\.gz|bit-os-core-(?:0\.2|1\.0)-installer\.img\.gz|coreOS\.exe)$">
   <IfModule mod_authz_core.c>
     Require all granted
   </IfModule>

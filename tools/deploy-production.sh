@@ -41,11 +41,22 @@ if [[ "$(cd -- "${PUBLIC_ROOT}" && pwd)" != "${REPOSITORY_ROOT}" ]]; then
 fi
 
 # The private umask protects deployment state, but Git may create newly checked-out
-# public assets with those same restrictive permissions. Make only the provider
-# sign-in artwork readable by the web server.
-for asset in assets/icons/apple-continue-button.png assets/icons/github-invertocat-white.png; do
+# public assets with those same restrictive permissions. Set the public assets this
+# deploy depends on to web-readable mode after checkout.
+for asset in \
+  assets/icons/apple-continue-button.png \
+  assets/icons/github-invertocat-white.png \
+  dailybreath/assets/css/bible-forest.css \
+  dailybreath/assets/css/tanakh-forest.css \
+  dailybreath/assets/css/quran-forest.css \
+  dailybreath/assets/images/bible-forest-landscape.png \
+  dailybreath/assets/images/bible-forest-portrait.png \
+  dailybreath/assets/images/tanakh-forest-landscape.png \
+  dailybreath/assets/images/tanakh-forest-portrait.png \
+  dailybreath/assets/images/quran-forest-landscape.png \
+  dailybreath/assets/images/quran-forest-portrait.png; do
   ASSET_PATH="${PUBLIC_ROOT}/${asset}"
-  [[ -f "${ASSET_PATH}" ]] || { echo "Required public sign-in asset is missing: ${ASSET_PATH}" >&2; exit 1; }
+  [[ -f "${ASSET_PATH}" ]] || { echo "Required public asset is missing: ${ASSET_PATH}" >&2; exit 1; }
   chmod 0644 "${ASSET_PATH}"
 done
 

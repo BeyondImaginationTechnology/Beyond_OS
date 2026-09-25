@@ -11,6 +11,49 @@ function beyond_private_root(): string
     return dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'var';
 }
 
+/** Keep the private storage layout stable for the lifetime of each request. */
+function beyond_private_migration_lock(): void
+{
+    static $handle;
+    if (is_resource($handle)) {
+        return;
+    }
+    $directory = beyond_private_root() . '/tmp';
+    if (!is_dir($directory) && !mkdir($directory, 0750, true) && !is_dir($directory)) {
+        throw new RuntimeException('Private storage lock directory is unavailable.');
+    }
+    $handle = fopen($directory . '/var-layout.lock', 'c');
+    if ($handle === false || !flock($handle, LOCK_SH)) {
+        throw new RuntimeException('Private storage layout is unavailable.');
+    }
+}
+
+/** Resolve a private file during the move from the flat var layout. */
+function beyond_private_file(string $relative, string $legacyRelative): string
+{
+    beyond_private_migration_lock();
+    $root = beyond_private_root();
+    $current = $root . '/' . ltrim($relative, '/');
+    $legacy = $root . '/' . ltrim($legacyRelative, '/');
+    if (is_file($current)) {
+        return $current;
+    }
+    return is_file($legacy) ? $legacy : $current;
+}
+
+/** Resolve a private directory while its contents are being relocated. */
+function beyond_private_directory(string $relative, string $legacyRelative): string
+{
+    beyond_private_migration_lock();
+    $root = beyond_private_root();
+    $current = $root . '/' . trim($relative, '/');
+    $legacy = $root . '/' . trim($legacyRelative, '/');
+    if (is_dir($current)) {
+        return $current;
+    }
+    return is_dir($legacy) ? $legacy : $current;
+}
+
 function beyond_live_config(): array
 {
     static $config;

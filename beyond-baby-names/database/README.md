@@ -2,7 +2,7 @@
 
 The Couple Mode API uses SQLite through PDO and creates its schema idempotently.
 By default the database is stored outside the public web root under
-`$BEYOND_VAR_PATH/beyond-baby-names/couples.sqlite`. Override it
+`$BEYOND_VAR_PATH/db/beyond-baby-names.sqlite` (with a fallback to the legacy path during migration). Override it
 with `BEYOND_BABY_NAMES_DB` in production.
 
 ## Privacy model

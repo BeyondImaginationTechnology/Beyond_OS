@@ -25,5 +25,5 @@ return [
     'username' => $configuredUser,
     'password' => (string)(getenv('BEYOND_DB_PASSWORD') ?: ($liveDatabase['pass'] ?? '')),
     'charset' => (string)(getenv('BEYOND_DB_CHARSET') ?: ($liveDatabase['charset'] ?? 'utf8mb4')),
-    'sqlite_path' => (string)(getenv('BEYOND_SQLITE_PATH') ?: beyond_private_root() . '/beyond-os.sqlite'),
+    'sqlite_path' => (string)(getenv('BEYOND_SQLITE_PATH') ?: beyond_private_file('db/beyond-os.sqlite', 'beyond-os.sqlite')),
 ];

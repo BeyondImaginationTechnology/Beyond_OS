@@ -70,10 +70,11 @@ function beyond_classic_blocks(): array
 
 function beyond_classic_state_file(): string
 {
-    $root = dirname(__DIR__, 3);
-    $dir = $root . '/var/tv';
+    require_once dirname(__DIR__, 2) . '/config/bootstrap.php';
+    $file = beyond_private_file('data/beyond-tv/channel-1-library-state.json', 'tv/channel-1-library-state.json');
+    $dir = dirname($file);
     if (!is_dir($dir)) @mkdir($dir, 0775, true);
-    return $dir . '/channel-1-library-state.json';
+    return $file;
 }
 
 function beyond_classic_load_progress(): array

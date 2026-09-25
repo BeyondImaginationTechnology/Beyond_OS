@@ -61,11 +61,12 @@ $publicUrl = !empty($user['username']) ? '/u/' . rawurlencode((string)$user['use
 <style>
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 90% 0,#e9e3ff,transparent 30%),#f7f8fc;color:#202231;font-family:system-ui}.shell{max-width:1180px;margin:auto;padding:22px}.top{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:8px 0 30px}.brand{font-weight:900}.actions{min-width:0;display:flex;gap:9px;overflow-x:auto;scrollbar-width:none}.actions::-webkit-scrollbar{display:none}.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:11px 15px;border-radius:13px;background:#fff;color:#292b3b;border:1px solid #dfe1ea;box-shadow:0 5px 18px rgba(37,39,68,.06);text-decoration:none;font-weight:800}.primary{color:#fff;border:0;background:linear-gradient(90deg,#5b6dff,#a044f2,#e9449f)}.hero{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}.welcome,.panel,.app{border:1px solid #e0e2ea;background:#fff;box-shadow:0 18px 55px rgba(45,47,78,.08)}.welcome{padding:32px;border-radius:28px}.welcome h1{font-size:clamp(42px,7vw,72px);letter-spacing:-.06em;line-height:.95;margin:10px 0}.muted{color:#6f7284}.wallet{padding:28px;border-radius:28px;color:#fff;background:linear-gradient(145deg,#182c55,#6f2b82 58%,#c93574);box-shadow:0 18px 55px rgba(98,43,137,.18)}.wallet strong{font-size:46px;display:block;margin:18px 0}.progress{height:9px;border-radius:99px;background:#e5e6ee;overflow:hidden;margin:18px 0}.progress span{display:block;width:<?= $complete ? '100' : '45' ?>%;height:100%;background:linear-gradient(90deg,#65c7ff,#b66cff,#ff64aa)}.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}.panel{padding:18px;border-radius:20px;text-decoration:none;color:inherit}.panel strong{display:block;font-size:30px;line-height:1}.panel span{color:#6f7284;font-size:12px;font-weight:850}.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.badge{display:inline-flex;min-height:32px;align-items:center;padding:7px 10px;border-radius:999px;background:#f1efff;color:#5542c8;font-size:12px;font-weight:850}.section{margin-top:30px}.section-head{display:flex;justify-content:space-between;align-items:end;gap:12px}.section h2{font-size:28px;margin:4px 0 0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.app{min-height:145px;padding:20px;border-radius:20px;color:#202231;text-decoration:none;display:flex;flex-direction:column;justify-content:space-between}.app:hover{border-color:#8d7cff;box-shadow:0 14px 34px rgba(89,72,193,.12)}.mark{display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:#f1efff;color:#5848b4;font-weight:900}.app small{color:#707386}.status{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.dot{width:9px;height:9px;border-radius:999px;background:#17a56b}@media(max-width:760px){.shell{width:100%;max-width:100vw;padding:16px;overflow:hidden}.hero,.quick{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.welcome,.wallet{padding:23px}.top{align-items:flex-start;padding-bottom:22px;flex-direction:column}.actions{width:100%;padding-bottom:4px}.btn{flex:0 0 auto}.brand{font-size:14px}}@media(max-width:520px){.grid{grid-template-columns:1fr}.welcome h1{font-size:44px}}
 </style>
+<style>.account-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 16px}.account-shortcuts a{display:block;padding:16px;border:1px solid #e0e2ea;border-radius:16px;background:#fff;color:#202231;text-decoration:none}.account-shortcuts a:focus-visible{outline:3px solid #6d66ff;outline-offset:3px}.account-shortcuts strong,.account-shortcuts small{display:block}.account-shortcuts small{margin-top:4px;color:#6f7284;line-height:1.45}@media(max-width:520px){.account-shortcuts{grid-template-columns:1fr}}</style>
 </head>
 <body>
 <main class="shell">
     <header class="top">
-        <div class="brand">BEYOND ID · BETA</div>
+        <div class="brand">BEYOND ID · 0.3</div>
         <div class="actions">
             <?php if (in_array(strtolower((string)($user['role'] ?? '')), ['admin','super_admin'], true)): ?><a class="btn admin" href="../admin/index.php">Admin</a><?php endif; ?>
             <?php if ($publicUrl): ?><a class="btn" href="<?= e($publicUrl) ?>">Public profile</a><?php endif; ?>
@@ -77,11 +78,16 @@ $publicUrl = !empty($user['username']) ? '/u/' . rawurlencode((string)$user['use
         </div>
     </header>
 
+    <nav class="account-shortcuts" aria-label="Account controls">
+        <a href="profile.php"><strong>Profile</strong><small>Update the details shared with connected apps.</small></a>
+        <a href="security.php"><strong>Security</strong><small>Manage your password, linked sign-in methods, and active sessions.</small></a>
+    </nav>
+
     <section class="hero">
         <div class="welcome">
             <span class="muted">YOUR BEYOND HOME</span>
             <h1>Welcome, <?= e($name) ?>.</h1>
-            <p class="muted">Your profile, security, apps, credentials, and bit$ all start here.</p>
+            <p class="muted">Manage your profile, security, and connected apps for BIT OS and Beyond.</p>
             <div class="badges"><?php foreach (array_slice($badges, 0, 6) as $badge): ?><span class="badge"><?= e($badge['label']) ?></span><?php endforeach; ?></div>
             <?php if (!$complete): ?>
                 <div class="progress"><span></span></div>

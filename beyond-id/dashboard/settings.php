@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare('UPDATE user_preferences SET theme=?,email_notifications=?,in_app_notifications=?,marketing_emails=? WHERE user_id=?')->execute([$theme, isset($_POST['email_notifications']) ? 1 : 0, isset($_POST['in_app_notifications']) ? 1 : 0, isset($_POST['marketing_emails']) ? 1 : 0, $uid]);
             $pdo->commit();
             $_SESSION['locale'] = $locale;
-            $message = 'Preferences saved across Beyond OS.';
+            $message = 'Preferences saved for your Beyond ID.';
         } catch (Throwable $exception) {
             if ($pdo->inTransaction()) $pdo->rollBack();
             $error = 'Unable to save preferences.';

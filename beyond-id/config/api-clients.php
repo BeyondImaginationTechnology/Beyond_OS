@@ -30,6 +30,12 @@ return [
         'scheme' => 'beyondfrench',
         'scopes' => ['profile:read', 'email:read', 'progress:read', 'progress:write', 'trivia:play'],
     ],
+    'beyond-french-android' => [
+        'name' => 'Beyond French for Android',
+        'app_slug' => 'beyond-french',
+        'scheme' => 'beyondfrenchandroid',
+        'scopes' => ['profile:read', 'email:read', 'progress:read', 'progress:write', 'trivia:play'],
+    ],
     'daily-breath-ios' => [
         'name' => 'DailyBreath for Apple',
         'app_slug' => 'dailybreath',

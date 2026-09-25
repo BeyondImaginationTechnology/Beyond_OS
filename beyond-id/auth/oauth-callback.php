@@ -71,7 +71,7 @@ try {
                 $sql = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite' ? "INSERT OR IGNORE INTO beyond_wallets (user_id,balance,currency,status) VALUES (?,0,'BITS','active')" : "INSERT IGNORE INTO beyond_wallets (user_id,balance,currency,status) VALUES (?,0,'BITS','active')";
                 $pdo->prepare($sql)->execute([$userId]);
             } catch (Throwable $exception) {}
-            create_notification($pdo, $userId, 'Welcome to Beyond OS', 'Your Beyond ID was created with social sign-in.', '/beyond-id/dashboard/profile.php', 'welcome');
+            create_notification($pdo, $userId, 'Welcome to Beyond ID', 'Your account is ready for BIT OS and Beyond apps.', '/beyond-id/dashboard/profile.php', 'welcome');
         }
         $link = $pdo->prepare('INSERT INTO social_identities (user_id,provider,provider_user_id,email,display_name,created_at,updated_at) VALUES (?,?,?,?,?,?,?)');
         $now = date('Y-m-d H:i:s');

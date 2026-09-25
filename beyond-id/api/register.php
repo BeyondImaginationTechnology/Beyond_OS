@@ -27,7 +27,7 @@ try{
  $pdo->prepare('INSERT INTO profiles(user_id,display_name) VALUES(?,?)')->execute([$uid,$first]);
  $pdo->prepare("INSERT INTO beyond_wallets(user_id,balance,currency,status) VALUES(?,0,'BITS','active')")->execute([$uid]);
  $pdo->prepare('INSERT INTO user_preferences(user_id) VALUES(?)')->execute([$uid]);
- create_notification($pdo,$uid,'Welcome to Beyond OS','Complete your profile to personalize every connected app and earn your first bit$.','/beyond-id/dashboard/profile.php','welcome');
+ create_notification($pdo,$uid,'Welcome to Beyond ID','Complete your profile to personalize your experience across BIT OS and Beyond apps.','/beyond-id/dashboard/profile.php','welcome');
  $pdo->commit();
 }catch(Throwable $e){
  if($pdo->inTransaction())$pdo->rollBack();
@@ -38,7 +38,7 @@ try{
 try{send_beyond_id_admin_signup_alert(['id'=>$uid,'first_name'=>$first,'last_name'=>$last,'email'=>$email,'created_at'=>$now], 'Beyond ID API signup');}
 catch(Throwable $e){error_log('Beyond ID API signup alert failed: '.$e->getMessage());}
 $emailSent=false;
-try{$emailSent=send_verification_email($email,$token,'beyond_id',trim($first.' '.$last));}
+try{$requestedReturn=is_string($data['return']??null)?$data['return']:'';$returnTo=safe_return_path($requestedReturn,'');$emailSent=send_verification_email($email,$token,'beyond_id',trim($first.' '.$last),$returnTo);}
 catch(Throwable $e){error_log('Beyond ID API verification delivery failed: '.$e->getMessage());}
 try{log_activity($pdo,$uid,$emailSent?'api_registration_verification_sent':'api_registration_verification_failed');}
 catch(Throwable $e){error_log('Beyond ID API registration activity log failed: '.$e->getMessage());}

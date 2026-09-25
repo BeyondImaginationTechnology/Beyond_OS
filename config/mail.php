@@ -90,7 +90,7 @@ function smtp_send_html(string $to, string $subject, string $html, string $fromN
         $headers[] = 'MIME-Version: 1.0';
         $headers[] = 'Content-Type: text/html; charset=UTF-8';
         $headers[] = 'Content-Transfer-Encoding: 8bit';
-        $headers[] = 'X-Mailer: Beyond OS SMTP';
+        $headers[] = 'X-Mailer: Beyond ID SMTP';
 
         $message = implode("\r\n", $headers) . "\r\n\r\n" . $html;
         $message = preg_replace('/^\./m', '..', $message);
@@ -108,17 +108,20 @@ function smtp_send_html(string $to, string $subject, string $html, string $fromN
     }
 }
 
-function beyond_verify_url(string $token, string $app = 'beyond_id'): string {
+function beyond_verify_url(string $token, string $app = 'beyond_id', string $returnTo = ''): string {
     $baseUrl = 'https://beyondimagination.co.technology';
     if ($app === 'catering') {
-        return $baseUrl . '/beyond-catering/auth/verify-email.php?token=' . urlencode($token);
+        $url = $baseUrl . '/beyond-catering/auth/verify-email.php?token=' . urlencode($token);
+    } else {
+        $url = $baseUrl . '/beyond-id/auth/verify-email.php?token=' . urlencode($token);
     }
-    return $baseUrl . '/beyond-id/auth/verify-email.php?token=' . urlencode($token);
+    return $returnTo !== '' ? $url . '&return=' . rawurlencode($returnTo) : $url;
 }
 
-function send_verification_email(string $to, string $token, string $app = 'beyond_id', string $name = ''): bool {
+function send_verification_email(string $to, string $token, string $app = 'beyond_id', string $name = '', string $returnTo = ''): bool {
     $brand = ($app === 'catering') ? 'Beyond Catering' : 'Beyond ID';
-    $verifyUrl = beyond_verify_url($token, $app);
+    $verifyUrl = beyond_verify_url($token, $app, $returnTo);
+    $safeVerifyUrl = htmlspecialchars($verifyUrl, ENT_QUOTES, 'UTF-8');
     $hello = $name ? 'Hi ' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') . ',' : 'Hi,';
     $html = "
     <html><body style='margin:0;background:#0b0b0f;color:#ffffff;font-family:Arial,sans-serif;padding:28px;'>
@@ -126,11 +129,12 @@ function send_verification_email(string $to, string $token, string $app = 'beyon
         <h2 style='margin:0 0 12px;color:#ff8a1d;'>{$brand}</h2>
         <p>{$hello}</p>
         <p>Please verify your email address to activate your account.</p>
+        " . ($app === 'beyond_id' ? "<p>Your Beyond ID connects your profile and sign-in across BIT OS and Beyond apps. After verification, you can sign in and continue to the app you came from.</p>" : "") . "
         <p style='margin:26px 0;'>
-          <a href='{$verifyUrl}' style='background:#ff8a1d;color:#111;padding:14px 22px;border-radius:999px;text-decoration:none;font-weight:bold;display:inline-block;'>Verify Email</a>
+          <a href='{$safeVerifyUrl}' style='background:#ff8a1d;color:#111;padding:14px 22px;border-radius:999px;text-decoration:none;font-weight:bold;display:inline-block;'>Verify Email</a>
         </p>
         <p style='font-size:13px;color:#aaa;'>This link expires in 24 hours.</p>
-        <p style='font-size:12px;color:#777;word-break:break-all;'>If the button does not work, copy this link:<br>{$verifyUrl}</p>
+        <p style='font-size:12px;color:#777;word-break:break-all;'>If the button does not work, copy this link:<br>{$safeVerifyUrl}</p>
       </div>
     </body></html>";
     return smtp_send_html($to, "Verify your {$brand} account", $html, $brand);
@@ -142,7 +146,7 @@ function send_email(string $to, string $subject, string $html): bool {
 
 function send_welcome_email(string $to, string $name = ''): bool {
     $safeName = htmlspecialchars($name ?: 'Explorer', ENT_QUOTES, 'UTF-8');
-    $home = 'https://beyondimagination.co.technology/';
-    $html = "<html><body style='margin:0;background:#08080d;color:#fff;font-family:Arial,sans-serif;padding:28px'><div style='max-width:580px;margin:auto;background:#15151f;border:1px solid #303044;border-radius:24px;padding:32px'><p style='color:#a5b4fc;font-weight:bold'>BEYOND OS</p><h1>Welcome, {$safeName}.</h1><p style='color:#c7c7d2;line-height:1.7'>Your Beyond ID is your key to the entire ecosystem. Your Beyond Wallet is ready with a shared bit$ balance for every app.</p><p style='margin:28px 0'><a href='{$home}' style='display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;font-weight:bold;padding:14px 22px;border-radius:999px'>Explore Beyond OS</a></p><p style='color:#88889a;font-size:13px'>One ID. One wallet. Every Beyond experience.</p></div></body></html>";
-    return smtp_send_html($to, 'Welcome to Beyond OS', $html, 'Beyond OS');
+    $home = 'https://beyondimagination.co.technology/beyond-id/dashboard/';
+    $html = "<html><body style='margin:0;background:#08080d;color:#fff;font-family:Arial,sans-serif;padding:28px'><div style='max-width:580px;margin:auto;background:#15151f;border:1px solid #303044;border-radius:24px;padding:32px'><p style='color:#a5b4fc;font-weight:bold'>BEYOND ID</p><h1>Welcome, {$safeName}.</h1><p style='color:#c7c7d2;line-height:1.7'>Your Beyond ID connects your profile and sign-in across BIT OS and Beyond apps. Manage your profile, connected apps, and security from your account dashboard.</p><p style='margin:28px 0'><a href='{$home}' style='display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;font-weight:bold;padding:14px 22px;border-radius:999px'>Open your Beyond ID</a></p><p style='color:#88889a;font-size:13px'>One account for BIT OS and Beyond apps.</p></div></body></html>";
+    return smtp_send_html($to, 'Welcome to Beyond ID', $html, 'Beyond ID');
 }

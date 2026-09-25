@@ -83,7 +83,7 @@ $adminIcon = static function (string $name) use ($adminIconPaths): string {
 
   <div class="side-card">
     <span class="status-dot" aria-hidden="true"></span>
-    <div><strong>Beyond OS</strong><small>All systems operational</small></div>
+    <div><strong>Beyond ID</strong><small>All systems operational</small></div>
   </div>
 
   <div class="sidebar-footer">

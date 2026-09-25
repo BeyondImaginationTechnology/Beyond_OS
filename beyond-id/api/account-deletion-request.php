@@ -20,6 +20,7 @@ try {
     $source = match ((string)$claims['audience']) {
         'daily-breath-ios' => 'dailybreath-ios',
         'beyond-french-ios' => 'beyond-french-ios',
+        'beyond-french-android' => 'beyond-french-android',
         default => throw new RuntimeException('Account deletion request is unavailable for this app.'),
     };
     $body = json_decode((string)file_get_contents('php://input'), true);

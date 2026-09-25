@@ -31,7 +31,7 @@ function beyond_social_http(string $url, array $options = []): array
 {
     if (!extension_loaded('curl')) throw new RuntimeException('The cURL PHP extension is required for social sign-in.');
     $curl = curl_init($url);
-    $headers = ['Accept: application/json', 'User-Agent: Beyond-ID/0.1'];
+    $headers = ['Accept: application/json', 'User-Agent: Beyond-ID/0.3'];
     if (!empty($options['access_token'])) $headers[] = 'Authorization: Bearer ' . $options['access_token'];
     foreach (($options['headers'] ?? []) as $header) {
         if (is_string($header) && $header !== '') $headers[] = $header;

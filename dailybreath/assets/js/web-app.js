@@ -23,6 +23,25 @@
   if(ios&&!standalone){install.innerHTML='<span aria-hidden="true">＋</span> Add to Home Screen';install.classList.add('show')}
   install.addEventListener('click',async()=>{if(promptEvent){promptEvent.prompt();await promptEvent.userChoice;promptEvent=null;install.classList.remove('show');return}if(ios)window.DailyBreath.toast('Open Share, then choose Add to Home Screen.');});
   addEventListener('appinstalled',()=>{install.classList.remove('show');window.DailyBreath.toast('Daily Breath installed on this device.')});
+  for(const [dialogId,triggerId,closeId] of [['home-chat','home-chat-open','home-chat-close'],['guide-chat','open-guide-chat','close-guide-chat']]){
+    const dialog=document.getElementById(dialogId),trigger=document.getElementById(triggerId),close=document.getElementById(closeId);
+    if(!dialog||!trigger||!close)continue;
+    dialog.addEventListener('click',event=>{
+      if((event.target===dialog||close.contains(event.target))&&dialog.hidden)trigger.focus();
+    });
+    dialog.addEventListener('keydown',event=>{
+      if(event.key==='Escape'){
+        event.preventDefault();dialog.hidden=true;trigger.focus();return;
+      }
+      if(event.key!=='Tab')return;
+      const controls=[...dialog.querySelectorAll('a[href],button:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')]
+        .filter(element=>element.getClientRects().length>0);
+      if(!controls.length)return;
+      const first=controls[0],last=controls[controls.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
+    });
+  }
   const entries=[...document.querySelectorAll('.entry')];
   if(entries.length){
     const heading=document.createElement('div');heading.className='db-journal-tools';heading.style.cssText='display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px';

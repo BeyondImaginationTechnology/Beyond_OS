@@ -1,0 +1,195 @@
+/* The Bible artwork is decorative; all Scripture and controls remain live HTML. */
+html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse {
+  isolation: isolate;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(15px, 2vw, 26px);
+  aspect-ratio: 16 / 9;
+  padding: clamp(95px, 13vw, 160px) clamp(55px, 8vw, 120px) clamp(70px, 9vw, 110px);
+  border: 1px solid #cfa759;
+  border-radius: 22px;
+  color: #fffdf6;
+  background: linear-gradient(180deg, #00130d0d 0%, #00130d24 32%, #00130d55 73%, #00130d30 100%), url("../images/bible-forest-landscape.png") center / cover no-repeat;
+  box-shadow: 0 24px 70px #00120988, 0 0 0 4px #cfa75924;
+  text-align: center;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 19% 12% 15%;
+  background: radial-gradient(ellipse at 50% 48%, #00150dc9, #00150d72 49%, transparent 74%);
+  pointer-events: none;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse > * {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse .label {
+  display: block;
+  max-width: 90%;
+  color: #f4d898;
+  font: 600 clamp(13px, 1.7vw, 19px)/1.4 Georgia, serif;
+  letter-spacing: .025em;
+  text-transform: none;
+  text-shadow: 0 2px 12px #00170f;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse .icon {
+  display: none;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse blockquote {
+  max-width: 860px;
+  margin: 0;
+  color: #fffdf9;
+  font: 500 clamp(32px, 4.3vw, 58px)/1.18 Georgia, serif;
+  letter-spacing: -.025em;
+  overflow-wrap: break-word;
+  text-shadow: 0 3px 22px #00150ee6;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse .verse-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 0;
+  border: 0;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse .reference {
+  color: #f6d891;
+  font: 600 clamp(22px, 2.8vw, 34px)/1.2 Georgia, serif;
+  text-shadow: 0 2px 14px #00150e;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse .pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid #e9cc83;
+  border-radius: 999px;
+  color: #092117;
+  background: #efd692;
+  box-shadow: 0 8px 22px #00150e99;
+  font: 800 13px/1.2 Inter, system-ui, sans-serif;
+  text-decoration: none;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-reader-head {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  min-height: 310px;
+  margin: 0 0 26px;
+  padding: 22% 12% 15%;
+  overflow: hidden;
+  border: 1px solid #cfa759;
+  border-radius: 18px;
+  color: #fffdf7;
+  background: linear-gradient(180deg, #00140c14, #00140c4d 60%, #00140c38), url("../images/bible-forest-landscape.png") center / cover no-repeat;
+  box-shadow: 0 14px 38px #00130c99;
+  text-align: center;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-reader-head .eyebrow {
+  color: #f3d895;
+  font: 700 clamp(10px, 1.3vw, 13px)/1.4 Georgia, serif;
+  letter-spacing: .09em;
+  text-shadow: 0 2px 10px #00150e;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-reader-head h1 {
+  margin: 10px 0 0;
+  color: #fffdf7;
+  font: 500 clamp(28px, 5vw, 55px)/1.12 Georgia, serif;
+  text-shadow: 0 3px 19px #00150ef0;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .reader,
+html[data-faith="bible"]:not([data-db-theme="fall"]) .books {
+  border-color: #c69a4e88;
+  background: linear-gradient(155deg, #0d3022f5, #061b13f9);
+  box-shadow: 0 24px 65px #00150d80;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .books h2,
+html[data-faith="bible"]:not([data-db-theme="fall"]) .verse sup {
+  color: #e7c77c;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .book-grid a.active,
+html[data-faith="bible"]:not([data-db-theme="fall"]) .chapters a.active,
+html[data-faith="bible"]:not([data-db-theme="fall"]) .chapter-nav a.active {
+  color: #0b2619;
+  background: #e9ca82;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .chapter-controls,
+html[data-faith="bible"]:not([data-db-theme="fall"]) .chapter-strip {
+  border-color: #c69a4e63;
+  background: #09271be8;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) .verse {
+  color: #f3f5ed;
+}
+
+html[data-faith="bible"]:not([data-db-theme="fall"]) a:focus-visible,
+html[data-faith="bible"]:not([data-db-theme="fall"]) button:focus-visible,
+html[data-faith="bible"]:not([data-db-theme="fall"]) select:focus-visible {
+  outline: 3px solid #f5d88f;
+  outline-offset: 3px;
+}
+
+@media (max-width: 520px) {
+  html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse {
+    gap: 15px;
+    aspect-ratio: auto;
+    min-height: 610px;
+    padding: 150px 40px 150px;
+    border-radius: 20px;
+    background-image: linear-gradient(180deg, #00130d11, #00130d4d 36%, #00130d85 64%, #00130d11), url("../images/bible-forest-portrait.png");
+    background-position: center;
+  }
+
+  html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse::before {
+    inset: 21% 11% 20%;
+    background: radial-gradient(ellipse at center, #00150d9e, transparent 73%);
+  }
+
+  html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse .label {
+    max-width: 100%;
+    font-size: 13px;
+  }
+
+  html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse blockquote {
+    font-size: clamp(26px, 7vw, 34px);
+    line-height: 1.2;
+  }
+
+  html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse .reference {
+    font-size: 23px;
+  }
+
+  html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-verse .verse-actions {
+    gap: 12px;
+  }
+
+  html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-reader-head {
+    min-height: 194px;
+    padding: 20% 9% 11%;
+    border-radius: 15px;
+  }
+
+  html[data-faith="bible"]:not([data-db-theme="fall"]) .bible-forest-reader-head h1 {
+    font-size: clamp(25px, 8vw, 36px);
+  }
+}

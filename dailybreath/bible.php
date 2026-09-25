@@ -68,7 +68,7 @@ if (!$verses) {
 }
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="en" data-faith="bible">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -98,6 +98,7 @@ body{padding-bottom:24px}
 </style>
 <style>.verse-tools{display:flex;gap:7px;margin:6px 0 18px;padding-left:26px;font-family:system-ui}.verse-tool{padding:6px 9px;border:1px solid #ffffff25;border-radius:999px;color:#dce9df;background:#ffffff0d;font-size:11px;cursor:pointer}.verse-tool.active{color:#173f2c;background:#f1cf7d}.verse[data-highlight="gold"]{margin-inline:-10px;padding:9px 10px;border-radius:12px;background:#f1cf7d22}.verse[data-highlight="green"]{margin-inline:-10px;padding:9px 10px;border-radius:12px;background:#6bc88d22}.verse-note{margin:-10px 0 17px 26px;padding:10px 12px;border-left:3px solid #f1cf7d;color:#dce9df;background:#ffffff0b;font:13px/1.5 system-ui;white-space:pre-wrap}</style>
 <style>.bottom-dock{position:fixed;z-index:2147483500;left:50%;bottom:18px;transform:translateX(-50%);width:min(430px,calc(100% - 36px));height:52px;display:flex;align-items:center;justify-content:space-around;border:1px solid #ffffff35;border-radius:999px;color:#dce7dd;background:#123927e8;box-shadow:0 14px 38px #00180c99;backdrop-filter:blur(22px);font:750 10px system-ui}.bottom-dock a{color:inherit;text-decoration:none;padding:10px 8px}.bottom-dock .active{color:#f0cf83}</style>
+<link rel="stylesheet" href="/dailybreath/assets/css/bible-forest.css?v=20260925-1">
 </head>
 <body>
 <main class="shell">
@@ -106,7 +107,7 @@ body{padding-bottom:24px}
 <div class="library">
 <aside class="books"><?php foreach ($books as $testament=>$items): ?><h2><?= e($testament) ?></h2><div class="book-grid"><?php foreach ($items as $name=>$count): ?><a class="<?= $name===$book?'active':'' ?>" href="?book=<?= urlencode($name) ?>&chapter=1#reader-top"><?= e($name) ?></a><?php endforeach; ?></div><?php endforeach; ?></aside>
 <article class="reader" id="reader-top">
-<div class="reader-head"><h1><?= e($book) ?> <?= $chapter ?></h1></div>
+<div class="reader-head bible-forest-reader-head"><h1><?= e($book) ?> <?= $chapter ?></h1></div>
 <div class="chapter-strip">
 <div class="book-picker">
 <label>Book

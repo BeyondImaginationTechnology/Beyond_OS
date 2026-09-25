@@ -34,8 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'queue
 
 $repository = beyond_git_state(dirname(__DIR__, 2));
 $deployment = beyond_deployment_public_status(beyond_deployment_status());
-$branch = $deployment['branch'] ?: ($repository['branch'] ?: 'main');
-$commit = $deployment['commit'] ?: $repository['commit'];
+$branch = $repository['branch'] ?: ($deployment['branch'] ?: 'main');
+$commit = $repository['commit'] ?: $deployment['commit'];
 $timestamp = $deployment['finished_at'] ?: ($deployment['started_at'] ?: $deployment['requested_at']);
 $result = $deployment['result'];
 $resultLabels = ['never' => 'Not run', 'queued' => 'Queued', 'running' => 'Running', 'success' => 'Successful', 'failed' => 'Failed'];
@@ -65,10 +65,10 @@ require __DIR__ . '/../includes/admin-sidebar.php';
   <section class="card" aria-labelledby="deployment-details-title">
     <div class="card-heading"><h2 id="deployment-details-title">Production status</h2></div>
     <div class="deployment-grid">
-      <div class="deployment-stat"><span>Branch</span><strong><?= e($branch ?: 'Unknown') ?></strong></div>
-      <div class="deployment-stat"><span>Commit</span><strong><code><?= e($commit !== '' ? substr($commit, 0, 12) : 'Unknown') ?></code></strong></div>
-      <div class="deployment-stat"><span>Timestamp</span><strong><?= e($timestamp !== '' ? $timestamp : 'No queued deployment') ?></strong></div>
-      <div class="deployment-stat"><span>Last result</span><strong><?= e($deployment['message'] ?: $resultLabel) ?></strong></div>
+      <div class="deployment-stat"><span>Live branch</span><strong><?= e($branch ?: 'Unknown') ?></strong></div>
+      <div class="deployment-stat"><span>Live commit</span><strong><code><?= e($commit !== '' ? substr($commit, 0, 12) : 'Unknown') ?></code></strong></div>
+      <div class="deployment-stat"><span>Last admin job</span><strong><?= e($timestamp !== '' ? $timestamp : 'No queued deployment') ?></strong></div>
+      <div class="deployment-stat"><span>Last admin job result</span><strong><?= e($deployment['message'] ?: $resultLabel) ?></strong></div>
     </div>
     <div class="deployment-actions">
       <form method="post" onsubmit="return confirm('Queue deployment of the latest main branch to production?');">

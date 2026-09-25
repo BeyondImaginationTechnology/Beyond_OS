@@ -89,8 +89,8 @@ $providers = [
 <div class="providers">
 <?php foreach ($providers as $provider => [$label]): ?>
 <?php $icon = match ($provider) {
-    'github' => '<img src="../assets/icons/github-invertocat-white.png" alt="">',
-    'apple' => '<img src="../assets/icons/apple-continue-button.png" alt="Continue with Apple">',
+    'github' => '<img src="../../assets/icons/github-invertocat-white.png" alt="">',
+    'apple' => '<img src="../../assets/icons/apple-continue-button.png" alt="Continue with Apple">',
     default => 'G',
 }; ?>
 <?php if (beyond_social_enabled($provider)): ?>

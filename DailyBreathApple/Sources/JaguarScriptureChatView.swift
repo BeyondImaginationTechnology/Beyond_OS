@@ -88,15 +88,16 @@ struct JaguarScriptureChatView: View {
         if messages.count >= 23 { messages.removeFirst(messages.count - 22) }
         prompt = ""; messages.append(("user", text)); isSending = true; error = nil
         defer { isSending = false }
+        let sessionToken = await auth.usableAccessToken()
         var request = URLRequest(url: URL(string: "https://beyondimagination.co.technology/dailybreath/api/jaguar-chat.php")!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        if let token = auth.accessToken {
+        if let token = sessionToken {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         let language = DailyBreathLanguage(rawValue: languageID)?.rawValue ?? "en"
         var body: [String: Any] = ["mode": "core", "language": language, "guide": guide.rawValue, "messages": messages.map { ["role": $0.role, "content": $0.text] }]
-        if auth.accessToken == nil {
+        if sessionToken == nil {
             do {
                 body["proof"] = try await guestProof()
             } catch {

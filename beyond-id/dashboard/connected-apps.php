@@ -23,6 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !verify_csrf_token($_POST['csrf'] ?
             try {
                 $pdo->beginTransaction();
                 $pdo->prepare('UPDATE connected_apps SET revoked_at=' . ($driver === 'sqlite' ? 'CURRENT_TIMESTAMP' : 'NOW()') . ' WHERE user_id=? AND app_slug=?')->execute([$uid, $slug]);
+                $revokedAt = date('Y-m-d H:i:s');
+                $pdo->prepare('UPDATE mobile_token_families SET revoked_at=? WHERE user_id=? AND app_slug=? AND revoked_at IS NULL')->execute([$revokedAt, $uid, $slug]);
+                $pdo->prepare('UPDATE mobile_refresh_tokens SET revoked_at=? WHERE family_id IN (SELECT family_id FROM mobile_token_families WHERE user_id=? AND app_slug=? AND revoked_at=?) AND revoked_at IS NULL')->execute([$revokedAt, $uid, $slug, $revokedAt]);
+                $pdo->prepare('UPDATE mobile_access_tokens SET revoked_at=? WHERE family_id IN (SELECT family_id FROM mobile_token_families WHERE user_id=? AND app_slug=? AND revoked_at=?) AND revoked_at IS NULL')->execute([$revokedAt, $uid, $slug, $revokedAt]);
                 foreach (beyond_api_audiences_for_app($slug) as $audience) {
                     $pdo->prepare('UPDATE mobile_access_tokens SET revoked_at=? WHERE user_id=? AND audience=? AND revoked_at IS NULL')->execute([date('Y-m-d H:i:s'), $uid, $audience]);
                 }
@@ -33,6 +37,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !verify_csrf_token($_POST['csrf'] ?
                 if ($pdo->inTransaction()) $pdo->rollBack();
                 error_log('App revocation failed: ' . $exception->getMessage());
                 $error = 'App access could not be revoked. Please try again.';
+            }
+        } elseif (isset($_POST['update_permissions'])) {
+            $allowedScopes = [];
+            foreach (beyond_api_audiences_for_app($slug) as $audience) $allowedScopes = array_merge($allowedScopes, beyond_mobile_scopes($audience));
+            $allowedScopes = array_values(array_unique($allowedScopes));
+            $selectedScopes = array_values(array_unique(array_filter(
+                is_array($_POST['permissions'] ?? null) ? array_map('strval', $_POST['permissions']) : [],
+                static fn($scope) => in_array($scope, $allowedScopes, true)
+            )));
+            try {
+                $pdo->beginTransaction();
+                $pdo->prepare('UPDATE connected_apps SET permissions_json=? WHERE user_id=? AND app_slug=? AND revoked_at IS NULL')->execute([json_encode($selectedScopes, JSON_THROW_ON_ERROR), $uid, $slug]);
+                $revokedAt = date('Y-m-d H:i:s');
+                $pdo->prepare('UPDATE mobile_token_families SET revoked_at=? WHERE user_id=? AND app_slug=? AND revoked_at IS NULL')->execute([$revokedAt, $uid, $slug]);
+                $pdo->prepare('UPDATE mobile_refresh_tokens SET revoked_at=? WHERE family_id IN (SELECT family_id FROM mobile_token_families WHERE user_id=? AND app_slug=? AND revoked_at=?) AND revoked_at IS NULL')->execute([$revokedAt, $uid, $slug, $revokedAt]);
+                $pdo->prepare('UPDATE mobile_access_tokens SET revoked_at=? WHERE family_id IN (SELECT family_id FROM mobile_token_families WHERE user_id=? AND app_slug=? AND revoked_at=?) AND revoked_at IS NULL')->execute([$revokedAt, $uid, $slug, $revokedAt]);
+                foreach (beyond_api_audiences_for_app($slug) as $audience) $pdo->prepare('UPDATE mobile_access_tokens SET revoked_at=? WHERE user_id=? AND audience=? AND revoked_at IS NULL')->execute([$revokedAt, $uid, $audience]);
+                $pdo->commit();
+                log_activity($pdo, $uid, 'app_permissions_updated_' . $slug);
+                $message = 'Permissions updated. Sign in to this app again to create a session with the new access.';
+            } catch (Throwable $exception) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                error_log('App permission update failed: ' . $exception->getMessage());
+                $error = 'Permissions could not be updated. Please try again.';
             }
         } elseif (isset($_POST['connect'])) {
             $meta = beyond_app_meta($slug);
@@ -81,10 +109,10 @@ $catalog = beyond_app_catalog();
 
     <h2 class="section-title">YOUR CONNECTIONS</h2>
     <section class="grid">
-        <?php foreach ($connected as $slug => $row): $meta = beyond_app_meta($slug); $permissions = json_decode((string)($row['permissions_json'] ?? '[]'), true) ?: ($meta['permissions'] ?? ['profile:read']); ?>
+        <?php foreach ($connected as $slug => $row): $meta = beyond_app_meta($slug); $permissions = json_decode((string)($row['permissions_json'] ?? '[]'), true) ?: ($meta['permissions'] ?? ['profile:read']); $appScopes = []; foreach (beyond_api_audiences_for_app($slug) as $audience) $appScopes = array_merge($appScopes, beyond_mobile_scopes($audience)); $appScopes = array_values(array_unique($appScopes)); ?>
             <article class="card">
                 <span class="mark"><?= e($meta['mark']) ?></span>
-                <div><h2><?= e($meta['name']) ?></h2><p class="muted"><?= empty($row['revoked_at']) ? 'Connected' : 'Revoked' ?><?= $row['last_used_at'] ? ' - Last used ' . e(date('M j, Y', strtotime((string)$row['last_used_at']))) : '' ?></p><div class="permissions"><span class="pill <?= empty($row['revoked_at']) ? 'status' : 'revoked' ?>"><?= empty($row['revoked_at']) ? 'Active' : 'Revoked' ?></span><?php foreach ($permissions as $permission): ?><span class="pill"><?= e((string)$permission) ?></span><?php endforeach; ?></div></div>
+                <div><h2><?= e($meta['name']) ?></h2><p class="muted"><?= empty($row['revoked_at']) ? 'Connected' : 'Revoked' ?><?= $row['last_used_at'] ? ' - Last used ' . e(date('M j, Y', strtotime((string)$row['last_used_at']))) : '' ?></p><div class="permissions"><span class="pill <?= empty($row['revoked_at']) ? 'status' : 'revoked' ?>"><?= empty($row['revoked_at']) ? 'Active' : 'Revoked' ?></span><?php foreach ($permissions as $permission): ?><span class="pill"><?= e((string)$permission) ?></span><?php endforeach; ?></div><?php if (empty($row['revoked_at']) && $appScopes): ?><details style="margin-top:12px"><summary style="cursor:pointer;font-size:13px;font-weight:800">Update permissions</summary><form method="post" style="margin-top:10px"><input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>"><input type="hidden" name="app_slug" value="<?= e($slug) ?>"><?php foreach ($appScopes as $scope): ?><label style="display:flex;align-items:center;gap:8px;margin:7px 0;font-size:13px"><input type="checkbox" name="permissions[]" value="<?= e($scope) ?>" <?= in_array($scope, $permissions, true) ? 'checked' : '' ?>><?= e($scope) ?></label><?php endforeach; ?><button name="update_permissions" value="1">Save permissions</button></form></details><?php endif; ?></div>
                 <div class="actions"><a class="btn primary" href="<?= e($meta['url']) ?>">Launch</a><form method="post"><input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>"><input type="hidden" name="app_slug" value="<?= e($slug) ?>"><?php if (empty($row['revoked_at'])): ?><button class="danger" name="revoke" value="1">Revoke</button><?php else: ?><button name="connect" value="1">Reconnect</button><?php endif; ?></form></div>
             </article>
         <?php endforeach; ?>

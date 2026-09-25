@@ -113,7 +113,14 @@ function beyond_mobile_scopes(string $audience): array
     return is_array($scopes) ? array_values(array_unique(array_map('strval', $scopes))) : [];
 }
 
-function beyond_mobile_issue_token(int $userId, int $ttl = 300, string $audience = 'beyond-music-ios', ?PDO $pdo = null): string
+function beyond_mobile_issue_token(
+    int $userId,
+    int $ttl = 900,
+    string $audience = 'beyond-music-ios',
+    ?PDO $pdo = null,
+    ?string $familyId = null,
+    ?array $grantedScopes = null
+): string
 {
     $allowedAudiences = beyond_mobile_audiences();
     if (!in_array($audience, $allowedAudiences, true)) {
@@ -122,11 +129,18 @@ function beyond_mobile_issue_token(int $userId, int $ttl = 300, string $audience
 
     if ($pdo === null) throw new RuntimeException('Mobile token storage is unavailable.');
     $ttl = max(60, min(3600, $ttl));
+    if ($familyId !== null && !preg_match('/^[a-f0-9]{64}$/', $familyId)) {
+        throw new RuntimeException('Invalid mobile session family.');
+    }
+    $scopes = beyond_mobile_scopes($audience);
+    if ($grantedScopes !== null) {
+        $scopes = array_values(array_intersect($scopes, array_map('strval', $grantedScopes)));
+    }
     $jti = bin2hex(random_bytes(32));
     $issuedAt = time();
     $expiresAt = $issuedAt + $ttl;
-    $pdo->prepare('INSERT INTO mobile_access_tokens(jti,user_id,audience,expires_at,created_at) VALUES (?,?,?,?,?)')->execute([
-        $jti, $userId, $audience, date('Y-m-d H:i:s', $expiresAt), date('Y-m-d H:i:s')
+    $pdo->prepare('INSERT INTO mobile_access_tokens(jti,user_id,audience,expires_at,created_at,family_id) VALUES (?,?,?,?,?,?)')->execute([
+        $jti, $userId, $audience, date('Y-m-d H:i:s', $expiresAt), date('Y-m-d H:i:s'), $familyId
     ]);
     $payload = beyond_mobile_base64url(json_encode([
         'sub' => $userId,
@@ -134,9 +148,10 @@ function beyond_mobile_issue_token(int $userId, int $ttl = 300, string $audience
         'exp' => $expiresAt,
         'aud' => $audience,
         'jti' => $jti,
+        'sid' => $familyId,
         'iss' => beyond_mobile_issuer(),
         'typ' => 'at+beyond-id',
-        'scp' => beyond_mobile_scopes($audience),
+        'scp' => $scopes,
     ], JSON_THROW_ON_ERROR));
     $signature = beyond_mobile_base64url(hash_hmac('sha256', $payload, beyond_mobile_secret(), true));
     return $payload . '.' . $signature;
@@ -164,6 +179,20 @@ function beyond_mobile_verify_token(string $token, ?string $requiredAudience = n
         ? array_values(array_filter($claims['scp'], 'is_string'))
         : $registeredScopes;
     $scopes = array_values(array_intersect(array_unique($tokenScopes), $registeredScopes));
+    $familyId = trim((string)($claims['sid'] ?? ''));
+    if ($familyId !== '') {
+        if (!preg_match('/^[a-f0-9]{64}$/', $familyId)) throw new RuntimeException('Invalid mobile session.');
+        $family = $pdo->prepare('SELECT scopes_json FROM mobile_token_families WHERE family_id=? AND user_id=? AND audience=? AND revoked_at IS NULL AND expires_at>? LIMIT 1');
+        $family->execute([$familyId, $userId, $audience, date('Y-m-d H:i:s')]);
+        $familyScopesJson = $family->fetchColumn();
+        if (!is_string($familyScopesJson)) throw new RuntimeException('Mobile session is revoked or expired.');
+        $familyScopes = json_decode($familyScopesJson, true);
+        if (!is_array($familyScopes)) throw new RuntimeException('Invalid mobile session permissions.');
+        $scopes = array_values(array_intersect($scopes, array_map('strval', $familyScopes)));
+        $pdo->prepare('UPDATE mobile_token_families SET last_used_at=? WHERE family_id=? AND revoked_at IS NULL')->execute([
+            date('Y-m-d H:i:s'), $familyId,
+        ]);
+    }
     $client = beyond_api_client($audience);
     $appSlug = (string)($client['app_slug'] ?? '');
     if ($appSlug !== '') {
@@ -184,7 +213,7 @@ function beyond_mobile_verify_token(string $token, ?string $requiredAudience = n
         }
     }
 
-    return ['user_id' => $userId, 'audience' => $audience, 'jti' => $jti, 'scopes' => $scopes];
+    return ['user_id' => $userId, 'audience' => $audience, 'jti' => $jti, 'family_id' => $familyId, 'scopes' => $scopes];
 }
 
 function beyond_mobile_require_scope(array $claims, string $scope): void

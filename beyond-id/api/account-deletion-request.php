@@ -7,16 +7,30 @@ require_once __DIR__ . '/../includes/db.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
+$requestId = bin2hex(random_bytes(12));
+header('X-Request-Id: ' . $requestId);
 
 if (strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? '')) !== 'POST') {
     http_response_code(405);
     header('Allow: POST');
-    echo json_encode(['ok' => false, 'error' => 'Method not allowed.']);
+    echo json_encode(['ok' => false, 'error' => 'Method not allowed.', 'error_code' => 'method_not_allowed', 'request_id' => $requestId]);
     exit;
 }
 
 try {
     $claims = beyond_mobile_verify_token(beyond_mobile_bearer_token(), null, $pdo);
+    if (!in_array('account:delete', $claims['scopes'], true)) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'This app has not been granted permission to request account deletion.', 'error_code' => 'insufficient_scope', 'request_id' => $requestId]);
+        exit;
+    }
+    $limit = beyond_rate_limit_consume($pdo, 'mobile-account-deletion-request', (string)$claims['user_id'], 5, 86400, 86400);
+    if (!$limit['allowed']) {
+        http_response_code(429);
+        header('Retry-After: ' . $limit['retry_after']);
+        echo json_encode(['ok' => false, 'error' => 'Too many account deletion requests. Try again later.', 'error_code' => 'rate_limited', 'retry_after' => $limit['retry_after'], 'request_id' => $requestId]);
+        exit;
+    }
     $source = match ((string)$claims['audience']) {
         'daily-breath-ios' => 'dailybreath-ios',
         'beyond-french-ios' => 'beyond-french-ios',
@@ -26,7 +40,7 @@ try {
     $body = json_decode((string)file_get_contents('php://input'), true);
     if (!is_array($body) || !hash_equals('DELETE', (string)($body['confirm'] ?? ''))) {
         http_response_code(422);
-        echo json_encode(['ok' => false, 'error' => 'Account deletion confirmation is required.']);
+        echo json_encode(['ok' => false, 'error' => 'Account deletion confirmation is required.', 'error_code' => 'confirmation_required', 'request_id' => $requestId]);
         exit;
     }
 
@@ -70,10 +84,11 @@ try {
         'ok' => true,
         'status' => 'pending',
         'message' => 'Your account deletion request was submitted. Processing may take up to 30 days.',
+        'request_id' => $requestId,
     ]);
 } catch (Throwable $exception) {
     error_log('Account deletion request failed: ' . $exception->getMessage());
     header('WWW-Authenticate: Bearer realm="Beyond ID", error="invalid_token"');
     http_response_code(401);
-    echo json_encode(['ok' => false, 'error' => 'Your session is invalid or expired. Please sign in again.']);
+    echo json_encode(['ok' => false, 'error' => 'Your session is invalid or expired. Please sign in again.', 'error_code' => 'invalid_token', 'request_id' => $requestId]);
 }

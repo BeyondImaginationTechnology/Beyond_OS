@@ -140,8 +140,8 @@ final class AppStore: ObservableObject {
     }
 
     func syncProgress() async {
-        guard let auth, auth.isSignedIn, let token = auth.accessToken,
-              let userID = auth.userID else { return }
+        guard let auth, auth.isSignedIn, let userID = auth.userID,
+              let token = await auth.usableAccessToken() else { return }
         if isSyncing { syncAgain = true; return }
         isSyncing = true
         defer {

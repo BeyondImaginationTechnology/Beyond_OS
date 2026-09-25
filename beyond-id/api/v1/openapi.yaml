@@ -1,0 +1,332 @@
+openapi: 3.1.0
+info:
+  title: Beyond ID First-Party Mobile API
+  version: 1.0.0
+  summary: Versioned account identity and mobile session endpoints for Beyond apps.
+  description: >-
+    This is a Beyond ID first-party API contract. It uses Beyond ID mobile
+    authorization codes and bearer tokens; it is not an OpenID Connect
+    provider contract. Existing /api/mobile-* and /api/me.php routes remain
+    available for v0.3 clients during migration. Timestamps are RFC 3339 UTC.
+    Errors use stable machine-readable codes and request IDs. A 401 means the
+    bearer session is missing, expired, or revoked; 403 means the session is
+    valid but its scope or app access is insufficient; 409 means an idempotency
+    key or revision conflict; 429 includes Retry-After. Retryable writes use
+    Idempotency-Key; sync writes use If-Match revisions. Collection endpoints
+    added later will use opaque cursor pagination with a bounded limit.
+    Authenticated v1 endpoints allow 120 requests per user/IP in five minutes;
+    French progress writes have an additional 30-write limit and reads an
+    additional 120-read limit per five minutes. A 429 includes Retry-After.
+servers:
+  - url: https://beyondimagination.co.technology/beyond-id
+security:
+  - mobileBearer: []
+paths:
+  /api/discovery.php:
+    get:
+      operationId: discoverBeyondIdMobileApi
+      summary: Read Beyond ID mobile API and authorization endpoints.
+      security: []
+      responses:
+        '200':
+          description: First-party endpoint and client discovery metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [issuer, authorization_endpoint, token_endpoint, refresh_endpoint, api_versions_supported]
+                properties:
+                  issuer: { type: string, format: uri }
+                  authorization_endpoint: { type: string, format: uri }
+                  token_endpoint: { type: string, format: uri }
+                  refresh_endpoint: { type: string, format: uri }
+                  userinfo_endpoint_v1: { type: string, format: uri }
+                  api_versions_supported:
+                    type: array
+                    items: { type: string }
+                  clients:
+                    type: array
+                    items:
+                      type: object
+                      required: [client_id, name, callback_scheme, scopes]
+                      properties:
+                        client_id: { type: string }
+                        name: { type: string }
+                        callback_scheme: { type: string }
+                        scopes: { type: array, items: { type: string } }
+  /api/mobile-token.php:
+    post:
+      operationId: exchangeMobileAuthorizationCode
+      summary: Exchange a short-lived PKCE authorization code for a mobile session.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, code_verifier]
+              properties:
+                code: { type: string }
+                code_verifier: { type: string, minLength: 43, maxLength: 128 }
+                device_id: { type: string, description: Random per-install identifier; never an authentication secret. }
+                device_name: { type: string, maxLength: 120 }
+                token_version: { type: string, enum: ['0.3', '0.4'], description: 0.4 opts into 15-minute access tokens and rotating refresh. Omission preserves the v0.3 one-hour access-token lifetime during client migration. }
+      responses:
+        '200':
+          description: Access and rotating refresh tokens.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TokenResponse' }
+        '401': { $ref: '#/components/responses/TokenError' }
+        '403': { $ref: '#/components/responses/TokenError' }
+        '422': { $ref: '#/components/responses/TokenError' }
+        '429': { $ref: '#/components/responses/TokenError' }
+        '503': { $ref: '#/components/responses/TokenError' }
+  /api/mobile-token-refresh.php:
+    post:
+      operationId: rotateMobileRefreshToken
+      summary: Rotate a refresh token and issue a new short-lived access token.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [refresh_token, audience]
+              properties:
+                refresh_token: { type: string }
+                audience: { type: string }
+      responses:
+        '200':
+          description: Newly rotated access and refresh tokens.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TokenResponse' }
+        '401': { $ref: '#/components/responses/TokenError' }
+        '422': { $ref: '#/components/responses/TokenError' }
+        '429': { $ref: '#/components/responses/TokenError' }
+        '503': { $ref: '#/components/responses/TokenError' }
+  /api/mobile-token-revoke.php:
+    post:
+      operationId: revokeMobileDeviceSession
+      summary: Revoke the current mobile device session and its refresh-token family.
+      description: v0.3 clients may send a bearer access token. 0.4 clients also send the refresh token so sign-out still works after the access token expires.
+      security: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token: { type: string }
+      responses:
+        '200':
+          description: Session revoked.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok]
+                properties:
+                  ok: { type: boolean, const: true }
+        '401': { $ref: '#/components/responses/TokenError' }
+        '503': { $ref: '#/components/responses/TokenError' }
+  /api/v1/me.php:
+    get:
+      operationId: getMyBeyondId
+      summary: Read the signed-in Beyond ID profile allowed by the token scopes.
+      description: Email is omitted unless the token has email:read.
+      parameters:
+        - $ref: '#/components/parameters/AppAudience'
+      responses:
+        '200':
+          description: Minimal stable account profile.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, request_id]
+                properties:
+                  ok: { type: boolean, const: true }
+                  request_id: { type: string }
+                  data:
+                    type: object
+                    required: [id, status, display_name, first_name, last_name, locale, avatar_url, created_at, updated_at]
+                    properties:
+                      id: { type: string, description: Stable Beyond ID subject identifier. }
+                      status: { type: string, const: active }
+                      display_name: { type: string }
+                      first_name: { type: string }
+                      last_name: { type: string }
+                      locale: { type: string }
+                      avatar_url: { type: [string, 'null'], format: uri }
+                      created_at: { type: string, format: date-time, description: RFC 3339 UTC timestamp. }
+                      updated_at: { type: [string, 'null'], format: date-time, description: RFC 3339 UTC timestamp. }
+                      email: { type: string, format: email }
+        '401': { $ref: '#/components/responses/ApiError' }
+        '403': { $ref: '#/components/responses/ApiError' }
+        '429': { $ref: '#/components/responses/ApiError' }
+  /api/v1/french-progress.php:
+    get:
+      operationId: getFrenchProgressV1
+      summary: Read the Beyond French pilot progress snapshot.
+      description: Requires progress:read. The ETag and data revision are used for offline synchronization.
+      parameters:
+        - $ref: '#/components/parameters/AppAudience'
+      responses:
+        '200':
+          description: Current progress and opaque revision.
+          headers:
+            ETag: { schema: { type: string } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FrenchProgressResponse' }
+        '401': { $ref: '#/components/responses/ApiError' }
+        '403': { $ref: '#/components/responses/ApiError' }
+        '429': { $ref: '#/components/responses/ApiError' }
+    put:
+      operationId: updateFrenchProgressV1
+      summary: Merge an offline Beyond French progress snapshot.
+      description: Requires progress:write, If-Match from the latest GET, and a unique Idempotency-Key. Stale revisions return 409 with current_revision.
+      parameters:
+        - $ref: '#/components/parameters/AppAudience'
+        - name: If-Match
+          in: header
+          required: true
+          schema: { type: string }
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string, minLength: 8, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [completed_lesson_ids, completed_daily_lesson_ids, correct_practice_count]
+              properties:
+                completed_lesson_ids: { type: array, maxItems: 500, items: { type: string } }
+                completed_daily_lesson_ids: { type: array, maxItems: 2000, items: { type: integer, minimum: 1 } }
+                correct_practice_count: { type: integer, minimum: 0, maximum: 1000000 }
+      responses:
+        '200':
+          description: Merged snapshot and its new revision.
+          headers:
+            ETag: { schema: { type: string } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FrenchProgressResponse' }
+        '401': { $ref: '#/components/responses/ApiError' }
+        '403': { $ref: '#/components/responses/ApiError' }
+        '409': { $ref: '#/components/responses/ApiError' }
+        '428': { $ref: '#/components/responses/ApiError' }
+        '429': { $ref: '#/components/responses/ApiError' }
+        '503': { $ref: '#/components/responses/ApiError' }
+  /api/account-deletion-request.php:
+    post:
+      operationId: requestBeyondIdDeletion
+      summary: Submit an account-deletion request from a supported first-party app.
+      description: Legacy compatibility route. Requires the account:delete scope, an app audience registered for deletion requests, and explicit DELETE confirmation. The audience is validated from the signed Beyond ID token for v0.3 compatibility.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [confirm]
+              properties:
+                confirm: { type: string, const: DELETE }
+      responses:
+        '200':
+          description: Deletion request accepted for processing.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, status, message, request_id]
+                properties:
+                  ok: { type: boolean, const: true }
+                  status: { type: string, const: pending }
+                  message: { type: string }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/TokenError' }
+        '403': { $ref: '#/components/responses/TokenError' }
+        '429': { $ref: '#/components/responses/TokenError' }
+components:
+  securitySchemes:
+    mobileBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: Beyond ID access token
+  parameters:
+    AppAudience:
+      name: X-Beyond-App
+      in: header
+      required: true
+      description: Must equal the audience for which this token was issued.
+      schema: { type: string }
+  schemas:
+    FrenchProgressResponse:
+      type: object
+      required: [ok, data, revision, request_id]
+      properties:
+        ok: { type: boolean, const: true }
+        request_id: { type: string }
+        revision: { type: string }
+        data:
+          type: object
+          required: [completed_lesson_ids, completed_daily_lesson_ids, correct_practice_count, updated_at]
+          properties:
+            completed_lesson_ids: { type: array, items: { type: string } }
+            completed_daily_lesson_ids: { type: array, items: { type: integer } }
+            correct_practice_count: { type: integer }
+            updated_at: { type: [string, 'null'], format: date-time }
+    TokenResponse:
+      type: object
+      required: [ok, access_token, refresh_token, token_type, expires_in, refresh_expires_in, audience, scope, request_id]
+      properties:
+        ok: { type: boolean, const: true }
+        access_token: { type: string }
+        refresh_token: { type: string }
+        token_type: { type: string, const: Bearer }
+        expires_in: { type: integer, enum: [900, 3600] }
+        refresh_expires_in: { type: integer }
+        audience: { type: string }
+        scope: { type: string }
+        request_id: { type: string }
+    ApiError:
+      type: object
+      required: [ok, error, request_id]
+      properties:
+        ok: { type: boolean, const: false }
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+        request_id: { type: string }
+    TokenError:
+      type: object
+      required: [ok, error, error_code, request_id]
+      properties:
+        ok: { type: boolean, const: false }
+        error: { type: string }
+        error_code: { type: string }
+        request_id: { type: string }
+        retry_after: { type: integer }
+  responses:
+    ApiError:
+      description: Standard v1 API error with a request identifier.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    TokenError:
+      description: Token endpoint error; retry only when appropriate for its error_code.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/TokenError' }

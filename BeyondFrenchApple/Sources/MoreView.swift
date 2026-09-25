@@ -94,7 +94,7 @@ struct MoreView: View {
     }
 
     private func requestAccountDeletion() async {
-        guard let token = auth.accessToken else { return }
+        guard let token = await auth.usableAccessToken() else { return }
         var request = URLRequest(url: URL(string: "https://beyondimagination.co.technology/beyond-id/api/account-deletion-request.php")!)
         request.httpMethod = "POST"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")

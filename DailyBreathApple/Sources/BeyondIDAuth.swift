@@ -16,10 +16,15 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
     }
 
     private var session: ASWebAuthenticationSession?
+    private var tokenRefreshTask: Task<String?, Never>?
     private var verifier = ""
     private let tokenKey = "dailybreath.beyondid.access-token"
+    private let refreshTokenKey = "dailybreath.beyondid.refresh-token"
+    private let tokenExpiresAtKey = "dailybreath.beyondid.expires-at"
     private let loginURL = URL(string: "https://beyondimagination.co.technology/beyond-id/auth/login.php")!
     private let tokenURL = URL(string: "https://beyondimagination.co.technology/beyond-id/api/mobile-token.php")!
+    private let refreshURL = URL(string: "https://beyondimagination.co.technology/beyond-id/api/mobile-token-refresh.php")!
+    private let revokeURL = URL(string: "https://beyondimagination.co.technology/beyond-id/api/mobile-token-revoke.php")!
     private let accountDeletionURL = URL(string: "https://beyondimagination.co.technology/beyond-id/api/account-deletion-request.php")!
 
     override init() {
@@ -65,7 +70,60 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
     }
 
     func signOut() {
+        if let token = accessToken {
+            let refreshToken = KeychainTokenStore.read(service: "DailyBreath", account: refreshTokenKey)
+            Task {
+                var request = URLRequest(url: revokeURL)
+                request.httpMethod = "POST"
+                request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+                request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                let body: [String: String] = refreshToken.map { ["refresh_token": $0] } ?? [:]
+                request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+                _ = try? await URLSession.shared.data(for: request)
+            }
+        }
         clearSession(message: "Signed out of Beyond-ID on this device.")
+    }
+
+    func usableAccessToken() async -> String? {
+        if let tokenRefreshTask { return await tokenRefreshTask.value }
+        guard let token = accessToken else { return nil }
+        let expiration = UserDefaults.standard.double(forKey: tokenExpiresAtKey)
+        if expiration > Date().timeIntervalSince1970 + 60 { return token }
+        guard let refresh = KeychainTokenStore.read(service: "DailyBreath", account: refreshTokenKey) else {
+            clearSession(message: "Your Beyond-ID session expired. Sign in again to continue.")
+            return nil
+        }
+        let task = Task { await rotateAccessToken(using: refresh) }
+        tokenRefreshTask = task
+        let renewed = await task.value
+        tokenRefreshTask = nil
+        return renewed
+    }
+
+    private func rotateAccessToken(using refresh: String) async -> String? {
+        var request = URLRequest(url: refreshURL)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try? JSONSerialization.data(withJSONObject: ["refresh_token": refresh, "audience": "daily-breath-ios"])
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode),
+                  let nextAccess = json?["access_token"] as? String,
+                  let nextRefresh = json?["refresh_token"] as? String else {
+                clearSession(message: "Your Beyond-ID session expired. Sign in again to continue.")
+                return nil
+            }
+            guard KeychainTokenStore.read(service: "DailyBreath", account: refreshTokenKey) == refresh else { return nil }
+            KeychainTokenStore.save(nextAccess, service: "DailyBreath", account: tokenKey)
+            KeychainTokenStore.save(nextRefresh, service: "DailyBreath", account: refreshTokenKey)
+            UserDefaults.standard.set(Date().timeIntervalSince1970 + (json?["expires_in"] as? Double ?? 900), forKey: tokenExpiresAtKey)
+            return nextAccess
+        } catch {
+            message = "Could not renew Beyond-ID right now. Check your connection and try again."
+            return nil
+        }
     }
 
     func handleAuthenticationExpired() {
@@ -74,13 +132,15 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
 
     private func clearSession(message: String) {
         KeychainTokenStore.delete(service: "DailyBreath", account: tokenKey)
+        KeychainTokenStore.delete(service: "DailyBreath", account: refreshTokenKey)
+        UserDefaults.standard.removeObject(forKey: tokenExpiresAtKey)
         isSignedIn = false
         self.message = message
     }
 
     func requestAccountDeletion() async -> Bool {
         accountDeletionMessage = nil
-        guard let token = accessToken else {
+        guard let token = await usableAccessToken() else {
             accountDeletionMessage = "Sign in before requesting account deletion."
             return false
         }
@@ -114,23 +174,40 @@ final class BeyondIDAuthManager: NSObject, ObservableObject, ASWebAuthentication
         var request = URLRequest(url: tokenURL)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try? JSONSerialization.data(withJSONObject: ["code": code, "code_verifier": verifier])
+        request.httpBody = try? JSONSerialization.data(withJSONObject: ["code": code, "code_verifier": verifier, "device_id": deviceIdentifier(), "device_name": "DailyBreath on \(UIDevice.current.model)", "token_version": "0.4"])
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
             let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
             guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode),
-                  let token = json?["access_token"] as? String, !token.isEmpty else {
-                message = json?["error"] as? String ?? "Beyond ID sign-in could not be completed. Please try again."
+                  let token = json?["access_token"] as? String, !token.isEmpty,
+                  let refresh = json?["refresh_token"] as? String else {
+                let serverMessage = json?["error"] as? String
+                message = (serverMessage ?? "Beyond-ID sign-in could not be completed.") + " Check your connection and retry. If the service remains unavailable, contact support."
+                isSigningIn = false
                 return
             }
             KeychainTokenStore.save(token, service: "DailyBreath", account: tokenKey)
+            KeychainTokenStore.save(refresh, service: "DailyBreath", account: refreshTokenKey)
+            UserDefaults.standard.set(Date().timeIntervalSince1970 + (json?["expires_in"] as? Double ?? 900), forKey: tokenExpiresAtKey)
             isSignedIn = true
+            isSigningIn = false
             message = "Signed in with Beyond-ID."
-        } catch { message = "Beyond-ID sign-in could not connect." }
+        } catch {
+            isSigningIn = false
+            message = "Beyond-ID sign-in could not connect. Check your connection and try again."
+        }
     }
 
     private func randomURLSafe(count: Int) -> String {
         base64URL(Data((0..<count).map { _ in UInt8.random(in: 0...255) }))
+    }
+
+    private func deviceIdentifier() -> String {
+        let key = "dailybreath.beyondid.device-id"
+        if let existing = UserDefaults.standard.string(forKey: key) { return existing }
+        let value = UUID().uuidString.lowercased()
+        UserDefaults.standard.set(value, forKey: key)
+        return value
     }
 
     private func base64URL<T: DataProtocol>(_ value: T) -> String {

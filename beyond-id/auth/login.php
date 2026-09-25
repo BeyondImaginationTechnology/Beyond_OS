@@ -73,7 +73,7 @@ $providers = [
 <div class="mark"><?= e($mark) ?></div>
 <?php if ($isBeyondFrench): ?>
 <h1>Welcome to <span>Beyond French</span></h1>
-<p>Use Beyond ID for saved progress and premium lessons, or continue free to the public dictionary and Bible.</p>
+<p>Learn French as a guest, then use Beyond ID to sync your progress across devices. All Academy lessons are free in the 1.2 beta.</p>
 <div class="daily-actions"><a class="test-bible" href="../../beyond-french/dictionary.php">Open free Dictionary + Bible</a><a class="read-verse" href="../../beyond-french/">Back to Beyond French</a></div>
 <p class="daily-note">No Beyond ID is required for written translation, dictionary search, pronunciation guides, or Bible access.</p>
 <?php else: ?>

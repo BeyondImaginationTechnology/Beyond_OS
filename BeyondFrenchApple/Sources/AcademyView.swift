@@ -7,7 +7,7 @@ struct AcademyView: View {
     private var selectedGroup: AgeGroup {
         let trackSlug: String
         switch selectedDifficulty {
-        case "normal": trackSlug = "teen"
+        case "normal", "intermediate": trackSlug = "teen"
         case "advanced": trackSlug = "adult"
         default: trackSlug = "kids"
         }
@@ -29,18 +29,19 @@ struct AcademyView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 14) {
-                    AccessPill(text: store.hasFullAcademyAccess ? "FULL ACADEMY" : "GREETINGS FREE")
+                    AccessPill(text: "ALL LESSONS FREE · 1.2 BETA")
                     Text("Choose a path and start speaking.")
                         .font(.largeTitle.weight(.black))
-                    Text(selectedGroup.guidance)
+                    Text("Learn French through short lessons, speaking, and everyday situations.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     Picker("Difficulty", selection: $selectedDifficulty) {
                         Text("Beginner").tag("beginner")
-                        Text("Normal").tag("normal")
+                        Text("Intermediate").tag("intermediate")
                         Text("Advanced").tag("advanced")
                     }
                     .pickerStyle(.menu)
+                    FrenchGuidesView()
                 }
                 .padding(20)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -49,7 +50,7 @@ struct AcademyView: View {
 
                 LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 12) {
                     MetricTile(title: "Lessons Done", value: "\(store.completedAcademyLessons(ageGroup: selectedGroup))/\(store.totalAcademyLessons)", systemImage: "checkmark.seal.fill", color: .green)
-                    MetricTile(title: "Modules Open", value: "\(store.academy.modules.filter { $0.isFree || store.hasFullAcademyAccess }.count)", systemImage: "lock.open.fill", color: store.appTheme.accent)
+                    MetricTile(title: "Modules Open", value: "\(store.academy.modules.filter { store.isLessonUnlocked(module: $0, lessonIndex: 0, ageGroup: selectedGroup) }.count)", systemImage: "lock.open.fill", color: store.appTheme.accent)
                 }
 
                 if let nextLesson {
@@ -89,6 +90,9 @@ struct AcademyView: View {
         }
         .background(store.appTheme.appBackground)
         .navigationTitle("Academy")
+        .onAppear {
+            if selectedDifficulty == "normal" { selectedDifficulty = "intermediate" }
+        }
     }
 }
 
@@ -113,9 +117,7 @@ private struct ModuleCard: View {
                         Text(module.title)
                             .font(.title3.weight(.black))
                         Spacer()
-                        if module.isFree {
-                            Text("FREE").font(.caption2.weight(.black)).foregroundStyle(.green)
-                        }
+                        Text("BETA FREE").font(.caption2.weight(.black)).foregroundStyle(.green)
                     }
                     Text(module.description)
                         .font(.subheadline)
@@ -187,8 +189,8 @@ private struct AcademyLessonDetailView: View {
     let ageGroup: AgeGroup
     @State private var answer = ""
     @State private var result: LessonCheckResult?
-    @State private var checkLanguage = AcademyLanguage.french
     @State private var showNextLesson = false
+    @State private var selectedGuide: FrenchGuide = .louis
     @FocusState private var answerFocused: Bool
 
     private var experience: AcademyLessonExperience {
@@ -224,7 +226,7 @@ private struct AcademyLessonDetailView: View {
                 Text(lesson.title)
                     .font(.largeTitle.weight(.black))
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("\(ageGroup.title) · Ages \(ageGroup.ages)")
+                    Text(difficultyTitle)
                         .font(.caption.weight(.bold))
                         .foregroundStyle(store.appTheme.accent)
                     Text(lesson.english)
@@ -249,21 +251,33 @@ private struct AcademyLessonDetailView: View {
                 .background(store.appTheme.accent.opacity(0.08), in: RoundedRectangle(cornerRadius: 20))
 
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Beyond Languages")
+                    Text("Learn with a guide")
                         .font(.headline)
-                    LazyVGrid(columns: [.init(.flexible()), .init(.flexible())], spacing: 10) {
-                        BeyondLanguageTile(language: .french, value: phrase.french, note: phrase.pronunciation)
-                        BeyondLanguageTile(language: .spanish, value: phrase.spanish, note: "Spanish bridge")
-                        BeyondLanguageTile(language: .kreyol, value: phrase.kreyol, note: "Kreyol bridge")
-                        BeyondLanguageTile(language: .patois, value: phrase.patois, note: "Patois bridge")
+                    FrenchGuidesView(selectedGuide: selectedGuide) { selectedGuide = $0 }
+                    Text(selectedGuide.prompt)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    if !selectedGuide.bridge(in: phrase).isEmpty {
+                        Text(selectedGuide.bridge(in: phrase))
+                            .font(.title3.weight(.bold))
+                        Button {
+                            store.speak(selectedGuide.bridge(in: phrase), language: selectedGuide.audioLocale)
+                        } label: {
+                            Label("Listen with \(selectedGuide.name)", systemImage: "speaker.wave.2.fill")
+                        }
+                        .buttonStyle(.bordered)
+                    } else {
+                        Text("\(selectedGuide.name)'s bridge is coming soon. Practice the French phrase above.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 .padding(16)
                 .background(store.appTheme.cardFill, in: RoundedRectangle(cornerRadius: 18))
                 .overlay(RoundedRectangle(cornerRadius: 18).stroke(store.appTheme.accent.opacity(0.16), lineWidth: 1))
 
-                LessonInfoBlock(title: "\(ageGroup.title) Teaching", text: experience.teaching, systemImage: "lightbulb.fill", color: .yellow)
-                LessonInfoBlock(title: "\(ageGroup.title) Practice", text: experience.practice, systemImage: "person.wave.2.fill", color: .teal)
+                LessonInfoBlock(title: "French tip", text: experience.teaching, systemImage: "lightbulb.fill", color: .yellow)
+                LessonInfoBlock(title: "Practice idea", text: experience.practice, systemImage: "person.wave.2.fill", color: .teal)
                 LessonInfoBlock(title: "Culture", text: lesson.culture, systemImage: "globe.americas.fill", color: .orange)
 
                 VStack(alignment: .leading, spacing: 12) {
@@ -272,13 +286,7 @@ private struct AcademyLessonDetailView: View {
                     Text(experience.checkPrompt)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    Picker("Check language", selection: $checkLanguage) {
-                        ForEach(AcademyLanguage.allCases) { language in
-                            Text(language.title).tag(language)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    TextField("\(checkLanguage.title) answer", text: $answer)
+                    TextField("French answer", text: $answer)
                         .textInputAutocapitalization(.sentences)
                         .submitLabel(.done)
                         .focused($answerFocused)
@@ -300,7 +308,7 @@ private struct AcademyLessonDetailView: View {
                     }
                     .controlSize(.large)
                     if let result {
-                        Text(result.message(expected: checkLanguage.value(in: phrase)))
+                        Text(result.message(expected: phrase.french))
                             .font(.headline)
                             .foregroundStyle(result.color)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -332,7 +340,7 @@ private struct AcademyLessonDetailView: View {
     }
 
     private func checkLesson() {
-        if store.checkAnswer(answer, expected: checkLanguage.value(in: phrase)) {
+        if store.checkAnswer(answer, expected: phrase.french) {
             answerFocused = false
             store.completeLesson(module: module, lessonIndex: lessonIndex, ageGroup: ageGroup)
             withAnimation(.snappy(duration: 0.24)) {
@@ -347,6 +355,14 @@ private struct AcademyLessonDetailView: View {
         }
     }
 
+    private var difficultyTitle: String {
+        switch ageGroup.slug {
+        case "teen": "Intermediate French"
+        case "adult": "Advanced French"
+        default: "Beginner French"
+        }
+    }
+
     private func advanceToNextLessonIfNeeded() {
         guard nextLessonRoute != nil else { return }
         Task {
@@ -355,97 +371,6 @@ private struct AcademyLessonDetailView: View {
                 guard result == .correct else { return }
                 showNextLesson = true
             }
-        }
-    }
-}
-
-private enum AcademyLanguage: String, CaseIterable, Identifiable {
-    case french
-    case spanish
-    case kreyol
-    case patois
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .french: "French"
-        case .spanish: "Spanish"
-        case .kreyol: "Kreyol"
-        case .patois: "Patois"
-        }
-    }
-
-    var shortTitle: String {
-        switch self {
-        case .french: "FR"
-        case .spanish: "ES"
-        case .kreyol: "HT"
-        case .patois: "JM"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .french: .indigo
-        case .spanish: .orange
-        case .kreyol: .red
-        case .patois: .green
-        }
-    }
-
-    func value(in phrase: BeyondPhrase) -> String {
-        switch self {
-        case .french: phrase.french
-        case .spanish: phrase.spanish
-        case .kreyol: phrase.kreyol
-        case .patois: phrase.patois
-        }
-    }
-}
-
-private struct BeyondLanguageTile: View {
-    @EnvironmentObject private var store: AppStore
-    let language: AcademyLanguage
-    let value: String
-    let note: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(language.shortTitle)
-                    .font(.caption.weight(.black))
-                    .foregroundStyle(language.color)
-                Spacer()
-                Button {
-                    store.speak(value, language: speechCode)
-                } label: {
-                    Image(systemName: "speaker.wave.2.fill")
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(language.color)
-            }
-            Text(value.isEmpty ? "Coming soon" : value)
-                .font(.headline)
-                .lineLimit(3)
-                .minimumScaleFactor(0.78)
-            Text(note)
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, minHeight: 118, alignment: .topLeading)
-        .padding(12)
-        .foregroundStyle(.white)
-        .background(language.color.opacity(0.17), in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(language.color.opacity(0.24), lineWidth: 1))
-    }
-
-    private var speechCode: String {
-        switch language {
-        case .french: "fr-FR"
-        case .spanish: "es-ES"
-        case .kreyol: "ht-HT"
-        case .patois: "en-JM"
         }
     }
 }

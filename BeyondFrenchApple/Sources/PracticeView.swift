@@ -45,16 +45,20 @@ struct PracticeView: View {
                         .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.12), lineWidth: 1))
                         .onSubmit(check)
 
-                    HStack {
+                    HStack(spacing: 12) {
                         Button(action: check) {
-                            Label("Check", systemImage: "checkmark.circle.fill").frame(maxWidth: .infinity)
+                            Label("Check", systemImage: "checkmark.circle.fill")
+                                .lineLimit(1)
+                                .frame(maxWidth: .infinity, minHeight: 44)
                         }
                         .buttonStyle(.borderedProminent)
 
                         Button { store.speak(activePrompt.listenText) } label: {
-                            Image(systemName: "speaker.wave.2.fill").frame(maxWidth: .infinity)
+                            Image(systemName: "speaker.wave.2.fill")
+                                .frame(width: 44, height: 44)
                         }
                         .buttonStyle(.bordered)
+                        .accessibilityLabel("Listen to French answer")
                     }
                     .controlSize(.large)
 
@@ -92,7 +96,7 @@ struct PracticeView: View {
             }
             .padding()
         }
-        .background(store.appTheme.appBackground)
+        .background(store.appTheme.appBackground.ignoresSafeArea())
         .navigationTitle("Practice")
     }
 
@@ -103,7 +107,7 @@ struct PracticeView: View {
                 answer = ""
                 result = .correct
             }
-            store.recordCorrectPractice()
+            store.recordCorrectPractice(dailyLessonID: promptMode == .daily ? store.lesson.id : nil)
             advanceDictionaryPromptIfNeeded()
         } else {
             withAnimation(.snappy(duration: 0.24)) {

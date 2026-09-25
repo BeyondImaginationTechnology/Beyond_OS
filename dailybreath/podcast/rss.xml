@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+  <channel>
+    <title>Daily Breath: Verse of the Day</title>
+    <link>https://beyondimagination.co.technology/dailybreath/</link>
+    <description>A quiet daily reading from the World English Bible, with a brief moment to breathe and reflect.</description>
+    <language>en-us</language>
+    <copyright>Scripture text: World English Bible (public domain). Audio: Daily Breath.</copyright>
+    <webMaster>support@beyondimagination.co.technology (Daily Breath)</webMaster>
+    <managingEditor>support@beyondimagination.co.technology (Daily Breath)</managingEditor>
+    <image><url>https://beyondimagination.co.technology/dailybreath/assets/icons/dailybreath-mark-v2.png</url><title>Daily Breath: Verse of the Day</title><link>https://beyondimagination.co.technology/dailybreath/</link></image>
+    <atom:link href="https://beyondimagination.co.technology/dailybreath/podcast/rss.xml" rel="self" type="application/rss+xml" />
+    <itunes:author>Daily Breath</itunes:author>
+    <itunes:summary>A quiet daily reading from the World English Bible, with a brief moment to breathe and reflect.</itunes:summary>
+    <itunes:owner><itunes:name>Daily Breath</itunes:name><itunes:email>support@beyondimagination.co.technology</itunes:email></itunes:owner>
+    <itunes:image href="https://beyondimagination.co.technology/dailybreath/assets/icons/dailybreath-mark-v2.png" />
+    <itunes:category text="Religion &amp; Spirituality"><itunes:category text="Christianity" /></itunes:category>
+    <itunes:explicit>false</itunes:explicit>
+    <item>
+      <title>Verse of the Day — September 25, 2026</title>
+      <description>Psalm 121:7 (World English Bible): The LORD will keep you from all evil. He will keep your soul.</description>
+      <guid isPermaLink="false">dailybreath-verse-2026-09-25</guid>
+      <pubDate>Fri, 25 Sep 2026 17:06:00 +0000</pubDate>
+      <enclosure url="https://beyondimagination.co.technology/dailybreath/podcast/episodes/2026-09-25-daily-verse.wav" length="1348404" type="audio/wav" />
+      <itunes:duration>00:00:30</itunes:duration>
+      <itunes:explicit>false</itunes:explicit>
+    </item>
+  </channel>
+</rss>
+

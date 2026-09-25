@@ -9,7 +9,7 @@ html[data-faith="torah"]:not([data-db-theme="fall"]) .tanakh-forest-verse {
   border: 1px solid #d4ac62;
   border-radius: 22px;
   color: #fffaf0;
-  background: linear-gradient(180deg, #010c2308, #010c2326 32%, #010c2366 75%), url("../images/tanakh-forest-landscape.png") center / cover no-repeat;
+  background: linear-gradient(180deg, #010c2308, #010c2326 32%, #010c2366 75%), url("../images/tanakh-forest-landscape.png?v=20260925-2") center / cover no-repeat;
   box-shadow: 0 24px 70px #020d2a88, 0 0 0 4px #d4ac6224;
   text-align: center;
 }
@@ -94,7 +94,7 @@ html[data-faith="torah"]:not([data-db-theme="fall"]) .tanakh-forest-reader-head 
   border: 1px solid #d4ac62;
   border-radius: 18px;
   color: #fffdfa;
-  background: linear-gradient(180deg, #020d280d, #020d285e 62%), url("../images/tanakh-forest-landscape.png") center / cover no-repeat;
+  background: linear-gradient(180deg, #020d280d, #020d285e 62%), url("../images/tanakh-forest-landscape.png?v=20260925-2") center / cover no-repeat;
   box-shadow: 0 14px 38px #020d2899;
   text-align: center;
 }
@@ -169,7 +169,7 @@ html[data-faith="torah"]:not([data-db-theme="fall"]) select:focus-visible {
     min-height: 610px;
     padding: 150px 40px 150px;
     border-radius: 20px;
-    background-image: linear-gradient(180deg, #020d2814, #020d2855 35%, #020d288a 65%, #020d2811), url("../images/tanakh-forest-portrait.png");
+    background-image: linear-gradient(180deg, #020d2814, #020d2855 35%, #020d288a 65%, #020d2811), url("../images/tanakh-forest-portrait.png?v=20260925-2");
     background-position: center;
   }
 

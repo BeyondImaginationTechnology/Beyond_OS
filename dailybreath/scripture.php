@@ -88,9 +88,9 @@ $chapterUrl = static fn(array $unit): string => '?tradition='.rawurlencode($trad
 <style>.bottom-dock{position:fixed;z-index:20;left:50%;bottom:18px;transform:translateX(-50%);width:min(500px,calc(100% - 20px));height:52px;display:flex;align-items:center;justify-content:space-around;border:1px solid var(--line);border-radius:999px;background:var(--panel2);box-shadow:0 14px 38px #0007}.bottom-dock a,.bottom-dock button{padding:10px 6px;border:0;color:var(--muted);background:transparent;text-decoration:none;font:800 10px/1 Inter,system-ui;cursor:pointer}.bottom-dock .active,.bottom-dock button:hover,.bottom-dock button:focus-visible{color:var(--accent)}</style>
 <style>html[data-faith=quran]{--bg:#06150d;--panel:#103624e8;--panel2:#092a1c;--ink:#f6fbf7;--muted:#bfd2c3;--accent:#f1cf7d;--accentInk:#173f2c;--line:#ffffff2d;--glow:#3d9b6255}html[data-script-direction=rtl] #chapter-text{direction:rtl;text-align:right}html[data-script-direction=rtl] #chapter-text .verse{font-family:"Noto Naskh Arabic","Geeza Pro",serif}</style>
 <style>.guide-chat-identity{display:flex;align-items:center;gap:12px}.guide-chat-guide{width:72px;height:72px;flex:0 0 72px;object-fit:contain;filter:drop-shadow(0 8px 14px #0006)}</style>
-<link rel="stylesheet" href="/dailybreath/assets/css/bible-forest.css?v=20260925-1">
-<link rel="stylesheet" href="/dailybreath/assets/css/tanakh-forest.css?v=20260925-1">
-<link rel="stylesheet" href="/dailybreath/assets/css/quran-forest.css?v=20260925-1">
+<link rel="stylesheet" href="/dailybreath/assets/css/bible-forest.css?v=20260925-2">
+<link rel="stylesheet" href="/dailybreath/assets/css/tanakh-forest.css?v=20260925-2">
+<link rel="stylesheet" href="/dailybreath/assets/css/quran-forest.css?v=20260925-2">
 </head>
 <body>
 <main class="shell">

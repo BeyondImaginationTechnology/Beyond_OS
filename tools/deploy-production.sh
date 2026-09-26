@@ -46,6 +46,7 @@ fi
 for asset in \
   assets/icons/apple-continue-button.png \
   assets/icons/github-invertocat-white.png \
+  beyond-tattoo/downloads/tattoo-procedure-consent-bc.pdf \
   dailybreath/assets/js/web-app.js \
   dailybreath/manifest.webmanifest \
   dailybreath/service-worker.js \

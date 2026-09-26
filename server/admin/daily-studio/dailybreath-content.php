@@ -100,7 +100,7 @@ $verseLive = $verseOverride && $verseOverride['status'] === 'published';
 $devotionalLive = $devotionalOverride && (int)$devotionalOverride['is_published'] === 1;
 $challengeLive = $challengeOverride && (int)$challengeOverride['is_published'] === 1;
 $verse = $verseLive ? ['text' => $verseOverride['verse_text'], 'reference' => $verseOverride['scripture_reference']] : (dailybreath_recovery_verse_for_date($targetDate, false) ?: dailybreath_recovery_verse_for_date($targetDate) ?: ['text' => 'Be still, and know that I am God.', 'reference' => 'Psalm 46:10']);
-$devotional = $devotionalLive ? $devotionalOverride : (dailybreath_recovery_devotional_for_date($targetDate, false) ?: dailybreath_recovery_devotional_for_date($targetDate) ?: []);
+$devotional = $devotionalLive ? $devotionalOverride : (dailybreath_recovery_devotional_for_date($weekStart, false) ?: dailybreath_recovery_devotional_for_date($weekStart) ?: []);
 $challenge = $challengeLive ? $challengeOverride : (dailybreath_recovery_challenge_for_date($targetDate) ?: []);
 $revisions = $pdo->query('SELECT content_type,content_key,action,created_at FROM dailybreath_content_revisions ORDER BY id DESC LIMIT 12')->fetchAll(PDO::FETCH_ASSOC);
 require dirname(__DIR__) . '/_header.php';

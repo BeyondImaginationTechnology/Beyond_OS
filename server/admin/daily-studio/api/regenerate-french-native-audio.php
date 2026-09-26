@@ -7,9 +7,9 @@ require_once dirname(__DIR__, 4) . '/includes/narration/StudioNarration.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: private, no-store');
 
-const FRENCH_NATIVE_AUDIO_BATCH = 'native-speakers-2026-08';
+const FRENCH_NATIVE_AUDIO_BATCH = 'native-speakers-2026-09-elevenlabs-v2';
 const FRENCH_NATIVE_AUDIO_LANGUAGES = [
-    'es-ES' => ['field' => 'spanish', 'provider' => 'azure', 'label' => 'Spanish'],
+    'es-ES' => ['field' => 'spanish', 'provider' => 'elevenlabs', 'label' => 'Spanish'],
     'ht-HT' => ['field' => 'kreyol', 'provider' => 'elevenlabs', 'label' => 'Haitian Kreyòl'],
     'en-JM' => ['field' => 'patois', 'provider' => 'elevenlabs', 'label' => 'Jamaican Patois'],
 ];

@@ -22,35 +22,36 @@ $view = str_replace('__FRENCH_RENDERER_VERSION__', rawurlencode($rendererVersion
 $providerLabels = [
     'openai' => 'OpenAI Speech · gpt-4o-mini-tts',
     'elevenlabs' => 'ElevenLabs Premium',
-    'azure' => 'Azure Speech',
 ];
 $provider = 'openai';
 $providerConfigured = false;
-$louisVoiceReady = false;
+$defaultNarrationProvider = 'openai';
+$characterVoiceLocales = [];
 try {
-    $provider = strtolower((string)beyond_config('voice.provider', 'openai'));
-    $providerConfigured = match ($provider) {
-        'openai' => trim((string)beyond_config('narration.openai.api_key', '')) !== '',
-        'elevenlabs' => trim((string)beyond_config('narration.elevenlabs.api_key', '')) !== '',
-        'azure' => trim((string)beyond_config('narration.azure.api_key', '')) !== ''
-            && trim((string)beyond_config('narration.azure.region', '')) !== '',
-        default => false,
-    };
-    $louisVoiceReady = trim((string)beyond_config('narration.elevenlabs.api_key', '')) !== ''
-        && trim((string)beyond_config('narration.elevenlabs.voices.fr-FR', beyond_config('voice.voices.fr-FR', ''))) !== '';
+    $configuredProvider = strtolower((string)beyond_config('voice.provider', 'openai'));
+    $openaiReady = trim((string)beyond_config('narration.openai.api_key', '')) !== '';
+    $elevenLabsReady = trim((string)beyond_config('narration.elevenlabs.api_key', beyond_config('voice.api_key', ''))) !== '';
+    $provider = in_array($configuredProvider, ['openai', 'elevenlabs'], true)
+        ? $configuredProvider
+        : ($elevenLabsReady ? 'elevenlabs' : 'openai');
+    $defaultNarrationProvider = $provider;
+    $providerConfigured = $provider === 'elevenlabs' ? $elevenLabsReady : $openaiReady;
+    foreach (['fr-FR' => 'Louis', 'es-ES' => 'Pablo', 'en-JM' => 'Irie', 'ht-HT' => 'Jazzy'] as $locale => $character) {
+        $voice = beyond_config('narration.elevenlabs.voices.' . $locale, beyond_config('voice.voices.' . $locale, ''));
+        $characterVoiceLocales[$locale] = $elevenLabsReady && is_string($voice) && trim($voice) !== '';
+    }
 } catch (Throwable $error) {
     error_log('French generator voice status unavailable: ' . $error->getMessage());
 }
-if ($provider === 'openai' && $louisVoiceReady) {
-    $providerLabels['openai'] = 'OpenAI for other locales · Louis via ElevenLabs for French';
-}
+$characterVoiceData = htmlspecialchars(json_encode($characterVoiceLocales, JSON_UNESCAPED_SLASHES) ?: '{}', ENT_QUOTES, 'UTF-8');
 $view = str_replace(
-    ['__VOICE_PROVIDER__', '__VOICE_STATUS__', '__VOICE_STATUS_CLASS__', '__LOUIS_VOICE_READY__'],
+    ['__VOICE_PROVIDER__', '__VOICE_STATUS__', '__VOICE_STATUS_CLASS__', '__CHARACTER_VOICE_LOCALES__', '__DEFAULT_NARRATION_PROVIDER__'],
     [
         htmlspecialchars($providerLabels[$provider] ?? ucfirst($provider), ENT_QUOTES, 'UTF-8'),
         $providerConfigured ? 'Ready' : 'Needs configuration',
         $providerConfigured ? 'ready' : 'needs-config',
-        $louisVoiceReady ? '1' : '0',
+        $characterVoiceData,
+        htmlspecialchars($defaultNarrationProvider, ENT_QUOTES, 'UTF-8'),
     ],
     $view
 );

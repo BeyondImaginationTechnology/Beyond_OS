@@ -54,11 +54,11 @@
         <a href="/server/admin/daily-studio/voice-settings.php">Configure premium voices</a>
       </div>
       <button id="regenerateNativeAudio" class="btn secondary wide" type="button">Regenerate native Spanish + Kreyòl + Patois MP3s</button>
-      <div class="hint" style="margin:7px 0 13px">Resumable 300-track batch: Azure Spanish plus the configured Haitian and Jamaican ElevenLabs speakers.</div>
+      <div class="hint" style="margin:7px 0 13px">Resumable 300-track batch: Pablo (Spanish), Jazzy (Kreyòl), and Irie (Patois) use their configured ElevenLabs voices.</div>
       <div class="grid"><label class="check"><input id="includeNarration" type="checkbox"> Include server audio</label><label class="check"><input id="showBadge" type="checkbox" checked> Show playing badge</label></div>
-      <div class="field" style="margin-top:13px"><label for="narrationProvider">Narration provider for export</label><select id="narrationProvider" data-louis-ready="__LOUIS_VOICE_READY__"><option value="">French uses Louis · ElevenLabs; other locales use Studio default</option><option value="elevenlabs">ElevenLabs Premium</option><option value="openai">OpenAI Speech</option><option value="azure">Azure Speech</option></select><div class="hint">French defaults to the configured Louis voice. Choose another provider to override it; no audio is generated until you preview or export.</div></div>
+      <div class="field" style="margin-top:13px"><label for="narrationProvider">Narration provider for export</label><select id="narrationProvider" data-character-voices="__CHARACTER_VOICE_LOCALES__" data-default-provider="__DEFAULT_NARRATION_PROVIDER__"><option value="">Character-matched default where configured</option><option value="elevenlabs">ElevenLabs Premium</option><option value="openai">OpenAI Speech</option></select><div class="hint">French uses Louis, Spanish Pablo, Patois Irie, and Kreyòl Jazzy when their language voice is configured. English uses the selected default. No audio is generated until preview or export.</div></div>
       <div class="field" style="margin-top:13px"><label for="exportLanguage">Export version</label><select id="exportLanguage"><option value="en">English text + English audio</option><option value="fr">French text + French audio</option><option value="es">Spanish text + Spanish audio</option><option value="jm">Patois text + Patois audio</option><option value="ht">Kreyòl text + Kreyòl audio</option></select></div>
-      <div class="field" style="margin-top:13px"><label for="narratorLocale">Narrator voice</label><select id="narratorLocale"><option value="fr-FR">French</option><option value="es-ES">Spanish</option><option value="en-US">English (overview)</option><option value="en-JM">Jamaican Patois</option><option value="ht-HT">Haitian Kreyòl</option></select></div>
+      <div class="field" style="margin-top:13px"><label for="narratorLocale">Narrator character</label><select id="narratorLocale"><option value="fr-FR">Louis · French</option><option value="es-ES">Pablo · Spanish</option><option value="en-US">English overview</option><option value="en-JM">Irie · Jamaican Patois</option><option value="ht-HT">Jazzy · Haitian Kreyòl</option></select></div>
       <div class="field"><label for="audioFile">Optional narration file</label><input id="audioFile" type="file" accept="audio/*"><div class="hint">Patois and Kreyòl use the current server speaker when it supports those locales. Upload audio to override or supply a voice when it does not.</div></div>
       <div class="audio-row"><button id="previewAudio" class="btn secondary" type="button">Preview narration</button><button id="stopAudio" class="btn secondary" type="button">Stop</button></div>
     </section>
@@ -95,8 +95,9 @@
   const localeLanguages=Object.fromEntries(Object.entries(languageLocales).map(([language,locale])=>[locale,language]));
   const languageForLocale=locale=>localeLanguages[locale]||'en';
   const selectedLanguage=()=>languageForLocale(v('narratorLocale'))||v('exportLanguage')||'en';
-  const selectedProvider=()=>v('narrationProvider')||(v('narratorLocale')==='fr-FR'&&$('narrationProvider').dataset.louisReady==='1'?'elevenlabs':'');
-  const selectedVoice=()=>selectedProvider()==='azure'?({'fr-FR':'fr-FR-DeniseNeural','fr-CA':'fr-CA-SylvieNeural','es-ES':'es-ES-ElviraNeural'}[v('narratorLocale')]||''):'';
+  const characterVoiceLocales=JSON.parse($('narrationProvider').dataset.characterVoices||'{}');
+  const selectedProvider=()=>v('narrationProvider')||(characterVoiceLocales[v('narratorLocale')]?'elevenlabs':$('narrationProvider').dataset.defaultProvider);
+  const selectedVoice=()=>'';
   const exportSettings=()=>({
     en:{locale:'en-US',label:'English',banner:'Today’s English Phrase',phrase:v('phrase'),pronunciation:'',meaningLabel:'What it means'},
     fr:{locale:'fr-FR',label:'French',banner:'Phrase Française du Jour',phrase:v('french'),pronunciation:v('frenchPron'),meaningLabel:'Meaning in English'},
@@ -275,7 +276,7 @@
     }catch(error){running=false;if(recorder&&recorder.state!=='inactive')recorder.stop();setStatus(error.message||'Batch video export failed.',true)}finally{$('exportLanguage').value=originalLanguage;$('narratorLocale').value=originalLocale;if(audioContext)await audioContext.close().catch(()=>{});draw();updateAudioUi();button.disabled=false}
   }
   async function regenerateNativeAudio(){
-    if(!confirm('Regenerate all 300 Spanish, Haitian Kreyòl, and Jamaican Patois MP3s? This uses Azure and ElevenLabs narration credits.'))return;
+    if(!confirm('Regenerate all 300 Spanish, Haitian Kreyòl, and Jamaican Patois MP3s with their configured ElevenLabs character voices? This uses ElevenLabs narration credits.'))return;
     const button=$('regenerateNativeAudio');button.disabled=true;let lastReady=0;
     try{
       while(true){
@@ -386,7 +387,7 @@
         const response=await fetch(scheduledAudioUrlFor(),{cache:'force-cache'});
         if(!response.ok)throw new Error('Today’s prerecorded audio could not be loaded.');
         const blob=await response.blob();if(blob.size<128)throw new Error('Today’s prerecorded audio is empty.');
-        download(blob,baseName()+'.mp3');setStatus('Today’s prerecorded Azure MP3 downloaded.');return;
+        download(blob,baseName()+'.mp3');setStatus('Today’s prerecorded native MP3 downloaded.');return;
       }
       const response=await fetch('/beyond-id/admin/api/french-narration-export.php',{
         method:'POST',

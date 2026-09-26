@@ -27,6 +27,7 @@ $provider = 'openai';
 $providerConfigured = false;
 $defaultNarrationProvider = 'openai';
 $characterVoiceLocales = [];
+$characterVoiceNames = [];
 try {
     $configuredProvider = strtolower((string)beyond_config('voice.provider', 'openai'));
     $openaiReady = trim((string)beyond_config('narration.openai.api_key', '')) !== '';
@@ -39,9 +40,16 @@ try {
     foreach (['fr-FR' => 'Louis', 'es-ES' => 'Pablo', 'en-JM' => 'Irie', 'ht-HT' => 'Jazzy'] as $locale => $character) {
         $voice = beyond_config('narration.elevenlabs.voices.' . $locale, beyond_config('voice.voices.' . $locale, ''));
         $characterVoiceLocales[$locale] = $elevenLabsReady && is_string($voice) && trim($voice) !== '';
+        if ($characterVoiceLocales[$locale]) $characterVoiceNames[] = $character;
     }
 } catch (Throwable $error) {
     error_log('French generator voice status unavailable: ' . $error->getMessage());
+}
+if ($characterVoiceNames) {
+    $characterList = count($characterVoiceNames) > 1
+        ? implode(', ', array_slice($characterVoiceNames, 0, -1)) . ' & ' . end($characterVoiceNames)
+        : $characterVoiceNames[0];
+    $providerLabels[$provider] = $characterList . ' via ElevenLabs · English overview via ' . ($provider === 'openai' ? 'OpenAI Speech' : 'ElevenLabs Premium');
 }
 $characterVoiceData = htmlspecialchars(json_encode($characterVoiceLocales, JSON_UNESCAPED_SLASHES) ?: '{}', ENT_QUOTES, 'UTF-8');
 $view = str_replace(

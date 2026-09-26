@@ -78,7 +78,7 @@ beyond_nav_bootstrap('Beyond Tattoo', beyond_wallet());
       <div style="display:grid;gap:8px;margin-top:8px">
         <button class="btn primary" id="savePng">Save high-res PNG</button>
         <button class="btn primary" onclick="window.print()">Print / Save PDF</button>
-        <a class="btn" href="/beyond-tattoo/<?=htmlspecialchars($stencilSource, ENT_QUOTES, 'UTF-8')?>" download="beyond-tattoo-<?=htmlspecialchars($stencilSlug, ENT_QUOTES, 'UTF-8')?>-source.png">Download source PNG</a>
+        <a class="btn" href="<?=e(bt_app_url($stencilSource))?>" download="beyond-tattoo-<?=htmlspecialchars($stencilSlug, ENT_QUOTES, 'UTF-8')?>-source.png">Download source PNG</a>
         <button class="btn" id="reset">Reset editor</button>
       </div>
       <p class="muted">iPhone PDF: Print → pinch out preview → Share → Save to Files.</p>
@@ -103,7 +103,7 @@ beyond_nav_bootstrap('Beyond Tattoo', beyond_wallet());
 <script>
 'use strict';
 const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true}),paper=document.getElementById('paper'),guideLayer=document.getElementById('guideLayer'),statusEl=document.getElementById('status');
-const source=new Image(); source.src=<?=json_encode('/beyond-tattoo/' . $stencilSource)?>;
+const source=new Image(); source.src=<?=json_encode(bt_app_url($stencilSource))?>;
 const state={tool:'move',scale:1,rotation:0,flipX:1,flipY:1,x:0,y:0,contrast:1,brightness:1,invert:false,gray:true,weight:0,brushSize:4,zoom:1,dragging:false,lastX:0,lastY:0,marks:[],currentPath:null,guide:'off',safeMargin:false,paper:'letter',landscape:false};
 let history=[],future=[];
 function snapshot(){history.push(JSON.stringify({marks:state.marks,scale:state.scale,rotation:state.rotation,flipX:state.flipX,flipY:state.flipY,x:state.x,y:state.y,contrast:state.contrast,brightness:state.brightness,invert:state.invert,gray:state.gray,weight:state.weight}));if(history.length>40)history.shift();future=[]}

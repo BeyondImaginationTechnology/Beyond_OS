@@ -14,6 +14,29 @@ define('UPLOAD_DIR', beyond_private_root() . '/uploads/beyond-tattoo/healing');
 require_once __DIR__ . '/repository.php';
 require_once __DIR__ . '/google-places.php';
 
+/** Return the public URL prefix for the app, whether mounted at / or /beyond-tattoo. */
+function bt_app_url(string $path = ''): string {
+    $documentRoot = realpath((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''));
+    $appRoot = realpath(APP_ROOT);
+    $basePath = '/beyond-tattoo';
+
+    if (is_string($documentRoot) && is_string($appRoot)) {
+        $documentRoot = rtrim(str_replace('\\', '/', $documentRoot), '/');
+        $appRoot = rtrim(str_replace('\\', '/', $appRoot), '/');
+        if (strtolower($documentRoot) === strtolower($appRoot)) {
+            $basePath = '';
+        } elseif (str_starts_with(strtolower($appRoot), strtolower($documentRoot) . '/')) {
+            $basePath = '/' . trim(substr($appRoot, strlen($documentRoot)), '/');
+        }
+    } elseif (preg_match('#(?:^|/)beyond-tattoo(?:/|$)#', str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? '')))) {
+        $basePath = '/beyond-tattoo';
+    } else {
+        $basePath = '';
+    }
+
+    return rtrim($basePath, '/') . '/' . ltrim($path, '/');
+}
+
 if (!function_exists('e')) {
     function e($value): string {
         return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');

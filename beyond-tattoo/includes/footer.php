@@ -1,4 +1,4 @@
-<script src="/beyond-tattoo/assets/js/app.js?v=<?= rawurlencode((string) (@filemtime(__DIR__ . '/../assets/js/app.js') ?: '20260716')) ?>"></script>
+<script src="<?= e(bt_app_url('assets/js/app.js')) ?>?v=<?= rawurlencode((string) (@filemtime(__DIR__ . '/../assets/js/app.js') ?: '20260716')) ?>"></script>
 <script>
 document.querySelectorAll('form[method="post" i]').forEach(function (form) {
   if (form.querySelector('input[name="_csrf"]')) return;

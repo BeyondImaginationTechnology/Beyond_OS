@@ -1,7 +1,7 @@
 ################################################################################
 # Beyond OS Home
 ################################################################################
-BEYOND_HOME_VERSION = 1.0.0-dev.1
+BEYOND_HOME_VERSION = 0.1.0-dev.1
 BEYOND_HOME_SITE = $(BR2_EXTERNAL_BEYOND_HOME_PATH)/src
 BEYOND_HOME_SITE_METHOD = local
 BEYOND_HOME_LICENSE = MIT (code), proprietary (artwork)
@@ -24,6 +24,8 @@ define BEYOND_HOME_INSTALL_TARGET_CMDS
 		$(TARGET_DIR)/usr/share/beyond-home/boot.ppm
 	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_HOME_PATH)/board/x86_64/grub.cfg.in \
 		$(TARGET_DIR)/usr/share/beyond-home/grub.cfg.in
+	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_HOME_PATH)/overlay/usr/share/beyond-home/grub-installed.cfg.in \
+		$(TARGET_DIR)/usr/share/beyond-home/grub-installed.cfg.in
 endef
 
 $(eval $(generic-package))

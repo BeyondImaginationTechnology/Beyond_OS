@@ -3,7 +3,7 @@ set -eu
 case "${1:-}" in
   start)
     if grep -qw 'bit.install=1' /proc/cmdline; then
-      exec /usr/bin/bit-install-home </dev/tty1 >/dev/tty1 2>&1
+      exec /usr/bin/bit-install-home </dev/console >/dev/console 2>&1
     fi
     # X uses a private cookie and has no TCP listener.
     umask 077
@@ -15,8 +15,9 @@ case "${1:-}" in
     xauth -f "$XAUTHORITY" add :0 . "$(mcookie)"
     chown home:home "$XAUTHORITY"
     start-stop-daemon -S -b -m -p /run/beyond-home.pid \
+      -O /home/home/beyond-home.log \
       -x /usr/bin/xinit -- /usr/bin/beyond-session -- /usr/bin/Xorg :0 vt1 \
-      -nolisten tcp -auth "$XAUTHORITY" >> /var/log/beyond-home.log 2>&1
+      -logfile /home/home/Xorg.0.log -nolisten tcp -auth "$XAUTHORITY"
     ;;
   stop)
     start-stop-daemon -K -p /run/beyond-home.pid || true

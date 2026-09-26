@@ -41,7 +41,7 @@ def text(value, y, size, color):
     font = ImageFont.truetype(str(args.font), size * scale)
     d.text(xy(320, y), value, font=font, fill=color, anchor="mt")
 text("Beyond OS", 193, 40, (245, 247, 255))
-text("HOME EDITION  1.0", 250, 12, (163, 175, 200))
+text("HOME EDITION  0.1", 250, 12, (163, 175, 200))
 for index in range(3):
     x = 307 + index * 13
     d.ellipse([xy(x - 2, 309), xy(x + 2, 313)], fill=(115 + index * 25, 142, 230))

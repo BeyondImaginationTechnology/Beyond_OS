@@ -29,6 +29,45 @@ The runtime applies the adapter to the selected Llama 3.1 base model at startup.
 
 For production, run this behind authenticated application infrastructure; do not expose the local runtime directly to the internet.
 
+## Admin Code Thinking
+
+`../code.php` is the administrator-only Code Thinking 0.1 workspace. Its PHP
+API checks the Beyond ID `admin` or `super_admin` role before listing projects,
+reading repository context, storing project notes, or running checks. The
+workspace uses a server-side project allowlist; never accept repository paths
+from browser input. By default, a Git checkout of this repository is listed as
+`Beyond OS`. To authorize additional BIT checkouts, configure
+`JAGUAR_CODE_PROJECTS_JSON` on the web host with an explicit map such as:
+
+```json
+{
+  "beyond-os": {
+    "label": "Beyond OS",
+    "path": "/srv/beyond-os",
+    "checks": [["php", "-l", "ai/api/chat.php"]]
+  },
+  "beyond-french": {
+    "label": "Beyond French",
+    "path": "/srv/beyond-french",
+    "checks": [["php", "-l", "api/jaguar.php"]]
+  }
+}
+```
+
+Every configured path must be a Git-tracked project directory inside a checkout
+(a monorepo subdirectory is allowed and becomes the file-access boundary). Check entries are
+argument arrays and run with that checkout as the working directory, without a
+shell, only after an administrator selects **Run configured checks**. Keep them
+to local lint/test commands; do not configure deploy, publish, merge, migration,
+or production-data commands. Returned patches are review-only unified diffs;
+Code Thinking does not apply them. Project notes are stored under private
+Beyond runtime data and are included only when their recorded Git revision
+matches the selected checkout.
+
+The web catalog maps `core` to runtime `explain` and the planned `build` mode to
+runtime `code`. Build remains locked in public chat. Admin Code Thinking calls
+the runtime `code` mode only through its separate role-protected API.
+
 ## Website deployment
 
 The public prompt interface is served from `ai/chat.php`. Configure the subdomain document root as the repository's `ai` directory, then set these production environment variables:

@@ -11,7 +11,22 @@ $faithTradition = dailybreath_faith_tradition((string)($_GET['faith'] ?? $_COOKI
 setcookie('dailybreath_faith', $faithTradition, ['expires'=>time()+31536000,'path'=>'/dailybreath/','samesite'=>'Lax']);
 $faithLabel = dailybreath_tradition_label($faithTradition);
 $dailyVerse = dailybreath_interfaith_verse_of_day($pdo, $faithTradition, (string)($_SESSION['locale'] ?? 'en'));
+$publishedDaily = null;
+try { $publishedDaily = dailybreath_published_content($pdo, date('Y-m-d'), $faithTradition, (string)($_SESSION['locale'] ?? 'en')); } catch (Throwable $exception) {}
+if ($publishedDaily) {
+    $publishedBook = trim((string)$publishedDaily['reader_book']) ?: ($faithTradition === 'quran' ? '1' : 'Psalms');
+    $dailyVerse['text'] = (string)$publishedDaily['passage'];
+    $dailyVerse['reference'] = (string)$publishedDaily['reference'];
+    $dailyVerse['book'] = $publishedBook;
+    $dailyVerse['chapter'] = (int)$publishedDaily['reader_chapter'];
+    $dailyVerse['verse'] = (int)$publishedDaily['reader_verse'];
+    $dailyVerse['reader_book'] = $publishedBook;
+    $dailyVerse['reader_chapter'] = (int)$publishedDaily['reader_chapter'];
+    $dailyVerse['tradition'] = $faithTradition;
+}
 $dailyTitle = $dailyVerse['text'];
+$dailyDirection = $faithTradition === 'quran' && preg_match('/[\x{0600}-\x{06FF}]/u', (string)$dailyVerse['text']) ? 'rtl' : 'ltr';
+$dailyVerseLanguage = $dailyDirection === 'rtl' ? 'ar' : (string)($_SESSION['locale'] ?? 'en');
 $dailyBody = $dailyVerse['reference'];
 $dailyDate = dailybreath_web_date();
 $dailyScriptureUrl = dailybreath_scripture_url($dailyVerse);
@@ -51,6 +66,12 @@ if ($faithTradition === 'torah') {
         'scripture_reference'=>$weeklyVerse['reference'],
         'duration_minutes'=>3,
     ];
+}
+if ($publishedDaily && trim((string)$publishedDaily['reflection']) !== '') {
+    $reflectionLabel = "Today's reflection";
+    $reflectionLink = 'daily.php?date=' . rawurlencode(date('Y-m-d')) . '&tradition=' . rawurlencode($faithTradition) . '&lang=' . rawurlencode((string)($_SESSION['locale'] ?? 'en'));
+    $reflectionAction = 'Open today’s content';
+    $devotional = ['title'=>'A moment with today’s passage','excerpt'=>(string)$publishedDaily['reflection'],'scripture_reference'=>(string)$publishedDaily['reference'],'duration_minutes'=>2];
 }
 
 $name = 'Friend';
@@ -123,6 +144,7 @@ html[data-faith=bible] .rhythm-card,html[data-faith=torah] .rhythm-card{backgrou
 <style>.tradition-step[hidden]{display:none}.tradition-options{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:24px 0 8px}.tradition-options button{min-height:54px;padding:10px;border:1px solid #ffffff45;border-radius:13px;color:#000;background:#ffffff12;font:inherit;font-weight:850;cursor:pointer}.tradition-options button:hover,.tradition-options button:focus-visible{border-color:#f0cb77;background:#f0cb7724;outline:none}.tradition-note{margin:0;color:#d5e6d7!important;font-size:13px!important}@media(max-width:560px){.tradition-options{grid-template-columns:1fr}}</style>
 <style>.home-chat[hidden]{display:none}.home-chat{position:fixed;z-index:2147483602;inset:0;display:grid;place-items:end center;padding:18px;background:#00170b88;backdrop-filter:blur(6px)}.home-chat-card{width:min(650px,100%);max-height:min(78vh,650px);display:grid;grid-template-rows:auto 1fr auto;overflow:hidden;border:1px solid #ffffff38;border-radius:25px;color:#f5fbf6;background:#123927;box-shadow:0 28px 85px #00170baa}.home-chat-head{display:flex;align-items:center;justify-content:space-between;padding:12px 19px;border-bottom:1px solid #ffffff22}.home-chat-identity{display:flex;align-items:center;gap:12px}.home-chat-guide{width:72px;height:72px;flex:0 0 72px;object-fit:contain;filter:drop-shadow(0 8px 14px #00170b77)}.home-chat-head strong{font:700 19px/1 Georgia,serif}.home-chat-close{display:grid;place-items:center;min-width:44px;min-height:44px;border:0;color:#fff;background:transparent;font:800 22px/1 system-ui;cursor:pointer}.home-chat-messages{min-height:180px;overflow:auto;padding:18px}.home-chat-message{max-width:88%;margin:0 0 12px;padding:11px 13px;border-radius:15px;color:#ecf7ef;background:#ffffff12;white-space:pre-wrap}.home-chat-message.user{margin-left:auto;color:#173f2c;background:#f0cb77}.home-chat-form{display:grid;grid-template-columns:1fr auto;gap:9px;padding:14px;border-top:1px solid #ffffff22}.home-chat-form textarea{min-height:45px;padding:11px;border:1px solid #ffffff35;border-radius:13px;color:#fff;background:#071f13;font:inherit}.home-chat-form button{min-width:76px;border:0;border-radius:13px;color:#173f2c;background:#f0cb77;font-weight:900;cursor:pointer}.bottom-dock button{display:flex;min-width:0;height:48px;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0;border:1px solid transparent;border-radius:15px;color:inherit;background:transparent;font:800 10px/1 Inter,system-ui;cursor:pointer}.bottom-dock button:hover{transform:translateY(-1px);background:#ffffff16}</style>
 <style>.grid>.verse{grid-column:1/-1}</style>
+<style>.verse blockquote[dir=rtl]{direction:rtl;unicode-bidi:plaintext;text-align:center;letter-spacing:0;font-family:"Noto Naskh Arabic","Geeza Pro",Georgia,serif}</style>
 <link rel="stylesheet" href="/dailybreath/assets/css/bible-forest.css?v=20260925-2">
 <link rel="stylesheet" href="/dailybreath/assets/css/tanakh-forest.css?v=20260925-2">
 <link rel="stylesheet" href="/dailybreath/assets/css/quran-forest.css?v=20260925-2">
@@ -136,7 +158,7 @@ html[data-faith=bible] .rhythm-card,html[data-faith=torah] .rhythm-card{backgrou
   <section class="card" id="continue-reading" hidden aria-live="polite"><strong>Continue reading</strong><a class="card-link" id="continue-reading-link" href="scripture.php">Open your last passage →</a></section>
   <section class="rhythm-card" aria-label="Today's rhythm"><div class="rhythm-ring" id="rhythm-ring"><strong id="rhythm-count">1 of 4</strong></div><div class="rhythm-copy"><h2>Today’s rhythm</h2><p>Small faithful steps. Return to peace at your own pace.</p><p id="daily-content-status" role="status" aria-live="polite">Today’s reading · <?= e($dailyDate) ?></p><div class="rhythm-steps"><span class="rhythm-step done" id="rhythm-read">✓ Read</span><a class="rhythm-step" href="practices.php?section=breathing" id="rhythm-breathe">○ Breathe</a><a class="rhythm-step" href="practices.php?section=journal" id="rhythm-reflect">○ Reflect</a><a class="rhythm-step" href="practices.php?section=challenge" id="rhythm-carry">○ Carry forward</a></div></div></section>
   <section class="grid">
-    <article class="card verse <?= $faithTradition==='bible'?'bible-forest-verse':($faithTradition==='torah'?'tanakh-forest-verse':($faithTradition==='quran'?'quran-forest-verse':'')) ?>"><div class="label"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg></span><?= e($faithTradition==='quran'?'Ayah':($faithTradition==='torah'?'Passage':'Verse')) ?> of the Day · <?= e($faithLabel) ?> · <?= e($dailyDate) ?></div><blockquote>“<?= e($dailyTitle) ?>”</blockquote><div class="verse-actions"><span class="reference"><?= e($dailyBody) ?></span><div class="verse-buttons"><a class="pill-btn" href="<?= e($dailyScriptureUrl) ?>">Read in context →</a></div></div></article>
+    <article class="card verse <?= $faithTradition==='bible'?'bible-forest-verse':($faithTradition==='torah'?'tanakh-forest-verse':($faithTradition==='quran'?'quran-forest-verse':'')) ?>"><div class="label"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg></span><?= e($faithTradition==='quran'?'Ayah':($faithTradition==='torah'?'Passage':'Verse')) ?> of the Day · <?= e($faithLabel) ?> · <?= e($dailyDate) ?></div><blockquote dir="<?=e($dailyDirection)?>" lang="<?=e($dailyVerseLanguage)?>">“<?= e($dailyTitle) ?>”</blockquote><div class="verse-actions"><span class="reference"><?= e($dailyBody) ?></span><div class="verse-buttons"><a class="pill-btn" href="<?= e($dailyScriptureUrl) ?>">Read in context →</a><?php if ($publishedDaily): ?><a class="pill-btn" href="daily.php?date=<?= e(date('Y-m-d')) ?>&amp;tradition=<?= e($faithTradition) ?>&amp;lang=<?= e((string)($_SESSION['locale'] ?? 'en')) ?>">Share today →</a><?php endif; ?></div></div></article>
     <article class="card devotional" id="devotionals"><div class="dev-art"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2H12v18H7.5A3.5 3.5 0 0 0 4 23V5.5ZM20 5.5A3.5 3.5 0 0 0 16.5 2H12v18h4.5A3.5 3.5 0 0 1 20 23V5.5Z"/></svg></div><div><span class="kicker"><?= e($reflectionLabel) ?></span><h2><?= e($devotional['title']) ?></h2><p><?= e($devotional['excerpt']) ?></p><div class="kicker" style="margin-top:10px"><?= e($devotional['scripture_reference']) ?> · <?= (int)$devotional['duration_minutes'] ?> minute read</div></div><a class="pill-btn" href="<?= e($reflectionLink) ?>"><?= e($reflectionAction) ?></a></article>
   </section>
 

@@ -11,4 +11,4 @@ sed "s/%PARTUUID%/$part_uuid/g" "$board_dir/grub.cfg.in" > "$BINARIES_DIR/efi-pa
 sed "s/%PARTUUID%/$part_uuid/g" "$board_dir/genimage-uefi.cfg.in" > "$BINARIES_DIR/genimage-uefi.cfg"
 support/scripts/genimage.sh -c "$BINARIES_DIR/genimage-uefi.cfg"
 cp "$BINARIES_DIR/rootfs.iso9660" "$BINARIES_DIR/bitHomeos.iso"
-sha256sum "$BINARIES_DIR/bit-os-home-1.0-installer.img" "$BINARIES_DIR/bitHomeos.iso" "$root_image" > "$BINARIES_DIR/SHA256SUMS"
+sha256sum "$BINARIES_DIR/bit-os-home-0.1-installer.img" "$BINARIES_DIR/bitHomeos.iso" "$root_image" > "$BINARIES_DIR/SHA256SUMS"

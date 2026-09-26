@@ -427,11 +427,10 @@ if ($runtimeToken !== '') { $headers[] = 'Authorization: Bearer ' . $runtimeToke
 $request = curl_init($runtimeUrl . '/v1/chat');
 // Leave enough time for a warm runtime, but return a usable error before the
 // browser can appear permanently stuck while a cold runtime is unavailable.
-$runtimeMode = $mode === 'core' ? 'explain' : $mode;
+$runtimeMode = (string)($modeDefinition['runtime'] ?? 'explain');
 curl_setopt_array($request, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 15, CURLOPT_TIMEOUT => 105, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode(['mode' => $runtimeMode, 'language' => $language, 'messages' => $messages], JSON_THROW_ON_ERROR)]);
 $response = curl_exec($request); $status = (int) curl_getinfo($request, CURLINFO_RESPONSE_CODE); curl_close($request);
 if (!is_string($response) || $status < 200 || $status >= 300) { http_response_code(503); echo json_encode(['error' => 'Jaguar could not complete that request.']); exit; }
 echo $response;
-
 
 

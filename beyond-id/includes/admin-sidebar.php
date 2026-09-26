@@ -2,9 +2,9 @@
 $beyondIdVersion = require __DIR__ . '/../config/version.php';
 $adminNavGroups = [
     'Workspace' => [
-        ['index.php', 'Overview', 'overview'],
+        ['/server/admin/daily-studio/', 'Studio Home', 'magic'],
+        ['overview.php', 'System overview', 'overview'],
         ['review.php', 'Admin Review', 'review'],
-        ['/server/admin/daily-studio/', 'Beyond Studio Home', 'magic'],
     ],
     'Management' => [
         ['users.php', 'Users', 'users'],
@@ -54,7 +54,7 @@ $adminIcon = static function (string $name) use ($adminIconPaths): string {
 ?>
 <button class="sidebar-scrim" type="button" data-sidebar-close aria-label="Close navigation"></button>
 <aside class="sidebar" id="admin-sidebar" aria-label="Admin navigation">
-  <a class="brand" href="index.php" aria-label="Beyond ID admin overview">
+  <a class="brand" href="/server/admin/daily-studio/" aria-label="Studio Home">
     <span class="brand-mark" aria-hidden="true">
       <svg viewBox="0 0 48 48" fill="none">
         <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2" opacity=".45"/>

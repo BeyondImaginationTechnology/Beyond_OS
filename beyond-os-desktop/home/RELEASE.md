@@ -1,6 +1,6 @@
-# Home Edition 1.0 release gates
+# BIT OS Home v0.1 acceptance gates
 
-The current work is `home-dev.1`. Passing source checks is not a successful boot.
+The current work is `home-0.1-dev.1`. Passing source checks is not a successful boot.
 
 ## Foundation acceptance
 
@@ -17,6 +17,14 @@ The current work is `home-dev.1`. Passing source checks is not a successful boot
 - [ ] Files handles empty/unreadable folders, long names and non-text files.
 - [ ] Notes retains text after save/reopen and a persistent-image reboot.
 - [ ] Notes save failure reports an error and preserves unsaved text.
+- [ ] Browser opens as `home`, loads an HTTPS page, validates certificates, and
+      uses its process sandbox without disabling it.
+- [ ] Browser keyboard/mouse navigation, download location, and a representative
+      media page work in the installed QEMU guest.
+- [ ] Media opens local MP3, Ogg, WAV, MP4, and WebM fixtures from `~/Media`;
+      video renders and audio reaches the QEMU sound device.
+- [ ] Home dashboard tiles, taskbar, keyboard navigation, window switching,
+      Files and Notes remain usable with Browser and Media installed.
 - [ ] X.Org listens only locally and requires the session cookie.
 - [ ] Headless/failing-display boot leaves readable serial diagnostics.
 

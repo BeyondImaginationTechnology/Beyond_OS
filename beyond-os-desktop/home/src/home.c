@@ -38,10 +38,14 @@ static char file_text[NOTE_CAP], file_title[256];
 static Entry entries[ENTRY_CAP];
 static int entry_count, scroll, selected;
 static bool dirty, note_writable = true;
+static bool media_mode;
 static const SDL_Color white = {239, 242, 255, 255};
 static const SDL_Color muted = {153, 170, 195, 255};
 static const SDL_Color accent = {150, 174, 255, 255};
 #ifdef BIT_EDITION_CYBER
+#define CARD_COUNT 4
+#define CARD_WIDTH 551
+#define CARD_HEIGHT 130
 #define EDITION_LABEL "CYBER EDITION 1.0"
 #define HOME_KICKER "AUTHORIZED SECURITY WORKSPACE"
 #define HOME_TITLE "Know your scope."
@@ -52,15 +56,20 @@ static const char *titles[] = {"Scope & Inventory", "Evidence", "Terminal", "Abo
 static const char *subtitles[] = {"Record authorization before network discovery", "Keep local findings together",
                                   "Your Linux command line", "Your system, at a glance"};
 #else
-#define EDITION_LABEL "HOME EDITION 1.0"
-#define HOME_KICKER "YOUR SPACE. YOUR POSSIBILITIES."
+#define EDITION_LABEL "HOME 0.1"
+#define HOME_KICKER "YOUR SPACE, READY TO GO"
 #define HOME_TITLE "Welcome home."
-#define HOME_COPY "A little room to think. A new place to begin."
-#define FOUNDATION_NOTE "Linux foundation preview"
-#define UPCOMING_NOTE "Browsing, streaming, device settings and updates are upcoming milestones."
-static const char *titles[] = {"Files", "Notes", "Terminal", "About Beyond OS"};
-static const char *subtitles[] = {"Explore your computer", "A place to put your thoughts",
-                                  "Your Linux command line", "Your system, at a glance"};
+#define HOME_COPY "Your desktop for everyday work and play."
+#define FOUNDATION_NOTE "HOME 0.1 PREVIEW  /  FILES, NOTES, WEB AND MEDIA"
+#define UPCOMING_NOTE "Choose a tile to begin. Tab and Enter work with the keyboard."
+#define CARD_COUNT 6
+#define CARD_WIDTH 371
+#define CARD_HEIGHT 124
+static const char *titles[] = {"Files", "Notes", "Browser", "Media", "Terminal", "About Home"};
+static const char *subtitles[] = {"Browse your folders", "Write something down",
+                                  "Explore the web", "Play your files",
+                                  "Open the command line", "System and edition details"};
+static const char *symbols[] = {"F", "N", "W", "M", ">", "i"};
 #endif
 
 static void box(int x, int y, int w, int h, int r, int g, int b)
@@ -68,6 +77,29 @@ static void box(int x, int y, int w, int h, int r, int g, int b)
     SDL_Rect rect = {x, y, w, h};
     SDL_SetRenderDrawColor(renderer, (Uint8)r, (Uint8)g, (Uint8)b, 255);
     SDL_RenderFillRect(renderer, &rect);
+}
+
+#ifndef BIT_EDITION_CYBER
+static void glass(int x, int y, int w, int h, int r, int g, int b, int alpha)
+{
+    SDL_Rect rect = {x, y, w, h};
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer, (Uint8)r, (Uint8)g, (Uint8)b, (Uint8)alpha);
+    SDL_RenderFillRect(renderer, &rect);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+}
+
+#endif
+
+static void card_rect(int index, int *x, int *y)
+{
+#ifdef BIT_EDITION_CYBER
+    *x = 74 + (index % 2) * 575;
+    *y = 320 + (index / 2) * 153;
+#else
+    *x = 62 + (index % 3) * 393;
+    *y = 345 + (index / 3) * 146;
+#endif
 }
 
 static void text(TTF_Font *face, const char *value, int x, int y, SDL_Color color)
@@ -151,8 +183,10 @@ static void load_directory(void)
     }
     closedir(dir);
     qsort(entries, (size_t)entry_count, sizeof entries[0], compare_entry);
-    snprintf(status, sizeof status, "%d items%s. Select a folder or UTF-8 text file.",
-             entry_count, entry_count == ENTRY_CAP ? " (first 512 shown)" : "");
+    snprintf(status, sizeof status, "%d items%s. %s",
+             entry_count, entry_count == ENTRY_CAP ? " (first 512 shown)" : "",
+             media_mode ? "Select a folder or a media file to play." :
+                          "Select a folder or UTF-8 text file.");
 }
 
 static bool save_note(void)
@@ -214,6 +248,49 @@ static void launch_terminal(void)
 #endif
 }
 
+#ifndef BIT_EDITION_CYBER
+static void launch_browser(void)
+{
+#ifndef _WIN32
+    pid_t child = fork();
+    if (child == 0) {
+        execlp("MiniBrowser", "MiniBrowser", "https://os.beyondimagination.co.technology/", (char *)NULL);
+        _exit(127);
+    }
+    if (child < 0) snprintf(status, sizeof status, "Could not open Browser: %s", strerror(errno));
+    else snprintf(status, sizeof status, "Browser opened. Alt+Tab switches windows.");
+#else
+    snprintf(status, sizeof status, "Browser is included in the Linux image.");
+#endif
+}
+
+static bool media_file(const char *path)
+{
+    const char *dot = strrchr(path, '.');
+    if (!dot) return false;
+    return !SDL_strcasecmp(dot, ".mp3") || !SDL_strcasecmp(dot, ".ogg") ||
+           !SDL_strcasecmp(dot, ".wav") || !SDL_strcasecmp(dot, ".flac") ||
+           !SDL_strcasecmp(dot, ".mp4") || !SDL_strcasecmp(dot, ".mkv") ||
+           !SDL_strcasecmp(dot, ".webm");
+}
+
+static void launch_media(const char *path)
+{
+#ifndef _WIN32
+    pid_t child = fork();
+    if (child == 0) {
+        execlp("ffplay", "ffplay", "-autoexit", "-window_title", "BIT OS Home Media", path, (char *)NULL);
+        _exit(127);
+    }
+    if (child < 0) snprintf(status, sizeof status, "Could not open Media: %s", strerror(errno));
+    else snprintf(status, sizeof status, "Media opened. Alt+Tab switches windows.");
+#else
+    (void)path;
+    snprintf(status, sizeof status, "Media playback is included in the Linux image.");
+#endif
+}
+#endif
+
 static void activate(int card)
 {
 #ifdef BIT_EDITION_CYBER
@@ -229,9 +306,24 @@ static void activate(int card)
         load_directory();
     } else { page = ABOUT; status[0] = 0; }
 #else
-    if (card == 0) { page = FILES; load_directory(); }
+    if (card == 0) {
+        const char *home = getenv("HOME");
+        if (home && strlen(home) < sizeof directory)
+            snprintf(directory, sizeof directory, "%s", home);
+        media_mode = false; page = FILES; load_directory();
+    }
     else if (card == 1) { if (!note_writable) { snprintf(status, sizeof status, "Notes could not load the existing file (unreadable or over 8 KB). It has not been changed."); return; } page = NOTES; SDL_StartTextInput(); snprintf(status, sizeof status, "Type a note. Ctrl+S saves. Home also saves before leaving."); }
-    else if (card == 2) launch_terminal();
+    else if (card == 2) launch_browser();
+    else if (card == 3) {
+        const char *home = getenv("HOME");
+        int count = home ? snprintf(directory, sizeof directory, "%s/Media", home) : -1;
+        if (count < 0 || (size_t)count >= sizeof directory) {
+            snprintf(status, sizeof status, "Media folder path is unavailable.");
+            return;
+        }
+        media_mode = true; page = FILES; load_directory();
+    }
+    else if (card == 4) launch_terminal();
     else { page = ABOUT; status[0] = 0; }
 #endif
 }
@@ -250,6 +342,9 @@ static void open_entry(int index)
     if (stat(path, &info) || !S_ISREG(info.st_mode)) {
         snprintf(status, sizeof status, "This viewer opens regular text files only."); return;
     }
+#ifndef BIT_EDITION_CYBER
+    if (media_mode && media_file(path)) { launch_media(path); return; }
+#endif
     FILE *file = fopen(path, "rb");
     if (!file) { snprintf(status, sizeof status, "Cannot read file: %s", strerror(errno)); return; }
     size_t length = fread(file_text, 1, sizeof file_text - 1, file);
@@ -275,18 +370,37 @@ static void open_entry(int index)
 
 static void draw(void)
 {
+#ifdef BIT_EDITION_CYBER
     for (int y = 0; y < H; y++) box(0, y, W, 1, 9 + y/110, 13 + y/100, 22 + y/60);
     box(0, 0, W, 64, 12, 18, 30);
     orbit(35, 32, 20);
     text(font, "Beyond OS", 68, 18, white);
     text(small_font, EDITION_LABEL, 224, 24, muted);
+#else
+    for (int y = 0; y < H; y++) {
+        int glow = y < 520 ? y / 12 : (H - y) / 14;
+        box(0, y, W, 1, 10 + glow / 2, 39 + glow, 76 + glow);
+    }
+    for (int i = 0; i < 10; i++) {
+        SDL_SetRenderDrawColor(renderer, 81, 157, 207, (Uint8)(34 - i * 3));
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        SDL_RenderDrawLine(renderer, 0, 532 + i * 13, W, 428 + i * 22);
+    }
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+    glass(0, 0, W, 76, 5, 19, 39, 211);
+    glass(0, 75, W, 1, 176, 218, 255, 114);
+    orbit(37, 37, 22);
+    text(font, "Beyond Imagination OS", 73, 21, white);
+    text(small_font, EDITION_LABEL, 395, 27, accent);
+#endif
     time_t now = time(NULL);
     struct tm *local = localtime(&now);
     char clock[80] = "";
     if (local) strftime(clock, sizeof clock, "%a %d %b   %H:%M", local);
-    text(small_font, clock, 1000, 24, muted);
+    text(small_font, clock, 1010, 28, white);
 
     if (page == HOME) {
+#ifdef BIT_EDITION_CYBER
         text(small_font, HOME_KICKER, 74, 133, accent);
         text(title_font, HOME_TITLE, 70, 170, white);
         text(font, HOME_COPY, 74, 232, muted);
@@ -301,12 +415,44 @@ static void draw(void)
         }
         text(small_font, FOUNDATION_NOTE, 74, 653, accent);
         text(small_font, UPCOMING_NOTE, 74, 682, muted);
+#else
+        glass(40, 105, 1200, 210, 10, 28, 57, 194);
+        glass(40, 105, 1200, 2, 174, 224, 255, 148);
+        glass(60, 124, 750, 173, 15, 49, 90, 125);
+        text(small_font, HOME_KICKER, 83, 144, accent);
+        text(title_font, HOME_TITLE, 79, 179, white);
+        text(font, HOME_COPY, 83, 245, white);
+        orbit(1050, 207, 75);
+        text(small_font, "DASHBOARD", 61, 319, white);
+        text(small_font, "Everything in one place", 1074, 319, muted);
+        for (int i = 0; i < CARD_COUNT; i++) {
+            int x, y; card_rect(i, &x, &y);
+            glass(x, y + 4, CARD_WIDTH, 128, 0, 8, 24, 98);
+            glass(x, y, CARD_WIDTH, CARD_HEIGHT, i == selected ? 65 : 17,
+                  i == selected ? 112 : 51, i == selected ? 159 : 87, 218);
+            glass(x, y, CARD_WIDTH, 2, 177, 223, 255, i == selected ? 225 : 96);
+            glass(x + 17, y + 22, 60, 60, 107, 178, 230, 136);
+            text(font, symbols[i], x + 37, y + 36, white);
+            text(font, titles[i], x + 94, y + 24, white);
+            text(small_font, subtitles[i], x + 94, y + 62, muted);
+            text(small_font, "OPEN  >", x + 94, y + 93, accent);
+        }
+        text(small_font, FOUNDATION_NOTE, 62, 659, white);
+        text(small_font, UPCOMING_NOTE, 62, 687, muted);
+#endif
     } else {
+#ifdef BIT_EDITION_CYBER
         box(50, 90, 110, 44, 33, 45, 65);
+#else
+        glass(36, 91, 1208, 641, 8, 25, 49, 225);
+        glass(50, 90, 110, 44, 68, 132, 181, 195);
+#endif
         text(font, "Home", 72, 99, white);
-        const char *heading = page == FILES ? "Files" : page == NOTES ? "Notes" : page == VIEWER ? file_title : "About Beyond OS";
+        const char *heading = page == FILES ? (media_mode ? "Media" : "Files") : page == NOTES ? "Notes" : page == VIEWER ? file_title : "About Home";
         text(title_font, heading, 50, 153, white);
         if (page == FILES) {
+            if (media_mode && entry_count == 0)
+                text(small_font, "Add music or video files to your Media folder to play them here.", 52, 262, muted);
             SDL_Rect clip = {50, 221, 1000, 34};
             SDL_RenderSetClipRect(renderer, &clip);
             text(font, directory, 50, 222, muted);
@@ -316,7 +462,13 @@ static void draw(void)
             for (int i = scroll; i < entry_count && i < scroll+9; i++) {
                 int y = 278 + (i-scroll)*46;
                 box(50, y, 1180, 42, 24, 34, 51);
+#ifdef BIT_EDITION_CYBER
                 text(small_font, entries[i].directory ? "FOLDER" : "FILE", 68, y+13, accent);
+#else
+                text(small_font, entries[i].directory ? "FOLDER" :
+                     (media_mode && media_file(entries[i].name) ? "MEDIA" : "FILE"),
+                     68, y+13, accent);
+#endif
                 text(font, entries[i].name, 173, y+8, white);
             }
         } else if (page == NOTES || page == VIEWER) {
@@ -329,7 +481,7 @@ static void draw(void)
 #ifdef BIT_EDITION_CYBER
             paragraph("BIT OS Cyber Edition 1.0\nDevelopment build: cyber-dev.1\n\nAn independent Linux workspace for authorized assessment, evidence handling and reporting.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2 / Nmap\n\nThe inventory launcher requires a local authorization record and runs a limited TCP connect inventory. Packet capture, browser research, user setup, installation and signed updates are still in development.",
 #else
-            paragraph("Beyond OS Home Edition 1.0\nDevelopment build: home-dev.1\n\nAn independent Linux system, assembled from upstream source.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2\n\nLocal Files and Notes work in this preview. Modern browsing, media,\nuser setup, installation and signed updates are still in development.",
+            paragraph("BIT OS Home 0.1\nDevelopment candidate\n\nAn independent Linux system, assembled from upstream source.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2\n\nHome includes Files, Notes, a WebKit browser, and local media playback.\nHardware support and release validation are still in progress.",
 #endif
                       54, 236, 1150, 365);
 #ifndef _WIN32
@@ -342,8 +494,26 @@ static void draw(void)
 #endif
         }
     }
+#ifdef BIT_EDITION_CYBER
     box(0, 751, W, 49, 12, 18, 30);
     text(small_font, *status ? status : "Beyond Imagination Technology", 50, 768, muted);
+#else
+    glass(0, 740, W, 60, 6, 23, 48, 223);
+    glass(0, 740, W, 2, 177, 225, 255, 146);
+    glass(17, 748, 150, 43, 51, 116, 174, 213);
+    orbit(43, 770, 15);
+    text(small_font, "HOME", 72, 761, white);
+    for (int i = 0; i < 3; i++) {
+        int x = 183 + i * 57;
+        glass(x, 749, 48, 42, 83, 148, 194, 128);
+        text(small_font, i == 0 ? "F" : i == 1 ? "W" : "M", x + 18, 761, white);
+    }
+    SDL_Rect status_clip = {376, 744, 650, 49};
+    SDL_RenderSetClipRect(renderer, &status_clip);
+    text(small_font, *status ? status : "Beyond Imagination Technology", 376, 761, white);
+    SDL_RenderSetClipRect(renderer, NULL);
+    text(small_font, clock, 1055, 761, white);
+#endif
     SDL_RenderPresent(renderer);
 }
 
@@ -403,11 +573,22 @@ int main(int argc, char **argv)
                     if (page != NOTES || !dirty || save_note()) running = false;
                 } else if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
                     int x = event.button.x, y = event.button.y;
-                    if (page != HOME && x>=50 && x<=160 && y>=90 && y<=134) go_home();
+#ifndef BIT_EDITION_CYBER
+                    if (y >= 749 && y < 791 && x >= 183 && x < 345) {
+                        int shortcut = (x - 183) / 57;
+                        if (page != HOME) go_home();
+                        if (page == HOME) activate(shortcut == 0 ? 0 : shortcut == 1 ? 2 : 3);
+                        continue;
+                    }
+#endif
+                    if (page != HOME && ((x>=50 && x<=160 && y>=90 && y<=134) ||
+                                         (x>=17 && x<=167 && y>=748 && y<=791))) go_home();
                     else if (page == HOME) {
-                        for (int i=0; i<4; i++) {
-                            int bx=74+(i%2)*575, by=320+(i/2)*153;
-                            if (x>=bx && x<bx+551 && y>=by && y<by+130) { selected=i; activate(i); break; }
+                        for (int i=0; i<CARD_COUNT; i++) {
+                            int bx, by; card_rect(i, &bx, &by);
+                            if (x>=bx && x<bx+CARD_WIDTH && y>=by && y<by+CARD_HEIGHT) {
+                                selected=i; activate(i); break;
+                            }
                         }
                     } else if (page == FILES) {
                         if (x>=1080 && y>=215 && y<257) {
@@ -431,8 +612,8 @@ int main(int argc, char **argv)
                     SDL_Keycode key=event.key.keysym.sym;
                     if (key == SDLK_ESCAPE) go_home();
                     else if (page == HOME) {
-                        if (key == SDLK_TAB || key == SDLK_RIGHT || key == SDLK_DOWN) selected=(selected+1)%4;
-                        else if (key == SDLK_LEFT || key == SDLK_UP) selected=(selected+3)%4;
+                        if (key == SDLK_TAB || key == SDLK_RIGHT || key == SDLK_DOWN) selected=(selected+1)%CARD_COUNT;
+                        else if (key == SDLK_LEFT || key == SDLK_UP) selected=(selected+CARD_COUNT-1)%CARD_COUNT;
                         else if (key == SDLK_RETURN) activate(selected);
                     } else if (page == VIEWER && key == SDLK_BACKSPACE) { page=FILES; load_directory(); }
                     else if (page == NOTES) {

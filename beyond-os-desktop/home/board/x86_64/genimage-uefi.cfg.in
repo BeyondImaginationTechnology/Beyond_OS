@@ -12,7 +12,7 @@ image efi-part.vfat {
     size = 32M
 }
 
-image bit-os-home-1.0-installer.img {
+image bit-os-home-0.1-installer.img {
     hdimage {
         partition-table-type = "gpt"
     }

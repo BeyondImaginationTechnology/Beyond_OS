@@ -2,7 +2,7 @@
 
 The startup screen uses the orbital gateway already established in
 `assets/images/bos-logo-mark.svg` at the repository root, with Beyond OS Home
-Edition 1.0 typography. `boot.ppm` is the actual RGB framebuffer asset.
+v0.1 typography. `boot.ppm` is the actual RGB framebuffer asset.
 `boot-preview.png` shows it centered on a 1440 × 900 display; it is an artwork
 preview, not evidence of a booted VM. The three dots are decorative, not a
 reported progress value.
@@ -18,6 +18,5 @@ Font binaries are not included. Artwork follows the repository's
 `CONTENT_RIGHTS.md`; source code follows `LICENSE`.
 
 
-`home-preview.png` was captured from the compiled SDL2 desktop running in hidden
-screenshot mode on Windows. It demonstrates the native renderer, not a booted
-Linux image. Temporary development binaries are not included in this folder.
+`home-preview.png` shows the earlier Home prototype. A v0.1 dashboard capture
+will be recorded after the new native shell has compiled and booted in the VM.

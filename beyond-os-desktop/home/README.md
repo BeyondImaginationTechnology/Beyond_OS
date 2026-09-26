@@ -1,4 +1,4 @@
-# Build Beyond OS Home
+# Build BIT OS Home v0.1
 
 This is Beyond OS's own Linux build, with no parent distribution root filesystem.
 Buildroot compiles the toolchain, Linux kernel and selected userspace software
@@ -7,22 +7,26 @@ from upstream sources. The repository supplies the Home product layer.
 ## What exists now
 
 - Pinned Buildroot 2026.02.3 archive and Linux 6.18.7 QEMU configuration.
-- Beyond OS identity, native framebuffer startup artwork, and an SDL2 desktop.
+- Home v0.1 identity, native framebuffer startup artwork, and a desktop
+  dashboard inspired by the translucent panels and taskbar of Windows Vista/7.
 - Files: navigate directories and preview small UTF-8 text files.
 - Notes: one local note in `~/Documents/Home Note.txt`; Ctrl+S saves it.
+- Browser: WebKitGTK MiniBrowser with HTTPS certificates and process sandboxing.
+- Media: open local audio and video files from `~/Media` with FFplay.
 - Terminal: launches xterm as the unprivileged Home user.
 - About: product information and the actual running kernel.
 - QEMU launch script, configuration checks, and release acceptance checklist.
 
-This is development source, not a completed 1.0 release. The first target is a
+This is development source, not a completed release. The first target is a
 QEMU VM. The Files view shows up to 512 non-hidden entries and previews up to
-8 KB of text. Notes supports append/backspace editing of up to 8 KB; it is not
-yet a full text editor. Browser and media cards are deliberately absent until
-working integrations exist.
+8 KB of text. Notes supports append/backspace editing of up to 8 KB. Browser
+and Media launchers are wired to packages in the image, but their runtime
+behavior still requires VM acceptance. The browser is an upstream example app;
+it does not yet provide Home specific bookmarks or account integration.
 
 ## UEFI installer candidate
 
-The UEFI candidate creates `bit-os-home-1.0-installer.img`, a GPT USB image
+The UEFI candidate creates `bit-os-home-0.1-installer.img`, a GPT USB image
 with a FAT EFI partition and an ext4 Home filesystem. It is written to a
 separate USB drive, then booted in UEFI mode. Its menu offers **Try Home** for a
 non-installing live session and **Install Home** for setup. The installer always
@@ -56,17 +60,17 @@ A graphical installer, Secure Boot signing, encryption, update signing, and a
 supported Windows USB-writing application remain release gates; they are not
 claimed as completed by this development source.
 
-The image is not yet boot-tested. Do not write it to a USB drive or use its
-installer on a physical computer until the UEFI QEMU and hardware acceptance
-gates in `RELEASE.md` pass. Its initial filesystem is 2 GB; installation expands
+The Home v0.1 image is not yet boot-tested. Keep installation tests on disposable
+VM disks until the UEFI QEMU and hardware acceptance gates in `RELEASE.md` pass.
+Its initial filesystem is 2 GB; installation expands
 it to fill the explicit target partition.
 
 ## Build host
 
 Use an x86-64 Linux host or VM with a case-sensitive Linux filesystem. Keep the
 checkout and build directory on that filesystem, not a Windows/OneDrive mount.
-Run as a normal user, with approximately 40 GB free disk and 8 GB RAM available
-as a starting allowance. The complete build has not yet been measured.
+Run as a normal user. Allow at least 100 GB of free disk and 16 GB RAM for the
+WebKitGTK build as a starting estimate; the complete build has not been measured.
 
 Install the prerequisites documented by the
 [Buildroot manual](https://buildroot.org/downloads/manual/manual.html#requirement):
@@ -87,7 +91,7 @@ Set `BEYOND_BUILD_DIR=/path/to/linux/build-area` to move generated files outside
 the repository. Output is `out/output/images/` by default:
 
 - `bzImage`: the Linux kernel.
-- `rootfs.ext4`: the complete root filesystem.
+- `rootfs.ext2`: the complete ext4 root filesystem image.
 - `SHA256SUMS`: hashes produced after a successful build.
 - `beyond-home.config`: the resolved build configuration.
 
@@ -123,7 +127,7 @@ On a Linux development machine with SDL2 and SDL2_ttf development libraries:
 
 ```sh
 cc -std=c11 -Wall -Wextra -Werror src/home.c -o /tmp/beyond-home \
-  $(pkg-config --cflags --libs sdl2 SDL2_ttf) -lm
+    $(pkg-config --cflags --libs sdl2 SDL2_ttf) -lm
 BEYOND_FONT=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf /tmp/beyond-home
 ```
 

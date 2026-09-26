@@ -1,6 +1,7 @@
 #!/bin/sh
 # BIT OS Home installer. Installs to a selected partition or a selected whole disk.
 set -eu
+set -o pipefail
 
 efi_guid=c12a7328-f81f-11d2-ba4b-00a0c93ec93b
 linux_guid=0fc63daf-8483-4772-8e79-3d69d8477de4
@@ -9,7 +10,16 @@ fail() { printf '%s\n' "Installer stopped: $*" >&2; exit 1; }
 notice() { printf '%s\n' "$*"; }
 partition_disk() { printf '/dev/%s\n' "$(lsblk -n -o PKNAME "$1" | head -n 1)"; }
 partition_type() { lsblk -n -o TYPE "$1"; }
-unmounted() { ! mountpoint -q "$1"; }
+unmounted() {
+  # A whole-disk target may contain mounted partitions, LVM/dm-crypt
+  # mappings, RAID members, or swap. Check the complete lsblk descendant
+  # tree so none of those devices can be overwritten underneath us.
+  for device in $(lsblk -nrpo NAME "$1"); do
+    findmnt -rn -S "$device" >/dev/null 2>&1 && return 1
+    swapon --show=NAME --noheadings 2>/dev/null | grep -Fxq "$device" && return 1
+  done
+  return 0
+}
 
 [ "$(id -u)" -eq 0 ] || fail "installer must start from the installer boot entry"
 [ -d /sys/firmware/efi ] || fail "UEFI boot is required"
@@ -31,7 +41,7 @@ case "$source_root" in
     ;;
 esac
 
-notice "BIT OS Home Edition 1.0 installer"
+notice "BIT OS Home v0.1 installer"
 notice "Choose where Home will be installed. The installer never chooses a disk automatically."
 notice "\nAvailable block devices:"
 lsblk -o NAME,SIZE,TYPE,FSTYPE,PARTTYPE,MODEL,MOUNTPOINTS
@@ -52,6 +62,10 @@ case "$mode" in
     [ "$target_root" != "$source_root" ] || fail "the installer media cannot be the install target"
     target_disk=$(partition_disk "$target_root")
     [ "$source_kind" = iso ] || [ "$target_disk" != "$source_disk" ] || fail "the installer USB disk cannot be the install target"
+    # BusyBox blkid reports filesystem metadata but not GPT PART_ENTRY_TYPE.
+    # lsblk exposes the kernel's partition type and is already required here.
+    root_type=$(lsblk -n -o PARTTYPE "$target_root" | head -n 1 | tr '[:upper:]' '[:lower:]')
+    [ "$root_type" = "$linux_guid" ] || fail "target must use the Linux filesystem partition type; refusing to overwrite a Windows/basic-data partition"
     unmounted "$target_root" || fail "target partition is mounted"
     [ "$(blockdev --getsize64 "$target_root")" -ge "$source_bytes" ] || fail "target partition is smaller than the Home image"
 
@@ -60,8 +74,9 @@ case "$mode" in
     [ -b "$target_esp" ] || fail "EFI System Partition is not a block device"
     [ "$(partition_type "$target_esp")" = part ] || fail "EFI System Partition must be a partition"
     [ "$(partition_disk "$target_esp")" = "$target_disk" ] || fail "EFI System Partition is not on the target disk"
-    esp_type=$(blkid -s PART_ENTRY_TYPE -o value "$target_esp" || true)
+    esp_type=$(lsblk -n -o PARTTYPE "$target_esp" | head -n 1 | tr '[:upper:]' '[:lower:]')
     [ "$esp_type" = "$efi_guid" ] || fail "chosen partition is not an EFI System Partition"
+    [ "$(blkid -s TYPE -o value "$target_esp" || true)" = vfat ] || fail "EFI System Partition must contain a FAT filesystem"
     unmounted "$target_esp" || fail "EFI System Partition is mounted"
 
     notice "\nThe next step replaces only $target_root and adds a BIT OS Home UEFI entry."
@@ -77,10 +92,14 @@ case "$mode" in
     [ -b "$target_disk" ] || fail "target is not a block device"
     [ "$(partition_type "$target_disk")" = disk ] || fail "choose a whole disk for this installation mode"
     [ "$source_kind" = iso ] || [ "$target_disk" != "$source_disk" ] || fail "the installer USB disk cannot be erased"
-    [ "$(blockdev --getsize64 "$target_disk")" -gt "$source_bytes" ] || fail "disk is too small for Home"
-    for device in $(lsblk -nrpo NAME,TYPE "$target_disk" | awk '$2 == "part" { print $1 }'); do
-      unmounted "$device" || fail "refusing to erase mounted partition $device"
-    done
+    # The layout consumes a 512 MiB EFI partition in addition to the image,
+    # plus a small alignment margin. Validate the complete footprint before
+    # any wipe operation; the old check could erase a disk and only then
+    # discover that the root partition could not hold the image.
+    layout_overhead=$((512 * 1024 * 1024 + 4 * 1024 * 1024))
+    required_bytes=$((source_bytes + layout_overhead))
+    [ "$(blockdev --getsize64 "$target_disk")" -ge "$required_bytes" ] || fail "disk is too small for the Home image and EFI layout"
+    unmounted "$target_disk" || fail "refusing to erase a disk with mounted or active descendant devices"
     printf 'Type exactly: ERASE %s\n> ' "$target_disk"
     IFS= read -r confirmation
     [ "$confirmation" = "ERASE $target_disk" ] || fail "confirmation did not match"
@@ -103,45 +122,57 @@ esac
 notice "Making the installer root read-only and copying the Home filesystem..."
 mount -o remount,ro / || fail "could not protect the source filesystem"
 if [ "$source_kind" = usb ]; then
-  dd if="$source_root" of="$target_root" bs=16M conv=fsync status=progress
+  # BusyBox dd in the installer does not implement GNU dd's status=progress.
+  dd if="$source_root" of="$target_root" bs=16M conv=fsync
   e2fsck -pf "$target_root" || [ "$?" -eq 1 ] || fail "filesystem check failed"
   resize2fs "$target_root"
 else
   mkfs.ext4 -F -L BEYOND_HOME "$target_root"
-  install -d /mnt/bit-target-root
-  mount "$target_root" /mnt/bit-target-root
-  tar -C / --one-file-system --exclude=./dev --exclude=./proc --exclude=./sys \
-    --exclude=./run --exclude=./tmp --exclude=./mnt --exclude=./media --exclude=./var -cpf - . |
-    tar -C /mnt/bit-target-root -xpf -
-  install -d -m 0755 /mnt/bit-target-root/var/cache /mnt/bit-target-root/var/lib /mnt/bit-target-root/var/log
-  install -d -m 1777 /mnt/bit-target-root/var/tmp
+  install -d /tmp/bit-target-root /tmp/bit-source-root
+  mount "$target_root" /tmp/bit-target-root
+  # A second read-only mount exposes the pristine ISO tree without the live
+  # system's devtmpfs/tmpfs mounts. Preserve its empty mount points and symlinks.
+  mount -t iso9660 -o ro "$source_root" /tmp/bit-source-root
+  tar -C /tmp/bit-source-root -cpf - . |
+    tar -C /tmp/bit-target-root -xpf -
+  umount /tmp/bit-source-root
   sync
-  umount /mnt/bit-target-root
+  umount /tmp/bit-target-root
 fi
 
 target_uuid=$(blkid -s PARTUUID -o value "$target_root" || true)
 [ -n "$target_uuid" ] || fail "could not read target partition UUID"
-install -d /mnt/bit-target-esp
+install -d /tmp/bit-target-esp
 if [ "$target_esp_new" = true ]; then
   mkfs.vfat -F 32 -n BITOS_EFI "$target_esp"
 fi
-mount "$target_esp" /mnt/bit-target-esp
-install -d /mnt/bit-target-esp/EFI/BITOS
+mount "$target_esp" /tmp/bit-target-esp
+install -d /tmp/bit-target-esp/EFI/BITOS
 if [ "$source_kind" = usb ]; then
   source_esp=$(lsblk -nrpo NAME,PARTTYPE "$source_disk" | awk -v type="$efi_guid" 'tolower($2) == type { print $1; exit }')
   [ -n "$source_esp" ] && [ -b "$source_esp" ] || fail "could not locate the installer EFI partition"
-  install -d /mnt/bit-source-esp
-  mount -o ro "$source_esp" /mnt/bit-source-esp
-  cp /mnt/bit-source-esp/EFI/BOOT/bootx64.efi /mnt/bit-target-esp/EFI/BITOS/bootx64.efi
-  umount /mnt/bit-source-esp
+  install -d /tmp/bit-source-esp
+  mount -o ro "$source_esp" /tmp/bit-source-esp
+  cp /tmp/bit-source-esp/EFI/BOOT/bootx64.efi /tmp/bit-target-esp/EFI/BITOS/bootx64.efi
+  cp /tmp/bit-source-esp/bzImage /tmp/bit-target-esp/EFI/BITOS/bzImage
+  umount /tmp/bit-source-esp
 else
-  mcopy -o -i /boot/fat.efi ::EFI/BOOT/bootx64.efi /mnt/bit-target-esp/EFI/BITOS/bootx64.efi
+  rm -f /tmp/bit-home-bootx64.efi
+  mcopy -i /boot/fat.efi ::EFI/BOOT/bootx64.efi /tmp/bit-home-bootx64.efi
+  cp /tmp/bit-home-bootx64.efi /tmp/bit-target-esp/EFI/BITOS/bootx64.efi
+  cp /boot/bzImage /tmp/bit-target-esp/EFI/BITOS/bzImage
 fi
-sed "s/%PARTUUID%/$target_uuid/g" /usr/share/beyond-home/grub.cfg.in > /mnt/bit-target-esp/EFI/BITOS/grub.cfg
+sed "s/%PARTUUID%/$target_uuid/g" /usr/share/beyond-home/grub-installed.cfg.in > /tmp/bit-target-esp/EFI/BITOS/grub.cfg
 sync
-umount /mnt/bit-target-esp
+umount /tmp/bit-target-esp
 
 esp_number=$(lsblk -n -o PARTN "$target_esp")
-efibootmgr -c -d "$target_disk" -p "$esp_number" -L "BIT OS Home" -l '\\EFI\\BITOS\\bootx64.efi'
+# Buildroot does not mount efivarfs automatically. efibootmgr needs it in
+# order to persist the BIT OS entry in UEFI NVRAM.
+efi_vars=/sys/firmware/efi/efivars
+if ! grep -qs " $efi_vars efivarfs " /proc/mounts; then
+  mount -t efivarfs efivarfs "$efi_vars" || fail "could not mount UEFI variable storage"
+fi
+efibootmgr -c -d "$target_disk" -p "$esp_number" -L "BIT OS Home" -l '\EFI\BITOS\bootx64.efi'
 notice "Installation completed. Remove the USB and choose BIT OS Home from UEFI boot options."
 exec /sbin/reboot -f

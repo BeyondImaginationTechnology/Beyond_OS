@@ -1,11 +1,13 @@
 (()=>{
-  const defaults={theme:'fall',reduceMotion:false};
+  const defaults={theme:'seasonal',reduceMotion:false};
   let stored={};
   try{const parsed=JSON.parse(localStorage.getItem('dailybreath.settings')||'{}');if(parsed&&typeof parsed==='object')stored=parsed}catch(error){localStorage.removeItem('dailybreath.settings')}
   const settings={...defaults,...stored};
   const requestedTheme=settings.theme||'system';
   const normalizedTheme=requestedTheme==='light'?'dawn':requestedTheme==='dark'?'dusk':requestedTheme==='lilac'?'dawn':requestedTheme;
-  const resolvedTheme=normalizedTheme==='system'
+  const date=new Date(),month=date.getMonth()+1;
+  const seasonalTheme=month>=9&&month<=11?'fall':month===12||month<=2?'dusk':'dawn';
+  const resolvedTheme=normalizedTheme==='seasonal'?seasonalTheme:normalizedTheme==='system'
     ? (matchMedia('(prefers-color-scheme: dark)').matches?'dusk':'dawn')
     : normalizedTheme;
   document.documentElement.dataset.dbTheme=['dawn','dusk','fall'].includes(resolvedTheme)?resolvedTheme:'dawn';

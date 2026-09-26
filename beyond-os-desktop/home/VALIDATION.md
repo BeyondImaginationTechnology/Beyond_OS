@@ -1,4 +1,16 @@
-# Validation — 2026-09-05
+# Home v0.1 validation — 2026-09-25
+
+Status: **source implementation in progress; no Home v0.1 image has been built or booted.**
+The record below describes the earlier Home 1.0 prototype and does not validate
+this v0.1 configuration.
+
+Home v0.1 adds the dashboard, WebKitGTK MiniBrowser, FFplay media launcher and
+audio device configuration. It also ports the Core v0.2 X.Org, session startup
+and UEFI installation fixes. The first required check is Buildroot defconfig
+resolution on the Linux VM, followed by a clean build and the VM gates in
+`RELEASE.md`. No Home v0.1 download or hardware installer is ready.
+
+## Historical prototype record — 2026-09-05
 
 Status: **installer candidate built; UEFI firmware boot path verified.**
 

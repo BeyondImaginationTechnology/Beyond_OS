@@ -10,6 +10,8 @@ $signedIn = !empty($_SESSION['user_id']);
 $displayName = trim((string)($_SESSION['first_name'] ?? $_SESSION['name'] ?? ''));
 $csrf = csrf_token();
 $jaguarModes = jaguar_mode_catalog();
+$scriptDirectory = str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/chat.php')));
+$appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim($scriptDirectory, '/');
 ?>
 <!doctype html>
 <html lang="en"><head>
@@ -33,7 +35,7 @@ $jaguarModes = jaguar_mode_catalog();
 </style>
 </head><body>
 <div class="shell"><aside class="sidebar"><a class="brand" href="/"><img class="brand-mark-image" src="assets/jaguar-eye-v0.2.png" alt="Jaguar eye logo"><span><strong>JAGUAR</strong><small>V0.3 · BEYOND AI</small></span></a><button class="new-chat" id="newChat" type="button">＋ New conversation</button><div class="sidebar-note"><b>Guest chat</b>Conversation history is not saved in this preview. A quick security check protects guest requests.</div><nav class="side-links"><a href="https://beyondimagination.co.technology/ai/">About Jaguar</a><a href="https://beyondimagination.co.technology/release-notes.php#jaguar">Build progress</a><a href="https://beyondimagination.co.technology/">Beyond Imagination</a></nav></aside>
-<section class="workspace"><header class="topbar"><div class="model-name"><i class="status"></i> Llama Jaguar · v0.3 Preview</div><div class="account"><?php if ($signedIn): ?><?=e($displayName !== '' ? $displayName : 'Beyond ID')?> · signed in<?php else: ?><a href="https://beyondimagination.co.technology/beyond-id/auth/login.php?return=%2Fai%2Fchat.php">Sign in with Beyond ID</a><?php endif; ?></div></header>
+<section class="workspace"><header class="topbar"><div class="model-name"><i class="status"></i> Llama Jaguar · v0.3 Preview</div><div class="account"><?php if ($signedIn): ?><?=e($displayName !== '' ? $displayName : 'Beyond ID')?> · signed in<?php if (in_array(strtolower((string)($_SESSION['role'] ?? '')), ['admin', 'super_admin'], true)): ?> · <a href="code.php">Code Thinking</a><?php endif; ?><?php else: ?><a href="https://beyondimagination.co.technology/beyond-id/auth/login.php?return=%2Fai%2Fchat.php">Sign in with Beyond ID</a><?php endif; ?></div></header>
 <main class="chat"><div class="messages" id="messages" tabindex="0" role="log" aria-live="polite" aria-label="Conversation"></div><div class="message-tools" aria-label="Conversation navigation"><button id="jumpOldest" type="button" aria-label="Jump to oldest message">↑ Oldest</button><button id="jumpNewest" type="button" aria-label="Jump to newest message">↓ Newest</button></div><div class="composer-wrap"><div class="mode-picker"><label for="modeSelect">Jaguar mode</label><select id="modeSelect" aria-label="Jaguar mode"><?php foreach ($jaguarModes as $modeKey => $modeDefinition): ?><option value="<?=e($modeKey)?>" <?=jaguar_mode_is_enabled($modeKey) ? '' : 'disabled'?>><?=e($modeDefinition['label'])?><?=jaguar_mode_is_enabled($modeKey) ? ($modeDefinition['status'] === 'preview' ? ' · preview' : '') : ' · locked'?></option><?php endforeach; ?></select><span class="mode-status" id="modeStatus">Explain is live · fast lane only</span></div><form class="composer" id="composer"><textarea id="prompt" rows="1" maxlength="8000" placeholder="Message Jaguar…" aria-label="Message Jaguar" required></textarea><button class="send" id="send" type="submit" aria-label="Send message">↑</button></form><p class="fine" id="finePrint">Jaguar can make mistakes. Check important information. Weather and place lookups use Open-Meteo.</p></div></main></section></div>
 <div class="gate" id="languageGate" role="dialog" aria-modal="true" aria-labelledby="languageTitle"><div class="gate-card"><img class="brand-mark-image" src="assets/jaguar-eye-v0.2.png" alt="" style="width:58px;height:58px;margin:auto"><h2 id="languageTitle">Choose your language</h2><p>Choose your language · Choisissez votre langue · Elige tu idioma</p><div class="language-options"><button type="button" data-language="en">English</button><button type="button" data-language="fr">Français</button><button type="button" data-language="es">Español</button></div></div></div>
 <?php if (!$signedIn): ?><div class="gate" id="verificationGate" hidden role="dialog" aria-modal="true" aria-labelledby="verificationTitle"><div class="gate-card"><h2 id="verificationTitle">One quick check</h2><p id="verificationCopy">Verify that you are human, then Jaguar will send your message.</p><div class="turnstile-slot" id="turnstileWidget"></div><div class="verification-error" id="verificationError"></div><button class="gate-cancel" id="verificationCancel" type="button">Cancel</button></div></div><?php endif; ?>
@@ -41,6 +43,7 @@ $jaguarModes = jaguar_mode_catalog();
 (() => {
     const signedIn = <?=json_encode($signedIn)?>;
     const csrf = <?=json_encode($csrf)?>;
+    const appBasePath = <?=json_encode($appBasePath, JSON_UNESCAPED_SLASHES)?>;
     const form = document.getElementById('composer');
     const input = document.getElementById('prompt');
     const send = document.getElementById('send');
@@ -173,8 +176,14 @@ $jaguarModes = jaguar_mode_catalog();
         verificationError.textContent = 'Completing local security check…';
         verificationGate.hidden = false;
         try {
-            const response = await fetch('/ai/api/challenge.php?v=20260921-1', {credentials: 'same-origin', cache: 'no-store'});
-            const data = await response.json();
+            const response = await fetch(`${appBasePath}/api/challenge.php?v=20260926-1`, {credentials: 'same-origin', cache: 'no-store'});
+            const responseText = await response.text();
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (error) {
+                throw new Error(`The guest security check returned an unexpected ${response.status} response. Refresh the page and try again.`);
+            }
             if (!response.ok || !data.challenge) throw new Error(data.error || 'The local security check is unavailable.');
             guestProof = await solveProofOfWork(data.challenge, data.difficulty);
             verificationGate.hidden = true;
@@ -216,7 +225,7 @@ $jaguarModes = jaguar_mode_catalog();
                 cache: 'no-store',
                 signal: controller.signal
             };
-            const response = await fetch('/ai/api/chat.php?v=20260921-1', {...requestOptions, credentials: 'same-origin'});
+            const response = await fetch(`${appBasePath}/api/chat.php?v=20260926-1`, {...requestOptions, credentials: 'same-origin'});
             updateNonceFromResponse(response);
             const responseText = await response.text();
             let data;
@@ -324,8 +333,6 @@ $jaguarModes = jaguar_mode_catalog();
     if (restoredDraft) { input.value = restoredDraft; sessionStorage.removeItem('jaguar_draft'); input.focus(); }
 })();
 </script></body></html>
-
-
 
 
 

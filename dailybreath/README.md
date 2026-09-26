@@ -6,6 +6,14 @@ Daily Breath is an installable Beyond OS progressive web app for matched daily B
 
 Daily Breath has product-specific legal pages at `/dailybreath/privacy.php`, `/dailybreath/terms.php`, and `/dailybreath/data-controls.php`. Keep these documents, native store disclosures, and actual data handling synchronized whenever a feature changes.
 
+## Web 2.3 daily content
+
+The admin-only daily content editor is at `/dailybreath/admin/daily-content.php` and uses the existing DAILYBREATH_ADMIN_PASSWORD session. Editors can save a Bible, Tanakh, or Quran reading as a draft, preview desktop and mobile cards, listen to a browser speech preview, and review podcast details and social captions. Only the explicit **Approve & publish** action makes a reading public. AI tools are not called from this feature; keep any provider keys server-side and never paste them into browser code.
+
+Published readings appear on the home page and have a clean public page at `/dailybreath/daily.php`. That page keeps the passage available as selectable HTML, supports share and listen actions, and can download a PNG share card. Browser speech preview is not an MP3 export; attach a reviewed audio file before adding a new enclosure to the podcast feed.
+
+The `dailybreath_daily_content` table is created defensively by the web app when first needed. The MySQL schema is also available in `../sql/dailybreath_web_2_3.sql`. A visitor with no saved theme follows the seasonal setting; a saved theme is preserved. The seasonal palette is Fall from September through November, Forest Dark from December through February, and Forest Light from March through August. The Bible, Tanakh, and Quran artwork previews in Settings select the matching tradition and enable the optional scripture artwork.
+
 ## Install
 
 Open `/dailybreath/` from the Beyond OS App Store. In a supported browser, use the **Install Daily Breath** prompt or the browser’s “Add to Home Screen” command. The installed app launches in its own standalone window and includes shortcuts for Today, Scripture, Breathe, Journal, and Weekly Challenge.

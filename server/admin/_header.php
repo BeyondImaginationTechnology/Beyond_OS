@@ -52,7 +52,7 @@ $studioGroups = [
     <div class="brand"><div class="logo"><?= $isStudio ? 'BS' : 'BI' ?></div><div><strong><?= $isStudio ? 'Beyond Studio' : 'Beyond Imagination' ?></strong><div class="muted"><?= $isStudio ? 'Content workspace' : 'Admin workspace' ?></div></div></div>
     <?php if ($isStudio): ?>
       <nav class="nav studio-nav" aria-label="Beyond Studio navigation">
-        <?php $homeActive = rtrim($currentPath, '/') === '/server/admin/daily-studio'; ?>
+        <?php $homeActive = in_array(rtrim($currentPath, '/'), ['/server/admin/daily-studio', '/server/admin/daily-studio/index.php'], true); ?>
         <a class="studio-home-link<?= $homeActive ? ' active' : '' ?>" href="/server/admin/daily-studio/"<?= $homeActive ? ' aria-current="page"' : '' ?>><span class="studio-nav-icon" aria-hidden="true">⌂</span><span>Studio Home</span></a>
         <?php foreach ($studioGroups as $groupLabel => $links):
           $groupActive = false;
@@ -65,7 +65,7 @@ $studioGroups = [
           </div></details>
         <?php endforeach; ?>
       </nav>
-      <div class="studio-sidebar-foot"><a class="studio-admin-link" href="/beyond-id/admin/index.php">← Beyond ID Admin</a><a class="studio-logout-link" href="/beyond-id/auth/logout.php">Log out</a></div>
+      <div class="studio-sidebar-foot"><a class="studio-admin-link" href="/beyond-id/admin/overview.php">System overview</a><a class="studio-logout-link" href="/beyond-id/auth/logout.php">Log out</a></div>
     <?php else: ?>
       <nav class="nav"><a href="/server/admin/dashboard.php">Dashboard</a><a href="/server/admin/users.php">Users</a><a href="/server/admin/catering.php">Beyond Catering</a><a href="/server/admin/dailybreath.php">DailyBreath</a><a href="/server/admin/daily-studio/">Beyond Studio</a><a href="/server/admin/analytics.php">Analytics</a><a href="/server/admin/settings.php">Settings</a><a href="/server/admin/change-password.php">Change Password</a><a href="/beyond-id/auth/logout.php">Logout</a></nav>
     <?php endif; ?>

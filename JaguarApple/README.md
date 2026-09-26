@@ -1,6 +1,13 @@
 # Beyond-1 for iOS
 
-Native SwiftUI app powered by the Beyond-1 v0.3 Preview service.
+Native SwiftUI app powered by the Beyond-1 v0.4 Preview service.
+
+## v0.4
+
+- Explain and public Build mode selection, saved independently per conversation.
+- Build starters for feature design, architecture planning, and implementation tradeoffs.
+- Build guidance stays text-only and cannot inspect or modify repositories.
+- Existing local conversations without a saved mode continue in Explain.
 
 ## v0.2
 
@@ -13,7 +20,7 @@ Native SwiftUI app powered by the Beyond-1 v0.3 Preview service.
 ## First release scope
 
 - Beyond ID sign-in with ASWebAuthenticationSession, PKCE, and Keychain storage
-- Explain mode chat through the existing Jaguar API
+- Explain and Build mode chat through the existing Jaguar API
 - English, French, and Spanish requests
 - Local conversation history and new conversation controls
 - Visible thinking stage and elapsed time

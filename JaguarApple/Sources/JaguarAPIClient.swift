@@ -22,9 +22,9 @@ struct JaguarAPIClient: Sendable {
     static let live = JaguarAPIClient(endpoint: URL(string: "https://beyondimagination.co.technology/ai/api/chat.php")!)
     let endpoint: URL
 
-    func send(messages: [JaguarMessage], language: JaguarLanguage, accessToken: String) async throws -> JaguarChatResponse {
+    func send(messages: [JaguarMessage], language: JaguarLanguage, mode: JaguarMode = .explain, accessToken: String) async throws -> JaguarChatResponse {
         let payload = JaguarChatRequest(
-            mode: "core",
+            mode: mode.rawValue,
             language: language.rawValue,
             messages: messages.suffix(24).map { JaguarWireMessage(role: $0.role.rawValue, content: $0.content) }
         )
@@ -60,7 +60,7 @@ struct JaguarAPIClient: Sendable {
         }
     }
 
-    func sendDemo(messages: [JaguarMessage], language: JaguarLanguage) async -> JaguarChatResponse {
+    func sendDemo(messages: [JaguarMessage], language: JaguarLanguage, mode: JaguarMode = .explain) async -> JaguarChatResponse {
         let latest = messages.last(where: { $0.role == .user })?.content ?? "your question"
         let languageNote: String
         switch language {
@@ -71,8 +71,10 @@ struct JaguarAPIClient: Sendable {
         return JaguarChatResponse(
             model: "jaguar-reviewer-demo",
             adapter: "local",
-            mode: "core",
-            message: "Demo response for: \"\(latest)\"\n\nBeyond-1 can explain an idea, shape a plan, and break down a difficult topic into plain language. Try changing the language menu, starting a new conversation, and reopening this conversation from the list.\n\n\(languageNote)"
+            mode: mode.rawValue,
+            message: mode == .build
+                ? "Demo response for: \"\(latest)\"\n\nBuild can help shape software ideas, compare designs, and plan implementation steps. This public mode does not inspect or modify repositories, and it does not generate images or video.\n\n\(languageNote)"
+                : "Demo response for: \"\(latest)\"\n\nBeyond-1 can explain an idea, shape a plan, and break down a difficult topic into plain language. Try changing the mode or language, starting a new conversation, and reopening this conversation from the list.\n\n\(languageNote)"
         )
     }
 }

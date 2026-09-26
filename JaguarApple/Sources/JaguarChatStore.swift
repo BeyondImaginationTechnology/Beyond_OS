@@ -57,6 +57,10 @@ final class JaguarChatStore: ObservableObject {
         updateSelected { $0.language = language }
     }
 
+    func setMode(_ mode: JaguarMode) {
+        updateSelected { $0.mode = mode }
+    }
+
     func send(accessToken: String) async -> Bool {
         let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty, !isThinking, let selectedID else { return false }
@@ -72,7 +76,7 @@ final class JaguarChatStore: ObservableObject {
         guard let conversation = conversations.first(where: { $0.id == selectedID }) else { return false }
         startThinking()
         do {
-            let response = try await client.send(messages: conversation.messages, language: conversation.language, accessToken: accessToken)
+            let response = try await client.send(messages: conversation.messages, language: conversation.language, mode: conversation.mode, accessToken: accessToken)
             update(id: selectedID) { $0.messages.append(JaguarMessage(role: .assistant, content: response.message)) }
             stopThinking()
             return true
@@ -95,7 +99,7 @@ final class JaguarChatStore: ObservableObject {
         }
         guard let conversation = conversations.first(where: { $0.id == selectedID }) else { return false }
         startThinking()
-        let response = await client.sendDemo(messages: conversation.messages, language: conversation.language)
+        let response = await client.sendDemo(messages: conversation.messages, language: conversation.language, mode: conversation.mode)
         update(id: selectedID) { $0.messages.append(JaguarMessage(role: .assistant, content: response.message)) }
         stopThinking()
         return true

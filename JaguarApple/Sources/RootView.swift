@@ -176,12 +176,27 @@ private struct JaguarChatView: View {
                 Text("Beyond-1").font(.headline)
                 HStack(spacing: 5) {
                     Circle().fill(JaguarTheme.mint).frame(width: 7, height: 7)
-                    Text("v0.2 · Explain preview")
+                    Text("v0.4 · Preview")
                 }
                 .font(.caption)
                 .foregroundStyle(JaguarTheme.secondaryText)
             }
             Spacer()
+            Menu {
+                ForEach(JaguarMode.allCases) { mode in
+                    Button { store.setMode(mode) } label: {
+                        if mode == conversation?.mode { Label(mode.title, systemImage: "checkmark") }
+                        else { Label(mode.title, systemImage: mode.icon) }
+                    }
+                }
+            } label: {
+                Label(conversation?.mode.title ?? JaguarMode.explain.title, systemImage: conversation?.mode.icon ?? JaguarMode.explain.icon)
+                    .font(.subheadline.weight(.semibold))
+                    .padding(.horizontal, 12)
+                    .frame(height: 38)
+                    .background(JaguarTheme.panelRaised, in: Capsule())
+            }
+            .accessibilityLabel("Thinking mode")
             Menu {
                 ForEach(JaguarLanguage.allCases) { language in
                     Button { store.setLanguage(language) } label: {
@@ -209,12 +224,14 @@ private struct JaguarChatView: View {
                 Text("Start somewhere good.")
                     .font(.system(size: 36, weight: .black, design: .rounded))
                     .multilineTextAlignment(.center)
-                Text("Choose a starting point, then make it yours. Beyond-1 is ready to explain, shape, and clarify.")
+                Text((conversation?.mode ?? .explain) == .build
+                     ? "Shape a software idea, explore a design, or plan a build. This public mode offers guidance without repository access."
+                     : "Choose a starting point, then make it yours. Beyond-1 is ready to explain, shape, and clarify.")
                     .font(.title3)
                     .foregroundStyle(JaguarTheme.secondaryText)
                     .multilineTextAlignment(.center)
                 VStack(spacing: 10) {
-                    ForEach(JaguarStarter.allCases) { starter in
+                    ForEach(JaguarStarter.visible(for: conversation?.mode ?? .explain)) { starter in
                     Button {
                         store.draft = starter.prompt
                         Task { await send() }
@@ -324,7 +341,7 @@ private struct JaguarChatView: View {
                 .disabled(store.isThinking || store.draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 .accessibilityLabel("Send message")
             }
-            Text("Explain is the live fast lane. Beyond-1 can make mistakes; check important information.")
+            Text((conversation?.mode ?? .explain).guidance)
                 .font(.caption2)
                 .foregroundStyle(JaguarTheme.secondaryText)
                 .multilineTextAlignment(.center)
@@ -354,14 +371,24 @@ private enum JaguarStarter: String, CaseIterable, Identifiable {
     case explain
     case plan
     case learn
+    case buildFeature
+    case buildArchitecture
+    case buildTradeoff
 
     var id: String { rawValue }
+
+    static func visible(for mode: JaguarMode) -> [JaguarStarter] {
+        mode == .build ? [.buildFeature, .buildArchitecture, .buildTradeoff] : [.explain, .plan, .learn]
+    }
 
     var title: String {
         switch self {
         case .explain: "Explain an idea"
         case .plan: "Shape a plan"
         case .learn: "Learn it simply"
+        case .buildFeature: "Design a feature"
+        case .buildArchitecture: "Plan an architecture"
+        case .buildTradeoff: "Compare approaches"
         }
     }
 
@@ -370,6 +397,9 @@ private enum JaguarStarter: String, CaseIterable, Identifiable {
         case .explain: "Use a memorable analogy and plain language."
         case .plan: "Turn a rough thought into clear next steps."
         case .learn: "Break a difficult topic into manageable pieces."
+        case .buildFeature: "Clarify users, behavior, and edge cases."
+        case .buildArchitecture: "Break a project into components and steps."
+        case .buildTradeoff: "Weigh options, constraints, and risks."
         }
     }
 
@@ -378,6 +408,9 @@ private enum JaguarStarter: String, CaseIterable, Identifiable {
         case .explain: "sparkles"
         case .plan: "point.3.connected.trianglepath.dotted"
         case .learn: "graduationcap.fill"
+        case .buildFeature: "square.stack.3d.up"
+        case .buildArchitecture: "shippingbox"
+        case .buildTradeoff: "arrow.left.arrow.right"
         }
     }
 
@@ -386,6 +419,9 @@ private enum JaguarStarter: String, CaseIterable, Identifiable {
         case .explain: "Explain AI tokens with a memorable analogy."
         case .plan: "Help me turn a rough idea into a clear project plan."
         case .learn: "Teach me something difficult in plain language."
+        case .buildFeature: "Help me design a useful feature for a software project. Ask clarifying questions where the requirements are ambiguous."
+        case .buildArchitecture: "Help me sketch an architecture for a small software project. State assumptions, key components, risks, and verification ideas."
+        case .buildTradeoff: "Compare two implementation approaches for a software feature. Explain tradeoffs and what information would change the recommendation."
         }
     }
 }
@@ -444,7 +480,8 @@ private struct JaguarAccountView: View {
                 }
                 Section("About") {
                     LabeledContent("App", value: "Beyond-1")
-                    LabeledContent("Version", value: "0.2 (Explain preview)")
+                    LabeledContent("Version", value: "0.4 (Explain + Build preview)")
+                    Text("Build is for public software brainstorming, design, and coding guidance. It has no repository or patch access and does not generate images or video.")
                     Text("Conversation history stays on this device. Messages are sent to Beyond-1 when you ask a question.")
                 }
             }

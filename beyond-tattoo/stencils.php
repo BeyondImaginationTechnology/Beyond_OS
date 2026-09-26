@@ -26,7 +26,10 @@ function bt_stencil_preview_assets(string $collectionSlug, int $collectionIndex,
     $uploadedFolder = sprintf('uploads/stencil-library/%s/%s', $collectionSlug, $folderName);
     $asset = static function (string $file) use ($bundledFolder, $uploadedFolder): string {
         $candidates = [$file];
-        if (str_ends_with($file, '.png') || str_ends_with($file, '.webp')) $candidates[] = substr($file, 0, -4) . '.jpg';
+        if (str_ends_with($file, '.png') || str_ends_with($file, '.webp')) {
+            $extensionPosition = strrpos($file, '.');
+            if ($extensionPosition !== false) $candidates[] = substr($file, 0, $extensionPosition) . '.jpg';
+        }
         foreach ($candidates as $candidate) {
             if (is_file(__DIR__ . '/' . $uploadedFolder . '/' . $candidate)) return $uploadedFolder . '/' . $candidate;
             if (is_file(__DIR__ . '/' . $bundledFolder . '/' . $candidate)) return $bundledFolder . '/' . $candidate;

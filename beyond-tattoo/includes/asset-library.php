@@ -15,7 +15,10 @@ function bt_asset_library_file(string $uploadedFolder, string $bundledFolder, st
     $root = dirname(__DIR__);
     foreach ([$uploadedFolder, $bundledFolder] as $folder) {
         $candidates = [$file];
-        if (str_ends_with($file, '.png') || str_ends_with($file, '.webp')) $candidates[] = substr($file, 0, -4) . '.jpg';
+        if (str_ends_with($file, '.png') || str_ends_with($file, '.webp')) {
+            $extensionPosition = strrpos($file, '.');
+            if ($extensionPosition !== false) $candidates[] = substr($file, 0, $extensionPosition) . '.jpg';
+        }
         foreach ($candidates as $candidate) {
             $relative = $folder . '/' . $candidate;
             if (is_file($root . '/' . $relative)) return ['path' => $root . '/' . $relative, 'url' => $relative, 'file' => $candidate];
@@ -60,11 +63,12 @@ function bt_asset_library(): array
             $transfer = bt_asset_library_file($uploadedFolder, $bundledFolder, 'studio-transfer-template.png');
             $pdf = bt_asset_library_file($uploadedFolder, $bundledFolder, 'stencil-print-ready.pdf');
             $reference = bt_asset_library_file($uploadedFolder, $bundledFolder, 'reference-artwork.webp');
+            $detail = bt_asset_library_file($uploadedFolder, $bundledFolder, 'detail-artwork.webp');
             $placementImage = bt_asset_library_file($uploadedFolder, $bundledFolder, 'placement-mockup.webp');
             $pack = bt_asset_library_file($uploadedFolder, $bundledFolder, 'premium-packaging.webp');
             $lore = bt_asset_library_file($uploadedFolder, $bundledFolder, 'lore-card.webp');
             $styleCard = bt_asset_library_file($uploadedFolder, $bundledFolder, 'style-card.webp');
-            $updated = max(array_map(static fn(array $asset): int => (int)filemtime($asset['path']), array_filter([$preview, $stencil, $outline, $transfer, $pdf, $reference, $placementImage, $pack, $lore, $styleCard])));
+            $updated = max(array_map(static fn(array $asset): int => (int)filemtime($asset['path']), array_filter([$preview, $stencil, $outline, $transfer, $pdf, $reference, $detail, $placementImage, $pack, $lore, $styleCard])));
             $description = trim((string)($metadata['description'] ?? ''));
             if ($description === '') $description = $collection['description'];
             $assets[] = [
@@ -92,12 +96,13 @@ function bt_asset_library(): array
                 'transfer_png_url' => $transfer['url'] ?? '',
                 'transfer_pdf_url' => $pdf['url'] ?? '',
                 'reference_image_url' => $reference['url'] ?? '',
+                'detail_image_url' => $detail['url'] ?? '',
                 'placement_image_url' => $placementImage['url'] ?? '',
                 'pack_image_url' => $pack['url'] ?? $preview['url'],
                 'lore_card_url' => $lore['url'] ?? '',
                 'style_card_url' => $styleCard['url'] ?? '',
                 'updated_at' => gmdate('c', $updated),
-                'files' => array_values(array_filter([$preview, $printMaster, $outline, $transfer, $pdf, $reference, $placementImage, $pack, $lore, $styleCard])),
+                'files' => array_values(array_filter([$preview, $printMaster, $outline, $transfer, $pdf, $reference, $detail, $placementImage, $pack, $lore, $styleCard])),
             ];
         }
     }

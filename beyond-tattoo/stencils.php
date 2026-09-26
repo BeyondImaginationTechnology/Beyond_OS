@@ -50,6 +50,7 @@ function bt_stencil_preview_assets(string $collectionSlug, int $collectionIndex,
         'print_pdf' => $asset('stencil-print-ready.pdf'),
         'transfer' => $asset('studio-transfer-template.png'),
         'reference' => $asset('reference-artwork.webp'),
+        'detail' => $asset('detail-artwork.webp'),
         'placement' => $asset('placement-mockup.webp'),
         'pack' => $asset('premium-packaging.webp'),
         'lore' => $asset('lore-card.webp'),
@@ -239,6 +240,7 @@ foreach ($collections as $collectionSlug => $collection) {
       data-stencil-outline="<?= is_file(__DIR__ . '/' . $assets['outline_png']) ? e($assets['outline_png']) : '' ?>"
       data-stencil-pdf="<?= is_file(__DIR__ . '/' . $assets['print_pdf']) ? e($assets['print_pdf']) : '' ?>"
       data-stencil-reference="<?= is_file(__DIR__ . '/' . $assets['reference']) ? e($assets['reference']) : '' ?>"
+      data-stencil-detail="<?= is_file(__DIR__ . '/' . $assets['detail']) ? e($assets['detail']) : '' ?>"
       data-stencil-placement="<?= is_file(__DIR__ . '/' . $assets['placement']) ? e($assets['placement']) : '' ?>"
       data-stencil-pack="<?= is_file(__DIR__ . '/' . $assets['pack']) ? e($assets['pack']) : '' ?>"
       data-stencil-lore="<?= is_file(__DIR__ . '/' . $assets['lore']) ? e($assets['lore']) : '' ?>"
@@ -288,6 +290,7 @@ foreach ($collections as $collectionSlug => $collection) {
         <a class="bt-glow-button" href="#" download data-stencil-viewer-zip hidden>↓ Download all assets (ZIP)</a>
         <a class="bt-outline-button" href="#" download data-stencil-viewer-pdf hidden>↓ Download printable PDF</a>
         <a class="bt-outline-button" href="#" download data-stencil-viewer-reference hidden>↓ Download reference artwork</a>
+        <a class="bt-outline-button" href="#" download data-stencil-viewer-detail hidden>↓ Download detail artwork</a>
         <a class="bt-outline-button" href="#" download data-stencil-viewer-placement hidden>↓ Download placement mockup</a>
         <a class="bt-outline-button" href="#" download data-stencil-viewer-pack hidden>↓ Download packaging</a>
         <a class="bt-outline-button" href="#" download data-stencil-viewer-lore hidden>↓ Download lore card</a>
@@ -317,7 +320,7 @@ foreach ($collections as $collectionSlug => $collection) {
   const pdfDownload = viewer.querySelector('[data-stencil-viewer-pdf]');
   const currentDownload = viewer.querySelector('[data-stencil-viewer-current]');
   const zipDownload = viewer.querySelector('[data-stencil-viewer-zip]');
-  const links = ['outline', 'reference', 'placement', 'pack', 'lore', 'style'];
+  const links = ['outline', 'reference', 'detail', 'placement', 'pack', 'lore', 'style'];
   let currentCard = null;
   let slides = [];
   let activeSlide = 0;
@@ -354,6 +357,7 @@ foreach ($collections as $collectionSlug => $collection) {
       ['Print-ready stencil', card.dataset.stencilDownload],
       ['Preview', card.dataset.stencilPreview],
       ['Reference artwork', card.dataset.stencilReference],
+      ['Detail artwork', card.dataset.stencilDetail],
       ['Placement mockup', card.dataset.stencilPlacement],
       ['Premium packaging', card.dataset.stencilPack],
       ['Lore card', card.dataset.stencilLore],

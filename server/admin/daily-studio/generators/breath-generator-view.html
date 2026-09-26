@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="csrf-token" content="__CSRF_TOKEN__">
-  <title>Verse of the Day Generator</title>
+  <title>DailyBreath Verse Studio</title>
   <style>.verse-picker{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,.7fr) minmax(0,.7fr);gap:9px}.verse-picker .field{min-width:0}.verse-picker label{font-size:12px;color:var(--muted)}@media(max-width:480px){.verse-picker{grid-template-columns:1fr 1fr}.verse-picker .field:first-child{grid-column:1/-1}}</style>
   <style>.language-toggle{grid-template-columns:repeat(auto-fit,minmax(105px,1fr))!important}</style>
   <style>
@@ -28,21 +28,21 @@
 <main class="shell">
   <aside class="controls">
     <a class="back" href="/server/admin/daily-studio/">&larr; Studio Home</a>
-    <h1>Verse of the Day Generator</h1>
-    <p class="lede">Open scheduled recovery verses for export, or create a separate draft with new prerecorded audio.</p>
+    <h1>DailyBreath Verse Studio</h1>
+    <p class="lede">Preview and export scheduled Scripture artwork, narration, and multilingual editions.</p>
     <div class="mode-switch"><button id="scheduledMode" class="btn primary" type="button">Scheduled</button><button id="createDraft" class="btn secondary" type="button">Create Draft</button></div>
     <div id="modePill" class="mode-pill"><span>SCHEDULED · READ ONLY</span><button id="editScheduled" class="btn secondary" type="button">Edit scheduled</button></div>
     <div id="scheduleNav" class="schedule-nav"><button id="previousVerse" class="btn secondary" type="button" aria-label="Previous scheduled verse">←</button><button id="todayVerse" class="btn secondary" type="button">Today</button><button id="nextVerse" class="btn secondary" type="button" aria-label="Next scheduled verse">→</button><button id="reloadVerse" class="btn secondary" type="button" aria-label="Reload scheduled verse">↻</button></div>
     <div id="scheduleSummary" class="schedule-summary"></div>
-    <div id="draftTools" class="draft-tools" hidden><button id="generateTodayVerse" class="btn primary" type="button">✨ Generate Unscheduled Draft Idea</button><span class="hint">Draft ideas exclude every verse already in the 138-entry recovery library.</span></div>
+    <div id="draftTools" class="draft-tools" hidden><button id="generateTodayVerse" class="btn primary" type="button">✨ Suggest an available verse</button><span class="hint">Suggestions use verses not already in the dated schedule.</span></div>
 
     <section class="group">
       <label>Template style</label>
       <div class="styles">
-        <label class="style-card"><input type="radio" name="style" value="advanced" checked><strong>Living Sanctuary</strong><small>Premium layered editorial artwork</small></label>
-        <label class="style-card"><input type="radio" name="style" value="forest"><strong>Modern Aurora</strong><small>Layered glass and forest light</small></label>
-        <label class="style-card"><input type="radio" name="style" value="botanical"><strong>Heritage Botanical</strong><small>Museum-grade engraved cannabis study</small></label>
-        <label class="style-card"><input type="radio" name="style" value="olive"><strong>Olive Sanctuary</strong><small>Dark olive branches, gold light, framed Scripture</small></label>
+        <label class="style-card"><input type="radio" name="style" value="advanced" checked><strong>Living Sanctuary</strong><small>Sunlit forest and open Scripture space</small></label>
+        <label class="style-card"><input type="radio" name="style" value="forest"><strong>Modern Aurora</strong><small>Evergreen landscape beneath aurora light</small></label>
+        <label class="style-card"><input type="radio" name="style" value="botanical"><strong>Olive Grove Engraving</strong><small>Archival olive branches on warm parchment</small></label>
+        <label class="style-card"><input type="radio" name="style" value="olive"><strong>Olive Sanctuary</strong><small>Gold light, olive branches, framed Scripture</small></label>
       </div>
     </section>
 
@@ -55,7 +55,7 @@
         <label class="language-option"><input type="radio" name="verseLanguage" value="jm"><span>🇯🇲 Patois</span></label>
         <label class="language-option"><input type="radio" name="verseLanguage" value="ht"><span>🇭🇹 Kreyòl</span></label>
       </div>
-      <div class="hint" style="margin:0 0 16px">English uses a recovery-focused WEB bank for cravings, freedom, strength, and self-control. Other languages use their matching hardcoded scripture banks.</div>
+      <div class="hint" style="margin:0 0 16px">English follows the DailyBreath WEB Scripture schedule. Other languages use their matching verse libraries.</div>
       <label>Select a specific Bible verse</label>
       <div class="verse-picker">
         <div class="field"><label for="verseBook">Book</label><select id="verseBook"></select></div>
@@ -68,7 +68,7 @@
       <div class="field"><label for="verse">Verse text</label><textarea id="verse">Loading today’s verse…</textarea></div>
       <div class="field"><label for="reference">Reference</label><input id="reference" type="text" value=""></div>
       <div class="field"><label for="translation">Translation</label><input id="translation" type="text" value=""></div>
-      <div class="field"><label for="footer">Footer message</label><input id="footer" type="text" value="BREATHE DEEP, GOD’S GOT YOU."></div>
+      <div class="field"><label for="footer">Footer message</label><input id="footer" type="text" value="WALK IN FAITH TODAY."></div>
       <div class="field"><label for="publishDate">Publish date</label><input id="publishDate" type="date"></div>
       <div class="field"><label for="locale">Locale</label><select id="locale"><option value="en-US">English (US)</option><option value="en-JM">English (Jamaica)</option><option value="fr-FR">French</option><option value="ht-HT">Haitian Kreyòl</option><option value="es-ES">Spanish</option></select></div>
     </section>
@@ -120,9 +120,9 @@
   const ctx = canvas.getContext('2d', {alpha:false});
   ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
   const csrf = document.querySelector('meta[name="csrf-token"]').content;
-  const livingSanctuary = new Image(); livingSanctuary.src = '/assets/img/verse-cannabis-living-sanctuary-v1.png';
-  const modernAurora = new Image(); modernAurora.src = '/assets/img/verse-cannabis-modern-aurora-v1.png';
-  const heritageBotanical = new Image(); heritageBotanical.src = '/assets/img/verse-cannabis-heritage-botanical-v1.png';
+  const livingSanctuary = new Image(); livingSanctuary.src = '/assets/img/verse-living-sanctuary-v2.png';
+  const modernAurora = new Image(); modernAurora.src = '/assets/img/verse-modern-aurora-v2.png';
+  const heritageBotanical = new Image(); heritageBotanical.src = '/assets/img/verse-olive-engraving-v1.png';
   let activeAudio = null;
   let narrationPlaying = false;
   let previewAnimation = null;
@@ -276,20 +276,20 @@
     $('scheduledMode').className=`btn ${scheduled||empty?'primary':'secondary'}`;$('createDraft').className=`btn ${draft||editing?'primary':'secondary'}`;$('editScheduled').hidden=!scheduled;$('draftTools').hidden=!draft;$('saveDraft').hidden=scheduled||empty;$('saveDraft').textContent=editing?'Replace scheduled verse + audio':'Publish draft + generate audio';
     ['downloadPng','exportMp3','previewAudio','exportVideo','exportAllVideo'].forEach(id=>{$(id).disabled=empty});$('previousVerse').disabled=!scheduleNavigation.previous;$('nextVerse').disabled=!scheduleNavigation.next;setContentLocked(scheduled||empty);
   }
-  function clearContent(date=''){currentVerseId='';$('heading').value='VERSE OF THE DAY';$('verse').value='';$('reference').value='';$('translation').value='WEB';$('footer').value='BREATHE THROUGH THE CRAVING. GOD IS WITH YOU.';$('publishDate').value=date;draw()}
+  function clearContent(date=''){currentVerseId='';$('heading').value='VERSE OF THE DAY';$('verse').value='';$('reference').value='';$('translation').value='WEB';$('footer').value='WALK IN FAITH TODAY.';$('publishDate').value=date;draw()}
   function scheduledAudioMatches(){return !!scheduledAudioUrl&&narrationLocale()==='en-US'&&value('publishDate')===scheduledDate&&value('verse')===scheduledVerseText&&value('reference')===scheduledReference}
   async function loadScheduleDate(date=localDate()){
-    status(`Loading the ${date} recovery schedule…`);
+    status(`Loading the ${date} verse schedule…`);
     try{
       const response=await fetch(`/server/admin/daily-studio/api/dailybreath-schedule.php?date=${encodeURIComponent(date)}`,{cache:'no-store'}),data=await response.json();
       if(!response.ok||!data.ok)throw new Error(data.error||'The Daily Breath schedule is unavailable.');
-      scheduleNavigation=data.navigation||{};nextAvailableDate=scheduleNavigation.next_available||'';$('scheduleSummary').textContent=`${data.counts?.scheduled||0} dated verses · ${data.counts?.with_audio||0} prerecorded MP3s · ${data.counts?.library||0} recovery entries`;
-      if(!data.item){contentMode='empty';scheduledAudioUrl='';scheduledDate='';scheduledVerseText='';scheduledReference='';clearContent(date);updateModeUi();status(`No recovery verse is scheduled for ${date}. Choose Create Draft to use this date.`);return false}
-      const item=data.item;contentMode='scheduled';$('publishDate').value=data.date;document.querySelector('input[name="verseLanguage"][value="en"]').checked=true;document.querySelector('input[name="narrationLanguage"][value="en-US"]').checked=true;$('locale').value='en-US';applyVerseItem({id:item.id,verse:item.verse||item.text,reference:item.reference,translation:item.translation||'WEB',footer:'BREATHE THROUGH THE CRAVING. GOD IS WITH YOU.'},true);scheduledAudioUrl=item.audio_url?new URL(item.audio_url,location.origin).href:'';scheduledDate=data.date;scheduledVerseText=value('verse');scheduledReference=value('reference');$('includeNarration').checked=!!scheduledAudioUrl;updateModeUi();draw();status(scheduledAudioUrl?`${data.date} is ready with prerecorded recovery audio.`:`${data.date} is scheduled. MP3 export will use the selected provider.`);return true;
-    }catch(error){status(error.message||'The recovery schedule could not be loaded.',true);return false}
+      scheduleNavigation=data.navigation||{};nextAvailableDate=scheduleNavigation.next_available||'';$('scheduleSummary').textContent=`${data.counts?.scheduled||0} dated verses · ${data.counts?.with_audio||0} prerecorded MP3s · ${data.counts?.library||0} library verses`;
+      if(!data.item){contentMode='empty';scheduledAudioUrl='';scheduledDate='';scheduledVerseText='';scheduledReference='';clearContent(date);updateModeUi();status(`No verse is scheduled for ${date}. Choose Create Draft to use this date.`);return false}
+      const item=data.item;contentMode='scheduled';$('publishDate').value=data.date;document.querySelector('input[name="verseLanguage"][value="en"]').checked=true;document.querySelector('input[name="narrationLanguage"][value="en-US"]').checked=true;$('locale').value='en-US';applyVerseItem({id:item.id,verse:item.verse||item.text,reference:item.reference,translation:item.translation||'WEB',footer:'WALK IN FAITH TODAY.'},true);scheduledAudioUrl=item.audio_url?new URL(item.audio_url,location.origin).href:'';scheduledDate=data.date;scheduledVerseText=value('verse');scheduledReference=value('reference');$('includeNarration').checked=!!scheduledAudioUrl;updateModeUi();draw();status(scheduledAudioUrl?`${data.date} is ready with prerecorded audio.`:`${data.date} is scheduled. MP3 export will use the selected provider.`);return true;
+    }catch(error){status(error.message||'The verse schedule could not be loaded.',true);return false}
   }
-  async function enterDraftMode(){const draftDate=contentMode==='empty'&&value('publishDate')?value('publishDate'):(nextAvailableDate||localDate());contentMode='draft';scheduledAudioUrl='';scheduledDate='';scheduledVerseText='';scheduledReference='';document.querySelector('input[name="verseLanguage"][value="en"]').checked=true;clearContent(draftDate);updateModeUi();draw();status('Draft mode is separate from the schedule. Loading the Bible picker…');await loadVerseCatalog();setContentLocked(false);status('Choose a date, select a verse, or generate an unused recovery verse idea.')}
-  function editScheduledVerse(){if(contentMode!=='scheduled')return;if(!confirm(`Edit the scheduled recovery verse for ${scheduledDate}? Publishing will overwrite that date and regenerate its prerecorded audio.`))return;contentMode='edit';updateModeUi();status('Scheduled editing is enabled. Publishing will use the overwrite permission you just confirmed.')}
+  async function enterDraftMode(){const draftDate=contentMode==='empty'&&value('publishDate')?value('publishDate'):(nextAvailableDate||localDate());contentMode='draft';scheduledAudioUrl='';scheduledDate='';scheduledVerseText='';scheduledReference='';document.querySelector('input[name="verseLanguage"][value="en"]').checked=true;clearContent(draftDate);updateModeUi();draw();status('Draft mode is separate from the schedule. Loading the Bible picker…');await loadVerseCatalog();setContentLocked(false);status('Choose a date, select a verse, or request an available verse suggestion.')}
+  function editScheduledVerse(){if(contentMode!=='scheduled')return;if(!confirm(`Edit the scheduled verse for ${scheduledDate}? Publishing will overwrite that date and regenerate its prerecorded audio.`))return;contentMode='edit';updateModeUi();status('Scheduled editing is enabled. Publishing will use the overwrite permission you just confirmed.')}
   function populateBooks(){
     const books=[...new Set(verseCatalog.map(item=>item.book))];$('verseBook').innerHTML=books.map(book=>`<option value="${book}">${book}</option>`).join('');populateChapters();
   }
@@ -320,12 +320,12 @@
 
   async function generateTodayVerse(){
     if(contentMode!=='draft'){status('Open Create Draft before generating new content.',true);return}
-    const button=$('generateTodayVerse');button.disabled=true;status('Choosing an unused recovery-focused verse…');
+    const button=$('generateTodayVerse');button.disabled=true;status('Choosing an available Scripture verse…');
     try{
       const response=await fetch(`/server/admin/daily-studio/api/dailybreath-schedule.php?draft=1&date=${encodeURIComponent(value('publishDate')||nextAvailableDate||localDate())}`,{cache:'no-store'});
       const data=await response.json();if(!response.ok||!data.item)throw new Error(data.error||'No verse was returned.');
       const item=data.item;applyVerseItem(item,true);
-      status(`Unused recovery verse selected — ${data.remaining.toLocaleString()} candidates remain outside the published library.`);
+      status(`Verse selected — ${data.remaining.toLocaleString()} available entries remain outside the published schedule.`);
     }catch(error){status(error.message||'Verse generation failed.',true)}finally{button.disabled=false}
   }
   async function loadFreshVerseForCurrentLanguage(){
@@ -349,7 +349,7 @@
   }
   async function narrationBlob(){
     const file=$('audioFile').files[0];if(file)return file;
-    if(scheduledAudioMatches()){const response=await fetch(scheduledAudioUrl,{cache:'force-cache'});if(!response.ok)throw new Error('The prerecorded recovery audio could not be loaded.');const blob=await response.blob();if(blob.size<128)throw new Error('The prerecorded recovery audio is empty.');return blob}
+    if(scheduledAudioMatches()){const response=await fetch(scheduledAudioUrl,{cache:'force-cache'});if(!response.ok)throw new Error('The prerecorded audio could not be loaded.');const blob=await response.blob();if(blob.size<128)throw new Error('The prerecorded recovery audio is empty.');return blob}
     const response=await fetch('/beyond-id/admin/api/verse-narration.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({text:narrationText(),locale:narrationLocale(),provider:selectedProvider(),voice:selectedVoice()})});
     if(!response.ok){let msg='Narration service is unavailable.';try{const data=await response.json();msg=data.error||msg}catch{}throw new Error(msg)}return response.blob();
   }
@@ -396,14 +396,14 @@
 
   async function saveDraft(){
     if(contentMode!=='draft'&&contentMode!=='edit'){status('Open Create Draft or confirm Edit scheduled before publishing.',true);return false}
-    const button=$('saveDraft'),payload={publish_date:value('publishDate'),verse_text:value('verse'),scripture_reference:value('reference'),theme:'spiritual support',narration_provider:selectedProvider(),narration_voice:selectedVoice(),confirm_overwrite:contentMode==='edit'};button.disabled=true;status('Generating English audio and publishing the recovery verse…');
+    const button=$('saveDraft'),payload={publish_date:value('publishDate'),verse_text:value('verse'),scripture_reference:value('reference'),theme:'spiritual support',narration_provider:selectedProvider(),narration_voice:selectedVoice(),confirm_overwrite:contentMode==='edit'};button.disabled=true;status('Generating English audio and publishing the verse…');
     try{
       const publish=()=>fetch('/server/admin/daily-studio/api/save-dailybreath-verse.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify(payload)});
       let response=await publish(),data=await response.json();
-      if(response.status===409&&data.requires_confirmation){if(!confirm(`A recovery verse is already scheduled for ${payload.publish_date}. Replace it and regenerate its audio?`))throw new Error('Publication cancelled. The scheduled recovery verse was not changed.');payload.confirm_overwrite=true;response=await publish();data=await response.json()}
-      if(!response.ok||!data.ok)throw new Error(data.error||'The recovery verse could not be published.');
+      if(response.status===409&&data.requires_confirmation){if(!confirm(`A verse is already scheduled for ${payload.publish_date}. Replace it and regenerate its audio?`))throw new Error('Publication cancelled. The scheduled verse was not changed.');payload.confirm_overwrite=true;response=await publish();data=await response.json()}
+      if(!response.ok||!data.ok)throw new Error(data.error||'The verse could not be published.');
       await loadScheduleDate(data.publish_date);status(`${data.message} Verse ${data.id} is attached to its prerecorded MP3.`);return true;
-    }catch(error){status(error.message||'The recovery verse could not be published.',true);return false}finally{button.disabled=false}
+    }catch(error){status(error.message||'The verse could not be published.',true);return false}finally{button.disabled=false}
   }
 
 
@@ -432,7 +432,7 @@
   }
   if('speechSynthesis' in window){window.speechSynthesis.onvoiceschanged=populateVoices;populateVoices()}
   document.querySelectorAll('input[name="narrationLanguage"]').forEach(input=>input.addEventListener('change',()=>{populateVoices();status(`${input.nextElementSibling.textContent.trim()} narrator selected.`);draw()}));
-  document.querySelectorAll('input[name="verseLanguage"]').forEach(input=>input.addEventListener('change',()=>{if(input.value!=='en'){document.querySelector('input[name="verseLanguage"][value="en"]').checked=true;status('The recovery schedule publishes English WEB verses. Use the multilingual Bible generator for localized editions.',true);return}syncHeading();draw()}));
+  document.querySelectorAll('input[name="verseLanguage"]').forEach(input=>input.addEventListener('change',()=>{if(input.value!=='en'){document.querySelector('input[name="verseLanguage"][value="en"]').checked=true;status('The dated schedule publishes English WEB verses. Use the multilingual Bible generator for localized editions.',true);return}syncHeading();draw()}));
   $('daypart').addEventListener('change',()=>{syncHeading();draw()});
   $('verseBook').addEventListener('change',populateChapters);$('verseChapter').addEventListener('change',populateVerseNumbers);$('loadSelectedVerse').addEventListener('click',()=>{if(contentMode==='draft'||contentMode==='edit')loadSelectedVerse()});$('publishDate').addEventListener('change',()=>{if(contentMode==='scheduled'||contentMode==='empty')loadScheduleDate(value('publishDate'));else draw()});
 

@@ -17,9 +17,9 @@ $locale = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($input['locale'] ?? 'en'
 $translation = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($input['translation_code'] ?? 'KJV')) ?: 'KJV';
 $templateStyle = (string)($input['template_style'] ?? 'forest');
 $backgroundAssets = [
-  'advanced' => '/assets/img/verse-cannabis-living-sanctuary-v1.png',
-  'forest' => '/assets/img/verse-cannabis-modern-aurora-v1.png',
-  'botanical' => '/assets/img/verse-cannabis-heritage-botanical-v1.png',
+  'advanced' => '/assets/img/verse-living-sanctuary-v2.png',
+  'forest' => '/assets/img/verse-modern-aurora-v2.png',
+  'botanical' => '/assets/img/verse-olive-engraving-v1.png',
   'olive' => '/assets/dailybreath-login-background.webp?template=olive-sanctuary',
 ];
 $backgroundAsset = $backgroundAssets[$templateStyle] ?? $backgroundAssets['forest'];

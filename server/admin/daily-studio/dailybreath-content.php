@@ -1,75 +1,124 @@
 <?php
 declare(strict_types=1);
-require __DIR__.'/bootstrap.php';
-require dirname(__DIR__,3).'/beyond-id/includes/db.php';
+require __DIR__ . '/bootstrap.php';
+require dirname(__DIR__, 3) . '/beyond-id/includes/db.php';
+require_once dirname(__DIR__, 3) . '/dailybreath/includes/verse-of-day.php';
+header('Cache-Control: private, no-store');
 
-$message='';$messageTone='success';
-$targetDate=(string)($_POST['publish_date']??$_GET['date']??date('Y-m-d'));
-if(!preg_match('/^\d{4}-\d{2}-\d{2}$/',$targetDate)||!strtotime($targetDate))$targetDate=date('Y-m-d');
+$targetDate = (string)($_POST['publish_date'] ?? $_GET['date'] ?? date('Y-m-d'));
+$parsedDate = DateTimeImmutable::createFromFormat('!Y-m-d', $targetDate);
+if (!$parsedDate || $parsedDate->format('Y-m-d') !== $targetDate) {
+    $targetDate = date('Y-m-d');
+    $parsedDate = new DateTimeImmutable($targetDate);
+}
+$weekStart = $parsedDate->modify('monday this week')->format('Y-m-d');
+$weekEnd = $parsedDate->modify('sunday this week')->format('Y-m-d');
+$weekSlug = 'week-' . $parsedDate->format('o-W');
+$message = '';
+$messageTone = 'success';
+$activeEditor = (string)($_POST['action'] ?? 'save_verse');
 
-function db_upsert(PDO $pdo,string $table,array $key,array $values): void{
-  $where=implode(' AND ',array_map(static fn(string $column): string=>$column.'=?',array_keys($key)));
-  $find=$pdo->prepare("SELECT id FROM $table WHERE $where LIMIT 1");$find->execute(array_values($key));$id=$find->fetchColumn();
-  if($id){$set=implode(',',array_map(static fn(string $column): string=>$column.'=?',array_keys($values)));$pdo->prepare("UPDATE $table SET $set,updated_at=CURRENT_TIMESTAMP WHERE id=?")->execute([...array_values($values),$id]);return;}
-  $all=$key+$values;$columns=implode(',',array_keys($all));$marks=implode(',',array_fill(0,count($all),'?'));$pdo->prepare("INSERT INTO $table ($columns) VALUES ($marks)")->execute(array_values($all));
+function managerRow(PDO $pdo, string $sql, array $parameters): ?array {
+    $query = $pdo->prepare($sql);
+    $query->execute($parameters);
+    return $query->fetch(PDO::FETCH_ASSOC) ?: null;
 }
-function db_revision(PDO $pdo,string $type,string $key,string $action,array $payload=[]): void{
-  $pdo->prepare('INSERT INTO dailybreath_content_revisions(content_type,content_key,action,payload_json,created_by) VALUES(?,?,?,?,?)')->execute([$type,$key,$action,json_encode($payload,JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE),(int)($_SESSION['user_id']??0)]);
+function managerField(string $name): string {
+    return trim((string)($_POST[$name] ?? ''));
 }
-function devotional_template(string $date): array{
-  $items=[
-    ['Grace for the Next Step','You do not need the whole map to take one faithful step.','God often gives enough light for the step in front of us, not the entire road. Release the pressure to solve everything today. Ask for wisdom, notice the next loving action, and move with quiet trust. Faithfulness grows through small acts of obedience.','Proverbs 3:5–6'],
-    ['Peace in the Middle','God’s presence is steady even when your circumstances are not.','Pause and name what feels unsettled. Peace is not the absence of difficulty, but the presence of God within it. Breathe slowly, pray honestly, and let gratitude anchor your attention in what remains true.','Philippians 4:6–7'],
-    ['Strength for Today','Today’s grace is enough for today’s assignment.','You were never asked to carry tomorrow before it arrives. Receive the strength available for this day. Choose one responsibility, one relationship, and one moment in which you can practice courage and kindness.','Matthew 6:34']
-  ];return $items[((int)date('W',strtotime($date)))%count($items)];
-}
-function challenge_template(string $date): array{
-  $items=[['Seven Days of Encouragement','Encourage one person each day with a specific, sincere message.','Hebrews 10:24–25'],['Seven Days of Gratitude','Write down one gift each day and thank someone who made a difference.','1 Thessalonians 5:18'],['Seven Days of Quiet Prayer','Set aside five uninterrupted minutes each day to listen and pray.','Psalm 46:10']];return $items[((int)date('W',strtotime($date)))%count($items)];
+function managerRevision(PDO $pdo, string $type, string $key, ?array $before, array $after): void {
+    $query = $pdo->prepare('INSERT INTO dailybreath_content_revisions(content_type,content_key,action,payload_json,created_by) VALUES(?,?,?,?,?)');
+    $query->execute([$type, $key, 'correction_published', json_encode(['before' => $before, 'after' => $after], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), (int)($_SESSION['user_id'] ?? 0)]);
 }
 
-if($_SERVER['REQUEST_METHOD']==='POST'){
-  if(!Auth::verifyCsrf($_POST['csrf']??'')){http_response_code(403);exit('Invalid CSRF token');}
-  $action=(string)($_POST['action']??'');
-  try{
-    if(in_array($action,['save_verse_draft','publish_verse'],true)){
-      $verseText=trim((string)($_POST['verse_text']??''));$reference=trim((string)($_POST['reference']??''));$translation=trim((string)($_POST['translation']??'KJV'));$footer=trim((string)($_POST['footer']??''));
-      if($verseText===''||$reference==='')throw new RuntimeException('Verse text and reference are required.');$published=$action==='publish_verse';
-      db_upsert($pdo,'verse_day_posts',['publish_date'=>$targetDate,'locale'=>'en'],['translation_code'=>$translation,'heading'=>'VERSE OF THE DAY','verse_text'=>$verseText,'scripture_reference'=>$reference,'footer_message'=>$footer,'background_asset_url'=>'/assets/dailybreath-login-background.webp','show_footer'=>1,'show_frame'=>1,'status'=>$published?'published':'draft','created_by'=>(int)($_SESSION['user_id']??0),'published_at'=>$published?date('Y-m-d H:i:s'):null]);
-      db_revision($pdo,'verse',$targetDate,$published?'published':'draft_saved',['reference'=>$reference,'translation'=>$translation]);$message=$published?'Verse published for '.date('F j, Y',strtotime($targetDate)).'.':'Verse draft saved safely.';
-    }elseif($action==='unpublish_verse'){
-      $pdo->prepare("UPDATE verse_day_posts SET status='draft',published_at=NULL,updated_at=CURRENT_TIMESTAMP WHERE publish_date=? AND locale='en'")->execute([$targetDate]);db_revision($pdo,'verse',$targetDate,'unpublished');$message='Verse moved back to draft.';$messageTone='warning';
-    }elseif($action==='generate_devotional_draft'){
-      [$title,$excerpt,$body,$reference]=devotional_template($targetDate);$slug='daily-'.$targetDate;db_upsert($pdo,'devotionals',['slug'=>$slug,'locale'=>'en'],['title'=>$title,'excerpt'=>$excerpt,'body'=>$body,'scripture_reference'=>$reference,'duration_minutes'=>5,'publish_date'=>$targetDate,'is_published'=>0]);db_revision($pdo,'devotional',$slug,'draft_generated',['title'=>$title]);$message='Devotional draft generated. Review it before publishing.';
-    }elseif($action==='publish_devotional'){
-      $slug='daily-'.$targetDate;$exists=$pdo->prepare('SELECT 1 FROM devotionals WHERE slug=? AND locale=?');$exists->execute([$slug,'en']);if(!$exists->fetchColumn()){[$title,$excerpt,$body,$reference]=devotional_template($targetDate);db_upsert($pdo,'devotionals',['slug'=>$slug,'locale'=>'en'],['title'=>$title,'excerpt'=>$excerpt,'body'=>$body,'scripture_reference'=>$reference,'duration_minutes'=>5,'publish_date'=>$targetDate,'is_published'=>1]);}else{$pdo->prepare('UPDATE devotionals SET is_published=1,updated_at=CURRENT_TIMESTAMP WHERE slug=? AND locale=?')->execute([$slug,'en']);}db_revision($pdo,'devotional',$slug,'published');$message='Devotional published.';
-    }elseif($action==='unpublish_devotional'){
-      $slug='daily-'.$targetDate;$pdo->prepare('UPDATE devotionals SET is_published=0,updated_at=CURRENT_TIMESTAMP WHERE slug=? AND locale=?')->execute([$slug,'en']);db_revision($pdo,'devotional',$slug,'unpublished');$message='Devotional returned to draft.';$messageTone='warning';
-    }elseif($action==='generate_challenge_draft'){
-      $start=date('Y-m-d',strtotime('monday this week',strtotime($targetDate)));$end=date('Y-m-d',strtotime($start.' +6 days'));[$title,$description,$reference]=challenge_template($targetDate);$slug='week-'.date('o-W',strtotime($targetDate));db_upsert($pdo,'weekly_challenges',['slug'=>$slug,'locale'=>'en'],['title'=>$title,'description'=>$description,'scripture_reference'=>$reference,'starts_on'=>$start,'ends_on'=>$end,'target_count'=>7,'is_published'=>0]);db_revision($pdo,'challenge',$slug,'draft_generated',['title'=>$title]);$message='Weekly challenge draft generated.';
-    }elseif($action==='publish_challenge'){
-      $start=date('Y-m-d',strtotime('monday this week',strtotime($targetDate)));$end=date('Y-m-d',strtotime($start.' +6 days'));[$title,$description,$reference]=challenge_template($targetDate);$slug='week-'.date('o-W',strtotime($targetDate));db_upsert($pdo,'weekly_challenges',['slug'=>$slug,'locale'=>'en'],['title'=>$title,'description'=>$description,'scripture_reference'=>$reference,'starts_on'=>$start,'ends_on'=>$end,'target_count'=>7,'is_published'=>1]);db_revision($pdo,'challenge',$slug,'published');$message='Weekly challenge published.';
-    }elseif($action==='unpublish_challenge'){
-      $slug='week-'.date('o-W',strtotime($targetDate));$pdo->prepare('UPDATE weekly_challenges SET is_published=0,updated_at=CURRENT_TIMESTAMP WHERE slug=? AND locale=?')->execute([$slug,'en']);db_revision($pdo,'challenge',$slug,'unpublished');$message='Weekly challenge returned to draft.';$messageTone='warning';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!Auth::verifyCsrf($_POST['csrf'] ?? '')) {
+        http_response_code(403);
+        exit('Invalid CSRF token');
     }
-  }catch(Throwable $error){error_log('DailyBreath manager: '.$error->getMessage());$message=$error instanceof RuntimeException?$error->getMessage():'The content action could not be completed.';$messageTone='error';}
+    try {
+        $pdo->beginTransaction();
+        switch ((string)($_POST['action'] ?? '')) {
+            case 'save_verse':
+                $values = ['verse_text' => managerField('verse_text'), 'scripture_reference' => managerField('reference'), 'translation_code' => managerField('translation'), 'footer_message' => managerField('footer')];
+                if ($values['verse_text'] === '' || $values['scripture_reference'] === '') throw new RuntimeException('Verse text and reference are required.');
+                $before = managerRow($pdo, 'SELECT * FROM verse_day_posts WHERE publish_date=? AND locale=? LIMIT 1', [$targetDate, 'en']);
+                if ($before) {
+                    $query = $pdo->prepare("UPDATE verse_day_posts SET verse_text=?,scripture_reference=?,translation_code=?,footer_message=?,status='published',published_at=COALESCE(published_at,CURRENT_TIMESTAMP),updated_at=CURRENT_TIMESTAMP WHERE id=?");
+                    $query->execute([$values['verse_text'], $values['scripture_reference'], $values['translation_code'], $values['footer_message'], $before['id']]);
+                } else {
+                    $query = $pdo->prepare("INSERT INTO verse_day_posts(publish_date,locale,translation_code,heading,verse_text,scripture_reference,footer_message,background_asset_url,status,created_by,published_at) VALUES(?,'en',?,'VERSE OF THE DAY',?,?,?,'/assets/dailybreath-login-background.webp','published',?,CURRENT_TIMESTAMP)");
+                    $query->execute([$targetDate, $values['translation_code'], $values['verse_text'], $values['scripture_reference'], $values['footer_message'], (int)($_SESSION['user_id'] ?? 0)]);
+                }
+                managerRevision($pdo, 'verse', $targetDate, $before, $values);
+                $message = 'Verse correction is live for ' . $targetDate . '.';
+                break;
+            case 'save_devotional':
+                $values = ['title' => managerField('devotional_title'), 'excerpt' => managerField('devotional_excerpt'), 'body' => managerField('devotional_body'), 'scripture_reference' => managerField('devotional_reference')];
+                if ($values['title'] === '' || $values['body'] === '') throw new RuntimeException('Devotional title and body are required.');
+                $before = managerRow($pdo, 'SELECT * FROM devotionals WHERE publish_date=? AND locale=? ORDER BY is_published DESC,id DESC LIMIT 1', [$targetDate, 'en']);
+                if ($before) {
+                    $query = $pdo->prepare('UPDATE devotionals SET title=?,excerpt=?,body=?,scripture_reference=?,is_published=1,updated_at=CURRENT_TIMESTAMP WHERE id=?');
+                    $query->execute([$values['title'], $values['excerpt'], $values['body'], $values['scripture_reference'], $before['id']]);
+                } else {
+                    $query = $pdo->prepare("INSERT INTO devotionals(slug,locale,title,excerpt,body,scripture_reference,duration_minutes,publish_date,is_published) VALUES(?,'en',?,?,?,?,5,?,1)");
+                    $query->execute(['daily-' . $targetDate, $values['title'], $values['excerpt'], $values['body'], $values['scripture_reference'], $targetDate]);
+                }
+                managerRevision($pdo, 'devotional', $targetDate, $before, $values);
+                $message = 'Devotional correction is live for ' . $targetDate . '.';
+                break;
+            case 'save_challenge':
+                $values = ['title' => managerField('challenge_title'), 'description' => managerField('challenge_description'), 'scripture_reference' => managerField('challenge_reference')];
+                if ($values['title'] === '' || $values['description'] === '') throw new RuntimeException('Challenge title and description are required.');
+                $before = managerRow($pdo, 'SELECT * FROM weekly_challenges WHERE locale=? AND starts_on<=? AND ends_on>=? ORDER BY is_published DESC,starts_on DESC,id DESC LIMIT 1', ['en', $targetDate, $targetDate]);
+                if ($before) {
+                    $query = $pdo->prepare('UPDATE weekly_challenges SET title=?,description=?,scripture_reference=?,is_published=1,updated_at=CURRENT_TIMESTAMP WHERE id=?');
+                    $query->execute([$values['title'], $values['description'], $values['scripture_reference'], $before['id']]);
+                } else {
+                    $query = $pdo->prepare("INSERT INTO weekly_challenges(slug,locale,title,description,scripture_reference,starts_on,ends_on,target_count,is_published) VALUES(?,'en',?,?,?,?,?,7,1)");
+                    $query->execute([$weekSlug, $values['title'], $values['description'], $values['scripture_reference'], $weekStart, $weekEnd]);
+                }
+                managerRevision($pdo, 'challenge', $weekSlug, $before, $values);
+                $message = 'Challenge correction is live for the selected week.';
+                break;
+            default:
+                throw new RuntimeException('Unknown content action.');
+        }
+        $pdo->commit();
+    } catch (Throwable $error) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        error_log('DailyBreath content correction: ' . $error->getMessage());
+        $message = $error instanceof RuntimeException ? $error->getMessage() : 'The correction could not be saved.';
+        $messageTone = 'error';
+    }
 }
 
-$verse=['verse_text'=>'Be still, and know that I am God.','scripture_reference'=>'Psalm 46:10','translation_code'=>'KJV','footer_message'=>'BE STILL. BREATHE. BELIEVE.','status'=>'draft'];$query=$pdo->prepare('SELECT * FROM verse_day_posts WHERE publish_date=? AND locale=? LIMIT 1');$query->execute([$targetDate,'en']);$verse=$query->fetch(PDO::FETCH_ASSOC)?:$verse;
-$devotionalQuery=$pdo->prepare('SELECT * FROM devotionals WHERE slug=? AND locale=? LIMIT 1');$devotionalQuery->execute(['daily-'.$targetDate,'en']);$devotional=$devotionalQuery->fetch(PDO::FETCH_ASSOC)?:null;
-$weekSlug='week-'.date('o-W',strtotime($targetDate));$challengeQuery=$pdo->prepare('SELECT * FROM weekly_challenges WHERE slug=? AND locale=? LIMIT 1');$challengeQuery->execute([$weekSlug,'en']);$challenge=$challengeQuery->fetch(PDO::FETCH_ASSOC)?:null;
-$academyCourses=(int)$pdo->query("SELECT COUNT(*) FROM academy_courses WHERE slug LIKE '%-module-%'")->fetchColumn();$academyLessons=(int)$pdo->query("SELECT COUNT(*) FROM academy_lessons WHERE course_id IN(SELECT id FROM academy_courses WHERE slug LIKE '%-module-%')")->fetchColumn();
-$revisions=$pdo->query('SELECT * FROM dailybreath_content_revisions ORDER BY id DESC LIMIT 12')->fetchAll(PDO::FETCH_ASSOC);
-require dirname(__DIR__).'/_header.php';
+$verseOverride = managerRow($pdo, 'SELECT * FROM verse_day_posts WHERE publish_date=? AND locale=? LIMIT 1', [$targetDate, 'en']);
+$devotionalOverride = managerRow($pdo, 'SELECT * FROM devotionals WHERE publish_date=? AND locale=? ORDER BY is_published DESC,id DESC LIMIT 1', [$targetDate, 'en']);
+$challengeOverride = managerRow($pdo, 'SELECT * FROM weekly_challenges WHERE locale=? AND starts_on<=? AND ends_on>=? ORDER BY is_published DESC,starts_on DESC,id DESC LIMIT 1', ['en', $targetDate, $targetDate]);
+$verseLive = $verseOverride && $verseOverride['status'] === 'published';
+$devotionalLive = $devotionalOverride && (int)$devotionalOverride['is_published'] === 1;
+$challengeLive = $challengeOverride && (int)$challengeOverride['is_published'] === 1;
+$verse = $verseLive ? ['text' => $verseOverride['verse_text'], 'reference' => $verseOverride['scripture_reference']] : (dailybreath_recovery_verse_for_date($targetDate, false) ?: dailybreath_recovery_verse_for_date($targetDate) ?: ['text' => 'Be still, and know that I am God.', 'reference' => 'Psalm 46:10']);
+$devotional = $devotionalLive ? $devotionalOverride : (dailybreath_recovery_devotional_for_date($targetDate, false) ?: dailybreath_recovery_devotional_for_date($targetDate) ?: []);
+$challenge = $challengeLive ? $challengeOverride : (dailybreath_recovery_challenge_for_date($targetDate) ?: []);
+$revisions = $pdo->query('SELECT content_type,content_key,action,created_at FROM dailybreath_content_revisions ORDER BY id DESC LIMIT 12')->fetchAll(PDO::FETCH_ASSOC);
+require dirname(__DIR__) . '/_header.php';
 ?>
-<link rel="stylesheet" href="/server/admin/daily-studio/studio.css"><link rel="stylesheet" href="/server/admin/daily-studio/studio-sunset.css"><link rel="stylesheet" href="/server/admin/daily-studio/content-manager.css?v=20260903-1">
-<div class="manager-head"><div><p class="studio-eyebrow">DailyBreath publishing</p><h1>App Content Manager</h1><p class="muted">Prepare, preview, and publish faith experiences with a clear revision trail.</p></div><div class="manager-actions"><form method="get"><label for="manager-date">Content date</label><input class="input compact" id="manager-date" type="date" name="date" value="<?=DailyStudio::esc($targetDate)?>" onchange="this.form.submit()"></form><a class="btn compact" href="/dailybreath/" target="_blank" rel="noopener">Open app ↗</a></div></div>
-<?php if($message):?><div class="manager-alert <?=$messageTone?>"><?=DailyStudio::esc($message)?></div><?php endif;?>
-<section class="manager-status"><article><span class="status-dot <?=($verse['status']??'draft')==='published'?'live':''?>"></span><div><small>VERSE</small><strong><?=DailyStudio::esc(ucfirst((string)($verse['status']??'draft')))?></strong></div></article><article><span class="status-dot <?=!empty($devotional['is_published'])?'live':''?>"></span><div><small>DEVOTIONAL</small><strong><?=$devotional?(!empty($devotional['is_published'])?'Published':'Draft'):'Not generated'?></strong></div></article><article><span class="status-dot <?=!empty($challenge['is_published'])?'live':''?>"></span><div><small>CHALLENGE</small><strong><?=$challenge?(!empty($challenge['is_published'])?'Published':'Draft'):'Not generated'?></strong></div></article><article><span class="status-dot live"></span><div><small>ACADEMY</small><strong><?=$academyCourses?> modules · <?=$academyLessons?> lessons</strong></div></article></section>
-<section class="manager-grid"><article class="manager-card verse-editor"><header><div><span class="manager-kicker">VERSE OF THE DAY</span><h2><?=date('l, F j',strtotime($targetDate))?></h2></div><span class="state-pill <?=($verse['status']??'draft')==='published'?'live':''?>"><?=DailyStudio::esc((string)($verse['status']??'draft'))?></span></header><form method="post"><input type="hidden" name="csrf" value="<?=Auth::csrf()?>"><input type="hidden" name="publish_date" value="<?=DailyStudio::esc($targetDate)?>"><div class="field"><label>Verse text</label><textarea class="input" name="verse_text" rows="5" required><?=DailyStudio::esc((string)$verse['verse_text'])?></textarea></div><div class="two"><div class="field"><label>Reference</label><input class="input" name="reference" value="<?=DailyStudio::esc((string)$verse['scripture_reference'])?>" required></div><div class="field"><label>Translation</label><input class="input" name="translation" value="<?=DailyStudio::esc((string)$verse['translation_code'])?>"></div></div><div class="field"><label>Footer message</label><input class="input" name="footer" value="<?=DailyStudio::esc((string)$verse['footer_message'])?>"></div><div class="button-row"><button class="btn secondary-action" name="action" value="save_verse_draft">Save draft</button><button class="btn" name="action" value="publish_verse">Publish verse</button><?php if(($verse['status']??'draft')==='published'):?><button class="text-action danger-action" name="action" value="unpublish_verse" onclick="return confirm('Move this verse back to draft?')">Unpublish</button><?php endif;?></div></form></article>
-<aside class="manager-preview"><span class="manager-kicker">LIVE PREVIEW</span><p class="preview-date"><?=strtoupper(date('F j',strtotime($targetDate)))?></p><blockquote><?=nl2br(DailyStudio::esc((string)$verse['verse_text']))?></blockquote><strong><?=DailyStudio::esc((string)$verse['scripture_reference'])?> · <?=DailyStudio::esc((string)$verse['translation_code'])?></strong><small><?=DailyStudio::esc((string)$verse['footer_message'])?></small></aside></section>
-<section class="generator-grid"><article class="manager-card generator-card"><div class="generator-icon">🙏</div><div><span class="manager-kicker">TODAY’S DEVOTIONAL</span><h2><?=$devotional?DailyStudio::esc((string)$devotional['title']):'Generate a five-minute devotional'?></h2><p><?=$devotional?DailyStudio::esc((string)$devotional['excerpt']):'Create a dated Scripture-centered draft, then review and publish it.'?></p><?php if($devotional):?><small><?=DailyStudio::esc((string)$devotional['scripture_reference'])?> · 5 min</small><?php endif;?></div><form class="generator-actions" method="post"><input type="hidden" name="csrf" value="<?=Auth::csrf()?>"><input type="hidden" name="publish_date" value="<?=DailyStudio::esc($targetDate)?>"><button class="btn secondary-action" name="action" value="generate_devotional_draft">Generate draft</button><button class="btn" name="action" value="publish_devotional">Publish</button><?php if(!empty($devotional['is_published'])):?><button class="text-action danger-action" name="action" value="unpublish_devotional">Unpublish</button><?php endif;?></form></article>
-<article class="manager-card generator-card"><div class="generator-icon">🌱</div><div><span class="manager-kicker">WEEKLY CHALLENGE</span><h2><?=$challenge?DailyStudio::esc((string)$challenge['title']):'Create the current faith practice'?></h2><p><?=$challenge?DailyStudio::esc((string)$challenge['description']):'Generate the Monday–Sunday challenge as a draft before it reaches the app.'?></p><?php if($challenge):?><small><?=DailyStudio::esc((string)$challenge['starts_on'])?> → <?=DailyStudio::esc((string)$challenge['ends_on'])?></small><?php endif;?></div><form class="generator-actions" method="post"><input type="hidden" name="csrf" value="<?=Auth::csrf()?>"><input type="hidden" name="publish_date" value="<?=DailyStudio::esc($targetDate)?>"><button class="btn secondary-action" name="action" value="generate_challenge_draft">Generate draft</button><button class="btn" name="action" value="publish_challenge">Publish</button><?php if(!empty($challenge['is_published'])):?><button class="text-action danger-action" name="action" value="unpublish_challenge">Unpublish</button><?php endif;?></form></article>
-<article class="manager-card generator-card"><div class="generator-icon">📰</div><div><span class="manager-kicker">RECOVERY NEWSLETTER</span><h2>Create this week’s shareable issue</h2><p>Combine the scheduled verse, recovery devotional, and weekly challenge in one branded layout.</p><small>US Letter PDF · Instagram 1080 × 1080 PNG</small></div><div class="generator-actions"><a class="btn" href="recovery-newsletter.php?date=<?=DailyStudio::esc($targetDate)?>">Open generator</a></div></article>
-<article class="manager-card generator-card academy-manager"><div class="generator-icon">🎓</div><div><span class="manager-kicker">BIBLE ACADEMY</span><h2><?=$academyCourses?> course modules ready</h2><p>Five age paths, five modules each, 10 lessons and a lesson test per module, plus module exams.</p><small><?=$academyLessons?> lesson records in the current catalog</small></div><div class="generator-actions"><a class="btn secondary-action" href="/dailybreath/academy.php" target="_blank" rel="noopener">Preview Academy</a><a class="btn" href="/dailybreath/academy.php">Manage catalog</a></div></article></section>
-<section class="manager-card revision-card"><header><div><span class="manager-kicker">REVISION HISTORY</span><h2>Recent publishing activity</h2></div><small>Last 12 actions</small></header><?php if(!$revisions):?><p class="muted">No revisions recorded yet.</p><?php else:?><div class="revision-list"><?php foreach($revisions as $revision):?><article><span class="revision-type"><?=DailyStudio::esc((string)$revision['content_type'])?></span><div><strong><?=DailyStudio::esc(str_replace('_',' ',ucfirst((string)$revision['action'])))?></strong><small><?=DailyStudio::esc((string)$revision['content_key'])?> · <?=DailyStudio::esc(date('M j, g:i A',strtotime((string)$revision['created_at'])))?></small></div></article><?php endforeach;?></div><?php endif;?></section>
-<?php require dirname(__DIR__).'/_footer.php';?>
+<link rel="stylesheet" href="/server/admin/daily-studio/studio.css"><link rel="stylesheet" href="/server/admin/daily-studio/studio-sunset.css"><link rel="stylesheet" href="/server/admin/daily-studio/content-manager.css?v=<?= (int)filemtime(__DIR__ . '/content-manager.css') ?>">
+<div class="manager-head"><div><p class="studio-eyebrow">DailyBreath · emergency controls</p><h1>Content corrections</h1><p class="muted">The daily schedule runs automatically. Use this page to correct a dated item when needed.</p></div><div class="manager-actions"><form method="get"><label for="manager-date">Content date</label><input class="input compact" id="manager-date" type="date" name="date" value="<?= DailyStudio::esc($targetDate) ?>" onchange="this.form.submit()"></form><a class="btn compact" href="/dailybreath/" target="_blank" rel="noopener">Open app ↗</a></div></div>
+<?php if ($message): ?><div class="manager-alert <?= $messageTone ?>" role="status"><?= DailyStudio::esc($message) ?></div><?php endif; ?>
+<p class="manager-help">Select a date, open an item, make the correction, then save. Saving creates or updates the English override shown in DailyBreath for that date or week.</p>
+<section class="manager-editors" aria-label="Content corrections">
+  <details class="manager-card correction-card" <?= $activeEditor === 'save_verse' ? 'open' : '' ?>><summary><span><span class="manager-kicker">VERSE OF THE DAY</span><strong><?= DailyStudio::esc((string)$verse['reference']) ?></strong></span><span class="state-pill <?= $verseLive ? 'live' : '' ?>"><?= $verseLive ? 'Live correction' : 'Automated' ?></span></summary>
+    <form method="post"><input type="hidden" name="csrf" value="<?= DailyStudio::esc(Auth::csrf()) ?>"><input type="hidden" name="publish_date" value="<?= DailyStudio::esc($targetDate) ?>"><div class="field"><label for="verse-text">Verse text</label><textarea class="input" id="verse-text" name="verse_text" rows="5" required><?= DailyStudio::esc((string)$verse['text']) ?></textarea></div><div class="two"><div class="field"><label for="verse-reference">Reference</label><input class="input" id="verse-reference" name="reference" value="<?= DailyStudio::esc((string)$verse['reference']) ?>" required></div><div class="field"><label for="verse-translation">Translation</label><input class="input" id="verse-translation" name="translation" value="<?= DailyStudio::esc((string)($verseOverride['translation_code'] ?? 'WEB')) ?>"></div></div><div class="field"><label for="verse-footer">Footer message</label><input class="input" id="verse-footer" name="footer" value="<?= DailyStudio::esc((string)($verseOverride['footer_message'] ?? '')) ?>"></div><button class="btn" name="action" value="save_verse">Save live correction</button></form>
+  </details>
+  <details class="manager-card correction-card" <?= $activeEditor === 'save_devotional' ? 'open' : '' ?>><summary><span><span class="manager-kicker">DAILY DEVOTIONAL</span><strong><?= DailyStudio::esc((string)($devotional['title'] ?? 'No scheduled devotional')) ?></strong></span><span class="state-pill <?= $devotionalLive ? 'live' : '' ?>"><?= $devotionalLive ? 'Live correction' : ($devotional ? 'Automated' : 'No schedule') ?></span></summary>
+    <form method="post"><input type="hidden" name="csrf" value="<?= DailyStudio::esc(Auth::csrf()) ?>"><input type="hidden" name="publish_date" value="<?= DailyStudio::esc($targetDate) ?>"><div class="field"><label for="devotional-title">Title</label><input class="input" id="devotional-title" name="devotional_title" value="<?= DailyStudio::esc((string)($devotional['title'] ?? '')) ?>" required></div><div class="field"><label for="devotional-excerpt">Short description</label><textarea class="input" id="devotional-excerpt" name="devotional_excerpt" rows="2"><?= DailyStudio::esc((string)($devotional['excerpt'] ?? '')) ?></textarea></div><div class="field"><label for="devotional-body">Full devotional</label><textarea class="input" id="devotional-body" name="devotional_body" rows="9" required><?= DailyStudio::esc((string)($devotional['body'] ?? '')) ?></textarea></div><div class="field"><label for="devotional-reference">Scripture reference</label><input class="input" id="devotional-reference" name="devotional_reference" value="<?= DailyStudio::esc((string)($devotional['scripture_reference'] ?? '')) ?>"></div><button class="btn" name="action" value="save_devotional">Save live correction</button></form>
+  </details>
+  <details class="manager-card correction-card" <?= $activeEditor === 'save_challenge' ? 'open' : '' ?>><summary><span><span class="manager-kicker">WEEKLY CHALLENGE · <?= DailyStudio::esc($weekStart) ?>–<?= DailyStudio::esc($weekEnd) ?></span><strong><?= DailyStudio::esc((string)($challenge['title'] ?? 'No scheduled challenge')) ?></strong></span><span class="state-pill <?= $challengeLive ? 'live' : '' ?>"><?= $challengeLive ? 'Live correction' : ($challenge ? 'Automated' : 'No schedule') ?></span></summary>
+    <form method="post"><input type="hidden" name="csrf" value="<?= DailyStudio::esc(Auth::csrf()) ?>"><input type="hidden" name="publish_date" value="<?= DailyStudio::esc($targetDate) ?>"><div class="field"><label for="challenge-title">Title</label><input class="input" id="challenge-title" name="challenge_title" value="<?= DailyStudio::esc((string)($challenge['title'] ?? '')) ?>" required></div><div class="field"><label for="challenge-description">Description</label><textarea class="input" id="challenge-description" name="challenge_description" rows="6" required><?= DailyStudio::esc((string)($challenge['description'] ?? '')) ?></textarea></div><div class="field"><label for="challenge-reference">Scripture reference</label><input class="input" id="challenge-reference" name="challenge_reference" value="<?= DailyStudio::esc((string)($challenge['scripture_reference'] ?? '')) ?>"></div><button class="btn" name="action" value="save_challenge">Save live correction</button></form>
+  </details>
+</section>
+<details class="manager-card revision-card"><summary><span><span class="manager-kicker">AUDIT TRAIL</span><strong>Recent corrections and publishing activity</strong></span></summary><?php if (!$revisions): ?><p class="muted">No changes recorded yet.</p><?php else: ?><div class="revision-list"><?php foreach ($revisions as $revision): ?><article><span class="revision-type"><?= DailyStudio::esc((string)$revision['content_type']) ?></span><div><strong><?= DailyStudio::esc(str_replace('_', ' ', (string)$revision['action'])) ?></strong><small><?= DailyStudio::esc((string)$revision['content_key']) ?> · <?= DailyStudio::esc(date('M j, g:i A', strtotime((string)$revision['created_at']))) ?></small></div></article><?php endforeach; ?></div><?php endif; ?></details>
+<?php require dirname(__DIR__) . '/_footer.php'; ?>

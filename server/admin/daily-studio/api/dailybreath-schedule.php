@@ -49,7 +49,7 @@ if (($_GET['draft'] ?? '') === '1') {
         $candidates[] = ['id'=>$match[1].' '.$match[2].':'.$match[3], 'verse'=>$text, 'reference'=>$reference, 'translation'=>'WEB'];
     }
     if (!$candidates) dailybreath_schedule_response(['ok'=>false,'error'=>'No unused recovery-focused verses remain.'], 404);
-    $item = $candidates[random_int(0, count($candidates) - 1)] + ['footer'=>'BREATHE THROUGH THE CRAVING. GOD IS WITH YOU.'];
+    $item = $candidates[random_int(0, count($candidates) - 1)] + ['footer'=>'WALK IN FAITH TODAY.'];
     dailybreath_schedule_response(['ok'=>true,'item'=>$item,'remaining'=>count($candidates)]);
 }
 

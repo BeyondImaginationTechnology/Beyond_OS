@@ -67,8 +67,9 @@ function jaguar_code_read_context(array $project, array $requestedFiles): array
     foreach (array_slice($requestedFiles, 0, 10) as $relative) {
         if (!is_string($relative) || strlen($relative) > 240 || str_contains($relative, "\0")) continue;
         $relative = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relative);
-        if ($relative === '' || preg_match('/(^|[\\\/])\.\.([\\\/]|$)/', $relative) || str_starts_with($relative, DIRECTORY_SEPARATOR)) continue;
+        if ($relative === '' || str_starts_with($relative, DIRECTORY_SEPARATOR)) continue;
         $segments = array_map('strtolower', explode(DIRECTORY_SEPARATOR, $relative));
+        if (in_array('..', $segments, true)) continue;
         $baseName = end($segments) ?: '';
         if (array_intersect($segments, ['.git', '.ssh', '.aws', '.config', '.secrets', 'private', 'var', 'storage', 'uploads', 'secrets', '.codex'])
             || $baseName === '.env' || str_starts_with($baseName, '.env.') || $baseName === 'live.php'

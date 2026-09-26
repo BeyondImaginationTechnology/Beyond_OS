@@ -20,6 +20,9 @@ VALID_TYPES = {
     "app_help",
     "breath_reflection",
     "sensitive_support",
+    "code_grounding",
+    "code_patch",
+    "code_plan",
 }
 
 

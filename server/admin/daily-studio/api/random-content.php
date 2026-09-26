@@ -109,7 +109,7 @@ try {
             }
             $backgroundAsset = (string)($managed['background_asset_url'] ?? '');
             $templateStyle = str_contains($backgroundAsset, 'olive-sanctuary') ? 'olive'
-                : (str_contains($backgroundAsset, 'heritage-botanical') ? 'botanical'
+                : ((str_contains($backgroundAsset, 'heritage-botanical') || str_contains($backgroundAsset, 'olive-engraving')) ? 'botanical'
                 : (str_contains($backgroundAsset, 'modern-aurora') ? 'forest'
                 : (str_contains($backgroundAsset, 'living-sanctuary') ? 'advanced' : 'forest')));
             jsonOut(['ok'=>true, 'source'=>'content_manager', 'item'=>[
@@ -127,8 +127,7 @@ try {
         }
         $historyFile = $storage . '/bible-history-' . $language . '.json';
         if ($reset) { writeHistory($historyFile, []); jsonOut(['ok'=>true,'reset'=>true,'language'=>$language]); }
-        // English generation is intentionally recovery-focused for Daily
-        // Breath users working through cravings, dependence, and habit change.
+        // English ideas use a broad faith-focused verse set for DailyBreath.
         $englishRecovery = [
           ['PSA 34:17','The righteous cry, and the LORD hears, and delivers them out of all their troubles.','PSALM 34:17'],
           ['PSA 46:1','God is our refuge and strength, a very present help in trouble.','PSALM 46:1'],
@@ -261,7 +260,7 @@ try {
             return ['id'=>$v[0], 'verse'=>$v[1], 'reference'=>$v[2], 'translation'=>$translation, 'book'=>$parts[1] ?? $v[2], 'chapter'=>(int)($parts[2] ?? 1), 'verse_number'=>(int)($parts[3] ?? 1)];
         }, $bank);
         $footerBanks = [
-          'en'=>['BREATHE THROUGH THE CRAVING. GOD IS WITH YOU.','ONE FREE BREATH AT A TIME.','LET PEACE GUIDE YOUR NEXT STEP.','TRUST GOD WITH THIS MOMENT.','GRACE IS STRONGER THAN THE URGE.'],
+          'en'=>['WALK IN FAITH TODAY.','BREATHE DEEPLY. RECEIVE PEACE.','LET WISDOM GUIDE YOUR NEXT STEP.','TRUST GOD WITH THIS MOMENT.','GRACE MEETS YOU HERE.'],
           'fr'=>['RESPIREZ PROFONDÉMENT. DIEU EST AVEC VOUS.','MARCHEZ DANS LA FOI AUJOURD’HUI.','LAISSEZ LA PAIX GUIDER VOS PAS.','CONFIEZ CETTE JOURNÉE À DIEU.'],
           'es'=>['RESPIRA PROFUNDO. DIOS ESTÁ CONTIGO.','CAMINA EN FE HOY.','DEJA QUE LA PAZ GUÍE TUS PASOS.','CONFÍA ESTE DÍA A DIOS.'],
           'jm'=>['BREATHE DEEP. GOD DEH WID YUH.','WALK INNA FAITH TODAY.','MEK PEACE GUIDE YUH NEXT STEP.','TRUST GOD WID TODAY.'],

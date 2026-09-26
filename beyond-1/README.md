@@ -37,6 +37,15 @@ a reviewed dataset of at least 500 examples before judging the model, and aim fo
 private chats, API keys, copyrighted training dumps, or personal data without
 permission.
 
+The starter set now includes four Code Thinking examples for repository
+grounding, minimal patches, cross-app uncertainty, and clarification. Training
+examples marked `code_grounding`, `code_patch`, or `code_plan` use a dedicated
+Code Thinking system prompt; the teaching examples retain Jaguar's teaching
+prompt. These examples exercise the formatter but are far too few to fine-tune
+a coding model or establish lead-developer quality. Run the validator after
+adding reviewed examples, and evaluate the resulting adapter on held-out BIT
+tasks before connecting it to a live runtime.
+
 ## Retrieve the adapter
 
 ```powershell
@@ -46,4 +55,3 @@ modal volume get beyond-1-vol /artifacts/jaguar-v0.1 ./artifacts/jaguar-v0.1
 Upload the adapter and tokenizer files to a private Hugging Face repo, or merge
 the adapter with an appropriately licensed base model for the inference platform
 you choose. Keep the Llama license and attribution with every distribution.
-

@@ -226,7 +226,6 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
                 signal: controller.signal
             };
             const response = await fetch(`${appBasePath}/api/chat.php?v=20260926-1`, {...requestOptions, credentials: 'same-origin'});
-            updateNonceFromResponse(response);
             const responseText = await response.text();
             let data;
             try {

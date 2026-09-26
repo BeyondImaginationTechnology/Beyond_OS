@@ -1,8 +1,9 @@
 # Boot artwork
 
-The startup screen uses the orbital gateway already established in
-`assets/images/bos-logo-mark.svg` at the repository root, with Beyond OS Home
-v0.1 typography. `boot.ppm` is the actual RGB framebuffer asset.
+The startup screen matches Core's jaguar-eye shield, layout, and title. Home
+uses an emerald green light variant of Core's blue mark, saved as
+`bit-os-home-logo-v0.1.png`, with Home v0.1 edition typography. `boot.ppm` is
+the actual RGB framebuffer asset.
 `boot-preview.png` shows it centered on a 1440 × 900 display; it is an artwork
 preview, not evidence of a booted VM. The three dots are decorative, not a
 reported progress value.
@@ -13,7 +14,9 @@ Regenerate with Pillow and an installed sans-serif font:
 python3 tools/render-assets.py --font /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
 ```
 
-The current raster was rendered using the locally installed Segoe UI font.
+Rendering requires Pillow and NumPy and reads Core's
+`assets/bit-os-core-logo-v0.2.png`. The current raster was rendered using the
+locally installed Segoe UI font.
 Font binaries are not included. Artwork follows the repository's
 `CONTENT_RIGHTS.md`; source code follows `LICENSE`.
 

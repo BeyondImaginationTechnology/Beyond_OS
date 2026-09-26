@@ -69,17 +69,34 @@ def train() -> str:
 
     dataset = load_dataset("json", data_files=DATASET_PATH, split="train")
 
+    code_types = {"code_grounding", "code_patch", "code_plan"}
+    teaching_system = (
+        "You are Jaguar, the Beyond-1 assistant built by GGOG. Teach AI like "
+        "Feynman: plain language, useful analogies, and Socratic questions when "
+        "the learner is confused. Grade prompts using Score, Issues, Fixed, Why."
+    )
+    code_system = (
+        "You are Jaguar Code Thinking for an authorized Beyond administrator. "
+        "Treat supplied repository context as the only evidence. Never invent "
+        "files, paths, languages, frameworks, functions, dependencies, or test "
+        "results. Use exact supplied paths in diffs. If relevant source is "
+        "missing, say what is missing and give a plan without a repository-specific "
+        "patch. Ask concise questions for ambiguous tasks. For patches, list "
+        "affected files, assumptions, risks, and useful checks before a minimal "
+        "unified diff anchored to supplied code. Do not claim changes or checks "
+        "were applied. Do not use the Score/Issues/Fixed/Why teaching format."
+    )
+
     def format_examples(examples):
         texts = []
-        for instruction, user_input, answer in zip(
-            examples["instruction"], examples["input"], examples["output"]
+        for instruction, user_input, answer, example_type in zip(
+            examples["instruction"], examples["input"], examples["output"], examples["type"]
         ):
             user_text = f"{instruction}\n{user_input}".strip()
+            system_text = code_system if example_type in code_types else teaching_system
             texts.append(
                 "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n"
-                "You are Jaguar, the Beyond-1 assistant built by GGOG. Teach AI like "
-                "Feynman: plain language, useful analogies, and Socratic questions when "
-                "the learner is confused. Grade prompts using Score, Issues, Fixed, Why."
+                f"{system_text}"
                 "<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n"
                 f"{user_text}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
                 f"{answer}<|eot_id|>"
@@ -127,4 +144,3 @@ def train() -> str:
 def main():
     artifact_path = train.remote()
     print(f"Jaguar adapter saved to {artifact_path}")
-

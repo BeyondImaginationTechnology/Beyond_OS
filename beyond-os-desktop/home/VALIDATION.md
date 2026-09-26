@@ -1,13 +1,21 @@
 # Home v0.1 validation — 2026-09-25
 
-Status: **source implementation in progress; no Home v0.1 image has been built or booted.**
+Status: **source and configuration checks passed on the Linux VM; no Home v0.1 image has been built or booted.**
 The record below describes the earlier Home 1.0 prototype and does not validate
 this v0.1 configuration.
 
 Home v0.1 adds the dashboard, WebKitGTK MiniBrowser, FFplay media launcher and
 audio device configuration. It also ports the Core v0.2 X.Org, session startup
-and UEFI installation fixes. The first required check is Buildroot defconfig
-resolution on the Linux VM, followed by a clean build and the VM gates in
+and UEFI installation fixes. On `bit-os-core-test-a`, the native desktop compiled
+with GCC and `-Wall -Wextra -Werror`, both the direct and UEFI installer
+Buildroot 2026.02.3 defconfigs resolved, and the direct configuration retained
+all 60 requested settings while keeping root login and SSH disabled. The
+post-build integration test and native storage tests passed. The desktop
+renderer produced a 1280x800 BMP under SDL's dummy video driver.
+
+The VM has only 28 GiB free on its root filesystem, which is insufficient for
+a clean Buildroot build with WebKitGTK alongside the existing Core build tree.
+A larger build volume is needed before the clean build and boot gates in
 `RELEASE.md`. No Home v0.1 download or hardware installer is ready.
 
 ## Historical prototype record — 2026-09-05

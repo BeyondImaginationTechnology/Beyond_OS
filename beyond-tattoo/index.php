@@ -92,13 +92,13 @@ if (!empty($stencilDay['iso_date'])) {
         <p class="bt-stencil-drop">STENCIL DROP</p>
         <p class="bt-main-lead">Premium tattoo stencils plus a focused operating workspace for modern shop owners.</p>
         <div class="bt-main-actions">
-          <a class="bt-glow-button" href="<?= e($downloadFile) ?>" download>↓ Download today’s stencil</a>
+          <a class="bt-glow-button" href="<?= e(bt_app_url('downloads/tattoo-procedure-consent-bc.pdf')) ?>" download>↓ Download consent waiver form</a>
           <a class="bt-outline-button" href="stencils.php">Browse release calendar</a>
         </div>
-        <div class="bt-trust-row" aria-label="Stencil package features">
-          <span><i>▣</i> Printer ready</span>
-          <span><i>◇</i> Clean lines</span>
-          <span><i>✦</i> Artist approved</span>
+        <div class="bt-trust-row" aria-label="Consent form features">
+          <span><i>▣</i> Fillable PDF</span>
+          <span><i>◇</i> Online signing</span>
+          <span><i>✦</i> Studio records</span>
         </div>
       </div>
 

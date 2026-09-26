@@ -246,3 +246,71 @@ function bt_list_open_jobs(): array
     $stmt=bt_db()->query("SELECT id,studio_name,title,opportunity_type,details,created_at FROM tattoo_jobs WHERE status='open' ORDER BY created_at DESC,id DESC LIMIT 12");
     return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 }
+
+function bt_create_consent_link(int $ownerUserId, array $data): string
+{
+    $token = rtrim(strtr(base64_encode(random_bytes(32)), '+/', '-_'), '=');
+    $stmt = bt_db()->prepare(
+        'INSERT INTO tattoo_consent_links(token_hash,owner_user_id,studio_name,artist_name,privacy_contact_name,privacy_contact_email,procedure_description,placement,appointment_date,expires_at) VALUES(?,?,?,?,?,?,?,?,?,?)'
+    );
+    $date = trim((string)($data['appointment_date'] ?? ''));
+    $date = $date !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) ? $date : null;
+    $stmt->execute([
+        hash('sha256', $token), $ownerUserId,
+        mb_substr(trim((string)$data['studio_name']), 0, 200),
+        mb_substr(trim((string)$data['artist_name']), 0, 200),
+        mb_substr(trim((string)$data['privacy_contact_name']), 0, 200),
+        mb_substr(trim((string)$data['privacy_contact_email']), 0, 255),
+        mb_substr(trim((string)$data['procedure_description']), 0, 500),
+        mb_substr(trim((string)$data['placement']), 0, 160), $date,
+        (new DateTimeImmutable('+30 days', new DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
+    ]);
+    return $token;
+}
+
+function bt_consent_link(string $token): ?array
+{
+    if (!preg_match('/^[A-Za-z0-9_-]{40,50}$/', $token)) return null;
+    $stmt = bt_db()->prepare('SELECT * FROM tattoo_consent_links WHERE token_hash=? AND used_at IS NULL AND expires_at>? LIMIT 1');
+    $stmt->execute([hash('sha256', $token), gmdate('Y-m-d H:i:s')]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return is_array($row) ? $row : null;
+}
+
+function bt_save_consent_record(array $link, string $clientName, string $signature, array $attestations): int
+{
+    $pdo = bt_db();
+    $pdo->beginTransaction();
+    try {
+        $guard = $pdo->prepare('SELECT id FROM tattoo_consent_links WHERE id=? AND used_at IS NULL AND expires_at>?');
+        $guard->execute([(int)$link['id'], gmdate('Y-m-d H:i:s')]);
+        if (!$guard->fetchColumn()) throw new RuntimeException('This signing link has already been used or has expired.');
+        $signedAt = gmdate('Y-m-d H:i:s');
+        $version = 'BC-TATTOO-CONSENT-2026-09-26-v1';
+        $payload = json_encode([$link['id'], $clientName, $signature, $attestations, $version, $signedAt], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $stmt = $pdo->prepare('INSERT INTO tattoo_consent_records(link_id,owner_user_id,client_name,client_signature,attestations_json,consent_version,signed_at,record_sha256) VALUES(?,?,?,?,?,?,?,?)');
+        $stmt->execute([(int)$link['id'], (int)$link['owner_user_id'], $clientName, $signature, json_encode($attestations, JSON_UNESCAPED_SLASHES), $version, $signedAt, hash('sha256', (string)$payload)]);
+        $recordId = (int)$pdo->lastInsertId();
+        $pdo->prepare('UPDATE tattoo_consent_links SET used_at=? WHERE id=? AND used_at IS NULL')->execute([$signedAt, (int)$link['id']]);
+        $pdo->commit();
+        return $recordId;
+    } catch (Throwable $error) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        throw $error;
+    }
+}
+
+function bt_list_consent_records(int $ownerUserId): array
+{
+    $stmt = bt_db()->prepare('SELECT r.id,r.client_name,r.signed_at,r.consent_version,l.studio_name,l.artist_name,l.procedure_description,l.placement,l.appointment_date FROM tattoo_consent_records r JOIN tattoo_consent_links l ON l.id=r.link_id WHERE r.owner_user_id=? ORDER BY r.signed_at DESC,r.id DESC LIMIT 100');
+    $stmt->execute([$ownerUserId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+}
+
+function bt_owned_consent_record(int $ownerUserId, int $recordId): ?array
+{
+    $stmt = bt_db()->prepare('SELECT r.*,l.studio_name,l.artist_name,l.procedure_description,l.placement,l.appointment_date FROM tattoo_consent_records r JOIN tattoo_consent_links l ON l.id=r.link_id WHERE r.owner_user_id=? AND r.id=? LIMIT 1');
+    $stmt->execute([$ownerUserId, $recordId]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return is_array($row) ? $row : null;
+}

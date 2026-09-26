@@ -146,8 +146,11 @@ $visibleCount = 0;
 $scheduleNumber = 0;
 foreach ($collections as $collectionSlug => $collection) {
     foreach ($collection['stencils'] as $collectionIndex => $item) {
-        if ($scheduleNumber >= $seasonTotal) break 2;
-        $scheduleNumber++;
+        $isOpeningBonus = $collectionSlug === 'season-one-opening' && $collectionIndex >= 4;
+        if (!$isOpeningBonus) {
+            if ($scheduleNumber >= $seasonTotal) break 2;
+            $scheduleNumber++;
+        }
         $releaseDate = new DateTimeImmutable($item[1], new DateTimeZone('America/Vancouver'));
         if ($releaseDate > $today) continue;
         $assets = bt_stencil_preview_assets($collectionSlug, $collectionIndex, $item[0]);
@@ -170,7 +173,7 @@ foreach ($collections as $collectionSlug => $collection) {
     <div class="bt-header-actions"><a class="bt-header-download" href="<?= e($downloadFile) ?>" download>↓ Free pack</a><a class="bt-login-link" href="login.php">Studio login</a><details class="bt-mobile-menu"><summary>☰</summary><div><a href="stencils.php">Stencils</a><a href="collections.php">Collections</a><a href="studios.php">Studios</a><a href="about.php">About</a><a href="login.php">Studio login</a></div></details></div>
   </div></header>
 
-<section class="bt-page-hero"><div class="bt-wrap"><p class="bt-gold-kicker">✦ ASSET-BACKED LIBRARY</p><h1><?= e((string)$availableCount) ?> VERIFIED<br><strong>STENCIL DROPS</strong></h1><p>Browse approved designs with real preview and print-master files. The 55-slot Season One schedule remains the publishing plan; only populated assets appear in this library.</p><div class="bt-main-actions"><a class="bt-glow-button" href="<?= e($downloadFile) ?>" download>↓ Download current stencil</a><a class="bt-outline-button" href="collections.php">Browse collections</a></div></div></section>
+<section class="bt-page-hero"><div class="bt-wrap"><p class="bt-gold-kicker">✦ ASSET-BACKED LIBRARY</p><h1><?= e((string)$availableCount) ?> VERIFIED<br><strong>STENCIL DROPS</strong></h1><p>Browse approved designs with real preview and print-master files. Season One has 55 numbered drops, plus two bonus opening designs; only populated assets appear in this library.</p><div class="bt-main-actions"><a class="bt-glow-button" href="<?= e($downloadFile) ?>" download>↓ Download current stencil</a><a class="bt-outline-button" href="collections.php">Browse collections</a></div></div></section>
 <section class="bt-page-section"><div class="bt-wrap">
   <form class="filter-row" method="get" role="search" style="margin-bottom:18px"><label class="sr-only" for="stencil-search">Search approved stencils</label><input class="input" id="stencil-search" name="q" value="<?= e($searchQuery) ?>" placeholder="Search subject, style, placement, or difficulty"><?php if ($activeCategory !== ''): ?><input type="hidden" name="category" value="<?= e($activeCategory) ?>"><?php endif; ?><select class="input" name="style" aria-label="Filter by style"><option value="">All styles</option><option value="black-and-grey" <?= $filterStyle === 'black-and-grey' ? 'selected' : '' ?>>Black &amp; grey</option><option value="realism" <?= $filterStyle === 'realism' ? 'selected' : '' ?>>Realism</option><option value="japanese" <?= $filterStyle === 'japanese' ? 'selected' : '' ?>>Japanese</option></select><select class="input" name="difficulty" aria-label="Filter by difficulty"><option value="">All difficulty</option><option value="intermediate" <?= $filterDifficulty === 'intermediate' ? 'selected' : '' ?>>Intermediate</option><option value="advanced" <?= $filterDifficulty === 'advanced' ? 'selected' : '' ?>>Advanced</option></select><input class="input" name="placement" value="<?= e($filterPlacement) ?>" placeholder="Placement"><input class="input" name="collection" value="<?= e($filterCollection) ?>" placeholder="Collection"><input class="input" type="date" name="from" value="<?= e($filterFrom) ?>" aria-label="Release date from"><input class="input" type="date" name="to" value="<?= e($filterTo) ?>" aria-label="Release date to"><button class="bt-outline-button" type="submit">Filter library</button></form>
   <?php if (($stencilDay['updated_at'] ?? '') !== '' && $searchQuery === '' && $activeCategory === ''): ?>
@@ -187,8 +190,13 @@ foreach ($collections as $collectionSlug => $collection) {
   <?php $number=1; foreach($collections as $slug=>$collection):
     $matchingItems = [];
     foreach ($collection['stencils'] as $index => $item) {
-      if ($number > $seasonTotal) break 2;
-      $itemNumber = $number++;
+      $isOpeningBonus = $slug === 'season-one-opening' && $index >= 4;
+      if ($isOpeningBonus) {
+        $itemNumber = 0;
+      } else {
+        if ($number > $seasonTotal) break 2;
+        $itemNumber = $number++;
+      }
       $scheduledDate = new DateTimeImmutable($item[1], new DateTimeZone('America/Vancouver'));
       $scheduledAssets = bt_stencil_preview_assets($slug, $index, $item[0]);
       $hasScheduledAssets = $scheduledAssets['approved'] && is_file(__DIR__ . '/' . $scheduledAssets['preview']) && is_file(__DIR__ . '/' . $scheduledAssets['print_png']);
@@ -235,7 +243,7 @@ foreach ($collections as $collectionSlug => $collection) {
       data-stencil-zip="api/stencil-download.php?type=package&amp;id=<?= e(bt_stencil_asset_slug($item[0]) . '-' . $item[1]) ?>"
     <?php endif; ?>
   >
-    <div class="bt-schedule-number"><?= str_pad((string)$itemNumber,2,'0',STR_PAD_LEFT) ?></div>
+    <div class="bt-schedule-number"><?= $itemNumber > 0 ? str_pad((string)$itemNumber,2,'0',STR_PAD_LEFT) : 'OPENING BONUS' ?></div>
     <div><time datetime="<?= e($item[1]) ?>"><?= e(bt_pretty_date($item[1])) ?></time><h3><?= e($item[0]) ?></h3><p><?= e((string)($assets['metadata']['style'] ?? $collection['name'])) ?> · <?= e((string)($assets['metadata']['placement'] ?? implode(' · ', array_map(static fn($cat) => $categoryOptions[$cat]['label'] ?? $cat, $itemCategories)))) ?> · <?= e((string)($assets['metadata']['license'] ?? 'Professional use')) ?></p></div>
     <span><?= $isUnlocked?'View stencil':($releaseDate > $today ? 'Upcoming' : 'Available') ?></span><?php if ($isUnlocked): ?><button class="bt-save-stencil" type="button" data-save-stencil="<?= e($item[0]) ?>" aria-label="Save <?= e($item[0]) ?>">☆ Save</button><?php endif; ?>
   </article><?php endforeach; ?>

@@ -11,12 +11,12 @@ source review from a model evaluation.
 
 ## Representative BIT tasks
 
-| Case | Prompt | Acceptance evidence | Result |
-| --- | --- | --- | --- |
-| Bug repair | “Guest verification shows `Unexpected token '<'` on the root-mounted Jaguar subdomain. Find the route error and propose a fix.” | The patch uses the PHP page mount path for both challenge and chat API routes; invalid JSON receives a clear message. Verify the live guest challenge and a follow-up chat after deployment. | Source review: route mismatch is addressed. End-to-end result: not run. |
-| Small feature | “Add an editable, revision-linked project decision note.” | Admin-only API adds, edits, lists current-revision notes, and allows stale note removal; notes live in protected private storage. Verify add/edit/delete through the admin page and check stale notes after changing HEAD. | Source review: workflow is present. PHP/runtime result: not run. |
-| Cross-app dependency | “Change a shared auth helper used by Beyond French and Beyond OS; identify affected clients.” | Both authorized checkouts appear independently; context never crosses project roots unless an architecture note is explicitly approved. Verify the allowlist contains both checkouts and the model cites files from each. | Not run: no secondary project checkout or runtime is configured here. |
-| Ambiguous request | “Make Jaguar better.” | The model asks what outcome is wanted and identifies missing files instead of inventing repository facts. | Not run: no model runtime is configured. |
+| Case | Correctness | Regressions | Unsupported repository claims | Proposed checks useful? |
+| --- | --- | --- | --- | --- |
+| Bug repair: guest challenge fails on the root-mounted Jaguar subdomain | Source review confirms both API routes use the page mount path and malformed challenge JSON gets a readable error. Live guest send was not run. | Not measured end to end. | Not measured against model output. | Yes: exercise root-mounted and `/ai` path installs, then send one guest message. |
+| Small feature: add/edit/remove a revision-linked project decision | Source review confirms project notes are revision keyed, stale notes can be reviewed/removed, and cross-project notes require the approval control. PHP/API actions were not run. | Not measured; PHP CLI is unavailable here. | Not measured against model output. | Yes: test admin and non-admin access, note CRUD, stale revision, and private storage. |
+| Cross-app dependency: change a shared auth helper | Not run: no second authorized checkout is configured. | Not measured. | Not measured. | Yes: configure two subprojects and ensure each response cites only the selected project plus currently approved architecture notes. |
+| Ambiguous request: “Make Jaguar better.” | Not run: no Jaguar model runtime is configured in this workspace. | Not measured. | Not measured. | Yes: require a clarifying question and no invented file-level claims. |
 
 ## Quality measures to record when the runtime is available
 

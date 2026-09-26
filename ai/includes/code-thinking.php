@@ -70,8 +70,8 @@ function jaguar_code_read_context(array $project, array $requestedFiles): array
         if ($relative === '' || preg_match('/(^|[\\\/])\.\.([\\\/]|$)/', $relative) || str_starts_with($relative, DIRECTORY_SEPARATOR)) continue;
         $segments = array_map('strtolower', explode(DIRECTORY_SEPARATOR, $relative));
         $baseName = end($segments) ?: '';
-        if (array_intersect($segments, ['.git', 'var', 'storage', 'uploads', 'secrets', '.codex'])
-            || $baseName === '.env' || str_starts_with($baseName, '.env.')
+        if (array_intersect($segments, ['.git', '.ssh', '.aws', '.config', '.secrets', 'private', 'var', 'storage', 'uploads', 'secrets', '.codex'])
+            || $baseName === '.env' || str_starts_with($baseName, '.env.') || $baseName === 'live.php'
             || preg_match('/\.(pem|key|p12|pfx|kdbx)$/i', $baseName)
             || preg_match('/(secret|credential|private[-_]?key)/i', $baseName)) continue;
         $path = realpath($root . DIRECTORY_SEPARATOR . $relative);

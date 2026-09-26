@@ -70,7 +70,7 @@ if (in_array($action, ['note_add', 'note_edit', 'note_delete'], true)) {
         if ($revision === null) code_json(409, ['error' => 'Project notes require a readable Git revision. You can still remove stale notes.']);
         $body = trim((string)($payload['note'] ?? ''));
         $source = trim((string)($payload['source'] ?? ''));
-        if ($body === '' || mb_strlen($body) > 1000 || mb_strlen($source) > 240) code_json(422, ['error' => 'Notes need text under 1,000 characters and a short source reference.']);
+        if ($body === '' || $source === '' || mb_strlen($body) > 1000 || mb_strlen($source) > 240) code_json(422, ['error' => 'Notes need text under 1,000 characters and a source reference.']);
         if ($action === 'note_edit') {
             $found = false;
             foreach ($notes as &$note) {
@@ -122,7 +122,7 @@ if ($action === 'check') {
 
 if (!in_array($action, ['read', 'plan', 'patch'], true)) code_json(422, ['error' => 'Choose read, plan, patch, or a configured project check.']);
 $task = trim((string)($payload['task'] ?? ''));
-if ($task === '' || mb_strlen($task) > 6000) code_json(422, ['error' => 'Describe the project question or change in 1–6,000 characters.']);
+if ($task === '' || mb_strlen($task) > 2500) code_json(422, ['error' => 'Describe the project question or change in 1–2,500 characters.']);
 $contextParts = jaguar_code_read_context($project, is_array($payload['files'] ?? null) ? $payload['files'] : []);
 $fileContext = array_values(array_filter($contextParts, static fn($entry) => str_starts_with($entry, '--- PROJECT FILE: ')));
 if ($fileContext === []) code_json(200, ['revision' => $revision, 'action' => $action, 'message' => 'I could not read project files for this request, so I will not make repository-specific claims. No files were changed. Plan: provide relative paths for the relevant files or add an AGENTS.md/README.md project guide, then retry. I verified only the workspace Git revision.']);
@@ -157,5 +157,6 @@ $request = [
 curl_setopt_array($runtime, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 12, CURLOPT_TIMEOUT => 110, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode($request, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)]);
 $response = curl_exec($runtime); $status = (int)curl_getinfo($runtime, CURLINFO_RESPONSE_CODE); curl_close($runtime);
 $decoded = is_string($response) ? json_decode($response, true) : null;
+if (is_array($decoded) && $status === 422 && is_string($decoded['detail'] ?? null)) code_json(422, ['error' => $decoded['detail'], 'revision' => $revision]);
 if (!is_array($decoded) || $status < 200 || $status >= 300 || !is_string($decoded['message'] ?? null)) code_json(200, ['revision' => $revision, 'action' => $action, 'message' => 'Jaguar’s model runtime did not complete this request. No repository files were changed. Plan: confirm the private runtime is healthy, then retry the same task at the displayed revision.']);
-code_json(200, ['revision' => $revision, 'action' => $action, 'message' => $decoded['message'], 'context_files' => array_map(static fn($entry) => preg_match('/^--- PROJECT FILE: (.+) ---/', $entry, $m) ? $m[1] : null, array_filter($contextParts, static fn($entry) => str_starts_with($entry, '--- PROJECT FILE: ')))]);
+code_json(200, ['revision' => $revision, 'action' => $action, 'message' => $decoded['message'], 'context_truncated' => !empty($decoded['context_truncated']), 'context_files' => array_map(static fn($entry) => preg_match('/^--- PROJECT FILE: (.+) ---/', $entry, $m) ? $m[1] : null, $fileContext)]);

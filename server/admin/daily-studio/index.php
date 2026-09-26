@@ -11,9 +11,11 @@ $apps=[
  'tattoo'=>['name'=>'Beyond Tattoo','icon'=>'🖋️','summary'=>'Stencils and artist assets','tools'=>[['tattoo-publish','Generate & publish','Publish a stencil library drop','stencil-library.php#publish'],['tattoo-assets','Asset inbox','Review uploaded tattoo assets','tattoo-asset-import.php']]],
 ];
 ?>
-<link rel="stylesheet" href="/server/admin/daily-studio/studio.css">
+<link rel="stylesheet" href="/server/admin/daily-studio/studio.css?v=<?= (int) filemtime(__DIR__ . '/studio.css') ?>">
 <section class="studio-console">
   <nav class="console-admin-tools" aria-label="Account and system tools">
+    <span class="console-admin-label">Administration</span>
+    <div class="console-admin-links">
     <a href="/beyond-id/admin/users.php">Users</a>
     <a href="/beyond-id/admin/apps.php">Apps</a>
     <a href="/beyond-id/admin/database.php">Database</a>
@@ -22,6 +24,7 @@ $apps=[
     <a href="/beyond-id/admin/system.php">System health</a>
     <a href="/beyond-id/admin/deployments.php">Deployments</a>
     <a href="/beyond-id/admin/settings.php">Appearance</a>
+    </div>
   </nav>
   <header class="console-hero">
     <div>

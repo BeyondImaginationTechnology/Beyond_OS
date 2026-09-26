@@ -62,7 +62,11 @@ to local lint/test commands; do not configure deploy, publish, merge, migration,
 or production-data commands. Returned patches are review-only unified diffs;
 Code Thinking does not apply them. Project notes are stored under private
 Beyond runtime data and are included only when their recorded Git revision
-matches the selected checkout.
+matches the selected checkout. To share a note across project contexts, an
+administrator must check the explicit BIT-wide approval box when saving it.
+Shared notes cite their source project and revision and are omitted when that
+source revision changes; an administrator can review, update, or remove stale
+notes.
 
 The web catalog maps `core` to runtime `explain` and the planned `build` mode to
 runtime `code`. Build remains locked in public chat. Admin Code Thinking calls

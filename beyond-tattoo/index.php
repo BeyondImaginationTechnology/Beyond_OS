@@ -18,6 +18,7 @@ $downloadFile = $stencilDay['package_url'];
 $packImage = trim((string)($stencilDay['pack_image_url'] ?? '')) ?: $stencilDay['preview_url'];
 $libraryAssets = bt_asset_library();
 $libraryCatalog = bt_library_collections();
+$homeCollectionSlugs = ['divine-realism', 'beyond-ancient', 'japanese-legends', 'dark-realism'];
 $libraryCounts = [];
 $libraryPreviews = [];
 foreach ($libraryAssets as $asset) {
@@ -156,11 +157,11 @@ if (!empty($stencilDay['iso_date'])) {
         <a href="stencils.php">View all →</a>
       </div>
       <div class="bt-collection-grid-new">
-        <?php foreach ($libraryCatalog as $slug => $collection): $actualCount = $libraryCounts[$slug] ?? 0; if ($actualCount === 0) { continue; } ?>
-          <a class="bt-collection-tile" href="collections.php#<?= e($slug) ?>" aria-label="Explore the <?= e($collection['name']) ?> collection">
-            <img src="<?= e($libraryPreviews[$slug]) ?>" alt="<?= e($collection['name']) ?> verified stencil preview">
-            <span class="bt-collection-date"><?= e($collection['dates']) ?></span>
-            <div><h3><?= e($collection['name']) ?></h3><p><?= e((string)$actualCount) ?> verified <?= $actualCount === 1 ? 'asset' : 'assets' ?></p></div>
+        <?php foreach ($homeCollectionSlugs as $slug): $collection = $libraryCatalog[$slug]; $actualCount = $libraryCounts[$slug] ?? 0; ?>
+          <a class="bt-collection-tile" href="<?= $actualCount > 0 ? 'collections.php#' : 'stencils.php#' ?><?= e($slug) ?>" aria-label="Explore the <?= e($collection['name']) ?> collection">
+            <img src="<?= e($libraryPreviews[$slug] ?? $collection['image']) ?>" alt="<?= e($collection['name']) ?> collection artwork">
+            <span class="bt-collection-date"><?= $slug === 'divine-realism' ? 'Season 1 · ' : '' ?><?= e($collection['dates']) ?></span>
+            <div><h3><?= e($collection['name']) ?></h3><p><?= $actualCount > 0 ? e((string)$actualCount) . ' verified ' . ($actualCount === 1 ? 'asset' : 'assets') : e((string)$collection['count']) . ' scheduled designs' ?></p></div>
           </a>
         <?php endforeach; ?>
       </div>

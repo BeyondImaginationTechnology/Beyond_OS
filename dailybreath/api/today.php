@@ -118,7 +118,6 @@ try {
     $pdo ??= beyond_db();
     $approvedContent = dailybreath_published_content($pdo, $contentDate, $tradition, $locale);
     if ($approvedContent) {
-        $approvedAudio = dailybreath_published_audio($pdo, $approvedContent);
         $verse = [
             'text' => (string)$approvedContent['passage'],
             'reference' => (string)$approvedContent['reference'],
@@ -128,6 +127,17 @@ try {
             'tradition' => $tradition,
             'source' => 'approved_daily_content',
         ];
+        try {
+            $approvedAudio = dailybreath_published_audio($pdo, $approvedContent);
+        } catch (Throwable $exception) {
+            // A missing audio table must never hide an approved reading.
+        }
+    } elseif ($tradition === 'bible' && $locale === 'en' && ($verse['source'] ?? '') === 'scheduled_recovery_library') {
+        try {
+            $approvedAudio = dailybreath_scheduled_verse_audio($pdo, $contentDate, $tradition, $locale, $verse);
+        } catch (Throwable $exception) {
+            // Scheduled reading audio is optional; keep the text available.
+        }
     }
 } catch (Throwable $exception) {
     // Existing automated readings remain available if the publishing tables are unavailable.
@@ -147,6 +157,7 @@ echo json_encode([
         'reference' => (string)($verse['reference'] ?? $fallbackVerse['reference']),
         'reflection' => $approvedContent ? (string)$approvedContent['reflection'] : 'Begin slowly. Make room for quiet, notice your breath, and let the next faithful step be enough for today.',
         'reader_url' => dailybreath_scripture_url($verse, 'https://beyondimagination.co.technology'),
+        'audio_url' => $approvedAudio ? $origin . (string)$approvedAudio['audio_url'] : null,
     ],
     'devotional' => [
         'id' => 1,

@@ -87,7 +87,9 @@ function dailybreath_published_content(PDO $pdo, string $date, string $tradition
 
 function dailybreath_narration_script(array $content): string
 {
-    return trim((string)$content['passage']) . "\n\n" . trim((string)$content['reference'])
+    $passage = trim((string)($content['passage'] ?? $content['text'] ?? $content['verse_text'] ?? ''));
+    $reference = trim((string)($content['reference'] ?? $content['scripture_reference'] ?? ''));
+    return $passage . "\n\n" . $reference
         . (trim((string)($content['reflection'] ?? '')) !== '' ? "\n\n" . trim((string)$content['reflection']) : '');
 }
 
@@ -106,9 +108,26 @@ function dailybreath_ensure_audio_table(PDO $pdo): void
 function dailybreath_published_audio(PDO $pdo, array $content): ?array
 {
     if (($content['status'] ?? '') !== 'published') return null;
+    return dailybreath_audio_for_script(
+        $pdo,
+        (string)$content['publish_date'],
+        (string)$content['tradition'],
+        (string)$content['locale'],
+        dailybreath_narration_script($content)
+    );
+}
+
+function dailybreath_audio_for_script(PDO $pdo, string $date, string $tradition, string $locale, string $script): ?array
+{
     dailybreath_ensure_audio_table($pdo);
     $query = $pdo->prepare('SELECT audio_url,voice_id,provider,generated_at,script_hash FROM dailybreath_daily_audio WHERE publish_date=? AND tradition=? AND locale=? LIMIT 1');
-    $query->execute([$content['publish_date'], $content['tradition'], $content['locale']]);
+    $query->execute([$date, $tradition, $locale]);
     $audio = $query->fetch(PDO::FETCH_ASSOC);
-    return is_array($audio) && hash_equals(hash('sha256', dailybreath_narration_script($content)), (string)$audio['script_hash']) ? $audio : null;
+    return is_array($audio) && hash_equals(hash('sha256', $script), (string)$audio['script_hash']) ? $audio : null;
+}
+
+function dailybreath_scheduled_verse_audio(PDO $pdo, string $date, string $tradition, string $locale, array $verse): ?array
+{
+    if ($tradition !== 'bible' || $locale !== 'en' || ($verse['source'] ?? '') !== 'scheduled_recovery_library') return null;
+    return dailybreath_audio_for_script($pdo, $date, $tradition, $locale, dailybreath_narration_script($verse));
 }

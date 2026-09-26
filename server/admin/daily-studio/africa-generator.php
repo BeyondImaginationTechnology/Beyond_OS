@@ -14,11 +14,9 @@ $azureReady = trim((string)beyond_config('narration.azure.api_key', '')) !== ''
 $lingalaVoice = beyond_config('narration.elevenlabs.voices.ln-CD', beyond_config('voice.voices.ln-CD', ''));
 $lingalaReady = trim(is_string($lingalaVoice) ? $lingalaVoice : '') !== ''
     && trim((string)beyond_config('narration.elevenlabs.api_key', beyond_config('voice.api_key', ''))) !== '';
-$view = str_replace('</head>', '<link rel="stylesheet" href="/server/admin/daily-studio/studio-sunset.css"></head>', $view);
 $view = str_replace(
     ['__CSRF_TOKEN__','__AZURE_STATUS__','__AZURE_CLASS__','__LINGALA_STATUS__','__LINGALA_CLASS__'],
     [htmlspecialchars((string)$_SESSION['verse_generator_csrf'], ENT_QUOTES, 'UTF-8'), $azureReady?'Ready':'Needs configuration', $azureReady?'ready':'needs', $lingalaReady?'Ready':'Needs native voice', $lingalaReady?'ready':'needs'],
     $view
 );
 echo $view;
-

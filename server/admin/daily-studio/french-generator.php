@@ -15,7 +15,6 @@ if ($view === false) {
     http_response_code(500);
     exit('Français du Jour generator view is unavailable.');
 }
-$view = str_replace('</head>', '<link rel="stylesheet" href="/server/admin/daily-studio/studio-sunset.css"></head>', $view);
 $rendererPath = __DIR__ . '/assets/beyond-french-remotion-renderer.js';
 $rendererVersion = is_file($rendererPath) ? (string)filemtime($rendererPath) : 'missing';
 $view = str_replace('__FRENCH_RENDERER_VERSION__', rawurlencode($rendererVersion), $view);

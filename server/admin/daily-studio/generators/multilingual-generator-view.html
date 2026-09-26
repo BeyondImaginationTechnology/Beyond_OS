@@ -93,10 +93,10 @@
   const selectedVoice=()=>selectedProvider()==='azure'?({'fr-FR':'fr-FR-DeniseNeural','it-IT':'it-IT-IsabellaNeural','de-DE':'de-DE-KatjaNeural','ru-RU':'ru-RU-SvetlanaNeural','pt-PT':'pt-PT-RaquelNeural'}[v('narratorLocale')]||''):'';
   const exportSettings=(language=v('exportLanguage'))=>({
     fr:{locale:'fr-FR',label:'French',banner:'Phrase Française du Jour',phrase:v('french'),pronunciation:v('frenchPron'),meaningLabel:'Meaning in English'},
-    it:{locale:'it-IT',label:'Italian',banner:'Phrase Française du Jour',phrase:v('italian'),pronunciation:v('italianPron'),meaningLabel:'Meaning in English'},
-    de:{locale:'de-DE',label:'German',banner:'Phrase Française du Jour',phrase:v('german'),pronunciation:v('germanPron'),meaningLabel:'Meaning in English'},
-    ru:{locale:'ru-RU',label:'Russian',banner:'Phrase Française du Jour',phrase:v('russian'),pronunciation:v('russianPron'),meaningLabel:'Meaning in English'},
-    pt:{locale:'pt-PT',label:'Portuguese',banner:'Phrase Française du Jour',phrase:v('portuguese'),pronunciation:v('portuguesePron'),meaningLabel:'Meaning in English'}
+    it:{locale:'it-IT',label:'Italian',banner:'Frase italiana del giorno',phrase:v('italian'),pronunciation:v('italianPron'),meaningLabel:'Meaning in English'},
+    de:{locale:'de-DE',label:'German',banner:'Deutscher Satz des Tages',phrase:v('german'),pronunciation:v('germanPron'),meaningLabel:'Meaning in English'},
+    ru:{locale:'ru-RU',label:'Russian',banner:'Фраза дня',phrase:v('russian'),pronunciation:v('russianPron'),meaningLabel:'Meaning in English'},
+    pt:{locale:'pt-PT',label:'Portuguese',banner:'Frase portuguesa do dia',phrase:v('portuguese'),pronunciation:v('portuguesePron'),meaningLabel:'Meaning in English'}
   }[language]||{locale:'fr-FR',label:'French',banner:'Phrase Française du Jour',phrase:v('french'),pronunciation:v('frenchPron'),meaningLabel:'Meaning in English'});
   function round(x,y,w,h,r,fill,stroke,line=2){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=line;ctx.stroke()}}
   function wrap(text,x,y,width,height,max=4,align='center'){const words=text.replace(/\s+/g,' ').trim().split(' '),lines=[];let line='';for(const word of words){const test=line?line+' '+word:word;if(ctx.measureText(test).width>width&&line){lines.push(line);line=word}else line=test}if(line)lines.push(line);ctx.textAlign=align;lines.slice(0,max).forEach((l,i)=>ctx.fillText(l,x,y+i*height));return lines.length}

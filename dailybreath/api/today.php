@@ -4,12 +4,13 @@ declare(strict_types=1);
 require_once __DIR__ . '/../../includes/ecosystem.php';
 require_once __DIR__ . '/../includes/verse-of-day.php';
 require_once __DIR__ . '/../includes/sacred-text.php';
+require_once __DIR__ . '/../includes/web-app.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 
-$locale = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($_GET['locale'] ?? 'en')) ?: 'en';
+$locale = dailybreath_scripture_locale((string)($_GET['locale'] ?? 'en'));
 $tradition = dailybreath_faith_tradition((string)($_GET['tradition'] ?? 'bible'));
 $contentDate = (string)($_GET['date'] ?? date('Y-m-d'));
 $parsedDate = DateTimeImmutable::createFromFormat('!Y-m-d', $contentDate);
@@ -111,6 +112,31 @@ try {
     $verse = $fallbackVerse;
 }
 
+$approvedContent = null;
+$approvedAudio = null;
+try {
+    $pdo ??= beyond_db();
+    $approvedContent = dailybreath_published_content($pdo, $contentDate, $tradition, $locale);
+    if ($approvedContent) {
+        $approvedAudio = dailybreath_published_audio($pdo, $approvedContent);
+        $verse = [
+            'text' => (string)$approvedContent['passage'],
+            'reference' => (string)$approvedContent['reference'],
+            'book' => (string)$approvedContent['reader_book'],
+            'chapter' => (int)$approvedContent['reader_chapter'],
+            'verse' => (int)$approvedContent['reader_verse'],
+            'tradition' => $tradition,
+            'source' => 'approved_daily_content',
+        ];
+    }
+} catch (Throwable $exception) {
+    // Existing automated readings remain available if the publishing tables are unavailable.
+}
+
+$origin = 'https://beyondimagination.co.technology';
+$shareUrl = $origin . '/dailybreath/daily.php?date=' . rawurlencode($contentDate)
+    . '&tradition=' . rawurlencode($tradition) . '&lang=' . rawurlencode($locale);
+
 echo json_encode([
     'ok' => true,
     'date' => $contentDate,
@@ -119,7 +145,7 @@ echo json_encode([
         'id' => 1,
         'text' => (string)($verse['text'] ?? $fallbackVerse['text']),
         'reference' => (string)($verse['reference'] ?? $fallbackVerse['reference']),
-        'reflection' => 'Begin slowly. Make room for quiet, notice your breath, and let the next faithful step be enough for today.',
+        'reflection' => $approvedContent ? (string)$approvedContent['reflection'] : 'Begin slowly. Make room for quiet, notice your breath, and let the next faithful step be enough for today.',
         'reader_url' => dailybreath_scripture_url($verse, 'https://beyondimagination.co.technology'),
     ],
     'devotional' => [
@@ -143,4 +169,16 @@ echo json_encode([
         'ends_on' => (string)$challenge['ends_on'],
     ],
     'source' => (string)($verse['source'] ?? 'emergency_fallback'),
+    'approved_content' => $approvedContent ? [
+        'date' => $contentDate,
+        'tradition' => $tradition,
+        'locale' => $locale,
+        'passage' => (string)$approvedContent['passage'],
+        'reference' => (string)$approvedContent['reference'],
+        'reflection' => (string)$approvedContent['reflection'],
+        'theme' => (string)$approvedContent['theme'],
+        'share_url' => $shareUrl,
+        'audio_url' => $approvedAudio ? $origin . (string)$approvedAudio['audio_url'] : null,
+        'updated_at' => (string)$approvedContent['updated_at'],
+    ] : null,
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

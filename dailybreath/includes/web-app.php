@@ -84,3 +84,31 @@ function dailybreath_published_content(PDO $pdo, string $date, string $tradition
     $row = $query->fetch(PDO::FETCH_ASSOC);
     return is_array($row) ? $row : null;
 }
+
+function dailybreath_narration_script(array $content): string
+{
+    return trim((string)$content['passage']) . "\n\n" . trim((string)$content['reference'])
+        . (trim((string)($content['reflection'] ?? '')) !== '' ? "\n\n" . trim((string)$content['reflection']) : '');
+}
+
+function dailybreath_ensure_audio_table(PDO $pdo): void
+{
+    static $initialized = false;
+    if ($initialized) return;
+    if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS dailybreath_daily_audio (publish_date TEXT NOT NULL,tradition TEXT NOT NULL,locale TEXT NOT NULL,script_hash TEXT NOT NULL,audio_url TEXT NOT NULL,voice_id TEXT NOT NULL,provider TEXT NOT NULL DEFAULT 'elevenlabs',generated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(publish_date,tradition,locale))");
+    } else {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS dailybreath_daily_audio (publish_date DATE NOT NULL,tradition VARCHAR(16) NOT NULL,locale VARCHAR(5) NOT NULL,script_hash CHAR(64) NOT NULL,audio_url VARCHAR(512) NOT NULL,voice_id VARCHAR(120) NOT NULL,provider VARCHAR(24) NOT NULL DEFAULT 'elevenlabs',generated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(publish_date,tradition,locale)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    }
+    $initialized = true;
+}
+
+function dailybreath_published_audio(PDO $pdo, array $content): ?array
+{
+    if (($content['status'] ?? '') !== 'published') return null;
+    dailybreath_ensure_audio_table($pdo);
+    $query = $pdo->prepare('SELECT audio_url,voice_id,provider,generated_at,script_hash FROM dailybreath_daily_audio WHERE publish_date=? AND tradition=? AND locale=? LIMIT 1');
+    $query->execute([$content['publish_date'], $content['tradition'], $content['locale']]);
+    $audio = $query->fetch(PDO::FETCH_ASSOC);
+    return is_array($audio) && hash_equals(hash('sha256', dailybreath_narration_script($content)), (string)$audio['script_hash']) ? $audio : null;
+}

@@ -22,6 +22,8 @@ define BEYOND_HOME_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/beyond-splash $(TARGET_DIR)/usr/bin/beyond-splash
 	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_HOME_PATH)/assets/boot.ppm \
 		$(TARGET_DIR)/usr/share/beyond-home/boot.ppm
+	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_HOME_PATH)/assets/wallpaper-home-v0.1.bmp \
+		$(TARGET_DIR)/usr/share/beyond-home/wallpaper.bmp
 	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_HOME_PATH)/board/x86_64/grub.cfg.in \
 		$(TARGET_DIR)/usr/share/beyond-home/grub.cfg.in
 	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_HOME_PATH)/overlay/usr/share/beyond-home/grub-installed.cfg.in \

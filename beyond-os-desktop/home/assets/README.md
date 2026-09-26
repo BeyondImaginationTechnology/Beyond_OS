@@ -21,5 +21,11 @@ Font binaries are not included. Artwork follows the repository's
 `CONTENT_RIGHTS.md`; source code follows `LICENSE`.
 
 
-`home-preview.png` shows the earlier Home prototype. A v0.1 dashboard capture
-will be recorded after the new native shell has compiled and booted in the VM.
+`wallpaper-home-v0.1.png` is the generated 1672 × 940 source wallpaper: an
+emerald Amazon rainforest canopy and river at sunrise. The desktop uses its
+1280 × 800 center-cropped `wallpaper-home-v0.1.bmp` build asset. Set
+`BEYOND_WALLPAPER` to a BMP path to preview another wallpaper; without the
+packaged bitmap, the desktop falls back to its procedural background.
+
+`home-preview.png` is an earlier Home prototype capture. It does not show this
+v0.1 wallpaper or dashboard.

@@ -31,6 +31,9 @@
 enum Page { HOME, FILES, NOTES, ABOUT, VIEWER };
 typedef struct { char name[256]; bool directory; } Entry;
 static SDL_Renderer *renderer;
+#ifndef BIT_EDITION_CYBER
+static SDL_Texture *wallpaper_texture;
+#endif
 static TTF_Font *small_font, *font, *title_font;
 static enum Page page = HOME;
 static char note[NOTE_CAP], status[256], directory[PATH_CAP], note_path[PATH_CAP];
@@ -377,16 +380,22 @@ static void draw(void)
     text(font, "Beyond OS", 68, 18, white);
     text(small_font, EDITION_LABEL, 224, 24, muted);
 #else
-    for (int y = 0; y < H; y++) {
-        int glow = y < 520 ? y / 12 : (H - y) / 14;
-        box(0, y, W, 1, 10 + glow / 2, 39 + glow, 76 + glow);
+    if (wallpaper_texture) {
+        SDL_Rect desktop = {0, 0, W, H};
+        SDL_RenderCopy(renderer, wallpaper_texture, NULL, &desktop);
+        glass(0, 0, W, H, 5, 15, 10, 24);
+    } else {
+        for (int y = 0; y < H; y++) {
+            int glow = y < 520 ? y / 12 : (H - y) / 14;
+            box(0, y, W, 1, 10 + glow / 2, 39 + glow, 76 + glow);
+        }
+        for (int i = 0; i < 10; i++) {
+            SDL_SetRenderDrawColor(renderer, 81, 157, 207, (Uint8)(34 - i * 3));
+            SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+            SDL_RenderDrawLine(renderer, 0, 532 + i * 13, W, 428 + i * 22);
+        }
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
     }
-    for (int i = 0; i < 10; i++) {
-        SDL_SetRenderDrawColor(renderer, 81, 157, 207, (Uint8)(34 - i * 3));
-        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-        SDL_RenderDrawLine(renderer, 0, 532 + i * 13, W, 428 + i * 22);
-    }
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
     glass(0, 0, W, 76, 5, 19, 39, 211);
     glass(0, 75, W, 1, 176, 218, 255, 114);
     orbit(37, 37, 22);
@@ -558,6 +567,15 @@ int main(int argc, char **argv)
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
     if (!renderer) { fprintf(stderr, "%s\n", SDL_GetError()); return 1; }
     SDL_RenderSetLogicalSize(renderer, W, H);
+#ifndef BIT_EDITION_CYBER
+    const char *wallpaper_path = getenv("BEYOND_WALLPAPER");
+    if (!wallpaper_path) wallpaper_path = "/usr/share/beyond-home/wallpaper.bmp";
+    SDL_Surface *wallpaper_surface = SDL_LoadBMP(wallpaper_path);
+    if (wallpaper_surface) {
+        wallpaper_texture = SDL_CreateTextureFromSurface(renderer, wallpaper_surface);
+        SDL_FreeSurface(wallpaper_surface);
+    }
+#endif
     if (preview) {
         draw();
         SDL_Surface *shot = SDL_CreateRGBSurfaceWithFormat(0, W, H, 32, SDL_PIXELFORMAT_ARGB8888);

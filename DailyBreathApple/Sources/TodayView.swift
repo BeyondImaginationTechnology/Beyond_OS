@@ -13,9 +13,6 @@ struct TodayView: View {
     @State private var narrationPlayer: AVPlayer?
     @State private var narrationURL: URL?
     @State private var narrationPlaying = false
-    @AppStorage("dailyReadingDayKeys") private var dailyReadingDayKeys = ""
-    @AppStorage("devotionalReadDayKeys") private var devotionalReadDayKeys = ""
-    @AppStorage("completedBreathDayKeys") private var completedBreathDayKeys = ""
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -33,28 +30,37 @@ struct TodayView: View {
         store.weeklyDevotional(for: selectedTradition)
     }
 
+    private var narrationAudioURL: URL? {
+        guard store.approvedContent?.tradition == selectedTradition else { return todayVerse.audioURL }
+        return store.approvedContent?.audioURL ?? todayVerse.audioURL
+    }
+
+    private var todayContentLocale: String {
+        switch selectedTradition {
+        case .bible: languageID
+        case .torah: "he"
+        case .quran: "ar"
+        }
+    }
+
+    private var todayShareURL: URL {
+        if let approved = store.approvedContent,
+           approved.date == todayKey,
+           approved.tradition == selectedTradition,
+           approved.locale == todayContentLocale {
+            return approved.shareURL
+        }
+        var components = URLComponents(string: "https://beyondimagination.co.technology/dailybreath/daily.php")!
+        components.queryItems = [
+            URLQueryItem(name: "date", value: todayKey),
+            URLQueryItem(name: "tradition", value: selectedTradition.id),
+            URLQueryItem(name: "lang", value: todayContentLocale)
+        ]
+        return components.url!
+    }
+
     private var todayKey: String {
         Self.dayFormatter.string(from: Date())
-    }
-
-    private var didReadDevotionalToday: Bool {
-        devotionalReadDayKeys.split(separator: ",").contains(Substring(todayKey))
-    }
-
-    private var didReadToday: Bool {
-        dailyReadingDayKeys.split(separator: ",").contains(Substring(todayKey))
-    }
-
-    private var didBreatheToday: Bool {
-        completedBreathDayKeys.split(separator: ",").contains(Substring(todayKey))
-    }
-
-    private var didReflectToday: Bool {
-        store.entries.contains { Calendar.current.isDateInToday($0.createdAt) }
-    }
-
-    private var dailyProgressCount: Int {
-        [didReadToday, didReadDevotionalToday, didBreatheToday, didReflectToday].filter(\.self).count
     }
 
     var body: some View {
@@ -62,7 +68,6 @@ struct TodayView: View {
             VStack(alignment: .leading, spacing: 18) {
                 todayIntro
                 todayReading
-                todayReflection
             }
             .padding()
         }
@@ -88,6 +93,9 @@ struct TodayView: View {
             }
         }
         .refreshable { await store.refreshToday() }
+        .onChange(of: selectedThemeID) { _, _ in
+            store.publishSelectedFaithContent()
+        }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .active else { return }
             Task {
@@ -117,69 +125,12 @@ struct TodayView: View {
     private var todayIntro: some View {
         BrandHeader()
         themePicker
-        dailyRhythmCard
         traditionPicker
     }
 
     @ViewBuilder
     private var todayReading: some View {
         verseCard
-        devotionalCard
-    }
-
-    @ViewBuilder
-    private var todayReflection: some View {
-        recoveryNewsletterCard
-        journalCard
-        quickActions
-    }
-
-    private var dailyRhythmCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack {
-                Label("Today's Rhythm", systemImage: "checklist.checked")
-                    .font(.headline)
-                Spacer()
-                Text("\(dailyProgressCount) of 4")
-                    .font(.caption.bold())
-                    .foregroundStyle(selectedTheme.primary)
-            }
-            HStack(spacing: 8) {
-                NavigationLink {
-                    VerseDetailView(verse: todayVerse, tradition: selectedTradition)
-                } label: {
-                    RhythmPill(title: "Read", isComplete: didReadToday, theme: selectedTheme)
-                }
-                .accessibilityHint("Opens today’s \(selectedTradition.dailyReadingName)")
-
-                NavigationLink {
-                    DevotionalDetailView(devotional: todayDevotional, tradition: selectedTradition)
-                } label: {
-                    RhythmPill(title: "Study", isComplete: didReadDevotionalToday, theme: selectedTheme)
-                }
-                .accessibilityHint("Opens this week’s \(selectedTradition.devotionalName)")
-
-                NavigationLink {
-                    BreatheView()
-                } label: {
-                    RhythmPill(title: "Breathe", isComplete: didBreatheToday, theme: selectedTheme)
-                }
-                .accessibilityHint("Opens the breathing practice")
-
-                NavigationLink {
-                    JournalView()
-                } label: {
-                    RhythmPill(title: "Reflect", isComplete: didReflectToday, theme: selectedTheme)
-                }
-                .accessibilityHint("Opens the reflection journal")
-            }
-            .buttonStyle(.plain)
-            Text("Small faithful steps count. Come back tomorrow, not because you broke a streak, but because peace is worth returning to.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .padding(16)
-        .background(.background.opacity(0.9), in: RoundedRectangle(cornerRadius: 8))
     }
 
     private var themePicker: some View {
@@ -239,11 +190,6 @@ struct TodayView: View {
             Text(todayVerse.reference)
                 .font(.headline.weight(.black))
                 .foregroundStyle(selectedTheme.accent)
-            Divider().overlay(.white.opacity(0.22))
-            Text(todayVerse.reflection)
-                .font(.body)
-                .foregroundStyle(.white.opacity(0.82))
-                .textSelection(.enabled)
             HStack(spacing: 10) {
                 NavigationLink {
                     VerseDetailView(verse: todayVerse, tradition: selectedTradition)
@@ -253,25 +199,21 @@ struct TodayView: View {
                 }
                 .buttonStyle(.bordered)
                 .tint(.white)
-                if let approved = store.approvedContent, approved.tradition == selectedTradition {
-                    ShareLink(item: approved.shareURL) {
-                        Label("Share", systemImage: "square.and.arrow.up")
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.white)
-                    Button {
-                        exportShareImage()
-                    } label: {
-                        Label("Image", systemImage: "photo")
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.white)
+                ShareLink(item: todayShareURL) {
+                    Label("Share", systemImage: "square.and.arrow.up")
                 }
+                .buttonStyle(.bordered)
+                .tint(.white)
+                Button {
+                    exportShareImage()
+                } label: {
+                    Label("Image", systemImage: "photo")
+                }
+                .buttonStyle(.bordered)
+                .tint(.white)
             }
             .controlSize(.large)
-            if let audioURL = store.approvedContent?.tradition == selectedTradition
-                ? (store.approvedContent?.audioURL ?? todayVerse.audioURL)
-                : todayVerse.audioURL {
+            if let audioURL = narrationAudioURL {
                 Button {
                     toggleNarration(url: audioURL)
                 } label: {
@@ -280,6 +222,11 @@ struct TodayView: View {
                 .buttonStyle(.borderedProminent)
                 .tint(selectedTheme.accent)
                 .accessibilityHint("Streams the online ElevenLabs narration. Internet connection required.")
+            } else {
+                Label("Online narration not available yet", systemImage: "waveform.slash")
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.72))
+                    .accessibilityLabel("Online narration is not available for this reading yet")
             }
         }
         .padding(24)
@@ -521,6 +468,7 @@ private struct DailyBreathExportCard: View {
                     .minimumScaleFactor(0.55)
                     .lineLimit(5)
                     .multilineTextAlignment(.center)
+                    .environment(\.layoutDirection, passageIsRightToLeft ? .rightToLeft : .leftToRight)
                     .foregroundStyle(.white)
                 Text(verse.reference)
                     .font(.system(size: 31, weight: .bold, design: .serif))
@@ -541,6 +489,12 @@ private struct DailyBreathExportCard: View {
             .padding(.vertical, 65)
         }
         .frame(width: 1200, height: 675)
+    }
+
+    private var passageIsRightToLeft: Bool {
+        verse.text.unicodeScalars.contains { scalar in
+            (0x0590...0x05FF).contains(scalar.value) || (0x0600...0x06FF).contains(scalar.value)
+        }
     }
 }
 

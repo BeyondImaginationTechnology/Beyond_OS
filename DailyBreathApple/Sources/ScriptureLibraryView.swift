@@ -145,11 +145,9 @@ struct ScriptureLibraryView: View {
             let snapshot = library
             searchResults = await Task.detached(priority: .userInitiated) { snapshot.search(query) }.value
         }
-        .onChange(of: traditionID) { _, value in
+        .onChange(of: traditionID) { _, _ in
             searchText = ""
             searchResults = []
-            let tradition = FaithTradition(rawValue: value) ?? .bible
-            selectedThemeID = DailyBreathTheme.recommended(for: tradition).id
             store.publishSelectedFaithContent()
         }
         .onChange(of: edition.id) { _, _ in

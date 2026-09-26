@@ -122,6 +122,9 @@ final class DailyBreathStore: ObservableObject {
     @Published private(set) var dailyContentAvailability: DailyContentAvailability = .awaitingRefresh
     @Published private(set) var approvedContent: ApprovedDailyContent?
     @Published private(set) var statusMessage = DailyContentAvailability.awaitingRefresh.title
+    private var syncedDailyVerse: Verse?
+    private var syncedTradition: FaithTradition?
+    private var syncedLocale: String?
     @Published var breathPhase = "Inhale"
     @Published var journalText = ""
     @Published var journalPrompt = DailyBreathStore.promptOfTheDay()
@@ -471,11 +474,19 @@ final class DailyBreathStore: ObservableObject {
     }
 
     func dailyVerse(for tradition: FaithTradition, date: Date = Date()) -> Verse {
+        let appLocale = UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en"
+        let contentLocale = Self.contentLocale(for: tradition, appLocale: appLocale)
+        if Calendar.current.isDateInToday(date),
+           syncedTradition == tradition,
+           syncedLocale == contentLocale,
+           let syncedDailyVerse {
+            return syncedDailyVerse
+        }
         if Calendar.current.isDateInToday(date),
            let approvedContent,
            approvedContent.date == Self.dateKey(date),
            approvedContent.tradition == tradition,
-           approvedContent.locale == (UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en") {
+           approvedContent.locale == contentLocale {
             return approvedContent.verse
         }
         let baseVerse: Verse
@@ -546,16 +557,21 @@ final class DailyBreathStore: ObservableObject {
         let requestedDate = Date()
         let requestedDateKey = Self.dateKey(requestedDate)
         let tradition = FaithTradition(rawValue: UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "bible") ?? .bible
-        let locale = UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en"
+        let appLocale = UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en"
+        let locale = Self.contentLocale(for: tradition, appLocale: appLocale)
 
         do {
             let today = try await apiClient.fetch(dateKey: requestedDateKey, tradition: tradition, locale: locale)
             guard (UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "bible") == tradition.id,
-                  (UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en") == locale,
+                  (UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en") == appLocale,
+                  Self.contentLocale(for: tradition, appLocale: appLocale) == locale,
                   Self.dateKey(Date()) == requestedDateKey else { return }
             approvedContent = today.approvedContent?.tradition == tradition && today.approvedContent?.locale == locale
                 ? today.approvedContent : nil
-            verse = RecoveryContent.resolvedVerseOfTheDay(for: requestedDate, remoteVerse: today.verse)
+            syncedDailyVerse = today.verse
+            syncedTradition = tradition
+            syncedLocale = locale
+            verse = today.verse
             devotional = today.devotional
             challenge = today.challenge ?? RecoveryContent.challengeOfTheDay(for: requestedDate)
             updateCurrentChallengeProgress()
@@ -564,9 +580,13 @@ final class DailyBreathStore: ObservableObject {
             statusMessage = DailyContentAvailability.current.title
         } catch {
             guard (UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "bible") == tradition.id,
-                  (UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en") == locale,
+                  (UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en") == appLocale,
+                  Self.contentLocale(for: tradition, appLocale: appLocale) == locale,
                   Self.dateKey(Date()) == requestedDateKey else { return }
             approvedContent = nil
+            syncedDailyVerse = nil
+            syncedTradition = nil
+            syncedLocale = nil
             loadBundledDailyContent(for: requestedDate)
             dailyContentAvailability = .offline
             statusMessage = DailyContentAvailability.offline.title
@@ -580,6 +600,14 @@ final class DailyBreathStore: ObservableObject {
         updateCurrentChallengeProgress()
         journalPrompt = Self.promptOfTheDay(for: date)
         recordDailyContent(for: date)
+    }
+
+    private static func contentLocale(for tradition: FaithTradition, appLocale: String) -> String {
+        switch tradition {
+        case .bible: appLocale
+        case .torah: "he"
+        case .quran: "ar"
+        }
     }
 
     private static func dateKey(_ date: Date) -> String {
@@ -767,6 +795,7 @@ final class DailyBreathStore: ObservableObject {
         defaults?.set(selectedVerse.text, forKey: "widgetVerseText")
         defaults?.set(selectedVerse.reference, forKey: "widgetVerseReference")
         defaults?.set(tradition.dailyReadingName.uppercased(), forKey: "widgetReadingLabel")
+        defaults?.set(UserDefaults.standard.string(forKey: "dailyBreathTheme") ?? "seasonal", forKey: "widgetThemeID")
         _ = defaults?.synchronize()
 #if canImport(WidgetKit)
         WidgetCenter.shared.reloadAllTimelines()

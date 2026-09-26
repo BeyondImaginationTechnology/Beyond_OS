@@ -8,7 +8,7 @@ enum DailyBreathTab: String, Hashable {
 struct RootView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
-    @State private var selectedTab: DailyBreathTab? = .home
+    @State private var selectedTab: DailyBreathTab? = .today
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)

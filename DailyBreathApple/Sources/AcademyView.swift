@@ -78,9 +78,7 @@ struct AcademyView: View {
             Task { await purchaseManager.load() }
         }
         .onChange(of: completedLessonIDs) { _ in refreshCertificate() }
-        .onChange(of: traditionID) { _, value in
-            let tradition = FaithTradition(rawValue: value) ?? .bible
-            selectedThemeID = DailyBreathTheme.recommended(for: tradition).id
+        .onChange(of: traditionID) { _, _ in
             store.publishSelectedFaithContent()
             refreshCertificate()
         }

@@ -75,6 +75,7 @@ try {
         'text'=>$text,
         'reference'=>$reference,
         'theme'=>trim((string)($input['theme'] ?? 'spiritual support')) ?: 'spiritual support',
+        'template_style'=>in_array(($input['template_style'] ?? ''), ['chris', 'dovi', 'moe'], true) ? $input['template_style'] : 'chris',
         'schedule_date'=>$date,
         'audio_file'=>$audioName,
         'translation'=>'WEB',

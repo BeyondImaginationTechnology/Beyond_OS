@@ -56,7 +56,7 @@
       <button id="regenerateNativeAudio" class="btn secondary wide" type="button">Regenerate native Spanish + Kreyòl + Patois MP3s</button>
       <div class="hint" style="margin:7px 0 13px">Resumable 300-track batch: Azure Spanish plus the configured Haitian and Jamaican ElevenLabs speakers.</div>
       <div class="grid"><label class="check"><input id="includeNarration" type="checkbox"> Include server audio</label><label class="check"><input id="showBadge" type="checkbox" checked> Show playing badge</label></div>
-      <div class="field" style="margin-top:13px"><label for="narrationProvider">Narration provider for export</label><select id="narrationProvider"><option value="">Studio default</option><option value="azure">Azure Speech</option></select><div class="hint">Choose Azure Speech to use your Azure credit for this preview, MP3, or animated Remotion export.</div></div>
+      <div class="field" style="margin-top:13px"><label for="narrationProvider">Narration provider for export</label><select id="narrationProvider" data-louis-ready="__LOUIS_VOICE_READY__"><option value="">French uses Louis · ElevenLabs; other locales use Studio default</option><option value="elevenlabs">ElevenLabs Premium</option><option value="openai">OpenAI Speech</option><option value="azure">Azure Speech</option></select><div class="hint">French defaults to the configured Louis voice. Choose another provider to override it; no audio is generated until you preview or export.</div></div>
       <div class="field" style="margin-top:13px"><label for="exportLanguage">Export version</label><select id="exportLanguage"><option value="en">English text + English audio</option><option value="fr">French text + French audio</option><option value="es">Spanish text + Spanish audio</option><option value="jm">Patois text + Patois audio</option><option value="ht">Kreyòl text + Kreyòl audio</option></select></div>
       <div class="field" style="margin-top:13px"><label for="narratorLocale">Narrator voice</label><select id="narratorLocale"><option value="fr-FR">French</option><option value="es-ES">Spanish</option><option value="en-US">English (overview)</option><option value="en-JM">Jamaican Patois</option><option value="ht-HT">Haitian Kreyòl</option></select></div>
       <div class="field"><label for="audioFile">Optional narration file</label><input id="audioFile" type="file" accept="audio/*"><div class="hint">Patois and Kreyòl use the current server speaker when it supports those locales. Upload audio to override or supply a voice when it does not.</div></div>
@@ -95,7 +95,7 @@
   const localeLanguages=Object.fromEntries(Object.entries(languageLocales).map(([language,locale])=>[locale,language]));
   const languageForLocale=locale=>localeLanguages[locale]||'en';
   const selectedLanguage=()=>languageForLocale(v('narratorLocale'))||v('exportLanguage')||'en';
-  const selectedProvider=()=>v('narrationProvider');
+  const selectedProvider=()=>v('narrationProvider')||(v('narratorLocale')==='fr-FR'&&$('narrationProvider').dataset.louisReady==='1'?'elevenlabs':'');
   const selectedVoice=()=>selectedProvider()==='azure'?({'fr-FR':'fr-FR-DeniseNeural','fr-CA':'fr-CA-SylvieNeural','es-ES':'es-ES-ElviraNeural'}[v('narratorLocale')]||''):'';
   const exportSettings=()=>({
     en:{locale:'en-US',label:'English',banner:'Today’s English Phrase',phrase:v('phrase'),pronunciation:'',meaningLabel:'What it means'},

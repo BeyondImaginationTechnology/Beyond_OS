@@ -10,6 +10,7 @@ declare(strict_types=1);
  */
 require_once dirname(__DIR__, 3) . '/beyond-id/includes/admin-check.php';
 require_once dirname(__DIR__, 3) . '/beyond-id/includes/functions.php';
+require_once dirname(__DIR__, 3) . '/config/bootstrap.php';
 
 if (!class_exists('Auth', false)) {
     final class Auth

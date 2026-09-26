@@ -174,7 +174,7 @@ foreach ($collections as $collectionSlug => $collection) {
 <section class="bt-page-section"><div class="bt-wrap">
   <form class="filter-row" method="get" role="search" style="margin-bottom:18px"><label class="sr-only" for="stencil-search">Search approved stencils</label><input class="input" id="stencil-search" name="q" value="<?= e($searchQuery) ?>" placeholder="Search subject, style, placement, or difficulty"><?php if ($activeCategory !== ''): ?><input type="hidden" name="category" value="<?= e($activeCategory) ?>"><?php endif; ?><select class="input" name="style" aria-label="Filter by style"><option value="">All styles</option><option value="black-and-grey" <?= $filterStyle === 'black-and-grey' ? 'selected' : '' ?>>Black &amp; grey</option><option value="realism" <?= $filterStyle === 'realism' ? 'selected' : '' ?>>Realism</option><option value="japanese" <?= $filterStyle === 'japanese' ? 'selected' : '' ?>>Japanese</option></select><select class="input" name="difficulty" aria-label="Filter by difficulty"><option value="">All difficulty</option><option value="intermediate" <?= $filterDifficulty === 'intermediate' ? 'selected' : '' ?>>Intermediate</option><option value="advanced" <?= $filterDifficulty === 'advanced' ? 'selected' : '' ?>>Advanced</option></select><input class="input" name="placement" value="<?= e($filterPlacement) ?>" placeholder="Placement"><input class="input" name="collection" value="<?= e($filterCollection) ?>" placeholder="Collection"><input class="input" type="date" name="from" value="<?= e($filterFrom) ?>" aria-label="Release date from"><input class="input" type="date" name="to" value="<?= e($filterTo) ?>" aria-label="Release date to"><button class="bt-outline-button" type="submit">Filter library</button></form>
   <?php if (($stencilDay['updated_at'] ?? '') !== '' && $searchQuery === '' && $activeCategory === ''): ?>
-  <section class="bt-library-group" id="studio-release"><div class="bt-library-heading"><div><p>BEYOND STUDIO RELEASE</p><h2>Latest published stencil</h2></div><span>Live now</span></div><div class="bt-stencil-schedule-grid"><article class="bt-schedule-card is-current is-unlocked" role="button" tabindex="0" aria-haspopup="dialog" aria-label="View <?= e($stencilDay['title']) ?> stencil" data-stencil-preview="<?= e($stencilDay['preview_url']) ?>" data-stencil-title="<?= e($stencilDay['title']) ?>" data-stencil-collection="<?= e($stencilDay['collection']) ?>" data-stencil-date="<?= e($stencilDay['display_date']) ?>" data-stencil-download="<?= e($stencilDay['transfer_png_url']) ?>" data-stencil-outline="<?= e($stencilDay['outline_png_url'] ?? '') ?>"><div class="bt-schedule-number">AI</div><div><time datetime="<?= e($stencilDay['iso_date']) ?>"><?= e($stencilDay['display_date']) ?></time><h3><?= e($stencilDay['title']) ?></h3><p><?= e($stencilDay['description']) ?></p></div><span>View stencil</span></article></div></section>
+  <section class="bt-library-group" id="studio-release"><div class="bt-library-heading"><div><p>BEYOND STUDIO RELEASE</p><h2>Latest published stencil</h2></div><span>Live now</span></div><div class="bt-stencil-schedule-grid"><article class="bt-schedule-card is-current is-unlocked" role="button" tabindex="0" aria-haspopup="dialog" aria-label="View <?= e($stencilDay['title']) ?> stencil" data-stencil-preview="<?= e($stencilDay['preview_url']) ?>" data-stencil-title="<?= e($stencilDay['title']) ?>" data-stencil-collection="<?= e($stencilDay['collection']) ?>" data-stencil-date="<?= e($stencilDay['display_date']) ?>" data-stencil-download="<?= e($stencilDay['transfer_png_url']) ?>" data-stencil-outline="<?= e($stencilDay['outline_png_url'] ?? '') ?>" data-stencil-pdf="<?= e($stencilDay['transfer_pdf_url'] ?? '') ?>" data-stencil-reference="<?= e($stencilDay['reference_image_url'] ?? '') ?>" data-stencil-placement="<?= e($stencilDay['placement_image_url'] ?? '') ?>" data-stencil-pack="<?= ($stencilDay['pack_image_url'] ?? '') !== ($stencilDay['preview_url'] ?? '') ? e($stencilDay['pack_image_url'] ?? '') : '' ?>" data-stencil-lore="<?= e($stencilDay['lore_card_url'] ?? '') ?>" data-stencil-style="<?= e($stencilDay['style_card_url'] ?? '') ?>" data-stencil-zip="<?= e($stencilDay['package_url'] ?? '') ?>"><div class="bt-schedule-number">AI</div><div><time datetime="<?= e($stencilDay['iso_date']) ?>"><?= e($stencilDay['display_date']) ?></time><h3><?= e($stencilDay['title']) ?></h3><p><?= e($stencilDay['description']) ?></p></div><span>View stencil</span></article></div></section>
   <?php endif; ?>
   <div class="bt-category-browser" aria-label="Browse stencils by category">
     <a class="<?= $activeCategory === '' ? 'is-active' : '' ?>" href="stencils.php"><b>▦</b><span>All</span><small><?= e((string)$availableCount) ?></small></a>
@@ -232,6 +232,7 @@ foreach ($collections as $collectionSlug => $collection) {
       data-stencil-pack="<?= is_file(__DIR__ . '/' . $assets['pack']) ? e($assets['pack']) : '' ?>"
       data-stencil-lore="<?= is_file(__DIR__ . '/' . $assets['lore']) ? e($assets['lore']) : '' ?>"
       data-stencil-style="<?= is_file(__DIR__ . '/' . $assets['style']) ? e($assets['style']) : '' ?>"
+      data-stencil-zip="api/stencil-download.php?type=package&amp;id=<?= e(bt_stencil_asset_slug($item[0]) . '-' . $item[1]) ?>"
     <?php endif; ?>
   >
     <div class="bt-schedule-number"><?= str_pad((string)$itemNumber,2,'0',STR_PAD_LEFT) ?></div>
@@ -241,24 +242,45 @@ foreach ($collections as $collectionSlug => $collection) {
   </div></section><?php endforeach; ?>
 </div></section>
 
+<style>
+.bt-stencil-viewer-art{position:relative;display:flex!important;flex-direction:column;align-items:stretch!important;justify-content:center;gap:12px;min-width:0}
+.bt-stencil-carousel-stage{position:relative;display:grid;place-items:center;min-height:0;flex:1;touch-action:pan-y;cursor:grab}
+.bt-stencil-carousel-stage img{width:100%;height:100%;max-height:68dvh;object-fit:contain;background:#fff;border-radius:8px;box-shadow:0 18px 55px rgba(0,0,0,.45);user-select:none;-webkit-user-drag:none}
+.bt-stencil-carousel-nav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:42px;height:42px;border:1px solid rgba(255,255,255,.35);border-radius:50%;background:rgba(5,3,8,.82);color:#fff;font-size:1.7rem;line-height:1;cursor:pointer}
+.bt-stencil-carousel-nav:disabled{opacity:.42;cursor:default}.bt-stencil-carousel-prev{left:10px}.bt-stencil-carousel-next{right:10px}
+.bt-stencil-carousel-footer{display:grid;grid-template-columns:1fr auto;gap:5px 12px;align-items:center;color:#fff;font-size:.78rem;font-weight:800}
+.bt-stencil-carousel-count{color:#c9b9cf;font-size:.7rem;font-weight:700}.bt-stencil-carousel-dots{grid-column:1/-1;display:flex;justify-content:center;gap:7px;padding:4px}
+.bt-stencil-carousel-dots{overflow-x:auto;justify-content:flex-start;scrollbar-width:thin;scrollbar-color:#d3a452 #25102f}.bt-stencil-carousel-dot{flex:none;width:74px;min-height:78px;padding:4px;border:2px solid transparent;border-radius:8px;background:#241b29;color:#fff;cursor:pointer;font-size:.61rem;line-height:1.1}.bt-stencil-carousel-dot img{width:100%;height:48px;object-fit:cover;border-radius:4px}.bt-stencil-carousel-dot[aria-current=true]{border-color:#d3a452;background:#46304f}
+.bt-stencil-viewer-actions [hidden]{display:none!important}
+@media(max-width:760px){.bt-stencil-carousel-stage img{max-height:48dvh}.bt-stencil-carousel-nav{width:38px;height:38px}.bt-stencil-viewer-art{height:54dvh!important;padding:14px!important}}
+</style>
 <div class="bt-stencil-viewer" id="bt-stencil-viewer" hidden aria-hidden="true">
   <button class="bt-stencil-viewer-backdrop" type="button" data-stencil-close aria-label="Close stencil preview"></button>
   <section class="bt-stencil-viewer-dialog" role="dialog" aria-modal="true" aria-labelledby="bt-stencil-viewer-title">
     <button class="bt-stencil-viewer-close" type="button" data-stencil-close aria-label="Close stencil preview">×</button>
-    <div class="bt-stencil-viewer-art"><img src="" alt="" data-stencil-viewer-image></div>
+    <div class="bt-stencil-viewer-art" role="region" aria-label="Stencil asset carousel" aria-roledescription="carousel">
+      <div class="bt-stencil-carousel-stage" data-stencil-carousel-stage>
+        <button class="bt-stencil-carousel-nav bt-stencil-carousel-prev" type="button" data-stencil-carousel-prev aria-label="Previous asset">‹</button>
+        <img src="" alt="" data-stencil-viewer-image>
+        <button class="bt-stencil-carousel-nav bt-stencil-carousel-next" type="button" data-stencil-carousel-next aria-label="Next asset">›</button>
+      </div>
+      <div class="bt-stencil-carousel-footer"><span data-stencil-carousel-label>Official outline stencil</span><span class="bt-stencil-carousel-count" data-stencil-carousel-count aria-live="polite"></span><div class="bt-stencil-carousel-dots" data-stencil-carousel-dots aria-label="Scroll assets and choose one"></div></div>
+    </div>
     <div class="bt-stencil-viewer-copy">
       <p data-stencil-viewer-meta>Unlocked stencil</p>
       <h2 id="bt-stencil-viewer-title" data-stencil-viewer-title>Stencil preview</h2>
-      <p class="bt-stencil-viewer-note">Watermarked preview. Open the print-ready file for studio use.</p>
+      <p class="bt-stencil-viewer-note">Official outline first, followed by the other available stencil assets.</p>
       <div class="bt-stencil-viewer-actions">
         <a class="bt-glow-button" href="#" download data-stencil-viewer-download hidden>↓ Download PNG</a>
         <a class="bt-glow-button" href="#" download data-stencil-viewer-outline hidden>↓ Download outline stencil</a>
-        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-pdf hidden>Open printable PDF</a>
-        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-reference hidden>Reference artwork</a>
-        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-placement hidden>Placement mockup</a>
-        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-pack hidden>Premium packaging</a>
-        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-lore hidden>Lore card</a>
-        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-style hidden>Style card</a>
+        <a class="bt-glow-button" href="#" download data-stencil-viewer-current hidden>↓ Download current asset</a>
+        <a class="bt-glow-button" href="#" download data-stencil-viewer-zip hidden>↓ Download all assets (ZIP)</a>
+        <a class="bt-outline-button" href="#" download data-stencil-viewer-pdf hidden>↓ Download printable PDF</a>
+        <a class="bt-outline-button" href="#" download data-stencil-viewer-reference hidden>↓ Download reference artwork</a>
+        <a class="bt-outline-button" href="#" download data-stencil-viewer-placement hidden>↓ Download placement mockup</a>
+        <a class="bt-outline-button" href="#" download data-stencil-viewer-pack hidden>↓ Download packaging</a>
+        <a class="bt-outline-button" href="#" download data-stencil-viewer-lore hidden>↓ Download lore card</a>
+        <a class="bt-outline-button" href="#" download data-stencil-viewer-style hidden>↓ Download style card</a>
       </div>
     </div>
   </section>
@@ -271,19 +293,130 @@ foreach ($collections as $collectionSlug => $collection) {
 (() => {
   const viewer = document.getElementById('bt-stencil-viewer');
   if (!viewer) return;
+  const image = viewer.querySelector('[data-stencil-viewer-image]');
+  const title = viewer.querySelector('[data-stencil-viewer-title]');
+  const meta = viewer.querySelector('[data-stencil-viewer-meta]');
+  const label = viewer.querySelector('[data-stencil-carousel-label]');
+  const counter = viewer.querySelector('[data-stencil-carousel-count]');
+  const dots = viewer.querySelector('[data-stencil-carousel-dots]');
+  const previous = viewer.querySelector('[data-stencil-carousel-prev]');
+  const next = viewer.querySelector('[data-stencil-carousel-next]');
+  const download = viewer.querySelector('[data-stencil-viewer-download]');
+  const outlineDownload = viewer.querySelector('[data-stencil-viewer-outline]');
+  const pdfDownload = viewer.querySelector('[data-stencil-viewer-pdf]');
+  const currentDownload = viewer.querySelector('[data-stencil-viewer-current]');
+  const zipDownload = viewer.querySelector('[data-stencil-viewer-zip]');
   const links = ['outline', 'reference', 'placement', 'pack', 'lore', 'style'];
-  const prepareAssetLinks = (card) => links.forEach((name) => {
-    const link = viewer.querySelector(`[data-stencil-viewer-${name}]`);
-    const url = card.dataset[`stencil${name[0].toUpperCase()}${name.slice(1)}`] || '';
+  let currentCard = null;
+  let slides = [];
+  let activeSlide = 0;
+  let pointerStart = null;
+  const setLink = (link, url) => {
     if (!link) return;
     if (url) { link.href = url; link.hidden = false; }
     else { link.removeAttribute('href'); link.hidden = true; }
+  };
+  const prepareAssetLinks = (card) => links.forEach((name) => {
+    const link = viewer.querySelector(`[data-stencil-viewer-${name}]`);
+    const url = card.dataset[`stencil${name[0].toUpperCase()}${name.slice(1)}`] || '';
+    setLink(link, url);
   });
+  const showSlide = (index) => {
+    if (!slides.length) return;
+    activeSlide = (index + slides.length) % slides.length;
+    const slide = slides[activeSlide];
+    image.src = slide.url;
+    image.alt = `${currentCard.dataset.stencilTitle || 'Stencil'} — ${slide.label}`;
+    label.textContent = slide.label;
+    setLink(currentDownload, slide.url);
+    counter.textContent = `${activeSlide + 1} / ${slides.length}`;
+    previous.disabled = slides.length < 2;
+    next.disabled = slides.length < 2;
+    dots.querySelectorAll('button').forEach((dot, dotIndex) => dot.setAttribute('aria-current', dotIndex === activeSlide ? 'true' : 'false'));
+    dots.children[activeSlide]?.scrollIntoView({block: 'nearest', inline: 'nearest'});
+  };
+  const open = (card) => {
+    currentCard = card;
+    const titleText = card.dataset.stencilTitle || 'Stencil preview';
+    const urls = [
+      ['Official outline stencil', card.dataset.stencilOutline],
+      ['Print-ready stencil', card.dataset.stencilDownload],
+      ['Preview', card.dataset.stencilPreview],
+      ['Reference artwork', card.dataset.stencilReference],
+      ['Placement mockup', card.dataset.stencilPlacement],
+      ['Premium packaging', card.dataset.stencilPack],
+      ['Lore card', card.dataset.stencilLore],
+      ['Style card', card.dataset.stencilStyle],
+    ];
+    const seen = new Set();
+    slides = urls.filter(([assetLabel, url]) => {
+      if (!url || seen.has(url)) return false;
+      seen.add(url);
+      return true;
+    }).map(([assetLabel, url]) => ({label: assetLabel, url}));
+    title.textContent = titleText;
+    meta.textContent = [card.dataset.stencilCollection, card.dataset.stencilDate, 'Unlocked'].filter(Boolean).join(' · ');
+    setLink(download, card.dataset.stencilDownload || '');
+    setLink(outlineDownload, card.dataset.stencilOutline || '');
+    setLink(pdfDownload, card.dataset.stencilPdf || '');
+    setLink(zipDownload, card.dataset.stencilZip || '');
+    prepareAssetLinks(card);
+    dots.replaceChildren(...slides.map((slide, index) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'bt-stencil-carousel-dot';
+      dot.setAttribute('aria-label', `Show ${slide.label}`);
+      const thumbnail = document.createElement('img');
+      thumbnail.src = slide.url;
+      thumbnail.alt = '';
+      thumbnail.loading = 'lazy';
+      dot.append(thumbnail, document.createTextNode(slide.label));
+      dot.addEventListener('click', () => showSlide(index));
+      return dot;
+    }));
+    showSlide(0);
+    viewer.hidden = false;
+    viewer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('bt-modal-open');
+    viewer.querySelector('[data-stencil-close]')?.focus();
+  };
+  const close = () => {
+    viewer.hidden = true;
+    viewer.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('bt-modal-open');
+    image.removeAttribute('src');
+    currentCard?.focus();
+    currentCard = null;
+  };
+  previous.addEventListener('click', () => showSlide(activeSlide - 1));
+  next.addEventListener('click', () => showSlide(activeSlide + 1));
+  viewer.querySelector('[data-stencil-carousel-stage]').addEventListener('pointerdown', (event) => {
+    pointerStart = {x: event.clientX, y: event.clientY};
+  });
+  viewer.querySelector('[data-stencil-carousel-stage]').addEventListener('pointerup', (event) => {
+    if (!pointerStart) return;
+    const dx = event.clientX - pointerStart.x;
+    const dy = event.clientY - pointerStart.y;
+    pointerStart = null;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) showSlide(activeSlide + (dx < 0 ? 1 : -1));
+  });
+  viewer.querySelector('[data-stencil-carousel-stage]').addEventListener('wheel', (event) => {
+    if (slides.length < 2 || Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+    event.preventDefault();
+    showSlide(activeSlide + (event.deltaX > 0 ? 1 : -1));
+  }, {passive: false});
   document.querySelectorAll('[data-stencil-preview]').forEach((card) => {
-    card.addEventListener('click', () => prepareAssetLinks(card));
+    card.addEventListener('click', (event) => { event.stopImmediatePropagation(); open(card); });
     card.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter' || event.key === ' ') prepareAssetLinks(card);
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); event.stopImmediatePropagation(); open(card); }
     });
+  });
+  viewer.querySelectorAll('[data-stencil-close]').forEach((button) => button.addEventListener('click', (event) => { event.stopImmediatePropagation(); close(); }));
+  document.addEventListener('keydown', (event) => {
+    if (viewer.hidden) return;
+    if (event.key === 'ArrowLeft') { event.preventDefault(); showSlide(activeSlide - 1); }
+    else if (event.key === 'ArrowRight') { event.preventDefault(); showSlide(activeSlide + 1); }
+    else if (event.key === 'Escape') { event.stopImmediatePropagation(); close(); }
   });
   const savedKey = 'beyond-tattoo-saved-stencils';
   const saved = new Set(JSON.parse(localStorage.getItem(savedKey) || '[]'));

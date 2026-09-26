@@ -6,10 +6,23 @@ require_once __DIR__ . '/../../includes/stencil-tracking.php';
 require_once __DIR__ . '/../includes/stencil-content.php';
 require_once __DIR__ . '/../includes/stencil-package.php';
 $stencil = bt_stencil_content();
+$requestedId = trim((string)($_GET['id'] ?? ''));
+if ($requestedId !== '') {
+    if (!preg_match('/^[a-z0-9-]+$/', $requestedId)) { http_response_code(400); exit('Invalid stencil ID.'); }
+    $selected = null;
+    foreach (bt_asset_library() as $asset) {
+        if ($asset['id'] === $requestedId) { $selected = $asset; break; }
+    }
+    if ($selected === null) { http_response_code(404); exit('Stencil package unavailable.'); }
+    $packageFiles = [];
+    foreach ($selected['files'] as $assetFile) $packageFiles[$assetFile['url']] = $selected['slug'] . '/' . $assetFile['file'];
+    $stencil = ['slug' => $selected['id'], 'package_files' => $packageFiles];
+}
 $type = strtolower((string)($_GET['type'] ?? 'package'));
 $slug = preg_replace('/[^a-z0-9-]+/i', '-', (string)($stencil['slug'] ?? 'stencil-of-the-day'));
 
 try {
+    if ($requestedId !== '' && $type !== 'package') { http_response_code(400); exit('Only stencil packages support an ID.'); }
     if ($type === 'package') {
         $file = bt_stencil_package($stencil);
         $mime = 'application/zip'; $name = 'beyond-tattoo-' . trim((string)$slug, '-') . '.zip';
@@ -38,7 +51,7 @@ try {
     error_log('Stencil download unavailable: ' . $e->getMessage());
     http_response_code(404); exit('The current stencil asset is unavailable. Please try again shortly.');
 }
-track_stencil_download('stencil-of-day.' . $type);
+track_stencil_download(($requestedId !== '' ? 'library.' : 'stencil-of-day.') . $type);
 header('Content-Type: ' . $mime);
 header('Content-Disposition: attachment; filename="' . $name . '"');
 header('Content-Length: ' . filesize($file));

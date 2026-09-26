@@ -74,3 +74,4 @@ body.app-shell .voice-card.voice-fr:hover{background:linear-gradient(145deg,#d43
 body.app-shell .voice-card.voice-es:hover{background:linear-gradient(145deg,#ffd34d,#e9a915)}
 body.app-shell .voice-card.voice-ht:hover{background:linear-gradient(145deg,#347de0,#205ab2)}
 body.app-shell .voice-card.voice-jm:hover{background:linear-gradient(145deg,#1caf71,#0a8552)}
+.quest-character-voice{display:block;margin:7px 14px 0;color:#c1cee2;font-size:.72rem;font-weight:750}.quest-active-tutor em{line-height:1.45}

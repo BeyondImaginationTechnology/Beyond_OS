@@ -13,10 +13,25 @@ try {
 
     $payload = json_decode((string)file_get_contents('php://input'), true);
     $text = trim((string)($payload['text'] ?? ''));
+    $profiles = [
+        'louis' => ['voice_locale' => 'fr-FR'],
+        'irie' => ['voice_locale' => 'en-JM'],
+        'jazzy' => ['voice_locale' => 'ht-HT'],
+        'pablo' => ['voice_locale' => 'es-ES'],
+    ];
+    $character = strtolower(trim((string)($payload['character'] ?? '')));
+    $profile = $character !== '' ? ($profiles[$character] ?? null) : null;
     $locale = trim((string)($payload['locale'] ?? ''));
+    $speechLocale = $locale;
+    if ($profile !== null) {
+        $locale = $profile['voice_locale'];
+        // Keep the configured ElevenLabs voice in its profile locale. The
+        // multilingual model detects French from the supplied phrase itself.
+        $speechLocale = $profile['voice_locale'];
+    }
     $allowed = ['fr-FR', 'fr-CA', 'es-ES', 'ht-HT', 'en-JM', 'en-US'];
     $textLength = function_exists('mb_strlen') ? mb_strlen($text, 'UTF-8') : strlen($text);
-    if ($text === '' || $textLength > 300 || !in_array($locale, $allowed, true)) {
+    if ($text === '' || $textLength > 300 || ($character !== '' && $profile === null) || !in_array($locale, $allowed, true) || !in_array($speechLocale, $allowed, true)) {
         http_response_code(422);
         echo json_encode(['error' => 'Invalid request']);
         exit;
@@ -24,13 +39,7 @@ try {
 
     $cacheDir = beyond_private_root() . '/cache/voices';
     if (!is_dir($cacheDir)) mkdir($cacheDir, 0700, true);
-    if ($locale === 'es-ES') {
-        $providerOrder = ['azure'];
-    } elseif (in_array($locale, ['ht-HT', 'en-JM'], true)) {
-        $providerOrder = ['elevenlabs'];
-    } else {
-        $providerOrder = ['azure', 'openai', 'elevenlabs'];
-    }
+    $providerOrder = ['elevenlabs'];
     $voicePlan = [];
     foreach ($providerOrder as $providerName) {
         try {
@@ -50,7 +59,7 @@ try {
         exit;
     }
 
-    $key = hash('sha256', implode(',', array_map(static fn($item): string => $item['provider'] . ':' . $item['voice'], $voicePlan)) . '|' . $locale . '|' . preg_replace('/\s+/u', ' ', $text));
+    $key = hash('sha256', implode(',', array_map(static fn($item): string => $item['provider'] . ':' . $item['voice'], $voicePlan)) . '|' . $speechLocale . '|' . preg_replace('/\s+/u', ' ', $text));
     $cache = $cacheDir . '/' . $key . '.mp3';
     $usedProvider = '';
     $usedVoice = '';
@@ -63,7 +72,7 @@ try {
                 $result = narration_service()->generate($item['provider'], [
                     'provider' => $item['provider'],
                     'voice' => $item['voice'],
-                    'language' => $locale,
+                    'language' => $speechLocale,
                     'text' => $text,
                     'instructions' => 'Clear, warm, natural language-learning pronunciation.',
                     'speed' => isset($payload['speed']) && is_numeric($payload['speed']) ? max(0.25, min(4.0, (float)$payload['speed'])) : 0.95,

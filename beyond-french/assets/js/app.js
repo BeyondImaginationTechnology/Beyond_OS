@@ -96,7 +96,7 @@ class BeyondLocalVoiceAPI {
     const matches = this.matching(locale);
     this.select.innerHTML = "";
     if (this.liveProviderDemoOnly(locale)) {
-      this.select.add(new Option(locale === "es-ES" ? "Azure Elvira live test" : "ElevenLabs live personal test", ""));
+      this.select.add(new Option("ElevenLabs live personal test", ""));
       return;
     }
     if (matches.length) {

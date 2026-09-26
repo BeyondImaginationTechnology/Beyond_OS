@@ -4,10 +4,10 @@
   if (!root || !content) return;
   const key = 'beyond-french-quest-v1';
   const tutors = [
-    { id:'louis', name:'Louis', label:'French tutor', flag:'🇫🇷' },
-    { id:'irie', name:'Irie', label:'Jamaican Patois tutor', flag:'🇯🇲' },
-    { id:'jazzy', name:'Jazzy', label:'Haitian Kreyòl tutor', flag:'🇭🇹' },
-    { id:'pablo', name:'Pablo', label:'Spanish tutor', flag:'🇪🇸' }
+    { id:'louis', name:'Louis', label:'French tutor', flag:'🇫🇷', voiceLabel:'French' },
+    { id:'irie', name:'Irie', label:'Jamaican Patois tutor', flag:'🇯🇲', voiceLabel:'Jamaican' },
+    { id:'jazzy', name:'Jazzy', label:'Haitian Kreyòl tutor', flag:'🇭🇹', voiceLabel:'Haitian Kreyòl' },
+    { id:'pablo', name:'Pablo', label:'Spanish tutor', flag:'🇪🇸', voiceLabel:'Spanish' }
   ];
   const regions = [
     { id:'port-au-prince', title:'Port-au-Prince', subtitle:'Begin the journey in the colorful Caribbean capital', icon:'⌂', color:'#ff5c9a', missions:[['translate','Choose the French greeting for hello.','Bonjour !','Hello','Use bonjour during the day.'],['listen','What does merci mean?','Thank you.','Merci.','Merci is always useful.'],['translate','Pick the polite word for please.',"S'il vous plait.",'Please',"S'il vous plait is the polite form."]] },
@@ -23,11 +23,11 @@
   function selectedTutor(){ return tutors.find(tutor => tutor.id === state.character) || null; }
   function tutorImage(tutor){ return `${root.dataset.tutorsBase}${tutor.id}.jpg`; }
   function renderCharacterSelect(){
-    content.innerHTML=`<section class="quest-character-select"><p class="quest-kicker">PLAYABLE CHARACTERS</p><h1 id="quest-title">Choose your tutor</h1><p>Pick the guide who will join you on the French Quest world tour.</p><div class="quest-character-grid">${tutors.map(tutor=>`<button class="quest-character ${state.character===tutor.id?'selected':''}" data-tutor="${tutor.id}"><img src="${tutorImage(tutor)}" alt="${esc(tutor.name)}"><span>${tutor.flag} ${esc(tutor.label)}</span><strong>${esc(tutor.name)}</strong></button>`).join('')}</div><button class="quest-primary" id="start-quest" ${selectedTutor()?'':'disabled'}>BEGIN WORLD TOUR →</button><button class="quest-back" id="character-menu">← Main menu</button></section>`;
+    content.innerHTML=`<section class="quest-character-select"><p class="quest-kicker">PLAYABLE CHARACTERS</p><h1 id="quest-title">Choose your tutor</h1><p>Pick the guide who will join you on the French Quest world tour.</p><div class="quest-character-grid">${tutors.map(tutor=>`<button class="quest-character ${state.character===tutor.id?'selected':''}" data-tutor="${tutor.id}"><img src="${tutorImage(tutor)}" alt="${esc(tutor.name)}"><span>${tutor.flag} ${esc(tutor.label)}</span><strong>${esc(tutor.name)}</strong><small class="quest-character-voice">ElevenLabs · ${esc(tutor.voiceLabel)} voice</small></button>`).join('')}</div><button class="quest-primary" id="start-quest" ${selectedTutor()?'':'disabled'}>BEGIN WORLD TOUR →</button><button class="quest-back" id="character-menu">← Main menu</button></section>`;
     document.querySelectorAll('[data-tutor]').forEach(button=>button.onclick=()=>{state.character=button.dataset.tutor;save();renderCharacterSelect();});
     document.querySelector('#start-quest').onclick=renderMap;document.querySelector('#character-menu').onclick=renderMenu;
   }
-  function addTutorToScreen(){ const tutor=selectedTutor();if(!tutor||content.querySelector('.quest-active-tutor'))return;const target=content.querySelector('.quest-map-copy,.quest-destination');if(!target)return;const card=document.createElement('div');card.className='quest-active-tutor';card.innerHTML=`<img src="${tutorImage(tutor)}" alt="${esc(tutor.name)}"><span><small>PLAYING AS</small><strong>${esc(tutor.name)}</strong><em>${tutor.flag} ${esc(tutor.label)}</em></span>`;target.prepend(card); }
+  function addTutorToScreen(){ const tutor=selectedTutor();if(!tutor||content.querySelector('.quest-active-tutor'))return;const target=content.querySelector('.quest-map-copy,.quest-destination');if(!target)return;const card=document.createElement('div');card.className='quest-active-tutor';card.innerHTML=`<img src="${tutorImage(tutor)}" alt="${esc(tutor.name)}"><span><small>PLAYING AS</small><strong>${esc(tutor.name)}</strong><em>${tutor.flag} ${esc(tutor.label)} · ${esc(tutor.voiceLabel)} voice</em></span>`;target.prepend(card); }
   const questObserver=new MutationObserver(()=>addTutorToScreen());questObserver.observe(content,{childList:true,subtree:true});
   document.addEventListener('click',event=>{if(!event.target.closest('#new-game'))return;event.preventDefault();event.stopImmediatePropagation();state=defaults();save();renderCharacterSelect();},true);
   function esc(value){ return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c])); }
@@ -38,7 +38,25 @@
   function renderMap(){ content.innerHTML = `<div class="quest-map-view"><div class="quest-map-copy"><p class="quest-kicker">FRENCH QUEST</p><h1 id="quest-title">WORLD TOUR</h1><p>Choose your next destination.</p>${stats()}</div><div class="quest-route">${regions.map((r,i)=>`<button class="quest-stop ${unlocked(i)?'is-unlocked':''} ${completed(r)===3?'is-complete':''}" data-index="${i}" style="--stop-color:${r.color}" ${unlocked(i)?'':'disabled'}><i>${completed(r)===3?'✓':unlocked(i)?r.icon:'⌑'}</i><strong>${r.title}</strong><small>${completed(r)}/3 missions</small></button>`).join('')}</div><button class="quest-back" id="map-menu">← Main menu</button></div>`; document.querySelectorAll('.quest-stop').forEach(b=>b.onclick=()=>renderRegion(regions[Number(b.dataset.index)])); document.querySelector('#map-menu').onclick=renderMenu; }
   function renderRegion(region){ const next=region.missions.find(m=>!state.completed.includes(region.id+':'+m[1])); if(!next){ content.innerHTML=`<div class="quest-card quest-cleared"><p class="quest-kicker" style="color:${region.color}">DESTINATION CLEARED</p><div class="quest-trophy">🏆</div><h1>${esc(region.title)}</h1><p>The next stop on the world tour is now open.</p><button class="quest-primary" id="back-map">🗺 CONTINUE WORLD TOUR</button></div>`; document.querySelector('#back-map').onclick=renderMap; return; } const number=region.missions.indexOf(next)+1; const options=[next[2], region.missions[(number)%3][2], region.missions[(number+1)%3][2]].sort(()=>Math.random()-.5); content.innerHTML=`<div class="quest-destination"><button class="quest-back" id="back-map">← World tour</button><p class="quest-kicker" style="color:${region.color}">DESTINATION ${regions.indexOf(region)+1} · MISSION ${number}</p><h1>${esc(region.title)}</h1><p class="quest-destination-subtitle">${esc(region.subtitle)}</p><div class="quest-progress">${region.missions.map((m,i)=>`<span class="${state.completed.includes(region.id+':'+m[1])?'done':''}" style="--stop-color:${region.color}">${state.completed.includes(region.id+':'+m[1])?'✓':i+1}</span>`).join('')}</div>${stats()}<article class="quest-challenge"><div class="quest-challenge-type">${next[0].toUpperCase()} · <button id="speak">🔊 Listen</button></div><h2>${esc(next[1])}</h2><div class="quest-options">${options.map(o=>`<button data-answer="${esc(o)}">${esc(o)}</button>`).join('')}</div><p class="quest-tip">Tip: ${esc(next[4])}</p><p class="quest-result" id="result" aria-live="polite"></p></article></div>`; document.querySelector('#back-map').onclick=renderMap; document.querySelector('#speak').onclick=()=>speak(next[2]); document.querySelectorAll('.quest-options button').forEach(b=>b.onclick=()=>answer(region,next,b)); }
   function answer(region, mission, button){ const result=document.querySelector('#result'); document.querySelectorAll('.quest-options button').forEach(b=>b.disabled=true); if(button.dataset.answer===mission[2]){ state.completed.push(region.id+':'+mission[1]); state.xp+=Math.round(80/3); state.streak+=1; state.hearts=Math.min(3,state.hearts+1); save(); result.textContent='Correct! +25 XP'; result.className='quest-result correct'; setTimeout(()=>renderRegion(region),700); } else { state.hearts=Math.max(0,state.hearts-1); state.streak=0; save(); result.textContent=state.hearts ? 'Not quite. Try the next mission.' : 'Out of hearts — your hearts refill for the next stop.'; result.className='quest-result wrong'; button.classList.add('wrong'); setTimeout(()=>renderRegion(region),900); } }
-  function speak(text){ if('speechSynthesis' in window){ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang='fr-FR'; u.rate=.88; speechSynthesis.speak(u); } }
+  let activeQuestAudio=null, activeQuestUrl='';
+  async function speak(text){
+    const tutor=selectedTutor(),button=document.querySelector('#speak'),status=document.querySelector('#result');
+    if(!tutor||!button)return;
+    window.speechSynthesis?.cancel();activeQuestAudio?.pause();if(activeQuestUrl)URL.revokeObjectURL(activeQuestUrl);
+    button.disabled=true;button.textContent=`🔊 ${tutor.name} is preparing the phrase…`;
+    try{
+      const response=await fetch('api/voice.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,character:tutor.id})});
+      if(!response.ok)throw new Error('voice_unavailable');
+      activeQuestUrl=URL.createObjectURL(await response.blob());activeQuestAudio=new Audio(activeQuestUrl);
+      activeQuestAudio.onended=()=>{activeQuestAudio=null;if(activeQuestUrl)URL.revokeObjectURL(activeQuestUrl);activeQuestUrl='';button.disabled=false;button.textContent='🔊 Listen'};
+      await activeQuestAudio.play();
+      if(status)status.textContent=`${tutor.name} · ElevenLabs ${tutor.voiceLabel} voice`;
+    }catch{
+      if('speechSynthesis'in window){const utterance=new SpeechSynthesisUtterance(text);utterance.lang='fr-FR';utterance.rate=.88;utterance.onend=()=>{button.disabled=false;button.textContent='🔊 Listen'};window.speechSynthesis.speak(utterance);if(status)status.textContent=`ElevenLabs ${tutor.voiceLabel} voice is not configured yet. Using the device's French voice.`;}
+      else{if(status)status.textContent=`ElevenLabs ${tutor.voiceLabel} voice is not configured yet.`;button.disabled=false;button.textContent='🔊 Listen'}
+      if(activeQuestUrl)URL.revokeObjectURL(activeQuestUrl);activeQuestUrl='';activeQuestAudio=null;
+    }
+  }
   const music = new Audio('../FrenchQuestApple/Resources/Audio/Music/french-accordion.mp3');
   music.loop = true;
   document.querySelector('#quest-music').onclick = e => {

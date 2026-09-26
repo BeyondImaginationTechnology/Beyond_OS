@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/ecosystem.php';
 $pageTitle = 'French Quest | The World Tour';
+$questScriptVersion = (string)(@filemtime(__DIR__ . '/assets/js/quest.js') ?: time());
 require __DIR__ . '/includes/header.php';
 ?>
 <div class="quest-game" id="quest-game" data-logo="<?= h($frenchBase) ?>assets/images/beyond-french-logo.webp" data-tutors-base="<?= h($frenchBase) ?>assets/images/tutors/">
@@ -12,5 +13,5 @@ require __DIR__ . '/includes/header.php';
         <div id="quest-content"></div>
     </section>
 </div>
-<script src="<?= h($frenchBase) ?>assets/js/quest.js" defer></script>
+<script src="<?= h($frenchBase) ?>assets/js/quest.js?v=<?= h($questScriptVersion) ?>" defer></script>
 <?php require __DIR__ . '/includes/footer.php'; ?>

@@ -5,6 +5,7 @@ $adminNavGroups = [
         ['/server/admin/daily-studio/', 'Studio Home', 'magic'],
         ['overview.php', 'System overview', 'overview'],
         ['review.php', 'Admin Review', 'review'],
+        ['/dailybreath/admin/daily-content.php', 'Daily Breath content', 'content'],
     ],
     'Management' => [
         ['users.php', 'Users', 'users'],

@@ -39,7 +39,7 @@ foreach ($azureDefaults as $azureLocale => [$defaultVoice, $defaultLabel]) {
 return [
     'allowed_providers' => ['openai', 'elevenlabs', 'azure'],
     'allowed_formats' => ['mp3'],
-    'allowed_languages' => ['en-US', 'fr-CA', 'fr-FR', 'es-ES', 'it-IT', 'de-DE', 'ru-RU', 'pt-PT', 'ht-HT', 'en-JM', 'ln-CD', 'ar-MA', 'ar-EG', 'sw-KE'],
+    'allowed_languages' => ['en-US', 'fr-CA', 'fr-FR', 'es-ES', 'he-IL', 'ar-SA', 'it-IT', 'de-DE', 'ru-RU', 'pt-PT', 'ht-HT', 'en-JM', 'ln-CD', 'ar-MA', 'ar-EG', 'sw-KE'],
     // Azure is the controlled server-side fallback for Studio exports.
     // Do not automatically retry quota-limited OpenAI or ElevenLabs accounts.
     'fallback_providers' => ['azure'],

@@ -7,11 +7,14 @@ from upstream sources. The repository supplies the Home product layer.
 ## What exists now
 
 - Pinned Buildroot 2026.02.3 archive and Linux 6.18.7 QEMU configuration.
-- Home v0.1 identity, native framebuffer startup artwork, and a desktop
-  dashboard inspired by the translucent panels and taskbar of Windows Vista/7.
+- Home v0.1 identity, native framebuffer startup artwork, and a file-based
+  desktop inspired by Windows Vista/7. Desktop icons can be moved; drag an item
+  from Files to its drop shelf to pin it to the desktop. Apps live in the Start
+  menu and taskbar.
 - Files: navigate directories and preview small UTF-8 text files.
 - Notes: one local note in `~/Documents/Home Note.txt`; Ctrl+S saves it.
-- Browser: WebKitGTK MiniBrowser with HTTPS certificates and process sandboxing.
+- Browser: WebKitGTK MiniBrowser with HTTPS certificates and process sandboxing;
+  Home disables WebKit compositing for compatibility with software displays.
 - Media: open local audio and video files from `~/Media` with FFplay.
 - Terminal: launches xterm as the unprivileged Home user.
 - About: product information and the actual running kernel.
@@ -133,9 +136,11 @@ BEYOND_FONT=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf /tmp/beyond-home
 ```
 
 The app opens a desktop-sized window. Use Alt+F4 to close the native development
-window. Tab/arrows select Home tiles, Enter opens them, Escape returns Home,
-and Alt+Tab switches to other applications. The Files view uses mouse clicks
-and wheel scrolling. A notes save failure keeps the note open.
+window. Tab/arrows move through desktop icons or Start menu apps, Enter opens
+the selection, Escape returns to the desktop, and Alt+Tab switches to other
+applications. The Files view uses mouse clicks and wheel scrolling; drag an
+item onto its bottom shelf to pin it to the desktop. A notes save failure keeps
+the note open.
 
 ## Maintenance and licensing
 

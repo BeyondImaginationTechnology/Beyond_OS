@@ -76,6 +76,7 @@ function bt_asset_library(): array
                 'slug' => bt_asset_library_slug($title),
                 'title' => $title,
                 'sequence' => $sequence,
+                'season_drop' => max(1, (int)($metadata['season_drop'] ?? $sequence)),
                 'season_total' => 55,
                 'collection' => $collection['name'],
                 'collection_slug' => $collectionSlug,

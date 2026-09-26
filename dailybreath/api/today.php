@@ -132,7 +132,7 @@ try {
         } catch (Throwable $exception) {
             // A missing audio table must never hide an approved reading.
         }
-    } elseif ($tradition === 'bible' && $locale === 'en' && ($verse['source'] ?? '') === 'scheduled_recovery_library') {
+    } else {
         try {
             $approvedAudio = dailybreath_scheduled_verse_audio($pdo, $contentDate, $tradition, $locale, $verse);
         } catch (Throwable $exception) {

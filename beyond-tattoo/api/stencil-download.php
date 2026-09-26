@@ -40,6 +40,13 @@ try {
         [$field,$mime,$suffix] = $map[$type];
         $relative = (string)($stencil[$field] ?? '');
         $file = bt_stencil_asset_path($relative);
+        if ($type === 'png' || $type === 'outline') {
+            $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            if (in_array($extension, ['jpg', 'jpeg', 'png'], true)) {
+                $mime = $extension === 'png' ? 'image/png' : 'image/jpeg';
+                $suffix = preg_replace('/\.(?:png|jpe?g)$/i', '', $suffix) . '.' . $extension;
+            }
+        }
         if ($mime === 'auto') {
             $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
             $mime = ['png' => 'image/png', 'webp' => 'image/webp', 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg'][$extension] ?? 'application/octet-stream';

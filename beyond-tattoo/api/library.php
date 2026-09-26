@@ -23,6 +23,8 @@ foreach ($assets as $asset) {
         'id' => $asset['id'],
         'title' => $asset['title'],
         'sequence' => $asset['sequence'],
+        'season_drop' => $asset['season_drop'],
+        'season_total' => $asset['season_total'],
         'collection_id' => $collectionSlug,
         'collection' => $asset['collection'],
         'release_date' => $asset['release_date'],

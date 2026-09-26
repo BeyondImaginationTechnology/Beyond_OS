@@ -248,7 +248,7 @@ foreach ($collections as $collectionSlug => $collection) {
       data-stencil-zip="api/stencil-download.php?type=package&amp;id=<?= e(bt_stencil_asset_slug($item[0]) . '-' . $item[1]) ?>"
     <?php endif; ?>
   >
-    <div class="bt-schedule-number"><?= $itemNumber > 0 ? str_pad((string)$itemNumber,2,'0',STR_PAD_LEFT) : 'OPENING BONUS' ?></div>
+    <div class="bt-schedule-number"><?= $itemNumber > 0 ? str_pad((string)max(1,(int)($assets['metadata']['season_drop'] ?? $itemNumber)),2,'0',STR_PAD_LEFT) : 'OPENING BONUS' ?></div>
     <div><time datetime="<?= e($item[1]) ?>"><?= e(bt_pretty_date($item[1])) ?></time><h3><?= e($item[0]) ?></h3><p><?= e((string)($assets['metadata']['style'] ?? $collection['name'])) ?> · <?= e((string)($assets['metadata']['placement'] ?? implode(' · ', array_map(static fn($cat) => $categoryOptions[$cat]['label'] ?? $cat, $itemCategories)))) ?> · <?= e((string)($assets['metadata']['license'] ?? 'Professional use')) ?></p></div>
     <span><?= $isUnlocked?'View stencil':($releaseDate > $today ? 'Upcoming' : 'Available') ?></span><?php if ($isUnlocked): ?><button class="bt-save-stencil" type="button" data-save-stencil="<?= e($item[0]) ?>" aria-label="Save <?= e($item[0]) ?>">☆ Save</button><?php endif; ?>
   </article><?php endforeach; ?>

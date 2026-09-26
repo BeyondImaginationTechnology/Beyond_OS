@@ -1,0 +1,28 @@
+{
+  "name": "beyond-tattoo-stencil-editor",
+  "version": "0.1",
+  "scope": "beyond-tattoo",
+  "status": "draft",
+  "base_revision": "76cfdcd722179229fb98f02f2c3a9f7fb591c201",
+  "dataset": "beyond-tattoo-stencil-editor-v0.1.jsonl",
+  "sources": [
+    {
+      "path": "beyond-tattoo/stencil-editor.php",
+      "sha256": "CBA9B85E8D53B74E66A1E75F4423D3AA0277EA24789F11AC9C21F73EC3E62A5D"
+    },
+    {
+      "path": "JaguarApple/Sources/JaguarDrawStudioView.swift",
+      "sha256": "DB299613129B6D3D71CBE753D8916FE18B8FC8EDE27509F17B201B92083A3AC3"
+    },
+    {
+      "path": "JaguarApple/Sources/RootView.swift",
+      "sha256": "BC212243BD797C9CA69EB044CF6D635FB91CB8CD06C703F79EB005FB5EB11053"
+    },
+    {
+      "path": "JaguarApple/project.yml",
+      "sha256": "E138F11BFBBEE7115E52915832BFCA5BABD8F790606005635911969B273E4218"
+    }
+  ],
+  "created_at": "2026-09-26",
+  "training_status": "prepared for human review; not loaded into production"
+}

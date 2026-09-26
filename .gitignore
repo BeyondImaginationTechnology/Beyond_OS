@@ -38,6 +38,7 @@ Thumbs.db
 /.pnpm-store/
 /tmp/
 /output/
+/outputs/
 /.local/
 /.cache/
 /ai/runtime/.venv/

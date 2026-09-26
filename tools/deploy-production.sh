@@ -32,7 +32,7 @@ if [[ "$(cd -- "${PUBLIC_ROOT}" && pwd)" != "${REPOSITORY_ROOT}" ]]; then
   rsync -a --delay-updates \
     --exclude='/.git/' --exclude='/.github/' --exclude='/.cache/' \
     --exclude='/var/' --exclude='/.tmp-dailybreath-var/' --exclude='/config/live.php' \
-    --exclude='/docs/' --exclude='/tools/' --exclude='/sql/' --exclude='/exports/' \
+    --exclude='/docs/' --exclude='/tools/' --exclude='/sql/' --exclude='/exports/' --exclude='/outputs/' \
     --exclude='/AppStoreAssets/' --exclude='/*Apple/' --exclude='/*Android/' \
     --exclude='/.gitattributes' --exclude='/.gitignore' \
     --exclude='/README.md' --exclude='/CONTRIBUTING.md' --exclude='/SECURITY.md' --exclude='/LICENSE' \

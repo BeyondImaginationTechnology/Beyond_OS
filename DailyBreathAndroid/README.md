@@ -1,8 +1,17 @@
 # Daily Breath for Android
 
-Native Android companion to `DailyBreathApple`, built with Java 17 and the Android view toolkit so the first release has no third-party runtime dependency.
+Native Android companion to `DailyBreathApple`, built with Java 17 and the Android view toolkit.
 
-## Included in this first slice
+## Android 2.3 update
+
+- Sync the selected day, tradition, and language from the Daily Breath daily-content API, with a date-specific on-device cache and bundled offline fallback
+- Stream published narrations online from the approved daily-content package; audio is not downloaded for offline playback
+- Share a public reading link or export a branded scripture card using the selected scripture artwork theme
+- Keep a person’s chosen appearance when they switch traditions; add Seasonal, Bible Forest, Tanakh Navy & Gold, and Quran Emerald & Gold themes
+- Render Hebrew and Arabic daily passages right-to-left and keep reading text selectable
+- Add a resizable home-screen reading widget that follows the selected tradition, theme, and synced daily passage
+
+## Existing Android features
 
 - Offline Bible, Tanakh, and Quran readers and search, with faith-appropriate daily readings and fallbacks
 - Today, Scripture, Chat, Academy, Breathe, and Journal navigation
@@ -17,7 +26,7 @@ Native Android companion to `DailyBreathApple`, built with Java 17 and the Andro
 
 Open this directory in Android Studio, install API 37 when prompted, and use **Build > Generate App Bundles or APKs**. The project uses the same Android Gradle Plugin 9.3.0 / Java 17 baseline as `BeyondTVAndroid`.
 
-The next Android slices can add lesson state, encrypted journal storage, notifications, widgets, and Play Billing once the base app is installed and verified on a device.
+The next Android slices can add lesson state, encrypted journal storage, notifications, and additional widget controls once the base app is installed and verified on a device.
 
 ## Store releases
 

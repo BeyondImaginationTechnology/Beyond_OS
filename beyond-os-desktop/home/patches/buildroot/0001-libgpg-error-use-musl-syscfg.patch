@@ -1,0 +1,8 @@
+--- a/package/libgpg-error/Config.in
++++ b/package/libgpg-error/Config.in
+@@ -59,4 +59,4 @@ config BR2_PACKAGE_LIBGPG_ERROR_SYSCFG
+ 	default "sparc64-unknown-linux-gnu" \
+ 		if BR2_sparc64
+-	default "x86_64-unknown-linux-gnu" \
++	default "x86_64-unknown-linux-musl" \
+ 		if BR2_x86_64

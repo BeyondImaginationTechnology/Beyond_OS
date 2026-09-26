@@ -1,6 +1,15 @@
 # Beyond-1 for iOS
 
-Native SwiftUI app powered by the Beyond-1 v0.3 Preview service.
+Native SwiftUI app powered by Jaguar, with a local Draw Studio for transparent tattoo-sketch exports.
+
+## v0.5 Draw preview
+
+- Open **Draw Studio** from the chat header and sketch with touch or Apple Pencil.
+- Choose ink, adjust brush size, erase, undo/redo, clear, and preview a white or transparent canvas.
+- Open `jaguar://draw` from Beyond Tattoo to launch Draw Studio directly.
+- Export a transparent 1200 × 1600 PNG to Files, return to the editor, and import it in the first step.
+- Drawing stays on the device; the Draw preview does not call the Jaguar API.
+- Jaguar's Draw mode for AI image generation is not part of this v0.5 sketch preview.
 
 ## v0.2
 

@@ -22,6 +22,14 @@ fi
 printf '%s  %s\n' "$BUILDROOT_SHA256" "$archive" | sha256sum --check --status
 source_dir="$build_area/buildroot-$BUILDROOT_VERSION"
 [[ -d "$source_dir" ]] || tar -xJf "$archive" -C "$build_area"
+libgpg_config="$source_dir/package/libgpg-error/Config.in"
+if grep -Fq 'default "x86_64-unknown-linux-gnu"' "$libgpg_config"; then
+    patch --forward --directory="$source_dir" --strip=1 < "$home_source/patches/buildroot/0001-libgpg-error-use-musl-syscfg.patch"
+fi
+grep -Fq 'default "x86_64-unknown-linux-musl"' "$libgpg_config" || {
+    echo "Buildroot libgpg-error is not configured for the x86_64 musl target." >&2
+    exit 1
+}
 if [[ "$action" == installer ]]; then
     output="$build_area/installer-output"
     defconfig=beyond_home_uefi_installer_x86_64_defconfig
@@ -33,6 +41,10 @@ chmod +x "$home_source/board/x86_64/post-build.sh"
 chmod +x "$home_source/board/x86_64/post-image-uefi.sh"
 make -C "$source_dir" O="$output" BR2_EXTERNAL="$home_source" "$defconfig"
 python3 "$home_source/tools/verify-config.py" "$home_source/configs/$defconfig" "$output/.config"
+grep -Fxq 'BR2_PACKAGE_LIBGPG_ERROR_SYSCFG="x86_64-unknown-linux-musl"' "$output/.config" || {
+    echo "libgpg-error lock configuration does not match the x86_64 musl target." >&2
+    exit 1
+}
 if [[ "$action" == configure ]]; then
     echo "Configured Beyond OS. No kernel or image has been built."
     exit 0

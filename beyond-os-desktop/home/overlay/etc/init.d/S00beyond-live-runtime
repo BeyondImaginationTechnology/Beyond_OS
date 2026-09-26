@@ -4,10 +4,12 @@
 # the installed-system path.
 case "$(awk '$2 == "/" { print $4 }' /proc/mounts)" in
   *ro*)
+    cp -a /var /run/beyond-var-seed
     cp -a /home /run/beyond-home-seed
     mount -t tmpfs -o mode=0755 tmpfs /var
-    install -d -m 0755 /var/cache /var/lib /var/log
+    cp -a /run/beyond-var-seed/. /var/
     install -d -m 1777 /var/tmp
+    install -d -m 0755 /run/lock
     ln -s /run /var/run
     ln -s /run/lock /var/lock
     mount -t tmpfs -o mode=0755 tmpfs /home

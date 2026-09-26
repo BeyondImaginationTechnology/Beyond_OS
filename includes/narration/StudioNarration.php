@@ -9,16 +9,31 @@ require_once dirname(__DIR__,2) . '/beyond-french/includes/narration/AzureSpeech
 
 function studio_narration_config(): array { return require dirname(__DIR__,2) . '/beyond-french/config/narration.php'; }
 
-function studio_elevenlabs_first_voice(array $providerConfig): string {
+function studio_elevenlabs_first_voice(array $providerConfig, string $language = ''): string {
   $apiKey=trim((string)($providerConfig['api_key']??''));
   if($apiKey===''||!function_exists('curl_init')) return '';
-  $ch=curl_init('https://api.elevenlabs.io/v2/voices?page_size=20');
+  $language=trim($language);
+  $url='https://api.elevenlabs.io/v2/voices?page_size=100'.($language!==''?'&language='.rawurlencode($language):'');
+  $ch=curl_init($url);
   curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_CONNECTTIMEOUT=>10,CURLOPT_TIMEOUT=>25,CURLOPT_HTTPHEADER=>['xi-api-key: '.$apiKey,'Accept: application/json']]);
   $body=curl_exec($ch);$status=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$err=curl_error($ch);curl_close($ch);
   if($status<200||$status>=300||!is_string($body)){error_log('ElevenLabs voice discovery failed: HTTP '.$status.' '.$err);return '';}
   $data=json_decode($body,true);if(!is_array($data))return '';
   $voices=$data['voices']??[];if(!is_array($voices)||!$voices)return '';
-  foreach($voices as $voice){$id=trim((string)($voice['voice_id']??''));if($id!=='')return $id;}
+  foreach($voices as $voice){
+    $id=trim((string)($voice['voice_id']??''));
+    if($id==='')continue;
+    if($language==='')return $id;
+    $verified=(array)($voice['verified_languages']??[]);
+    if(!$verified)return $id;
+    $aliases=['english'=>['english','en'],'french'=>['french','fr'],'spanish'=>['spanish','es'],'hebrew'=>['hebrew','he','heb'],'arabic'=>['arabic','ar']];
+    $accepted=$aliases[strtolower($language)]??[strtolower($language)];
+    foreach($verified as $item){
+      $name=strtolower(trim((string)($item['language']??$item['language_name']??'')));
+      $languageId=strtolower(trim((string)($item['language_id']??'')));
+      foreach($accepted as $match){if($name===$match || str_starts_with($name,$match.' ') || $languageId===$match)return $id;}
+    }
+  }
   return '';
 }
 function studio_narration_provider(): string { return strtolower((string)beyond_config('voice.provider','openai')); }
@@ -30,6 +45,13 @@ function studio_narration_voice(string $provider,string $locale): string {
   if(is_array($v)) { $selected=''; foreach($v as $k=>$label){ $selected=is_string($k)?$k:(string)$label; break; } $v=$selected; }
   $v=trim((string)$v);
   if($provider==='azure' && $locale!=='en-US' && $v==='en-US-JennyMultilingualNeural') return $fallback;
+  if($v==='' && $provider==='elevenlabs'){
+    $language=['en-US'=>'English','fr-FR'=>'French','fr-CA'=>'French','es-ES'=>'Spanish','he-IL'=>'Hebrew','ar-SA'=>'Arabic'][$locale]??'';
+    if($language!==''){
+      $cfg=studio_narration_config();
+      $v=studio_elevenlabs_first_voice((array)($cfg['providers']['elevenlabs']??[]),$language);
+    }
+  }
   return $v;
 }
 function studio_assert_mp3(string $audio): void {
@@ -71,6 +93,16 @@ function studio_narration_generate(string $text,string $locale,string $preferred
     if($provider==='elevenlabs' && trim((string)($providerCfg['api_key']??''))==='') continue;
     if($provider==='azure' && (trim((string)($providerCfg['api_key']??''))===''||trim((string)($providerCfg['region']??''))==='')) continue;
     $voice=trim($preferredVoice)!==''?trim($preferredVoice):studio_narration_voice($provider,$locale);
+    if($provider==='elevenlabs' && $voice!==''){
+      // Auto-discovered language-matched voices are request-local, not persisted
+      // as account settings, but must be allowed by the provider validator.
+      $cfg['providers']['elevenlabs']['voices'][$locale]=[$voice=>$voice];
+      $service=new NarrationService([
+        'openai'=>new OpenAIProvider((array)$cfg['providers']['openai']),
+        'elevenlabs'=>new ElevenLabsProvider((array)$cfg['providers']['elevenlabs']),
+        'azure'=>new AzureSpeechProvider((array)$cfg['providers']['azure']),
+      ]);
+    }
     if($provider==='openai' && $voice==='') $voice='coral';
     if($provider==='azure' && $voice==='') {
       $lastError=new RuntimeException('Azure has no native voice selected for '.$locale.'. Use a matching ElevenLabs voice for Haitian Kreyol or Jamaican Patois.');

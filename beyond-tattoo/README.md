@@ -2,7 +2,7 @@
 
 ## Version 1.2 nightly stencil publication
 
-The 55-drop catalog is a schedule, not a claim that all files exist. The public web library and Apple API scan the actual asset folders and expose a drop only when it is approved, its release date has arrived, and both `preview-watermarked.png` and `stencil-print-ready.png` exist.
+The 55-drop catalog is a schedule, not a claim that all files exist. The public web library and Apple API scan the actual asset folders and expose a drop only when it is approved, its release date has arrived, a preview exists, and either `stencil-print-ready.png` or the official `stencil-outline.png` exists.
 
 1. Open Beyond Studio → Beyond Tattoo → 55-drop assets.
 2. Choose an asset role and upload one file or a filename-mapped batch. Supported roles are preview, official outline stencil, print master, transfer PNG, printable PDF, reference artwork, placement mockup, packaging, lore card, and style card.

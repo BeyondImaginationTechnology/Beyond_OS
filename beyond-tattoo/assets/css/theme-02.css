@@ -95,7 +95,10 @@ body[data-theme="dark"] .panel, body[data-theme="dark"] .card, body[data-theme="
 
 @media (max-width: 760px) {
   .bt-mobile-menu { background: var(--bt20-surface); border-color: var(--bt20-border); }
+  .bt-mobile-menu summary { background: var(--bt20-surface); color: var(--bt20-ink); border-color: var(--bt20-border); }
+  .bt-mobile-menu > div { background: var(--bt20-surface); border-color: var(--bt20-border); box-shadow: var(--bt20-shadow); }
   .bt-mobile-menu a { color: var(--bt20-ink); }
+  .bt-mobile-menu a:hover { background: #F0EAFB; color: var(--bt20-violet); }
 }
 
 @media (prefers-reduced-motion: reduce) {

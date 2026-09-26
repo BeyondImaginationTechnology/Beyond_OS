@@ -109,7 +109,7 @@ final class ElevenLabsProvider implements NarrationProvider
 
         // Some accounts/voices reject v3 even though voice listing succeeds. Retry once
         // with ElevenLabs' stable multilingual model and without language_code.
-        if (($status === 400 || $status === 422) && $model !== 'eleven_multilingual_v2') {
+        if (($status === 400 || $status === 422) && $model !== 'eleven_multilingual_v2' && strtolower(substr($language, 0, 2)) !== 'he') {
             $retryBody = ['text' => (string)$request['text'], 'model_id' => 'eleven_multilingual_v2'];
             [$retryAudio, $retryStatus, $retryError, $retryNumber] = $perform($retryBody);
             if ($retryStatus >= 200 && $retryStatus < 300) {

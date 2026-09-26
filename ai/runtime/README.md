@@ -29,6 +29,17 @@ The runtime applies the adapter to the selected Llama 3.1 base model at startup.
 
 For production, run this behind authenticated application infrastructure; do not expose the local runtime directly to the internet.
 
+## Beyond Tattoo editor knowledge pack
+
+`../training/beyond-tattoo-stencil-editor-v0.1.jsonl` contains draft,
+app-scoped examples grounded in the Beyond Tattoo editor and Beyond-1 Draw
+Studio source. Its manifest pins the source hashes and base Git revision. The
+pack is not loaded by this runtime, is not approved for production, and has not
+changed the model adapter. The current Daily Breath training page is not a
+Beyond Tattoo-scoped review interface. Review the examples and connect them to
+an app-scoped retrieval or deliberate training workflow before expecting
+Jaguar to use them.
+
 ## Admin Code Thinking
 
 `../code.php` is the administrator-only Code Thinking 0.1 workspace. Its PHP

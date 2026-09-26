@@ -128,6 +128,9 @@ function dailybreath_audio_for_script(PDO $pdo, string $date, string $tradition,
 
 function dailybreath_scheduled_verse_audio(PDO $pdo, string $date, string $tradition, string $locale, array $verse): ?array
 {
-    if ($tradition !== 'bible' || $locale !== 'en' || ($verse['source'] ?? '') !== 'scheduled_recovery_library') return null;
+    $supported = ['bible'=>['en','fr','es'], 'torah'=>['he'], 'quran'=>['ar']];
+    $scheduledSources = ['scheduled_recovery_library','bundled_recovery_rotation','matched_torah_theme','torah_theme_match','quran_theme_match'];
+    if (!isset($supported[$tradition]) || !in_array($locale, $supported[$tradition], true)
+        || !in_array((string)($verse['source'] ?? ''), $scheduledSources, true)) return null;
     return dailybreath_audio_for_script($pdo, $date, $tradition, $locale, dailybreath_narration_script($verse));
 }

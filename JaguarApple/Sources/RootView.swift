@@ -4,6 +4,7 @@ struct RootView: View {
     @EnvironmentObject private var auth: JaguarAuthManager
     @EnvironmentObject private var store: JaguarChatStore
     @State private var showingAccount = false
+    @State private var showingDrawStudio = false
 
     var body: some View {
         Group {
@@ -19,7 +20,12 @@ struct RootView: View {
         }
         .tint(JaguarTheme.magenta)
         .background(JaguarTheme.ink.ignoresSafeArea())
+        .onOpenURL { url in
+            guard url.scheme == "jaguar", url.host == "draw" else { return }
+            showingDrawStudio = true
+        }
         .sheet(isPresented: $showingAccount) { JaguarAccountView() }
+        .sheet(isPresented: $showingDrawStudio) { JaguarDrawStudioView() }
     }
 
     private var conversationList: some View {
@@ -55,6 +61,7 @@ struct RootView: View {
 
 private struct JaguarWelcomeView: View {
     @EnvironmentObject private var auth: JaguarAuthManager
+    @State private var showingDrawStudio = false
 
     var body: some View {
         ZStack {
@@ -90,6 +97,9 @@ private struct JaguarWelcomeView: View {
                 }
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(JaguarTheme.mint)
+                Button("Try Draw Studio") { showingDrawStudio = true }
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(JaguarTheme.magenta)
                 if let message = auth.message {
                     JaguarSignInNotice(message: message, detail: auth.signInDetail, retry: auth.signIn, dismiss: auth.clearMessage)
                 }
@@ -100,6 +110,9 @@ private struct JaguarWelcomeView: View {
             }
             .padding(28)
             .frame(maxWidth: 620)
+        }
+        .sheet(isPresented: $showingDrawStudio) {
+            JaguarDrawStudioView()
         }
     }
 }
@@ -150,6 +163,7 @@ private struct JaguarChatView: View {
     @Binding var showingAccount: Bool
     @FocusState private var composerFocused: Bool
     @State private var isNearBottom = true
+    @State private var showingDrawStudio = false
 
     private var conversation: JaguarConversation? { store.selectedConversation }
 
@@ -167,6 +181,9 @@ private struct JaguarChatView: View {
             }
         }
         .navigationBarHidden(true)
+        .sheet(isPresented: $showingDrawStudio) {
+            JaguarDrawStudioView()
+        }
     }
 
     private var header: some View {
@@ -176,12 +193,19 @@ private struct JaguarChatView: View {
                 Text("Beyond-1").font(.headline)
                 HStack(spacing: 5) {
                     Circle().fill(JaguarTheme.mint).frame(width: 7, height: 7)
-                    Text("v0.2 · Explain preview")
+                    Text("v0.5 · Explain + Draw preview")
                 }
                 .font(.caption)
                 .foregroundStyle(JaguarTheme.secondaryText)
             }
             Spacer()
+            Button { showingDrawStudio = true } label: {
+                Image(systemName: "pencil.and.scribble")
+                    .font(.headline)
+                    .frame(width: 38, height: 38)
+                    .background(JaguarTheme.panelRaised, in: Circle())
+            }
+            .accessibilityLabel("Open Draw Studio")
             Menu {
                 ForEach(JaguarLanguage.allCases) { language in
                     Button { store.setLanguage(language) } label: {
@@ -444,7 +468,7 @@ private struct JaguarAccountView: View {
                 }
                 Section("About") {
                     LabeledContent("App", value: "Beyond-1")
-                    LabeledContent("Version", value: "0.2 (Explain preview)")
+                    LabeledContent("Version", value: "0.5.0 (Draw preview)")
                     Text("Conversation history stays on this device. Messages are sent to Beyond-1 when you ask a question.")
                 }
             }

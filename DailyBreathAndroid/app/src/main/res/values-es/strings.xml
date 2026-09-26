@@ -1,1 +1,4 @@
-<resources><string name="app_name">Daily Breath</string></resources>
+<resources>
+    <string name="app_name">Daily Breath</string>
+    <string name="widget_description">La lectura diaria de Daily Breath con el tema elegido.</string>
+</resources>

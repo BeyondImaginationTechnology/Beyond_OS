@@ -1,11 +1,18 @@
+import AVFoundation
 import SwiftUI
+import UIKit
 
 struct TodayView: View {
     var onNavigate: (DailyBreathTab) -> Void = { _ in }
     @EnvironmentObject private var store: DailyBreathStore
     @Environment(\.scenePhase) private var scenePhase
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
+    @AppStorage("dailyBreathLanguage") private var languageID = "en"
+    @State private var shareImage: DailyBreathShareImage?
+    @State private var narrationPlayer: AVPlayer?
+    @State private var narrationURL: URL?
+    @State private var narrationPlaying = false
     @AppStorage("dailyReadingDayKeys") private var dailyReadingDayKeys = ""
     @AppStorage("devotionalReadDayKeys") private var devotionalReadDayKeys = ""
     @AppStorage("completedBreathDayKeys") private var completedBreathDayKeys = ""
@@ -90,6 +97,19 @@ struct TodayView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
             Task { await store.refreshToday() }
+        }
+        .onChange(of: languageID) { _, _ in
+            stopNarration()
+            Task { await store.refreshToday() }
+        }
+        .onChange(of: store.approvedContent?.audioURL) { _, _ in stopNarration() }
+        .onReceive(NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime)) { notification in
+            if (notification.object as? AVPlayerItem) === narrationPlayer?.currentItem {
+                stopNarration()
+            }
+        }
+        .sheet(item: $shareImage) { item in
+            DailyBreathImageShareSheet(image: item.image)
         }
     }
 
@@ -188,10 +208,10 @@ struct TodayView: View {
             }
         }
         .pickerStyle(.segmented)
-        .onChange(of: traditionID) { _, value in
-            let tradition = FaithTradition(rawValue: value) ?? .bible
-            selectedThemeID = DailyBreathTheme.recommended(for: tradition).id
+        .onChange(of: traditionID) { _, _ in
             store.publishSelectedFaithContent()
+            stopNarration()
+            Task { await store.refreshToday() }
         }
     }
 
@@ -204,10 +224,18 @@ struct TodayView: View {
             Text(Date(), format: .dateTime.weekday(.wide).month(.wide).day().year())
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.white.opacity(0.78))
-            Text("\"\(todayVerse.text)\"")
-                .font(.system(size: 36, weight: .semibold, design: .serif))
+            if let approved = store.approvedContent, approved.tradition == selectedTradition {
+                Text("Approved reading · updated \(String(approved.updatedAt.prefix(16)))")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.82))
+            }
+            Text(todayVerse.text)
+                .font(.system(.largeTitle, design: .serif, weight: .semibold))
                 .foregroundStyle(.white)
                 .fixedSize(horizontal: false, vertical: true)
+                .multilineTextAlignment(passageIsRightToLeft ? .trailing : .leading)
+                .environment(\.layoutDirection, passageIsRightToLeft ? .rightToLeft : .leftToRight)
+                .textSelection(.enabled)
             Text(todayVerse.reference)
                 .font(.headline.weight(.black))
                 .foregroundStyle(selectedTheme.accent)
@@ -215,6 +243,7 @@ struct TodayView: View {
             Text(todayVerse.reflection)
                 .font(.body)
                 .foregroundStyle(.white.opacity(0.82))
+                .textSelection(.enabled)
             HStack(spacing: 10) {
                 NavigationLink {
                     VerseDetailView(verse: todayVerse, tradition: selectedTradition)
@@ -224,14 +253,88 @@ struct TodayView: View {
                 }
                 .buttonStyle(.bordered)
                 .tint(.white)
+                if let approved = store.approvedContent, approved.tradition == selectedTradition {
+                    ShareLink(item: approved.shareURL) {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.white)
+                    Button {
+                        exportShareImage()
+                    } label: {
+                        Label("Image", systemImage: "photo")
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.white)
+                }
             }
             .controlSize(.large)
+            if let audioURL = store.approvedContent?.tradition == selectedTradition
+                ? (store.approvedContent?.audioURL ?? todayVerse.audioURL)
+                : todayVerse.audioURL {
+                Button {
+                    toggleNarration(url: audioURL)
+                } label: {
+                    Label(narrationPlaying ? "Pause narration" : "Play Verse of the Day", systemImage: narrationPlaying ? "pause.fill" : "play.fill")
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(selectedTheme.accent)
+                .accessibilityHint("Streams the online ElevenLabs narration. Internet connection required.")
+            }
         }
         .padding(24)
         .background(
-            LinearGradient(colors: [selectedTheme.primary, selectedTheme.secondary], startPoint: .topLeading, endPoint: .bottomTrailing),
-            in: RoundedRectangle(cornerRadius: 26)
+            ZStack {
+                LinearGradient(colors: [selectedTheme.primary, selectedTheme.secondary], startPoint: .topLeading, endPoint: .bottomTrailing)
+                if let artwork = selectedTheme.artworkName {
+                    Image(artwork).resizable().scaledToFill()
+                    LinearGradient(colors: [.black.opacity(0.66), .black.opacity(0.50), .black.opacity(0.75)], startPoint: .top, endPoint: .bottom)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 26))
         )
+    }
+
+    private var passageIsRightToLeft: Bool {
+        todayVerse.text.unicodeScalars.contains { scalar in
+            (0x0590...0x05FF).contains(scalar.value) || (0x0600...0x06FF).contains(scalar.value)
+        }
+    }
+
+    private func toggleNarration(url: URL) {
+        if narrationPlaying {
+            narrationPlayer?.pause()
+            narrationPlaying = false
+            return
+        }
+        if narrationPlayer == nil || narrationURL != url {
+            narrationPlayer = AVPlayer(url: url)
+            narrationURL = url
+        }
+        narrationPlayer?.play()
+        narrationPlaying = true
+    }
+
+    private func stopNarration() {
+        narrationPlayer?.pause()
+        narrationPlayer = nil
+        narrationURL = nil
+        narrationPlaying = false
+    }
+
+    private func exportShareImage() {
+        let card = DailyBreathExportCard(
+            verse: todayVerse,
+            tradition: selectedTradition,
+            theme: selectedTheme,
+            date: Date()
+        )
+        let renderer = ImageRenderer(content: card)
+        renderer.proposedSize = ProposedViewSize(width: 1200, height: 675)
+        renderer.scale = 1
+        if let image = renderer.uiImage {
+            shareImage = DailyBreathShareImage(image: image)
+        }
     }
 
     private var devotionalCard: some View {
@@ -376,6 +479,71 @@ struct TodayView: View {
     }()
 }
 
+private struct DailyBreathShareImage: Identifiable {
+    let id = UUID()
+    let image: UIImage
+}
+
+private struct DailyBreathImageShareSheet: UIViewControllerRepresentable {
+    let image: UIImage
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: [image], applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
+}
+
+private struct DailyBreathExportCard: View {
+    let verse: Verse
+    let tradition: FaithTradition
+    let theme: DailyBreathTheme
+    let date: Date
+
+    var body: some View {
+        ZStack {
+            LinearGradient(colors: [theme.primary, theme.secondary], startPoint: .topLeading, endPoint: .bottomTrailing)
+            if let artwork = theme.shareArtworkName {
+                Image(artwork)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 1200, height: 675)
+                    .clipped()
+            }
+            LinearGradient(colors: [.black.opacity(0.46), .black.opacity(0.62)], startPoint: .top, endPoint: .bottom)
+            VStack(spacing: 20) {
+                Text("\(tradition.dailyReadingName) of the Day · \(date.formatted(date: .long, time: .omitted))")
+                    .font(.system(size: 25, weight: .semibold, design: .serif))
+                    .foregroundStyle(theme.accent)
+                Spacer(minLength: 0)
+                Text(verse.text)
+                    .font(.system(size: 52, weight: .semibold, design: .serif))
+                    .minimumScaleFactor(0.55)
+                    .lineLimit(5)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.white)
+                Text(verse.reference)
+                    .font(.system(size: 31, weight: .bold, design: .serif))
+                    .foregroundStyle(theme.accent)
+                if !verse.reflection.isEmpty {
+                    Text(verse.reflection)
+                        .font(.system(size: 23, weight: .medium, design: .serif))
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(.white.opacity(0.92))
+                }
+                Spacer(minLength: 0)
+                Text("@thedaybreath · Faith · Recovery · Hope")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(theme.accent)
+            }
+            .padding(.horizontal, 110)
+            .padding(.vertical, 65)
+        }
+        .frame(width: 1200, height: 675)
+    }
+}
+
 private struct RhythmPill: View {
     let title: String
     let isComplete: Bool
@@ -403,7 +571,7 @@ private struct QuickAction: View {
     let subtitle: String
     let systemImage: String
     var guide: FaithTradition? = nil
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -434,7 +602,7 @@ private struct VerseDetailView: View {
     let verse: Verse
     let tradition: FaithTradition
     @AppStorage("dailyReadingDayKeys") private var dailyReadingDayKeys = ""
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -510,7 +678,7 @@ private struct DevotionalDetailView: View {
     let devotional: Devotional
     let tradition: FaithTradition
     @AppStorage("devotionalReadDayKeys") private var devotionalReadDayKeys = ""
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -610,7 +778,7 @@ private struct DevotionalDetailView: View {
 
 private struct RecoveryNewsletterView: View {
     @EnvironmentObject private var store: DailyBreathStore
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
 
     private var selectedTheme: DailyBreathTheme {
@@ -709,7 +877,7 @@ private struct RecoveryNewsletterView: View {
 
 private struct PrayerPracticesView: View {
     @EnvironmentObject private var store: DailyBreathStore
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     let tradition: FaithTradition
 
     private var selectedTheme: DailyBreathTheme {
@@ -759,7 +927,7 @@ private struct PrayerPracticesView: View {
 private struct PrayerPracticeDetailView: View {
     let practice: PrayerPractice
     let tradition: FaithTradition
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -827,7 +995,7 @@ private struct PrayerPracticeDetailView: View {
 
 private struct WeeklyChallengeView: View {
     @EnvironmentObject private var store: DailyBreathStore
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
 
     private var selectedTradition: FaithTradition {

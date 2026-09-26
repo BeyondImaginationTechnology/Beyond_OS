@@ -38,6 +38,7 @@ foreach ($assets as $asset) {
         'preview_url' => $base . $asset['preview_url'],
         'stencil_url' => $base . $asset['stencil_url'],
         'transfer_url' => $asset['transfer_png_url'] !== '' ? $base . $asset['transfer_png_url'] : null,
+        'outline_url' => $asset['outline_png_url'] !== '' ? $base . $asset['outline_png_url'] : null,
         'pdf_url' => $asset['transfer_pdf_url'] !== '' ? $base . $asset['transfer_pdf_url'] : null,
         'reference_url' => $asset['reference_image_url'] !== '' ? $base . $asset['reference_image_url'] : null,
         'placement_image_url' => $asset['placement_image_url'] !== '' ? $base . $asset['placement_image_url'] : null,

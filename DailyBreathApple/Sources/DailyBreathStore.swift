@@ -39,6 +39,36 @@ struct DailyBreathTodayResponse: Decodable, Equatable, Sendable {
     let verse: Verse
     let devotional: Devotional
     let challenge: RecoveryChallenge?
+    let approvedContent: ApprovedDailyContent?
+
+    enum CodingKeys: String, CodingKey {
+        case date, verse, devotional, challenge
+        case approvedContent = "approved_content"
+    }
+}
+
+struct ApprovedDailyContent: Decodable, Equatable, Sendable {
+    let date: String
+    let tradition: FaithTradition
+    let locale: String
+    let passage: String
+    let reference: String
+    let reflection: String
+    let theme: String
+    let shareURL: URL
+    let audioURL: URL?
+    let updatedAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case date, tradition, locale, passage, reference, reflection, theme
+        case shareURL = "share_url"
+        case audioURL = "audio_url"
+        case updatedAt = "updated_at"
+    }
+
+    var verse: Verse {
+        Verse(id: 1, text: passage, reference: reference, reflection: reflection)
+    }
 }
 
 struct DailyBreathAPIClient: Sendable {
@@ -56,11 +86,15 @@ struct DailyBreathAPIClient: Sendable {
         self.timeoutInterval = timeoutInterval
     }
 
-    func fetch(dateKey: String) async throws -> DailyBreathTodayResponse {
+    func fetch(dateKey: String, tradition: FaithTradition = .bible, locale: String = "en") async throws -> DailyBreathTodayResponse {
         guard var components = URLComponents(url: endpoint, resolvingAgainstBaseURL: false) else {
             throw DailyBreathAPIError.invalidURL
         }
-        components.queryItems = [URLQueryItem(name: "date", value: dateKey)]
+        components.queryItems = [
+            URLQueryItem(name: "date", value: dateKey),
+            URLQueryItem(name: "tradition", value: tradition.id),
+            URLQueryItem(name: "locale", value: locale)
+        ]
         guard let requestURL = components.url else { throw DailyBreathAPIError.invalidURL }
 
         var request = URLRequest(url: requestURL)
@@ -86,6 +120,7 @@ final class DailyBreathStore: ObservableObject {
     @Published private(set) var challenge = RecoveryContent.challengeOfTheDay()
     @Published private(set) var isRefreshing = false
     @Published private(set) var dailyContentAvailability: DailyContentAvailability = .awaitingRefresh
+    @Published private(set) var approvedContent: ApprovedDailyContent?
     @Published private(set) var statusMessage = DailyContentAvailability.awaitingRefresh.title
     @Published var breathPhase = "Inhale"
     @Published var journalText = ""
@@ -436,6 +471,13 @@ final class DailyBreathStore: ObservableObject {
     }
 
     func dailyVerse(for tradition: FaithTradition, date: Date = Date()) -> Verse {
+        if Calendar.current.isDateInToday(date),
+           let approvedContent,
+           approvedContent.date == Self.dateKey(date),
+           approvedContent.tradition == tradition,
+           approvedContent.locale == (UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en") {
+            return approvedContent.verse
+        }
         let baseVerse: Verse
         if Calendar.current.isDateInToday(date) {
             baseVerse = verse
@@ -503,9 +545,16 @@ final class DailyBreathStore: ObservableObject {
         defer { isRefreshing = false }
         let requestedDate = Date()
         let requestedDateKey = Self.dateKey(requestedDate)
+        let tradition = FaithTradition(rawValue: UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "bible") ?? .bible
+        let locale = UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en"
 
         do {
-            let today = try await apiClient.fetch(dateKey: requestedDateKey)
+            let today = try await apiClient.fetch(dateKey: requestedDateKey, tradition: tradition, locale: locale)
+            guard (UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "bible") == tradition.id,
+                  (UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en") == locale,
+                  Self.dateKey(Date()) == requestedDateKey else { return }
+            approvedContent = today.approvedContent?.tradition == tradition && today.approvedContent?.locale == locale
+                ? today.approvedContent : nil
             verse = RecoveryContent.resolvedVerseOfTheDay(for: requestedDate, remoteVerse: today.verse)
             devotional = today.devotional
             challenge = today.challenge ?? RecoveryContent.challengeOfTheDay(for: requestedDate)
@@ -514,6 +563,10 @@ final class DailyBreathStore: ObservableObject {
             dailyContentAvailability = .current
             statusMessage = DailyContentAvailability.current.title
         } catch {
+            guard (UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "bible") == tradition.id,
+                  (UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en") == locale,
+                  Self.dateKey(Date()) == requestedDateKey else { return }
+            approvedContent = nil
             loadBundledDailyContent(for: requestedDate)
             dailyContentAvailability = .offline
             statusMessage = DailyContentAvailability.offline.title
@@ -689,10 +742,12 @@ final class DailyBreathStore: ObservableObject {
 
     private func recordDailyContent(for date: Date) {
         let key = Self.dateKey(date)
+        let tradition = FaithTradition(rawValue: UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "bible") ?? .bible
+        let selectedVerse = dailyVerse(for: tradition, date: date)
         dailyHistory[key] = DailyHistoryRecord(
             dayKey: key,
-            verseReference: verse.reference,
-            verseText: verse.text,
+            verseReference: selectedVerse.reference,
+            verseText: selectedVerse.text,
             devotionalTitle: devotional.title,
             updatedAt: Date()
         )

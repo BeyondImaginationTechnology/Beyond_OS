@@ -27,7 +27,7 @@ struct BreatheView: View {
     @AppStorage("completedBreathDayKeys") private var completedBreathDayKeys = ""
     @AppStorage("lastBreathMood") private var lastMood = ""
     @AppStorage("lastBreathComparison") private var lastComparison = ""
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
 
     @State private var isBreathing = false
     @State private var remainingSeconds = 120

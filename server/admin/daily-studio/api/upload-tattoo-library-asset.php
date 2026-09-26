@@ -85,6 +85,7 @@ try {
     $roleSpecs = [
         'preview' => ['file' => 'preview-watermarked.png', 'kind' => 'image', 'format' => 'png'],
         'stencil' => ['file' => 'stencil-print-ready.png', 'kind' => 'image', 'format' => 'png'],
+        'outline' => ['file' => 'stencil-outline.png', 'kind' => 'image', 'format' => 'png'],
         'transfer' => ['file' => 'studio-transfer-template.png', 'kind' => 'image', 'format' => 'png'],
         'pdf' => ['file' => 'stencil-print-ready.pdf', 'kind' => 'pdf'],
         'reference' => ['file' => 'reference-artwork.webp', 'kind' => 'image', 'format' => 'webp'],

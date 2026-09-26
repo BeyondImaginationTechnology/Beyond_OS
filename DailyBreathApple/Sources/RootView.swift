@@ -7,7 +7,7 @@ enum DailyBreathTab: String, Hashable {
 
 struct RootView: View {
     @EnvironmentObject private var store: DailyBreathStore
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @State private var selectedTab: DailyBreathTab? = .home
 
     private var selectedTheme: DailyBreathTheme {
@@ -152,7 +152,7 @@ struct RootView: View {
 private struct DailyBreathHomeView: View {
     var onNavigate: (DailyBreathTab) -> Void = { _ in }
     @EnvironmentObject private var store: DailyBreathStore
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
     @AppStorage("dailyReadingDayKeys") private var readDays = ""
     @AppStorage("devotionalReadDayKeys") private var studyDays = ""
@@ -252,7 +252,7 @@ enum DailyBreathCaptureRoute {
 }
 
 struct BrandHeader: View {
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)

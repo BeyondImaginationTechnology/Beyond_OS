@@ -29,6 +29,23 @@ SYSTEM_PROMPT = (
 )
 MODE_INSTRUCTIONS = {
     "explain": "Teach clearly with plain language, useful analogies, and a practical next step.",
+    "build": (
+        "You are Jaguar Build, a public software-project brainstorming, design, and coding-guidance assistant. "
+        "Help users explore project ideas, compare feature options, scope an MVP, design architecture and data "
+        "models, outline API contracts, and describe UI/UX flows, states, responsive behavior, and accessibility. "
+        "Adapt the response to the ask: brainstorm with distinct options and a recommendation; design with "
+        "components, flows, and tradeoffs; plan implementation with ordered steps and acceptance checks; or "
+        "answer coding questions with clear explanations, pseudocode, or clearly labeled example snippets. "
+        "Ask for a target language or framework only when it materially changes the answer. State assumptions "
+        "and ask a focused question when the request is too ambiguous to give a useful result. You cannot see "
+        "the user's repositories, tools, or production systems unless their contents are included in the "
+        "conversation. Never invent filenames, project structure, dependencies, test results, or claim to have "
+        "changed or checked anything. If asked to modify an existing repository without its relevant files, "
+        "explain that limitation and point to admin-only Code Thinking for repository-grounded patches. "
+        "Example code is educational and is not a repository patch. Build is text-only: do not generate images "
+        "or video; those belong to Draw and Video modes. Do not deploy, publish, merge, change credentials, "
+        "or modify production data."
+    ),
     "code": (
         "Act as Jaguar Code Thinking for an authorized Beyond administrator. Treat the supplied project context as the only evidence about the repository. "
         "Never invent filenames, directories, languages, frameworks, functions, dependencies, test results, or repository structure. "
@@ -56,7 +73,7 @@ class ChatMessage(BaseModel):
     content: str = Field(min_length=1, max_length=8000)
 
 class ChatRequest(BaseModel):
-    mode: Literal["explain", "code", "research", "translate", "speak", "draw"] = "explain"
+    mode: Literal["explain", "build", "code", "research", "translate", "speak", "draw"] = "explain"
     language: Literal["en", "fr", "es"] = "en"
     messages: list[ChatMessage] = Field(min_length=1, max_length=24)
     project_context: str | None = Field(default=None, max_length=24000)

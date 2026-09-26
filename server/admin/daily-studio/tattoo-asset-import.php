@@ -27,6 +27,7 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
             'assets' => [
                 'preview' => is_file($folder . '/preview-watermarked.png') || is_file($bundledFolder . '/preview-watermarked.png'),
                 'stencil' => is_file($folder . '/stencil-print-ready.png') || is_file($bundledFolder . '/stencil-print-ready.png'),
+                'outline' => is_file($folder . '/stencil-outline.png') || is_file($bundledFolder . '/stencil-outline.png'),
                 'transfer' => is_file($folder . '/studio-transfer-template.png') || is_file($bundledFolder . '/studio-transfer-template.png'),
                 'pdf' => is_file($folder . '/stencil-print-ready.pdf') || is_file($bundledFolder . '/stencil-print-ready.pdf'),
                 'reference' => is_file($folder . '/reference-artwork.webp') || is_file($bundledFolder . '/reference-artwork.webp'),
@@ -72,7 +73,7 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
       <h2>Optional: organize assets now</h2>
       <div class="field"><label for="mode">How should assets be assigned?</label><select id="mode"><option value="roleBatch">Numbered files (recommended)</option><option value="exact">Choose one numbered drop</option><option value="auto">Upload organized asset folders</option></select><small>Files named 01, 02, … 55 map directly to the matching drop.</small></div>
       <div class="field" id="dropField" hidden><label for="drop">Numbered drop</label><select id="drop"><?php foreach ($drops as $drop): ?><option value="<?= (int)$drop['sequence'] ?>"><?= str_pad((string)$drop['sequence'], 2, '0', STR_PAD_LEFT) ?> · <?= htmlspecialchars($drop['title']) ?> — <?= htmlspecialchars($drop['collection']) ?></option><?php endforeach; ?></select><small>This is the safest option when a filename is unclear.</small></div>
-      <div class="field" id="roleField" hidden><label for="role">Asset type</label><select id="role"><option value="preview">Public preview</option><option value="stencil">Print-ready stencil</option><option value="transfer">Studio transfer template</option><option value="pdf">Printable PDF</option><option value="reference">Reference artwork</option><option value="placement">Placement mockup</option><option value="pack">Premium packaging</option><option value="lore">Lore card</option><option value="style">Style card</option></select></div>
+      <div class="field" id="roleField" hidden><label for="role">Asset type</label><select id="role"><option value="preview">Public preview</option><option value="outline">Official outline stencil</option><option value="stencil">Print-ready stencil</option><option value="transfer">Studio transfer template</option><option value="pdf">Printable PDF</option><option value="reference">Reference artwork</option><option value="placement">Placement mockup</option><option value="pack">Premium packaging</option><option value="lore">Lore card</option><option value="style">Style card</option></select></div>
       <div class="field" id="mappingField"><label for="mapping">Number mapping</label><select id="mapping"><option value="smart">Use each filename's number</option><option value="order">Use selection order (Drop 01 onward)</option></select><small>Leading zeros are optional: 1, 01, and 001 all map to Drop 01.</small></div>
       <div class="field"><label for="files" id="filesLabel">Batch upload all assets</label><input id="files" type="file" accept="image/png,image/jpeg,image/webp,application/pdf" multiple><small id="filesHelp">Select previews, stencils, transfers, PDFs, and cards together · 20 MB maximum each.</small></div>
       <label class="check"><input id="watermark" type="checkbox" checked> Apply Beyond Tattoo footer watermark to previews</label>
@@ -100,7 +101,7 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
   'use strict';
   const csrf = <?= json_encode($csrf) ?>;
   const drops = <?= json_encode($drops, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-  const roleLabels = {preview:'Preview',stencil:'Stencil',transfer:'Transfer',pdf:'PDF',reference:'Reference',placement:'Placement',pack:'Packaging',lore:'Lore',style:'Style'};
+  const roleLabels = {preview:'Preview',outline:'Outline stencil',stencil:'Stencil',transfer:'Transfer',pdf:'PDF',reference:'Reference',placement:'Placement',pack:'Packaging',lore:'Lore',style:'Style'};
   const $ = (id) => document.getElementById(id);
   const rows = new Map([...document.querySelectorAll('[data-sequence]')].map((row) => [Number(row.dataset.sequence), row]));
   const runtimeAssets = Object.fromEntries(drops.map((drop) => [drop.sequence, {...drop.assets}]));
@@ -198,6 +199,7 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
     const name = normalize(fileName);
     if (/\.pdf$/i.test(fileName)) return 'pdf';
     const rules = [
+      ['outline', /\b(outlines?|outline stencils?)\b/],
       ['transfer', /\b(transfers?|thermal|thermofax)\b/],
       ['placement', /\b(placements?|mockups?|mock up|on skin)\b/],
       ['reference', /\b(references?|source artworks?|original artworks?|reference artworks?)\b/],

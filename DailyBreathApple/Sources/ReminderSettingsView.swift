@@ -4,7 +4,7 @@ import UserNotifications
 
 struct ReminderSettingsView: View {
     @Environment(\.openURL) private var openURL
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @AppStorage("dailyReminderEnabled") private var reminderEnabled = false
     @AppStorage("dailyReminderHour") private var reminderHour = 8
     @AppStorage("dailyReminderMinute") private var reminderMinute = 0

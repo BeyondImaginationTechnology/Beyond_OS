@@ -68,9 +68,11 @@ Shared notes cite their source project and revision and are omitted when that
 source revision changes; an administrator can review, update, or remove stale
 notes.
 
-The web catalog maps `core` to runtime `explain` and the planned `build` mode to
-runtime `code`. Build remains locked in public chat. Admin Code Thinking calls
-the runtime `code` mode only through its separate role-protected API.
+The web catalog maps `core` to runtime `explain` and public Build to its own
+runtime `build` mode. Build is a text-only software brainstorming, technical
+and UI design, and coding-guidance preview; it receives no repository context
+and does not generate images or video. Admin Code Thinking calls the runtime
+`code` mode only through its separate role-protected API.
 
 ## Website deployment
 

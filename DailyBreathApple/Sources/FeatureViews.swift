@@ -3,7 +3,7 @@ import SwiftUI
 struct SettingsAboutView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @EnvironmentObject private var auth: BeyondIDAuthManager
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @AppStorage("dailyBreathLanguage") private var languageID = DailyBreathLanguage.english.rawValue
     @AppStorage("encryptedICloudSyncEnabled") private var encryptedICloudSyncEnabled = false
     @State private var showingDeleteConfirmation = false
@@ -39,6 +39,35 @@ struct SettingsAboutView: View {
                     ForEach(DailyBreathTheme.allCases) { theme in
                         Label(theme.name, systemImage: theme.symbolName).tag(theme.id)
                     }
+                }
+                Text("Seasonal changes with the calendar. A theme you choose stays selected until you change it.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Scripture artwork") {
+                ForEach([DailyBreathTheme.bibleForest, .tanakhNavy, .quranEmerald]) { theme in
+                    Button {
+                        selectedThemeID = theme.id
+                    } label: {
+                        HStack(spacing: 12) {
+                            if let artwork = theme.artworkName {
+                                Image(artwork)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 58, height: 72)
+                                    .clipped()
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                            }
+                            Text(theme.name)
+                            Spacer()
+                            if selectedThemeID == theme.id {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .accessibilityLabel("Selected")
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
                 }
             }
 

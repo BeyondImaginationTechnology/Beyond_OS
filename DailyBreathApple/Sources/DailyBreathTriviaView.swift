@@ -16,7 +16,7 @@ private struct DailyBreathTriviaQuestion: Identifiable {
 }
 
 struct DailyBreathTriviaView: View {
-    @AppStorage("dailyBreathTheme") private var themeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var themeID = DailyBreathTheme.seasonal.id
     @State private var index = 0
     @State private var selectedAnswer: String?
     @State private var score = 0

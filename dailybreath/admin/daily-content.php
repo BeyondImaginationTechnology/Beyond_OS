@@ -15,22 +15,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $date = (string)($_POST['publish_date'] ?? '');
         $tradition = (string)($_POST['tradition'] ?? '');
         $locale = (string)($_POST['locale'] ?? '');
-        $content = dailybreath_published_content($pdo, $date, $tradition, $locale);
-        $commercialLicense = (string)getenv('DAILYBREATH_ELEVENLABS_COMMERCIAL_LICENSE') === '1'
-            || beyond_config('narration.elevenlabs.commercial_license', false) === true;
+        $validDate = preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)
+            && checkdate((int)substr($date,5,2),(int)substr($date,8,2),(int)substr($date,0,4));
+        $validSelection = in_array($tradition, ['bible','torah','quran'], true)
+            && in_array($locale, ['en','fr','es'], true);
+        $content = $validDate && $validSelection
+            ? dailybreath_published_content($pdo, $date, $tradition, $locale) : null;
         if (!$content) $error = 'Approve the reading before generating narration.';
-        elseif (!$commercialLicense) $error = 'Commercial narration is disabled until the paid ElevenLabs license is confirmed in server configuration.';
         else {
             try {
                 require_once __DIR__ . '/../../includes/narration/StudioNarration.php';
                 $script = dailybreath_narration_script($content);
                 $voiceLocale = preg_match('/[\x{0590}-\x{05FF}]/u', $script) ? 'he-IL'
                     : (preg_match('/[\x{0600}-\x{06FF}]/u', $script) ? 'ar-SA'
-                    : ['fr'=>'fr-FR','es'=>'es-ES'][$locale] ?? 'en-US');
+                    : (['fr'=>'fr-FR','es'=>'es-ES'][$locale] ?? 'en-US'));
                 $voice = studio_narration_voice('elevenlabs', $voiceLocale);
+                if ($voice === '' && in_array($voiceLocale, ['he-IL','ar-SA'], true)) {
+                    $voice = studio_narration_voice('elevenlabs', 'en-US');
+                }
                 if ($voice === '') throw new RuntimeException('Select an ElevenLabs voice for ' . $voiceLocale . ' in Premium Voices.');
                 $generated = studio_narration_generate($script, $voiceLocale, 'elevenlabs', $voice);
-                $stored = studio_store_mp3((string)$generated['audio_content'], 'daily-breath', $date, $voiceLocale, $script);
+                $stored = studio_store_mp3((string)$generated['audio_content'], 'daily-breath', $date, $voiceLocale, $script . "\n" . $voice);
                 dailybreath_ensure_audio_table($pdo);
                 $values = [$date,$tradition,$locale,hash('sha256',$script),(string)$stored['url'],$voice,'elevenlabs'];
                 if ($pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {

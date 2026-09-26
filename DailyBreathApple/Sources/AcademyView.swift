@@ -5,7 +5,7 @@ struct AcademyView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @EnvironmentObject private var auth: BeyondIDAuthManager
     @StateObject private var purchaseManager = AcademyPurchaseManager()
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @AppStorage("completedAcademyLessonIDs") private var completedLessonIDs = ""
     @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
     @State private var certificateDate = Date()
@@ -464,7 +464,7 @@ private struct AcademyModuleCard: View {
 }
 
 private struct AcademyCertificateView: View {
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @AppStorage("academyCertificateName") private var learnerName = ""
 
     let tradition: FaithTradition
@@ -617,7 +617,7 @@ private struct AcademyLessonRow: View {
 private struct AcademyLessonView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var store: DailyBreathStore
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @AppStorage("completedAcademyLessonIDs") private var completedLessonIDs = ""
 
     let path: AcademyPath

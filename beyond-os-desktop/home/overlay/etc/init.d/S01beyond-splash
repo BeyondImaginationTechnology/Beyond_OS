@@ -1,7 +1,13 @@
 #!/bin/sh
 # Keep diagnostics available on machines without a framebuffer.
 case "${1:-}" in
-  start) /usr/bin/beyond-splash /usr/share/beyond-home/boot.ppm || true ;;
-  stop|restart|reload) ;;
+  start)
+    start-stop-daemon -S -b -m -p /run/beyond-splash.pid \
+      -x /usr/bin/beyond-splash -- /usr/share/beyond-home/boot.ppm || true ;;
+  stop)
+    start-stop-daemon -K -p /run/beyond-splash.pid || true
+    rm -f /run/beyond-splash.pid ;;
+  restart) "$0" stop; "$0" start ;;
+  reload) ;;
   *) echo "Usage: $0 {start|stop|restart|reload}" >&2; exit 1 ;;
 esac

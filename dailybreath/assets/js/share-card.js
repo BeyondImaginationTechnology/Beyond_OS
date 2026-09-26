@@ -43,8 +43,4 @@
     if(navigator.share){try{await navigator.share(data)}catch(error){if(error.name!=='AbortError')await navigator.clipboard?.writeText(location.href)}}
     else{try{await navigator.clipboard.writeText(location.href);alert('Share link copied.')}catch{prompt('Copy this share link:',location.href)}}
   });
-  document.getElementById('listen-reading')?.addEventListener('click',()=>{
-    if(!('speechSynthesis'in window)){alert('Audio narration is not available in this browser.');return}
-    speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance([passage,reference,reflection].filter(Boolean).join('. '));utterance.lang=document.documentElement.lang==='fr'?'fr-FR':document.documentElement.lang==='es'?'es-ES':'en-US';if(document.documentElement.dir==='rtl')utterance.lang='ar';speechSynthesis.speak(utterance);
-  });
 })();

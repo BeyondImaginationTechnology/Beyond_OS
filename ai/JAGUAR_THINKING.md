@@ -7,13 +7,14 @@ Jaguar is the model family. **Jaguar Thinking** is the product layer that choose
 | Mode | State | Runtime | Planned usage |
 | --- | --- | --- | --- |
 | Explain | Live | Jaguar base/LoRA runtime | Free preview |
+| Build | Public preview | Jaguar base/LoRA runtime (`build`) | Software brainstorming, coding guidance, and technical/UI design; no repository or tool access |
 | Code Thinking 0.1 | Admin preview | Same runtime with a project-scoped coding instruction | Internal |
 | Research | Planned | Retrieval pipeline | 2 credits |
 | Translate | Planned | Language workflow | 1 credit |
 | Speak | Planned | Text-to-speech worker | 5 credits |
 | Draw | Planned | Image-generation GPU worker | 10 credits |
 
-The public mode catalog in `ai/includes/modes.php` is shared by the chat UI and PHP API. It maps `core` to runtime `explain` and the planned `build` mode to runtime `code`; Build remains locked in public chat. Admin Code Thinking is a separate page and API, and the API checks the Beyond ID administrator role before project listing or repository access.
+The public mode catalog in `ai/includes/modes.php` is shared by the chat UI and PHP API. It maps `core` to runtime `explain` and public `build` to the distinct runtime mode `build`. Build is a text-only software ideation and design preview: it can brainstorm features, discuss architecture and UX, and offer coding guidance or illustrative examples, but cannot inspect repositories, tools, or production systems. Image and video generation belong to Draw and Video. Admin Code Thinking remains separate and maps to runtime `code`; its API checks the Beyond ID administrator role before project listing or repository access.
 
 ## Subscription shape
 
@@ -27,4 +28,4 @@ Text modes can remain the low-cost/free entry point. Draw and Speak should use r
 
 ## Runtime contract
 
-`POST /v1/chat` accepts a `mode` plus the existing message list and returns the selected mode in the response. Explain and Code share the same base model and adapter; Code can also receive bounded project context on the admin route. Admin Code Thinking returns proposed unified diffs for review and does not write the checkout. Research, Translate, Speak, and Draw should get dedicated workers once their dependencies and cost controls are ready.
+`POST /v1/chat` accepts a `mode` plus the existing message list and returns the selected mode in the response. Explain, Build, and Code share the same base model and adapter but have separate instructions. Public Build receives no repository context. Admin Code can receive bounded project context on the admin route and returns proposed unified diffs for review without writing to the checkout. Research, Translate, Speak, and Draw should get dedicated workers once their dependencies and cost controls are ready.

@@ -4,16 +4,60 @@
 #include <fcntl.h>
 #include <linux/fb.h>
 #include <stdint.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
+#include <time.h>
 #include <unistd.h>
+
+static volatile sig_atomic_t stop_animation;
+
+static void request_stop(int signal_number)
+{
+    (void)signal_number;
+    stop_animation = 1;
+}
 
 static uint32_t channel(unsigned value, struct fb_bitfield field)
 {
     if (!field.length || field.length > 8 || field.offset > 31) return 0;
     return (value >> (8 - field.length)) << field.offset;
+}
+
+static void put_pixel(unsigned char *pixels, size_t memory_size,
+                      const struct fb_var_screeninfo *v,
+                      const struct fb_fix_screeninfo *f, unsigned bytes,
+                      unsigned x, unsigned y, unsigned r, unsigned g, unsigned b)
+{
+    if (x >= v->xres || y >= v->yres) return;
+    uint32_t color = channel(r, v->red) | channel(g, v->green) |
+                     channel(b, v->blue) | channel(255, v->transp);
+    size_t at = ((size_t)y + v->yoffset) * f->line_length +
+                ((size_t)x + v->xoffset) * bytes;
+    if (at + bytes > memory_size) return;
+    for (unsigned byte = 0; byte < bytes; byte++)
+        pixels[at + byte] = (unsigned char)(color >> (byte * 8));
+}
+
+static void draw_dot(unsigned char *pixels, size_t memory_size,
+                     const struct fb_var_screeninfo *v,
+                     const struct fb_fix_screeninfo *f, unsigned bytes,
+                     unsigned left, unsigned top, unsigned draw_w, unsigned draw_h,
+                     unsigned width, unsigned height, int center_x,
+                     unsigned r, unsigned g, unsigned b)
+{
+    for (int dy = -2; dy <= 2; dy++) {
+        for (int dx = -2; dx <= 2; dx++) {
+            if (dx * dx + dy * dy > 5) continue;
+            unsigned sx = (unsigned)(center_x + dx);
+            unsigned sy = (unsigned)(311 + dy);
+            unsigned x = left + (unsigned)((uint64_t)sx * draw_w / width);
+            unsigned y = top + (unsigned)((uint64_t)sy * draw_h / height);
+            put_pixel(pixels, memory_size, v, f, bytes, x, y, r, g, b);
+        }
+    }
 }
 
 int main(int argc, char **argv)
@@ -68,6 +112,28 @@ int main(int argc, char **argv)
                 pixels[at + byte] = (unsigned char)(color >> (byte * 8));
         }
     }
+    /* Pulse the emerald loading dots until the graphical session takes over. */
+    signal(SIGTERM, request_stop);
+    signal(SIGINT, request_stop);
+    while (!stop_animation) {
+        for (int active = 0; active < 3; active++) {
+            if (stop_animation) break;
+            for (int dot = 0; dot < 3; dot++) {
+                unsigned r = dot == active ? 112 : 28;
+                unsigned g = dot == active ? 236 : 61;
+                unsigned b = dot == active ? 164 : 48;
+                draw_dot(pixels, f.smem_len, &v, &f, bytes, left, top,
+                         draw_w, draw_h, width, height, 307 + dot * 13,
+                         r, g, b);
+            }
+            struct timespec pulse = {0, 110000000};
+            while (nanosleep(&pulse, &pulse) && errno == EINTR && !stop_animation) {}
+        }
+    }
+    for (int dot = 0; dot < 3; dot++)
+        draw_dot(pixels, f.smem_len, &v, &f, bytes, left, top,
+                 draw_w, draw_h, width, height, 307 + dot * 13,
+                 145, 222, 166);
     munmap(pixels, f.smem_len);
     close(fd);
     free(image);

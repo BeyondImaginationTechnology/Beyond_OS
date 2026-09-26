@@ -3,7 +3,7 @@ import SwiftUI
 struct ScriptureLibraryView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @AppStorage("scriptureEdition.bible") private var bibleEditionID = ScriptureEdition.bibleEnglish.id
     @AppStorage("scriptureEdition.torah") private var torahEditionID = ScriptureEdition.torahHebrew.id
     @AppStorage("scriptureEdition.quran") private var quranEditionID = ScriptureEdition.quranArabic.id
@@ -277,7 +277,7 @@ private struct SacredTextBookView: View {
 
 private struct SacredTextChapterView: View {
     @EnvironmentObject private var store: DailyBreathStore
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     let chapter: SacredTextChapter
     var highlightedVerseID: SacredTextVerse.ID?
 

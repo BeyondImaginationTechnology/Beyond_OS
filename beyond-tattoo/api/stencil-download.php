@@ -17,6 +17,7 @@ try {
         $map = [
             'preview' => ['preview_url', 'auto', 'preview'],
             'png' => ['transfer_png_url', 'image/png', 'studio-transfer.png'],
+            'outline' => ['outline_png_url', 'image/png', 'outline-stencil.png'],
             'pdf' => ['transfer_pdf_url', 'application/pdf', 'studio-transfer.pdf'],
             'editable' => ['editable_url', 'image/svg+xml; charset=UTF-8', 'editable-master.svg'],
             'placement' => ['placement_guide_url', 'application/pdf', 'placement-guide.pdf'],

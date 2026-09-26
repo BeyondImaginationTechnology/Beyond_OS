@@ -2,6 +2,9 @@
 set -eu
 case "${1:-}" in
   start)
+    # Stop the framebuffer dot animation before X.Org claims the display.
+    start-stop-daemon -K -p /run/beyond-splash.pid || true
+    rm -f /run/beyond-splash.pid
     if grep -qw 'bit.install=1' /proc/cmdline; then
       exec /usr/bin/bit-install-home </dev/console >/dev/console 2>&1
     fi

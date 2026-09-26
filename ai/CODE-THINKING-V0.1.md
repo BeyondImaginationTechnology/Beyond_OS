@@ -32,9 +32,9 @@ repo-grounded answers, useful plans, and changes that pass project checks.
 1. Fix the guest challenge routing for both a root-mounted `ai` subdomain and a
    `/ai` path deployment. Return a useful message if the endpoint responds with
    HTML or another invalid response.
-2. Resolve the current mode-contract drift: the PHP catalog uses `core/build`,
-   while the model runtime accepts `explain/code`; map these deliberately before
-   making Code available.
+2. Resolve the mode contract deliberately: public `core` maps to runtime
+   `explain`, public software-design and coding-guidance `build` maps to
+   runtime `build`, and private admin Code Thinking maps to runtime `code`.
 3. Add an admin entitlement and project picker, then a read-only project
    briefing and task planner.
 4. Add patch generation in a bounded workspace, a visible diff, and checks
@@ -55,8 +55,10 @@ work should follow those results rather than precede them.
 - Guest challenge and chat API URLs now derive from the mounted `ai` page path,
   so root-mounted and `/ai` deployments resolve correctly. Invalid challenge
   responses produce a useful status message.
-- The PHP mode catalog now states the runtime mapping explicitly: `core` →
-  `explain`, `build` → `code`. Public Build remains planned/locked.
+- The PHP mode catalog maps `core` → `explain`, public Build → `build`, and
+  keeps the admin Code Thinking API on `code`. Build is a text-only public mode
+  for software brainstorming, design, and coding guidance; it receives no
+  repository context and cannot change files or generate media.
 - Added a separate Beyond-admin Code Thinking page/API. Its project roots come
   from `JAGUAR_CODE_PROJECTS_JSON` (or the current Git checkout by default), and
   requested files are resolved and constrained inside the selected root.

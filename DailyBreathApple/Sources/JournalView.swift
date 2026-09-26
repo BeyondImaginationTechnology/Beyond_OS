@@ -2,7 +2,7 @@ import SwiftUI
 
 struct JournalView: View {
     @EnvironmentObject private var store: DailyBreathStore
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @State private var editingEntry: JournalEntry?
     @FocusState private var isReflectionFocused: Bool
 

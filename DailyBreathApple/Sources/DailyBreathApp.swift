@@ -43,9 +43,11 @@ struct DailyBreathApp: App {
 private enum DailyBreathLaunchDefaults {
     static func seedIfNeeded() {
         let defaults = UserDefaults.standard
-        guard defaults.object(forKey: "selectedFaithTradition") == nil else { return }
-
-        defaults.set(FaithTradition.bible.id, forKey: "selectedFaithTradition")
-        defaults.set(DailyBreathTheme.forest.id, forKey: "dailyBreathTheme")
+        if defaults.object(forKey: "selectedFaithTradition") == nil {
+            defaults.set(FaithTradition.bible.id, forKey: "selectedFaithTradition")
+        }
+        if defaults.object(forKey: "dailyBreathTheme") == nil {
+            defaults.set(DailyBreathTheme.seasonal.id, forKey: "dailyBreathTheme")
+        }
     }
 }

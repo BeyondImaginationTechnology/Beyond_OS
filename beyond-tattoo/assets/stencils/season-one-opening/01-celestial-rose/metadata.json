@@ -7,5 +7,7 @@
   "style": "Black-and-grey floral realism",
   "placement": "Upper arm, thigh or calf",
   "difficulty": "Intermediate",
-  "rights_confirmed": true
+  "rights_confirmed": true,
+  "outline_stencil": "stencil-outline.png",
+  "outline_standard": "Clean black contours on pure white; no shading or gray texture."
 }

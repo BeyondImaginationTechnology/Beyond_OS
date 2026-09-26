@@ -109,14 +109,15 @@ image and remove `-snapshot` from a copy of the launcher.
 ## Startup path
 
 Linux initializes the virtual GPU and mounts the root filesystem. BusyBox init
-runs `S01beyond-splash`, which centers the Beyond artwork on the framebuffer.
-When services are ready, `S99beyond-home` starts X.Org and launches Openbox and
-the Home shell under the non-root user. X.Org runs with a private authentication
-cookie and no TCP listener. The generic X.Org startup script is removed to
-prevent a competing display server.
+starts `S01beyond-splash`, which centers the Beyond artwork on the framebuffer
+and pulses its three emerald loading dots until the graphical session starts.
+When services are ready, `S99beyond-home` stops the splash and starts X.Org.
+Openbox and the Home shell then launch under the non-root user. X.Org runs with
+a private authentication cookie and no TCP listener. The generic X.Org startup
+script is removed to prevent a competing display server.
 
-This boot screen is a static early-userspace splash, not an encrypted-disk
-password prompt. Diagnostic kernel output goes to the VM's serial console.
+This boot screen is an early-userspace splash, not an encrypted-disk password
+prompt. Diagnostic kernel output goes to the VM's serial console.
 A framebuffer failure leaves the console available. Firmware and bootloader
 branding, graphical disk unlock, multi-monitor behavior and real GPU support
 still need implementation and VM/hardware testing.

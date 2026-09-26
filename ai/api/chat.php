@@ -201,9 +201,9 @@ if ($isDailyBreathChat) {
 }
 $simpleReply = null;
 $simpleCopy = [
-    'en' => ['hello' => 'Hello! I’m Jaguar. What would you like to explore?', 'thanks' => 'You’re welcome. What should we explore next?', 'acknowledgement' => 'I’m here when you’re ready. What should we explore?', 'help' => 'I’m Jaguar, Beyond’s AI assistant. Core can explain ideas, shape plans, work through code, and teach difficult topics in plain language. Build, Draw, and Video are locked while we finish them.', 'version' => 'You’re using Jaguar v0.3 Preview.'],
-    'fr' => ['hello' => 'Bonjour ! Je suis Jaguar. Qu’aimeriez-vous explorer ?', 'thanks' => 'Avec plaisir. Qu’allons-nous explorer ensuite ?', 'acknowledgement' => 'Je suis là quand vous êtes prêt. Qu’allons-nous explorer ?', 'help' => 'Je suis Jaguar, l’assistant IA de Beyond. Core peut expliquer des idées, structurer des projets, travailler sur du code et simplifier des sujets difficiles. Build, Dessiner et Vidéo restent verrouillés pendant leur préparation.', 'version' => 'Vous utilisez Jaguar v0.3 Preview.'],
-    'es' => ['hello' => '¡Hola! Soy Jaguar. ¿Qué te gustaría explorar?', 'thanks' => 'De nada. ¿Qué exploramos ahora?', 'acknowledgement' => 'Estoy aquí cuando estés listo. ¿Qué exploramos?', 'help' => 'Soy Jaguar, el asistente de IA de Beyond. Core puede explicar ideas, organizar proyectos, trabajar con código y enseñar temas difíciles con palabras sencillas. Build, Dibujar y Video permanecen bloqueados mientras los terminamos.', 'version' => 'Estás usando Jaguar v0.3 Preview.'],
+    'en' => ['hello' => 'Hello! I’m Jaguar. What would you like to explore?', 'thanks' => 'You’re welcome. What should we explore next?', 'acknowledgement' => 'I’m here when you’re ready. What should we explore?', 'help' => 'I’m Jaguar, Beyond’s AI assistant. Explain teaches ideas; Build preview turns product ideas into scoped plans. Build cannot inspect repositories or change files. Draw and Video are still in development.', 'version' => 'You’re using Jaguar v0.4 Preview.'],
+    'fr' => ['hello' => 'Bonjour ! Je suis Jaguar. Qu’aimeriez-vous explorer ?', 'thanks' => 'Avec plaisir. Qu’allons-nous explorer ensuite ?', 'acknowledgement' => 'Je suis là quand vous êtes prêt. Qu’allons-nous explorer ?', 'help' => 'Je suis Jaguar, l’assistant IA de Beyond. Explain enseigne des idées ; Build transforme les idées de produit en plans structurés. Build ne peut ni consulter des dépôts ni modifier des fichiers. Dessiner et Vidéo sont encore en préparation.', 'version' => 'Vous utilisez Jaguar v0.4 Preview.'],
+    'es' => ['hello' => '¡Hola! Soy Jaguar. ¿Qué te gustaría explorar?', 'thanks' => 'De nada. ¿Qué exploramos ahora?', 'acknowledgement' => 'Estoy aquí cuando estés listo. ¿Qué exploramos?', 'help' => 'Soy Jaguar, el asistente de IA de Beyond. Explain enseña ideas; Build convierte ideas de producto en planes concretos. Build no puede consultar repositorios ni cambiar archivos. Dibujar y Video siguen en preparación.', 'version' => 'Estás usando Jaguar v0.4 Preview.'],
 ];
 // Keep common greeting variations off the scale-to-zero runtime. In particular,
 // "Hello world" is a normal first message, not a request that needs a GPU cold start.
@@ -219,9 +219,9 @@ if (preg_match('/^(hi|hello|hey|bonjour|salut|allo|hola|buenas)(?:[\s,]+(?:there
     $simpleReply = $simpleCopy[$language]['version'];
 } elseif (preg_match('/^(how old are you|what(?:[’\']s| is) your age|when were you (?:made|created|born)|quel âge as-tu|cuántos años tienes)[\s!.?¿¡]*$/u', $simplePrompt)) {
     $simpleReply = [
-        'en' => 'I don’t have a human age. I’m Llama Jaguar v0.3 Preview, an AI system being built for the BIT ecosystem.',
-        'fr' => 'Je n’ai pas d’âge humain. Je suis Llama Jaguar v0.3 Preview, un système d’IA conçu pour l’écosystème BIT.',
-        'es' => 'No tengo una edad humana. Soy Llama Jaguar v0.3 Preview, un sistema de IA creado para el ecosistema BIT.',
+        'en' => 'I don’t have a human age. I’m Llama Jaguar v0.4 Preview, an AI system being built for the BIT ecosystem.',
+        'fr' => 'Je n’ai pas d’âge humain. Je suis Llama Jaguar v0.4 Preview, un système d’IA conçu pour l’écosystème BIT.',
+        'es' => 'No tengo una edad humana. Soy Llama Jaguar v0.4 Preview, un sistema de IA creado para el ecosistema BIT.',
     ][$language];
 } elseif (preg_match('/^(-?\d+(?:\.\d+)?)\s*([+\-*\/])\s*(-?\d+(?:\.\d+)?)\s*(?:=|\?)?$/', $simplePrompt, $math)) {
     $left = (float) $math[1];
@@ -430,7 +430,13 @@ $request = curl_init($runtimeUrl . '/v1/chat');
 $runtimeMode = (string)($modeDefinition['runtime'] ?? 'explain');
 curl_setopt_array($request, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 15, CURLOPT_TIMEOUT => 105, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode(['mode' => $runtimeMode, 'language' => $language, 'messages' => $messages], JSON_THROW_ON_ERROR)]);
 $response = curl_exec($request); $status = (int) curl_getinfo($request, CURLINFO_RESPONSE_CODE); curl_close($request);
-if (!is_string($response) || $status < 200 || $status >= 300) { http_response_code(503); echo json_encode(['error' => 'Jaguar could not complete that request.']); exit; }
+if (!is_string($response) || $status < 200 || $status >= 300) {
+    http_response_code(503);
+    $error = $mode === 'build' && $status === 422
+        ? 'Build preview is not enabled on the Jaguar runtime yet. Please try Explain or contact the Jaguar administrator.'
+        : 'Jaguar could not complete that request.';
+    echo json_encode(['error' => $error]);
+    exit;
+}
 echo $response;
-
 

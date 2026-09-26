@@ -5,7 +5,7 @@ struct BibleView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @AppStorage("bibleLastBookCode") private var lastBookCode = "GEN"
     @AppStorage("bibleLastChapter") private var lastChapter = 1
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @State private var searchText = ""
     @State private var searchResults: [BibleVerse] = []
 
@@ -226,7 +226,7 @@ private struct FavoriteCollectionView: View {
 
 private struct BibleBookView: View {
     let book: BibleBook
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -275,7 +275,7 @@ private struct BibleChapterView: View {
     var highlightedVerseID: BibleVerse.ID?
     @AppStorage("bibleLastBookCode") private var lastBookCode = "GEN"
     @AppStorage("bibleLastChapter") private var lastChapter = 1
-    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.forest.id
+    @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @State private var noteVerse: BibleVerse?
     @State private var noteDraft = ""
     @State private var collectionVerse: BibleVerse?

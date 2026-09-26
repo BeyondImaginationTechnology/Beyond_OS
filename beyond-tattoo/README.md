@@ -5,7 +5,7 @@
 The 55-drop catalog is a schedule, not a claim that all files exist. The public web library and Apple API scan the actual asset folders and expose a drop only when it is approved, its release date has arrived, and both `preview-watermarked.png` and `stencil-print-ready.png` exist.
 
 1. Open Beyond Studio → Beyond Tattoo → 55-drop assets.
-2. Choose an asset role and upload one file or a filename-mapped batch. Supported roles are preview, print master, transfer PNG, printable PDF, reference artwork, placement mockup, packaging, lore card, and style card.
+2. Choose an asset role and upload one file or a filename-mapped batch. Supported roles are preview, official outline stencil, print master, transfer PNG, printable PDF, reference artwork, placement mockup, packaging, lore card, and style card.
 3. Repeat until the drop has at least its preview and print master. Other files are optional and appear automatically when present.
 4. Add the approval description, style, recommended body placements, and difficulty when useful. Review the files, confirm Beyond Tattoo has publishing permission, then select **Approve drop**.
 5. An approved future drop remains private until its scheduled Vancouver release date. A draft is never returned by the storefront, ZIP download, library API, or Apple apps.

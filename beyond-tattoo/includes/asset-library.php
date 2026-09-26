@@ -54,7 +54,9 @@ function bt_asset_library(): array
             if ($releaseDate > $today) continue;
             $preview = bt_asset_library_file($uploadedFolder, $bundledFolder, 'preview-watermarked.png');
             $stencil = bt_asset_library_file($uploadedFolder, $bundledFolder, 'stencil-print-ready.png');
-            if ($preview === null || $stencil === null) continue;
+            $outline = bt_asset_library_file($uploadedFolder, $bundledFolder, 'stencil-outline.png');
+            if ($preview === null || ($stencil === null && $outline === null)) continue;
+            $printMaster = $stencil ?? $outline;
             $transfer = bt_asset_library_file($uploadedFolder, $bundledFolder, 'studio-transfer-template.png');
             $pdf = bt_asset_library_file($uploadedFolder, $bundledFolder, 'stencil-print-ready.pdf');
             $reference = bt_asset_library_file($uploadedFolder, $bundledFolder, 'reference-artwork.webp');
@@ -62,7 +64,7 @@ function bt_asset_library(): array
             $pack = bt_asset_library_file($uploadedFolder, $bundledFolder, 'premium-packaging.webp');
             $lore = bt_asset_library_file($uploadedFolder, $bundledFolder, 'lore-card.webp');
             $styleCard = bt_asset_library_file($uploadedFolder, $bundledFolder, 'style-card.webp');
-            $updated = max(array_map(static fn(array $asset): int => (int)filemtime($asset['path']), array_filter([$preview, $stencil, $transfer, $pdf, $reference, $placementImage, $pack, $lore, $styleCard])));
+            $updated = max(array_map(static fn(array $asset): int => (int)filemtime($asset['path']), array_filter([$preview, $stencil, $outline, $transfer, $pdf, $reference, $placementImage, $pack, $lore, $styleCard])));
             $description = trim((string)($metadata['description'] ?? ''));
             if ($description === '') $description = $collection['description'];
             $assets[] = [
@@ -85,7 +87,8 @@ function bt_asset_library(): array
                 'rights_confirmed' => (bool)($metadata['rights_confirmed'] ?? false),
                 'reward_bits' => 25,
                 'preview_url' => $preview['url'],
-                'stencil_url' => $stencil['url'],
+                'stencil_url' => $printMaster['url'],
+                'outline_png_url' => $outline['url'] ?? '',
                 'transfer_png_url' => $transfer['url'] ?? '',
                 'transfer_pdf_url' => $pdf['url'] ?? '',
                 'reference_image_url' => $reference['url'] ?? '',
@@ -94,7 +97,7 @@ function bt_asset_library(): array
                 'lore_card_url' => $lore['url'] ?? '',
                 'style_card_url' => $styleCard['url'] ?? '',
                 'updated_at' => gmdate('c', $updated),
-                'files' => array_values(array_filter([$preview, $stencil, $transfer, $pdf, $reference, $placementImage, $pack, $lore, $styleCard])),
+                'files' => array_values(array_filter([$preview, $printMaster, $outline, $transfer, $pdf, $reference, $placementImage, $pack, $lore, $styleCard])),
             ];
         }
     }
@@ -129,6 +132,7 @@ function bt_asset_library_daily(): array
         'ig_post_url' => $asset['pack_image_url'],
         'editable_url' => '',
         'transfer_png_url' => $asset['transfer_png_url'] !== '' ? $asset['transfer_png_url'] : $asset['stencil_url'],
+        'outline_png_url' => $asset['outline_png_url'],
         'transfer_pdf_url' => $asset['transfer_pdf_url'],
         'placement_guide_url' => '',
         'placement' => $asset['placement'],

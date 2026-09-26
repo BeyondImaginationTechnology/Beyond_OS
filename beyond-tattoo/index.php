@@ -65,7 +65,7 @@ if (!empty($stencilDay['iso_date'])) {
 
       <div class="bt-header-actions">
         <a class="bt-header-download" href="stencils.php">View release calendar</a>
-        <a class="bt-login-link" href="login.php?workspace=artist">Artist login</a>
+        <a class="bt-login-link" href="stencils.php">Browse release calendar</a>
         <a class="bt-login-link" href="login.php?workspace=studio">Studio login</a>
         <details class="bt-mobile-menu">
           <summary aria-label="Open menu">☰</summary>
@@ -75,7 +75,7 @@ if (!empty($stencilDay['iso_date'])) {
             <a href="store.php">Store</a>
             <a href="studios.php">Studios</a>
             <a href="about.php">About</a>
-            <a href="login.php?workspace=artist">Artist login</a>
+            <a href="stencils.php">Browse release calendar</a>
             <a href="login.php?workspace=studio">Studio login</a>
           </div>
         </details>
@@ -92,7 +92,7 @@ if (!empty($stencilDay['iso_date'])) {
         <p class="bt-main-lead">Premium tattoo stencils plus a focused operating workspace for modern shop owners.</p>
         <div class="bt-main-actions">
           <a class="bt-glow-button" href="<?= e($downloadFile) ?>" download>↓ Download today’s stencil</a>
-          <a class="bt-outline-button" href="login.php?workspace=artist">Artist login</a>
+          <a class="bt-outline-button" href="stencils.php">Browse release calendar</a>
         </div>
         <div class="bt-trust-row" aria-label="Stencil package features">
           <span><i>▣</i> Printer ready</span>
@@ -175,7 +175,7 @@ if (!empty($stencilDay['iso_date'])) {
         <p>Beyond Tattoo gives shop owners one focused workspace for artist recruiting, studio discovery and production-ready stencil resources—all connected to an existing Beyond ID.</p>
         <div class="bt-main-actions">
           <a class="bt-glow-button" href="login.php?workspace=studio">Open studio workspace</a>
-          <a class="bt-outline-button" href="login.php?workspace=artist">Artist workspace</a>
+          <a class="bt-outline-button" href="stencils.php">Browse release calendar</a>
           <a class="bt-outline-button" href="about.php">See how it works</a>
         </div>
         <small>No separate Tattoo account required.</small>
@@ -206,7 +206,7 @@ if (!empty($stencilDay['iso_date'])) {
         </span>
         <div><strong>Beyond Tattoo</strong><small>Beyond imagination. Beyond limits.</small></div>
       </div>
-      <div class="bt-footer-links"><a href="../">Beyond OS</a><a href="login.php?workspace=artist">Artist login</a><a href="login.php?workspace=studio">Studio login</a><a href="../legal/terms.php">Terms</a><a href="../legal/privacy.php">Privacy</a></div>
+      <div class="bt-footer-links"><a href="../">Beyond OS</a><a href="stencils.php">Browse release calendar</a><a href="login.php?workspace=studio">Studio login</a><a href="../legal/terms.php">Terms</a><a href="../legal/privacy.php">Privacy</a></div>
     </div>
   </footer>
 

@@ -38,10 +38,11 @@ function bt_stencil_preview_assets(string $collectionSlug, int $collectionIndex,
         : __DIR__ . '/' . $bundledFolder . '/metadata.json';
     $metadata = is_file($metadataPath) ? json_decode((string)file_get_contents($metadataPath), true) : [];
     $status = is_array($metadata) ? strtolower(trim((string)($metadata['status'] ?? 'draft'))) : 'draft';
-    return [
+    $assets = [
         'approved' => in_array($status, ['approved', 'published'], true),
         'metadata' => is_array($metadata) ? $metadata : [],
         'preview' => $asset('preview-watermarked.png'),
+        'outline_png' => $asset('stencil-outline.png'),
         'print_png' => $asset('stencil-print-ready.png'),
         'print_pdf' => $asset('stencil-print-ready.pdf'),
         'transfer' => $asset('studio-transfer-template.png'),
@@ -51,6 +52,10 @@ function bt_stencil_preview_assets(string $collectionSlug, int $collectionIndex,
         'lore' => $asset('lore-card.webp'),
         'style' => $asset('style-card.webp'),
     ];
+    if (!is_file(__DIR__ . '/' . $assets['print_png']) && is_file(__DIR__ . '/' . $assets['outline_png'])) {
+        $assets['print_png'] = $assets['outline_png'];
+    }
+    return $assets;
 }
 
 $categoryOptions = [
@@ -169,7 +174,7 @@ foreach ($collections as $collectionSlug => $collection) {
 <section class="bt-page-section"><div class="bt-wrap">
   <form class="filter-row" method="get" role="search" style="margin-bottom:18px"><label class="sr-only" for="stencil-search">Search approved stencils</label><input class="input" id="stencil-search" name="q" value="<?= e($searchQuery) ?>" placeholder="Search subject, style, placement, or difficulty"><?php if ($activeCategory !== ''): ?><input type="hidden" name="category" value="<?= e($activeCategory) ?>"><?php endif; ?><select class="input" name="style" aria-label="Filter by style"><option value="">All styles</option><option value="black-and-grey" <?= $filterStyle === 'black-and-grey' ? 'selected' : '' ?>>Black &amp; grey</option><option value="realism" <?= $filterStyle === 'realism' ? 'selected' : '' ?>>Realism</option><option value="japanese" <?= $filterStyle === 'japanese' ? 'selected' : '' ?>>Japanese</option></select><select class="input" name="difficulty" aria-label="Filter by difficulty"><option value="">All difficulty</option><option value="intermediate" <?= $filterDifficulty === 'intermediate' ? 'selected' : '' ?>>Intermediate</option><option value="advanced" <?= $filterDifficulty === 'advanced' ? 'selected' : '' ?>>Advanced</option></select><input class="input" name="placement" value="<?= e($filterPlacement) ?>" placeholder="Placement"><input class="input" name="collection" value="<?= e($filterCollection) ?>" placeholder="Collection"><input class="input" type="date" name="from" value="<?= e($filterFrom) ?>" aria-label="Release date from"><input class="input" type="date" name="to" value="<?= e($filterTo) ?>" aria-label="Release date to"><button class="bt-outline-button" type="submit">Filter library</button></form>
   <?php if (($stencilDay['updated_at'] ?? '') !== '' && $searchQuery === '' && $activeCategory === ''): ?>
-  <section class="bt-library-group" id="studio-release"><div class="bt-library-heading"><div><p>BEYOND STUDIO RELEASE</p><h2>Latest published stencil</h2></div><span>Live now</span></div><div class="bt-stencil-schedule-grid"><article class="bt-schedule-card is-current is-unlocked" role="button" tabindex="0" aria-haspopup="dialog" aria-label="View <?= e($stencilDay['title']) ?> stencil" data-stencil-preview="<?= e($stencilDay['preview_url']) ?>" data-stencil-title="<?= e($stencilDay['title']) ?>" data-stencil-collection="<?= e($stencilDay['collection']) ?>" data-stencil-date="<?= e($stencilDay['display_date']) ?>" data-stencil-download="<?= e($stencilDay['transfer_png_url']) ?>"><div class="bt-schedule-number">AI</div><div><time datetime="<?= e($stencilDay['iso_date']) ?>"><?= e($stencilDay['display_date']) ?></time><h3><?= e($stencilDay['title']) ?></h3><p><?= e($stencilDay['description']) ?></p></div><span>View stencil</span></article></div></section>
+  <section class="bt-library-group" id="studio-release"><div class="bt-library-heading"><div><p>BEYOND STUDIO RELEASE</p><h2>Latest published stencil</h2></div><span>Live now</span></div><div class="bt-stencil-schedule-grid"><article class="bt-schedule-card is-current is-unlocked" role="button" tabindex="0" aria-haspopup="dialog" aria-label="View <?= e($stencilDay['title']) ?> stencil" data-stencil-preview="<?= e($stencilDay['preview_url']) ?>" data-stencil-title="<?= e($stencilDay['title']) ?>" data-stencil-collection="<?= e($stencilDay['collection']) ?>" data-stencil-date="<?= e($stencilDay['display_date']) ?>" data-stencil-download="<?= e($stencilDay['transfer_png_url']) ?>" data-stencil-outline="<?= e($stencilDay['outline_png_url'] ?? '') ?>"><div class="bt-schedule-number">AI</div><div><time datetime="<?= e($stencilDay['iso_date']) ?>"><?= e($stencilDay['display_date']) ?></time><h3><?= e($stencilDay['title']) ?></h3><p><?= e($stencilDay['description']) ?></p></div><span>View stencil</span></article></div></section>
   <?php endif; ?>
   <div class="bt-category-browser" aria-label="Browse stencils by category">
     <a class="<?= $activeCategory === '' ? 'is-active' : '' ?>" href="stencils.php"><b>▦</b><span>All</span><small><?= e((string)$availableCount) ?></small></a>
@@ -220,6 +225,7 @@ foreach ($collections as $collectionSlug => $collection) {
       data-stencil-collection="<?= e($collection['name']) ?>"
       data-stencil-date="<?= e(bt_pretty_date($item[1])) ?>"
       data-stencil-download="<?= is_file(__DIR__ . '/' . $assets['print_png']) ? e($assets['print_png']) : '' ?>"
+      data-stencil-outline="<?= is_file(__DIR__ . '/' . $assets['outline_png']) ? e($assets['outline_png']) : '' ?>"
       data-stencil-pdf="<?= is_file(__DIR__ . '/' . $assets['print_pdf']) ? e($assets['print_pdf']) : '' ?>"
       data-stencil-reference="<?= is_file(__DIR__ . '/' . $assets['reference']) ? e($assets['reference']) : '' ?>"
       data-stencil-placement="<?= is_file(__DIR__ . '/' . $assets['placement']) ? e($assets['placement']) : '' ?>"
@@ -246,6 +252,7 @@ foreach ($collections as $collectionSlug => $collection) {
       <p class="bt-stencil-viewer-note">Watermarked preview. Open the print-ready file for studio use.</p>
       <div class="bt-stencil-viewer-actions">
         <a class="bt-glow-button" href="#" download data-stencil-viewer-download hidden>↓ Download PNG</a>
+        <a class="bt-glow-button" href="#" download data-stencil-viewer-outline hidden>↓ Download outline stencil</a>
         <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-pdf hidden>Open printable PDF</a>
         <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-reference hidden>Reference artwork</a>
         <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-placement hidden>Placement mockup</a>
@@ -264,7 +271,7 @@ foreach ($collections as $collectionSlug => $collection) {
 (() => {
   const viewer = document.getElementById('bt-stencil-viewer');
   if (!viewer) return;
-  const links = ['reference', 'placement', 'pack', 'lore', 'style'];
+  const links = ['outline', 'reference', 'placement', 'pack', 'lore', 'style'];
   const prepareAssetLinks = (card) => links.forEach((name) => {
     const link = viewer.querySelector(`[data-stencil-viewer-${name}]`);
     const url = card.dataset[`stencil${name[0].toUpperCase()}${name.slice(1)}`] || '';

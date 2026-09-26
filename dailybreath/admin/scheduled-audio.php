@@ -8,7 +8,7 @@ require_once __DIR__ . '/../includes/verse-of-day.php';
 require_once __DIR__ . '/../includes/sacred-text.php';
 
 $pdo = db();
-$dateToday = date('Y-m-d');
+$dateToday = (new DateTimeImmutable('now', new DateTimeZone('America/Vancouver')))->format('Y-m-d');
 $error = '';
 $notice = '';
 

@@ -2,6 +2,12 @@
 
 Native Android companion to `DailyBreathApple`, built with Java 17 and the Android view toolkit.
 
+## Android 2.4 Play release
+
+Version 2.4.0 uses version code 7. Build the signed Play App Bundle locally with `build-play-review.ps1`, which checks that the signing certificate matches the upload key registered with Google Play. The script prompts for the keystore passwords without storing them in the repository. Upload the resulting AAB in Play Console.
+
+The Play Console privacy policy declaration and the in-app policy link must both use the public, app-specific page at `https://beyondimagination.co.technology/dailybreath/privacy.php`. Check that page without a signed-in browser session before sending a release for review.
+
 ## Android 2.3 update
 
 - Sync the selected day, tradition, and language from the Daily Breath daily-content API, with a date-specific on-device cache and bundled offline fallback

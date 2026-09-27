@@ -55,10 +55,7 @@ DirectoryIndex index.php index.html
   # Downloadable operating-system mirrors contain navigable copies of the
   # website for offline use. Keep those copies out of search results while
   # leaving the actual downloads accessible.
-  <IfModule mod_setenvif.c>
-    SetEnvIf Request_URI "^/downloads/" beyond_noindex=1
-    Header always set X-Robots-Tag "noindex, nofollow" env=beyond_noindex
-  </IfModule>
+  Header always set X-Robots-Tag "noindex, nofollow" "expr=%{REQUEST_URI} =~ m#^/downloads/#"
 </IfModule>
 
 <IfModule mod_rewrite.c>
@@ -86,14 +83,14 @@ DirectoryIndex index.php index.html
   RewriteRule ^dailybreath/podcast/rss\.xml$ /dailybreath/podcast/rss.php [END]
 
   # Retire malformed legacy Catering links that Search Console discovered.
-  RewriteRule ^beyond-catering/(?:.*/)?(?:help-center\.php)$ /help-center.php [R=301,END,NE]
-  RewriteRule ^beyond-catering/(?:.*/)?(?:contact\.php)$ /contact.php [R=301,END,NE]
-  RewriteRule ^beyond-catering/(?:.*/)?(?:blog\.php)$ /blog.php [R=301,END,NE]
-  RewriteRule ^beyond-catering/(?:.*/)?(?:release-notes\.php)$ /release-notes.php [R=301,END,NE]
-  RewriteRule ^beyond-catering/(?:.*/)?(?:legal/)?privacy\.php$ /legal/privacy.php [R=301,END,NE]
-  RewriteRule ^beyond-catering/(?:.*/)?(?:legal/)?terms\.php$ /legal/terms.php [R=301,END,NE]
-  RewriteRule ^beyond-catering/(?:.*/)?beyond-tv/?$ /beyond-tv/ [R=301,END,NE]
-  RewriteRule ^beyond-catering/?$ / [R=301,END,NE]
+  RewriteRule ^beyond-catering/(?:.*/)?(?:help-center\.php)$ https://beyondimagination.co.technology/help-center.php [R=301,END,NE]
+  RewriteRule ^beyond-catering/(?:.*/)?(?:contact\.php)$ https://beyondimagination.co.technology/contact.php [R=301,END,NE]
+  RewriteRule ^beyond-catering/(?:.*/)?(?:blog\.php)$ https://beyondimagination.co.technology/blog.php [R=301,END,NE]
+  RewriteRule ^beyond-catering/(?:.*/)?(?:release-notes\.php)$ https://beyondimagination.co.technology/release-notes.php [R=301,END,NE]
+  RewriteRule ^beyond-catering/(?:.*/)?(?:legal/)?privacy\.php$ https://beyondimagination.co.technology/legal/privacy.php [R=301,END,NE]
+  RewriteRule ^beyond-catering/(?:.*/)?(?:legal/)?terms\.php$ https://beyondimagination.co.technology/legal/terms.php [R=301,END,NE]
+  RewriteRule ^beyond-catering/(?:.*/)?beyond-tv/?$ https://beyondimagination.co.technology/beyond-tv/ [R=301,END,NE]
+  RewriteRule ^beyond-catering/?$ https://beyondimagination.co.technology/ [R=301,END,NE]
 
   # Serve real application files and folders directly.
   RewriteCond %{REQUEST_FILENAME} -f [OR]

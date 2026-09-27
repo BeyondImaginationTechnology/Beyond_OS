@@ -1,17 +1,2 @@
-# Release artifacts are published by the release process and served directly.
-Options -Indexes
-
-<IfModule mod_headers.c>
-  Header set X-Content-Type-Options "nosniff"
-  Header set Cache-Control "public, max-age=300, must-revalidate"
-</IfModule>
-
-<IfModule mod_mime.c>
-  AddType application/gzip .gz
-</IfModule>
-
-<FilesMatch "^(?:SHA256SUMS|bitCoreos\.iso\.gz|bit-os-core-(?:0\.2|1\.0)-installer\.img\.gz|coreOS\.exe|bitCyberos\.iso\.gz|bit-os-cyber-0\.1-installer\.img\.gz|bitHomeos\.iso\.gz|bit-os-home-0\.2-installer\.img\.gz)$">
-  <IfModule mod_authz_core.c>
-    Require all granted
-  </IfModule>
-</FilesMatch>
+# Release artifacts inherit the verified root-level static-file rules.
+# Keep this directory configuration-free for compatibility with shared hosts.

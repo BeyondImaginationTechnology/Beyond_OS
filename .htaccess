@@ -55,12 +55,16 @@ DirectoryIndex index.php index.html
   # Downloadable operating-system mirrors contain navigable copies of the
   # website for offline use. Keep those copies out of search results while
   # leaving the actual downloads accessible.
-  Header always set X-Robots-Tag "noindex, nofollow" "expr=%{REQUEST_URI} =~ m#^/downloads/#"
+  Header always set X-Robots-Tag "noindex, nofollow" env=beyond_noindex
+  Header always set X-Robots-Tag "noindex, nofollow" env=REDIRECT_beyond_noindex
 </IfModule>
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # Pass the download mirror noindex marker through any internal rewrite.
+  RewriteRule ^downloads(?:/|$) - [E=beyond_noindex:1]
 
   # Preserve Bearer credentials when Apache/FastCGI does not expose the
   # Authorization header to PHP directly.

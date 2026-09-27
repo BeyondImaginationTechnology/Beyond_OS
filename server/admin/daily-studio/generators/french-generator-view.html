@@ -58,6 +58,8 @@
       <div id="nativeAudioStatus" class="hint" style="margin:-8px 0 13px" aria-live="polite">Checking the selected character voices…</div>
       <button id="regeneratePabloAudio" class="btn secondary wide" type="button">Generate Pablo’s Mateo Spanish tracks only</button>
       <div id="pabloAudioStatus" class="hint" style="margin:7px 0 13px" aria-live="polite">Checking Pablo’s 100 Spanish recordings…</div>
+      <button id="regenerateLouisAudio" class="btn secondary wide" type="button">Generate Louis’s Florian French tracks only</button>
+      <div id="louisAudioStatus" class="hint" style="margin:7px 0 13px" aria-live="polite">Checking Louis’s 100 French recordings…</div>
       <div class="grid"><label class="check"><input id="includeNarration" type="checkbox"> Include server audio</label><label class="check"><input id="showBadge" type="checkbox" checked> Show playing badge</label></div>
       <div class="field" style="margin-top:13px"><label for="narrationProvider">Narration provider for export</label><select id="narrationProvider" data-character-voices="__CHARACTER_VOICE_LOCALES__" data-character-voice-ids="__CHARACTER_VOICE_IDS__" data-default-provider="__DEFAULT_NARRATION_PROVIDER__"><option value="">Character-matched default where configured</option><option value="elevenlabs">ElevenLabs Premium</option><option value="openai">OpenAI Speech</option></select><div class="hint">French uses Louis, Spanish Pablo (Mateo), Patois Irie, and Kreyòl Jazzy when their character voice is configured. English uses the selected default. No audio is generated until preview or export.</div></div>
       <div class="field" style="margin-top:13px"><label for="exportLanguage">Export version</label><select id="exportLanguage"><option value="en">English text + English audio</option><option value="fr">French text + French audio</option><option value="es">Spanish text + Spanish audio</option><option value="jm">Patois text + Patois audio</option><option value="ht">Kreyòl text + Kreyòl audio</option></select></div>
@@ -310,17 +312,35 @@
     }catch(error){$('pabloAudioStatus').textContent=`${error.message||'Pablo audio generation failed.'} Progress is saved at ${lastReady}/100; click again to resume.`;}
     finally{button.disabled=false}
   }
+  async function regenerateLouisAudio(){
+    if(!confirm('Generate only Louis’s French lesson MP3s that do not already match Florian? This can use up to 100 ElevenLabs generations and resumes safely if interrupted.'))return;
+    const button=$('regenerateLouisAudio');button.disabled=true;let lastReady=0;
+    try{
+      while(true){
+        $('louisAudioStatus').textContent=`Generating Louis’s Florian French tracks… ${lastReady}/100 verified.`;
+        const response=await fetch('/server/admin/daily-studio/api/regenerate-french-native-audio.php?locale=fr-FR',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:'{}'});
+        const data=await response.json();
+        if(!response.ok||!data.ok)throw new Error(data.error||'Louis audio generation failed.');
+        lastReady=Number(data.ready||0);button.textContent=`Louis French ${lastReady}/${Number(data.target||100)}`;
+        if(data.complete){$('louisAudioStatus').textContent=`Louis’s French tracks are ready: ${lastReady} of ${Number(data.target||100)} verified against Florian.`;break}
+        await new Promise(resolve=>setTimeout(resolve,120));
+      }
+    }catch(error){$('louisAudioStatus').textContent=`${error.message||'Louis audio generation failed.'} Progress is saved at ${lastReady}/100; click again to resume.`;}
+    finally{button.disabled=false}
+  }
   async function refreshNativeAudioProgress(){
     try{
       const response=await fetch('/server/admin/daily-studio/api/regenerate-french-native-audio.php',{cache:'no-store'}),data=await response.json();
       if(!response.ok||!data.ok)return;
-      const ready=Number(data.ready||0),target=Number(data.target||300),button=$('regenerateNativeAudio'),notice=$('nativeAudioStatus'),pabloButton=$('regeneratePabloAudio'),pabloNotice=$('pabloAudioStatus');
-      if(Array.isArray(data.configuration_issues)&&data.configuration_issues.length){notice.textContent='Not ready: '+data.configuration_issues.join(' ');button.disabled=true;pabloButton.disabled=true;return}
-      button.disabled=false;pabloButton.disabled=false;notice.textContent=`${ready}/${target} Spanish, Kreyòl, and Patois recordings verified against their selected voices.`;
+      const ready=Number(data.ready||0),target=Number(data.target||300),button=$('regenerateNativeAudio'),notice=$('nativeAudioStatus'),pabloButton=$('regeneratePabloAudio'),pabloNotice=$('pabloAudioStatus'),louisButton=$('regenerateLouisAudio'),louisNotice=$('louisAudioStatus');
+      if(Array.isArray(data.configuration_issues)&&data.configuration_issues.length){notice.textContent='Not ready: '+data.configuration_issues.join(' ');button.disabled=true;pabloButton.disabled=true;louisButton.disabled=true;return}
+      button.disabled=false;pabloButton.disabled=false;louisButton.disabled=false;notice.textContent=`${ready}/${target} Spanish, Kreyòl, and Patois recordings verified against their selected voices.`;
       if(ready>0)button.textContent=`Native MP3 batch ${ready}/${target}`;
       if(data.complete)setStatus(`Native-speaker audio regeneration finished: ${ready} Spanish, Kreyòl, and Patois tracks are ready.`);
       const pabloResponse=await fetch('/server/admin/daily-studio/api/regenerate-french-native-audio.php?locale=es-ES',{cache:'no-store'}),pabloData=await pabloResponse.json();
       if(pabloResponse.ok&&pabloData.ok){const pabloReady=Number(pabloData.ready||0),pabloTarget=Number(pabloData.target||100);pabloButton.textContent=`Pablo Spanish ${pabloReady}/${pabloTarget}`;pabloNotice.textContent=`${pabloReady}/${pabloTarget} Pablo Spanish recordings verified against Mateo; only mismatches use credits.`;if(pabloData.complete)pabloButton.disabled=true}
+      const louisResponse=await fetch('/server/admin/daily-studio/api/regenerate-french-native-audio.php?locale=fr-FR',{cache:'no-store'}),louisData=await louisResponse.json();
+      if(louisResponse.ok&&louisData.ok){const louisReady=Number(louisData.ready||0),louisTarget=Number(louisData.target||100);louisButton.textContent=`Louis French ${louisReady}/${louisTarget}`;louisNotice.textContent=`${louisReady}/${louisTarget} Louis French recordings verified against Florian; only mismatches use credits.`;if(louisData.complete)louisButton.disabled=true}
     }catch(_error){const notice=$('nativeAudioStatus');if(notice)notice.textContent='Voice assignments could not be verified. Reload before starting a regeneration batch.'}
   }
   function save(){if(contentMode!=='draft'){setStatus('Only new drafts are stored in the browser.',true);return}const data={};ids.forEach(id=>data[id]=$(id).type==='checkbox'?$(id).checked:$(id).value);localStorage.setItem('beyondFrenchGeneratorDraft',JSON.stringify(data));setStatus('Draft saved in this browser.')}
@@ -431,7 +451,7 @@
       setStatus(savedUrl?'MP3 saved to the French audio library and downloaded.':'MP3 generated and downloaded.');
     }catch(error){setStatus(error.message||'MP3 export failed.',true)}finally{button.disabled=false}
   }
-  updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{if(el.id==='publishDate')setFieldValue('weekday',weekdayForDate(el.value),false);updateAudioUi(el.id);draw()});el.addEventListener('change',()=>{if(el.id==='publishDate'&&(contentMode==='scheduled'||contentMode==='empty')){loadScheduleDate(el.value);return}updateAudioUi(el.id);draw()})});$('scheduledMode').onclick=()=>loadScheduleDate(contentMode==='draft'?localDateParts().date:(v('publishDate')||localDateParts().date));$('createDraft').onclick=enterDraftMode;$('editScheduled').onclick=editScheduledLesson;$('previousLesson').onclick=()=>scheduleNavigation.previous&&loadScheduleDate(scheduleNavigation.previous);$('todayLesson').onclick=()=>loadScheduleDate(localDateParts().date);$('nextLesson').onclick=()=>scheduleNavigation.next&&loadScheduleDate(scheduleNavigation.next);$('reloadLesson').onclick=()=>loadScheduleDate(v('publishDate')||localDateParts().date);$('saveDailyPhrase').onclick=saveDailyPhrase;$('saveAndExportVideo').onclick=saveAndExportVideo;$('exportRemotionVideo').onclick=remotionVideo;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;$('generateTodayPhrase').onclick=generateTodayPhrase;$('regenerateNativeAudio').onclick=regenerateNativeAudio;$('regeneratePabloAudio').onclick=regeneratePabloAudio;draw();loadScheduleDate();refreshNativeAudioProgress();
+  updateAudioUi();document.querySelectorAll('input,textarea,select').forEach(el=>{el.addEventListener('input',()=>{if(el.id==='publishDate')setFieldValue('weekday',weekdayForDate(el.value),false);updateAudioUi(el.id);draw()});el.addEventListener('change',()=>{if(el.id==='publishDate'&&(contentMode==='scheduled'||contentMode==='empty')){loadScheduleDate(el.value);return}updateAudioUi(el.id);draw()})});$('scheduledMode').onclick=()=>loadScheduleDate(contentMode==='draft'?localDateParts().date:(v('publishDate')||localDateParts().date));$('createDraft').onclick=enterDraftMode;$('editScheduled').onclick=editScheduledLesson;$('previousLesson').onclick=()=>scheduleNavigation.previous&&loadScheduleDate(scheduleNavigation.previous);$('todayLesson').onclick=()=>loadScheduleDate(localDateParts().date);$('nextLesson').onclick=()=>scheduleNavigation.next&&loadScheduleDate(scheduleNavigation.next);$('reloadLesson').onclick=()=>loadScheduleDate(v('publishDate')||localDateParts().date);$('saveDailyPhrase').onclick=saveDailyPhrase;$('saveAndExportVideo').onclick=saveAndExportVideo;$('exportRemotionVideo').onclick=remotionVideo;$('downloadPng').onclick=png;$('saveLocal').onclick=save;$('previewAudio').onclick=preview;$('stopAudio').onclick=()=>{stop();setStatus('Narration stopped.')};$('exportVideo').onclick=video;$('exportAllVideo').onclick=exportAllLanguagesVideo;$('exportMp3').onclick=exportMp3;$('generateTodayPhrase').onclick=generateTodayPhrase;$('regenerateNativeAudio').onclick=regenerateNativeAudio;$('regeneratePabloAudio').onclick=regeneratePabloAudio;$('regenerateLouisAudio').onclick=regenerateLouisAudio;draw();loadScheduleDate();refreshNativeAudioProgress();
 })();
 </script>
 </body>

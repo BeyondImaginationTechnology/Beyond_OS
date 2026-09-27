@@ -8,6 +8,7 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: private, no-store');
 
 const FRENCH_NATIVE_AUDIO_BATCH = 'native-speakers-2026-09-elevenlabs-v3';
+const FRENCH_LOUIS_AUDIO_BATCH = 'louis-florian-2026-09-elevenlabs-v3';
 const FRENCH_PABLO_MATEO_VOICE_ID = '00uevfcKk0GtPlbU69ZH';
 const FRENCH_CHARACTER_VOICES = [
     'fr-FR' => 'Louis',
@@ -19,6 +20,9 @@ const FRENCH_NATIVE_AUDIO_LANGUAGES = [
     'es-ES' => ['field' => 'spanish', 'provider' => 'elevenlabs', 'label' => 'Spanish'],
     'ht-HT' => ['field' => 'kreyol', 'provider' => 'elevenlabs', 'label' => 'Haitian Kreyòl'],
     'en-JM' => ['field' => 'patois', 'provider' => 'elevenlabs', 'label' => 'Jamaican Patois'],
+];
+const FRENCH_LOUIS_AUDIO_LANGUAGE = [
+    'fr-FR' => ['field' => 'french', 'provider' => 'elevenlabs', 'label' => 'French'],
 ];
 
 function frenchNativeResponse(array $payload, int $status = 200): never
@@ -106,18 +110,20 @@ if (!is_array($lessons)) frenchNativeResponse(['ok' => false, 'error' => 'The Fr
 $characterVoices = frenchNativeCharacterVoices();
 $voiceIssues = frenchNativeVoiceIssues($characterVoices);
 $requestedLocale = trim((string)($_GET['locale'] ?? ''));
-if ($requestedLocale !== '' && !isset(FRENCH_NATIVE_AUDIO_LANGUAGES[$requestedLocale])) {
+$allLanguages = [...FRENCH_NATIVE_AUDIO_LANGUAGES, ...FRENCH_LOUIS_AUDIO_LANGUAGE];
+if ($requestedLocale !== '' && !isset($allLanguages[$requestedLocale])) {
     frenchNativeResponse(['ok' => false, 'error' => 'Unsupported character voice batch.'], 422);
 }
 $selectedLanguages = $requestedLocale === ''
     ? FRENCH_NATIVE_AUDIO_LANGUAGES
-    : [$requestedLocale => FRENCH_NATIVE_AUDIO_LANGUAGES[$requestedLocale]];
+    : [$requestedLocale => $allLanguages[$requestedLocale]];
+$batch = $requestedLocale === 'fr-FR' ? FRENCH_LOUIS_AUDIO_BATCH : FRENCH_NATIVE_AUDIO_BATCH;
 $publicVoiceProfiles = array_map(static function (array $profile): array {
     return ['character' => $profile['character'], 'configured' => $profile['voice_id'] !== ''];
 }, $characterVoices);
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'GET') {
-    frenchNativeResponse(['ok' => true, ...frenchNativeProgress($lessons, $characterVoices, $root, $selectedLanguages), 'batch' => FRENCH_NATIVE_AUDIO_BATCH, 'character_voices' => $publicVoiceProfiles, 'configuration_ready' => !$voiceIssues, 'configuration_issues' => $voiceIssues]);
+    frenchNativeResponse(['ok' => true, ...frenchNativeProgress($lessons, $characterVoices, $root, $selectedLanguages), 'batch' => $batch, 'character_voices' => $publicVoiceProfiles, 'configuration_ready' => !$voiceIssues, 'configuration_issues' => $voiceIssues]);
 }
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     frenchNativeResponse(['ok' => false, 'error' => 'Unsupported request.'], 405);
@@ -130,6 +136,7 @@ if ($voiceIssues) {
         'ok' => false,
         'error' => 'Audio generation was not started. ' . implode(' ', $voiceIssues) . ' Choose four distinct character voices in Premium Voices first.',
         ...frenchNativeProgress($lessons, $characterVoices, $root, $selectedLanguages),
+        'batch' => $batch,
         'configuration_issues' => $voiceIssues,
     ], 422);
 }
@@ -151,10 +158,10 @@ try {
     }
 
     if ($selectedIndex === null) {
-        frenchNativeResponse(['ok' => true, 'built' => null, ...frenchNativeProgress($lessons, $characterVoices, $root, $selectedLanguages), 'batch' => FRENCH_NATIVE_AUDIO_BATCH]);
+        frenchNativeResponse(['ok' => true, 'built' => null, ...frenchNativeProgress($lessons, $characterVoices, $root, $selectedLanguages), 'batch' => $batch]);
     }
 
-    $settings = FRENCH_NATIVE_AUDIO_LANGUAGES[$selectedLocale];
+    $settings = $allLanguages[$selectedLocale];
     $lesson = (array)$lessons[$selectedIndex];
     $text = trim((string)($lesson[$settings['field']] ?? ''));
     if ($text === '') throw new RuntimeException('Lesson #' . (int)($lesson['id'] ?? 0) . ' has no ' . $settings['label'] . ' text.');
@@ -185,7 +192,7 @@ try {
     @chmod($destination, 0644);
 
     $lessons[$selectedIndex]['audio_generation'][$selectedLocale] = [
-        'batch' => FRENCH_NATIVE_AUDIO_BATCH,
+        'batch' => $batch,
         'provider' => $settings['provider'],
         'profile' => 'native-speaker',
         'character' => $characterVoices[$selectedLocale]['character'],
@@ -205,7 +212,7 @@ try {
             'url' => $urlPath,
         ],
         ...$progress,
-        'batch' => FRENCH_NATIVE_AUDIO_BATCH,
+        'batch' => $batch,
     ]);
 } catch (Throwable $error) {
     error_log('Beyond French native audio regeneration: ' . $error->getMessage());

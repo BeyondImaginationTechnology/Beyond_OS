@@ -32,7 +32,7 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
 .side-links a:hover,.side-links a:focus-visible{color:#f5eaff;background:linear-gradient(90deg,rgba(179,92,255,.1),transparent);transform:translateX(3px)}
 .message.assistant .avatar{transition:box-shadow .3s ease,transform .3s ease}.message.assistant:hover .avatar{box-shadow:0 0 20px rgba(224,79,194,.28);transform:scale(1.04)}
 @media(prefers-reduced-motion:reduce){.suggestions button,.new-chat,.mode-picker select,.side-links a,.message.assistant .avatar{transition:none}.suggestions button::after{display:none}.composer:focus-within{animation:none}}
-</style>
+</style><style>.usage-status{text-align:center;margin:0 0 7px;color:#a99ab6;font-size:10px;line-height:1.4}</style>
 </head><body>
 <div class="shell"><aside class="sidebar"><a class="brand" href="/"><img class="brand-mark-image" src="assets/jaguar-eye-v0.2.png" alt="Jaguar eye logo"><span><strong>JAGUAR</strong><small>V0.5 · BEYOND AI</small></span></a><button class="new-chat" id="newChat" type="button">＋ New conversation</button><div class="sidebar-note"><b>Guest chat</b>Conversation history is not saved in this preview. A quick security check protects guest requests.</div><nav class="side-links"><a href="https://beyondimagination.co.technology/ai/">About Jaguar</a><a href="https://beyondimagination.co.technology/release-notes.php#jaguar">Build progress</a><a href="https://beyondimagination.co.technology/">Beyond Imagination</a></nav></aside>
 <section class="workspace"><header class="topbar"><div class="model-name"><i class="status"></i> Llama Jaguar · v0.5 Preview</div><div class="account"><?php if ($signedIn): ?><?=e($displayName !== '' ? $displayName : 'Beyond ID')?> · signed in<?php if (in_array(strtolower((string)($_SESSION['role'] ?? '')), ['admin', 'super_admin'], true)): ?> · <a href="code.php">Code Thinking</a> · <a href="admin/training-feedback.php">Training review</a><?php endif; ?> · <a href="https://beyondimagination.co.technology/beyond-id/auth/logout.php">Sign out</a><?php else: ?><a href="https://beyondimagination.co.technology/beyond-id/auth/login.php?return=%2Fai%2Fchat.php">Sign in with Beyond ID</a><?php endif; ?></div></header>
@@ -57,6 +57,13 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
     const newChat = document.getElementById('newChat');
     const modeSelect = document.getElementById('modeSelect');
     const modeStatus = document.getElementById('modeStatus');
+    const usageStatus = document.createElement('div');
+    usageStatus.id = 'usageStatus';
+    usageStatus.className = 'usage-status';
+    usageStatus.setAttribute('role', 'status');
+    usageStatus.setAttribute('aria-live', 'polite');
+    usageStatus.textContent = 'Monthly usage is loading…';
+    form.parentNode.insertBefore(usageStatus, form);
     const feedbackGate = document.getElementById('feedbackGate');
     const feedbackForm = document.getElementById('feedbackForm');
     let feedbackExchange = null;
@@ -68,6 +75,23 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
     let language = 'en';
     let pendingText = '';
     let guestProof = null;
+
+    function updateUsageStatus(usage) {
+        if (!usage || typeof usage !== 'object') return;
+        const bitDollars = Number(usage.bit_dollars || 0).toFixed(6);
+        const bitLimit = Number(usage.bit_dollar_limit || 0.10).toFixed(6);
+        const inputTokens = Number(usage.input_tokens || 0).toLocaleString();
+        const outputTokens = Number(usage.output_tokens || 0).toLocaleString();
+        usageStatus.textContent = `This month: ${usage.requests || 0}/${usage.request_limit || 1} model requests · ${inputTokens} input + ${outputTokens} output tokens · ${bitDollars} BIT$ estimated of ${bitLimit} BIT$`;
+    }
+
+    fetch(`${appBasePath}/api/usage.php`, {credentials: 'same-origin', cache: 'no-store'})
+        .then(response => response.ok ? response.json() : null)
+        .then(data => {
+            if (data?.usage) updateUsageStatus(data.usage);
+            else usageStatus.textContent = 'Monthly BIT$ and token usage is temporarily unavailable.';
+        })
+        .catch(() => { usageStatus.textContent = 'Monthly BIT$ and token usage is temporarily unavailable.'; });
 
     const nearBottom = () => messages.scrollHeight - messages.scrollTop - messages.clientHeight < 56;
     const updateMessageTools = () => {
@@ -258,7 +282,7 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
                 cache: 'no-store',
                 signal: controller.signal
             };
-            const response = await fetch(`${appBasePath}/api/chat.php?v=20260926-1`, {...requestOptions, credentials: 'same-origin'});
+            const response = await fetch(`${appBasePath}/api/chat.php?v=20260926-2`, {...requestOptions, credentials: 'same-origin'});
             const responseText = await response.text();
             let data;
             try {
@@ -276,6 +300,11 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
                 return;
             }
             if (!response.ok && response.status === 429) {
+                if (data.monthly_limit) {
+                    updateUsageStatus(data.usage);
+                    thinking.textContent = data.error || 'You have reached this month’s Jaguar model request allowance.';
+                    return;
+                }
                 const retryHeader = Number(response.headers.get('Retry-After') || 10);
                 const retryAfter = Number.isFinite(retryHeader) ? Math.max(1, Math.ceil(retryHeader)) : 10;
                 retryUntil = Date.now() + retryAfter * 1000;
@@ -294,6 +323,7 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
                 return;
             }
             if (!response.ok) throw new Error(data.error || 'Jaguar is unavailable.');
+            updateUsageStatus(data.usage);
             thinking.textContent = data.message;
             history.push({role: 'assistant', content: data.message});
             attachFeedback(thinking, text, data.message, requestMode);

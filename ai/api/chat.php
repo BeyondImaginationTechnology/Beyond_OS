@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/modes.php';
+require_once __DIR__ . '/../includes/usage.php';
 require_once __DIR__ . '/../../beyond-id/includes/mobile-auth.php';
 require_once __DIR__ . '/../../dailybreath/includes/chat-guide.php';
 
@@ -439,6 +440,24 @@ $request = curl_init($runtimeUrl . '/v1/chat');
 // browser can appear permanently stuck while a cold runtime is unavailable.
 $runtimeMode = (string)($modeDefinition['runtime'] ?? 'explain');
 $runtimePayload = ['mode' => $runtimeMode, 'language' => $language, 'messages' => $messages];
+try {
+    $usageIdentity = jaguar_usage_identity($signedIn);
+    $usageReservation = jaguar_usage_reserve(beyond_db(), $usageIdentity);
+} catch (Throwable $exception) {
+    error_log('Jaguar monthly usage ledger unavailable: ' . $exception->getMessage());
+    http_response_code(503);
+    echo json_encode(['error' => 'Jaguar usage protection is temporarily unavailable. Please try again later.']);
+    exit;
+}
+if (!$usageReservation['allowed']) {
+    http_response_code(429);
+    echo json_encode([
+        'error' => 'You have reached this month’s Jaguar model request allowance. Your usage resets next month.',
+        'monthly_limit' => true,
+        'usage' => jaguar_usage_public($usageReservation),
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
 curl_setopt_array($request, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 15, CURLOPT_TIMEOUT => 105, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode($runtimePayload, JSON_THROW_ON_ERROR)]);
 $response = curl_exec($request); $status = (int) curl_getinfo($request, CURLINFO_RESPONSE_CODE); curl_close($request);
 if (!is_string($response) || $status < 200 || $status >= 300) {
@@ -449,4 +468,33 @@ if (!is_string($response) || $status < 200 || $status >= 300) {
     echo json_encode(['error' => $error]);
     exit;
 }
-echo $response;
+$runtimeResult = json_decode($response, true);
+$runtimeUsage = is_array($runtimeResult) && is_array($runtimeResult['usage'] ?? null) ? $runtimeResult['usage'] : null;
+if (!is_array($runtimeResult) || $runtimeUsage === null
+    || !isset($runtimeUsage['input_tokens'], $runtimeUsage['output_tokens'], $runtimeUsage['gpu_seconds'])
+    || !is_numeric($runtimeUsage['input_tokens']) || !is_numeric($runtimeUsage['output_tokens']) || !is_numeric($runtimeUsage['gpu_seconds'])
+    || !is_finite((float)$runtimeUsage['gpu_seconds'])
+    || (float)$runtimeUsage['gpu_seconds'] < 0 || (float)$runtimeUsage['gpu_seconds'] > 105
+    || (float)$runtimeUsage['input_tokens'] < 0 || (float)$runtimeUsage['input_tokens'] > 8192
+    || (float)$runtimeUsage['output_tokens'] < 0 || (float)$runtimeUsage['output_tokens'] > 1024) {
+    http_response_code(503);
+    echo json_encode(['error' => 'Jaguar usage metering is not ready on the model runtime. The request allowance was reserved; contact support if this continues.']);
+    exit;
+}
+try {
+    $usage = jaguar_usage_settle(
+        beyond_db(),
+        $usageIdentity,
+        (string)$usageReservation['period'],
+        (int)$runtimeUsage['input_tokens'],
+        (int)$runtimeUsage['output_tokens'],
+        (float)$runtimeUsage['gpu_seconds']
+    );
+} catch (Throwable $exception) {
+    error_log('Jaguar monthly usage settlement failed: ' . $exception->getMessage());
+    http_response_code(503);
+    echo json_encode(['error' => 'Jaguar could not record this request’s token usage. Your monthly request allowance was reserved.']);
+    exit;
+}
+$runtimeResult['usage'] = jaguar_usage_public($usage);
+echo json_encode($runtimeResult, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

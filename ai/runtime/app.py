@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 import secrets
+import time
 from functools import lru_cache
 from typing import Literal
 
@@ -85,6 +86,7 @@ class ChatResponse(BaseModel):
     mode: str
     message: str
     context_truncated: bool = False
+    usage: dict[str, int | float]
 
 @lru_cache(maxsize=1)
 def load_model():
@@ -185,6 +187,7 @@ def chat(request: ChatRequest) -> ChatResponse:
             max_length=MAX_INPUT_TOKENS,
         )
     inputs = inputs.to(model.device)
+    inference_started = time.perf_counter()
     with torch.inference_mode():
         output = model.generate(
             inputs,
@@ -195,6 +198,9 @@ def chat(request: ChatRequest) -> ChatResponse:
             pad_token_id=tokenizer.pad_token_id,
             eos_token_id=tokenizer.eos_token_id,
         )
+    if torch.cuda.is_available():
+        torch.cuda.synchronize()
+    inference_seconds = time.perf_counter() - inference_started
     generated = output[0][inputs.shape[-1]:]
     return ChatResponse(
         model=MODEL_ID,
@@ -202,4 +208,9 @@ def chat(request: ChatRequest) -> ChatResponse:
         mode=request.mode,
         message=tokenizer.decode(generated, skip_special_tokens=True).strip(),
         context_truncated=context_truncated,
+        usage={
+            "input_tokens": int(inputs.shape[-1]),
+            "output_tokens": int(generated.shape[-1]),
+            "gpu_seconds": round(inference_seconds, 6),
+        },
     )

@@ -9,4 +9,6 @@ $args = @('/nologo','/target:winexe','/platform:anycpu','/optimize+',('/out:' + 
 if ($LASTEXITCODE -ne 0) { throw 'Compiler failed.' }
 $coreExe = Join-Path $out 'coreOS.exe'
 Copy-Item -LiteralPath (Join-Path $out 'BITOSInstaller.exe') -Destination $coreExe -Force
-Get-Item (Join-Path $out 'BITOSInstaller.exe'), $coreExe | Select-Object FullName,Length,LastWriteTime
+$homeExe = Join-Path $out 'homeOS.exe'
+Copy-Item -LiteralPath (Join-Path $out 'BITOSInstaller.exe') -Destination $homeExe -Force
+Get-Item (Join-Path $out 'BITOSInstaller.exe'), $coreExe, $homeExe | Select-Object FullName,Length,LastWriteTime

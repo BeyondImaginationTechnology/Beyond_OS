@@ -64,7 +64,7 @@ namespace BITOSInstaller
                 CompressedImage = true
             },
             new ReleaseDefinition {
-                Edition = "BIT OS Home", Version = "v0.2 Candidate", Available = false,
+                Edition = "BIT OS Home", Version = "v0.2 Candidate", Available = true,
                 ImageUrl = "https://os.beyondimagination.co.technology/releases/home/0.2/bit-os-home-0.2-installer.img.gz",
                 ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/home/0.2/SHA256SUMS",
                 CompressedImage = true

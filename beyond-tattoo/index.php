@@ -113,6 +113,24 @@ if (!empty($stencilDay['iso_date'])) {
     </div>
   </section>
 
+  <section class="bt-needle-feature" aria-labelledby="needle-feature-title">
+    <div class="bt-wrap bt-needle-feature-card">
+      <div class="bt-needle-feature-art">
+        <img src="<?= e(bt_app_url('assets/img/needle-bot-v1.png')) ?>" alt="Needle Bot, a white woman with silver hair in ornate violet-accented armor, holding a tattoo machine" width="1024" height="1024" loading="lazy">
+      </div>
+      <div class="bt-needle-feature-copy">
+        <p class="bt-purple-kicker">Your tattoo AI companion</p>
+        <h2 id="needle-feature-title">Meet Needle Bot</h2>
+        <p>Plan tattoo concepts, get stencil-prep guidance, and ask questions about Beyond Tattoo. Needle Bot is here in the editor and whenever you need a hand.</p>
+        <div class="bt-needle-feature-actions">
+          <a class="bt-glow-button" href="<?= e(bt_app_url('needle-bot.php')) ?>">Chat with Needle Bot</a>
+          <a class="bt-outline-button" href="<?= e(bt_app_url('stencil-editor.php')) ?>">Open Stencil Editor</a>
+        </div>
+        <small>Image generation is handled by Jaguar Draw when connected; chat is for tattoo guidance and editor help.</small>
+      </div>
+    </div>
+  </section>
+
   <section class="bt-category-section" aria-labelledby="category-title">
     <div class="bt-wrap bt-section-frame">
       <h2 id="category-title"><span>✦</span> Browse by category <span>✦</span></h2>

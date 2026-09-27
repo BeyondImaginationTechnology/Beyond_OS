@@ -28,7 +28,7 @@ beyond_nav_bootstrap('Beyond Tattoo', beyond_wallet());
 <aside>
   <div class="brand">Advanced Stencil Editor</div>
   <div class="studio-intro"><strong>Turn an image into a stencil</strong><p class="muted">Upload your reference, choose a rendering style, then refine and print.</p></div>
-  <div class="group" style="border-top:0;padding-top:0"><div class="group-title">1 · Add an image</div><label class="upload-drop">Choose a photo or artwork<input class="text-input" id="sourceFile" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Upload an image to turn into a stencil" style="margin-top:8px"></label><p class="ai-note">Images stay on this device. Stencil rendering runs in the background in your browser; Needle Bot can answer questions about the editor.</p></div>
+  <div class="group" style="border-top:0;padding-top:0"><div class="group-title">1 · Add an image</div><label class="upload-drop">Choose a photo or artwork<input class="text-input" id="sourceFile" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Upload an image to turn into a stencil" style="margin-top:8px"></label><p class="ai-note">Images stay on this device. Local stencil previews render in the background. Jaguar Draw image generation is not yet connected to this web editor; Needle Bot can help with tattoo and editor questions.</p></div>
   <div class="group"><div class="group-title">2 · Rendering mode</div><div class="mode-grid" role="group" aria-label="Stencil rendering mode"><button class="mode-card" data-mode="outline" aria-pressed="false"><strong>Outline</strong><small>Clean contours</small></button><button class="mode-card active" data-mode="standard" aria-pressed="true"><strong>Standard</strong><small>Balanced detail</small></button><button class="mode-card" data-mode="hatching" aria-pressed="false"><strong>Hatching</strong><small>Shadow strokes</small></button></div></div>
 
   <div class="toolbar" role="toolbar" aria-label="Editing tools">
@@ -116,7 +116,7 @@ beyond_nav_bootstrap('Beyond Tattoo', beyond_wallet());
   </div>
 </main>
 </div>
-<section class="needle-panel" id="needlePanel" aria-label="Needle Bot chat" hidden><header><strong>✦ Needle Bot · AI companion</strong><button class="needle-close" id="needleClose" type="button" aria-label="Close Needle Bot chat">×</button></header><iframe title="Needle Bot tattoo and stencil assistant" src="<?=e(bt_app_url('needle-bot.php?embed=1'))?>" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></section>
+<section class="needle-panel" id="needlePanel" aria-label="Needle Bot chat" hidden><header><strong><img src="<?=e(bt_app_url('assets/img/needle-bot-v1.png'))?>" alt="" aria-hidden="true"> Needle Bot · AI companion</strong><button class="needle-close" id="needleClose" type="button" aria-label="Close Needle Bot chat">×</button></header><iframe title="Needle Bot tattoo and stencil assistant" src="<?=e(bt_app_url('needle-bot.php?embed=1'))?>" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></section>
 <script>
 'use strict';
 const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true}),paper=document.getElementById('paper'),guideLayer=document.getElementById('guideLayer'),statusEl=document.getElementById('status');

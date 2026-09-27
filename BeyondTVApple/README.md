@@ -2,7 +2,7 @@
 
 Native SwiftUI and AVPlayer clients for iPhone, iPad, and Apple TV.
 
-Current release: **2.001 (2001)**. This is an internal iOS and tvOS build for channel operations and playback review.
+Current release: **1.0 (2001)**. The public release remains 1.0 while iOS, tvOS, and Android builds increment independently.
 
 ## Open the project
 

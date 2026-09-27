@@ -6,6 +6,9 @@ require_once __DIR__ . '/beyond-tv/includes/beyond-cartoons-schedule.php';
 require_once __DIR__ . '/beyond-tv/includes/public-channel-catalog.php';
 beyond_nav_bootstrap('Beyond Imagination Technology');
 $signedIn = isset($_SESSION['user_id']);
+$homeTvRelease = json_decode((string)@file_get_contents(__DIR__ . '/beyond-tv/data/release.json'), true) ?: [];
+$homeTvVersion = (string)($homeTvRelease['version'] ?? '1.0');
+$homeTvBuild = (int)($homeTvRelease['build'] ?? 2001);
 
 $homeVerse = [
     'text' => 'Be still, and know that I am God.',
@@ -293,12 +296,12 @@ $homeLiveControls = [
     'beyond-mystery' => ['theme'=>'technology','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=beyond-mystery','icon'=>'cpu'],
 ];
 ?>
-<section class="home-live-stage" data-channel-theme="after-dark" data-sync-owner="page" aria-labelledby="homeLiveHeading">
+<section class="home-live-stage" data-channel-theme="after-dark" data-sync-owner="page" data-tv-version="<?=htmlspecialchars($homeTvVersion)?>" data-tv-build="<?=$homeTvBuild?>" aria-labelledby="homeLiveHeading">
   <div class="home-live-stage__background" aria-hidden="true"></div>
   <div class="home-live-stage__inner">
     <header class="home-live-stage__top">
       <div>
-        <span class="home-live-kicker" id="homeLiveKicker"><i></i> Beyond TV · Channel 1 live</span>
+        <span class="home-live-kicker" id="homeLiveKicker"><i></i> Beyond TV <?=htmlspecialchars($homeTvVersion)?> · Channel 1 live</span>
         <h2 id="homeLiveHeading">Beyond After Dark is playing now.</h2>
         <p id="homeLiveDescription"><strong>🌙 Connecting to the live program…</strong> · Synchronized premium channel preview · Vancouver time</p>
       </div>
@@ -372,6 +375,7 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
  const heading=document.getElementById('homeLiveHeading');
  const description=document.getElementById('homeLiveDescription');
  const clock=stage.querySelector('.home-live-clock');
+ const tvVersion=stage.dataset.tvVersion||'1.0';
  const EPISODE_SYNC_MS=30*60*1000;
  const LONG_FORM_SYNC_MS=2*60*60*1000;
  const longFormChannels=new Set(['space','ancient','cinema','health','comedy','family']);
@@ -437,7 +441,7 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
    if(sourceKey)button.dataset.streamKey=sourceKey;
    name.textContent=channelName;
    now.textContent=block;
-   kicker.innerHTML='<i></i> Beyond TV · Channel '+clean(channelNumber)+' live';
+   kicker.innerHTML='<i></i> Beyond TV '+clean(tvVersion)+' · Channel '+clean(channelNumber)+' live';
    heading.textContent=channelName+' is playing now.';
    description.innerHTML='<strong><span class="home-live-description__icon" aria-hidden="true"><i data-lucide="'+clean(iconName)+'"></i></span>'+clean(block)+'</strong>'+(lineup&&lineup!==block?' · '+clean(lineup):'')+(upNext?' · Up next: '+clean(upNext):'')+' · Vancouver time';
    if(window.lucide)window.lucide.createIcons({attrs:{'stroke-width':2}});

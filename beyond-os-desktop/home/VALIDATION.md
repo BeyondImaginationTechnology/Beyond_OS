@@ -101,12 +101,12 @@ This is a VM acceptance result, not a release sign-off.
   `bit-os-core-test-a`. The Home package compiled with `-std=c11 -Wall -Wextra
   -Werror`; the full ISO and GPT installer image generation completed.
 - `bitHomeos.iso`: 348,274,688 bytes; bootable ISO 9660. SHA-256:
-  `58d0e80ef2f26d95390093bb98d603cca6db5321136d765c2abc643943d80691`.
+  `fc99f523ea2a34e232a30fbc8503c54ac680d0934a4e2213164ae5fe1f1a9d03`.
 - `bit-os-home-0.1-installer.img`: 2,182,107,136 bytes; GPT with a 32 MiB EFI
   System partition and 2 GiB Linux root partition. SHA-256:
-  `88973b56f729848bcea057b81c188fed53859ff5aa52a3d2b2594b2297ca0662`.
+  `77ddc5065c077b3af9fe5403dabd6a98e9eddad23ad6b48ccedff6d0184a9903`.
 - `rootfs.ext2`: 2,147,483,648 bytes; SHA-256:
-  `ef8cbf01645abd4e97e63def75400a92626708979a1027a19db79202a62a43bb`.
+  `3d0e74ba93ee7910ca0beecf3976bcb2c3e70dee367b2b09165631db1a0bc887`.
   All three pass the generated `SHA256SUMS` manifest.
 - The default 1280×800 wallpaper is a quiet, people-free movie-night room with
   a couch, blanket, popcorn, plants, and gentle TV glow. Start includes a
@@ -115,9 +115,11 @@ This is a VM acceptance result, not a release sign-off.
   its rainforest texture whichever background is selected.
 - Launcher cards, wallpaper choices, taskbar buttons, and file rows now use
   rounded corners and hover highlights. Desktop folders use a layered emerald
-  folder symbol. The 1280×800 screenshot below was captured from the refreshed
-  QEMU guest after booting the rebuilt ISO under OVMF UEFI with TCG emulation.
-  The guest is available in noVNC on the running test VM.
+  folder symbol. Start-menu descriptions were shortened and clipped to each
+  card so text stays inside its bounds. The 1280×800 screenshot below was
+  captured from the refreshed QEMU guest after booting the rebuilt ISO under
+  OVMF UEFI with TCG emulation. The guest is available in noVNC on the running
+  test VM.
 
 ## Remaining release checks
 

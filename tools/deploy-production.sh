@@ -28,6 +28,18 @@ CURRENT_BRANCH="$(git symbolic-ref --quiet --short HEAD || true)"
 git fetch --prune origin main
 git merge --ff-only origin/main
 
+# Git respects the private umask for newly checked-out files and directories.
+# Make only tracked content web-readable; ignored config and runtime data stay private.
+while IFS= read -r -d '' tracked_file; do
+  tracked_dir="${tracked_file%/*}"
+  while [[ "${tracked_dir}" != "${tracked_file}" ]]; do
+    printf '%s\0' "${tracked_dir}"
+    [[ "${tracked_dir}" == */* ]] || break
+    tracked_dir="${tracked_dir%/*}"
+  done
+done < <(git ls-files -z) | sort -zu | xargs -0 -r chmod a+rx
+git ls-files -z | xargs -0 -r chmod a+r
+
 if [[ "$(cd -- "${PUBLIC_ROOT}" && pwd)" != "${REPOSITORY_ROOT}" ]]; then
   rsync -a --delay-updates \
     --exclude='/.git/' --exclude='/.github/' --exclude='/.cache/' \

@@ -6,12 +6,16 @@ The current work is `home-0.2-dev.1`. Passing source checks is not a successful 
 
 - The website source and validation record are pushed to `main`.
 - The compressed ISO and installer image pass manifest hashes and full
-  decompression checks. They are staged outside Git for separate upload.
-- The production site still shows Home as preparing. HostDeal transfer ports
-  are refusing connections. The deployment settings page and candidate
-  `SHA256SUMS` URL both returned HTTP 500 during the publication check. Do not
-  treat the candidate page or downloads as live until the site is deployed,
-  release files are uploaded, and the public URLs are verified.
+  decompression checks.
+- The Home v0.2 candidate is published on the production domain. On
+  2026-09-27, the public SHA-256 manifest and both compressed artifacts
+  returned HTTP 200. Their published sizes are 156,147,053 bytes for
+  `bitHomeos.iso.gz` and 172,531,321 bytes for
+  `bit-os-home-0.2-installer.img.gz`.
+- Download from
+  `https://beyondimagination.co.technology/releases/home/0.2/`. The separate
+  `os.beyondimagination.co.technology` host remains unavailable for release
+  paths and is not the Home v0.2 release mirror.
 
 ## Foundation acceptance
 

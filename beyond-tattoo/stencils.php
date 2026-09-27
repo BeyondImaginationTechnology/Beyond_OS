@@ -8,6 +8,8 @@ $disableBeyondShell = true;
 $stencilDay = bt_stencil_content();
 $downloadFile = $stencilDay['package_url'];
 $pageTitle = 'Stencils — Beyond Tattoo';
+$pageDescription = 'Browse Beyond Tattoo stencil collections, placement references, print-ready artwork and studio transfer resources.';
+$pageCanonical = 'https://beyondimagination.co.technology/beyond-tattoo/stencils.php';
 require __DIR__ . '/includes/header.php';
 $collections = bt_library_collections();
 $today = new DateTimeImmutable('today', new DateTimeZone('America/Vancouver'));

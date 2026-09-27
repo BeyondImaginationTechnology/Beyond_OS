@@ -62,6 +62,7 @@ if (is_file($frenchLessonsPath)) {
 <meta name="theme-color" content="#24140d">
 <title>Beyond Imagination Technology | Live. Learn. Earn. Explore.</title>
 <meta name="description" content="Beyond Imagination Technology connects health, education, creator commerce and entertainment through Beyond ID, with BIT OS environments in development.">
+<link rel="canonical" href="https://beyondimagination.co.technology/">
 <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
 <link rel="stylesheet" href="/assets/css/beyond-splash.css?v=20260828-1">
 <script src="/assets/js/beyond-splash.js?v=20260904-1" defer></script>

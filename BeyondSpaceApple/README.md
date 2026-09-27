@@ -1,6 +1,6 @@
 # Beyond Space for iOS
 
-Native SwiftUI starter app for the Beyond Space daily space fact and horoscope experience.
+Native SwiftUI app for the Beyond Space daily fact and Academy learning experience.
 
 ## Open and run
 
@@ -8,7 +8,7 @@ Native SwiftUI starter app for the Beyond Space daily space fact and horoscope e
 2. Select the shared `BeyondSpace` scheme and an iPhone simulator.
 3. Choose your Apple development team if Xcode asks, then Run.
 
-The project targets iOS 17 and includes no third-party dependencies. `project.yml` is included so the project can also be regenerated with XcodeGen.
+The project targets iOS 17 and includes no third-party dependencies. It loads the daily fact and its Academy lesson link from the shared Beyond Space API. Saved facts stay on the device; the lesson and video destinations open in the browser. `project.yml` is included so the project can also be regenerated with XcodeGen.
 
 ## Accessibility baseline
 

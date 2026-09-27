@@ -3,9 +3,12 @@ import SwiftUI
 struct TodayView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AppStorage("savedFactIDs") private var savedFactIDs = ""
-    @State private var selectedIndex = 0
+    @State private var fact = SampleContent.facts[0]
+    @State private var academyURL = URL(string: "https://beyondimagination.co.technology/beyond-space/academy.php")!
+    @State private var spaceTVURL = URL(string: "https://beyondimagination.co.technology/beyond-tv/channel.php?slug=space-tv")!
+    @State private var youtubeURL = URL(string: "https://www.youtube.com/playlist?list=PLXBcsPKqNstB10447aKbDnkPEJdTV9sj-")!
+    @State private var factDate = ""
 
-    private var fact: SpaceFact { SampleContent.facts[selectedIndex] }
     private var isSaved: Bool { savedIDs.contains(fact.id) }
     private var savedIDs: Set<Int> {
         Set(savedFactIDs.split(separator: ",").compactMap { Int($0) })
@@ -25,7 +28,7 @@ struct TodayView: View {
 
                     SpaceCard {
                         VStack(alignment: .leading, spacing: 18) {
-                            Label("FACT \(fact.id) OF 55", systemImage: fact.symbol)
+                            Label("DAILY FACT · \(fact.id)", systemImage: fact.symbol)
                                 .font(.caption.bold())
                                 .foregroundStyle(SpaceTheme.cyan)
                             Text(fact.title)
@@ -46,37 +49,69 @@ struct TodayView: View {
                     }
                     .accessibilityElement(children: .contain)
 
+                    if !factDate.isEmpty {
+                        Text("Daily Space · \(factDate)")
+                            .font(.footnote)
+                            .foregroundStyle(SpaceTheme.secondaryText)
+                    }
+
                     HStack(spacing: 12) {
-                        Button { previousFact() } label: {
-                            Label("Previous", systemImage: "chevron.left")
-                                .frame(maxWidth: .infinity, minHeight: 44)
-                        }
-                        .buttonStyle(.bordered)
                         Button { toggleSaved() } label: {
                             Label(isSaved ? "Saved" : "Save", systemImage: isSaved ? "bookmark.fill" : "bookmark")
-                                .frame(maxWidth: .infinity, minHeight: 44)
+                                .frame(maxWidth: .infinity, minHeight: 48)
                         }
                         .buttonStyle(.borderedProminent)
-                        Button { nextFact() } label: {
-                            Label("Next", systemImage: "chevron.right")
-                                .labelStyle(.iconOnly)
-                                .frame(minWidth: 44, minHeight: 44)
+                        Link(destination: academyURL) {
+                            Label("Continue learning", systemImage: "book.closed.fill")
+                                .frame(maxWidth: .infinity, minHeight: 48)
                         }
                         .buttonStyle(.bordered)
-                        .accessibilityLabel("Next fact")
+                    }
+                    HStack(spacing: 12) {
+                        Link(destination: spaceTVURL) {
+                            Label("Space TV", systemImage: "tv")
+                                .frame(maxWidth: .infinity, minHeight: 44)
+                        }
+                        .buttonStyle(.bordered)
+                        Link(destination: youtubeURL) {
+                            Label("YouTube", systemImage: "play.rectangle")
+                                .frame(maxWidth: .infinity, minHeight: 44)
+                        }
+                        .buttonStyle(.bordered)
                     }
                 }
                 .padding()
             }
+            .refreshable { await loadDailyFact() }
         }
         .navigationTitle("Beyond Space")
         .navigationBarTitleDisplayMode(.inline)
+        .task { await loadDailyFact() }
     }
 
-    private func previousFact() { changeIndex((selectedIndex - 1 + SampleContent.facts.count) % SampleContent.facts.count) }
-    private func nextFact() { changeIndex((selectedIndex + 1) % SampleContent.facts.count) }
-    private func changeIndex(_ index: Int) {
-        if reduceMotion { selectedIndex = index } else { withAnimation(.easeInOut(duration: 0.25)) { selectedIndex = index } }
+    private func loadDailyFact() async {
+        guard let result = try? await DailySpaceService.today(),
+              let sourceURL = result.fact.sourceURL,
+              let remoteAcademyURL = result.fact.academyURL else { return }
+        let remote = result.fact
+        let updatedFact = SpaceFact(
+            id: remote.number,
+            title: remote.title,
+            summary: remote.fact,
+            detail: remote.lesson,
+            sourceName: remote.sourceName ?? "NASA Science",
+            sourceURL: sourceURL,
+            symbol: "sparkles"
+        )
+        if reduceMotion {
+            fact = updatedFact
+        } else {
+            withAnimation(.easeInOut(duration: 0.25)) { fact = updatedFact }
+        }
+        academyURL = remoteAcademyURL
+        spaceTVURL = result.fact.distribution?.spaceTVURL ?? spaceTVURL
+        youtubeURL = result.fact.distribution?.youtubeURL ?? youtubeURL
+        factDate = result.date
     }
     private func toggleSaved() {
         var ids = savedIDs

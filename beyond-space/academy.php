@@ -4,7 +4,7 @@ function space_lesson(string $title,string $focus,string $teaching,string $pract
  return compact('title','focus','teaching','practice','concept','example','activity');
 }
 $academyConfig=[
- 'slug'=>'beyond-space','title'=>'Beyond Space Academy','icon'=>'🚀','logo'=>'/beyond-space/beyond-space-v1/assets/img/beyond-space-logo.webp','tagline'=>'Cosmic learning campus','accent'=>'#635bff','base'=>'/beyond-space/academy.php','css'=>'/beyond-space/academy.css?v=20260730-1','headline'=>'Learn the universe by exploring it.','description'=>'Five complete astronomy modules with 50 narrated lessons, interactive mission labs, lesson checks, saved progress, and module exams. All modules are open for this investor demo.','default_path'=>'cosmic-explorer','group_label'=>'explorer paths',
+ 'slug'=>'beyond-space','title'=>'Beyond Space Academy','icon'=>'🚀','logo'=>'/beyond-space/beyond-space-v1/assets/img/beyond-space-logo.webp','tagline'=>'Cosmic learning campus','accent'=>'#635bff','base'=>'/beyond-space/academy.php','css'=>'/beyond-space/academy.css?v=20260926-1','headline'=>'Learn the universe by exploring it.','description'=>'Five complete astronomy modules with 50 narrated lessons, interactive mission labs, lesson checks, saved progress, and module exams. All modules are open for this investor demo.','default_path'=>'cosmic-explorer','group_label'=>'explorer paths',
  'demo_access'=>true,
  'disclaimer'=>'Beyond Space Academy teaches evidence-based astronomy and space science. Astrology and horoscopes are offered separately for entertainment and personal reflection.',
  'paths'=>[
@@ -83,5 +83,39 @@ $academyConfig['rich_lessons']['*']['cosmology-extreme-space']=[
  space_lesson('What Science Does Not Yet Know','Uncertainty and frontiers','Open questions include dark matter identity, dark energy, quantum gravity, early-universe physics, and conditions beyond the observable horizon.','Label statements as measured, inferred, hypothetical, or unknown.','Good science makes uncertainty visible and turns it into testable questions.','Different models can fit current data and require better observations to distinguish them.','evidence'),
  space_lesson('Capstone: Tell the Cosmic Story','Synthesis','A scientific cosmic story connects evidence across scale and time—from early expansion to atoms, stars, galaxies, planets, and observers.','Create an illustrated timeline citing at least five observations and two uncertainties.','Wonder grows stronger when imagination is anchored to evidence.','A complete timeline distinguishes direct measurement, inference, and open questions.','cosmic-story'),
 ];
-$academyConfig['scripts']='<script src="/beyond-space/assets/js/learning-center.js?v=20260730-1" defer></script>';
+$spaceMediaRoot='/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/';
+$spaceVideoRoot='/beyond-space/beyond-space-v1/assets/video/academy/';
+$academyConfig['rich_lessons']['*']['solar-system-planetary-science'][5]['media']=[
+ ['type'=>'video','src'=>$spaceVideoRoot.'pluto-clip-1.mp4','title'=>'Pluto’s orbit adventure · clip 1','caption'=>'A short visual introduction to Pluto’s long orbit.'],
+ ['type'=>'video','src'=>$spaceVideoRoot.'pluto-clip-2.mp4','title'=>'Pluto’s orbit adventure · clip 2','caption'=>'Continue the Pluto story.'],
+ ['type'=>'video','src'=>$spaceVideoRoot.'pluto-clip-3.mp4','title'=>'Pluto’s orbit adventure · clip 3','caption'=>'Continue the five-part Pluto video story.'],
+ ['type'=>'video','src'=>$spaceVideoRoot.'pluto-clip-4.mp4','title'=>'Pluto’s orbit adventure · clip 4','caption'=>'Continue the five-part Pluto video story.'],
+ ['type'=>'video','src'=>$spaceVideoRoot.'pluto-clip-5.mp4','title'=>'Pluto’s orbit adventure · clip 5','caption'=>'Final clip in the supplied five-part Pluto video story.'],
+ ['type'=>'image','src'=>$spaceMediaRoot.'01-pluto-cover.jpg','title'=>'Pluto and its five known moons','caption'=>'Illustration: Pluto and Charon orbit a shared centre of mass; Pluto has five known moons.'],
+ ['type'=>'image','src'=>$spaceMediaRoot.'02-pluto-heart.jpg','title'=>'Pluto’s orbit around the Sun','caption'=>'Illustration. Pluto takes about 248 Earth years to orbit the Sun; the diagram is not a scale model.'],
+ ['type'=>'image','src'=>$spaceMediaRoot.'03-pluto-size.jpg','title'=>'Pluto compared with Earth and the Moon','caption'=>'Pluto is smaller than Earth’s Moon. The driving-time comparison shown in the artwork is not a scientific measurement.'],
+ ['type'=>'image','src'=>$spaceMediaRoot.'04-pluto-orbit.jpg','title'=>'Pluto’s bright heart-shaped region','caption'=>'Tombaugh Regio includes a large plain of frozen nitrogen.'],
+];
+$academyConfig['rich_lessons']['*']['solar-system-planetary-science'][2]['media']=[
+ ['type'=>'image','src'=>$spaceMediaRoot.'10-venus-cover.jpg','title'=>'Venus: a hot, high-pressure world','caption'=>'Venus’s surface is about 465°C and its surface pressure is roughly 92 times Earth’s sea-level pressure.'],
+ ['type'=>'image','src'=>$spaceMediaRoot.'11-venus-pressure.jpg','title'=>'Venus’s surface pressure','caption'=>'Artwork dramatization. Sulfuric-acid cloud droplets evaporate before reaching the hot surface.'],
+ ['type'=>'image','src'=>$spaceMediaRoot.'12-venus-earth-twin.jpg','title'=>'Venus and Earth compared','caption'=>'Venus and Earth are similar in size, but their environments are very different.'],
+ ['type'=>'image','src'=>$spaceMediaRoot.'13-venus-day-year.jpg','title'=>'Venus’s rotation period and year','caption'=>'Venus’s sidereal rotation takes about 243 Earth days; one orbit takes about 225 days. Its sunrise-to-sunrise solar day is about 117 Earth days.'],
+];
+$academyConfig['rich_lessons']['*']['astrobiology-exoplanets'][4]['media']=[
+ ['type'=>'image','src'=>$spaceMediaRoot.'07-diamond-planet.jpg','title'=>'Artist’s concept of 55 Cancri e','caption'=>'Artist’s concept only. 55 Cancri e is an ultra-hot rocky super-Earth; a diamond composition has not been confirmed.'],
+ ['type'=>'image','src'=>$spaceMediaRoot.'09-diamond-core.jpg','title'=>'Possible interior model','caption'=>'Hypothetical illustration. The internal structure of 55 Cancri e is not directly known.'],
+ ['type'=>'image','src'=>$spaceMediaRoot.'06-diamond-rain.jpg','title'=>'A speculative exoplanet illustration','caption'=>'The “diamond rain” claim is not established evidence. Treat this as imaginative concept art, not a confirmed observation.'],
+ ['type'=>'image','src'=>$spaceMediaRoot.'08-diamond-value.jpg','title'=>'A fictional space-wealth comparison','caption'=>'The dollar value in this artwork is not a scientific valuation; planets cannot be assigned a market price this way.'],
+];
+$academyConfig['rich_lessons']['*']['solar-system-planetary-science'][5]['teaching'].=' The five known moons are Charon, Styx, Nix, Kerberos, and Hydra. Pluto and Charon orbit a shared centre of mass outside Pluto; the pair are often described as a binary system, while Charon is formally classified as Pluto’s moon. Claims that Pluto’s heart keeps it warm or that the moon is a dancing character are storytelling, not established measurements.';
+$academyConfig['rich_lessons']['*']['solar-system-planetary-science'][5]['concept'].=' A dwarf planet is a real world with complex geology; the label does not mean it is inactive or unimportant.';
+$academyConfig['rich_lessons']['*']['solar-system-planetary-science'][2]['teaching'].=' Venus is similar to Earth in size, but its dense carbon-dioxide atmosphere drives an extreme greenhouse effect. Its sulfuric-acid clouds are high in the atmosphere; droplets evaporate before reaching the surface. Venus rotates once relative to the stars in about 243 Earth days; its solar day, measured from noon to noon, is about 117 Earth days.';
+$academyConfig['rich_lessons']['*']['astrobiology-exoplanets'][4]['teaching'].=' 55 Cancri e (also called Janssen) is a very hot rocky super-Earth that circles its star in about 18 hours, roughly 41 light-years away. Its exact atmosphere and interior are still being studied. A “diamond planet” interior is an old hypothesis, not a confirmed fact, and popular claims about its dollar value or diamond rain are not established findings.';
+$academyConfig['rich_lessons']['*']['astrobiology-exoplanets'][4]['concept'].=' Separate measured properties from model-dependent interpretations and imaginative headlines when learning about distant exoplanets.';
+$academyConfig['rich_lessons']['*']['solar-system-planetary-science'][5]['sources']=[['title'=>'NASA: Pluto facts','url'=>'https://science.nasa.gov/dwarf-planets/pluto/facts/'],['title'=>'NASA: Pluto’s moons','url'=>'https://science.nasa.gov/dwarf-planets/pluto/moons/facts/']];
+$academyConfig['rich_lessons']['*']['solar-system-planetary-science'][2]['sources']=[['title'=>'NASA: Venus facts','url'=>'https://science.nasa.gov/venus/venus-facts/']];
+$academyConfig['rich_lessons']['*']['astrobiology-exoplanets'][4]['sources']=[['title'=>'NASA: 55 Cancri e','url'=>'https://science.nasa.gov/exoplanet-catalog/55-cancri-e/'],['title'=>'NASA: 55 Cancri e observing notes','url'=>'https://science.nasa.gov/solar-system/skywatching/night-sky-network/dim-delights-in-cancer/']];
+$academyConfig['css']='/beyond-space/academy.css?v=20260926-1';
+$academyConfig['scripts']='<script src="/beyond-space/assets/js/learning-center.js?v=20260926-1" defer></script>';
 require dirname(__DIR__).'/includes/learning-academy.php';

@@ -1,0 +1,79 @@
+[
+  {
+    "number": 1,
+    "world": "Pluto",
+    "title": "Pluto has a heart-shaped glacier.",
+    "fact": "Pluto’s bright Tombaugh Regio includes a vast nitrogen-ice plain that helps drive winds and weather across its surface.",
+    "lesson": "Dwarf planets can have active landscapes, weather, and complex geology.",
+    "source_name": "NASA Science",
+    "source_url": "https://science.nasa.gov/dwarf-planets/pluto/facts/",
+    "academy": { "age": "cosmic-explorer", "module": "solar-system-planetary-science", "lesson": 6 },
+    "asset_url": "/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/01-pluto-cover.jpg"
+  },
+  {
+    "number": 2,
+    "world": "Venus",
+    "title": "Venus has a crushing atmosphere.",
+    "fact": "Venus reaches about 467°C, has crushing atmospheric pressure, and clouds of sulfuric acid. Its surface is hostile, but its atmosphere teaches us about runaway greenhouse warming.",
+    "lesson": "Atmosphere and pressure can transform a planet’s climate.",
+    "source_name": "NASA Science",
+    "source_url": "https://science.nasa.gov/venus/venus-facts/",
+    "academy": { "age": "cosmic-explorer", "module": "solar-system-planetary-science", "lesson": 3 },
+    "asset_url": "/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/10-venus-cover.jpg"
+  },
+  {
+    "number": 3,
+    "world": "55 Cancri e",
+    "title": "A planet with an ocean of lava?",
+    "fact": "55 Cancri e is a super-Earth orbiting very close to its star. NASA describes this superhot world as likely covered by a global ocean of lava; its atmosphere and interior remain active research questions.",
+    "lesson": "Exoplanet discoveries combine measurements with models, and the models change as new observations arrive.",
+    "source_name": "NASA Exoplanet Catalog",
+    "source_url": "https://science.nasa.gov/exoplanet-catalog/55-cancri-e/",
+    "academy": { "age": "cosmic-explorer", "module": "astrobiology-exoplanets", "lesson": 5 },
+    "asset_url": null
+  },
+  {
+    "number": 4,
+    "world": "Mars",
+    "title": "Iron-rich dust gives Mars its rusty colour.",
+    "fact": "Iron minerals in Martian dust oxidize and give Mars its rusty red colour. Valleys, deltas, minerals, and sediments also show that ancient water shaped parts of its surface.",
+    "lesson": "Colour can be a clue to chemistry, while landscapes preserve planetary history.",
+    "source_name": "NASA Science",
+    "source_url": "https://science.nasa.gov/mars/facts/",
+    "academy": { "age": "cosmic-explorer", "module": "astrobiology-exoplanets", "lesson": 3 },
+    "asset_url": "/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/14-mars-cover.jpg"
+  },
+  {
+    "number": 5,
+    "world": "Jupiter",
+    "title": "Jupiter is the Solar System’s largest planet.",
+    "fact": "Jupiter is the largest planet in the Solar System, a gas giant with no solid surface, and its day lasts about 10 hours.",
+    "lesson": "Size, composition, and rotation help distinguish the worlds in our Solar System.",
+    "source_name": "NASA Science",
+    "source_url": "https://science.nasa.gov/jupiter/jupiter-facts/",
+    "academy": { "age": "cosmic-explorer", "module": "solar-system-planetary-science", "lesson": 4 },
+    "asset_url": "/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/19-new-1.jpg"
+  },
+  {
+    "number": 6,
+    "world": "Saturn",
+    "title": "Saturn’s rings are made mostly of ice.",
+    "fact": "Saturn’s rings are made mostly of water ice, with pieces ranging from tiny grains to larger chunks. The bright rings are wide but very thin compared with their span.",
+    "lesson": "A planet’s rings are a system of countless small pieces, not one solid disk.",
+    "source_name": "NASA Science",
+    "source_url": "https://science.nasa.gov/mission/cassini/faq/",
+    "academy": { "age": "cosmic-explorer", "module": "solar-system-planetary-science", "lesson": 4 },
+    "asset_url": "/beyond-space/beyond-space-v1/assets/img/daily-facts/imported/29-new-1.jpg"
+  },
+  {
+    "number": 7,
+    "world": "Uranus",
+    "title": "Uranus spins on its side.",
+    "fact": "Uranus has an axial tilt of about 98 degrees. Its unusual orientation gives it extreme seasons as it travels around the Sun.",
+    "lesson": "Compare composition, atmosphere, rotation, and orbit before drawing conclusions about a planet’s climate.",
+    "source_name": "NASA Science",
+    "source_url": "https://science.nasa.gov/uranus/facts/",
+    "academy": { "age": "cosmic-explorer", "module": "solar-system-planetary-science", "lesson": 5 },
+    "asset_url": null
+  }
+]

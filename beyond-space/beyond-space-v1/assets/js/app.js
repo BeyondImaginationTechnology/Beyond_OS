@@ -22,8 +22,11 @@
   one('.black-hole')?.addEventListener('click',event=>event.currentTarget.classList.toggle('active'));
   fetch('/beyond-space/api/daily-space-fact.php',{headers:{Accept:'application/json'}}).then(response=>response.ok?response.json():null).then(payload=>{
     const fact=payload?.fact;if(!fact)return;
+    const kicker=one('#dailyFactKicker'),dateLabel=one('#dailyFactDate');if(kicker)kicker.textContent='Daily Space Fact · '+(fact.number||'');if(dateLabel&&payload.date){const date=new Date(payload.date+'T12:00:00');dateLabel.textContent=date.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric',year:'numeric'});}
     one('#dailyFactWorld').textContent='🪐 '+(fact.world||'Beyond Space');one('#dailyFactTitle').textContent=fact.title||'';one('#dailyFactCopy').textContent=fact.fact||'';one('#dailyFactLesson').textContent=fact.lesson||'';
-    const source=one('#dailyFactSource');if(source&&fact.source_url){source.href=fact.source_url;source.textContent='Open source post ↗';source.hidden=false}
+    const source=one('#dailyFactSource');if(source&&fact.source_url){source.href=fact.source_url;source.textContent='Read the science source ↗';source.hidden=false}
+    const academyLink=one('#dailyFactAcademyLink');if(academyLink&&fact.academy_url)academyLink.href=fact.academy_url;
+    const tvLink=one('#dailyFactTVLink'),youtubeLink=one('#dailyFactYouTubeLink');if(tvLink&&fact.distribution?.space_tv_url)tvLink.href=fact.distribution.space_tv_url;if(youtubeLink&&fact.distribution?.youtube_url)youtubeLink.href=fact.distribution.youtube_url;
     const asset=one('#dailyFactAsset');if(asset&&fact.asset_url){asset.src=fact.asset_url;asset.alt=(fact.world||'Daily Space Fact')+' artwork';asset.hidden=false}
     if(Array.isArray(fact.assets)&&fact.assets.length){window.BS_CHIBI_CARDS=fact.assets.map((item,index)=>({group:'Published card · '+(fact.world||'Space'),title:item.title||('Card '+(index+1)),copy:item.copy||'Published from Daily Studio.',image:item.url||item.asset_url||item}));initChibi();}
   }).catch(()=>{});

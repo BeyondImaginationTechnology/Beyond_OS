@@ -10,12 +10,16 @@ struct TodayView: View {
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
     @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
     @AppStorage("dailyBreathLanguage") private var languageID = "en"
+    @AppStorage("scriptureEdition.torah") private var torahEditionID = ScriptureEdition.torahHebrew.id
+    @AppStorage("scriptureEdition.quran") private var quranEditionID = ScriptureEdition.quranArabic.id
     @State private var shareImage: DailyBreathShareImage?
     @State private var narrationPlayer: AVPlayer?
     @State private var narrationURL: URL?
     @State private var narrationPlaying = false
     @State private var narrationLoading = false
     @State private var narrationMessage: String?
+    @State private var narrationTask: Task<Void, Never>?
+    @State private var narrationRequestID = UUID()
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -35,9 +39,12 @@ struct TodayView: View {
 
     private var todayContentLocale: String {
         switch selectedTradition {
-        case .bible: languageID
-        case .torah: "he"
-        case .quran: "ar"
+        case .bible:
+            store.contentLocale(for: .bible)
+        case .torah:
+            store.contentLocale(for: .torah, editionID: torahEditionID)
+        case .quran:
+            store.contentLocale(for: .quran, editionID: quranEditionID)
         }
     }
 
@@ -95,16 +102,30 @@ struct TodayView: View {
             store.publishSelectedFaithContent()
         }
         .onChange(of: scenePhase) { _, phase in
-            guard phase == .active else { return }
+            guard phase == .active else {
+                stopNarration()
+                return
+            }
             Task {
                 await store.syncICloudNow()
                 await store.refreshToday()
             }
         }
+        .onDisappear { stopNarration() }
         .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
             Task { await store.refreshToday() }
         }
         .onChange(of: languageID) { _, _ in
+            stopNarration()
+            Task { await store.refreshToday() }
+        }
+        .onChange(of: torahEditionID) { _, _ in
+            guard selectedTradition == .torah else { return }
+            stopNarration()
+            Task { await store.refreshToday() }
+        }
+        .onChange(of: quranEditionID) { _, _ in
+            guard selectedTradition == .quran else { return }
             stopNarration()
             Task { await store.refreshToday() }
         }
@@ -281,30 +302,68 @@ struct TodayView: View {
         guard !narrationLoading else { return }
         narrationLoading = true
         narrationMessage = nil
-        Task { await prepareNarration() }
+        let requestID = UUID()
+        narrationRequestID = requestID
+        narrationTask = Task { await prepareNarration(requestID: requestID) }
     }
 
     @MainActor
-    private func prepareNarration() async {
-        defer { narrationLoading = false }
+    private func prepareNarration(requestID: UUID) async {
+        defer {
+            if requestID == narrationRequestID {
+                narrationLoading = false
+                narrationTask = nil
+            }
+        }
         let requestedDate = todayKey
         let requestedTradition = selectedTradition.id
         let requestedLocale = todayContentLocale
+        let offlineVerse = todayVerse
         do {
+            if let cachedURL = try Self.existingCachedNarration(
+                date: requestedDate,
+                tradition: requestedTradition,
+                locale: requestedLocale,
+                passage: offlineVerse.text,
+                reference: offlineVerse.reference
+            ) {
+                guard requestID == narrationRequestID, !Task.isCancelled,
+                      scenePhase == .active, requestedDate == todayKey,
+                      requestedTradition == selectedTradition.id,
+                      requestedLocale == todayContentLocale else { return }
+                playNarration(from: cachedURL)
+                narrationMessage = "Saved on this device for offline listening."
+                return
+            }
+
+            await store.refreshToday()
+            guard requestID == narrationRequestID, !Task.isCancelled,
+                  scenePhase == .active, requestedDate == todayKey,
+                  requestedTradition == selectedTradition.id,
+                  requestedLocale == todayContentLocale,
+                  store.dailyContentAvailability == .current else {
+                throw DailyBreathAPIError.badResponse
+            }
+            let syncedVerse = todayVerse
             let fileURL = try await Self.cachedNarration(
                 date: requestedDate,
                 tradition: requestedTradition,
                 locale: requestedLocale,
-                passage: todayVerse.text,
-                reference: todayVerse.reference
+                passage: syncedVerse.text,
+                reference: syncedVerse.reference
             )
-            guard requestedDate == todayKey,
+            guard requestID == narrationRequestID, !Task.isCancelled,
+                  scenePhase == .active,
+                  requestedDate == todayKey,
                   requestedTradition == selectedTradition.id,
                   requestedLocale == todayContentLocale else { return }
             playNarration(from: fileURL)
             narrationMessage = "Saved on this device for offline listening."
         } catch {
-            narrationMessage = "Narration could not be prepared. Check your connection and try again."
+            guard requestID == narrationRequestID, !Task.isCancelled else { return }
+            narrationMessage = store.dailyContentAvailability == .offline
+                ? "Connect to refresh today’s reading before preparing narration."
+                : "Narration could not be prepared. Check your connection and try again."
         }
     }
 
@@ -317,16 +376,7 @@ struct TodayView: View {
 
     private static func cachedNarration(date: String, tradition: String, locale: String, passage: String, reference: String) async throws -> URL {
         let fileManager = FileManager.default
-        let directory = try fileManager.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-            .appendingPathComponent("DailyBreathNarration", isDirectory: true)
-        try fileManager.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
-        var directoryURL = directory
-        var resourceValues = URLResourceValues()
-        resourceValues.isExcludedFromBackup = true
-        try? directoryURL.setResourceValues(resourceValues)
-        let script = passage.trimmingCharacters(in: .whitespacesAndNewlines) + "\n\n" + reference.trimmingCharacters(in: .whitespacesAndNewlines)
-        let contentHash = SHA256.hash(data: Data(script.utf8)).map { String(format: "%02x", $0) }.joined()
-        let fileURL = directory.appendingPathComponent("\(date)-\(tradition)-\(locale)-\(contentHash.prefix(16)).mp3")
+        let fileURL = try narrationFileURL(date: date, tradition: tradition, locale: locale, passage: passage, reference: reference)
         if fileManager.fileExists(atPath: fileURL.path) { return fileURL }
 
         let endpoint = URL(string: "https://beyondimagination.co.technology/dailybreath/api/narration.php")!
@@ -361,7 +411,30 @@ struct TodayView: View {
         return fileURL
     }
 
+    private static func existingCachedNarration(date: String, tradition: String, locale: String, passage: String, reference: String) throws -> URL? {
+        let fileURL = try narrationFileURL(date: date, tradition: tradition, locale: locale, passage: passage, reference: reference)
+        return FileManager.default.fileExists(atPath: fileURL.path) ? fileURL : nil
+    }
+
+    private static func narrationFileURL(date: String, tradition: String, locale: String, passage: String, reference: String) throws -> URL {
+        let fileManager = FileManager.default
+        let directory = try fileManager.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+            .appendingPathComponent("DailyBreathNarration", isDirectory: true)
+        try fileManager.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
+        var directoryURL = directory
+        var resourceValues = URLResourceValues()
+        resourceValues.isExcludedFromBackup = true
+        try? directoryURL.setResourceValues(resourceValues)
+        let script = passage.trimmingCharacters(in: .whitespacesAndNewlines) + "\n\n" + reference.trimmingCharacters(in: .whitespacesAndNewlines)
+        let contentHash = SHA256.hash(data: Data(script.utf8)).map { String(format: "%02x", $0) }.joined()
+        return directory.appendingPathComponent("\(date)-\(tradition)-\(locale)-\(contentHash.prefix(16)).mp3")
+    }
+
     private func stopNarration() {
+        narrationRequestID = UUID()
+        narrationTask?.cancel()
+        narrationTask = nil
+        narrationLoading = false
         narrationPlayer?.pause()
         narrationPlayer = nil
         narrationURL = nil

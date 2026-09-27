@@ -1,11 +1,11 @@
 # DailyBreath for iOS
 
-Native SwiftUI app for DailyBreath 2.3 (build 4).
+Native SwiftUI app for DailyBreath 2.4 (build 5).
 
 ## Included in this build
 
 - Automatically synced Verse of the Day, devotional, and weekly recovery challenge
-- Approved daily passage and reflection sync by date, tradition, and language; bundled readings remain available offline
+- Approved daily passage and reflection sync by date, tradition, and selected scripture language; bundled readings remain available offline
 - Seasonal default and optional Bible forest, Tanakh navy and gold, and Quran emerald and gold artwork
 - Selectable native scripture text, public reading links, and branded image sharing
 - Tap-to-generate ElevenLabs narration for the daily Bible, Tanakh, or Quran reading; the MP3 is saved on device for offline replay

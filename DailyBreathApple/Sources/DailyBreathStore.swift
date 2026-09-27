@@ -475,7 +475,8 @@ final class DailyBreathStore: ObservableObject {
 
     func dailyVerse(for tradition: FaithTradition, date: Date = Date()) -> Verse {
         let appLocale = UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en"
-        let contentLocale = Self.contentLocale(for: tradition, appLocale: appLocale)
+        let editionID = UserDefaults.standard.string(forKey: ScriptureEdition.storageKey(for: tradition))
+        let contentLocale = Self.contentLocale(for: tradition, appLocale: appLocale, editionID: editionID)
         if Calendar.current.isDateInToday(date),
            syncedTradition == tradition,
            syncedLocale == contentLocale,
@@ -558,13 +559,16 @@ final class DailyBreathStore: ObservableObject {
         let requestedDateKey = Self.dateKey(requestedDate)
         let tradition = FaithTradition(rawValue: UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "bible") ?? .bible
         let appLocale = UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en"
-        let locale = Self.contentLocale(for: tradition, appLocale: appLocale)
+        let editionStorageKey = ScriptureEdition.storageKey(for: tradition)
+        let editionID = UserDefaults.standard.string(forKey: editionStorageKey)
+        let locale = Self.contentLocale(for: tradition, appLocale: appLocale, editionID: editionID)
 
         do {
             let today = try await apiClient.fetch(dateKey: requestedDateKey, tradition: tradition, locale: locale)
             guard (UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "bible") == tradition.id,
                   (UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en") == appLocale,
-                  Self.contentLocale(for: tradition, appLocale: appLocale) == locale,
+                  UserDefaults.standard.string(forKey: editionStorageKey) == editionID,
+                  Self.contentLocale(for: tradition, appLocale: appLocale, editionID: editionID) == locale,
                   Self.dateKey(Date()) == requestedDateKey else { return }
             approvedContent = today.approvedContent?.tradition == tradition && today.approvedContent?.locale == locale
                 ? today.approvedContent : nil
@@ -581,7 +585,8 @@ final class DailyBreathStore: ObservableObject {
         } catch {
             guard (UserDefaults.standard.string(forKey: "selectedFaithTradition") ?? "bible") == tradition.id,
                   (UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en") == appLocale,
-                  Self.contentLocale(for: tradition, appLocale: appLocale) == locale,
+                  UserDefaults.standard.string(forKey: editionStorageKey) == editionID,
+                  Self.contentLocale(for: tradition, appLocale: appLocale, editionID: editionID) == locale,
                   Self.dateKey(Date()) == requestedDateKey else { return }
             approvedContent = nil
             syncedDailyVerse = nil
@@ -602,11 +607,26 @@ final class DailyBreathStore: ObservableObject {
         recordDailyContent(for: date)
     }
 
-    private static func contentLocale(for tradition: FaithTradition, appLocale: String) -> String {
+    func contentLocale(for tradition: FaithTradition, editionID: String? = nil) -> String {
+        let appLocale = UserDefaults.standard.string(forKey: "dailyBreathLanguage") ?? "en"
+        let savedEditionID = editionID ?? UserDefaults.standard.string(forKey: ScriptureEdition.storageKey(for: tradition))
+        return Self.contentLocale(for: tradition, appLocale: appLocale, editionID: savedEditionID)
+    }
+
+    private static func contentLocale(for tradition: FaithTradition, appLocale: String, editionID: String?) -> String {
         switch tradition {
         case .bible: appLocale
-        case .torah: "he"
-        case .quran: "ar"
+        case .torah:
+            switch ScriptureEdition(rawValue: editionID ?? "") {
+            case .some(.torahEnglish): "en"
+            case .some(.torahFrench): "fr"
+            default: "he"
+            }
+        case .quran:
+            switch ScriptureEdition(rawValue: editionID ?? "") {
+            case .some(.quranEnglish): "en"
+            default: "ar"
+            }
         }
     }
 
@@ -795,6 +815,7 @@ final class DailyBreathStore: ObservableObject {
         defaults?.set(selectedVerse.text, forKey: "widgetVerseText")
         defaults?.set(selectedVerse.reference, forKey: "widgetVerseReference")
         defaults?.set(tradition.dailyReadingName.uppercased(), forKey: "widgetReadingLabel")
+        defaults?.set(tradition.id, forKey: "widgetReadingTradition")
         defaults?.set(UserDefaults.standard.string(forKey: "dailyBreathTheme") ?? "seasonal", forKey: "widgetThemeID")
         _ = defaults?.synchronize()
 #if canImport(WidgetKit)

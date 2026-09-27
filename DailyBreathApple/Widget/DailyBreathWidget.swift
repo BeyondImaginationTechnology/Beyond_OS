@@ -47,12 +47,23 @@ private struct VerseWidgetProvider: TimelineProvider {
     private func entry(for date: Date) -> VerseWidgetEntry {
         let dateKey = Self.dateKey(date)
         let shared = UserDefaults(suiteName: "group.technology.co.beyondimagination.thedailybreath")
+        let selectedTradition = shared?.string(forKey: "widgetReadingTradition") ?? "bible"
+        let selectedLabel = shared?.string(forKey: "widgetReadingLabel") ?? Self.readingLabel(for: selectedTradition)
+        let themeID = shared?.string(forKey: "widgetThemeID") ?? "seasonal"
         if shared?.string(forKey: "widgetVerseDate") == dateKey,
            let text = shared?.string(forKey: "widgetVerseText"),
            let reference = shared?.string(forKey: "widgetVerseReference") {
-            let label = shared?.string(forKey: "widgetReadingLabel") ?? "DAILY READING"
-            let themeID = shared?.string(forKey: "widgetThemeID") ?? "seasonal"
-            return VerseWidgetEntry(date: date, text: text, reference: reference, readingLabel: label, themeID: themeID)
+            return VerseWidgetEntry(date: date, text: text, reference: reference, readingLabel: selectedLabel, themeID: themeID)
+        }
+
+        guard selectedTradition == "bible" else {
+            return VerseWidgetEntry(
+                date: date,
+                text: "Open Daily Breath to refresh today’s reading.",
+                reference: "",
+                readingLabel: selectedLabel,
+                themeID: themeID
+            )
         }
 
         guard let url = Bundle.main.url(forResource: "daily-verses", withExtension: "json"),
@@ -69,8 +80,15 @@ private struct VerseWidgetProvider: TimelineProvider {
         }
         let day = Calendar.current.ordinality(of: .day, in: .era, for: date) ?? 1
         let verse = verses.first(where: { $0.scheduleDate == dateKey }) ?? verses[(day - 1) % verses.count]
-        let themeID = UserDefaults(suiteName: "group.technology.co.beyondimagination.thedailybreath")?.string(forKey: "widgetThemeID") ?? "seasonal"
         return VerseWidgetEntry(date: date, text: verse.text, reference: verse.reference, readingLabel: "BIBLE VERSE", themeID: themeID)
+    }
+
+    private static func readingLabel(for tradition: String) -> String {
+        switch tradition {
+        case "torah": "TANAKH PASSAGE"
+        case "quran": "QURAN AYAH"
+        default: "BIBLE VERSE"
+        }
     }
 
     private static func dateKey(_ date: Date) -> String {

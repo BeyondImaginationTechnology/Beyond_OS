@@ -2,7 +2,7 @@
 
 The startup screen uses the orbital gateway already established in
 `assets/images/bos-logo-mark.svg` at the repository root, with BIT OS Cyber
-Edition 1.0 typography. `boot.ppm` is the actual RGB framebuffer asset.
+Edition 0.1 typography. `boot.ppm` is the actual RGB framebuffer asset.
 `boot-preview.png` shows it centered on a 1440 × 900 display; it is an artwork
 preview, not evidence of a booted VM. The three dots are decorative, not a
 reported progress value.

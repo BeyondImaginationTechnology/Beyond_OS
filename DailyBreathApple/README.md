@@ -8,7 +8,7 @@ Native SwiftUI app for DailyBreath 2.3 (build 4).
 - Approved daily passage and reflection sync by date, tradition, and language; bundled readings remain available offline
 - Seasonal default and optional Bible forest, Tanakh navy and gold, and Quran emerald and gold artwork
 - Selectable native scripture text, public reading links, and branded image sharing
-- Approved ElevenLabs narration streamed online when the admin generates audio; narration is unavailable offline
+- Tap-to-generate ElevenLabs narration for the daily Bible, Tanakh, or Quran reading; the MP3 is saved on device for offline replay
 - Bundled offline recovery verse, devotional, and challenge libraries
 - Recovery Newsletter digest built from the current synced content
 - Full local World English Bible with background loading and search
@@ -40,7 +40,7 @@ Generate the Xcode project with `xcodegen generate`, then open `TheDailyBreath.x
 
 The reading, practice, Academy, and journal experiences work offline with bundled content and refresh scheduled content from the DailyBreath web API when available. Chat requires a network connection but is available to guests through the Daily Breath scoped guide service; Beyond-ID sign-in is optional. Private user data remains protected on device unless the user explicitly enables encrypted iCloud sync. No Daily Breath subscription is required.
 
-For narration, configure the ElevenLabs API key and locale-specific voice IDs on the web server. An admin approves the daily reading and selects **Generate ElevenLabs narration**; only then does the API expose its MP3 URL. The key is never included in the iOS app. The audio player streams the published MP3 and has no offline download feature.
+For narration, configure the ElevenLabs API key and locale-specific voice IDs on the web server. When someone taps Listen, the app asks the server for that day’s MP3; the server reuses a matching cached file or generates it once and caches it. The key never ships in the iOS app. After the first successful download, the recording can be replayed offline on that device.
 
 ## Release checks
 

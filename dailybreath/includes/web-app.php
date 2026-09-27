@@ -50,7 +50,8 @@ function dailybreath_web_head(string $title = 'Daily Breath'): string
 function dailybreath_web_scripts(): string
 {
     return '<script src="/dailybreath/assets/js/locales.js?v=' . DAILYBREATH_WEB_VERSION . '" defer></script>'
-        . '<script src="/dailybreath/assets/js/web-app.js?v=' . DAILYBREATH_WEB_VERSION . '" defer></script>';
+        . '<script src="/dailybreath/assets/js/web-app.js?v=' . DAILYBREATH_WEB_VERSION . '" defer></script>'
+        . '<script src="/dailybreath/assets/js/narration.js?v=' . DAILYBREATH_WEB_VERSION . '" defer></script>';
 }
 
 function dailybreath_ensure_web_tables(PDO $pdo): void
@@ -89,8 +90,7 @@ function dailybreath_narration_script(array $content): string
 {
     $passage = trim((string)($content['passage'] ?? $content['text'] ?? $content['verse_text'] ?? ''));
     $reference = trim((string)($content['reference'] ?? $content['scripture_reference'] ?? ''));
-    return $passage . "\n\n" . $reference
-        . (trim((string)($content['reflection'] ?? '')) !== '' ? "\n\n" . trim((string)$content['reflection']) : '');
+    return $passage . "\n\n" . $reference;
 }
 
 function dailybreath_ensure_audio_table(PDO $pdo): void

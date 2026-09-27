@@ -8,7 +8,142 @@ window.BeyondTVClassicFallback=async function(frame,payload){
  play(pos);
 };
 })();
-const menuBtn=document.querySelector(".menu-btn"),mobileNav=document.querySelector(".mobile-nav");function initProviderPlayer(e){if(!e||"1"===e.dataset.ready)return;e.dataset.ready="1";const t=e.querySelector(".beyond-video"),n=e.querySelector(".player-loading"),r=e.querySelector(".player-fallback"),a=e.querySelector(".archive-embed"),d=document.querySelector(".provider-status");let o=[],i=-1,c="",l=0,s=0;const u=e=>{d&&(d.textContent=e)},y=()=>{l&&(clearTimeout(l),l=0)},m=()=>{if(y(),i+=1,i>=o.length)return t&&(t.hidden=!0),n&&(n.hidden=!0),r&&(r.hidden=!1),void u("Direct providers unavailable — backup player ready.");const e=o[i];n&&(n.hidden=!1,n.textContent=`Tuning to ${e.provider}…`),r&&(r.hidden=!0),t&&(t.hidden=!1,t.pause(),t.removeAttribute("src"),t.load(),t.src=e.url),l=setTimeout(m,11e3);const a=t?.play();a&&a.catch&&a.catch(()=>{})};t?.addEventListener("loadedmetadata",()=>{if(y(),s>0&&Number.isFinite(t.duration)&&t.duration>s)try{t.currentTime=s}catch(e){}n&&(n.hidden=!0);const e=o[i];e&&u(`Playing from ${e.provider} · ${e.title}`)}),t?.addEventListener("playing",()=>{y(),n&&(n.hidden=!0)}),t?.addEventListener("error",m),t?.addEventListener("ended",m),e.querySelector("[data-open-embed]")?.addEventListener("click",()=>{c&&(r&&(r.hidden=!0),t&&(t.hidden=!0),a&&(a.hidden=!1,a.src=c),u("Playing with the backup provider."))}),e.querySelector("[data-unmute]")?.addEventListener("click",e=>{t&&(t.muted=!1,t.play().catch(()=>{})),e.currentTarget.hidden=!0}),fetch(e.dataset.streamEndpoint,{headers:{Accept:"application/json"}}).then(e=>{if(!e.ok)throw new Error("endpoint");return e.json()}).then(e=>{if(e?.mode==="youtube-library"&&e?.state?.embed_url){y();o=[];c=e.state.embed_url;s=0;t&&(t.pause(),t.hidden=!0);r&&(r.hidden=!0);n&&(n.hidden=!0);if(a){a.hidden=!1;a.src=c;a.dataset.library=e.state.library_key||"";a.dataset.sourceIndex=String(e.state.source_index||0);a.dataset.fallbacks=JSON.stringify(e.fallbacks||[]);a.title=`${e.state.current?.library_name||"Channel 1"} Episode ${e.state.episode_number||1}`;}u(`Playing ${e.state.current?.library_name||"Channel 1"} · Episode ${e.state.episode_number||1}`);window.BeyondTVClassicFallback?.(a,e);return}o=Array.isArray(e.sources)?e.sources:[],c=e.embed_fallback||"",s=Number(e.start_offset||0),m()}).catch(()=>{n&&(n.hidden=!0),r&&(r.hidden=!1),u("Provider lookup failed — backup player ready.")})}menuBtn&&mobileNav&&menuBtn.addEventListener("click",()=>{const e="true"===menuBtn.getAttribute("aria-expanded");menuBtn.setAttribute("aria-expanded",String(!e)),mobileNav.hidden=e}),document.querySelectorAll("[data-stream-endpoint]").forEach(initProviderPlayer),document.querySelectorAll(".tv-channel-tile[data-channel]").forEach(e=>e.addEventListener("click",()=>{let t;try{t=JSON.parse(e.dataset.channel||"{}")}catch(e){return}if(e.dataset.external)return void window.open(e.dataset.external,"_blank","noopener");document.querySelectorAll(".tv-channel-tile").forEach(e=>e.classList.remove("is-active")),e.classList.add("is-active");const n=document.querySelector("[data-tv-stage] .provider-player");if(!n)return;const r=n.cloneNode(!0);r.dataset.streamEndpoint=t.stream_endpoint,r.dataset.ready="0";const a=r.querySelector("video");a&&(a.removeAttribute("src"),a.load());const d=r.querySelector("iframe");d&&(d.src="",d.hidden=!0);const o=r.querySelector(".player-fallback");o&&(o.hidden=!0);const i=r.querySelector(".player-loading");i&&(i.hidden=!1,i.textContent=`Tuning into ${t.name}…`),n.replaceWith(r),document.querySelector("[data-stage-title]").textContent=t.name,document.querySelector("[data-stage-now]").textContent=t.now,document.querySelector("[data-stage-next]").textContent=t.up_next||"",initProviderPlayer(r),window.scrollTo({top:0,behavior:"smooth"})})),document.querySelectorAll("[data-my-list]").forEach(e=>e.addEventListener("click",()=>{e.textContent=e.textContent.includes("Added")?"＋ My List":"✓ Added to My List"}));
+const menuBtn=document.querySelector('.menu-btn');
+const mobileNav=document.querySelector('.mobile-nav');
+
+function initProviderPlayer(container){
+  if(!container||container.dataset.ready==='1')return;
+  container.dataset.ready='1';
+  const video=container.querySelector('.beyond-video');
+  const loading=container.querySelector('.player-loading');
+  const fallback=container.querySelector('.player-fallback');
+  const embed=container.querySelector('.archive-embed');
+  const status=document.querySelector('.provider-status');
+  let sources=[];
+  let sourceIndex=-1;
+  let embedFallback='';
+  let timer=0;
+  let startOffset=0;
+  const setStatus=value=>{if(status)status.textContent=value};
+  const clearTimer=()=>{if(timer){clearTimeout(timer);timer=0}};
+  const showFallback=()=>{
+    clearTimer();
+    if(video){video.pause();video.hidden=true}
+    if(embed)embed.hidden=true;
+    if(loading)loading.hidden=true;
+    if(fallback)fallback.hidden=false;
+    setStatus('Direct providers unavailable — backup player ready.');
+  };
+  const playNext=()=>{
+    clearTimer();
+    sourceIndex+=1;
+    if(sourceIndex>=sources.length){showFallback();return}
+    const source=sources[sourceIndex];
+    const sourceOffset=sourceIndex===0?startOffset:0;
+    if(loading){loading.hidden=false;loading.textContent=`Tuning to ${source.provider}…`}
+    if(fallback)fallback.hidden=true;
+    if(String(source.type||'').toLowerCase()==='youtube'){
+      if(video){video.pause();video.hidden=true;video.removeAttribute('src');video.load()}
+      if(embed){
+        const scheduledUrl=new URL(source.url,window.location.href);
+        if(sourceOffset>0)scheduledUrl.searchParams.set('start',String(Math.floor(sourceOffset)));
+        embed.hidden=false;
+        embed.title=source.title||'Preschool program';
+        embed.src=scheduledUrl.href;
+      }
+      if(loading)loading.hidden=true;
+      setStatus(`Playing from ${source.provider} · ${source.title}`);
+      const remaining=Math.max(60,Number(source.duration||0)-sourceOffset);
+      timer=setTimeout(playNext,remaining*1000);
+      return;
+    }
+    if(embed){embed.hidden=true;embed.src=''}
+    if(video){
+      video.hidden=false;
+      video.pause();
+      video.removeAttribute('src');
+      video.load();
+      video.src=source.url;
+      timer=setTimeout(playNext,11000);
+      video.play().catch(()=>{});
+    }else playNext();
+  };
+  video?.addEventListener('loadedmetadata',()=>{
+    clearTimer();
+    const sourceOffset=sourceIndex===0?startOffset:0;
+    if(sourceOffset>0&&Number.isFinite(video.duration)&&video.duration>sourceOffset){
+      try{video.currentTime=sourceOffset}catch(_){}
+    }
+    if(loading)loading.hidden=true;
+    const source=sources[sourceIndex];
+    if(source)setStatus(`Playing from ${source.provider} · ${source.title}`);
+  });
+  video?.addEventListener('playing',()=>{clearTimer();if(loading)loading.hidden=true});
+  video?.addEventListener('error',playNext);
+  video?.addEventListener('ended',playNext);
+  embed?.addEventListener('load',()=>{if(loading)loading.hidden=true});
+  container.querySelector('[data-open-embed]')?.addEventListener('click',()=>{
+    if(!embedFallback)return;
+    if(fallback)fallback.hidden=true;
+    if(video){video.pause();video.hidden=true}
+    if(embed){embed.hidden=false;embed.src=embedFallback}
+    setStatus('Playing with the backup provider.');
+  });
+  container.querySelector('[data-unmute]')?.addEventListener('click',event=>{
+    if(video){video.muted=false;video.play().catch(()=>{})}
+    event.currentTarget.hidden=true;
+  });
+  fetch(container.dataset.streamEndpoint,{headers:{Accept:'application/json'}})
+    .then(response=>{if(!response.ok)throw new Error('endpoint');return response.json()})
+    .then(payload=>{
+      if(payload?.mode==='youtube-library'&&payload?.state?.embed_url){
+        clearTimer();sources=[];embedFallback=payload.state.embed_url;startOffset=0;
+        if(video){video.pause();video.hidden=true}
+        if(fallback)fallback.hidden=true;
+        if(loading)loading.hidden=true;
+        if(embed){
+          embed.hidden=false;embed.src=embedFallback;
+          embed.dataset.library=payload.state.library_key||'';
+          embed.dataset.sourceIndex=String(payload.state.source_index||0);
+          embed.dataset.fallbacks=JSON.stringify(payload.fallbacks||[]);
+          embed.title=`${payload.state.current?.library_name||'Channel 1'} Episode ${payload.state.episode_number||1}`;
+        }
+        setStatus(`Playing ${payload.state.current?.library_name||'Channel 1'} · Episode ${payload.state.episode_number||1}`);
+        window.BeyondTVClassicFallback?.(embed,payload);
+        return;
+      }
+      sources=Array.isArray(payload.sources)?payload.sources:[];
+      embedFallback=payload.embed_fallback||'';
+      startOffset=Number(payload.start_offset||0);
+      playNext();
+    })
+    .catch(()=>{if(loading)loading.hidden=true;if(fallback)fallback.hidden=false;setStatus('Provider lookup failed — backup player ready.')});
+}
+
+menuBtn&&mobileNav&&menuBtn.addEventListener('click',()=>{const open=menuBtn.getAttribute('aria-expanded')==='true';menuBtn.setAttribute('aria-expanded',String(!open));mobileNav.hidden=open});
+document.querySelectorAll('[data-stream-endpoint]').forEach(initProviderPlayer);
+document.querySelectorAll('.tv-channel-tile[data-channel]').forEach(tile=>tile.addEventListener('click',()=>{
+  let channel;try{channel=JSON.parse(tile.dataset.channel||'{}')}catch(_){return}
+  if(tile.dataset.external){window.open(tile.dataset.external,'_blank','noopener');return}
+  document.querySelectorAll('.tv-channel-tile').forEach(item=>item.classList.remove('is-active'));
+  tile.classList.add('is-active');
+  const current=document.querySelector('[data-tv-stage] .provider-player');
+  if(!current)return;
+  const player=current.cloneNode(true);
+  player.dataset.streamEndpoint=channel.stream_endpoint;
+  player.dataset.ready='0';
+  const video=player.querySelector('video');if(video){video.removeAttribute('src');video.load()}
+  const frame=player.querySelector('iframe');if(frame){frame.src='';frame.hidden=true}
+  const fallback=player.querySelector('.player-fallback');if(fallback)fallback.hidden=true;
+  const loading=player.querySelector('.player-loading');if(loading){loading.hidden=false;loading.textContent=`Tuning into ${channel.name}…`}
+  current.replaceWith(player);
+  document.querySelector('[data-stage-title]').textContent=channel.name;
+  document.querySelector('[data-stage-now]').textContent=channel.now;
+  document.querySelector('[data-stage-next]').textContent=channel.up_next||'';
+  initProviderPlayer(player);
+  window.scrollTo({top:0,behavior:'smooth'});
+}));
+document.querySelectorAll('[data-my-list]').forEach(button=>button.addEventListener('click',()=>{button.textContent=button.textContent.includes('Added')?'＋ My List':'✓ Added to My List'}));
 (function initRotatingNowPlaying(){
   const stage=document.querySelector('[data-tv-stage]');
   const dataNode=document.getElementById('tv-rotation-data');

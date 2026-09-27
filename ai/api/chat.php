@@ -340,96 +340,13 @@ if ($mode === 'core') {
         exit;
     }
 
-    $coreCopy = [
-        'en' => [
-            'json' => 'JSON is a lightweight text format for structured data. Example: {"name":"Jaguar","mode":"Core"}.',
-            'loop' => 'A loop repeats work. In JavaScript: for (let i = 0; i < 3; i++) { console.log(i); }',
-            'variable' => 'A variable stores a value you can reuse. In JavaScript: const name = "Jaguar";.',
-            'api' => 'An API is a defined way for software to request data or an action from another service.',
-            'html' => 'HTML gives a web page its structure and content, such as headings, paragraphs, and buttons.',
-            'css' => 'CSS controls how a web page looks: layout, colors, spacing, and responsive design.',
-            'javascript' => 'JavaScript makes a web page interactive: it can respond to clicks, update content, and call APIs.',
-            'sql' => 'SQL is a language for reading and changing data in relational databases.',
-            'git' => 'Git tracks changes to code so people can review, share, and safely restore versions.',
-            'url' => 'A URL is a web address that points to a page or resource, such as https://example.com.',
-            'boolean' => 'A Boolean is a value with only two states: true or false.',
-            'array' => 'An array is an ordered list of values. In JavaScript: ["Core", "Build", "Draw"].',
-            'function' => 'A function is reusable named code that performs a task, often using inputs and returning a result.',
-        ],
-        'fr' => [
-            'json' => 'JSON est un format texte léger pour des données structurées. Exemple : {"nom":"Jaguar","mode":"Core"}.',
-            'loop' => 'Une boucle répète une action. En JavaScript : for (let i = 0; i < 3; i++) { console.log(i); }',
-            'variable' => 'Une variable stocke une valeur réutilisable. En JavaScript : const nom = "Jaguar";.',
-            'api' => 'Une API est une manière définie pour un logiciel de demander des données ou une action à un autre service.',
-            'html' => 'HTML donne à une page web sa structure et son contenu : titres, paragraphes et boutons.',
-            'css' => 'CSS contrôle l’apparence d’une page web : mise en page, couleurs, espacements et adaptation mobile.',
-            'javascript' => 'JavaScript rend une page web interactive : clics, contenu dynamique et appels API.',
-            'sql' => 'SQL est un langage pour lire et modifier des données dans des bases relationnelles.',
-            'git' => 'Git suit les changements du code afin de les relire, partager et restaurer des versions.',
-            'url' => 'Une URL est une adresse web qui pointe vers une page ou une ressource, par exemple https://example.com.',
-            'boolean' => 'Un booléen ne possède que deux états : vrai ou faux.',
-            'array' => 'Un tableau est une liste ordonnée de valeurs. En JavaScript : ["Core", "Build", "Draw"].',
-            'function' => 'Une fonction est du code réutilisable nommé qui exécute une tâche, souvent avec des entrées et un résultat.',
-        ],
-        'es' => [
-            'json' => 'JSON es un formato de texto ligero para datos estructurados. Ejemplo: {"nombre":"Jaguar","modo":"Core"}.',
-            'loop' => 'Un bucle repite una tarea. En JavaScript: for (let i = 0; i < 3; i++) { console.log(i); }',
-            'variable' => 'Una variable guarda un valor reutilizable. En JavaScript: const nombre = "Jaguar";.',
-            'api' => 'Una API es una forma definida para que un programa solicite datos o una acción a otro servicio.',
-            'html' => 'HTML da a una página web su estructura y contenido: títulos, párrafos y botones.',
-            'css' => 'CSS controla cómo se ve una página web: diseño, colores, espaciado y adaptación a pantallas.',
-            'javascript' => 'JavaScript vuelve una página web interactiva: responde a clics, actualiza contenido y llama APIs.',
-            'sql' => 'SQL es un lenguaje para leer y modificar datos en bases de datos relacionales.',
-            'git' => 'Git registra cambios de código para revisarlos, compartirlos y recuperar versiones con seguridad.',
-            'url' => 'Una URL es una dirección web que apunta a una página o recurso, como https://example.com.',
-            'boolean' => 'Un booleano solo tiene dos estados: verdadero o falso.',
-            'array' => 'Un arreglo es una lista ordenada de valores. En JavaScript: ["Core", "Build", "Draw"].',
-            'function' => 'Una función es código reutilizable con nombre que realiza una tarea, a menudo recibe entradas y devuelve un resultado.',
-        ],
-    ];
-    $definitionTerms = [
-        'json' => 'json', 'loop' => '(?:a\\s+)?(?:loop|for loop)', 'variable' => '(?:a\\s+)?variable',
-        'api' => '(?:an?\\s+)?api', 'html' => 'html', 'css' => 'css', 'javascript' => 'javascript',
-        'sql' => 'sql', 'git' => 'git', 'url' => '(?:a\\s+)?url', 'boolean' => '(?:a\\s+)?boolean',
-        'array' => '(?:an?\\s+)?array', 'function' => '(?:a\\s+)?function',
-    ];
-    foreach ($definitionTerms as $term => $expression) {
-        if (preg_match('/^(?:what(?:\\s+is)?|define|explain)\\s+' . $expression . '[\\s?!.]*$/iu', $simplePrompt)) {
-            $simpleReply = $coreCopy[$language][$term];
-            break;
-        }
-    }
-    if ($simpleReply === null && preg_match('/^what does https? mean[\s?!.]*$/iu', $simplePrompt)) {
-        $simpleReply = [
-            'en' => 'HTTPS is the secure version of HTTP. It encrypts the connection between your browser and a website.',
-            'fr' => 'HTTPS est la version sécurisée de HTTP. Il chiffre la connexion entre votre navigateur et un site web.',
-            'es' => 'HTTPS es la versión segura de HTTP. Cifra la conexión entre tu navegador y un sitio web.',
-        ][$language];
-    } elseif ($simpleReply === null && preg_match('/\b(401|403|404|500|503)\b/', $simplePrompt, $httpStatus)) {
-        $statusHelp = [
-            '401' => ['en' => '401 means authentication is required or invalid.', 'fr' => '401 signifie que l’authentification est requise ou invalide.', 'es' => '401 significa que la autenticación es obligatoria o no es válida.'],
-            '403' => ['en' => '403 means the server understood the request but refuses access.', 'fr' => '403 signifie que le serveur refuse l’accès.', 'es' => '403 significa que el servidor rechaza el acceso.'],
-            '404' => ['en' => '404 means the requested page or API route was not found.', 'fr' => '404 signifie que la page ou route API demandée est introuvable.', 'es' => '404 significa que no se encontró la página o ruta de API solicitada.'],
-            '500' => ['en' => '500 means the server hit an unexpected internal error.', 'fr' => '500 signifie que le serveur a rencontré une erreur interne inattendue.', 'es' => '500 significa que el servidor encontró un error interno inesperado.'],
-            '503' => ['en' => '503 means the service is temporarily unavailable; retry shortly.', 'fr' => '503 signifie que le service est temporairement indisponible ; réessayez bientôt.', 'es' => '503 significa que el servicio no está disponible temporalmente; inténtalo pronto.'],
-        ];
-        $simpleReply = $statusHelp[$httpStatus[1]][$language];
-    }
-    if ($simpleReply !== null) {
-        echo json_encode(['model' => 'jaguar-core-fast-lane', 'adapter' => null, 'mode' => $mode, 'message' => $simpleReply], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        exit;
-    }
 }
-if ($mode === 'core') {
-    if ($guide !== '') {
+if ($mode === 'core' && $guide !== '') {
         $guideNames = ['chris' => 'Chris', 'dovi' => 'Dovi', 'moe' => 'Moe'];
         $guideName = $guideNames[$guide] ?? 'Daily Breath guide';
         echo json_encode(['model' => 'jaguar-dailybreath-fast-lane', 'adapter' => 'local', 'mode' => $mode, 'message' => $guideName . ' is available here for Daily Breath and sacred-text questions only. This no-GPU chat can offer concise, best-effort guidance from Jaguar’s built-in knowledge; for a specific passage, include its book, chapter, and verse.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
-    echo json_encode(['model' => 'jaguar-core-fast-lane', 'adapter' => 'local', 'mode' => $mode, 'message' => 'Explain handles fast-lane utilities and concise built-in guidance. Deep thinking is available in a separate Jaguar mode.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    exit;
-}
 $runtimeUrl = rtrim((string) getenv('JAGUAR_RUNTIME_URL'), '/');
 if ($runtimeUrl === '' || !filter_var($runtimeUrl, FILTER_VALIDATE_URL)) { http_response_code(503); echo json_encode(['error' => 'Jaguar is not available yet.']); exit; }
 $runtimeToken = trim((string) getenv('JAGUAR_RUNTIME_TOKEN'));

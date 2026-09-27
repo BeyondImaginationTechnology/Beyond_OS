@@ -42,7 +42,7 @@ static const SDL_Color white = {239, 242, 255, 255};
 static const SDL_Color muted = {153, 170, 195, 255};
 static const SDL_Color accent = {150, 174, 255, 255};
 #ifdef BIT_EDITION_CYBER
-#define EDITION_LABEL "CYBER EDITION 1.0"
+#define EDITION_LABEL "CYBER EDITION 0.1"
 #define HOME_KICKER "AUTHORIZED SECURITY WORKSPACE"
 #define HOME_TITLE "Know your scope."
 #define HOME_COPY "Start with permission. Preserve the evidence."
@@ -326,7 +326,7 @@ static void draw(void)
                 text(small_font, dirty ? "Unsaved changes  /  Ctrl+S to save" : "Documents/Cyber Note.txt", 51, 704, accent);
             }
         } else {
-            paragraph("BIT OS Cyber Edition 1.0\nDevelopment build: cyber-dev.1\n\nAn independent defensive Linux workstation, assembled from upstream source.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2 / nftables\n\nLocal files, evidence notes, and inbound firewall defaults are included in this preview. Disk encryption, signed updates, hardware support, and a graphical installer remain in development.",
+            paragraph("BIT OS Cyber Edition 0.1\nDevelopment build: cyber-0.1-dev.1\n\nAn independent defensive Linux workstation, assembled from upstream source.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2 / nftables\n\nLocal files, evidence notes, and inbound firewall defaults are included in this preview. Disk encryption, signed updates, hardware support, and a graphical installer remain in development.",
                       54, 236, 1150, 365);
 #ifndef _WIN32
             struct utsname system;

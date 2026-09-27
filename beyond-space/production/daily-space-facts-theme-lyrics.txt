@@ -1,0 +1,5 @@
+Spoken theme tag for Beyond Space TV:
+
+Beyond Space TV! Daily Space Facts — let's explore!
+
+The new spoken tag was generated with ElevenLabs voice "Liam - Viral Short-Form Storyteller". The current local WAV file is still the previous system-voice render; replace it with the ElevenLabs download before producing a final opener with the new voice.

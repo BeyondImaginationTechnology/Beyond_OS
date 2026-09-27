@@ -12,11 +12,11 @@ chmod 0755 "$target/usr/bin/beyond-session" "$target/usr/bin/beyond-user-session
 rm -f "$target/etc/os-release"
 cat > "$target/etc/os-release" <<'EOF'
 NAME="BIT OS Cyber Edition"
-PRETTY_NAME="BIT OS Cyber Edition 1.0 (Development)"
+PRETTY_NAME="BIT OS Cyber Edition 0.1 (Development)"
 ID=beyond-os
-VERSION="1.0 (Development)"
-VERSION_ID="1.0"
-BUILD_ID="cyber-dev.1"
+VERSION="0.1 (Development)"
+VERSION_ID="0.1"
+BUILD_ID="cyber-0.1-dev.1"
 HOME_URL="https://beyondimagination.co.technology/"
 EOF
 install -d -m 0755 \
@@ -27,7 +27,7 @@ install -d -m 0755 \
   "$target/mnt/bit-source-esp"
 rm -f "$target/usr/lib/os-release"
 cp "$target/etc/os-release" "$target/usr/lib/os-release"
-printf '%s\n' 'Welcome to BIT OS Cyber Edition 1.0.' 'This VM development image is built from upstream Linux components.' > "$target/home/home/Documents/Welcome.txt"
+printf '%s\n' 'Welcome to BIT OS Cyber Edition 0.1.' 'This VM development image is built from upstream Linux components.' > "$target/home/home/Documents/Welcome.txt"
 printf '%s\n' 'Place user-created notes and local evidence files in this folder.' > "$target/home/home/Documents/Cyber/Evidence/README.txt"
-printf '%s\n' 'BIT OS Cyber Edition 1.0 (Development)' > "$target/etc/issue"
-printf '%s\n' 'BIT OS Cyber Edition 1.0 (Development)' > "$target/etc/motd"
+printf '%s\n' 'BIT OS Cyber Edition 0.1 (Development)' > "$target/etc/issue"
+printf '%s\n' 'BIT OS Cyber Edition 0.1 (Development)' > "$target/etc/motd"

@@ -3,6 +3,8 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/../../includes/ecosystem.php';
 if (empty($disableBeyondShell)) { beyond_nav_bootstrap('Beyond Tattoo'); }
 $pageTitle = $pageTitle ?? APP_NAME;
+$pageDescription = $pageDescription ?? '';
+$pageCanonical = $pageCanonical ?? '';
 $bodyClass = $bodyClass ?? '';
 ?>
 <!doctype html>
@@ -14,6 +16,8 @@ $bodyClass = $bodyClass ?? '';
   <meta name="application-name" content="Beyond Tattoo">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <?php if ($pageDescription !== ''): ?><meta name="description" content="<?= e($pageDescription) ?>"><?php endif; ?>
+  <?php if ($pageCanonical !== ''): ?><link rel="canonical" href="<?= e($pageCanonical) ?>"><?php endif; ?>
   <link rel="icon" type="image/png" sizes="192x192" href="<?= e(bt_app_url('assets/icons/beyond-tattoo-192.png')) ?>">
   <link rel="apple-touch-icon" href="<?= e(bt_app_url('assets/icons/beyond-tattoo-192.png')) ?>">
   <link rel="manifest" href="<?= e(bt_app_url('manifest.php')) ?>">

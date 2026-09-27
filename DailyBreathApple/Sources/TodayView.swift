@@ -1,4 +1,5 @@
 import AVFoundation
+import CryptoKit
 import SwiftUI
 import UIKit
 
@@ -13,6 +14,8 @@ struct TodayView: View {
     @State private var narrationPlayer: AVPlayer?
     @State private var narrationURL: URL?
     @State private var narrationPlaying = false
+    @State private var narrationLoading = false
+    @State private var narrationMessage: String?
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -28,11 +31,6 @@ struct TodayView: View {
 
     private var todayDevotional: Devotional {
         store.weeklyDevotional(for: selectedTradition)
-    }
-
-    private var narrationAudioURL: URL? {
-        guard store.approvedContent?.tradition == selectedTradition else { return todayVerse.audioURL }
-        return store.approvedContent?.audioURL ?? todayVerse.audioURL
     }
 
     private var todayContentLocale: String {
@@ -71,7 +69,7 @@ struct TodayView: View {
             }
             .padding()
         }
-        .background(DailyBreathThemeBackground(theme: selectedTheme))
+        .background(todayScreenBackground)
         .navigationTitle("Today")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
@@ -213,33 +211,55 @@ struct TodayView: View {
                 .tint(.white)
             }
             .controlSize(.large)
-            if let audioURL = narrationAudioURL {
-                Button {
-                    toggleNarration(url: audioURL)
-                } label: {
-                    Label(narrationPlaying ? "Pause narration" : "Play Verse of the Day", systemImage: narrationPlaying ? "pause.fill" : "play.fill")
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(selectedTheme.accent)
-                .accessibilityHint("Streams the online ElevenLabs narration. Internet connection required.")
-            } else {
-                Label("Online narration not available yet", systemImage: "waveform.slash")
+            Button {
+                handleNarrationTap()
+            } label: {
+                Label(
+                    narrationLoading ? "Preparing narration…" : narrationPlaying ? "Pause narration" : "Listen to today’s reading",
+                    systemImage: narrationLoading ? "hourglass" : narrationPlaying ? "pause.fill" : "play.fill"
+                )
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(selectedTheme.accent)
+            .disabled(narrationLoading)
+            .accessibilityHint("Prepares and saves today’s narration on this device for offline replay.")
+            if let narrationMessage {
+                Text(narrationMessage)
                     .font(.footnote.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.72))
-                    .accessibilityLabel("Online narration is not available for this reading yet")
+                    .foregroundStyle(.white.opacity(0.82))
+                    .accessibilityLiveRegion(.polite)
             }
         }
         .padding(24)
         .background(
+            RoundedRectangle(cornerRadius: 26)
+                .fill(.black.opacity(selectedTheme.artworkName == nil ? 0.18 : 0.30))
+        )
+    }
+
+    private var todayScreenBackground: some View {
+        GeometryReader { geometry in
             ZStack {
-                LinearGradient(colors: [selectedTheme.primary, selectedTheme.secondary], startPoint: .topLeading, endPoint: .bottomTrailing)
+                DailyBreathThemeBackground(theme: selectedTheme)
                 if let artwork = selectedTheme.artworkName {
-                    Image(artwork).resizable().scaledToFill()
-                    LinearGradient(colors: [.black.opacity(0.66), .black.opacity(0.50), .black.opacity(0.75)], startPoint: .top, endPoint: .bottom)
+                    Image(artwork)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipped()
+                        .overlay {
+                            LinearGradient(
+                                colors: [.black.opacity(0.22), .black.opacity(0.08), .black.opacity(0.30)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        }
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 26))
-        )
+            .frame(width: geometry.size.width, height: geometry.size.height)
+        }
+        .ignoresSafeArea()
+        .accessibilityHidden(true)
     }
 
     private var passageIsRightToLeft: Bool {
@@ -248,18 +268,97 @@ struct TodayView: View {
         }
     }
 
-    private func toggleNarration(url: URL) {
+    private func handleNarrationTap() {
         if narrationPlaying {
             narrationPlayer?.pause()
             narrationPlaying = false
             return
         }
-        if narrationPlayer == nil || narrationURL != url {
-            narrationPlayer = AVPlayer(url: url)
-            narrationURL = url
+        if let narrationURL, narrationURL.isFileURL {
+            playNarration(from: narrationURL)
+            return
         }
+        guard !narrationLoading else { return }
+        narrationLoading = true
+        narrationMessage = nil
+        Task { await prepareNarration() }
+    }
+
+    @MainActor
+    private func prepareNarration() async {
+        defer { narrationLoading = false }
+        let requestedDate = todayKey
+        let requestedTradition = selectedTradition.id
+        let requestedLocale = todayContentLocale
+        do {
+            let fileURL = try await Self.cachedNarration(
+                date: requestedDate,
+                tradition: requestedTradition,
+                locale: requestedLocale,
+                passage: todayVerse.text,
+                reference: todayVerse.reference
+            )
+            guard requestedDate == todayKey,
+                  requestedTradition == selectedTradition.id,
+                  requestedLocale == todayContentLocale else { return }
+            playNarration(from: fileURL)
+            narrationMessage = "Saved on this device for offline listening."
+        } catch {
+            narrationMessage = "Narration could not be prepared. Check your connection and try again."
+        }
+    }
+
+    private func playNarration(from url: URL) {
+        narrationPlayer = AVPlayer(url: url)
+        narrationURL = url
         narrationPlayer?.play()
         narrationPlaying = true
+    }
+
+    private static func cachedNarration(date: String, tradition: String, locale: String, passage: String, reference: String) async throws -> URL {
+        let fileManager = FileManager.default
+        let directory = try fileManager.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+            .appendingPathComponent("DailyBreathNarration", isDirectory: true)
+        try fileManager.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
+        var directoryURL = directory
+        var resourceValues = URLResourceValues()
+        resourceValues.isExcludedFromBackup = true
+        try? directoryURL.setResourceValues(resourceValues)
+        let script = passage.trimmingCharacters(in: .whitespacesAndNewlines) + "\n\n" + reference.trimmingCharacters(in: .whitespacesAndNewlines)
+        let contentHash = SHA256.hash(data: Data(script.utf8)).map { String(format: "%02x", $0) }.joined()
+        let fileURL = directory.appendingPathComponent("\(date)-\(tradition)-\(locale)-\(contentHash.prefix(16)).mp3")
+        if fileManager.fileExists(atPath: fileURL.path) { return fileURL }
+
+        let endpoint = URL(string: "https://beyondimagination.co.technology/dailybreath/api/narration.php")!
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 45
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.httpBody = try JSONSerialization.data(withJSONObject: [
+            "date": date,
+            "tradition": tradition,
+            "locale": locale,
+            "content_hash": contentHash
+        ])
+        let (responseData, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode),
+              let payload = try JSONDecoder().decode(DailyBreathNarrationResponse.self, from: responseData).audioURL else {
+            throw DailyBreathAPIError.badResponse
+        }
+
+        var downloadRequest = URLRequest(url: payload)
+        downloadRequest.timeoutInterval = 90
+        let (audioData, audioResponse) = try await URLSession.shared.data(for: downloadRequest)
+        let audioMimeType = (audioResponse as? HTTPURLResponse)?.mimeType ?? ""
+        guard let audioHTTP = audioResponse as? HTTPURLResponse,
+              (200..<300).contains(audioHTTP.statusCode),
+              (audioMimeType.hasPrefix("audio/") || audioMimeType == "application/octet-stream"),
+              !audioData.isEmpty else {
+            throw DailyBreathAPIError.badResponse
+        }
+        try audioData.write(to: fileURL, options: .atomic)
+        return fileURL
     }
 
     private func stopNarration() {
@@ -424,6 +523,14 @@ struct TodayView: View {
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
+}
+
+private struct DailyBreathNarrationResponse: Decodable {
+    let audioURL: URL?
+
+    enum CodingKeys: String, CodingKey {
+        case audioURL = "audio_url"
+    }
 }
 
 private struct DailyBreathShareImage: Identifiable {

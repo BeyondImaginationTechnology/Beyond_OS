@@ -148,7 +148,7 @@
   function apply(locale) {
     var dictionary = dictionaries[locale] || dictionaries.en;
     var appStoreLabels = { en: 'App Store', fr: 'Boutique apps', ht: 'Magazen aplikasyon', es: 'Tienda de apps' };
-    var appStoreCtas = { en: 'Open the App Store ▶', fr: 'Ouvrir la boutique ▶', ht: 'Louvri magazen an ▶', es: 'Abrir la tienda ▶' };
+    var osInstallCtas = { en: 'Install OS ▶', fr: 'Installer l’OS ▶', ht: 'Enstale OS ▶', es: 'Instalar OS ▶' };
     var root = document.documentElement;
     if (!root) return;
     root.lang = locale;
@@ -160,7 +160,7 @@
     document.querySelectorAll('.bos-locale').forEach(function (label) { label.title = dictionary.language; });
     document.querySelectorAll('.bos-locale-picker').forEach(function (picker) { picker.setAttribute('aria-label', dictionary.language); });
     document.querySelectorAll('.bos-app-store-label-full').forEach(function (label) { var value = appStoreLabels[locale] || appStoreLabels.en; if (label.textContent !== value) label.textContent = value; });
-    document.querySelectorAll('.hero-actions .ghost').forEach(function (link) { var value = appStoreCtas[locale] || appStoreCtas.en; if (link.textContent !== value) link.textContent = value; });
+    document.querySelectorAll('.hero-actions .ghost').forEach(function (link) { var value = osInstallCtas[locale] || osInstallCtas.en; if (link.textContent !== value) link.textContent = value; });
     document.querySelectorAll('#beyond-os-shell .bos-home-label').forEach(function (label) { if (label.textContent !== 'BEYOND IMAGINATION') label.textContent = 'BEYOND IMAGINATION'; });
     document.querySelectorAll('.bos-kicker,.bos-hero h1,.os,.logo').forEach(function (label) {
       var nextText = label.textContent

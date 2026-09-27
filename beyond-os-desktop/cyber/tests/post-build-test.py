@@ -20,7 +20,7 @@ with tempfile.TemporaryDirectory(prefix="beyond-cyber-hook-") as temporary:
                     target.as_posix()], check=True)
     identity = (target / "etc/os-release").read_text()
     assert 'ID=beyond-os\n' in identity
-    assert 'PRETTY_NAME="BIT OS Cyber Edition 1.0 (Development)"' in identity
+    assert 'PRETTY_NAME="BIT OS Cyber Edition 0.1 (Development)"' in identity
     assert (target / "usr/lib/os-release").read_text() == identity
     assert not (target / "etc/init.d/S40xorg").exists()
     assert (target / "etc/init.d/S99beyond-cyber").exists()

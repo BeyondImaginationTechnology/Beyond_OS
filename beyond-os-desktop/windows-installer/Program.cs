@@ -58,14 +58,16 @@ namespace BITOSInstaller
                 ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/academy/1.0/SHA256SUMS"
             },
             new ReleaseDefinition {
-                Edition = "BIT OS Cyber", Version = "1.0", Available = false,
-                ImageUrl = "https://os.beyondimagination.co.technology/releases/cyber/1.0/bit-os-cyber-1.0-installer.img",
-                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/cyber/1.0/SHA256SUMS"
+                Edition = "BIT OS Cyber", Version = "v0.1 Candidate", Available = false,
+                ImageUrl = "https://os.beyondimagination.co.technology/releases/cyber/0.1/bit-os-cyber-0.1-installer.img.gz",
+                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/cyber/0.1/SHA256SUMS",
+                CompressedImage = true
             },
             new ReleaseDefinition {
-                Edition = "BIT OS Home", Version = "1.0", Available = false,
-                ImageUrl = "https://os.beyondimagination.co.technology/releases/home/1.0/bit-os-home-1.0-installer.img",
-                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/home/1.0/SHA256SUMS"
+                Edition = "BIT OS Home", Version = "v0.2 Candidate", Available = false,
+                ImageUrl = "https://os.beyondimagination.co.technology/releases/home/0.2/bit-os-home-0.2-installer.img.gz",
+                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/home/0.2/SHA256SUMS",
+                CompressedImage = true
             },
             new ReleaseDefinition {
                 Edition = "BIT OS Core", Version = "v0.2 Candidate", Available = true,

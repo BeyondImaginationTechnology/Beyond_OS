@@ -43,10 +43,12 @@ public final class DailyBreathWidgetProvider extends AppWidgetProvider {
         SharedPreferences prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         String date = LocalDate.now().toString();
         String faith = prefs.getString("selected_faith", "BIBLE");
-        String locale = faith.equals("TANAKH") ? "he" : faith.equals("QURAN") ? "ar" : prefs.getString("interface_language", "en");
+        String locale = faith.equals("TANAKH") ? scriptureLocale(prefs, "tanakh_scripture_locale", "he", "he")
+                : faith.equals("QURAN") ? scriptureLocale(prefs, "quran_scripture_locale", "ar", "ar")
+                : prefs.getString("interface_language", "en");
         String theme = prefs.getString("daily_breath_theme", "seasonal");
         Reading reading = readCachedReading(prefs, date, faith, locale);
-        if (reading == null) reading = localReading(context, date, faith);
+        if (reading == null) reading = localReading(context, date, faith, locale);
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.daily_breath_widget);
         views.setTextViewText(R.id.widget_reading_label, faith.equals("TANAKH") ? "TANAKH PASSAGE OF THE DAY" : faith.equals("QURAN") ? "QURAN AYAH OF THE DAY" : "BIBLE VERSE OF THE DAY");
@@ -83,6 +85,11 @@ public final class DailyBreathWidgetProvider extends AppWidgetProvider {
         return views;
     }
 
+    private static String scriptureLocale(SharedPreferences prefs, String key, String fallback, String originalLanguage) {
+        String saved = prefs.getString(key, fallback);
+        return saved.equals("en") || saved.equals(originalLanguage) ? saved : fallback;
+    }
+
     private static Reading readCachedReading(SharedPreferences prefs, String date, String faith, String locale) {
         String key = "daily_content_" + date + "_" + faith.toLowerCase(Locale.US) + "_" + locale;
         try {
@@ -97,9 +104,18 @@ public final class DailyBreathWidgetProvider extends AppWidgetProvider {
         }
     }
 
-    private static Reading localReading(Context context, String date, String faith) {
-        if (faith.equals("TANAKH")) return new Reading("בְּטַח אֶל־יְהוָה בְּכָל־לִבֶּךָ", "משלי 3:5");
-        if (faith.equals("QURAN")) return new Reading("قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ", "الفلق 113:1");
+    private static Reading localReading(Context context, String date, String faith, String locale) {
+        if (faith.equals("TANAKH")) {
+            String[][] pool={{"EXO","23","32","Exodus"},{"PSA","46","10","Psalms"},{"DEU","31","6","Deuteronomy"},{"ISA","41","10","Isaiah"},{"PRO","3","5","Proverbs"}};
+            String[] selected=pool[Math.floorMod((int)LocalDate.parse(date).toEpochDay(),pool.length)];
+            try(InputStream stream=context.getAssets().open("engwebp_vpl.txt");java.io.BufferedReader reader=new java.io.BufferedReader(new java.io.InputStreamReader(stream,java.nio.charset.StandardCharsets.UTF_8))){String line;while((line=reader.readLine())!=null){String[] parts=line.split(" ",3);if(parts.length==3&&parts[0].equals(selected[0])&&parts[1].equals(selected[1]+":"+selected[2]))return new Reading(parts[2],selected[3]+" "+selected[1]+":"+selected[2]);}}catch(Exception ignored){}
+            return new Reading("Be still, and know that I am God.","Psalm 46:10");
+        }
+        if (faith.equals("QURAN")) {
+            int[][] pool={{13,28},{2,153},{39,53},{94,5},{3,200}};int[] selected=pool[Math.floorMod((int)LocalDate.parse(date).toEpochDay(),pool.length)];
+            try(InputStream stream=context.getAssets().open("quran-pickthall-vpl.txt");java.io.BufferedReader reader=new java.io.BufferedReader(new java.io.InputStreamReader(stream,java.nio.charset.StandardCharsets.UTF_8))){String line;while((line=reader.readLine())!=null){String[] parts=line.split("\\|",4);if(parts.length==4&&Integer.parseInt(parts[0])==selected[0]&&Integer.parseInt(parts[1])==selected[1])return new Reading(parts[3],parts[2]+" "+parts[0]+":"+parts[1]);}}catch(Exception ignored){}
+            return new Reading("Say: I seek refuge in the Lord of the Daybreak.","Al-Falaq 113:1");
+        }
         try (InputStream stream = context.getAssets().open("daily-verses.json")) {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             byte[] buffer = new byte[8192];

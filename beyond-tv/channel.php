@@ -99,4 +99,4 @@ html[data-tv-theme="sunset"]{color-scheme:dark}html[data-tv-theme="sunset"] .btv
 <?php elseif($isExternal):?><p class="source-note"><span class="source-pill">OFFICIAL SOURCE</span></p><?php endif;?>
 <?php if($signedIn):?><button class="btn btn-secondary" type="button" data-my-list>＋ My List</button><?php else:?><a class="btn btn-secondary" href="/beyond-id/auth/login.php?return=<?=urlencode($_SERVER['REQUEST_URI']??'/beyond-tv/')?>">Sign in to save</a><?php endif;?>
 </div>
-</section></main><script src="/beyond-tv/assets/js/app.js?v=3.0.1"></script><script src="/assets/js/visitor-analytics.js" defer></script></body></html>
+</section></main><script src="/beyond-tv/assets/js/app.js?v=3.0.3"></script><script src="/assets/js/visitor-analytics.js" defer></script></body></html>

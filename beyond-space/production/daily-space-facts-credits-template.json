@@ -1,0 +1,20 @@
+{
+  "series": "DAILY SPACE FACTS",
+  "episode_number": "{{EPISODE_NUMBER}}",
+  "episode_title": "{{FACT_TITLE}}",
+  "sources": [
+    {
+      "title": "{{SOURCE_1_TITLE}}",
+      "url": "{{SOURCE_1_URL}}"
+    },
+    {
+      "title": "{{SOURCE_2_TITLE}}",
+      "url": "{{SOURCE_2_URL}}"
+    },
+    {
+      "title": "{{SOURCE_3_TITLE}}",
+      "url": "{{SOURCE_3_URL}}"
+    }
+  ],
+  "footer": "Source links shown for fact checking  •  Beyond TV"
+}

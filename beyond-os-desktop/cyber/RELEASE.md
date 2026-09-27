@@ -1,6 +1,6 @@
-# BIT OS Cyber Edition 1.0 release gates
+# BIT OS Cyber Edition 0.1 release gates
 
-Current work: `cyber-dev.1`. Source completion is not a stable release.
+Current work: `cyber-0.1-dev.1`. Source completion is not a stable release.
 
 ## Build and provenance
 
@@ -9,6 +9,11 @@ Current work: `cyber-dev.1`. Source completion is not a stable release.
 - [ ] Retain the resolved configurations, build logs, SHA-256 manifest, and Buildroot legal information.
 - [ ] Confirm that the ISO, GUID Partition Table (GPT) USB image, and root filesystem match the published manifest.
 - [ ] Build and Authenticode-sign `BITOSInstaller.exe`; retain its SHA-256 hash and signing evidence.
+
+For a public test-candidate download, compress the ISO and GPT image, then
+publish those archives with a manifest that hashes the downloadable files.
+Keep Buildroot's original `SHA256SUMS` beside the build log as the raw-image
+record; do not overwrite it until it has been retained separately.
 
 ## Boot and installation
 
@@ -32,6 +37,6 @@ Current work: `cyber-dev.1`. Source completion is not a stable release.
 
 ## Deferred capabilities that must be disclosed
 
-Secure Boot, full-disk encryption, and signed in-system updates are not implemented in the current candidate. They must either be completed before a stable 1.0 release or be prominently documented as unsupported with an approved security rationale.
+Secure Boot, full-disk encryption, and signed in-system updates are not implemented in the current candidate. They must either be completed before a stable 0.1 release or be prominently documented as unsupported with an approved security rationale.
 
-Never label an artifact as stable BIT OS Cyber 1.0 until every applicable gate above passes.
+Never label an artifact as stable BIT OS Cyber 0.1 until every applicable gate above passes.

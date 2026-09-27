@@ -10,8 +10,8 @@ android {
         applicationId 'technology.co.beyondimagination.beyondtv'
         minSdk 26
         targetSdk 37
-        versionCode 110
-        versionName '1.1.0'
+        versionCode 2001
+        versionName '2.001'
     }
 
     buildTypes {

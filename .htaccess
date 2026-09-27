@@ -73,6 +73,10 @@ DirectoryIndex index.php index.html
   # than an application-generated 500.
   RewriteRule ^releases(?:/|$) - [END]
 
+  # Keep the established podcast subscription URL while building its episodes
+  # from approved readings that already have a saved narration MP3.
+  RewriteRule ^dailybreath/podcast/rss\.xml$ /dailybreath/podcast/rss.php [END]
+
   # Serve real application files and folders directly.
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d

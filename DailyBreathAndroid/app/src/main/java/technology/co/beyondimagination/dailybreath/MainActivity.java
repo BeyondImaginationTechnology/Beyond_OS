@@ -19,6 +19,9 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -55,6 +58,7 @@ import java.io.File;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyStore;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -96,7 +100,7 @@ public final class MainActivity extends Activity {
     private final Runnable ticker = this::tick;
     private final Map<String,String> englishNames = englishNames(), tanakhNames = tanakhNames();
     private SharedPreferences prefs;
-    private LinearLayout page, nav;
+    private LinearLayout root, page, nav;
     private int tab, seconds = 120;
     private boolean breathing, complete;
     private TextView timerView, phaseView, weekView;
@@ -113,6 +117,8 @@ public final class MainActivity extends Activity {
     private Button chatSend;
     private RemoteDailyContent remoteToday;
     private MediaPlayer narrationPlayer;
+    private boolean narrationRequestInFlight;
+    private boolean activityResumed;
     private String lastContentFetchDate="";
     private final Map<String,Long> contentFetchAttempts = new ConcurrentHashMap<>();
     private final Map<String,Long> contentFetchSuccesses = new ConcurrentHashMap<>();
@@ -138,12 +144,12 @@ public final class MainActivity extends Activity {
         else if (!prefs.getBoolean("onboarding_complete", false)) page.post(this::showAccountChoice);
     }
     @Override protected void onNewIntent(Intent intent) { super.onNewIntent(intent); setIntent(intent); if (!handleAuthCallback(intent)) openIntent(intent); }
-    @Override protected void onResume(){super.onResume();String date=LocalDate.now().toString();boolean dayChanged=!date.equals(lastContentFetchDate);if(dayChanged){loadCachedTodayContent();lastContentFetchDate=date;if(tab==0)showToday();}refreshTodayContent(dayChanged);int month=LocalDate.now().getMonthValue();if(themeId.equals("seasonal")&&month!=seasonalMonth){applyTheme(themeId);buildLayout();showTab(tab);}DailyBreathWidgetProvider.updateWidgets(this);}
-    @Override protected void onPause() { super.onPause(); if (breathing) { breathing = false; handler.removeCallbacks(ticker); refreshBreathControls(); } stopNarration(); }
+    @Override protected void onResume(){super.onResume();activityResumed=true;String date=LocalDate.now().toString();boolean dayChanged=!date.equals(lastContentFetchDate);if(dayChanged){loadCachedTodayContent();lastContentFetchDate=date;if(tab==0)showToday();}refreshTodayContent(dayChanged);int month=LocalDate.now().getMonthValue();if(themeId.equals("seasonal")&&month!=seasonalMonth){applyTheme(themeId);buildLayout();showTab(tab);}DailyBreathWidgetProvider.updateWidgets(this);}
+    @Override protected void onPause() { activityResumed=false;super.onPause(); if (breathing) { breathing = false; handler.removeCallbacks(ticker); refreshBreathControls(); } stopNarration(); }
     @Override protected void onDestroy() { handler.removeCallbacks(ticker); stopNarration(); super.onDestroy(); }
 
     private void buildLayout() {
-        LinearLayout root = new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL); root.setBackgroundColor(CREAM);
+        root = new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL); root.setBackgroundColor(CREAM);
         getWindow().setStatusBarColor(CREAM);getWindow().setNavigationBarColor(FOREST_DARK);
         getWindow().getDecorView().setSystemUiVisibility(themeId.equals("quranMoon")?0:android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         LinearLayout header = new LinearLayout(this); header.setOrientation(LinearLayout.VERTICAL); header.setPadding(dp(20),dp(16),dp(20),dp(12));
@@ -153,7 +159,7 @@ public final class MainActivity extends Activity {
         nav = new LinearLayout(this); nav.setOrientation(LinearLayout.HORIZONTAL); nav.setBackgroundColor(FOREST_DARK); nav.setPadding(dp(3),dp(5),dp(3),dp(3)); root.addView(nav,new LinearLayout.LayoutParams(-1,dp(68)));
         setContentView(root); showTab(0);
     }
-    private void showTab(int value) { tab=Math.max(0,Math.min(6,value)); page.removeAllViews(); renderNav(); if(tab==6)showHome();else if(tab==0)showToday();else if(tab==1)showScripture();else if(tab==2)showChat();else if(tab==3)showAcademy();else if(tab==4)showBreathe();else showJournal(); }
+    private void showTab(int value) { tab=Math.max(0,Math.min(6,value)); applyTodayBackground(); page.removeAllViews(); renderNav(); if(tab==6)showHome();else if(tab==0)showToday();else if(tab==1)showScripture();else if(tab==2)showChat();else if(tab==3)showAcademy();else if(tab==4)showBreathe();else showJournal(); }
     private void renderNav() {
         nav.removeAllViews();
         for(int index=0;index<TABS.length;index++){
@@ -245,10 +251,10 @@ public final class MainActivity extends Activity {
         Button breathe=action("Begin a breathing practice");breathe.setOnClickListener(v->showTab(4));page.addView(breathe,spaced());
     }
     private void showToday() {
-        title("TODAY","A steadier next step"); addBody(todayIntro()); Reading reading=readingOfTheDay();
+        title("TODAY","A steadier next step"); if(faith!=Faith.BIBLE)addReadingLanguagePicker(); addBody(todayIntro()); Reading reading=readingOfTheDay();
         LinearLayout card=card(faith==Faith.QURAN?FOREST_DARK:INK);applyReadingArtwork(card);card.addView(label(faith.dailyLabel.toUpperCase(Locale.US)+" OF THE DAY",12,GOLD,true)); TextView date=label(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy",Locale.getDefault())),14,Color.LTGRAY,true); date.setPadding(0,dp(7),0,0); card.addView(date); if(remoteToday!=null&&remoteToday.isToday(faith,todayLocale())&&!remoteToday.updatedAt.isEmpty())card.addView(label("Updated from Daily Breath · "+remoteToday.updatedAt,12,Color.LTGRAY,false)); TextView quote=label("“"+reading.text+"”",27,Color.WHITE,true); quote.setPadding(0,dp(14),0,dp(12)); quote.setTextIsSelectable(true); applyPassageDirection(quote,reading.text); card.addView(quote); card.addView(label(reading.reference,18,GOLD,true)); page.addView(card,spaced());
         LinearLayout sharing=new LinearLayout(this);sharing.setOrientation(LinearLayout.HORIZONTAL);Button share=action("Share reading");share.setOnClickListener(v->shareTodayReading(reading));sharing.addView(share,new LinearLayout.LayoutParams(0,-2,1));Button image=action("Share image");image.setOnClickListener(v->shareTodayImage(reading));LinearLayout.LayoutParams imageParams=new LinearLayout.LayoutParams(0,-2,1);imageParams.leftMargin=dp(8);sharing.addView(image,imageParams);page.addView(sharing,spaced());
-        if(remoteToday!=null&&remoteToday.isToday(faith,todayLocale())&&!remoteToday.audioUrl.isEmpty()){Button audio=action("Play online narration");audio.setOnClickListener(v->playNarration(remoteToday.audioUrl));page.addView(audio,spaced());}else addBody("Online narration is not available for this reading yet.");
+        Button audio=action("Listen to today’s reading");audio.setOnClickListener(v->prepareNarration());page.addView(audio,spaced());
     }
     private void showScripture() {
         title(faith.title.toUpperCase(Locale.US),faith==Faith.TANAKH?"Complete local Tanakh":faith==Faith.QURAN?"Complete local Quran":"Complete local Bible"); addFaithPicker();
@@ -470,7 +476,16 @@ public final class MainActivity extends Activity {
     private void loadLibraries(){try(BufferedReader reader=assetReader("engwebp_vpl.txt")){String line;while((line=reader.readLine())!=null){String[] parts=line.split(" ",3);if(parts.length!=3||!parts[1].contains(":"))continue;String[] location=parts[1].split(":",2);bible.add(new ScriptureVerse(parts[0],number(location[0]),number(location[1]),parts[2],bibleReference(parts[0],location[0],location[1],false)));}}catch(Exception ignored){}try(BufferedReader reader=assetReader("quran-pickthall-vpl.txt")){String line;while((line=reader.readLine())!=null){String[] parts=line.split("\\|",4);if(parts.length!=4)continue;int surah=number(parts[0]),ayah=number(parts[1]);if(surah<=0||ayah<=0)continue;quran.add(new ScriptureVerse(String.valueOf(surah),surah,ayah,parts[3],quranReference(parts[2],surah,ayah)));}}catch(Exception ignored){}}
     private Reading readingOfTheDay(){return remoteToday!=null&&remoteToday.isToday(faith,todayLocale())?new Reading(remoteToday.text,remoteToday.reference):readingFor(LocalDate.now());}
     private Reading readingFor(LocalDate date){if(faith==Faith.BIBLE){DailyVerse verse=dailyVerseFor(date);return new Reading(verse.text,verse.reference);}if(faith==Faith.TANAKH){String[][] pool={{"EXO","23","32"},{"PSA","46","10"},{"DEU","31","6"},{"ISA","41","10"},{"PRO","3","5"}};String[] selected=pool[Math.floorMod((int)date.toEpochDay(),pool.length)];ScriptureVerse verse=findBible(selected[0],number(selected[1]),number(selected[2]));return verse==null?new Reading("Be still, and know that I am God.","Tehillim 46:10"):new Reading(verse.text,bibleReference(verse.code,String.valueOf(verse.chapter),String.valueOf(verse.number),true));}int[][] pool={{13,28},{2,153},{39,53},{94,5},{3,200}};int[] selected=pool[Math.floorMod((int)date.toEpochDay(),pool.length)];ScriptureVerse verse=findQuran(selected[0],selected[1]);return verse==null?new Reading("Who have believed and whose hearts have rest in the remembrance of Allah. Verily in the remembrance of Allah do hearts find rest!","Ar-Ra'd 13:28"):new Reading(verse.text,verse.reference);}
-    private String todayLocale(){return faith==Faith.TANAKH?"he":faith==Faith.QURAN?"ar":prefs.getString("interface_language","en");}
+    private String todayLocale(){if(faith==Faith.TANAKH){String locale=prefs.getString("tanakh_scripture_locale","he");return locale.equals("en")?"en":"he";}if(faith==Faith.QURAN){String locale=prefs.getString("quran_scripture_locale","ar");return locale.equals("en")?"en":"ar";}return prefs.getString("interface_language","en");}
+    private void addReadingLanguagePicker(){
+        boolean tanakh=faith==Faith.TANAKH;String key=tanakh?"tanakh_scripture_locale":"quran_scripture_locale",current=todayLocale();
+        String[] codes=tanakh?new String[]{"en","he"}:new String[]{"en","ar"};
+        String[] labels=tanakh?new String[]{"English","עברית · Hebrew"}:new String[]{"English","العربية · Arabic"};
+        TextView choice=label("Reading language: "+(current.equals("en")?"English":tanakh?"עברית · Hebrew":"العربية · Arabic")+"  ▾",14,FOREST,true);
+        choice.setPadding(dp(13),dp(8),dp(13),dp(8));choice.setMinHeight(dp(48));choice.setGravity(Gravity.CENTER_VERTICAL);choice.setBackground(round(surface,14));
+        choice.setOnClickListener(v->new AlertDialog.Builder(this).setTitle("Reading language").setSingleChoiceItems(labels,current.equals("en")?0:1,(dialog,index)->{dialog.dismiss();if(codes[index].equals(current))return;prefs.edit().putString(key,codes[index]).apply();loadCachedTodayContent();showTab(tab);refreshTodayContent(true);DailyBreathWidgetProvider.updateWidgets(this);}).show());
+        page.addView(choice,spaced());
+    }
     private String todayContentKey(Faith target,String locale){return "daily_content_"+LocalDate.now()+"_"+target.name().toLowerCase(Locale.US)+"_"+locale;}
     private void loadCachedTodayContent(){remoteToday=null;String locale=todayLocale();try{String cached=prefs.getString(todayContentKey(faith,locale),"");if(!cached.isEmpty())remoteToday=RemoteDailyContent.fromJson(new JSONObject(cached));}catch(Exception ignored){remoteToday=null;}}
     private void refreshTodayContent(){
@@ -505,18 +520,33 @@ public final class MainActivity extends Activity {
         }catch(Exception ignored){}finally{contentFetchesInFlight.remove(fetchKey);if(connection!=null)connection.disconnect();}}).start();
     }
     private void shareTodayReading(Reading reading){String tradition=faith==Faith.TANAKH?"torah":faith==Faith.QURAN?"quran":"bible",locale=todayLocale();String url=remoteToday!=null&&remoteToday.isToday(faith,locale)&&!remoteToday.shareUrl.isEmpty()?remoteToday.shareUrl:"https://beyondimagination.co.technology/dailybreath/daily.php?date="+LocalDate.now()+"&tradition="+tradition+"&lang="+locale;Intent share=new Intent(Intent.ACTION_SEND);share.setType("text/plain");share.putExtra(Intent.EXTRA_SUBJECT,faith.dailyLabel+" · "+reading.reference);share.putExtra(Intent.EXTRA_TEXT,reading.text+"\n\n"+reading.reference+" · "+LocalDate.now()+"\n\nDaily Breath\n"+url);startActivity(Intent.createChooser(share,"Share today’s reading"));}
-    private void shareTodayImage(Reading reading){try{Bitmap bitmap=createReadingCard(reading);File directory=new File(getCacheDir(),"shared");if(!directory.exists()&&!directory.mkdirs())throw new IllegalStateException("Could not create share cache");File file=new File(directory,"daily-breath-"+LocalDate.now()+".png");try(OutputStream output=new java.io.FileOutputStream(file)){bitmap.compress(Bitmap.CompressFormat.PNG,100,output);}bitmap.recycle();Uri uri=FileProvider.getUriForFile(this,getPackageName()+".files",file);Intent share=new Intent(Intent.ACTION_SEND);share.setType("image/png");share.putExtra(Intent.EXTRA_STREAM,uri);share.putExtra(Intent.EXTRA_TEXT,reading.reference+" · Daily Breath");share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);startActivity(Intent.createChooser(share,"Share today’s reading card"));}catch(Exception error){Toast.makeText(this,"The reading image could not be shared.",Toast.LENGTH_LONG).show();}}
+    private void shareTodayImage(Reading reading){try{Bitmap bitmap=createReadingCard(reading);File directory=new File(getCacheDir(),"shared");if(!directory.exists()&&!directory.mkdirs())throw new IllegalStateException("Could not create share cache");String tradition=faith.name().toLowerCase(Locale.US),locale=todayLocale();File file=new File(directory,"daily-breath-"+LocalDate.now()+"-"+tradition+"-"+locale+"-"+themeId+".png");try(OutputStream output=new java.io.FileOutputStream(file)){bitmap.compress(Bitmap.CompressFormat.PNG,100,output);}bitmap.recycle();Uri uri=FileProvider.getUriForFile(this,getPackageName()+".files",file);Intent share=new Intent(Intent.ACTION_SEND);share.setType("image/png");share.putExtra(Intent.EXTRA_STREAM,uri);share.putExtra(Intent.EXTRA_TEXT,reading.reference+" · Daily Breath");share.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);startActivity(Intent.createChooser(share,"Share today’s reading card"));}catch(Exception error){Toast.makeText(this,"The reading image could not be shared.",Toast.LENGTH_LONG).show();}}
     private String artworkFile(){switch(themeId){case "bibleForest":return "artwork/bible-forest.png";case "tanakhNavy":return "artwork/tanakh-navy.png";case "quranEmerald":return "artwork/quran-emerald.png";default:return null;}}
     private Bitmap loadThemeArtwork(){String file=artworkFile();if(file==null)return null;try(InputStream input=getAssets().open(file)){BitmapFactory.Options options=new BitmapFactory.Options();options.inSampleSize=2;return BitmapFactory.decodeStream(input,null,options);}catch(Exception ignored){return null;}}
-    private void applyReadingArtwork(LinearLayout card){Bitmap artwork=loadThemeArtwork();if(artwork!=null){BitmapDrawable background=new BitmapDrawable(getResources(),artwork);background.setGravity(Gravity.FILL);card.setBackground(background);}}
+    private void applyTodayBackground(){
+        Bitmap artwork=tab==0?loadThemeArtwork():null;
+        boolean immersive=artwork!=null;
+        if(immersive){
+            BitmapDrawable image=new BitmapDrawable(getResources(),artwork);image.setGravity(Gravity.FILL);
+            root.setBackground(new LayerDrawable(new Drawable[]{image,new ColorDrawable(Color.argb(30,0,0,0))}));
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }else{
+            root.setBackgroundColor(CREAM);
+            getWindow().setStatusBarColor(CREAM);
+            getWindow().getDecorView().setSystemUiVisibility(themeId.equals("quranMoon")?0:View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
+    }
+    private void applyReadingArtwork(LinearLayout card){if(artworkFile()!=null)card.setBackground(round(Color.argb(94,0,0,0),22));}
     private Bitmap createReadingCard(Reading reading){
-        int width=1200,height=675;Bitmap bitmap=Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(bitmap);Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
-        Bitmap artwork=loadThemeArtwork();
-        if(artwork!=null){android.graphics.Rect source=new android.graphics.Rect(0,0,artwork.getWidth(),artwork.getHeight());canvas.drawBitmap(artwork,source,new android.graphics.Rect(0,0,width,height),paint);artwork.recycle();paint.setColor(0x65000000);canvas.drawRect(0,0,width,height,paint);}
+        int width=1200;TextPaint versePaint=new TextPaint(Paint.ANTI_ALIAS_FLAG);versePaint.setTypeface(Typeface.create("serif",Typeface.BOLD));versePaint.setTextSize(reading.text.length()>180?42:52);versePaint.setColor(Color.WHITE);
+        StaticLayout verseLayout=StaticLayout.Builder.obtain(reading.text,0,reading.text.length(),versePaint,width-160).setAlignment(Layout.Alignment.ALIGN_CENTER).setTextDirection(isRightToLeft(reading.text)?android.text.TextDirectionHeuristics.RTL:android.text.TextDirectionHeuristics.FIRSTSTRONG_LTR).setLineSpacing(6,1.0f).setIncludePad(false).build();
+        int referenceY=Math.max(545,185+verseLayout.getHeight()+70),footerY=referenceY+75,height=Math.max(675,footerY+55);
+        Bitmap bitmap=Bitmap.createBitmap(width,height,Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(bitmap);Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);Bitmap artwork=loadThemeArtwork();
+        if(artwork!=null){canvas.drawBitmap(artwork,null,new android.graphics.Rect(0,0,width,height),paint);artwork.recycle();paint.setColor(0x65000000);canvas.drawRect(0,0,width,height,paint);}
         else{int top=themeId.equals("tanakhNavy")?Color.rgb(5,16,40):themeId.equals("quranEmerald")?Color.rgb(3,40,31):themeId.equals("quranMoon")?Color.rgb(6,11,26):seasonalPalette().equals("fall")?Color.rgb(67,39,23):Color.rgb(7,39,25);int bottom=themeId.equals("tanakhNavy")?Color.rgb(23,48,83):themeId.equals("quranEmerald")?Color.rgb(20,83,61):Color.rgb(25,75,53);paint.setShader(new android.graphics.LinearGradient(0,0,width,height,top,bottom,android.graphics.Shader.TileMode.CLAMP));canvas.drawRect(0,0,width,height,paint);paint.setShader(null);}
         paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(4);paint.setColor(GOLD);canvas.drawRect(28,28,width-28,height-28,paint);paint.setStyle(Paint.Style.FILL);paint.setTextAlign(Paint.Align.CENTER);paint.setTypeface(Typeface.create("serif",Typeface.BOLD));paint.setTextSize(28);paint.setColor(GOLD);canvas.drawText(faith.dailyLabel+" of the Day · "+LocalDate.now().format(DateTimeFormatter.ofPattern("MMMM d, yyyy",Locale.getDefault())),width/2f,92,paint);
-        TextPaint versePaint=new TextPaint(Paint.ANTI_ALIAS_FLAG);versePaint.setTypeface(Typeface.create("serif",Typeface.BOLD));versePaint.setTextSize(52);versePaint.setColor(Color.WHITE);StaticLayout verseLayout=StaticLayout.Builder.obtain(reading.text,0,reading.text.length(),versePaint,width-160).setAlignment(Layout.Alignment.ALIGN_CENTER).setTextDirection(isRightToLeft(reading.text)?android.text.TextDirectionHeuristics.RTL:android.text.TextDirectionHeuristics.FIRSTSTRONG_LTR).setLineSpacing(6,1.0f).setIncludePad(false).setMaxLines(4).setEllipsize(TextUtils.TruncateAt.END).build();canvas.save();canvas.translate(80,185);verseLayout.draw(canvas);canvas.restore();
-        paint.setTextSize(36);paint.setColor(GOLD);canvas.drawText(reading.reference,width/2f,545,paint);paint.setTextSize(22);canvas.drawText("@thedaybreath · Faith · Recovery · Hope",width/2f,620,paint);return bitmap;
+        canvas.save();canvas.translate(80,185);verseLayout.draw(canvas);canvas.restore();paint.setTextSize(36);paint.setColor(GOLD);canvas.drawText(reading.reference,width/2f,referenceY,paint);paint.setTextSize(22);canvas.drawText("@thedaybreath · Faith · Recovery · Hope",width/2f,footerY,paint);return bitmap;
     }
     private boolean isRightToLeft(String text){return text.codePoints().anyMatch(codePoint->(codePoint>=0x0590&&codePoint<=0x08FF)||(codePoint>=0xFB1D&&codePoint<=0xFEFC));}
     private void applyPassageDirection(TextView view,String text){boolean rtl=isRightToLeft(text);view.setTextDirection(rtl?View.TEXT_DIRECTION_RTL:View.TEXT_DIRECTION_FIRST_STRONG);view.setGravity(rtl?Gravity.RIGHT:Gravity.LEFT);}
@@ -530,9 +560,28 @@ public final class MainActivity extends Activity {
             narrationPlayer.setOnCompletionListener(player->stopNarration());
             narrationPlayer.setOnErrorListener((player,what,extra)->{stopNarration();runOnUiThread(()->Toast.makeText(this,"Online narration could not be played.",Toast.LENGTH_LONG).show());return true;});
             narrationPlayer.prepareAsync();
-            Toast.makeText(this,"Loading online narration…",Toast.LENGTH_SHORT).show();
-        }catch(Exception error){stopNarration();Toast.makeText(this,"Online narration could not be played.",Toast.LENGTH_LONG).show();}
+            Toast.makeText(this,"Loading narration…",Toast.LENGTH_SHORT).show();
+        }catch(Exception error){stopNarration();Toast.makeText(this,"Narration could not be played.",Toast.LENGTH_LONG).show();}
     }
+    private void prepareNarration(){
+        if(remoteToday==null||!remoteToday.isToday(faith,todayLocale())){Toast.makeText(this,"Sync today’s reading before preparing narration. Try again when the reading is updated.",Toast.LENGTH_LONG).show();refreshTodayContent(true);return;}
+        String date=LocalDate.now().toString(),tradition=faith==Faith.TANAKH?"torah":faith==Faith.QURAN?"quran":"bible",locale=todayLocale();Faith requestedFaith=faith;Reading reading=readingOfTheDay();String script=reading.text.trim()+"\n\n"+reading.reference.trim();String contentHash;try{contentHash=sha256Hex(script);}catch(Exception error){Toast.makeText(this,"Narration could not be prepared.",Toast.LENGTH_LONG).show();return;}
+        File directory=new File(getFilesDir(),"dailybreath-narration");File cached=new File(directory,date+"-"+tradition+"-"+locale+"-"+contentHash.substring(0,16)+".mp3");
+        if(cached.isFile()&&cached.length()>0){playNarration(cached.getAbsolutePath());return;}
+        if(narrationRequestInFlight)return;narrationRequestInFlight=true;Toast.makeText(this,"Preparing narration for offline listening…",Toast.LENGTH_SHORT).show();
+        new Thread(()->{HttpURLConnection api=null,audio=null;File temporary=new File(directory,cached.getName()+".part");try{
+            if(!directory.exists()&&!directory.mkdirs())throw new IllegalStateException("Narration cache unavailable");
+            api=(HttpURLConnection)new URL("https://beyondimagination.co.technology/dailybreath/api/narration.php").openConnection();api.setRequestMethod("POST");api.setConnectTimeout(20000);api.setReadTimeout(60000);api.setDoOutput(true);api.setRequestProperty("Content-Type","application/json");api.setRequestProperty("Accept","application/json");
+            byte[] payload=new JSONObject().put("date",date).put("tradition",tradition).put("locale",locale).put("content_hash",contentHash).toString().getBytes(StandardCharsets.UTF_8);try(OutputStream output=api.getOutputStream()){output.write(payload);}
+            int status=api.getResponseCode();InputStream response=status>=400?api.getErrorStream():api.getInputStream();StringBuilder body=new StringBuilder();if(response!=null)try(BufferedReader reader=new BufferedReader(new InputStreamReader(response,StandardCharsets.UTF_8))){String line;while((line=reader.readLine())!=null)body.append(line);}
+            if(status<200||status>=300)throw new IllegalStateException(new JSONObject(body.toString()).optString("error","Narration is unavailable."));String audioUrl=new JSONObject(body.toString()).optString("audio_url","");if(audioUrl.isEmpty())throw new IllegalStateException("Narration audio is unavailable.");
+            audio=(HttpURLConnection)new URL(audioUrl).openConnection();audio.setConnectTimeout(20000);audio.setReadTimeout(90000);audio.setRequestProperty("Accept","audio/mpeg,application/octet-stream");if(audio.getResponseCode()<200||audio.getResponseCode()>=300)throw new IllegalStateException("Narration download failed.");
+            try(InputStream input=audio.getInputStream();OutputStream output=new java.io.FileOutputStream(temporary)){byte[] buffer=new byte[16384];int read;while((read=input.read(buffer))!=-1)output.write(buffer,0,read);}
+            if(temporary.length()==0)throw new IllegalStateException("Narration audio was empty.");if(cached.exists()&&!cached.delete())throw new IllegalStateException("Could not update narration cache.");if(!temporary.renameTo(cached))throw new IllegalStateException("Could not save narration for offline playback.");
+            runOnUiThread(()->{narrationRequestInFlight=false;if(activityResumed&&tab==0&&date.equals(LocalDate.now().toString())&&faith==requestedFaith&&locale.equals(todayLocale()))playNarration(cached.getAbsolutePath());});
+        }catch(Exception error){temporary.delete();runOnUiThread(()->{narrationRequestInFlight=false;if(activityResumed)Toast.makeText(this,"Narration could not be prepared. Check your connection and try again.",Toast.LENGTH_LONG).show();});}finally{if(api!=null)api.disconnect();if(audio!=null)audio.disconnect();}}).start();
+    }
+    private String sha256Hex(String value)throws Exception{byte[] digest=MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8));StringBuilder result=new StringBuilder(digest.length*2);for(byte item:digest)result.append(String.format(Locale.US,"%02x",item&0xff));return result.toString();}
     private void stopNarration(){if(narrationPlayer!=null){try{narrationPlayer.stop();}catch(Exception ignored){}narrationPlayer.release();narrationPlayer=null;}}
     private DailyVerse dailyVerseFor(LocalDate date){String day=date.toString();for(DailyVerse verse:dailyVerses)if(day.equals(verse.date))return verse;if(!dailyVerses.isEmpty())return dailyVerses.get((int)Math.floorMod(date.toEpochDay(),dailyVerses.size()));return new DailyVerse("Be still, and know that I am God.","Psalm 46:10","");}
     private List<ScriptureVerse> libraryFor(Faith requested){if(requested==Faith.QURAN)return quran;if(requested==Faith.BIBLE)return bible;List<ScriptureVerse> result=new ArrayList<>();for(ScriptureVerse verse:bible)if(TANAKH_CODES.contains(verse.code))result.add(new ScriptureVerse(verse.code,verse.chapter,verse.number,verse.text,bibleReference(verse.code,String.valueOf(verse.chapter),String.valueOf(verse.number),true)));return result;}
@@ -560,8 +609,8 @@ public final class MainActivity extends Activity {
     private void openUrl(String value){try{startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(value)));}catch(Exception error){Toast.makeText(this,"Privacy policy could not be opened.",Toast.LENGTH_LONG).show();}}
     private void showDetail(String heading,String body){page.removeAllViews();title("DAILY BREATH",heading);addBody(body);Button back=action("Back");back.setOnClickListener(v->showTab(tab));page.addView(back,spaced());}
     private void openIntent(Intent intent){if(intent==null||intent.getData()==null)return;String route=intent.getData().getHost();if(route==null)route=intent.getData().getLastPathSegment();if(route==null)return;route=route.toLowerCase(Locale.US);Faith previous=faith;if(route.contains("torah")||route.contains("tanakh"))faith=Faith.TANAKH;else if(route.contains("quran"))faith=Faith.QURAN;else if(route.contains("bible"))faith=Faith.BIBLE;prefs.edit().putString("selected_faith",faith.name()).apply();if(faith!=previous){loadCachedTodayContent();buildLayout();refreshTodayContent();}showTab(route.contains("breathe")?4:route.contains("chat")?2:route.contains("scripture")||route.contains("bible")||route.contains("torah")||route.contains("tanakh")||route.contains("quran")?1:route.contains("academy")?3:route.contains("journal")?5:0);}
-    private void title(String eyebrow,String heading){TextView top=label(eyebrow,12,FOREST,true);top.setLetterSpacing(.12f);page.addView(top);TextView title=label(heading,30,INK,true);title.setPadding(0,dp(8),0,dp(4));page.addView(title);}
-    private void addBody(String text){TextView body=label(text,15,Color.DKGRAY,false);body.setPadding(0,dp(8),0,dp(10));page.addView(body);}
+    private void title(String eyebrow,String heading){boolean immersive=tab==0&&artworkFile()!=null;TextView top=label(eyebrow,12,immersive?GOLD:FOREST,true);top.setLetterSpacing(.12f);page.addView(top);TextView title=label(heading,30,immersive?Color.WHITE:INK,true);title.setPadding(0,dp(8),0,dp(4));page.addView(title);}
+    private void addBody(String text){boolean immersive=tab==0&&artworkFile()!=null;TextView body=label(text,15,immersive?Color.WHITE:Color.DKGRAY,false);body.setPadding(0,dp(8),0,dp(10));page.addView(body);}
     private TextView label(String text,float sp,int color,boolean bold){TextView view=new TextView(this);view.setText(tr(text));view.setTextSize(sp);view.setTextColor(color==Color.DKGRAY?bodyInk:color);view.setLineSpacing(0,1.15f);view.setTypeface(Typeface.DEFAULT,bold?Typeface.BOLD:Typeface.NORMAL);return view;}
     private Button action(String text){Button button=new Button(this);button.setText(tr(text));button.setAllCaps(false);button.setTextSize(15);button.setTextColor(themeId.equals("quranMoon")?CREAM:Color.WHITE);button.setTypeface(Typeface.DEFAULT,Typeface.BOLD);button.setBackground(round(FOREST,16));button.setPadding(dp(14),dp(11),dp(14),dp(11));button.setContentDescription(tr(text));return button;}
     private LinearLayout card(int color){LinearLayout card=new LinearLayout(this);card.setOrientation(LinearLayout.VERTICAL);card.setPadding(dp(20),dp(20),dp(20),dp(20));card.setBackground(round(color==Color.WHITE?surface:color,22));return card;}

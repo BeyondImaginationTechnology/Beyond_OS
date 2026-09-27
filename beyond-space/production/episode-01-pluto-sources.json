@@ -1,0 +1,20 @@
+{
+  "series": "DAILY SPACE FACTS",
+  "episode_number": "1/55",
+  "episode_title": "Pluto",
+  "sources": [
+    {
+      "title": "Pluto Facts — NASA Science",
+      "url": "https://science.nasa.gov/dwarf-planets/pluto/facts/"
+    },
+    {
+      "title": "Pluto Moons — NASA Science",
+      "url": "https://science.nasa.gov/dwarf-planets/pluto/moons/"
+    },
+    {
+      "title": "Pluto and Charon: Barycentric View — NASA",
+      "url": "https://science.nasa.gov/photojournal/pluto-and-charon-in-color-barycentric-view-animation/"
+    }
+  ],
+  "footer": "Science sources • Links shown for fact checking • Beyond Space TV"
+}

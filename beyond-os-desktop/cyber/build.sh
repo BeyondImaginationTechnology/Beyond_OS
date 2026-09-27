@@ -49,11 +49,11 @@ if [[ "$action" == build ]]; then
         sha256sum bzImage rootfs.ext2 > SHA256SUMS
     )
     cp "$output/.config" "$output/images/beyond-cyber.config"
-    printf 'BIT OS Cyber 1.0 images: %s/images\n' "$output"
+    printf 'BIT OS Cyber 0.1 images: %s/images\n' "$output"
 elif [[ "$action" == installer ]]; then
-    test -s "$output/images/bit-os-cyber-1.0-installer.img"
+    test -s "$output/images/bit-os-cyber-0.1-installer.img"
     test -s "$output/images/bitCyberos.iso"
     test -s "$output/images/SHA256SUMS"
     cp "$output/.config" "$output/images/beyond-cyber-installer.config"
-    printf 'BIT OS Cyber 1.0 UEFI installer candidate: %s/images\n' "$output"
+    printf 'BIT OS Cyber 0.1 UEFI installer candidate: %s/images\n' "$output"
 fi

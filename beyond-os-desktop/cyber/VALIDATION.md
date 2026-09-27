@@ -1,6 +1,14 @@
-# BIT OS Cyber validation — 2026-09-13
+# BIT OS Cyber 0.1 validation — 2026-09-26
 
-Status: **source candidate repaired and locally preflighted; Linux build, UEFI boot, installation, and security behavior remain unverified.**
+Status: **0.1 identity and post-build preflight pass; the installer build is running on the GCP test VM. UEFI boot and public download availability remain pending.**
+
+## Cyber 0.1 build checkpoint — 2026-09-26
+
+- Cyber product identity, on-screen version, installer name, and release paths now use 0.1 / `cyber-0.1-dev.1`.
+- `python3 tests/post-build-test.py` passed on `bit-os-core-test-a` before the installer build.
+- The installer build is running with `BR2_JLEVEL=2` in `/home/goldenghostog/cyber-v0.1-work/cyber/out/installer-output`; log: `/home/goldenghostog/cyber-v0.1-build.log`.
+- Buildroot host GCC is compiling. The only messages found so far are optional missing `makeinfo` documentation notices; no build failure has occurred.
+- Public files are intended for `/releases/cyber/0.1/` as compressed ISO and GPT image with a SHA-256 manifest. The host currently serves the Core release files but has no known upload credentials from this workspace.
 
 ## Completed in this workspace
 
@@ -31,10 +39,12 @@ Retain the build logs and the complete `output/images` and `installer-output/ima
 After the applicable release gates pass, publish the verified candidate files together:
 
 ```text
-/releases/cyber/1.0/bitCyberos.iso
-/releases/cyber/1.0/bit-os-cyber-1.0-installer.img
-/releases/cyber/1.0/SHA256SUMS
-/releases/cyber/1.0/BITOSInstaller.exe
+/releases/cyber/0.1/bitCyberos.iso.gz
+/releases/cyber/0.1/bit-os-cyber-0.1-installer.img.gz
+/releases/cyber/0.1/SHA256SUMS
 ```
 
-Do not set the Cyber profile in `windows-installer/Program.cs` to `Available = true` until the image and manifest return successfully from those public URLs.
+The Windows USB creator is not part of this initial 0.1 candidate download set.
+Do not enable the Cyber profile in `windows-installer/Program.cs` until its
+unsigned status is resolved and the image and manifest return successfully
+from the public URLs.

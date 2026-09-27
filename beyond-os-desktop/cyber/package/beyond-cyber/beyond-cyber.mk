@@ -1,7 +1,7 @@
 ################################################################################
 # BIT OS Cyber
 ################################################################################
-BEYOND_CYBER_VERSION = 1.0.0-dev.1
+BEYOND_CYBER_VERSION = 0.1.0-dev.1
 BEYOND_CYBER_SITE = $(BR2_EXTERNAL_BEYOND_CYBER_PATH)/src
 BEYOND_CYBER_SITE_METHOD = local
 BEYOND_CYBER_LICENSE = MIT (code), proprietary (artwork)

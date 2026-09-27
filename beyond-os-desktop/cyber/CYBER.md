@@ -1,4 +1,4 @@
-# BIT OS Cyber 1.0
+# BIT OS Cyber 0.1
 
 BIT OS Cyber is a defensive Linux workstation for security-aware users,
 education, incident review, and privacy-preserving local work. It is a separate
@@ -17,7 +17,7 @@ product from BIT OS Home and shares only the upstream-built platform foundation.
 
 ## Intentional limits
 
-Cyber 1.0 is a defensive workstation, not an offensive toolkit. It does not
+Cyber 0.1 is a defensive workstation, not an offensive toolkit. It does not
 ship exploit frameworks, credential collection tools, persistence tooling, or
 automated scanning against third-party systems. Any future diagnostic feature
 must be local-first, visible to the user, and documented before inclusion.

@@ -5,8 +5,10 @@ Native Android companion to `DailyBreathApple`, built with Java 17 and the Andro
 ## Android 2.3 update
 
 - Sync the selected day, tradition, and language from the Daily Breath daily-content API, with a date-specific on-device cache and bundled offline fallback
-- Stream published narrations online from the approved daily-content package; audio is not downloaded for offline playback
+- Prepare daily Bible, Tanakh, and Quran narration on demand and save the MP3 on device for offline replay
 - Share a public reading link or export a branded scripture card using the selected scripture artwork theme
+- Choose English or the original-language reading for Tanakh and Quran on Today; the choice also updates the home-screen widget
+- Preserve complete passages in exported cards, letting the image grow for longer readings
 - Keep a person’s chosen appearance when they switch traditions; add Seasonal, Bible Forest, Tanakh Navy & Gold, and Quran Emerald & Gold themes
 - Render Hebrew and Arabic daily passages right-to-left and keep reading text selectable
 - Add a resizable home-screen reading widget that follows the selected tradition, theme, and synced daily passage
@@ -20,6 +22,8 @@ Native Android companion to `DailyBreathApple`, built with Java 17 and the Andro
 - Peace Breath session with phase cues, pause/repeat, and persisted daily completion
 - Shared `dailybreath://today`, `dailybreath://breathe`, `dailybreath://scripture`, `dailybreath://chat`, `dailybreath://academy`, and `dailybreath://journal` deep links
 - Material-friendly forest visual language matching the web and iOS apps
+
+Narration requires a server-side ElevenLabs API key and a configured voice for the requested locale in Daily Breath Premium Voices. A tap on Today prepares that passage’s MP3 once; the server shares its cached recording across clients, and Android keeps a private on-device copy for offline replay. The app does not include the provider key.
 - Saved first-launch interface selection for English, French, and Spanish
 
 ## Build

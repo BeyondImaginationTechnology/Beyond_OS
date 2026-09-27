@@ -7,6 +7,17 @@ if ($studio && $studio['slug'] === 'beyond-studio-nanaimo') { $studio['city'] = 
 if (!$studio) { http_response_code(404); $pageTitle='Studio not found — Beyond Tattoo'; require __DIR__.'/includes/header.php'; echo '<main class="container dashboard"><div class="panel"><h1>Studio not found</h1><a href="studios.php">Back to studios</a></div></main>'; require __DIR__.'/includes/footer.php'; exit; }
 $artists = bt_list_artists((int)$studio['id']);
 $pageTitle = $studio['name'] . ' — Beyond Tattoo';
+$seoLocation = implode(', ', array_filter([
+    trim((string)($studio['city'] ?? '')),
+    trim((string)($studio['province'] ?? '')),
+]));
+$pageDescription = sprintf(
+    'Explore %s in %s. See studio details, listed artists, contact options, and booking information on Beyond Tattoo.',
+    trim((string)$studio['name']),
+    $seoLocation !== '' ? $seoLocation : 'the Beyond Tattoo community'
+);
+$pageCanonical = 'https://beyondimagination.co.technology'
+    . bt_app_url('studio-profile.php?slug=' . rawurlencode((string)$studio['slug']));
 require __DIR__ . '/includes/header.php';
 $mapQuery = rawurlencode(trim($studio['address_line1'] . ', ' . $studio['city'] . ', ' . $studio['province'] . ' ' . $studio['postal_code']));
 $studioWebsite = trim((string)($studio['website_url'] ?? '')) ?: (string)$studio['instagram_url'];

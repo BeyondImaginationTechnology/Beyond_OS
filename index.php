@@ -147,7 +147,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
         <p class="intro">Useful apps for wellness, learning, creator commerce and entertainment—connected through Beyond ID. BIT OS is the planned operating-environment layer for home, learning, creating and organizational work.</p>
         <div class="hero-actions">
             <a class="primary" href="https://ai.beyondimagination.co.technology/">Explore AI &nbsp;→</a>
-            <a class="ghost" href="/app-store/">Open the App Store →</a>
+            <a class="ghost" href="https://os.beyondimagination.co.technology/">Install OS ▶</a>
         </div>
         <div class="benefits"><span><b>∞</b> Every possibility, connected</span></div>
     </div>
@@ -282,7 +282,7 @@ $homeLiveControls = [
     'classic-cinema' => ['theme'=>'cinema','endpoint'=>'/beyond-tv/api/movies-live.php','embed'=>'/beyond-tv/movie-player.php','icon'=>'clapperboard','now'=>'Loading the live feature...','next'=>'Next movie loading','sync'=>'7200000'],
     'beyond-comedy' => ['theme'=>'comedy','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=beyond-comedy','embed'=>'/beyond-tv/embed-player.php?slug=beyond-comedy','icon'=>'laugh','now'=>'Loading the live program...','next'=>'Live schedule connecting'],
     'beyond-family' => ['theme'=>'family','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=beyond-family','embed'=>'/beyond-tv/embed-player.php?slug=beyond-family','icon'=>'sparkles','now'=>'Loading the live program...','next'=>'Live schedule connecting'],
-    'bubble-guppies' => ['theme'=>'preschool','endpoint'=>'/beyond-tv/api/bluey-live.php','embed'=>'https://www.youtube-nocookie.com/embed/61fSXCbzF1M?autoplay=1&mute=1&playsinline=1&rel=0&enablejsapi=1','icon'=>'paw-print','now'=>"English preschool demo",'next'=>"Bluey, Blue's Clues and more"],
+    'bubble-guppies' => ['theme'=>'preschool','endpoint'=>'/beyond-tv/api/bluey-live.php','icon'=>'paw-print','now'=>'Loading the preschool schedule...','next'=>'Next preschool program loading'],
     'preschool-francais' => ['theme'=>'preschool-fr','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=preschool-francais','embed'=>'/beyond-tv/embed-player.php?slug=preschool-francais','icon'=>'languages','now'=>'Caillou en francais','next'=>'Histoires educatives en francais'],
     'space-tv' => ['theme'=>'space','endpoint'=>'/beyond-tv/api/space-live.php','icon'=>'satellite','now'=>'The Sun & The Milky Way','next'=>'Weekly space rotation'],
     'beyond-health' => ['theme'=>'health','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=beyond-health','icon'=>'heart-pulse'],
@@ -308,6 +308,7 @@ $homeLiveControls = [
 
     <div class="home-live-player">
       <iframe id="homeBeyondTvPlayer" src="/beyond-tv/embed-player.php?slug=beyond-after-dark" title="Beyond After Dark live on Beyond TV" allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <video id="homeBeyondTvVideo" controls autoplay muted playsinline preload="metadata" hidden></video>
     </div>
 
     <div class="home-live-meta">
@@ -352,13 +353,15 @@ $homeLiveControls = [
 @media(max-width:800px){.home-live-stage{width:calc(100vw - 12px);border-radius:23px;margin-bottom:32px}.home-live-stage__inner{padding:14px}.home-live-stage__top{align-items:flex-start;flex-direction:column;margin-bottom:14px}.home-live-actions{width:100%}.home-live-button{flex:1}.home-live-player{aspect-ratio:16/9;border-radius:16px}.home-live-meta{align-items:flex-start;flex-direction:column}.home-live-switch{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 1px 8px}.home-live-switch button{min-width:102px;scroll-snap-align:start}.home-shortcuts{grid-template-columns:1fr}}
 @media(max-width:480px){.home-live-stage h2{font-size:34px}.home-live-stage__top p{font-size:13px}.home-live-actions{display:grid;grid-template-columns:1fr 1fr}.home-live-button{padding:0 10px}.home-live-player{aspect-ratio:16/10}.home-live-clock{display:none}}
 html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .home-shortcuts a{background:rgba(255,255,255,.82);border-color:rgba(26,31,54,.14)}html[data-theme="light"] .home-shortcuts small{color:#5e667a}
+.home-live-player video{display:block;width:100%;height:100%;border:0;background:#000}.home-live-player iframe[hidden],.home-live-player video[hidden]{display:none}
 </style>
 
 <script>
 (function(){
  const frame=document.getElementById('homeBeyondTvPlayer');
+ const video=document.getElementById('homeBeyondTvVideo');
  const stage=document.querySelector('.home-live-stage');
- if(!frame||!stage)return;
+ if(!frame||!video||!stage)return;
  const buttons=[...stage.querySelectorAll('[data-home-channel]')];
  const name=document.getElementById('homeLiveChannelName');
  const now=document.getElementById('homeLiveNow');
@@ -386,18 +389,47 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
    stage.dataset.channelTheme=button.dataset.homeChannel||'cartoons';
    const channelName=button.dataset.channelName||'Beyond TV';
    const channelNumber=button.dataset.channelNumber||'';
-   const current=state.current||state.playing||{};
-   const next=state.next||{};
-   const block=current.title||state.episode_title||button.dataset.now||state.programme||'Live now';
-   const lineup=current.lineup||(!current.title?button.dataset.now:'')||state.episode_title||'';
-   const upNext=next.title||button.dataset.next||'';
-   const iconName=button.dataset.iconName||'tv';
-   const embed=state.player_url||state.embed_url||button.dataset.embed||'';
-   if(embed){
-     const withApi=/youtube(?:-nocookie)?\.com/.test(embed)&&!embed.includes('enablejsapi=1')?embed+(embed.includes('?')?'&':'?')+'enablejsapi=1':embed;
-     const nextSrc=new URL(withApi,window.location.href).href;
-     if(frame.src!==nextSrc)frame.src=nextSrc;
-   }
+    const channelState=state.channel||{};
+    const current=state.current||state.playing||{};
+    const next=state.next||{};
+    const source=Array.isArray(state.sources)?state.sources[0]:null;
+    const block=current.title||state.episode_title||channelState.programme||state.programme||button.dataset.now||'Live now';
+    const lineup=current.lineup||state.episode_title||'';
+    const upNext=next.title||channelState.up_next||state.up_next||button.dataset.next||'';
+    const iconName=button.dataset.iconName||'tv';
+    const sourceType=String(source?.type||'').toLowerCase();
+    let embed=sourceType==='youtube'?source.url:(state.player_url||state.embed_url||button.dataset.embed||'');
+    if(sourceType==='youtube'&&embed){
+      const scheduledUrl=new URL(embed,window.location.href);
+      const offset=Math.max(0,Math.floor(Number(state.start_offset||0)));
+      if(offset)scheduledUrl.searchParams.set('start',String(offset));
+      embed=scheduledUrl.href;
+    }
+    const directVideo=source&&sourceType!=='youtube'?source.url:'';
+    if(directVideo){
+      frame.hidden=true;
+      video.hidden=false;
+      const nextSrc=new URL(directVideo,window.location.href).href;
+      if(video.src!==nextSrc){
+        video.src=nextSrc;
+        video.addEventListener('loadedmetadata',()=>{
+          const offset=Math.max(0,Number(state.start_offset||0));
+          if(offset&&Number.isFinite(video.duration)&&offset<video.duration)video.currentTime=offset;
+        },{once:true});
+      }
+      video.play().catch(()=>{});
+    }else if(embed){
+      video.pause();
+      video.hidden=true;
+      frame.hidden=false;
+      const withApi=/youtube(?:-nocookie)?\.com/.test(embed)&&!embed.includes('enablejsapi=1')?embed+(embed.includes('?')?'&':'?')+'enablejsapi=1':embed;
+      const nextSrc=new URL(withApi,window.location.href).href;
+      if(frame.src!==nextSrc)frame.src=nextSrc;
+    }
+    if(source?.duration){
+      const remaining=Math.max(60,Number(source.duration)-Math.max(0,Number(state.start_offset||0)));
+      button.dataset.syncMs=String(remaining*1000);
+    }
    const sourceKey=String(state.source_key||current.source_key||'');
    if(sourceKey)button.dataset.streamKey=sourceKey;
    name.textContent=channelName;
@@ -508,7 +540,7 @@ window.addEventListener('DOMContentLoaded',()=>{
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&drawer.classList.contains('is-open'))setOpen(false);});
 })();
 </script>
-<script src="/beyond-tv/assets/js/app.js?v=3.0.2"></script>
+<script src="/beyond-tv/assets/js/app.js?v=3.0.3"></script>
 </main>
 <footer class="footer wrap">
     <div><a class="brand" href="./">BEYOND <span>IMAGINATION</span></a><p>Technology for the connected imagination ecosystem.</p><p class="copyright">© 2026 Beyond Imagination Technology.</p></div>

@@ -4,8 +4,8 @@ Native Android web-app shell for the canonical Beyond TV experience.
 
 ## Release
 
-- Version name: `1.1.0`
-- Version code: `110`
+- Version name: `2.001`
+- Version code: `2001`
 - Application ID: `technology.co.beyondimagination.beyondtv`
 - Minimum Android version: Android 8.0 (API 26)
 - Target/compile SDK: API 37

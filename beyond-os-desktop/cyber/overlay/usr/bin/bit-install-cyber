@@ -31,7 +31,7 @@ case "$source_root" in
     ;;
 esac
 
-notice "BIT OS Cyber Edition 1.0 installer"
+notice "BIT OS Cyber Edition 0.1 installer"
 notice "Choose where Cyber will be installed. The installer never chooses a disk automatically."
 notice "\nAvailable block devices:"
 lsblk -o NAME,SIZE,TYPE,FSTYPE,PARTTYPE,MODEL,MOUNTPOINTS

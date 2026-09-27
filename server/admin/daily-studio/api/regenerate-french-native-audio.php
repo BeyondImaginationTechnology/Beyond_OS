@@ -11,6 +11,8 @@ header('Cache-Control: private, no-store');
 const FRENCH_NATIVE_AUDIO_BATCH = 'native-speakers-2026-09-elevenlabs-v3';
 const FRENCH_LOUIS_AUDIO_BATCH = 'louis-florian-2026-09-elevenlabs-v3';
 const FRENCH_PABLO_MATEO_VOICE_ID = '00uevfcKk0GtPlbU69ZH';
+const FRENCH_JAZZY_HAITIAN_CREOLE_VOICE_ID = 'ELf3eScSrJr0jn1jDw8T';
+const FRENCH_IRIE_ANNAKAY_VOICE_ID = 'RRIjxt3K1iKEkfsLGRXU';
 const FRENCH_CHARACTER_VOICES = [
     'fr-FR' => 'Louis',
     'es-ES' => 'Pablo',
@@ -52,9 +54,12 @@ function frenchNativeCharacterVoices(): array
 {
     $profiles = [];
     foreach (FRENCH_CHARACTER_VOICES as $locale => $character) {
-        $voice = $locale === 'es-ES'
-            ? beyond_config('narration.elevenlabs.character_voices.pablo', FRENCH_PABLO_MATEO_VOICE_ID)
-            : beyond_config('narration.elevenlabs.voices.' . $locale, beyond_config('voice.voices.' . $locale, ''));
+        $voice = match ($locale) {
+            'es-ES' => beyond_config('narration.elevenlabs.character_voices.pablo', FRENCH_PABLO_MATEO_VOICE_ID),
+            'ht-HT' => beyond_config('narration.elevenlabs.character_voices.jazzy', FRENCH_JAZZY_HAITIAN_CREOLE_VOICE_ID),
+            'en-JM' => beyond_config('narration.elevenlabs.character_voices.irie', FRENCH_IRIE_ANNAKAY_VOICE_ID),
+            default => beyond_config('narration.elevenlabs.voices.' . $locale, beyond_config('voice.voices.' . $locale, '')),
+        };
         $profiles[$locale] = ['character' => $character, 'voice_id' => trim((string)$voice)];
     }
     return $profiles;

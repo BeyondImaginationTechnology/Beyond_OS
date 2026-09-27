@@ -41,9 +41,12 @@ try {
     $characterProfiles = ['fr-FR' => 'Louis', 'es-ES' => 'Pablo', 'en-JM' => 'Irie', 'ht-HT' => 'Jazzy'];
     $configuredCharacterVoices = [];
     foreach ($characterProfiles as $locale => $character) {
-        $voice = $locale === 'es-ES'
-            ? beyond_config('narration.elevenlabs.character_voices.pablo', '00uevfcKk0GtPlbU69ZH')
-            : beyond_config('narration.elevenlabs.voices.' . $locale, beyond_config('voice.voices.' . $locale, ''));
+        $voice = match ($locale) {
+            'es-ES' => beyond_config('narration.elevenlabs.character_voices.pablo', '00uevfcKk0GtPlbU69ZH'),
+            'ht-HT' => beyond_config('narration.elevenlabs.character_voices.jazzy', 'ELf3eScSrJr0jn1jDw8T'),
+            'en-JM' => beyond_config('narration.elevenlabs.character_voices.irie', 'RRIjxt3K1iKEkfsLGRXU'),
+            default => beyond_config('narration.elevenlabs.voices.' . $locale, beyond_config('voice.voices.' . $locale, '')),
+        };
         $voice = is_string($voice) ? trim($voice) : '';
         $configuredCharacterVoices[$locale] = $voice;
     }

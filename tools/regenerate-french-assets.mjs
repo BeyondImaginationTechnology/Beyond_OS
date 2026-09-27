@@ -7,8 +7,8 @@
 // PowerShell example:
 //   $env:ELEVENLABS_API_KEY='...'
 //   $env:ELEVENLABS_COMMERCIAL_LICENSE='1'
-//   $env:ELEVENLABS_VOICE_HT_HT='PEjMkBhSB6492eADs4Ew' # Wesly
-//   $env:ELEVENLABS_VOICE_EN_JM='mrDMz4sYNCz18XYFpmyV' # Nicole - Rich and Expressive
+//   $env:ELEVENLABS_VOICE_HT_HT='ELf3eScSrJr0jn1jDw8T' # Haitian Creole female
+//   $env:ELEVENLABS_VOICE_EN_JM='RRIjxt3K1iKEkfsLGRXU' # Annakay
 //   $env:ELEVENLABS_VOICE_ES_ES='<native Spanish voice id>'
 //   node tools/regenerate-french-assets.mjs --scope=lessons,quest
 
@@ -32,8 +32,8 @@ const voices = {
   // Saved Studio voice for French and Spanish; override per locale when needed.
   'fr-FR': env('ELEVENLABS_VOICE_FR_FR', 'hpp4J3VqNfWAUOO0d1Us'),
   'es-ES': env('ELEVENLABS_VOICE_ES_ES', 'hpp4J3VqNfWAUOO0d1Us'),
-  'ht-HT': env('ELEVENLABS_VOICE_HT_HT', 'PEjMkBhSB6492eADs4Ew'), // Wesly
-  'en-JM': env('ELEVENLABS_VOICE_EN_JM', 'mrDMz4sYNCz18XYFpmyV'), // Nicole - Rich and Expressive
+  'ht-HT': env('ELEVENLABS_VOICE_HT_HT', 'ELf3eScSrJr0jn1jDw8T'), // Haitian Creole female
+  'en-JM': env('ELEVENLABS_VOICE_EN_JM', 'RRIjxt3K1iKEkfsLGRXU'), // Annakay
   'ln-CD': env('ELEVENLABS_VOICE_LN_CD', 'PEjMkBhSB6492eADs4Ew'), // Wesly
   'ar-MA': env('ELEVENLABS_VOICE_AR_MA'),
   'ar-EG': env('ELEVENLABS_VOICE_AR_EG'),

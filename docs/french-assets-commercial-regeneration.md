@@ -11,9 +11,11 @@ The batch is intentionally fail-closed:
 - `ELEVENLABS_COMMERCIAL_LICENSE=1` is required as an explicit acknowledgement
   that the current ElevenLabs account permits commercial use.
 - The saved Studio voice (`hpp4J3VqNfWAUOO0d1Us`) is used for French and
-  Spanish unless overridden. **Wesly** (`PEjMkBhSB6492eADs4Ew`) is used for
-  Haitian Kreyòl and Lingala, and **Nicole – Rich and Expressive**
-  (`mrDMz4sYNCz18XYFpmyV`) for Jamaican Patois. Override any locale with its
+  Spanish unless overridden. Jazzy uses ElevenLabs’ dedicated **Haitian Creole**
+  female voice (`ELf3eScSrJr0jn1jDw8T`) for Haitian Kreyòl, while Irie uses
+  **Annakay** (`RRIjxt3K1iKEkfsLGRXU`) for
+  Jamaican Patois, and **Wesly** (`PEjMkBhSB6492eADs4Ew`) is retained for
+  Lingala. Override any locale with its
   `ELEVENLABS_VOICE_*` variable when a different approved speaker is required.
 - Euro-African tracks additionally require `ELEVENLABS_VOICE_AR_MA`,
   `ELEVENLABS_VOICE_AR_EG`, and `ELEVENLABS_VOICE_SW_KE`.

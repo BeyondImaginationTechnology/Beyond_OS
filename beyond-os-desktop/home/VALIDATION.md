@@ -162,6 +162,9 @@ historical builds and are not the current downloads.
   `f965ba269bb4ae9dabb0791db1d4132993695489cf8bbb051824adda92c63dd2`,
   `bit-os-home-0.2-installer.img.gz` SHA-256
   `4c2fb33b77a62aa7d0c2d4f42fb45034d0d892f4adbbbd0e1827a127d9fce475`.
+- Copied both compressed files and `SHA256SUMS` from the build VM into local
+  release staging. Their SHA-256 hashes match the manifest; complete streamed
+  decompression reproduced the expected raw artifact sizes and SHA-256 hashes.
 - Fresh OVMF UEFI boot displayed both GRUB entries as Home v0.2. The Try entry
   reached the 1280×720 desktop with the movie-night wallpaper, desktop folders,
   and rainforest taskbar. The boot splash displayed `HOME EDITION v0.2`.

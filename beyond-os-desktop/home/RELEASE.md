@@ -2,6 +2,16 @@
 
 The current work is `home-0.2-dev.1`. Passing source checks is not a successful boot.
 
+## Home v0.2 candidate publication status
+
+- The website source and validation record are pushed to `main`.
+- The compressed ISO and installer image pass manifest hashes and full
+  decompression checks. They are staged outside Git for separate upload.
+- The production site still shows Home as preparing. HostDeal transfer ports
+  are refusing connections, and the site deployment settings route currently
+  returns HTTP 500. Do not treat the candidate page or downloads as live until
+  the release files are uploaded and the public URLs are verified.
+
 ## Foundation acceptance
 
 - [ ] Complete a clean build on Linux using the locked source archive.

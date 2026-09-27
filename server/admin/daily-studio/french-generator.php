@@ -37,9 +37,17 @@ try {
         : ($elevenLabsReady ? 'elevenlabs' : 'openai');
     $defaultNarrationProvider = $provider;
     $providerConfigured = $provider === 'elevenlabs' ? $elevenLabsReady : $openaiReady;
-    foreach (['fr-FR' => 'Louis', 'es-ES' => 'Pablo', 'en-JM' => 'Irie', 'ht-HT' => 'Jazzy'] as $locale => $character) {
+    $characterProfiles = ['fr-FR' => 'Louis', 'es-ES' => 'Pablo', 'en-JM' => 'Irie', 'ht-HT' => 'Jazzy'];
+    $configuredCharacterVoices = [];
+    foreach ($characterProfiles as $locale => $character) {
         $voice = beyond_config('narration.elevenlabs.voices.' . $locale, beyond_config('voice.voices.' . $locale, ''));
-        $characterVoiceLocales[$locale] = $elevenLabsReady && is_string($voice) && trim($voice) !== '';
+        $voice = is_string($voice) ? trim($voice) : '';
+        $configuredCharacterVoices[$locale] = $voice;
+    }
+    foreach ($characterProfiles as $locale => $character) {
+        $voice = $configuredCharacterVoices[$locale];
+        $matches = $voice === '' ? [] : array_keys($configuredCharacterVoices, $voice, true);
+        $characterVoiceLocales[$locale] = $elevenLabsReady && $voice !== '' && count($matches) === 1;
         if ($characterVoiceLocales[$locale]) $characterVoiceNames[] = $character;
     }
 } catch (Throwable $error) {

@@ -2,7 +2,7 @@
 
 The startup screen matches Core's jaguar-eye shield, layout, and title. Home
 uses an emerald green light variant of Core's blue mark, saved as
-`bit-os-home-logo-v0.1.png`, with Home v0.1 edition typography. `boot.ppm` is
+`bit-os-home-logo-v0.2.png`, with Home v0.2 edition typography. `boot.ppm` is
 the actual RGB framebuffer asset.
 `boot-preview.png` shows it centered on a 1440 × 900 display; it is an artwork
 preview, not evidence of a booted VM. The three dots are decorative, not a

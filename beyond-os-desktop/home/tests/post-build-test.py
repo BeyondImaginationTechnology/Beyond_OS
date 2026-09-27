@@ -20,10 +20,10 @@ with tempfile.TemporaryDirectory(prefix="beyond-home-hook-") as temporary:
                     target.as_posix()], check=True)
     identity = (target / "etc/os-release").read_text()
     assert 'ID=beyond-os\n' in identity
-    assert 'PRETTY_NAME="BIT OS Home v0.1 (Development Candidate)"' in identity
+    assert 'PRETTY_NAME="BIT OS Home v0.2 (Development Candidate)"' in identity
     assert (target / "usr/lib/os-release").read_text() == identity
     assert not (target / "etc/init.d/S40xorg").exists()
     assert (target / "etc/init.d/S99beyond-home").exists()
     assert (target / "home/home/Documents/Welcome.txt").exists()
-    assert (target / "etc/issue").read_text().startswith("BIT OS Home v0.1")
+    assert (target / "etc/issue").read_text().startswith("BIT OS Home v0.2")
 print("PASS: target identity, single display startup, and welcome document")

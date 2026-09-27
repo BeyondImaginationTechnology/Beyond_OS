@@ -11,7 +11,7 @@ args = parser.parse_args()
 root = Path(__file__).resolve().parents[1]
 (root / "assets").mkdir(exist_ok=True)
 core_mark = root.parent / "core/assets/bit-os-core-logo-v0.2.png"
-home_mark = root / "assets/bit-os-home-logo-v0.1.png"
+home_mark = root / "assets/bit-os-home-logo-v0.2.png"
 
 # Preserve the Core mark except for its blue light. Silver metal and black
 # jaguar detail stay unchanged while blue/cyan light becomes emerald green.
@@ -46,7 +46,7 @@ def text(value, y, size, color):
     font = ImageFont.truetype(str(args.font), size * scale)
     d.text(xy(320, y), value, font=font, fill=color, anchor="mt")
 text("Beyond Imagination OS", 193, 29, (245, 247, 255))
-text("HOME EDITION  v0.1", 250, 12, (163, 175, 200))
+text("HOME EDITION  v0.2", 250, 12, (163, 175, 200))
 for index in range(3):
     x = 307 + index * 13
     d.ellipse([xy(x - 2, 309), xy(x + 2, 313)], fill=(79, 185 + index * 18, 147))

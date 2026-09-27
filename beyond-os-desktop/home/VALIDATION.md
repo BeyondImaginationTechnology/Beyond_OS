@@ -1,7 +1,13 @@
-# Home v0.1 validation — 2026-09-26
+# Home v0.2 validation — 2026-09-26
 
-Status: **Home v0.2 desktop candidate built and booted to the Home desktop under QEMU/OVMF UEFI.**
-This is a VM acceptance result, not a release sign-off.
+Status: **Home 0.2 development candidate built and booted under QEMU/OVMF UEFI.**
+This is not a production release. The browser remains blank, installation to a
+target disk was not completed, media playback and hardware acceptance remain
+unverified.
+
+The latest v0.2 artifact hashes and boot results are recorded in the
+“Home v0.2 release identity rebuild” section below. Earlier hash entries are
+historical builds and are not the current downloads.
 
 ## Initial Home 0.1 full image build
 
@@ -95,7 +101,7 @@ This is a VM acceptance result, not a release sign-off.
   [assets/home-qemu-uefi.png](assets/home-qemu-uefi.png). The GCP test VM stays
   running for interactive testing.
 
-## Home 0.2 desktop personalization — 2026-09-26
+## Historical Home 0.2 UI preview before identity rebuild — 2026-09-26
 
 - Rebuilt Beyond Home 0.2.0-dev.1 with the existing Buildroot output on
   `bit-os-core-test-a`. The Home package compiled with `-std=c11 -Wall -Wextra
@@ -130,6 +136,43 @@ This is a VM acceptance result, not a release sign-off.
   hardware graphics and input, and real hardware boot remain unverified.
 - These are unsigned development images. Do not publish them as a production
   download before the remaining checks in `RELEASE.md`.
+
+## Home v0.2 release identity rebuild — 2026-09-26
+
+- Updated the edition identity to `home-0.2-dev.1` across the boot splash,
+  operating-system release metadata, desktop About panel, GRUB menus, installer,
+  and generated GPT image name. The previous verified image files still carried
+  v0.1 identity and are not the v0.2 release artifacts.
+- Completed the clean identity rebuild on `bit-os-core-test-a` using
+  Buildroot 2026.02.3 and `BR2_JLEVEL=2`. The build log is
+  `/home/goldenghostog/home-v0.2-build.log` on the VM. The Home package
+  integration check passed; the build generated the ISO, root filesystem, and
+  GPT installer image.
+- `bitHomeos.iso`: 354,426,880 bytes; `file` identifies a bootable ISO 9660
+  image. SHA-256: `bb916505624ac46eb7ed7e6fb4c363893174e3080a244a11ec570e8154dbf1e2`.
+- `bit-os-home-0.2-installer.img`: 2,182,107,136 bytes; `file` identifies an
+  MBR image with a protective GPT record. SHA-256:
+  `0d04be52a4ef9107ad8c036529947656b1e3a4ece872469fc7dd0132ad9ad078`.
+- `rootfs.ext2`: 2,147,483,648 bytes; SHA-256:
+  `dabd8b285e102fc91d70ab7f788b9d845fb106456903ccccdd7aeae37136bda0`.
+  All three raw artifact entries passed `sha256sum -c`.
+- Deterministic gzip downloads were generated with `gzip -1n` and verified:
+  `bitHomeos.iso.gz` SHA-256
+  `f965ba269bb4ae9dabb0791db1d4132993695489cf8bbb051824adda92c63dd2`,
+  `bit-os-home-0.2-installer.img.gz` SHA-256
+  `4c2fb33b77a62aa7d0c2d4f42fb45034d0d892f4adbbbd0e1827a127d9fce475`.
+- Fresh OVMF UEFI boot displayed both GRUB entries as Home v0.2. The Try entry
+  reached the 1280×720 desktop with the movie-night wallpaper, desktop folders,
+  and rainforest taskbar. The boot splash displayed `HOME EDITION v0.2`.
+- The installer entry reached the text installer and enumerated only the ISO
+  (`/dev/sr0`) and a 5 GiB disposable QEMU disk (`/dev/vda`). The test did not
+  complete target selection or write an installation; no installed-disk boot
+  is claimed.
+- Browser launch produced a MiniBrowser window, but its page remained blank at
+  the configured Home site. Browser navigation is still a release blocker.
+  Media playback/audio, notes persistence, graphics/input hardware, and real
+  hardware boot remain unverified. The Media app's empty-library state was
+  observed in an earlier v0.2 UI session; no media fixture was played.
 
 ## Earlier v0.1 source checks — 2026-09-25
 

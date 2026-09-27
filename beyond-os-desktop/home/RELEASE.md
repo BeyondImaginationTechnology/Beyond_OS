@@ -1,6 +1,6 @@
-# BIT OS Home v0.1 acceptance gates
+# BIT OS Home v0.2 acceptance gates
 
-The current work is `home-0.1-dev.1`. Passing source checks is not a successful boot.
+The current work is `home-0.2-dev.1`. Passing source checks is not a successful boot.
 
 ## Foundation acceptance
 

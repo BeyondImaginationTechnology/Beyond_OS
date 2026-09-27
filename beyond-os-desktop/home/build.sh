@@ -39,7 +39,7 @@ else
 fi
 chmod +x "$home_source/board/x86_64/post-build.sh"
 chmod +x "$home_source/board/x86_64/post-image-uefi.sh"
-make -C "$source_dir" O="$output" BR2_EXTERNAL="$home_source" "$defconfig"
+make -C "$source_dir" O="$output" BR2_EXTERNAL="$home_source" BR2_JLEVEL="${BR2_JLEVEL:-2}" "$defconfig"
 python3 "$home_source/tools/verify-config.py" "$home_source/configs/$defconfig" "$output/.config"
 grep -Fxq 'BR2_PACKAGE_LIBGPG_ERROR_SYSCFG="x86_64-unknown-linux-musl"' "$output/.config" || {
     echo "libgpg-error lock configuration does not match the x86_64 musl target." >&2
@@ -54,18 +54,18 @@ if [[ "$action" == installer ]]; then
 else
     target="${action/build/all}"
 fi
-make -C "$source_dir" O="$output" BR2_EXTERNAL="$home_source" "$target"
+make -C "$source_dir" O="$output" BR2_EXTERNAL="$home_source" BR2_JLEVEL="${BR2_JLEVEL:-2}" "$target"
 if [[ "$action" == build ]]; then
     (
         cd "$output/images"
         sha256sum bzImage rootfs.ext2 > SHA256SUMS
     )
     cp "$output/.config" "$output/images/beyond-home.config"
-    printf 'Beyond OS Home 0.1 images: %s/images\n' "$output"
+    printf 'Beyond OS Home 0.2 images: %s/images\n' "$output"
 elif [[ "$action" == installer ]]; then
-    test -s "$output/images/bit-os-home-0.1-installer.img"
+    test -s "$output/images/bit-os-home-0.2-installer.img"
     test -s "$output/images/bitHomeos.iso"
     test -s "$output/images/SHA256SUMS"
     cp "$output/.config" "$output/images/beyond-home-installer.config"
-    printf 'Beyond OS Home 0.1 UEFI installer candidate: %s/images\n' "$output"
+    printf 'Beyond OS Home 0.2 UEFI installer candidate: %s/images\n' "$output"
 fi

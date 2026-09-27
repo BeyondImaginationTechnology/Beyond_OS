@@ -87,11 +87,11 @@ static const char *titles[] = {"Scope & Inventory", "Evidence", "Terminal", "Abo
 static const char *subtitles[] = {"Record authorization before network discovery", "Keep local findings together",
                                   "Your Linux command line", "Your system, at a glance"};
 #else
-#define EDITION_LABEL "HOME 0.1"
+#define EDITION_LABEL "HOME 0.2"
 #define HOME_KICKER "YOUR SPACE, READY TO GO"
 #define HOME_TITLE "Welcome home."
 #define HOME_COPY "Your desktop for everyday work and play."
-#define FOUNDATION_NOTE "HOME 0.1 PREVIEW  /  FILES, NOTES, WEB AND MEDIA"
+#define FOUNDATION_NOTE "HOME 0.2 PREVIEW  /  FILES, NOTES, WEB AND MEDIA"
 #define UPCOMING_NOTE "Choose a tile to begin. Tab and Enter work with the keyboard."
 #define CARD_COUNT 7
 #define CARD_WIDTH 371
@@ -907,9 +907,9 @@ static void draw(void)
             }
         } else {
 #ifdef BIT_EDITION_CYBER
-            paragraph("BIT OS Cyber Edition 1.0\nDevelopment build: cyber-dev.1\n\nAn independent Linux workspace for authorized assessment, evidence handling and reporting.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2 / Nmap\n\nThe inventory launcher requires a local authorization record and runs a limited TCP connect inventory. Packet capture, browser research, user setup, installation and signed updates are still in development.",
+            paragraph("BIT OS Cyber Edition 0.1\nDevelopment build: cyber-0.1-dev.1\n\nAn independent Linux workspace for authorized assessment, evidence handling and reporting.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2 / Nmap\n\nThe inventory launcher requires a local authorization record and runs a limited TCP connect inventory. Packet capture, browser research, user setup, installation and signed updates are still in development.",
 #else
-            paragraph("BIT OS Home 0.1\nDevelopment candidate\n\nAn independent Linux system, assembled from upstream source.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2\n\nHome includes Files, Notes, a WebKit browser, and local media playback.\nHardware support and release validation are still in progress.",
+            paragraph("BIT OS Home 0.2\nDevelopment candidate\n\nAn independent Linux system, assembled from upstream source.\n\nLinux kernel / musl / BusyBox / X.Org / Openbox / SDL2\n\nHome includes Files, Notes, a WebKit browser, and local media playback.\nHardware support and release validation are still in progress.",
 #endif
                       54, 236, 1150, 365);
 #ifndef _WIN32

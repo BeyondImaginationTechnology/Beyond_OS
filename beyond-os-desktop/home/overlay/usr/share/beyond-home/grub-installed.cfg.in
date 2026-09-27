@@ -4,6 +4,6 @@ set timeout=3
 insmod part_gpt
 insmod fat
 
-menuentry "BIT OS Home v0.1" {
+menuentry "BIT OS Home v0.2" {
     linux $cmdpath/bzImage root=PARTUUID=%PARTUUID% rootwait rw quiet loglevel=3
 }

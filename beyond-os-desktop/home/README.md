@@ -1,4 +1,4 @@
-# Build BIT OS Home v0.1
+# Build BIT OS Home v0.2
 
 This is Beyond OS's own Linux build, with no parent distribution root filesystem.
 Buildroot compiles the toolchain, Linux kernel and selected userspace software
@@ -7,7 +7,7 @@ from upstream sources. The repository supplies the Home product layer.
 ## What exists now
 
 - Pinned Buildroot 2026.02.3 archive and Linux 6.18.7 QEMU configuration.
-- Home v0.1 identity, native framebuffer startup artwork, and a file-based
+- Home v0.2 identity, native framebuffer startup artwork, and a file-based
   desktop inspired by Windows Vista/7. Desktop icons can be moved; drag an item
   from Files to its drop shelf to pin it to the desktop. Apps live in the Start
   menu and a leafy emerald glass taskbar with recognizable folder, globe, play,
@@ -32,7 +32,7 @@ it does not yet provide Home specific bookmarks or account integration.
 
 ## UEFI installer candidate
 
-The UEFI candidate creates `bit-os-home-0.1-installer.img`, a GPT USB image
+The UEFI candidate creates `bit-os-home-0.2-installer.img`, a GPT USB image
 with a FAT EFI partition and an ext4 Home filesystem. It is written to a
 separate USB drive, then booted in UEFI mode. Its menu offers **Try Home** for a
 non-installing live session and **Install Home** for setup. The installer always

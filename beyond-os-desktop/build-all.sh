@@ -35,8 +35,8 @@ run_tree() {
     local iso image sums
     case "$flavour" in
       core) iso="$images/bitCoreos.iso"; image="$images/bit-os-core-0.2-installer.img" ;;
-      home) iso="$images/bitHomeos.iso"; image="$images/bit-os-home-1.0-installer.img" ;;
-      cyber) iso="$images/bitCyberos.iso"; image="$images/bit-os-cyber-1.0-installer.img" ;;
+      home) iso="$images/bitHomeos.iso"; image="$images/bit-os-home-0.2-installer.img" ;;
+      cyber) iso="$images/bitCyberos.iso"; image="$images/bit-os-cyber-0.1-installer.img" ;;
       *) iso="$images/bit${flavour^}os.iso"; image="$images/bit-os-$flavour-1.0-installer.img" ;;
     esac
     sums="$images/SHA256SUMS"

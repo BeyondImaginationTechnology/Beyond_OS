@@ -116,6 +116,15 @@ if ($authorization !== '') {
 $signedIn = $mobileClaims !== null || !empty($_SESSION['user_id']);
 $payload = json_decode((string) file_get_contents('php://input'), true);
 if (!is_array($payload)) { http_response_code(400); echo json_encode(['error' => 'Invalid request.']); exit; }
+$mode = is_string($payload['mode'] ?? null) ? strtolower(trim($payload['mode'])) : 'core';
+$modeDefinition = jaguar_mode($mode);
+if ($modeDefinition === null) { http_response_code(422); echo json_encode(['error' => 'Choose a valid Jaguar Thinking mode.']); exit; }
+if (!jaguar_mode_is_enabled($mode)) { http_response_code(501); echo json_encode(['error' => 'Jaguar Thinking ' . $modeDefinition['label'] . ' is planned, not available in this preview yet.']); exit; }
+if (in_array($mode, ['draw', 'video'], true)) {
+    http_response_code(503);
+    echo json_encode(['error' => 'Jaguar ' . ucfirst($mode) . ' is selectable in preview, but its GPU generation worker is not connected yet. No media was generated.']);
+    exit;
+}
 try {
     $limit = $signedIn
         ? beyond_rate_limit_consume(beyond_db(), 'jaguar-chat', (string) $_SESSION['user_id'], 20, 60, 60)
@@ -138,10 +147,6 @@ if (!$signedIn) {
     if (!$validWork) { http_response_code(403); echo json_encode(['error' => 'Security check failed or expired. Please try again.']); exit; }
     $_SESSION['jaguar_guest_challenge']['used'] = true;
 }
-$mode = is_string($payload['mode'] ?? null) ? strtolower(trim($payload['mode'])) : 'core';
-$modeDefinition = jaguar_mode($mode);
-if ($modeDefinition === null) { http_response_code(422); echo json_encode(['error' => 'Choose a valid Jaguar Thinking mode.']); exit; }
-if (!jaguar_mode_is_enabled($mode)) { http_response_code(501); echo json_encode(['error' => 'Jaguar Thinking ' . $modeDefinition['label'] . ' is planned, not available in this preview yet.']); exit; }
 if (($payload['knowledge_scope'] ?? '') === 'beyond-tattoo') {
     http_response_code(422);
     echo json_encode(['error' => 'Beyond Tattoo stencil-editor guidance is reserved for Needle Bot, the Beyond Tattoo companion.']);

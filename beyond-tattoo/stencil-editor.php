@@ -116,7 +116,7 @@ beyond_nav_bootstrap('Beyond Tattoo', beyond_wallet());
   </div>
 </main>
 </div>
-<section class="needle-panel" id="needlePanel" aria-label="Needle Bot chat" hidden><header><strong><img src="<?=e(bt_app_url('assets/img/needle-bot-v1.png'))?>" alt="" aria-hidden="true"> Needle Bot · AI companion</strong><button class="needle-close" id="needleClose" type="button" aria-label="Close Needle Bot chat">×</button></header><iframe title="Needle Bot tattoo and stencil assistant" src="<?=e(bt_app_url('needle-bot.php?embed=1'))?>" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></section>
+<section class="needle-panel" id="needlePanel" aria-label="Needle Bot chat" hidden><header><strong><img src="<?=e(bt_app_url('assets/img/needle-bot-v2.png'))?>" alt="" aria-hidden="true"> Needle Bot · AI companion</strong><button class="needle-close" id="needleClose" type="button" aria-label="Close Needle Bot chat">×</button></header><iframe title="Needle Bot tattoo and stencil assistant" src="<?=e(bt_app_url('needle-bot.php?embed=1'))?>" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></section>
 <script>
 'use strict';
 const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true}),paper=document.getElementById('paper'),guideLayer=document.getElementById('guideLayer'),statusEl=document.getElementById('status');

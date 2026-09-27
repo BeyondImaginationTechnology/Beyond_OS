@@ -116,7 +116,7 @@ if (!empty($stencilDay['iso_date'])) {
   <section class="bt-needle-feature" aria-labelledby="needle-feature-title">
     <div class="bt-wrap bt-needle-feature-card">
       <div class="bt-needle-feature-art">
-        <img src="<?= e(bt_app_url('assets/img/needle-bot-v1.png')) ?>" alt="Needle Bot, a white woman with silver hair in ornate violet-accented armor, holding a tattoo machine" width="1024" height="1024" loading="lazy">
+        <img src="<?= e(bt_app_url('assets/img/needle-bot-v2.png')) ?>" alt="Needle Bot, a petite armored tattoo robot with a pale feminine face, ornate dark metal helmet, and glowing violet eyes" width="1024" height="1536" loading="lazy">
       </div>
       <div class="bt-needle-feature-copy">
         <p class="bt-purple-kicker">Your tattoo AI companion</p>
@@ -126,7 +126,7 @@ if (!empty($stencilDay['iso_date'])) {
           <a class="bt-glow-button" href="<?= e(bt_app_url('needle-bot.php')) ?>">Chat with Needle Bot</a>
           <a class="bt-outline-button" href="<?= e(bt_app_url('stencil-editor.php')) ?>">Open Stencil Editor</a>
         </div>
-        <small>Image generation is handled by Jaguar Draw when connected; chat is for tattoo guidance and editor help.</small>
+        <small>Jaguar Draw creates images. Needle Bot is your tattoo guidance and editor companion.</small>
       </div>
     </div>
   </section>

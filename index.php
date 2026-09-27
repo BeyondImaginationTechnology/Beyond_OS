@@ -135,7 +135,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 <aside class="mobile-drawer" id="mobileNavigation" aria-label="Mobile navigation" aria-hidden="true">
     <div class="mobile-drawer-head"><strong>BEYOND IMAGINATION</strong><button class="drawer-close" type="button" aria-label="Close navigation menu">×</button></div>
     <nav aria-label="Primary navigation"><a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a><a href="/ai/">AI</a><a href="https://os.beyondimagination.co.technology/">OS</a><a href="/beyond-market/">Store</a></nav>
-    <a class="primary" href="/app-store/">Explore OS</a>
+    <a class="primary" href="/app-store/">Open App Store</a>
     <label class="mobile-currency">Display currency <span class="currency-picker"><span aria-hidden="true">BIT$</span><select id="mobileCurrency" aria-label="Display currency"><option value="BITS">BIT$</option><option value="USD">USD</option><option value="CAD">CAD</option></select></span></label>
 </aside>
 <main>
@@ -147,7 +147,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
         <p class="intro">Useful apps for wellness, learning, creator commerce and entertainment—connected through Beyond ID. BIT OS is the planned operating-environment layer for home, learning, creating and organizational work.</p>
         <div class="hero-actions">
             <a class="primary" href="https://ai.beyondimagination.co.technology/">Explore AI &nbsp;→</a>
-            <a class="ghost" href="https://os.beyondimagination.co.technology/">Explore OS →</a>
+            <a class="ghost" href="/app-store/">Open the App Store →</a>
         </div>
         <div class="benefits"><span><b>∞</b> Every possibility, connected</span></div>
     </div>

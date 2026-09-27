@@ -87,7 +87,8 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
             suggestions: ['Explain AI tokens with a memorable analogy.', 'Help me turn a rough idea into a clear project plan.', 'Teach me something difficult in plain language.'],
             buildIntro: 'Brainstorm software ideas, design how an app should work, or explore coding approaches. Build cannot inspect your repository or generate images or video.',
             buildSuggestions: ['Brainstorm useful features and an MVP for a neighborhood tool library.', 'Design the API and data model for a simple appointment app.', 'Sketch the main screens, interaction states, and accessibility needs for a study planner.'],
-            placeholder: 'Message Jaguar…', fine: 'Jaguar can make mistakes. Check important information. Weather and place lookups use Open-Meteo.', waking: 'Jaguar is thinking…', thinkingStages: ['Understanding your request…', 'Preparing a response…', 'Checking the result…'], timedOut: 'Jaguar is taking longer than expected. Please try again.', explicit: 'Jaguar cannot help with explicit sexual content.', coreStatus: 'Explain is live · fast lane only', buildStatus: 'Build preview · software design', user: 'YOU',
+            drawIntro: 'Draw is Jaguar’s image-generation mode. Its GPU worker is not connected in this preview yet.', videoIntro: 'Video is a planned Jaguar generation mode. Its GPU worker is not connected in this preview yet.',
+            placeholder: 'Message Jaguar…', fine: 'Jaguar can make mistakes. Check important information. Weather and place lookups use Open-Meteo.', waking: 'Jaguar is thinking…', thinkingStages: ['Understanding your request…', 'Preparing a response…', 'Checking the result…'], timedOut: 'Jaguar is taking longer than expected. Please try again.', explicit: 'Jaguar cannot help with explicit sexual content.', coreStatus: 'Explain is live · fast lane only', buildStatus: 'Build preview · software design', drawStatus: 'Draw preview · generation not connected', videoStatus: 'Video preview · generation not connected', user: 'YOU',
             newChat: '＋ New conversation', verifyTitle: 'One quick check', verifyCopy: 'Verify that you are human, then Jaguar will send your message.', cancel: 'Cancel'
         },
         fr: {
@@ -96,7 +97,8 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
             suggestions: ['Explique les jetons IA avec une analogie mémorable.', 'Transforme mon idée en plan de projet clair.', 'Enseigne-moi un sujet difficile simplement.'],
             buildIntro: 'Imaginez des idées de logiciels, concevez le fonctionnement d’une application ou comparez des approches de programmation. Build ne consulte pas votre dépôt et ne génère ni images ni vidéos.',
             buildSuggestions: ['Imagine des fonctionnalités utiles et un MVP pour une bibliothèque d’outils de quartier.', 'Conçois l’API et le modèle de données d’une application de rendez-vous.', 'Décris les écrans, les interactions et les besoins d’accessibilité d’un agenda d’étude.'],
-            placeholder: 'Écrivez à Jaguar…', fine: 'Jaguar peut se tromper. Vérifiez les informations importantes. Les recherches météo et de lieux utilisent Open-Meteo.', waking: 'Jaguar réfléchit…', thinkingStages: ['Compréhension de votre demande…', 'Préparation de la réponse…', 'Vérification du résultat…'], timedOut: 'Jaguar met plus de temps que prévu. Veuillez réessayer.', explicit: 'Jaguar ne peut pas aider avec du contenu sexuel explicite.', coreStatus: 'Explain est disponible · voie rapide seulement', buildStatus: 'Aperçu Build · conception logicielle', user: 'VOUS',
+            drawIntro: 'Draw est le mode de génération d’images de Jaguar. Son GPU de génération n’est pas encore connecté.', videoIntro: 'Video est un mode de génération prévu pour Jaguar. Son GPU de génération n’est pas encore connecté.',
+            placeholder: 'Écrivez à Jaguar…', fine: 'Jaguar peut se tromper. Vérifiez les informations importantes. Les recherches météo et de lieux utilisent Open-Meteo.', waking: 'Jaguar réfléchit…', thinkingStages: ['Compréhension de votre demande…', 'Préparation de la réponse…', 'Vérification du résultat…'], timedOut: 'Jaguar met plus de temps que prévu. Veuillez réessayer.', explicit: 'Jaguar ne peut pas aider avec du contenu sexuel explicite.', coreStatus: 'Explain est disponible · voie rapide seulement', buildStatus: 'Aperçu Build · conception logicielle', drawStatus: 'Aperçu Draw · génération non connectée', videoStatus: 'Aperçu Video · génération non connectée', user: 'VOUS',
             newChat: '＋ Nouvelle conversation', verifyTitle: 'Une vérification rapide', verifyCopy: 'Confirmez que vous êtes une personne, puis Jaguar enverra votre message.', cancel: 'Annuler'
         },
         es: {
@@ -105,7 +107,8 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
             suggestions: ['Explica los tokens de IA con una analogía memorable.', 'Convierte mi idea en un plan de proyecto claro.', 'Enséñame algo difícil con palabras sencillas.'],
             buildIntro: 'Propón ideas de software, diseña cómo debería funcionar una aplicación o compara formas de programarla. Build no puede inspeccionar tu repositorio ni generar imágenes o videos.',
             buildSuggestions: ['Propón funciones útiles y un MVP para una biblioteca comunitaria de herramientas.', 'Diseña la API y el modelo de datos para una app de citas.', 'Describe las pantallas, interacciones y necesidades de accesibilidad de un planificador de estudio.'],
-            placeholder: 'Escribe a Jaguar…', fine: 'Jaguar puede equivocarse. Verifica la información importante. Las consultas de tiempo y lugares usan Open-Meteo.', waking: 'Jaguar está pensando…', thinkingStages: ['Entendiendo tu solicitud…', 'Preparando una respuesta…', 'Comprobando el resultado…'], timedOut: 'Jaguar está tardando más de lo esperado. Inténtalo de nuevo.', explicit: 'Jaguar no puede ayudar con contenido sexual explícito.', coreStatus: 'Explain está disponible · solo vía rápida', buildStatus: 'Vista previa Build · diseño de software', user: 'TÚ',
+            drawIntro: 'Draw es el modo de generación de imágenes de Jaguar. Su GPU de generación aún no está conectada.', videoIntro: 'Video es un modo de generación previsto para Jaguar. Su GPU de generación aún no está conectada.',
+            placeholder: 'Escribe a Jaguar…', fine: 'Jaguar puede equivocarse. Verifica la información importante. Las consultas de tiempo y lugares usan Open-Meteo.', waking: 'Jaguar está pensando…', thinkingStages: ['Entendiendo tu solicitud…', 'Preparando una respuesta…', 'Comprobando el resultado…'], timedOut: 'Jaguar está tardando más de lo esperado. Inténtalo de nuevo.', explicit: 'Jaguar no puede ayudar con contenido sexual explícito.', coreStatus: 'Explain está disponible · solo vía rápida', buildStatus: 'Vista previa Build · diseño de software', drawStatus: 'Vista previa Draw · generación no conectada', videoStatus: 'Vista previa Video · generación no conectada', user: 'TÚ',
             newChat: '＋ Nueva conversación', verifyTitle: 'Una verificación rápida', verifyCopy: 'Confirma que eres una persona y Jaguar enviará tu mensaje.', cancel: 'Cancelar'
         }
     };
@@ -115,7 +118,8 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
     function renderWelcome() {
         const text = copy[language];
         const buildMode = modeSelect.value === 'build';
-        const intro = buildMode ? text.buildIntro : text.intro;
+        const selectedMode = modeSelect.value;
+        const intro = buildMode ? text.buildIntro : selectedMode === 'draw' ? text.drawIntro : selectedMode === 'video' ? text.videoIntro : text.intro;
         const suggestions = buildMode ? text.buildSuggestions : text.suggestions;
         messages.innerHTML = `<section class="welcome" id="welcome"><img class="brand-mark-image" src="assets/jaguar-eye-v0.2.png" width="40" height="40" alt="Jaguar eye logo"><h1>${text.title}</h1><p>${escapeHtml(intro)}</p><div class="suggestions">${suggestions.map(suggestion => `<button type="button">${escapeHtml(suggestion)}</button>`).join('')}</div></section>`;
         input.placeholder = text.placeholder;
@@ -173,7 +177,9 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
 
     function updateModeStatus() {
         const text = copy[language];
-        modeStatus.textContent = modeSelect.value === 'build' ? text.buildStatus : text.coreStatus;
+        modeStatus.textContent = modeSelect.value === 'build' ? text.buildStatus
+            : modeSelect.value === 'draw' ? text.drawStatus
+            : modeSelect.value === 'video' ? text.videoStatus : text.coreStatus;
     }
 
     function looksExplicit(text) {

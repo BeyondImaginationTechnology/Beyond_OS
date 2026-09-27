@@ -2,6 +2,7 @@ package technology.co.beyondimagination.beyondtattoo;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.ValueCallback;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,6 +26,8 @@ public final class MainActivity extends Activity {
     private WebView webView;
     private TextView title;
     private Button selectedButton;
+    private ValueCallback<Uri[]> fileUploadCallback;
+    private static final int FILE_REQUEST = 4102;
 
     @Override @SuppressLint("SetJavaScriptEnabled")
     public void onCreate(Bundle state) {
@@ -58,12 +62,21 @@ public final class MainActivity extends Activity {
         settings.setAllowFileAccess(false);
         settings.setMediaPlaybackRequiresUserGesture(true);
         webView.setBackgroundColor(Color.rgb(11, 7, 18));
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
+                if (fileUploadCallback != null) fileUploadCallback.onReceiveValue(null);
+                fileUploadCallback = callback;
+                Intent picker = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                picker.addCategory(Intent.CATEGORY_OPENABLE);
+                picker.setType("image/*");
+                startActivityForResult(picker, FILE_REQUEST);
+                return true;
+            }
+        });
         webView.setWebViewClient(new WebViewClient() {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 // Keep editor, Needle Bot, and Jaguar requests in this signed-in app session.
-                view.loadUrl(request.getUrl().toString());
-                return true;
+                return false;
             }
         });
         root.addView(webView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
@@ -80,6 +93,15 @@ public final class MainActivity extends Activity {
         root.addView(navigation);
         setContentView(root);
         select("Today", BASE, null);
+    }
+
+    @Override protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != FILE_REQUEST || fileUploadCallback == null) return;
+        Uri[] result = resultCode == RESULT_OK && data != null && data.getData() != null
+                ? new Uri[]{data.getData()} : null;
+        fileUploadCallback.onReceiveValue(result);
+        fileUploadCallback = null;
     }
 
     private void addNav(LinearLayout navigation, String label, String url, String pageTitle) {

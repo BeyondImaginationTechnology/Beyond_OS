@@ -28,6 +28,7 @@ $providerConfigured = false;
 $defaultNarrationProvider = 'openai';
 $characterVoiceLocales = [];
 $characterVoiceNames = [];
+$characterVoiceIds = [];
 try {
     $configuredProvider = strtolower((string)beyond_config('voice.provider', 'openai'));
     $openaiReady = trim((string)beyond_config('narration.openai.api_key', '')) !== '';
@@ -40,10 +41,13 @@ try {
     $characterProfiles = ['fr-FR' => 'Louis', 'es-ES' => 'Pablo', 'en-JM' => 'Irie', 'ht-HT' => 'Jazzy'];
     $configuredCharacterVoices = [];
     foreach ($characterProfiles as $locale => $character) {
-        $voice = beyond_config('narration.elevenlabs.voices.' . $locale, beyond_config('voice.voices.' . $locale, ''));
+        $voice = $locale === 'es-ES'
+            ? beyond_config('narration.elevenlabs.character_voices.pablo', '00uevfcKk0GtPlbU69ZH')
+            : beyond_config('narration.elevenlabs.voices.' . $locale, beyond_config('voice.voices.' . $locale, ''));
         $voice = is_string($voice) ? trim($voice) : '';
         $configuredCharacterVoices[$locale] = $voice;
     }
+    $characterVoiceIds = $configuredCharacterVoices;
     foreach ($characterProfiles as $locale => $character) {
         $voice = $configuredCharacterVoices[$locale];
         $matches = $voice === '' ? [] : array_keys($configuredCharacterVoices, $voice, true);
@@ -60,13 +64,15 @@ if ($characterVoiceNames) {
     $providerLabels[$provider] = $characterList . ' via ElevenLabs · English overview via ' . ($provider === 'openai' ? 'OpenAI Speech' : 'ElevenLabs Premium');
 }
 $characterVoiceData = htmlspecialchars(json_encode($characterVoiceLocales, JSON_UNESCAPED_SLASHES) ?: '{}', ENT_QUOTES, 'UTF-8');
+$characterVoiceIdData = htmlspecialchars(json_encode($characterVoiceIds, JSON_UNESCAPED_SLASHES) ?: '{}', ENT_QUOTES, 'UTF-8');
 $view = str_replace(
-    ['__VOICE_PROVIDER__', '__VOICE_STATUS__', '__VOICE_STATUS_CLASS__', '__CHARACTER_VOICE_LOCALES__', '__DEFAULT_NARRATION_PROVIDER__'],
+    ['__VOICE_PROVIDER__', '__VOICE_STATUS__', '__VOICE_STATUS_CLASS__', '__CHARACTER_VOICE_LOCALES__', '__CHARACTER_VOICE_IDS__', '__DEFAULT_NARRATION_PROVIDER__'],
     [
         htmlspecialchars($providerLabels[$provider] ?? ucfirst($provider), ENT_QUOTES, 'UTF-8'),
         $providerConfigured ? 'Ready' : 'Needs configuration',
         $providerConfigured ? 'ready' : 'needs-config',
         $characterVoiceData,
+        $characterVoiceIdData,
         htmlspecialchars($defaultNarrationProvider, ENT_QUOTES, 'UTF-8'),
     ],
     $view

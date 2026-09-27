@@ -219,6 +219,40 @@ final class AppStore: ObservableObject {
         configureAudioSession()
         let text = lesson.text(for: language)
 
+        // The published Spanish lesson schedule carries Mateo-recorded MP3s.
+        // Prefer those before local bundled audio, which may contain older tests.
+        if language == .spanish, let remoteURL = remoteLessonAudioURL(for: lesson, language: language) {
+            statusMessage = "Loading prerecorded \(language.title) lesson..."
+            Task {
+                do {
+                    let (data, response) = try await URLSession.shared.data(from: remoteURL)
+                    guard let http = response as? HTTPURLResponse,
+                          200..<300 ~= http.statusCode,
+                          data.count > 128 else { throw PremiumVoiceError.invalidAudio }
+                    let player = try AVAudioPlayer(data: data)
+                    player.prepareToPlay()
+                    premiumVoicePlayer = player
+                    if player.play() {
+                        statusMessage = "Prerecorded \(language.title) lesson"
+                        return
+                    }
+                } catch {
+                    // Fall through to the bundled or device voice if the network is unavailable.
+                }
+                if let url = bundledLessonAudioURL(for: lesson, language: language),
+                   let player = try? AVAudioPlayer(contentsOf: url) {
+                    player.prepareToPlay()
+                    premiumVoicePlayer = player
+                    if player.play() {
+                        statusMessage = "Bundled prerecorded \(language.title) lesson"
+                        return
+                    }
+                }
+                speak(text, language: language.locale)
+            }
+            return
+        }
+
         if language.usesLiveProviderDemoVoice {
             speak(text, language: language.locale)
             return
@@ -279,7 +313,7 @@ final class AppStore: ObservableObject {
         premiumVoicePlayer?.stop()
         configureAudioSession()
 
-        if language.usesLiveProviderDemoVoice {
+        if language == .spanish || language.usesLiveProviderDemoVoice {
             speak(text, language: language.locale)
             return
         }

@@ -8,6 +8,7 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: private, no-store');
 
 const FRENCH_NATIVE_AUDIO_BATCH = 'native-speakers-2026-09-elevenlabs-v3';
+const FRENCH_PABLO_MATEO_VOICE_ID = '00uevfcKk0GtPlbU69ZH';
 const FRENCH_CHARACTER_VOICES = [
     'fr-FR' => 'Louis',
     'es-ES' => 'Pablo',
@@ -41,7 +42,9 @@ function frenchNativeCharacterVoices(): array
 {
     $profiles = [];
     foreach (FRENCH_CHARACTER_VOICES as $locale => $character) {
-        $voice = beyond_config('narration.elevenlabs.voices.' . $locale, beyond_config('voice.voices.' . $locale, ''));
+        $voice = $locale === 'es-ES'
+            ? beyond_config('narration.elevenlabs.character_voices.pablo', FRENCH_PABLO_MATEO_VOICE_ID)
+            : beyond_config('narration.elevenlabs.voices.' . $locale, beyond_config('voice.voices.' . $locale, ''));
         $profiles[$locale] = ['character' => $character, 'voice_id' => trim((string)$voice)];
     }
     return $profiles;
@@ -158,7 +161,12 @@ try {
         throw new RuntimeException('The native audio directory could not be created.');
     }
 
-    $generated = studio_narration_generate($text, $selectedLocale, $settings['provider']);
+    $generated = studio_narration_generate(
+        $text,
+        $selectedLocale,
+        $settings['provider'],
+        $characterVoices[$selectedLocale]['voice_id']
+    );
     $audio = (string)($generated['audio_content'] ?? '');
     if (strlen($audio) < 128) throw new RuntimeException('The narration provider returned invalid audio.');
     $temporaryAudio = $destination . '.tmp-' . bin2hex(random_bytes(4));

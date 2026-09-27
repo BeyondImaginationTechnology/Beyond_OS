@@ -134,10 +134,10 @@ enum DictionaryAudioLanguage: Equatable {
     }
 
     /// These locales temporarily use live providers for personal testing:
-    /// Azure Elvira for Spanish and ElevenLabs for Kreyòl and Patois.
+    /// ElevenLabs for Kreyòl and Patois. Spanish lessons use prerecorded tracks.
     /// Retired Jenny recordings must not override them.
     var usesLiveProviderDemoVoice: Bool {
-        self == .spanish || self == .kreyol || self == .patois
+        self == .kreyol || self == .patois
     }
 }
 

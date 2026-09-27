@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/../includes/ecosystem.php';
+require_once __DIR__ . '/includes/config.php';
 $stencilMeta = require __DIR__ . '/config/stencil-day.php';
 $stencilTitle = (string)$stencilMeta['title'];
 $stencilSource = (string)$stencilMeta['transfer_png_url'];

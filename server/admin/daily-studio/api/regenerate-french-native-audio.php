@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require dirname(__DIR__) . '/bootstrap.php';
 require_once dirname(__DIR__, 4) . '/includes/narration/StudioNarration.php';
+require_once dirname(__DIR__, 4) . '/beyond-french/includes/narration/NarrationApi.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: private, no-store');
@@ -16,6 +17,7 @@ const FRENCH_CHARACTER_VOICES = [
     'ht-HT' => 'Jazzy',
     'en-JM' => 'Irie',
 ];
+const FRENCH_NATIVE_NARRATION_INSTRUCTIONS = 'Warm, clear, natural premium narration. Preserve scripture references and French pronunciation accurately.';
 const FRENCH_NATIVE_AUDIO_LANGUAGES = [
     'es-ES' => ['field' => 'spanish', 'provider' => 'elevenlabs', 'label' => 'Spanish'],
     'ht-HT' => ['field' => 'kreyol', 'provider' => 'elevenlabs', 'label' => 'Haitian Kreyòl'],
@@ -32,14 +34,18 @@ function frenchNativeResponse(array $payload, int $status = 200): never
     exit;
 }
 
-function frenchNativeWriteLessons(string $file, array $lessons): void
+function frenchNativeNarrationRequest(array $lesson, string $locale, array $settings, array $profiles): array
 {
-    $json = json_encode(array_values($lessons), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    $temporary = $file . '.tmp';
-    if ($json === false || file_put_contents($temporary, $json . PHP_EOL, LOCK_EX) === false || !rename($temporary, $file)) {
-        @unlink($temporary);
-        throw new RuntimeException('The French lesson library could not be updated.');
-    }
+    return [
+        'lesson_id' => (int)($lesson['id'] ?? 0),
+        'provider' => $settings['provider'],
+        'voice' => (string)($profiles[$locale]['voice_id'] ?? ''),
+        'language' => $locale,
+        'text' => trim((string)($lesson[$settings['field']] ?? '')),
+        'instructions' => FRENCH_NATIVE_NARRATION_INSTRUCTIONS,
+        'speed' => 1.0,
+        'format' => 'mp3',
+    ];
 }
 
 function frenchNativeCharacterVoices(): array
@@ -73,31 +79,27 @@ function frenchNativeVoiceIssues(array $profiles): array
     return $issues;
 }
 
-function frenchNativeTrackMatchesSelectedVoice(array $lesson, string $locale, array $profiles, string $root): bool
+function frenchNativeTrackMatchesSelectedVoice(array $lesson, string $locale, array $profiles, array $languages, PDO $pdo): bool
 {
-    $profile = (array)($profiles[$locale] ?? []);
-    $generation = (array)($lesson['audio_generation'][$locale] ?? []);
-    $voiceId = trim((string)($profile['voice_id'] ?? ''));
-    $recordedVoiceId = trim((string)($generation['voice_id'] ?? $generation['voice'] ?? ''));
-    if ($voiceId === '' || $recordedVoiceId !== $voiceId || (string)($generation['provider'] ?? '') !== 'elevenlabs') return false;
-    $urlPath = (string)parse_url((string)(((array)($lesson['audio_urls'] ?? []))[$locale] ?? ''), PHP_URL_PATH);
-    $prefix = '/beyond-french/assets/audio/lessons/' . $locale . '/';
-    if (!str_starts_with($urlPath, $prefix) || !preg_match('#^[A-Za-z0-9._-]+\.mp3$#i', substr($urlPath, strlen($prefix)))) return false;
-    $destination = $root . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, ltrim($urlPath, '/'));
-    return is_file($destination);
+    $settings = (array)($languages[$locale] ?? []);
+    $request = frenchNativeNarrationRequest($lesson, $locale, $settings, $profiles);
+    if ($request['lesson_id'] < 1 || $request['text'] === '' || $request['voice'] === '') return false;
+    $cached = narration_cached_audio($pdo, $request['lesson_id'], narration_content_hash($request));
+    return is_array($cached)
+        && (string)($cached['provider'] ?? '') === 'elevenlabs'
+        && (string)($cached['voice'] ?? '') === $request['voice'];
 }
 
-function frenchNativeProgress(array $lessons, array $profiles, string $root, ?array $languages = null): array
+function frenchNativeProgress(array $lessons, array $profiles, array $languages, PDO $pdo): array
 {
     $eligible = 0;
     $ready = 0;
-    $languages ??= FRENCH_NATIVE_AUDIO_LANGUAGES;
     foreach ($lessons as $lesson) {
         $audioUrls = (array)($lesson['audio_urls'] ?? []);
         foreach ($languages as $locale => $_settings) {
             if (trim((string)($audioUrls[$locale] ?? '')) === '') continue;
             $eligible++;
-            if (frenchNativeTrackMatchesSelectedVoice((array)$lesson, $locale, $profiles, $root)) $ready++;
+            if (frenchNativeTrackMatchesSelectedVoice((array)$lesson, $locale, $profiles, $languages, $pdo)) $ready++;
         }
     }
     return ['ready' => $ready, 'target' => $eligible, 'complete' => $eligible > 0 && $ready >= $eligible];
@@ -107,6 +109,7 @@ $root = dirname(__DIR__, 4);
 $lessonsFile = $root . '/beyond-french/data/lessons.json';
 $lessons = json_decode((string)file_get_contents($lessonsFile), true);
 if (!is_array($lessons)) frenchNativeResponse(['ok' => false, 'error' => 'The French lesson library is unavailable.'], 500);
+$pdo = sqlite_db();
 $characterVoices = frenchNativeCharacterVoices();
 $voiceIssues = frenchNativeVoiceIssues($characterVoices);
 $requestedLocale = trim((string)($_GET['locale'] ?? ''));
@@ -123,7 +126,7 @@ $publicVoiceProfiles = array_map(static function (array $profile): array {
 }, $characterVoices);
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'GET') {
-    frenchNativeResponse(['ok' => true, ...frenchNativeProgress($lessons, $characterVoices, $root, $selectedLanguages), 'batch' => $batch, 'character_voices' => $publicVoiceProfiles, 'configuration_ready' => !$voiceIssues, 'configuration_issues' => $voiceIssues]);
+    frenchNativeResponse(['ok' => true, ...frenchNativeProgress($lessons, $characterVoices, $selectedLanguages, $pdo), 'batch' => $batch, 'character_voices' => $publicVoiceProfiles, 'configuration_ready' => !$voiceIssues, 'configuration_issues' => $voiceIssues]);
 }
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     frenchNativeResponse(['ok' => false, 'error' => 'Unsupported request.'], 405);
@@ -135,7 +138,7 @@ if ($voiceIssues) {
     frenchNativeResponse([
         'ok' => false,
         'error' => 'Audio generation was not started. ' . implode(' ', $voiceIssues) . ' Choose four distinct character voices in Premium Voices first.',
-        ...frenchNativeProgress($lessons, $characterVoices, $root, $selectedLanguages),
+        ...frenchNativeProgress($lessons, $characterVoices, $selectedLanguages, $pdo),
         'batch' => $batch,
         'configuration_issues' => $voiceIssues,
     ], 422);
@@ -150,7 +153,7 @@ try {
         $audioUrls = (array)($lesson['audio_urls'] ?? []);
         foreach ($selectedLanguages as $locale => $_settings) {
             if (trim((string)($audioUrls[$locale] ?? '')) === '') continue;
-            if (frenchNativeTrackMatchesSelectedVoice((array)$lesson, $locale, $characterVoices, $root)) continue;
+            if (frenchNativeTrackMatchesSelectedVoice((array)$lesson, $locale, $characterVoices, $selectedLanguages, $pdo)) continue;
             $selectedIndex = $index;
             $selectedLocale = $locale;
             break 2;
@@ -165,43 +168,30 @@ try {
     $lesson = (array)$lessons[$selectedIndex];
     $text = trim((string)($lesson[$settings['field']] ?? ''));
     if ($text === '') throw new RuntimeException('Lesson #' . (int)($lesson['id'] ?? 0) . ' has no ' . $settings['label'] . ' text.');
+    $request = frenchNativeNarrationRequest($lesson, $selectedLocale, $settings, $characterVoices);
+    $contentHash = narration_content_hash($request);
+    $lessonId = (int)$request['lesson_id'];
+    $audioId = narration_processing_record($pdo, $request, $contentHash, max(1, (int)($_SESSION['user_id'] ?? 1)));
+    $savedFile = '';
 
-    $urlPath = (string)parse_url((string)$lesson['audio_urls'][$selectedLocale], PHP_URL_PATH);
-    $requiredPrefix = '/beyond-french/assets/audio/lessons/' . $selectedLocale . '/';
-    if (!str_starts_with($urlPath, $requiredPrefix) || !str_ends_with(strtolower($urlPath), '.mp3')) {
-        throw new RuntimeException('Lesson #' . (int)($lesson['id'] ?? 0) . ' has an invalid audio destination.');
+    try {
+        $generated = studio_narration_generate($text, $selectedLocale, $settings['provider'], $characterVoices[$selectedLocale]['voice_id']);
+        $audio = (string)($generated['audio_content'] ?? '');
+        if (!narration_valid_mp3($audio)) throw new RuntimeException('The narration provider returned an invalid MP3.');
+        if ((string)($generated['provider'] ?? '') !== 'elevenlabs' || (string)($generated['voice'] ?? '') !== $request['voice']) {
+            throw new RuntimeException('The generated track did not use the selected ElevenLabs character voice.');
+        }
+        $stored = narration_store_mp3($audio, $lessonId, $audioId);
+        $savedFile = (string)$stored['file'];
+        $update = $pdo->prepare("UPDATE french_lesson_audio SET provider=?, voice=?, format='mp3', audio_path=?, generation_status='ready', error_code=NULL WHERE id=?");
+        $update->execute(['elevenlabs', $request['voice'], (string)$stored['url'], $audioId]);
+    } catch (Throwable $generationError) {
+        if ($savedFile !== '' && is_file($savedFile)) @unlink($savedFile);
+        $failed = $pdo->prepare("UPDATE french_lesson_audio SET generation_status='failed', error_code=? WHERE id=?");
+        $failed->execute(['generation_failed', $audioId]);
+        throw $generationError;
     }
-    $destination = $root . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, ltrim($urlPath, '/'));
-    if (!is_dir(dirname($destination)) && !mkdir(dirname($destination), 0775, true) && !is_dir(dirname($destination))) {
-        throw new RuntimeException('The native audio directory could not be created.');
-    }
-
-    $generated = studio_narration_generate(
-        $text,
-        $selectedLocale,
-        $settings['provider'],
-        $characterVoices[$selectedLocale]['voice_id']
-    );
-    $audio = (string)($generated['audio_content'] ?? '');
-    if (strlen($audio) < 128) throw new RuntimeException('The narration provider returned invalid audio.');
-    $temporaryAudio = $destination . '.tmp-' . bin2hex(random_bytes(4));
-    if (file_put_contents($temporaryAudio, $audio, LOCK_EX) === false || !rename($temporaryAudio, $destination)) {
-        @unlink($temporaryAudio);
-        throw new RuntimeException('The regenerated MP3 could not be stored.');
-    }
-    @chmod($destination, 0644);
-
-    $lessons[$selectedIndex]['audio_generation'][$selectedLocale] = [
-        'batch' => $batch,
-        'provider' => $settings['provider'],
-        'profile' => 'native-speaker',
-        'character' => $characterVoices[$selectedLocale]['character'],
-        'voice_id' => (string)($generated['voice'] ?? $characterVoices[$selectedLocale]['voice_id']),
-        'voice' => (string)($generated['voice'] ?? $characterVoices[$selectedLocale]['voice_id']),
-        'generated_at' => date(DATE_ATOM),
-    ];
-    frenchNativeWriteLessons($lessonsFile, $lessons);
-    $progress = frenchNativeProgress($lessons, $characterVoices, $root, $selectedLanguages);
+    $progress = frenchNativeProgress($lessons, $characterVoices, $selectedLanguages, $pdo);
     frenchNativeResponse([
         'ok' => true,
         'built' => [
@@ -209,12 +199,12 @@ try {
             'locale' => $selectedLocale,
             'language' => $settings['label'],
             'bytes' => strlen($audio),
-            'url' => $urlPath,
+            'url' => (string)$stored['url'],
         ],
         ...$progress,
         'batch' => $batch,
     ]);
 } catch (Throwable $error) {
     error_log('Beyond French native audio regeneration: ' . $error->getMessage());
-    frenchNativeResponse(['ok' => false, 'error' => $error->getMessage(), ...frenchNativeProgress($lessons, $characterVoices, $root, $selectedLanguages)], 502);
+    frenchNativeResponse(['ok' => false, 'error' => $error->getMessage(), ...frenchNativeProgress($lessons, $characterVoices, $selectedLanguages, $pdo)], 502);
 }

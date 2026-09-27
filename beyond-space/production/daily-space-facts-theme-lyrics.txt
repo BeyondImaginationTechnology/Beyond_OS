@@ -1,5 +1,10 @@
-Spoken theme tag for Beyond Space TV:
+Spoken theme tag for Beyond Space TV (use the line breaks as pauses):
 
-Beyond Space TV! Daily Space Facts — let's explore!
+Beyond Space TV!
+Daily Space Facts!
+Look up…
+Let wonder begin!
 
-The new spoken tag was generated with ElevenLabs voice "Liam - Viral Short-Form Storyteller". The current local WAV file is still the previous system-voice render; replace it with the ElevenLabs download before producing a final opener with the new voice.
+ElevenLabs voice: Oliver - Playful, Vibrant and Optimistic.
+The approved take is about 5.20 seconds. Source MP3: BeyondSpaceTV_intro_narration_oliver_2026-09-27.mp3.
+The production WAV is converted to 48 kHz stereo for the video render. The previous system-voice WAV is preserved as daily-space-facts-theme-voice-previous.wav.

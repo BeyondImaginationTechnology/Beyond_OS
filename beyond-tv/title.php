@@ -202,7 +202,7 @@ function beyond_tv_episode_code(array $episode): string
   } catch (error) {}
 })();
 </script>
-<script src="/beyond-tv/assets/js/app.js?v=3.0.3"></script>
+<script src="/beyond-tv/assets/js/app.js?v=3.0.4"></script>
 <script src="/assets/js/visitor-analytics.js" defer></script>
 </body>
 </html>

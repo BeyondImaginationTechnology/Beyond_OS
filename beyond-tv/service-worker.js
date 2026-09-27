@@ -1,7 +1,9 @@
-const CACHE_NAME = 'beyond-tv-2.001';
+const CACHE_NAME = 'beyond-tv-2.001-ads-1';
 const STATIC_ASSETS = [
   '/beyond-tv/assets/css/app.css',
+  '/beyond-tv/assets/css/video-ads.css',
   '/beyond-tv/assets/js/app.js',
+  '/beyond-tv/assets/js/video-ads.js',
   '/beyond-tv/assets/img/beyond-tv-logo.webp'
 ];
 

@@ -78,20 +78,20 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
 
     function updateUsageStatus(usage) {
         if (!usage || typeof usage !== 'object') return;
-        const bitDollars = Number(usage.bit_dollars || 0).toFixed(6);
-        const bitLimit = Number(usage.bit_dollar_limit || 0.10).toFixed(6);
-        const inputTokens = Number(usage.input_tokens || 0).toLocaleString();
-        const outputTokens = Number(usage.output_tokens || 0).toLocaleString();
-        usageStatus.textContent = `This month: ${usage.requests || 0}/${usage.request_limit || 1} model requests · ${inputTokens} input + ${outputTokens} output tokens · ${bitDollars} BIT$ estimated of ${bitLimit} BIT$`;
+        const bitDollarsLeft = Number(usage.bit_dollars_left ?? 0.10).toFixed(2);
+        const requestLimit = Number(usage.request_limit || 5);
+        const wallet = Number(usage.wallet_bit_balance);
+        const walletCopy = Number.isFinite(wallet) ? ` · Wallet: ${wallet.toLocaleString()} BIT$` : '';
+        usageStatus.textContent = `This month: ${usage.requests || 0}/${requestLimit} model requests · ${bitDollarsLeft} BIT$ left${walletCopy}`;
     }
 
     fetch(`${appBasePath}/api/usage.php`, {credentials: 'same-origin', cache: 'no-store'})
         .then(response => response.ok ? response.json() : null)
         .then(data => {
             if (data?.usage) updateUsageStatus(data.usage);
-            else usageStatus.textContent = 'Monthly BIT$ and token usage is temporarily unavailable.';
+            else usageStatus.textContent = 'Monthly BIT$ usage is temporarily unavailable.';
         })
-        .catch(() => { usageStatus.textContent = 'Monthly BIT$ and token usage is temporarily unavailable.'; });
+        .catch(() => { usageStatus.textContent = 'Monthly BIT$ usage is temporarily unavailable.'; });
 
     const nearBottom = () => messages.scrollHeight - messages.scrollTop - messages.clientHeight < 56;
     const updateMessageTools = () => {
@@ -282,7 +282,7 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
                 cache: 'no-store',
                 signal: controller.signal
             };
-            const response = await fetch(`${appBasePath}/api/chat.php?v=20260926-2`, {...requestOptions, credentials: 'same-origin'});
+            const response = await fetch(`${appBasePath}/api/chat.php?v=20260927-1`, {...requestOptions, credentials: 'same-origin'});
             const responseText = await response.text();
             let data;
             try {

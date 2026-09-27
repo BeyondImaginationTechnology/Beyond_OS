@@ -146,8 +146,9 @@ $instructions = [
 $runtimeUrl = rtrim((string)getenv('JAGUAR_RUNTIME_URL'), '/');
 if ($runtimeUrl === '' || !filter_var($runtimeUrl, FILTER_VALIDATE_URL) || !function_exists('curl_init')) code_json(200, ['revision' => $revision, 'action' => $action, 'context_files' => array_map(static fn($entry) => preg_match('/^--- PROJECT FILE: (.+) ---/', $entry, $m) ? $m[1] : null, $fileContext), 'message' => 'Jaguar’s model runtime is unavailable, so I could not analyze the supplied files or draft a repository-grounded diff. No files were changed. Plan: configure the private runtime URL and token, then retry this task; the selected context is ready.']);
 $runtimeToken = trim((string)getenv('JAGUAR_RUNTIME_TOKEN'));
+if ($runtimeToken === '') code_json(200, ['revision' => $revision, 'action' => $action, 'context_files' => array_map(static fn($entry) => preg_match('/^--- PROJECT FILE: (.+) ---/', $entry, $m) ? $m[1] : null, $fileContext), 'message' => 'Jaguar’s runtime authentication is not configured, so I could not analyze the supplied files or draft a repository-grounded diff. No files were changed. Plan: configure the private runtime URL and token, then retry this task; the selected context is ready.']);
 $headers = ['Content-Type: application/json'];
-if ($runtimeToken !== '') $headers[] = 'Authorization: Bearer ' . $runtimeToken;
+$headers[] = 'Authorization: Bearer ' . $runtimeToken;
 $runtime = curl_init($runtimeUrl . '/v1/chat');
 $request = [
     'mode' => 'code', 'language' => 'en', 'max_new_tokens' => 1024,

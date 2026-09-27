@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require_once __DIR__ . '/../../includes/visitor-analytics.php';
 
-const JAGUAR_MONTHLY_REQUEST_LIMIT = 1;
+const JAGUAR_MONTHLY_REQUEST_LIMIT = 5;
 const JAGUAR_MONTHLY_BIT_MICRO_LIMIT = 100000; // 0.10 BIT$, at 1 BIT$ = 1 Modal credit.
 const JAGUAR_MODAL_L4_BIT_MICRO_PER_SECOND = 222; // Modal's listed $0.000222 / L4 GPU-second.
 
@@ -116,11 +116,12 @@ function jaguar_usage_read(PDO $pdo, string $identity, ?string $period = null): 
     $period ??= jaguar_usage_period();
     // Individual month buckets are only needed until the monthly reset.
     $pdo->prepare('DELETE FROM jaguar_monthly_usage WHERE period < ?')->execute([$period]);
-    $statement = $pdo->prepare('SELECT request_count,input_tokens,output_tokens,modal_bit_micro_estimate FROM jaguar_monthly_usage WHERE identity_key=? AND period=? LIMIT 1');
+    $statement = $pdo->prepare('SELECT request_count,reserved_request_count,input_tokens,output_tokens,modal_bit_micro_estimate FROM jaguar_monthly_usage WHERE identity_key=? AND period=? LIMIT 1');
     $statement->execute([$identity, $period]);
     $row = $statement->fetch(PDO::FETCH_ASSOC) ?: [];
     return [
         'requests' => (int)($row['request_count'] ?? 0),
+        'reserved_requests' => (int)($row['reserved_request_count'] ?? 0),
         'input_tokens' => (int)($row['input_tokens'] ?? 0),
         'output_tokens' => (int)($row['output_tokens'] ?? 0),
         'bit_micro' => (int)($row['modal_bit_micro_estimate'] ?? 0),
@@ -128,7 +129,7 @@ function jaguar_usage_read(PDO $pdo, string $identity, ?string $period = null): 
     ];
 }
 
-/** Reserve the single monthly model request atomically for both account and IP identities. */
+/** Reserve one of five monthly model requests atomically for an account or guest IP. */
 function jaguar_usage_reserve(PDO $pdo, string $identity): array
 {
     $period = jaguar_usage_period();
@@ -140,17 +141,25 @@ function jaguar_usage_reserve(PDO $pdo, string $identity): array
             ? 'INSERT OR IGNORE INTO jaguar_monthly_usage(identity_key,period,updated_at) VALUES(?,?,?)'
             : 'INSERT IGNORE INTO jaguar_monthly_usage(identity_key,period,updated_at) VALUES(?,?,?)';
         $pdo->prepare($insert)->execute([$identity, $period, $now]);
-        $select = 'SELECT request_count,modal_bit_micro_estimate FROM jaguar_monthly_usage WHERE identity_key=? AND period=?' . ($driver === 'mysql' ? ' FOR UPDATE' : '');
+        $select = 'SELECT request_count,reserved_request_count,modal_bit_micro_estimate,updated_at FROM jaguar_monthly_usage WHERE identity_key=? AND period=?' . ($driver === 'mysql' ? ' FOR UPDATE' : '');
         $statement = $pdo->prepare($select);
         $statement->execute([$identity, $period]);
-        $row = $statement->fetch(PDO::FETCH_ASSOC) ?: ['request_count' => 0, 'modal_bit_micro_estimate' => 0];
+        $row = $statement->fetch(PDO::FETCH_ASSOC) ?: ['request_count' => 0, 'reserved_request_count' => 0, 'modal_bit_micro_estimate' => 0, 'updated_at' => $now];
         $used = (int)$row['request_count'];
+        $reserved = (int)$row['reserved_request_count'];
         $bitMicro = (int)$row['modal_bit_micro_estimate'];
-        if ($used >= JAGUAR_MONTHLY_REQUEST_LIMIT || $bitMicro >= JAGUAR_MONTHLY_BIT_MICRO_LIMIT) {
+        // The runtime call deadline is 105 seconds. Expire reservations left
+        // behind by a crashed PHP worker after a generous five-minute window.
+        if ($reserved > 0 && $now - (int)$row['updated_at'] > 300) {
+            $pdo->prepare('UPDATE jaguar_monthly_usage SET reserved_request_count=0,updated_at=? WHERE identity_key=? AND period=?')
+                ->execute([$now, $identity, $period]);
+            $reserved = 0;
+        }
+        if ($used + $reserved >= JAGUAR_MONTHLY_REQUEST_LIMIT || $bitMicro >= JAGUAR_MONTHLY_BIT_MICRO_LIMIT) {
             $pdo->commit();
             return array_merge(['allowed' => false], jaguar_usage_read($pdo, $identity, $period));
         }
-        $pdo->prepare('UPDATE jaguar_monthly_usage SET request_count=request_count+1,updated_at=? WHERE identity_key=? AND period=?')
+        $pdo->prepare('UPDATE jaguar_monthly_usage SET reserved_request_count=reserved_request_count+1,updated_at=? WHERE identity_key=? AND period=?')
             ->execute([$now, $identity, $period]);
         $pdo->commit();
         return array_merge(['allowed' => true], jaguar_usage_read($pdo, $identity, $period));
@@ -160,26 +169,47 @@ function jaguar_usage_reserve(PDO $pdo, string $identity): array
     }
 }
 
+/** Release an uncompleted model request so a transient runtime failure does not use monthly allowance. */
+function jaguar_usage_release(PDO $pdo, string $identity, string $period): void
+{
+    $statement = $pdo->prepare('UPDATE jaguar_monthly_usage SET reserved_request_count=CASE WHEN reserved_request_count>0 THEN reserved_request_count-1 ELSE 0 END,updated_at=? WHERE identity_key=? AND period=?');
+    $statement->execute([time(), $identity, $period]);
+}
+
+/** Count a completed runtime call even if its usage metadata was malformed. */
+function jaguar_usage_consume_unmetered(PDO $pdo, string $identity, string $period): void
+{
+    $statement = $pdo->prepare('UPDATE jaguar_monthly_usage SET request_count=request_count+1,reserved_request_count=CASE WHEN reserved_request_count>0 THEN reserved_request_count-1 ELSE 0 END,updated_at=? WHERE identity_key=? AND period=?');
+    $statement->execute([time(), $identity, $period]);
+}
+
 /** Save exact tokenizer counts and a GPU-only Modal BIT$ estimate for the request. */
 function jaguar_usage_settle(PDO $pdo, string $identity, string $period, int $inputTokens, int $outputTokens, float $gpuSeconds): array
 {
     $bitMicro = max(0, (int)ceil(max(0.0, $gpuSeconds) * JAGUAR_MODAL_L4_BIT_MICRO_PER_SECOND));
-    $statement = $pdo->prepare('UPDATE jaguar_monthly_usage SET input_tokens=input_tokens+?,output_tokens=output_tokens+?,modal_bit_micro_estimate=modal_bit_micro_estimate+?,updated_at=? WHERE identity_key=? AND period=?');
+    $statement = $pdo->prepare('UPDATE jaguar_monthly_usage SET request_count=request_count+1,reserved_request_count=CASE WHEN reserved_request_count>0 THEN reserved_request_count-1 ELSE 0 END,input_tokens=input_tokens+?,output_tokens=output_tokens+?,modal_bit_micro_estimate=modal_bit_micro_estimate+?,updated_at=? WHERE identity_key=? AND period=?');
     $statement->execute([max(0, $inputTokens), max(0, $outputTokens), $bitMicro, time(), $identity, $period]);
     return jaguar_usage_read($pdo, $identity, $period);
 }
 
-/** @return array{requests:int,request_limit:int,input_tokens:int,output_tokens:int,bit_dollars:float,bit_dollar_limit:float,period:string,estimate_basis:string} */
-function jaguar_usage_public(array $usage): array
+/** Read the signed-in user's current closed-loop BIT$ wallet balance. */
+function jaguar_wallet_bit_balance(PDO $pdo, int $userId): float
 {
-    return [
+    $statement = $pdo->prepare("SELECT balance FROM beyond_wallets WHERE user_id=? AND currency='BITS' AND status='active' LIMIT 1");
+    $statement->execute([$userId]);
+    $balance = $statement->fetchColumn();
+    return is_numeric($balance) ? max(0.0, (float)$balance) : 0.0;
+}
+
+/** @return array{requests:int,request_limit:int,bit_dollars_left:float,period:string,wallet_bit_balance?:float} */
+function jaguar_usage_public(array $usage, ?float $walletBalance = null): array
+{
+    $public = [
         'requests' => $usage['requests'],
         'request_limit' => JAGUAR_MONTHLY_REQUEST_LIMIT,
-        'input_tokens' => $usage['input_tokens'],
-        'output_tokens' => $usage['output_tokens'],
-        'bit_dollars' => $usage['bit_micro'] / 1000000,
-        'bit_dollar_limit' => JAGUAR_MONTHLY_BIT_MICRO_LIMIT / 1000000,
+        'bit_dollars_left' => max(0.0, (JAGUAR_MONTHLY_BIT_MICRO_LIMIT - $usage['bit_micro']) / 1000000),
         'period' => $usage['period'],
-        'estimate_basis' => 'GPU-only estimate from the current Modal L4 rate; workspace billing is authoritative.',
     ];
+    if ($walletBalance !== null) $public['wallet_bit_balance'] = $walletBalance;
+    return $public;
 }

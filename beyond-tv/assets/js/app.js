@@ -26,6 +26,11 @@ function initProviderPlayer(container){
   let startOffset=0;
   const setStatus=value=>{if(status)status.textContent=value};
   const clearTimer=()=>{if(timer){clearTimeout(timer);timer=0}};
+  const playAdBreak=next=>{
+    if(window.BeyondTVAds?.playBreak){
+      window.BeyondTVAds.playBreak({container,contentVideo:video,duration:300}).then(next);
+    }else next();
+  };
   const showFallback=()=>{
     clearTimer();
     if(video){video.pause();video.hidden=true}
@@ -54,7 +59,7 @@ function initProviderPlayer(container){
       if(loading)loading.hidden=true;
       setStatus(`Playing from ${source.provider} · ${source.title}`);
       const remaining=Math.max(60,Number(source.duration||0)-sourceOffset);
-      timer=setTimeout(playNext,remaining*1000);
+      timer=setTimeout(()=>playAdBreak(playNext),remaining*1000);
       return;
     }
     if(embed){embed.hidden=true;embed.src=''}
@@ -80,7 +85,7 @@ function initProviderPlayer(container){
   });
   video?.addEventListener('playing',()=>{clearTimer();if(loading)loading.hidden=true});
   video?.addEventListener('error',playNext);
-  video?.addEventListener('ended',playNext);
+  video?.addEventListener('ended',()=>playAdBreak(playNext));
   embed?.addEventListener('load',()=>{if(loading)loading.hidden=true});
   container.querySelector('[data-open-embed]')?.addEventListener('click',()=>{
     if(!embedFallback)return;

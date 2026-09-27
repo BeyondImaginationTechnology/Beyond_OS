@@ -123,7 +123,11 @@ if ($modeDefinition === null) { http_response_code(422); echo json_encode(['erro
 if (!jaguar_mode_is_enabled($mode)) { http_response_code(501); echo json_encode(['error' => 'Jaguar Thinking ' . $modeDefinition['label'] . ' is planned, not available in this preview yet.']); exit; }
 if (in_array($mode, ['draw', 'video'], true)) {
     http_response_code(503);
-    echo json_encode(['error' => 'Jaguar ' . ucfirst($mode) . ' is selectable in preview, but its GPU generation worker is not connected yet. No media was generated.']);
+    $drawPayload = ['error' => 'Jaguar ' . ucfirst($mode) . ' is selectable in preview, but its GPU generation worker is not connected yet. No media was generated and no BIT$ was charged.'];
+    if ($signedIn) {
+        try { $drawPayload['wallet_bit_balance'] = jaguar_wallet_bit_balance(beyond_db(), (int)$_SESSION['user_id']); } catch (Throwable $exception) {}
+    }
+    echo json_encode($drawPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
 try {
@@ -230,9 +234,9 @@ if (preg_match('/^(hi|hello|hey|bonjour|salut|allo|hola|buenas)(?:[\s,]+(?:there
     $simpleReply = $simpleCopy[$language]['version'];
 } elseif (preg_match('/^(how old are you|what(?:[’\']s| is) your age|when were you (?:made|created|born)|quel âge as-tu|cuántos años tienes)[\s!.?¿¡]*$/u', $simplePrompt)) {
     $simpleReply = [
-        'en' => 'I don’t have a human age. I’m Llama Jaguar v0.4 Preview, an AI system being built for the BIT ecosystem.',
-        'fr' => 'Je n’ai pas d’âge humain. Je suis Llama Jaguar v0.4 Preview, un système d’IA conçu pour l’écosystème BIT.',
-        'es' => 'No tengo una edad humana. Soy Llama Jaguar v0.4 Preview, un sistema de IA creado para el ecosistema BIT.',
+        'en' => 'I don’t have a human age. I’m Llama Jaguar v0.5 Preview, an AI system being built for the BIT ecosystem.',
+        'fr' => 'Je n’ai pas d’âge humain. Je suis Llama Jaguar v0.5 Preview, un système d’IA conçu pour l’écosystème BIT.',
+        'es' => 'No tengo una edad humana. Soy Llama Jaguar v0.5 Preview, un sistema de IA creado para el ecosistema BIT.',
     ][$language];
 } elseif (preg_match('/^(-?\d+(?:\.\d+)?)\s*([+\-*\/])\s*(-?\d+(?:\.\d+)?)\s*(?:=|\?)?$/', $simplePrompt, $math)) {
     $left = (float) $math[1];
@@ -348,10 +352,11 @@ if ($mode === 'core' && $guide !== '') {
         exit;
     }
 $runtimeUrl = rtrim((string) getenv('JAGUAR_RUNTIME_URL'), '/');
-if ($runtimeUrl === '' || !filter_var($runtimeUrl, FILTER_VALIDATE_URL)) { http_response_code(503); echo json_encode(['error' => 'Jaguar is not available yet.']); exit; }
+if ($runtimeUrl === '' || !filter_var($runtimeUrl, FILTER_VALIDATE_URL) || !function_exists('curl_init')) { http_response_code(503); echo json_encode(['error' => 'Jaguar is not available yet.']); exit; }
 $runtimeToken = trim((string) getenv('JAGUAR_RUNTIME_TOKEN'));
+if ($runtimeToken === '') { http_response_code(503); echo json_encode(['error' => 'Jaguar runtime authentication is not configured.']); exit; }
 $headers = ['Content-Type: application/json'];
-if ($runtimeToken !== '') { $headers[] = 'Authorization: Bearer ' . $runtimeToken; }
+$headers[] = 'Authorization: Bearer ' . $runtimeToken;
 $request = curl_init($runtimeUrl . '/v1/chat');
 // Leave enough time for a warm runtime, but return a usable error before the
 // browser can appear permanently stuck while a cold runtime is unavailable.
@@ -375,9 +380,14 @@ if (!$usageReservation['allowed']) {
     ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
+$releaseUsageReservation = static function () use ($usageIdentity, $usageReservation): void {
+    try { jaguar_usage_release(beyond_db(), $usageIdentity, (string)$usageReservation['period']); }
+    catch (Throwable $exception) { error_log('Jaguar monthly usage reservation release failed: ' . $exception->getMessage()); }
+};
 curl_setopt_array($request, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 15, CURLOPT_TIMEOUT => 105, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode($runtimePayload, JSON_THROW_ON_ERROR)]);
 $response = curl_exec($request); $status = (int) curl_getinfo($request, CURLINFO_RESPONSE_CODE); curl_close($request);
 if (!is_string($response) || $status < 200 || $status >= 300) {
+    $releaseUsageReservation();
     http_response_code(503);
     $error = $mode === 'build' && $status === 422
         ? 'Build preview is not enabled on the Jaguar runtime yet. Please try Explain or contact the Jaguar administrator.'
@@ -394,8 +404,10 @@ if (!is_array($runtimeResult) || $runtimeUsage === null
     || (float)$runtimeUsage['gpu_seconds'] < 0 || (float)$runtimeUsage['gpu_seconds'] > 105
     || (float)$runtimeUsage['input_tokens'] < 0 || (float)$runtimeUsage['input_tokens'] > 8192
     || (float)$runtimeUsage['output_tokens'] < 0 || (float)$runtimeUsage['output_tokens'] > 1024) {
+    try { jaguar_usage_consume_unmetered(beyond_db(), $usageIdentity, (string)$usageReservation['period']); }
+    catch (Throwable $exception) { error_log('Jaguar completed request could not be recorded: ' . $exception->getMessage()); }
     http_response_code(503);
-    echo json_encode(['error' => 'Jaguar usage metering is not ready on the model runtime. The request allowance was reserved; contact support if this continues.']);
+    echo json_encode(['error' => 'Jaguar usage metering is not ready on the model runtime. This completed model request counts toward your monthly allowance; contact support if this continues.']);
     exit;
 }
 try {
@@ -413,5 +425,10 @@ try {
     echo json_encode(['error' => 'Jaguar could not record this request’s token usage. Your monthly request allowance was reserved.']);
     exit;
 }
-$runtimeResult['usage'] = jaguar_usage_public($usage);
+$walletBalance = null;
+if ($signedIn) {
+    try { $walletBalance = jaguar_wallet_bit_balance(beyond_db(), (int)$_SESSION['user_id']); }
+    catch (Throwable $exception) { error_log('Jaguar BIT$ wallet lookup failed: ' . $exception->getMessage()); }
+}
+$runtimeResult['usage'] = jaguar_usage_public($usage, $walletBalance);
 echo json_encode($runtimeResult, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

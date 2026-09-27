@@ -65,6 +65,7 @@ if (is_file($frenchLessonsPath)) {
 <link rel="canonical" href="https://beyondimagination.co.technology/">
 <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
 <link rel="stylesheet" href="/assets/css/beyond-splash.css?v=20260828-1">
+<link rel="stylesheet" href="/beyond-tv/assets/css/video-ads.css?v=1.0.0">
 <script src="/assets/js/beyond-splash.js?v=20260904-1" defer></script>
 <style>
 :root{--bg:#030611;--panel:#09101f;--line:rgba(255,255,255,.13);--text:#f7f8ff;--muted:#b8bed2;--pink:#f2469d;--violet:#7057ff;--green:#51db78;--gold:#ffbf32;--blue:#448cff}
@@ -430,6 +431,7 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
     if(source?.duration){
       const remaining=Math.max(60,Number(source.duration)-Math.max(0,Number(state.start_offset||0)));
       button.dataset.syncMs=String(remaining*1000);
+      button.dataset.adBreak='1';
     }
    const sourceKey=String(state.source_key||current.source_key||'');
    if(sourceKey)button.dataset.streamKey=sourceKey;
@@ -445,7 +447,12 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
    if(syncTimer)window.clearTimeout(syncTimer);
    const delay=syncInterval(button);
    nextSyncAt=Date.now()+delay;
-   syncTimer=window.setTimeout(()=>tune(button),delay);
+   syncTimer=window.setTimeout(()=>{
+     const refresh=()=>{if(button.classList.contains('active'))tune(button)};
+     if(button.dataset.adBreak==='1'&&window.BeyondTVAds?.playBreak){
+       window.BeyondTVAds.playBreak({container:stage.querySelector('.home-live-player'),contentVideo:video,duration:300}).then(refresh);
+     }else refresh();
+   },delay);
    updateClock(button);
  }
  async function tune(button,{refreshState=true}={}){
@@ -541,7 +548,8 @@ window.addEventListener('DOMContentLoaded',()=>{
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&drawer.classList.contains('is-open'))setOpen(false);});
 })();
 </script>
-<script src="/beyond-tv/assets/js/app.js?v=3.0.3"></script>
+<script src="/beyond-tv/assets/js/video-ads.js?v=1.0.0"></script>
+<script src="/beyond-tv/assets/js/app.js?v=3.0.4"></script>
 </main>
 <footer class="footer wrap">
     <div><a class="brand" href="./">BEYOND <span>IMAGINATION</span></a><p>Technology for the connected imagination ecosystem.</p><p class="copyright">© 2026 Beyond Imagination Technology.</p></div>

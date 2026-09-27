@@ -118,9 +118,9 @@ def load_model():
 
 
 def require_runtime_token(authorization: str | None = Header(default=None)) -> None:
-    """Authenticate callers when this runtime is deployed beyond localhost."""
+    """Require a configured shared secret for every runtime request."""
     if not RUNTIME_TOKEN:
-        return
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Runtime authentication is not configured")
     expected = f"Bearer {RUNTIME_TOKEN}"
     if authorization is None or not secrets.compare_digest(authorization, expected):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized runtime request")

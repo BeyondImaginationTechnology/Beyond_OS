@@ -10,6 +10,15 @@ The latest v0.2 artifact hashes and boot results are recorded in the
 “Home v0.2 release identity rebuild” section below. Earlier hash entries are
 historical builds and are not the current downloads.
 
+## Windows Wizard build
+
+- `homeOS.exe` built on 2026-09-27 from the shared USB creator. It enables
+  the Home v0.2 candidate, verifies the compressed USB image against the
+  published SHA-256 manifest, expands it locally, and writes the selected USB
+  disk only after explicit erase confirmation. SHA-256:
+  `62b56ca22befc88a991ccecd68474b9577a400db8cfadf67356da16025ebc898`
+  (25,600 bytes). It is not Authenticode-signed.
+
 ## Initial Home 0.1 full image build
 
 - Built Buildroot 2026.02.3 in the isolated checkout on GCP VM

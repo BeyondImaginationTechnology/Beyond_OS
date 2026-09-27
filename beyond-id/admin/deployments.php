@@ -71,10 +71,10 @@ require __DIR__ . '/../includes/admin-sidebar.php';
       <div class="deployment-stat"><span>Last admin job result</span><strong><?= e($deployment['message'] ?: $resultLabel) ?></strong></div>
     </div>
     <div class="deployment-actions">
-      <form method="post" onsubmit="return confirm('Queue deployment of the latest main branch to production?');">
+      <form method="post">
         <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
         <input type="hidden" name="action" value="queue_deployment">
-        <button type="submit"<?= in_array($result, ['queued', 'running'], true) ? ' disabled' : '' ?>>Queue production deploy</button>
+        <button type="submit"<?= in_array($result, ['queued', 'running'], true) ? ' disabled' : '' ?>>Queue latest main for production</button>
       </form>
       <a class="btn btn-secondary" href="<?= e($startCpUrl) ?>" target="_blank" rel="noopener noreferrer">Open StartCP Deploy ↗</a>
     </div>

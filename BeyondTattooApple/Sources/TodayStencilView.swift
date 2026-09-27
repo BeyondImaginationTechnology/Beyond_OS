@@ -20,6 +20,28 @@ struct TodayStencilView: View {
             }
 
             VStack(alignment: .leading, spacing: 12) {
+                SectionTitle(text: "Make it yours")
+                Text("Start with today’s released stencil, then refine it in the editor or ask Needle Bot for composition and placement guidance.")
+                    .foregroundStyle(.secondary)
+                NavigationLink {
+                    CreateStencilView()
+                } label: {
+                    Label("Open stencil editor", systemImage: "wand.and.stars")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                NavigationLink {
+                    NeedleBotView()
+                } label: {
+                    Label("Ask Needle Bot", systemImage: "sparkles")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+            }
+            .padding()
+            .background(Color.tattooPanel, in: RoundedRectangle(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 12) {
                 SectionTitle(text: "Studio pack")
                 Link(destination: store.dailyDrop.packageURL) {
                     Label("Download complete pack", systemImage: "square.and.arrow.down.fill")

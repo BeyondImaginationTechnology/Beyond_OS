@@ -1,0 +1,6 @@
+<resources>
+    <color name="tattoo_background">#0B0712</color>
+    <color name="tattoo_panel">#17101E</color>
+    <color name="tattoo_violet">#9633EB</color>
+    <color name="tattoo_ink">#F1E8F5</color>
+</resources>

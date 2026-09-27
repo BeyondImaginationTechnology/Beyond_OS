@@ -7,10 +7,10 @@ struct RootView: View {
                 .tabItem { Label("Today", systemImage: "sparkles.rectangle.stack.fill") }
             NavigationStack { LibraryView() }
                 .tabItem { Label("Library", systemImage: "square.grid.2x2.fill") }
-            NavigationStack { HealingView() }
-                .tabItem { Label("Healing", systemImage: "heart.text.square.fill") }
-            NavigationStack { StudiosView() }
-                .tabItem { Label("Studios", systemImage: "mappin.and.ellipse") }
+            NavigationStack { CreateStencilView() }
+                .tabItem { Label("Create", systemImage: "wand.and.stars") }
+            NavigationStack { NeedleBotView() }
+                .tabItem { Label("Needle Bot", systemImage: "sparkles") }
             NavigationStack { ProfileView() }
                 .tabItem { Label("Profile", systemImage: "person.crop.circle.fill") }
         }

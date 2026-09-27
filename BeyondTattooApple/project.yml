@@ -3,14 +3,13 @@ options:
   bundleIdPrefix: technology.co.beyondimagination
   deploymentTarget:
     iOS: "17.0"
-    macOS: "14.0"
   xcodeVersion: "26.0"
   createIntermediateGroups: true
 settings:
   base:
     DEVELOPMENT_TEAM: FK9QM3VUNH
     CODE_SIGN_STYLE: Automatic
-    CURRENT_PROJECT_VERSION: 3
+    CURRENT_PROJECT_VERSION: 4
     MARKETING_VERSION: 1.2.0
     SWIFT_VERSION: 6.0
     GENERATE_INFOPLIST_FILE: YES
@@ -42,21 +41,6 @@ targets:
     scheme:
       testTargets:
         - BeyondTattooTests
-  BeyondTattoo-macOS:
-    type: application
-    platform: macOS
-    sources:
-      - path: Sources
-    resources:
-      - path: Resources
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.beyondtattoo.mac
-        PRODUCT_NAME: Beyond Tattoo
-        PRODUCT_MODULE_NAME: BeyondTattoo
-        INFOPLIST_KEY_CFBundleDisplayName: Beyond Tattoo
-        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.lifestyle
-    scheme: {}
   BeyondTattooTests:
     type: bundle.unit-test
     platform: iOS

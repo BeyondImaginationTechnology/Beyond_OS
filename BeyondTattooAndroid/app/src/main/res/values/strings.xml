@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Beyond Tattoo</string>
+    <string name="home">Today</string>
+    <string name="library">Library</string>
+    <string name="create">Create</string>
+    <string name="needle_bot">Needle Bot</string>
+    <string name="profile">Profile</string>
+</resources>

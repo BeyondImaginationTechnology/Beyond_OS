@@ -1,0 +1,23 @@
+plugins { id 'com.android.application' }
+
+android {
+    namespace 'technology.co.beyondimagination.beyondtattoo'
+    compileSdk 37
+
+    defaultConfig {
+        applicationId 'technology.co.beyondimagination.beyondtattoo'
+        minSdk 26
+        targetSdk 37
+        versionCode providers.gradleProperty('versionCode').map { it.toInteger() }.getOrElse(4)
+        versionName providers.gradleProperty('versionName').getOrElse('1.2.0')
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}

@@ -277,6 +277,8 @@ enum WebDestination: String, Identifiable, CaseIterable {
     case dashboard = "Dashboard"
     case studios = "Studios"
     case stencil = "Stencil of day"
+    case editor = "Stencil editor"
+    case needleBot = "Needle Bot"
 
     var id: String { rawValue }
 
@@ -290,6 +292,10 @@ enum WebDestination: String, Identifiable, CaseIterable {
             URL(string: "https://beyondimagination.co.technology/beyond-tattoo/studios.php")!
         case .stencil:
             URL(string: "https://beyondimagination.co.technology/beyond-tattoo/stencil-of-day.php")!
+        case .editor:
+            URL(string: "https://beyondimagination.co.technology/beyond-tattoo/stencil-editor.php")!
+        case .needleBot:
+            URL(string: "https://beyondimagination.co.technology/beyond-tattoo/needle-bot.php?embed=1")!
         }
     }
 }

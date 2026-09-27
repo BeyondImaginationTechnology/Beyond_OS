@@ -17,19 +17,12 @@
 		300000000000000000000008 /* TattooStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000008 /* TattooStore.swift */; };
 		300000000000000000000009 /* TodayStencilView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000009 /* TodayStencilView.swift */; };
 		300000000000000000000010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000010 /* Assets.xcassets */; };
-		300000000000000000000011 /* BeyondTattooApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000001 /* BeyondTattooApp.swift */; };
-		300000000000000000000012 /* HealingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000002 /* HealingView.swift */; };
-		300000000000000000000013 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000003 /* LibraryView.swift */; };
-		300000000000000000000014 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000004 /* Models.swift */; };
-		300000000000000000000015 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000005 /* ProfileView.swift */; };
-		300000000000000000000016 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000006 /* RootView.swift */; };
-		300000000000000000000017 /* StudiosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000007 /* StudiosView.swift */; };
-		300000000000000000000018 /* TattooStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000008 /* TattooStore.swift */; };
-		300000000000000000000019 /* TodayStencilView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000009 /* TodayStencilView.swift */; };
-		300000000000000000000020 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000010 /* Assets.xcassets */; };
 		300000000000000000000021 /* BeyondTattooTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000011 /* BeyondTattooTests.swift */; };
 		300000000000000000000022 /* tattoo-library-v1.2.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000015 /* tattoo-library-v1.2.json */; };
 		300000000000000000000023 /* tattoo-library-v1.2.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000015 /* tattoo-library-v1.2.json */; };
+		300000000000000000000024 /* CreateStencilView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000016 /* CreateStencilView.swift */; };
+		300000000000000000000025 /* NeedleBotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000017 /* NeedleBotView.swift */; };
+		300000000000000000000026 /* WebFeatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000018 /* WebFeatureView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,20 +48,15 @@
 		100000000000000000000010 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		100000000000000000000011 /* BeyondTattooTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeyondTattooTests.swift; sourceTree = "<group>"; };
 		100000000000000000000012 /* BeyondTattoo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeyondTattoo.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		100000000000000000000013 /* Beyond Tattoo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Beyond Tattoo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		100000000000000000000014 /* BeyondTattooTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeyondTattooTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		100000000000000000000015 /* tattoo-library-v1.2.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "tattoo-library-v1.2.json"; sourceTree = "<group>"; };
+		100000000000000000000016 /* CreateStencilView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateStencilView.swift; sourceTree = "<group>"; };
+		100000000000000000000017 /* NeedleBotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeedleBotView.swift; sourceTree = "<group>"; };
+		100000000000000000000018 /* WebFeatureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebFeatureView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		500000000000000000000001 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		500000000000000000000002 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -107,6 +95,9 @@
 				100000000000000000000007 /* StudiosView.swift */,
 				100000000000000000000008 /* TattooStore.swift */,
 				100000000000000000000009 /* TodayStencilView.swift */,
+				100000000000000000000016 /* CreateStencilView.swift */,
+				100000000000000000000017 /* NeedleBotView.swift */,
+				100000000000000000000018 /* WebFeatureView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -132,7 +123,6 @@
 			isa = PBXGroup;
 			children = (
 				100000000000000000000012 /* BeyondTattoo.app */,
-				100000000000000000000013 /* Beyond Tattoo.app */,
 				100000000000000000000014 /* BeyondTattooTests.xctest */,
 			);
 			name = Products;
@@ -158,25 +148,6 @@
 			);
 			productName = BeyondTattoo;
 			productReference = 100000000000000000000012 /* BeyondTattoo.app */;
-			productType = "com.apple.product-type.application";
-		};
-		222222222222222222222222 /* BeyondTattoo-macOS */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 700000000000000000000002 /* Build configuration list for PBXNativeTarget "BeyondTattoo-macOS" */;
-			buildPhases = (
-				600000000000000000000003 /* Sources */,
-				500000000000000000000002 /* Frameworks */,
-				600000000000000000000004 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "BeyondTattoo-macOS";
-			packageProductDependencies = (
-			);
-			productName = "Beyond Tattoo";
-			productReference = 100000000000000000000013 /* Beyond Tattoo.app */;
 			productType = "com.apple.product-type.application";
 		};
 		333333333333333333333333 /* BeyondTattooTests */ = {
@@ -207,10 +178,6 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
-					222222222222222222222222 = {
-						DevelopmentTeam = FK9QM3VUNH;
-						ProvisioningStyle = Automatic;
-					};
 					333333333333333333333333 = {
 						DevelopmentTeam = FK9QM3VUNH;
 						ProvisioningStyle = Automatic;
@@ -232,7 +199,6 @@
 			projectRoot = "";
 			targets = (
 				111111111111111111111111 /* BeyondTattoo-iOS */,
-				222222222222222222222222 /* BeyondTattoo-macOS */,
 				333333333333333333333333 /* BeyondTattooTests */,
 			);
 		};
@@ -245,15 +211,6 @@
 			files = (
 				300000000000000000000010 /* Assets.xcassets in Resources */,
 				300000000000000000000022 /* tattoo-library-v1.2.json in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		600000000000000000000004 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				300000000000000000000020 /* Assets.xcassets in Resources */,
-				300000000000000000000023 /* tattoo-library-v1.2.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -273,22 +230,9 @@
 				300000000000000000000007 /* StudiosView.swift in Sources */,
 				300000000000000000000008 /* TattooStore.swift in Sources */,
 				300000000000000000000009 /* TodayStencilView.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		600000000000000000000003 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				300000000000000000000011 /* BeyondTattooApp.swift in Sources */,
-				300000000000000000000012 /* HealingView.swift in Sources */,
-				300000000000000000000013 /* LibraryView.swift in Sources */,
-				300000000000000000000014 /* Models.swift in Sources */,
-				300000000000000000000015 /* ProfileView.swift in Sources */,
-				300000000000000000000016 /* RootView.swift in Sources */,
-				300000000000000000000017 /* StudiosView.swift in Sources */,
-				300000000000000000000018 /* TattooStore.swift in Sources */,
-				300000000000000000000019 /* TodayStencilView.swift in Sources */,
+				300000000000000000000024 /* CreateStencilView.swift in Sources */,
+				300000000000000000000025 /* NeedleBotView.swift in Sources */,
+				300000000000000000000026 /* WebFeatureView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -373,46 +317,6 @@
 			};
 			name = Release;
 		};
-		800000000000000000000003 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = FK9QM3VUNH;
-				INFOPLIST_KEY_CFBundleDisplayName = "Beyond Tattoo";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.beyondtattoo.mac;
-				PRODUCT_MODULE_NAME = BeyondTattoo;
-				PRODUCT_NAME = "Beyond Tattoo";
-				SDKROOT = macosx;
-			};
-			name = Debug;
-		};
-		800000000000000000000004 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = FK9QM3VUNH;
-				INFOPLIST_KEY_CFBundleDisplayName = "Beyond Tattoo";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = technology.co.beyondimagination.beyondtattoo.mac;
-				PRODUCT_MODULE_NAME = BeyondTattoo;
-				PRODUCT_NAME = "Beyond Tattoo";
-				SDKROOT = macosx;
-			};
-			name = Release;
-		};
 		800000000000000000000005 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -486,7 +390,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -554,7 +458,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -589,15 +493,6 @@
 			buildConfigurations = (
 				800000000000000000000001 /* Debug */,
 				800000000000000000000002 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
-		700000000000000000000002 /* Build configuration list for PBXNativeTarget "BeyondTattoo-macOS" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				800000000000000000000003 /* Debug */,
-				800000000000000000000004 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

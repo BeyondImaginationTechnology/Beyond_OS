@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.BeyondTattoo" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">@color/tattoo_violet</item>
+        <item name="android:navigationBarColor">@color/tattoo_background</item>
+        <item name="android:statusBarColor">@color/tattoo_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

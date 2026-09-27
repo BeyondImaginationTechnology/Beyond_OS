@@ -1,0 +1,109 @@
+package technology.co.beyondimagination.beyondtattoo;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.CookieManager;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+/** Native Android container for the responsive Beyond Tattoo 1.2 experience. */
+public final class MainActivity extends Activity {
+    private static final String BASE = "https://beyondimagination.co.technology/beyond-tattoo/";
+    private WebView webView;
+    private TextView title;
+    private Button selectedButton;
+
+    @Override @SuppressLint("SetJavaScriptEnabled")
+    public void onCreate(Bundle state) {
+        super.onCreate(state);
+        CookieManager.getInstance().setAcceptCookie(true);
+
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setBackgroundColor(Color.rgb(11, 7, 18));
+
+        LinearLayout header = new LinearLayout(this);
+        header.setOrientation(LinearLayout.VERTICAL);
+        header.setPadding(dp(18), dp(12), dp(18), dp(10));
+        header.setBackgroundColor(Color.rgb(23, 16, 30));
+        title = new TextView(this);
+        title.setTextColor(Color.rgb(241, 232, 245));
+        title.setTextSize(20);
+        title.setTypeface(null, 1);
+        header.addView(title);
+        TextView subtitle = new TextView(this);
+        subtitle.setText("Beyond Tattoo 1.2 · mobile studio");
+        subtitle.setTextColor(Color.rgb(196, 174, 210));
+        subtitle.setTextSize(12);
+        header.addView(subtitle);
+        root.addView(header);
+
+        webView = new WebView(this);
+        WebSettings settings = webView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setDomStorageEnabled(true);
+        settings.setDatabaseEnabled(true);
+        settings.setAllowFileAccess(false);
+        settings.setMediaPlaybackRequiresUserGesture(true);
+        webView.setBackgroundColor(Color.rgb(11, 7, 18));
+        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebViewClient(new WebViewClient() {
+            @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                // Keep editor, Needle Bot, and Jaguar requests in this signed-in app session.
+                view.loadUrl(request.getUrl().toString());
+                return true;
+            }
+        });
+        root.addView(webView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
+
+        LinearLayout navigation = new LinearLayout(this);
+        navigation.setGravity(Gravity.CENTER);
+        navigation.setPadding(dp(5), dp(7), dp(5), dp(9));
+        navigation.setBackgroundColor(Color.rgb(23, 16, 30));
+        addNav(navigation, getString(R.string.home), BASE, "Today");
+        addNav(navigation, getString(R.string.library), BASE + "stencils.php", "Library");
+        addNav(navigation, getString(R.string.create), BASE + "stencil-editor.php", "Create");
+        addNav(navigation, getString(R.string.needle_bot), BASE + "needle-bot.php?embed=1", "Needle Bot");
+        addNav(navigation, getString(R.string.profile), BASE + "profile.php", "Profile");
+        root.addView(navigation);
+        setContentView(root);
+        select("Today", BASE, null);
+    }
+
+    private void addNav(LinearLayout navigation, String label, String url, String pageTitle) {
+        Button button = new Button(this);
+        button.setText(label);
+        button.setTextSize(11);
+        button.setAllCaps(false);
+        button.setTextColor(Color.rgb(241, 232, 245));
+        button.setBackgroundColor(Color.TRANSPARENT);
+        button.setOnClickListener(v -> select(pageTitle, url, button));
+        navigation.addView(button, new LinearLayout.LayoutParams(0, dp(48), 1));
+    }
+
+    private void select(String pageTitle, String url, Button button) {
+        title.setText(pageTitle);
+        if (selectedButton != null) selectedButton.setTextColor(Color.rgb(241, 232, 245));
+        selectedButton = button;
+        if (selectedButton != null) selectedButton.setTextColor(Color.rgb(188, 126, 255));
+        webView.loadUrl(url);
+    }
+
+    @Override public void onBackPressed() {
+        if (webView != null && webView.canGoBack()) webView.goBack(); else super.onBackPressed();
+    }
+
+    private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
+}

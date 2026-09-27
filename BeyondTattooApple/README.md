@@ -1,6 +1,6 @@
 # Beyond Tattoo Apple
 
-Native SwiftUI companion app for Beyond Tattoo on iOS and macOS.
+Native SwiftUI companion app for Beyond Tattoo on iOS. Desktop users install the responsive web app as a PWA.
 
 ## Includes
 
@@ -9,6 +9,7 @@ Native SwiftUI companion app for Beyond Tattoo on iOS and macOS.
 - Healing tracker timeline for photo logs and care milestones.
 - Location-aware Canadian studio directory with nine Ottawa listings and national coverage, showing the nearest 10 in kilometres.
 - Beyond ID beta/profile shell with role switching for collectors, artists, and studios.
+- In-app stencil editor session and Needle Bot tattoo companion, keeping Jaguar/editor requests inside the app.
 
 ## Build
 
@@ -19,4 +20,4 @@ cd BeyondTattooApple
 xcodegen generate
 ```
 
-Then open `BeyondTattoo.xcodeproj` and run either `BeyondTattoo-iOS` or `BeyondTattoo-macOS`.
+Then open `BeyondTattoo.xcodeproj` and run `BeyondTattoo-iOS`.

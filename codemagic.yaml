@@ -331,3 +331,109 @@ workflows:
     publishing:
       app_store_connect:
         auth: integration
+
+  beyond-tattoo-ios-checks:
+    name: Beyond Tattoo iOS 1.2 checks
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    working_directory: BeyondTattooApple
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+    environment:
+      xcode: latest
+    scripts:
+      - name: Generate the iOS-only project
+        script: |
+          set -euo pipefail
+          command -v xcodegen >/dev/null || brew install xcodegen
+          xcodegen generate
+      - name: Test and build on an iPhone simulator
+        script: |
+          set -euo pipefail
+          simulator_id="$(xcrun simctl list devices available -j | ruby -rjson -e '
+            devices = JSON.parse(STDIN.read).fetch("devices").values.flatten
+            device = devices.find { |candidate| candidate["isAvailable"] && candidate["name"].start_with?("iPhone") }
+            abort "No available iPhone simulator found" unless device
+            puts device.fetch("udid")
+          ')"
+          xcodebuild test -project BeyondTattoo.xcodeproj -scheme BeyondTattoo-iOS -destination "id=$simulator_id" -derivedDataPath "$CM_BUILD_DIR/derived-data" CODE_SIGNING_ALLOWED=NO
+          xcodebuild build -project BeyondTattoo.xcodeproj -scheme BeyondTattoo-iOS -sdk iphonesimulator -destination "id=$simulator_id" -derivedDataPath "$CM_BUILD_DIR/derived-data" CODE_SIGNING_ALLOWED=NO
+    artifacts:
+      - $CM_BUILD_DIR/derived-data/Logs/Test/*.xcresult
+      - $CM_BUILD_DIR/derived-data/Build/Products/**/*.app
+
+  beyond-tattoo-ios-testflight:
+    name: Beyond Tattoo iOS 1.2 TestFlight
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    working_directory: BeyondTattooApple
+    triggering:
+      events: []
+    integrations:
+      app_store_connect: beyond-apple-api
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: technology.co.beyondimagination.beyondtattoo
+      xcode: latest
+    scripts:
+      - name: Generate the iOS-only project
+        script: |
+          set -euo pipefail
+          command -v xcodegen >/dev/null || brew install xcodegen
+          xcodegen generate
+      - name: Configure signing profiles
+        script: xcode-project use-profiles
+      - name: Set a unique App Store build number
+        script: agvtool new-version -all "$(date +%s)"
+      - name: Build signed IPA
+        script: xcode-project build-ipa --project "$CM_BUILD_DIR/BeyondTattooApple/BeyondTattoo.xcodeproj" --scheme BeyondTattoo-iOS
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+
+  beyond-tattoo-android-simulator:
+    name: Beyond Tattoo Android 1.2 simulator
+    max_build_duration: 75
+    instance_type: mac_mini_m2
+    working_directory: BeyondTattooAndroid
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+    environment:
+      java: 17
+      vars:
+        ANDROID_VERSION_CODE: 4
+        ANDROID_VERSION_NAME: 1.2.0
+    scripts:
+      - name: Build the installable Android app
+        script: |
+          set -euo pipefail
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+          ./gradlew --no-daemon -PversionCode="$ANDROID_VERSION_CODE" -PversionName="$ANDROID_VERSION_NAME" assembleDebug
+      - name: Launch in Android simulator
+        script: |
+          set -euo pipefail
+          echo no | avdmanager create avd --force --name beyond-tattoo-api35 --package "system-images;android-35;google_apis;arm64-v8a"
+          "$ANDROID_SDK_ROOT/emulator/emulator" -avd beyond-tattoo-api35 -no-window -no-audio -no-snapshot -gpu swiftshader_indirect > "$CM_BUILD_DIR/android-emulator.log" 2>&1 &
+          adb wait-for-device
+          until [ "$(adb shell getprop sys.boot_completed | tr -d '\r')" = "1" ]; do sleep 2; done
+          adb install -r app/build/outputs/apk/debug/app-debug.apk
+          adb shell am start -W -n technology.co.beyondimagination.beyondtattoo/.MainActivity
+          adb shell dumpsys window windows | grep -q 'technology.co.beyondimagination.beyondtattoo'
+    artifacts:
+      - app/build/outputs/apk/debug/*.apk
+      - $CM_BUILD_DIR/android-emulator.log

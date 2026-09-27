@@ -1,9 +1,10 @@
 # Home v0.2 validation — 2026-09-26
 
 Status: **Home 0.2 development candidate built and booted under QEMU/OVMF UEFI.**
-This is not a production release. The browser remains blank, installation to a
-target disk was not completed, media playback and hardware acceptance remain
-unverified.
+This is not a production release. The configured Home page rendered in the
+guest browser after a delay, but external HTTPS navigation remains unverified.
+Installation to a target disk was not completed; media playback and hardware
+acceptance remain unverified.
 
 The latest v0.2 artifact hashes and boot results are recorded in the
 “Home v0.2 release identity rebuild” section below. Earlier hash entries are
@@ -54,8 +55,8 @@ historical builds and are not the current downloads.
   Clicking the Browser tile and sending keyboard input produced the guest's
   “Browser opened” status, confirming mouse and keyboard control.
 - WebKitGTK MiniBrowser opened and showed the configured site title, but its
-  page content stayed blank. The remote display path and app launch work;
-  browser rendering and navigation still need diagnosis.
+  initial page content stayed blank. The remote display path and app launch
+  work; browser rendering and navigation still need diagnosis.
 
 ## Desktop interaction refresh — 2026-09-26
 
@@ -169,10 +170,22 @@ historical builds and are not the current downloads.
   complete target selection or write an installation; no installed-disk boot
   is claimed.
 - Browser launch produced a MiniBrowser window, but its page remained blank at
-  the configured Home site. Browser navigation is still a release blocker.
+  the configured Home site during this identity-rebuild check. A later noVNC
+  check superseded the blank-page observation: the configured Home page rendered
+  after a delay. External HTTPS navigation is still unverified.
   Media playback/audio, notes persistence, graphics/input hardware, and real
   hardware boot remain unverified. The Media app's empty-library state was
   observed in an earlier v0.2 UI session; no media fixture was played.
+
+## Browser follow-up — 2026-09-26
+
+- In the later noVNC session, MiniBrowser eventually rendered the configured
+  BIT OS Home website, correcting the earlier blank-page observation. The
+  software-emulated guest was slow to paint the page.
+- Entering `https://example.com` left MiniBrowser displaying “The URL can't be
+  shown.” This external-navigation check did not pass; DNS, TLS, and general
+  browser network access still need diagnosis. Do not treat the Browser as
+  release-ready based on the configured-site render alone.
 
 ## Earlier v0.1 source checks — 2026-09-25
 

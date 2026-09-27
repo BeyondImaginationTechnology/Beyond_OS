@@ -161,7 +161,7 @@ try {
     }
 
     if ($selectedIndex === null) {
-        frenchNativeResponse(['ok' => true, 'built' => null, ...frenchNativeProgress($lessons, $characterVoices, $root, $selectedLanguages), 'batch' => $batch]);
+        frenchNativeResponse(['ok' => true, 'built' => null, ...frenchNativeProgress($lessons, $characterVoices, $selectedLanguages, $pdo), 'batch' => $batch]);
     }
 
     $settings = $allLanguages[$selectedLocale];

@@ -248,7 +248,6 @@ struct TodayView: View {
                 Text(narrationMessage)
                     .font(.footnote.weight(.medium))
                     .foregroundStyle(.white.opacity(0.82))
-                    .accessibilityLiveRegion(.polite)
             }
         }
         .padding(24)
@@ -378,6 +377,8 @@ struct TodayView: View {
         let fileManager = FileManager.default
         let fileURL = try narrationFileURL(date: date, tradition: tradition, locale: locale, passage: passage, reference: reference)
         if fileManager.fileExists(atPath: fileURL.path) { return fileURL }
+        let script = passage.trimmingCharacters(in: .whitespacesAndNewlines) + "\n\n" + reference.trimmingCharacters(in: .whitespacesAndNewlines)
+        let contentHash = SHA256.hash(data: Data(script.utf8)).map { String(format: "%02x", $0) }.joined()
 
         let endpoint = URL(string: "https://beyondimagination.co.technology/dailybreath/api/narration.php")!
         var request = URLRequest(url: endpoint)

@@ -23,7 +23,12 @@ fi
 cd "${REPOSITORY_ROOT}"
 CURRENT_BRANCH="$(git symbolic-ref --quiet --short HEAD || true)"
 [[ "${CURRENT_BRANCH}" == "main" ]] || { echo "Refusing to deploy branch '${CURRENT_BRANCH:-detached}'. Expected main." >&2; exit 1; }
-[[ -z "$(git status --porcelain)" ]] || { echo "Refusing to deploy a repository with local changes or untracked files." >&2; exit 1; }
+# Generated lesson narration is runtime data and intentionally lives outside Git.
+# Keep the safety check strict for tracked edits and every other untracked path.
+TRACKED_CHANGES="$(git diff --name-only; git diff --cached --name-only)"
+[[ -z "${TRACKED_CHANGES}" ]] || { echo "Refusing to deploy a repository with tracked local changes." >&2; exit 1; }
+UNEXPECTED_UNTRACKED="$(git ls-files --others --exclude-standard | grep -v '^dailybreath/assets/audio/' || true)"
+[[ -z "${UNEXPECTED_UNTRACKED}" ]] || { echo "Refusing to deploy unexpected untracked files." >&2; exit 1; }
 
 git fetch --prune origin main
 git merge --ff-only origin/main

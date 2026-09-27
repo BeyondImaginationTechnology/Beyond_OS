@@ -1,6 +1,3 @@
 # Keep the OS landing page on this subdomain while serving large release
 # artifacts from the production mirror, where they are published.
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteRule ^releases/(.*)$ https://beyondimagination.co.technology/releases/$1 [R=302,L,NE]
-</IfModule>
+RedirectMatch 302 ^/releases/(.*)$ https://beyondimagination.co.technology/releases/$1

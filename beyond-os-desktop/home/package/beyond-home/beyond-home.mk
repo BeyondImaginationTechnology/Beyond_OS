@@ -1,7 +1,7 @@
 ################################################################################
 # Beyond OS Home
 ################################################################################
-BEYOND_HOME_VERSION = 0.1.0-dev.1
+BEYOND_HOME_VERSION = 0.2.0-dev.1
 BEYOND_HOME_SITE = $(BR2_EXTERNAL_BEYOND_HOME_PATH)/src
 BEYOND_HOME_SITE_METHOD = local
 BEYOND_HOME_LICENSE = MIT (code), proprietary (artwork)
@@ -22,8 +22,10 @@ define BEYOND_HOME_INSTALL_TARGET_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/beyond-splash $(TARGET_DIR)/usr/bin/beyond-splash
 	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_HOME_PATH)/assets/boot.ppm \
 		$(TARGET_DIR)/usr/share/beyond-home/boot.ppm
+	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_HOME_PATH)/assets/wallpaper-home-movie-night-v0.2.bmp \
+		$(TARGET_DIR)/usr/share/beyond-home/wallpaper-movie-night.bmp
 	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_HOME_PATH)/assets/wallpaper-home-v0.1.bmp \
-		$(TARGET_DIR)/usr/share/beyond-home/wallpaper.bmp
+		$(TARGET_DIR)/usr/share/beyond-home/wallpaper-rainforest.bmp
 	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_HOME_PATH)/board/x86_64/grub.cfg.in \
 		$(TARGET_DIR)/usr/share/beyond-home/grub.cfg.in
 	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_BEYOND_HOME_PATH)/overlay/usr/share/beyond-home/grub-installed.cfg.in \

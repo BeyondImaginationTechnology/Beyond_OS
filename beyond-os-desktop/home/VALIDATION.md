@@ -1,9 +1,9 @@
 # Home v0.1 validation — 2026-09-26
 
-Status: **full installer candidate built; the ISO booted to the Home desktop under QEMU/OVMF UEFI.**
+Status: **Home v0.2 desktop candidate built and booted to the Home desktop under QEMU/OVMF UEFI.**
 This is a VM acceptance result, not a release sign-off.
 
-## Full image build
+## Initial Home 0.1 full image build
 
 - Built Buildroot 2026.02.3 in the isolated checkout on GCP VM
   `bit-os-core-test-a`, using `BR2_JLEVEL=2` and the Home UEFI installer
@@ -16,14 +16,14 @@ This is a VM acceptance result, not a release sign-off.
   Rebuilding `libgpg-error` and its reverse dependencies produced a 40-byte
   lock object in the target headers; the final installer build completed.
 - `bitHomeos.iso`: 348,274,688 bytes; `file` identified a bootable ISO 9660
-  image. SHA-256 after the Home desktop refresh:
-  `91898d0d23b988d4baab6dd1070d12559e66fe494f751e6110770d8bdcc56722`.
+  image. SHA-256 after the rainforest taskbar and icon refresh:
+  `d69d8046c1a84077490af889d1979729680a6d988b10c91930d4a4c6a66e82f2`.
 - `bit-os-home-0.1-installer.img`: 2,182,107,136 bytes; `fdisk` identified
   a GPT with a 32 MiB EFI system partition and a 2 GiB Linux root partition.
-  SHA-256 after the Home desktop refresh:
-  `44db5c53bb13238a5623996d3ff4afb878d1efe2abda0719750453c303c1fa9f`.
-- `rootfs.ext2` SHA-256 after the Home desktop refresh:
-  `41756f6f61ecd3ef51884733912dfbaa5f11debb89c9a4b6b1957f5fe09ca60c`.
+  SHA-256 after the rainforest taskbar and icon refresh:
+  `f46e658fa542c53e3243df327dcd9b63336e7281b17169207079803898c3a629`.
+- `rootfs.ext2` SHA-256 after the rainforest taskbar and icon refresh:
+  `18579eb921e7f98161d5996350e28567043aa6cc0dd348c9a331e602b08c9d35`.
   All three current entries passed `sha256sum -c`. The images
   remain on the VM's persistent disk under
   `beyond-os-desktop/home/out/installer-output/images/`.
@@ -33,8 +33,8 @@ This is a VM acceptance result, not a release sign-off.
 - Booted the final ISO with QEMU 10.0.13 and OVMF 4M firmware on the same VM,
   using TCG software emulation, standard VGA, a virtual NIC, and USB input.
   The Home graphical session reached its 1280×800 desktop. The current build
-  shows the rainforest wallpaper, desktop file/folder icons, and the Start
-  taskbar button. [Captured desktop](assets/home-qemu-uefi.png).
+  shows the rainforest wallpaper, desktop file/folder icons, no top header,
+  and the emerald glass taskbar. [Captured desktop](assets/home-qemu-uefi.png).
 - The read-only ISO live session copies the initial `/var` and `/home` content
   into temporary writable mounts before services and the user session start.
   The final boot passed the DBus and X.Org startup failures observed in earlier
@@ -70,6 +70,54 @@ This is a VM acceptance result, not a release sign-off.
   has not yet been confirmed in the VM; verify its page and navigation in noVNC.
 - The updated noVNC session is available at the existing local forwarded URL.
   The GCP VM remains running for interactive testing.
+
+## Emerald taskbar refresh — 2026-09-26
+
+- Rebuilt the Home package and regenerated the ISO, GPT installer image, and
+  root filesystem. The Home source cross-compiled with `-Wall -Wextra -Werror`.
+- Verified all three entries in the generated `SHA256SUMS` manifest. Image sizes
+  are unchanged; the hashes above correspond to this refreshed build.
+- The Home flavor now has a dark emerald glass taskbar with green Start and
+  launcher buttons. The top branding strip, top clock, and desktop corner hint
+  were removed so the rainforest wallpaper fills the desktop above the taskbar.
+- Rebooted the updated ISO through the running QEMU/OVMF session. A QEMU
+  monitor capture shows the refreshed 1280×800 desktop. The guest and GCP test
+  VM remain running for noVNC testing.
+
+## Rainforest taskbar and icon pass — 2026-09-26
+
+- Rebuilt Home with `-Wall -Wextra -Werror`, regenerated the ISO and installer
+  images, and verified every entry in the new `SHA256SUMS` manifest.
+- The taskbar now uses a cropped strip of the Amazon rainforest wallpaper under
+  a translucent emerald tint. Its quick launch icons are a folder, a globe, and
+  a play symbol; Start uses a leaf glyph.
+- Rebooted the ISO in QEMU/OVMF and captured the live 1280×800 desktop at
+  [assets/home-qemu-uefi.png](assets/home-qemu-uefi.png). The GCP test VM stays
+  running for interactive testing.
+
+## Home 0.2 desktop personalization — 2026-09-26
+
+- Rebuilt Beyond Home 0.2.0-dev.1 with the existing Buildroot output on
+  `bit-os-core-test-a`. The Home package compiled with `-std=c11 -Wall -Wextra
+  -Werror`; the full ISO and GPT installer image generation completed.
+- `bitHomeos.iso`: 348,274,688 bytes; bootable ISO 9660. SHA-256:
+  `58d0e80ef2f26d95390093bb98d603cca6db5321136d765c2abc643943d80691`.
+- `bit-os-home-0.1-installer.img`: 2,182,107,136 bytes; GPT with a 32 MiB EFI
+  System partition and 2 GiB Linux root partition. SHA-256:
+  `88973b56f729848bcea057b81c188fed53859ff5aa52a3d2b2594b2297ca0662`.
+- `rootfs.ext2`: 2,147,483,648 bytes; SHA-256:
+  `ef8cbf01645abd4e97e63def75400a92626708979a1027a19db79202a62a43bb`.
+  All three pass the generated `SHA256SUMS` manifest.
+- The default 1280×800 wallpaper is a quiet, people-free movie-night room with
+  a couch, blanket, popcorn, plants, and gentle TV glow. Start includes a
+  wallpaper picker for this scene and the preserved Amazon rainforest image;
+  the choice is stored in `~/.config/beyond-home/wallpaper`. The taskbar keeps
+  its rainforest texture whichever background is selected.
+- Launcher cards, wallpaper choices, taskbar buttons, and file rows now use
+  rounded corners and hover highlights. Desktop folders use a layered emerald
+  folder symbol. The 1280×800 screenshot below was captured from the refreshed
+  QEMU guest after booting the rebuilt ISO under OVMF UEFI with TCG emulation.
+  The guest is available in noVNC on the running test VM.
 
 ## Remaining release checks
 

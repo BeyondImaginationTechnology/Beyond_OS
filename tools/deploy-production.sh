@@ -46,6 +46,13 @@ fi
 for asset in \
   assets/icons/apple-continue-button.png \
   assets/icons/github-invertocat-white.png \
+  beyond-tattoo/manifest.php \
+  beyond-tattoo/service-worker.js \
+  beyond-tattoo/offline.html \
+  beyond-tattoo/assets/css/responsive.css \
+  beyond-tattoo/assets/js/pwa.js \
+  beyond-tattoo/assets/icons/beyond-tattoo-192.png \
+  beyond-tattoo/assets/icons/beyond-tattoo-512.png \
   beyond-tattoo/downloads/tattoo-procedure-consent-bc.pdf \
   dailybreath/assets/js/web-app.js \
   dailybreath/manifest.webmanifest \

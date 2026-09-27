@@ -29,12 +29,18 @@
 #define W 1280
 #define H 800
 
-enum Page { HOME, LAUNCHER, FILES, NOTES, ABOUT, VIEWER };
+enum Page { HOME, LAUNCHER, FILES, NOTES, ABOUT, VIEWER, WALLPAPERS };
 typedef struct { char name[256]; bool directory; } Entry;
 typedef struct { char name[256]; char path[PATH_CAP]; bool directory; int x, y; } DesktopIcon;
 static SDL_Renderer *renderer;
+static int pointer_x = -1, pointer_y = -1;
 #ifndef BIT_EDITION_CYBER
 static SDL_Texture *wallpaper_texture;
+static int wallpaper_width, wallpaper_height;
+static SDL_Texture *wallpaper_options[2];
+static int wallpaper_option_width[2], wallpaper_option_height[2];
+static int selected_wallpaper;
+static char wallpaper_preference_path[PATH_CAP];
 #endif
 static TTF_Font *small_font, *font, *title_font;
 static enum Page page = HOME;
@@ -87,14 +93,15 @@ static const char *subtitles[] = {"Record authorization before network discovery
 #define HOME_COPY "Your desktop for everyday work and play."
 #define FOUNDATION_NOTE "HOME 0.1 PREVIEW  /  FILES, NOTES, WEB AND MEDIA"
 #define UPCOMING_NOTE "Choose a tile to begin. Tab and Enter work with the keyboard."
-#define CARD_COUNT 6
+#define CARD_COUNT 7
 #define CARD_WIDTH 371
 #define CARD_HEIGHT 124
-static const char *titles[] = {"Files", "Notes", "Browser", "Media", "Terminal", "About Home"};
-static const char *subtitles[] = {"Browse your folders", "Write something down",
-                                  "Explore the web", "Play your files",
-                                  "Open the command line", "System and edition details"};
-static const char *symbols[] = {"F", "N", "W", "M", ">", "i"};
+static const char *titles[] = {"Files", "Notes", "Browser", "Media", "Terminal", "About Home", "Wallpaper"};
+static const char *subtitles[] = {"Browse your files", "Write a note",
+                                  "Explore the web", "Play your media",
+                                  "Open the terminal", "System information",
+                                  "Set desktop scene"};
+static const char *symbols[] = {"F", "N", "W", "M", ">", "i", "W"};
 #endif
 
 static void box(int x, int y, int w, int h, int r, int g, int b)
@@ -112,6 +119,117 @@ static void glass(int x, int y, int w, int h, int r, int g, int b, int alpha)
     SDL_SetRenderDrawColor(renderer, (Uint8)r, (Uint8)g, (Uint8)b, (Uint8)alpha);
     SDL_RenderFillRect(renderer, &rect);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+}
+
+static void rounded_glass(int x, int y, int w, int h, int r, int g, int b, int alpha, int radius)
+{
+    if (radius < 1 || radius * 2 > w || radius * 2 > h) {
+        glass(x, y, w, h, r, g, b, alpha);
+        return;
+    }
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_SetRenderDrawColor(renderer, (Uint8)r, (Uint8)g, (Uint8)b, (Uint8)alpha);
+    for (int row = 0; row < h; row++) {
+        int dy = row < radius ? radius - row : row >= h - radius ? row - (h - radius) + 1 : 0;
+        int inset = dy ? radius - (int)sqrt((double)(radius * radius - dy * dy)) : 0;
+        SDL_RenderDrawLine(renderer, x + inset, y + row, x + w - 1 - inset, y + row);
+    }
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+}
+
+static void draw_taskbar_glyph(int cx, int cy, int app)
+{
+    SDL_SetRenderDrawColor(renderer, 222, 255, 235, 255);
+    if (app == 0) {
+        /* Files: a raised emerald folder with a bright front edge. */
+        rounded_glass(cx - 12, cy - 9, 14, 8, 164, 241, 181, 245, 3);
+        rounded_glass(cx - 13, cy - 5, 27, 21, 87, 197, 124, 255, 4);
+        rounded_glass(cx - 10, cy - 1, 21, 13, 141, 232, 164, 255, 3);
+        SDL_SetRenderDrawColor(renderer, 226, 255, 233, 255);
+        SDL_RenderDrawLine(renderer, cx - 9, cy + 1, cx + 8, cy + 1);
+    } else if (app == 1) {
+        /* Browser: a globe with meridians and a latitude line. */
+        for (int i = 0; i < 32; i++) {
+            double a = i * 6.283185307179586 / 32.0;
+            double b = (i + 1) * 6.283185307179586 / 32.0;
+            SDL_RenderDrawLine(renderer, cx + (int)(11*cos(a)), cy + (int)(11*sin(a)),
+                               cx + (int)(11*cos(b)), cy + (int)(11*sin(b)));
+            SDL_RenderDrawLine(renderer, cx + (int)(5*cos(a)), cy + (int)(11*sin(a)),
+                               cx + (int)(5*cos(b)), cy + (int)(11*sin(b)));
+        }
+        SDL_RenderDrawLine(renderer, cx - 11, cy, cx + 11, cy);
+        SDL_RenderDrawLine(renderer, cx - 9, cy - 6, cx + 9, cy - 6);
+        SDL_RenderDrawLine(renderer, cx - 9, cy + 6, cx + 9, cy + 6);
+    } else {
+        /* Media: a clear play triangle with a leaf-green center stroke. */
+        SDL_RenderDrawLine(renderer, cx - 7, cy - 10, cx + 8, cy);
+        SDL_RenderDrawLine(renderer, cx + 8, cy, cx - 7, cy + 10);
+        SDL_RenderDrawLine(renderer, cx - 7, cy + 10, cx - 7, cy - 10);
+        SDL_SetRenderDrawColor(renderer, 126, 243, 173, 255);
+        SDL_RenderDrawLine(renderer, cx - 3, cy - 5, cx + 4, cy);
+        SDL_RenderDrawLine(renderer, cx + 4, cy, cx - 3, cy + 5);
+    }
+}
+
+static void draw_home_leaf(int cx, int cy)
+{
+    SDL_SetRenderDrawColor(renderer, 224, 255, 234, 255);
+    SDL_RenderDrawLine(renderer, cx - 7, cy + 7, cx + 7, cy - 7);
+    SDL_RenderDrawLine(renderer, cx - 7, cy + 7, cx - 5, cy - 1);
+    SDL_RenderDrawLine(renderer, cx - 5, cy - 1, cx + 1, cy - 7);
+    SDL_RenderDrawLine(renderer, cx + 1, cy - 7, cx + 7, cy - 7);
+    SDL_RenderDrawLine(renderer, cx + 7, cy - 7, cx + 6, cy);
+    SDL_RenderDrawLine(renderer, cx + 6, cy, cx - 7, cy + 7);
+    SDL_RenderDrawLine(renderer, cx - 3, cy + 3, cx - 2, cy - 2);
+    SDL_RenderDrawLine(renderer, cx, cy, cx + 3, cy - 4);
+}
+
+static bool set_wallpaper(int choice, bool save)
+{
+    if (choice < 0 || choice >= 2 || !wallpaper_options[choice]) return false;
+    selected_wallpaper = choice;
+    wallpaper_texture = wallpaper_options[choice];
+    wallpaper_width = wallpaper_option_width[choice];
+    wallpaper_height = wallpaper_option_height[choice];
+    if (save && *wallpaper_preference_path) {
+        char temporary[PATH_CAP];
+        int n = snprintf(temporary, sizeof temporary, "%s.tmp", wallpaper_preference_path);
+        if (n < 0 || (size_t)n >= sizeof temporary) return false;
+        FILE *file = fopen(temporary, "wb");
+        if (!file) return false;
+        const char *value = choice == 0 ? "movie-night\n" : "rainforest\n";
+        bool okay = fputs(value, file) >= 0;
+        if (fclose(file)) okay = false;
+        if (!okay || rename(temporary, wallpaper_preference_path)) {
+            remove(temporary);
+            return false;
+        }
+    }
+    return true;
+}
+
+static void load_wallpapers(void)
+{
+    const char *paths[] = {
+        "/usr/share/beyond-home/wallpaper-movie-night.bmp",
+        "/usr/share/beyond-home/wallpaper-rainforest.bmp"
+    };
+    for (int i = 0; i < 2; i++) {
+        SDL_Surface *surface = SDL_LoadBMP(paths[i]);
+        if (!surface) continue;
+        wallpaper_option_width[i] = surface->w;
+        wallpaper_option_height[i] = surface->h;
+        wallpaper_options[i] = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_FreeSurface(surface);
+    }
+    FILE *file = *wallpaper_preference_path ? fopen(wallpaper_preference_path, "rb") : NULL;
+    if (file) {
+        char value[32] = "";
+        if (fgets(value, sizeof value, file) && !strncmp(value, "rainforest", 10))
+            selected_wallpaper = 1;
+        fclose(file);
+    }
+    if (!set_wallpaper(selected_wallpaper, false)) set_wallpaper(1 - selected_wallpaper, false);
 }
 
 #endif
@@ -160,6 +278,7 @@ static void paragraph(const char *value, int x, int y, int width, int height)
     SDL_FreeSurface(surface);
 }
 
+#ifdef BIT_EDITION_CYBER
 static void orbit(int cx, int cy, double radius)
 {
     for (int ring = 0; ring < 3; ring++) {
@@ -186,6 +305,7 @@ static void orbit(int cx, int cy, double radius)
     box(cx - 2, cy - 5, 4, 10, 221, 255, 232);
 #endif
 }
+#endif
 
 static bool join_path(char *dest, size_t size, const char *base, const char *name)
 {
@@ -555,7 +675,8 @@ static void activate(int card)
         media_mode = true; page = FILES; load_directory();
     }
     else if (card == 4) launch_terminal();
-    else { page = ABOUT; status[0] = 0; }
+    else if (card == 5) { page = ABOUT; status[0] = 0; }
+    else { page = WALLPAPERS; status[0] = 0; }
 #endif
 }
 
@@ -604,16 +725,21 @@ static void draw_desktop_icon(int index)
 {
     DesktopIcon *icon = &desktop_icons[index];
     int x = icon->x, y = icon->y;
-    if (index == desktop_selected || index == desktop_drag)
-        glass(x - 5, y - 6, 88, 82, 111, 171, 229, index == desktop_drag ? 110 : 72);
+    bool hovered = pointer_x >= x - 5 && pointer_x < x + 83 &&
+                   pointer_y >= y - 6 && pointer_y < y + 76;
+    if (index == desktop_selected || index == desktop_drag || hovered)
+        rounded_glass(x - 5, y - 6, 88, 82, 182, 226, 199,
+                      index == desktop_drag ? 120 : hovered ? 78 : 52, 13);
     if (icon->directory) {
-        glass(x + 12, y + 14, 46, 29, 15, 43, 29, 238);
-        glass(x + 15, y + 10, 22, 9, 15, 43, 29, 238);
-        glass(x + 9, y + 18, 49, 30, 44, 145, 82, 248);
-        glass(x + 9, y + 18, 49, 2, 197, 255, 211, 232);
+        rounded_glass(x + 15, y + 14, 29, 10, 12, 66, 38, 255, 4);
+        rounded_glass(x + 11, y + 19, 49, 32, 38, 126, 71, 255, 7);
+        rounded_glass(x + 13, y + 22, 45, 25, 72, 174, 94, 255, 6);
+        rounded_glass(x + 13, y + 22, 45, 4, 173, 244, 175, 255, 3);
+        SDL_SetRenderDrawColor(renderer, 214, 255, 217, 255);
+        SDL_RenderDrawLine(renderer, x + 17, y + 28, x + 54, y + 28);
     } else {
-        glass(x + 18, y + 8, 35, 42, 12, 28, 45, 238);
-        glass(x + 18, y + 8, 35, 2, 211, 232, 255, 206);
+        rounded_glass(x + 18, y + 8, 35, 42, 12, 28, 45, 238, 5);
+        rounded_glass(x + 21, y + 11, 29, 2, 211, 232, 255, 206, 1);
         glass(x + 24, y + 20, 22, 2, 174, 207, 234, 205);
         glass(x + 24, y + 27, 22, 2, 174, 207, 234, 180);
         glass(x + 24, y + 34, 16, 2, 174, 207, 234, 150);
@@ -629,21 +755,28 @@ static void draw_desktop_icon(int index)
 
 static void draw_launcher(void)
 {
-    glass(18, 83, 548, 644, 5, 27, 18, 241);
-    glass(18, 83, 548, 2, 173, 255, 204, 205);
+    rounded_glass(18, 83, 548, 644, 5, 27, 18, 244, 15);
+    rounded_glass(20, 85, 544, 2, 173, 255, 204, 205, 1);
     text(title_font, "Home", 43, 95, white);
     text(small_font, "APPS & PLACES", 46, 153, accent);
     for (int i = 0; i < CARD_COUNT; i++) {
         int x = 44 + (i % 2) * 257;
-        int y = 184 + (i / 2) * 145;
-        glass(x, y, 236, 128, i == selected ? 49 : 13,
-              i == selected ? 120 : 49, i == selected ? 76 : 38, 226);
-        glass(x, y, 236, 2, 173, 255, 204, i == selected ? 230 : 112);
-        glass(x + 15, y + 18, 45, 45, 62, 153, 92, 178);
+        int y = 180 + (i / 2) * 116;
+        bool hovered = pointer_x >= x && pointer_x < x + 236 && pointer_y >= y && pointer_y < y + 104;
+        rounded_glass(x, y, 236, 104, i == selected || hovered ? 35 : 13,
+                      i == selected || hovered ? 84 : 49,
+                      i == selected || hovered ? 56 : 38,
+                      i == selected || hovered ? 245 : 218, 12);
+        rounded_glass(x + 2, y + 2, 232, 2, 173, 255, 204,
+                      i == selected || hovered ? 230 : 112, 1);
+        rounded_glass(x + 15, y + 18, 45, 45, 62, 153, 92, 178, 9);
         text(font, symbols[i], x + 29, y + 27, white);
+        SDL_Rect card_text_clip = {x + 72, y + 15, 153, 78};
+        SDL_RenderSetClipRect(renderer, &card_text_clip);
         text(font, titles[i], x + 73, y + 20, white);
-        text(small_font, subtitles[i], x + 73, y + 57, muted);
-        text(small_font, "OPEN  >", x + 73, y + 91, accent);
+        text(small_font, subtitles[i], x + 73, y + 51, muted);
+        text(small_font, "OPEN  >", x + 73, y + 76, accent);
+        SDL_RenderSetClipRect(renderer, NULL);
     }
     glass(19, 665, 546, 61, 255, 255, 255, 19);
     text(small_font, "Drag files from Files onto Desktop to pin them", 42, 684, muted);
@@ -711,13 +844,35 @@ static void draw(void)
 #ifdef BIT_EDITION_CYBER
         box(50, 90, 110, 44, 33, 45, 65);
 #else
-        glass(36, 91, 1208, 641, 8, 25, 49, 225);
-        glass(50, 90, 110, 44, 68, 132, 181, 195);
+        rounded_glass(36, 91, 1208, 641, 8, 25, 49, 225, 15);
+        rounded_glass(50, 90, 110, 44, 68, 132, 181, 195, 8);
 #endif
         text(font, "Home", 72, 99, white);
-        const char *heading = page == FILES ? (media_mode ? "Media" : "Files") : page == NOTES ? "Notes" : page == VIEWER ? file_title : "About Home";
+        const char *heading = page == FILES ? (media_mode ? "Media" : "Files") : page == NOTES ? "Notes" : page == VIEWER ? file_title : page == WALLPAPERS ? "Wallpaper" : "About Home";
         text(title_font, heading, 50, 153, white);
-        if (page == FILES) {
+        if (page == WALLPAPERS) {
+            text(font, "Choose a scene for your desktop", 54, 220, white);
+            text(small_font, "Your choice is saved on this device.", 54, 256, muted);
+            for (int i = 0; i < 2; i++) {
+                SDL_Rect card = {54 + i * 588, 292, 560, 300};
+                bool hovered = pointer_x >= card.x && pointer_x < card.x + card.w &&
+                               pointer_y >= card.y && pointer_y < card.y + card.h;
+                rounded_glass(card.x, card.y, card.w, card.h,
+                              i == selected_wallpaper || hovered ? 38 : 18,
+                              i == selected_wallpaper || hovered ? 90 : 47,
+                              i == selected_wallpaper || hovered ? 58 : 37,
+                              i == selected_wallpaper || hovered ? 246 : 220, 15);
+                rounded_glass(card.x + 2, card.y + 2, card.w - 4, 3, 177, 255, 201,
+                              i == selected_wallpaper || hovered ? 255 : 100, 2);
+                SDL_Rect preview = {card.x + 12, card.y + 12, card.w - 24, 214};
+                if (wallpaper_options[i]) SDL_RenderCopy(renderer, wallpaper_options[i], NULL, &preview);
+                else rounded_glass(preview.x, preview.y, preview.w, preview.h, 16, 45, 30, 255, 8);
+                text(font, i == 0 ? "Movie night" : "Amazon rainforest", card.x + 18, card.y + 239, white);
+                text(small_font, i == 0 ? "A quiet, leafy room" : "Emerald canopy at sunrise",
+                     card.x + 18, card.y + 270, muted);
+                if (i == selected_wallpaper) text(small_font, "CURRENT", card.x + 448, card.y + 251, accent);
+            }
+        } else if (page == FILES) {
             if (media_mode && entry_count == 0)
                 text(small_font, "Add music or video files to your Media folder to play them here.", 52, 262, muted);
             SDL_Rect clip = {50, 221, 1000, 34};
@@ -728,7 +883,9 @@ static void draw(void)
             text(small_font, "Up a folder", 1100, 228, white);
             for (int i = scroll; i < entry_count && i < scroll+9; i++) {
                 int y = 278 + (i-scroll)*46;
-                box(50, y, 1180, 42, 24, 34, 51);
+                bool hovered = pointer_x >= 50 && pointer_x < 1230 && pointer_y >= y && pointer_y < y + 42;
+                rounded_glass(50, y, 1180, 42, hovered ? 36 : 24,
+                              hovered ? 56 : 34, hovered ? 45 : 51, hovered ? 250 : 220, 8);
 #ifdef BIT_EDITION_CYBER
                 text(small_font, entries[i].directory ? "FOLDER" : "FILE", 68, y+13, accent);
 #else
@@ -738,8 +895,8 @@ static void draw(void)
 #endif
                 text(font, entries[i].name, 173, y+8, white);
             }
-            glass(50, 697, 1180, 36, file_dragged ? 57 : 18,
-                  file_dragged ? 132 : 54, file_dragged ? 91 : 79, 221);
+            rounded_glass(50, 697, 1180, 36, file_dragged ? 57 : 18,
+                          file_dragged ? 132 : 54, file_dragged ? 91 : 79, 221, 9);
             text(small_font, "DROP A FILE OR FOLDER HERE TO PIN IT TO THE DESKTOP", 70, 706,
                  file_dragged ? white : muted);
         } else if (page == NOTES || page == VIEWER) {
@@ -769,17 +926,30 @@ static void draw(void)
     box(0, 751, W, 49, 12, 18, 30);
     text(small_font, *status ? status : "Beyond Imagination Technology", 50, 768, muted);
 #else
-    glass(0, 740, W, 60, 4, 34, 21, 238);
+    if (wallpaper_options[1] && wallpaper_option_width[1] > 0 && wallpaper_option_height[1] > 0) {
+        int crop_height = wallpaper_option_height[1] / 6;
+        if (crop_height < 1) crop_height = 1;
+        SDL_Rect foliage = {0, wallpaper_option_height[1] - crop_height,
+                            wallpaper_option_width[1], crop_height};
+        SDL_Rect taskbar = {0, 740, W, 60};
+        SDL_RenderCopy(renderer, wallpaper_options[1], &foliage, &taskbar);
+    }
+    glass(0, 740, W, 60, 3, 32, 18, 158);
     glass(0, 740, W, 2, 160, 255, 192, 210);
-    glass(17, 748, 150, 43, 24, 111, 61, 236);
-    glass(17, 748, 150, 2, 200, 255, 218, 212);
-    orbit(43, 770, 15);
+    bool start_hovered = pointer_x >= 17 && pointer_x < 167 && pointer_y >= 748 && pointer_y < 791;
+    rounded_glass(17, 748, 150, 43, start_hovered ? 35 : 24,
+                  start_hovered ? 140 : 111, start_hovered ? 82 : 61,
+                  start_hovered ? 255 : 236, 11);
+    rounded_glass(19, 750, 146, 2, 200, 255, 218, 212, 1);
+    draw_home_leaf(43, 770);
     text(small_font, "START", 72, 761, white);
     for (int i = 0; i < 3; i++) {
         int x = 183 + i * 57;
-        glass(x, 749, 48, 42, 14, 65, 39, 218);
-        glass(x, 749, 48, 2, 141, 255, 183, 170);
-        text(small_font, i == 0 ? "F" : i == 1 ? "W" : "M", x + 18, 761, white);
+        bool hovered = pointer_x >= x && pointer_x < x + 48 && pointer_y >= 749 && pointer_y < 791;
+        rounded_glass(x, 749, 48, 42, hovered ? 17 : 9, hovered ? 85 : 59,
+                      hovered ? 53 : 34, hovered ? 250 : 208, 9);
+        rounded_glass(x + 2, 751, 44, 2, 141, 255, 183, hovered ? 230 : 170, 1);
+        draw_taskbar_glyph(x + 24, 770, i);
     }
     SDL_Rect status_clip = {376, 744, 650, 49};
     SDL_RenderSetClipRect(renderer, &status_clip);
@@ -836,12 +1006,20 @@ int main(int argc, char **argv)
     if (!renderer) { fprintf(stderr, "%s\n", SDL_GetError()); return 1; }
     SDL_RenderSetLogicalSize(renderer, W, H);
 #ifndef BIT_EDITION_CYBER
+    char config_dir[PATH_CAP];
+    if (join_path(config_dir, sizeof config_dir, home_directory, ".config/beyond-home"))
+        join_path(wallpaper_preference_path, sizeof wallpaper_preference_path, config_dir, "wallpaper");
     const char *wallpaper_path = getenv("BEYOND_WALLPAPER");
-    if (!wallpaper_path) wallpaper_path = "/usr/share/beyond-home/wallpaper.bmp";
-    SDL_Surface *wallpaper_surface = SDL_LoadBMP(wallpaper_path);
-    if (wallpaper_surface) {
-        wallpaper_texture = SDL_CreateTextureFromSurface(renderer, wallpaper_surface);
-        SDL_FreeSurface(wallpaper_surface);
+    if (wallpaper_path) {
+        SDL_Surface *wallpaper_surface = SDL_LoadBMP(wallpaper_path);
+        if (wallpaper_surface) {
+            wallpaper_width = wallpaper_surface->w;
+            wallpaper_height = wallpaper_surface->h;
+            wallpaper_texture = SDL_CreateTextureFromSurface(renderer, wallpaper_surface);
+            SDL_FreeSurface(wallpaper_surface);
+        }
+    } else {
+        load_wallpapers();
     }
 #endif
     if (preview) {
@@ -883,17 +1061,25 @@ int main(int argc, char **argv)
                             desktop_dragged = false;
                         }
                     } else if (page == LAUNCHER) {
-                        if (x >= 44 && x < 537 && y >= 184 && y < 619) {
-                            int row = (y - 184) / 145;
+                        if (x >= 44 && x < 537 && y >= 180 && y < 632) {
+                            int row = (y - 180) / 116;
                             int column = x >= 301 ? 1 : 0;
                             int card = row * 2 + column;
                             int bx = column ? 301 : 44;
-                            int by = 184 + row * 145;
-                            if (card < CARD_COUNT && x < bx + 236 && y < by + 128) {
+                            int by = 180 + row * 116;
+                            if (card < CARD_COUNT && x < bx + 236 && y < by + 104) {
                                 selected = card;
                                 activate(card);
                             }
                         } else page = HOME;
+                    } else if (page == WALLPAPERS) {
+                        if (x >= 54 && x < 614 && y >= 292 && y < 592) {
+                            if (set_wallpaper(0, true)) snprintf(status, sizeof status, "Movie night wallpaper selected.");
+                            else snprintf(status, sizeof status, "Could not save the wallpaper choice.");
+                        } else if (x >= 642 && x < 1202 && y >= 292 && y < 592) {
+                            if (set_wallpaper(1, true)) snprintf(status, sizeof status, "Amazon rainforest wallpaper selected.");
+                            else snprintf(status, sizeof status, "Could not save the wallpaper choice.");
+                        } else if (x >= 50 && x <= 160 && y >= 90 && y <= 134) go_home();
                     } else if (page != HOME &&
                                ((x >= 50 && x <= 160 && y >= 90 && y <= 134) ||
                                 (x >= 17 && x <= 167 && y >= 748 && y <= 791))) go_home();
@@ -933,6 +1119,8 @@ int main(int argc, char **argv)
                     }
 #endif
                 } else if (event.type == SDL_MOUSEMOTION) {
+                    pointer_x = event.motion.x;
+                    pointer_y = event.motion.y;
 #ifndef BIT_EDITION_CYBER
                     int x = event.motion.x, y = event.motion.y;
                     if (desktop_drag >= 0 && page == HOME) {

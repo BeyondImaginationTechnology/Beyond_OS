@@ -29,16 +29,13 @@ The runtime applies the adapter to the selected Llama 3.1 base model at startup.
 
 For production, run this behind authenticated application infrastructure; do not expose the local runtime directly to the internet.
 
-## Beyond Tattoo editor knowledge pack
+## Needle Bot training pack
 
-`../training/beyond-tattoo-stencil-editor-v0.1.jsonl` contains draft,
-app-scoped examples grounded in the Beyond Tattoo editor and Beyond-1 Draw
-Studio source. Its manifest pins the source hashes and base Git revision. The
-pack is not loaded by this runtime, is not approved for production, and has not
-changed the model adapter. The current Daily Breath training page is not a
-Beyond Tattoo-scoped review interface. Review the examples and connect them to
-an app-scoped retrieval or deliberate training workflow before expecting
-Jaguar to use them.
+`../training/needle-bot-beyond-tattoo-stencil-editor-v0.1.jsonl` contains 13
+examples intended for Needle Bot, Beyond Tattoo's AI companion. Retrieval
+approval is paused because a cited editor source changed since review. The
+examples are not loaded by Jaguar, and the live Needle Bot endpoint is not
+connected to the pack. This is not fine-tuning or a live weight update.
 
 ## Admin Code Thinking
 
@@ -81,9 +78,11 @@ notes.
 
 The web catalog maps `core` to runtime `explain` and public Build to its own
 runtime `build` mode. Build is a text-only software brainstorming, technical
-and UI design, and coding-guidance preview; it receives no repository context
-and does not generate images or video. Admin Code Thinking calls the runtime
-`code` mode only through its separate role-protected API.
+and UI design, and coding-guidance preview; it does not receive repository
+context or generate images or video. Beyond Tattoo training examples belong
+to Needle Bot and are not sent to Jaguar.
+Admin Code Thinking calls the runtime `code` mode only through its separate
+role-protected API.
 
 ## Website deployment
 

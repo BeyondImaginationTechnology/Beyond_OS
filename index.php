@@ -226,15 +226,10 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 <section class="platform-proof wrap" id="platform" aria-labelledby="platform-title">
     <div class="platform-head">
         <div>
-            <span class="platform-kicker">Apps today · operating environments next</span>
-            <h2 id="platform-title">A working app ecosystem.<br>A broader foundation in progress.</h2>
+            <span class="platform-kicker">One connected ecosystem</span>
+            <h2 id="platform-title">Useful tools for every part of life.</h2>
         </div>
-        <p>Beyond Imagination Technology brings focused web experiences into one recognizable system. BIT OS extends that direction with planned Home, Creator, Academy and organizational environments, while the apps remain the live product experience today.</p>
-    </div>
-    <div class="proof-strip" aria-label="Beyond Imagination Technology platform at a glance">
-        <div class="proof-stat"><strong>18</strong><span>web product hubs in active development</span></div>
-        <div class="proof-stat"><strong>4</strong><span>connected pillars: Live, Learn, Earn and Explore</span></div>
-        <div class="proof-stat"><strong>BIT OS</strong><span>planned operating-environment family, beginning with Home 1.0</span></div>
+        <p>Discover experiences for health, learning, entertainment, and creator commerce. Beyond brings them together through a shared identity and a connected path across the products you use.</p>
     </div>
     <div class="product-grid" aria-label="Explore flagship Beyond Imagination Technology web products">
         <a class="product-card health" href="/dailybreath/">

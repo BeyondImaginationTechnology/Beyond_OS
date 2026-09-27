@@ -10,7 +10,10 @@ from upstream sources. The repository supplies the Home product layer.
 - Home v0.1 identity, native framebuffer startup artwork, and a file-based
   desktop inspired by Windows Vista/7. Desktop icons can be moved; drag an item
   from Files to its drop shelf to pin it to the desktop. Apps live in the Start
-  menu and taskbar.
+  menu and a leafy emerald glass taskbar with recognizable folder, globe, play,
+  and leaf symbols. The Home desktop opens without a top header. A Wallpaper
+  choice in Start switches between the default movie-night room and the
+  optional Amazon rainforest, and saves the selection on this device.
 - Files: navigate directories and preview small UTF-8 text files.
 - Notes: one local note in `~/Documents/Home Note.txt`; Ctrl+S saves it.
 - Browser: WebKitGTK MiniBrowser with HTTPS certificates and process sandboxing;
@@ -63,10 +66,10 @@ A graphical installer, Secure Boot signing, encryption, update signing, and a
 supported Windows USB-writing application remain release gates; they are not
 claimed as completed by this development source.
 
-The Home v0.1 image is not yet boot-tested. Keep installation tests on disposable
-VM disks until the UEFI QEMU and hardware acceptance gates in `RELEASE.md` pass.
-Its initial filesystem is 2 GB; installation expands
-it to fill the explicit target partition.
+The UEFI ISO has reached the Home desktop in QEMU/OVMF testing. Installation is
+not yet validated, so use disposable VM disks until the UEFI install and hardware
+acceptance gates in `RELEASE.md` pass. Its initial filesystem is 2 GB;
+installation expands it to fill the explicit target partition.
 
 ## Build host
 

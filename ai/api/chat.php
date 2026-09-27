@@ -142,6 +142,11 @@ $mode = is_string($payload['mode'] ?? null) ? strtolower(trim($payload['mode']))
 $modeDefinition = jaguar_mode($mode);
 if ($modeDefinition === null) { http_response_code(422); echo json_encode(['error' => 'Choose a valid Jaguar Thinking mode.']); exit; }
 if (!jaguar_mode_is_enabled($mode)) { http_response_code(501); echo json_encode(['error' => 'Jaguar Thinking ' . $modeDefinition['label'] . ' is planned, not available in this preview yet.']); exit; }
+if (($payload['knowledge_scope'] ?? '') === 'beyond-tattoo') {
+    http_response_code(422);
+    echo json_encode(['error' => 'Beyond Tattoo stencil-editor guidance is reserved for Needle Bot, the Beyond Tattoo companion.']);
+    exit;
+}
 $language = is_string($payload['language'] ?? null) ? strtolower(trim($payload['language'])) : 'en';
 if (!in_array($language, ['en', 'fr', 'es'], true)) { http_response_code(422); echo json_encode(['error' => 'Choose English, French, or Spanish.']); exit; }
 $messages = is_array($payload['messages'] ?? null) ? $payload['messages'] : [];
@@ -201,9 +206,9 @@ if ($isDailyBreathChat) {
 }
 $simpleReply = null;
 $simpleCopy = [
-    'en' => ['hello' => 'Hello! I’m Jaguar. What would you like to explore?', 'thanks' => 'You’re welcome. What should we explore next?', 'acknowledgement' => 'I’m here when you’re ready. What should we explore?', 'help' => 'I’m Jaguar, Beyond’s AI assistant. Explain teaches ideas; Build preview turns product ideas into scoped plans. Build cannot inspect repositories or change files. Draw and Video are still in development.', 'version' => 'You’re using Jaguar v0.4 Preview.'],
-    'fr' => ['hello' => 'Bonjour ! Je suis Jaguar. Qu’aimeriez-vous explorer ?', 'thanks' => 'Avec plaisir. Qu’allons-nous explorer ensuite ?', 'acknowledgement' => 'Je suis là quand vous êtes prêt. Qu’allons-nous explorer ?', 'help' => 'Je suis Jaguar, l’assistant IA de Beyond. Explain enseigne des idées ; Build transforme les idées de produit en plans structurés. Build ne peut ni consulter des dépôts ni modifier des fichiers. Dessiner et Vidéo sont encore en préparation.', 'version' => 'Vous utilisez Jaguar v0.4 Preview.'],
-    'es' => ['hello' => '¡Hola! Soy Jaguar. ¿Qué te gustaría explorar?', 'thanks' => 'De nada. ¿Qué exploramos ahora?', 'acknowledgement' => 'Estoy aquí cuando estés listo. ¿Qué exploramos?', 'help' => 'Soy Jaguar, el asistente de IA de Beyond. Explain enseña ideas; Build convierte ideas de producto en planes concretos. Build no puede consultar repositorios ni cambiar archivos. Dibujar y Video siguen en preparación.', 'version' => 'Estás usando Jaguar v0.4 Preview.'],
+    'en' => ['hello' => 'Hello! I’m Jaguar. What would you like to explore?', 'thanks' => 'You’re welcome. What should we explore next?', 'acknowledgement' => 'I’m here when you’re ready. What should we explore?', 'help' => 'I’m Jaguar, Beyond’s AI assistant. Explain teaches ideas; Build preview turns product ideas into scoped plans. Build cannot inspect repositories or change files. Draw is intended for Jaguar image generation; the stencil editor has separate canvas drawing tools.', 'version' => 'You’re using Jaguar v0.5 Preview.'],
+    'fr' => ['hello' => 'Bonjour ! Je suis Jaguar. Qu’aimeriez-vous explorer ?', 'thanks' => 'Avec plaisir. Qu’allons-nous explorer ensuite ?', 'acknowledgement' => 'Je suis là quand vous êtes prêt. Qu’allons-nous explorer ?', 'help' => 'Je suis Jaguar, l’assistant IA de Beyond. Explain enseigne des idées ; Build transforme les idées de produit en plans structurés. Build ne peut ni consulter des dépôts ni modifier des fichiers. Draw est prévu pour la génération d’images Jaguar ; l’éditeur de pochoirs possède ses propres outils de dessin.', 'version' => 'Vous utilisez Jaguar v0.5 Preview.'],
+    'es' => ['hello' => '¡Hola! Soy Jaguar. ¿Qué te gustaría explorar?', 'thanks' => 'De nada. ¿Qué exploramos ahora?', 'acknowledgement' => 'Estoy aquí cuando estés listo. ¿Qué exploramos?', 'help' => 'Soy Jaguar, el asistente de IA de Beyond. Explain enseña ideas; Build convierte ideas de producto en planes concretos. Build no puede consultar repositorios ni cambiar archivos. Draw está pensado para la generación de imágenes de Jaguar; el editor de plantillas tiene sus propias herramientas de dibujo.', 'version' => 'Estás usando Jaguar v0.5 Preview.'],
 ];
 // Keep common greeting variations off the scale-to-zero runtime. In particular,
 // "Hello world" is a normal first message, not a request that needs a GPU cold start.
@@ -428,7 +433,8 @@ $request = curl_init($runtimeUrl . '/v1/chat');
 // Leave enough time for a warm runtime, but return a usable error before the
 // browser can appear permanently stuck while a cold runtime is unavailable.
 $runtimeMode = (string)($modeDefinition['runtime'] ?? 'explain');
-curl_setopt_array($request, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 15, CURLOPT_TIMEOUT => 105, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode(['mode' => $runtimeMode, 'language' => $language, 'messages' => $messages], JSON_THROW_ON_ERROR)]);
+$runtimePayload = ['mode' => $runtimeMode, 'language' => $language, 'messages' => $messages];
+curl_setopt_array($request, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 15, CURLOPT_TIMEOUT => 105, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode($runtimePayload, JSON_THROW_ON_ERROR)]);
 $response = curl_exec($request); $status = (int) curl_getinfo($request, CURLINFO_RESPONSE_CODE); curl_close($request);
 if (!is_string($response) || $status < 200 || $status >= 300) {
     http_response_code(503);
@@ -439,4 +445,3 @@ if (!is_string($response) || $status < 200 || $status >= 300) {
     exit;
 }
 echo $response;
-

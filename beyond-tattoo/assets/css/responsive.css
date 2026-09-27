@@ -1,0 +1,134 @@
+/* Responsive refinements for the Beyond Tattoo studio storefront and workspace. */
+:root {
+  --bt-content-width: 1380px;
+  --bt-page-gutter: clamp(20px, 4vw, 48px);
+  --bt-violet-focus: rgba(109, 60, 200, .28);
+}
+
+html { scroll-padding-top: 88px; }
+body { overflow-x: clip; }
+img { height: auto; }
+.bt-wrap { width: min(var(--bt-content-width), calc(100% - var(--bt-page-gutter) * 2)); }
+.bt-site-header { z-index: 30; }
+.bt-site-header-inner { min-height: 82px; gap: clamp(14px, 2vw, 28px); }
+.bt-brand { flex: 0 0 auto; }
+.bt-desktop-nav { gap: clamp(12px, 1.55vw, 24px); white-space: nowrap; }
+.bt-header-actions { flex: 0 0 auto; }
+.bt-main-hero { padding-block: clamp(46px, 7vw, 104px); }
+.bt-main-hero-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr); gap: clamp(38px, 7vw, 104px); align-items: center; }
+.bt-main-copy { max-width: 680px; }
+.bt-main-copy h1 { font-size: clamp(4.2rem, 8.2vw, 7.5rem); line-height: .86; }
+.bt-main-lead { max-width: 580px; font-size: clamp(1.05rem, 1.45vw, 1.25rem); line-height: 1.7; }
+.bt-main-actions { gap: 12px; }
+.bt-glow-button, .bt-outline-button, .bt-header-download, .bt-login-link { min-height: 46px; }
+.bt-package-stage { min-height: clamp(500px, 56vw, 720px); overflow: hidden; isolation: isolate; }
+.bt-package-stage > img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; padding: clamp(16px, 3vw, 38px); object-fit: contain; object-position: center; filter: none; }
+.bt-package-cta { z-index: 3; }
+.bt-category-section, .bt-daily-section, .bt-collections-section, .bt-studio-product, .bt-values-section { padding-block: clamp(44px, 6.5vw, 92px); }
+.bt-section-frame, .bt-studio-product-shell { padding: clamp(24px, 3.5vw, 48px); }
+.bt-category-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; }
+.bt-category-grid a { min-width: 0; min-height: 112px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center; }
+.bt-category-grid a b { font-size: clamp(1.4rem, 2vw, 2rem); }
+.bt-daily-card { overflow: hidden; }
+.bt-daily-art { position: relative; min-height: 500px; overflow: hidden; }
+.bt-daily-art > img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: center; }
+.bt-daily-copy { padding: clamp(28px, 5vw, 72px); align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
+.bt-daily-copy h2 { font-size: clamp(2.3rem, 5vw, 4.4rem); line-height: .95; }
+.bt-collection-grid-new { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.bt-collection-tile { min-height: 320px; }
+.bt-collection-tile img { transition: transform .45s cubic-bezier(.2, .65, .3, 1); }
+.bt-collection-tile:hover img { transform: scale(1.035); }
+.bt-studio-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.bt-values-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.bt-store-footer-grid { gap: 30px; }
+a, button, summary, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+:where(a, button, summary, input, select, textarea):focus-visible { outline: 3px solid var(--bt-violet-focus); outline-offset: 3px; }
+.bt-install-button[hidden] { display: none !important; }
+.bt-install-button { position: fixed; z-index: 80; right: max(24px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 18px 0 12px; border: 1px solid rgba(109, 60, 200, .22); border-radius: 999px; background: rgba(255, 255, 255, .94); color: #17131a; box-shadow: 0 12px 34px rgba(45, 32, 20, .18); backdrop-filter: blur(16px); font: inherit; font-size: .88rem; font-weight: 820; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.bt-install-button:hover { transform: translateY(-2px); border-color: #6d3cc8; box-shadow: 0 16px 38px rgba(109, 60, 200, .24); }
+.bt-install-button-mark { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 50%; background: #f0eafb; color: #6d3cc8; font-size: 1.2rem; }
+.bt-install-help { width: min(480px, calc(100% - 32px)); padding: clamp(24px, 5vw, 38px); border: 1px solid #e5ded4; border-radius: 24px; background: #fff; color: #17131a; box-shadow: 0 30px 100px rgba(20, 12, 28, .28); }
+.bt-install-help::backdrop { background: rgba(23, 19, 26, .5); backdrop-filter: blur(5px); }
+.bt-install-help form { display: flex; justify-content: flex-end; }
+.bt-install-help-close { width: 38px; height: 38px; border: 1px solid #e5ded4; border-radius: 50%; background: #fff; color: #17131a; font-size: 1.45rem; cursor: pointer; }
+.bt-install-kicker { margin: 8px 0; color: #6d3cc8; font-size: .7rem; font-weight: 900; letter-spacing: .14em; }
+.bt-install-help h2 { margin: 0; font-size: clamp(1.9rem, 5vw, 2.5rem); letter-spacing: -.04em; }
+.bt-install-help p:not(.bt-install-kicker) { color: #756d78; line-height: 1.7; }
+.bt-install-help-done { min-height: 46px; padding: 0 18px; border: 0; border-radius: 12px; background: #6d3cc8; color: #fff; font: inherit; font-weight: 800; cursor: pointer; }
+
+@media (min-width: 1500px) {
+  .bt-wrap { width: min(1480px, calc(100% - 96px)); }
+  .bt-main-hero-grid { grid-template-columns: minmax(0, 1fr) minmax(520px, .95fr); }
+  .bt-package-stage { min-height: 720px; }
+}
+
+@media (max-width: 1120px) {
+  :root { --bt-page-gutter: 28px; }
+  .bt-desktop-nav { gap: 12px; font-size: .83rem; }
+  .bt-header-actions .bt-login-link { display: none; }
+  .bt-main-hero-grid { grid-template-columns: minmax(0, 1fr) minmax(320px, .9fr); gap: 36px; }
+  .bt-category-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .bt-collection-grid-new { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 820px) {
+  :root { --bt-page-gutter: 22px; }
+  .bt-desktop-nav { display: none; }
+  .bt-mobile-menu { display: block; }
+  .bt-header-actions { margin-left: auto; }
+  .bt-header-actions .bt-login-link { display: inline-flex; }
+  .bt-main-hero-grid { grid-template-columns: 1fr; }
+  .bt-main-copy { max-width: 720px; }
+  .bt-package-stage { min-height: 0; aspect-ratio: 1.08 / 1; }
+  .bt-package-stage > img { padding: 12px; }
+  .bt-daily-card { grid-template-columns: 1fr; }
+  .bt-daily-art { min-height: 0; aspect-ratio: 1.16 / 1; }
+  .bt-values-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  :root { --bt-page-gutter: 16px; }
+  html { scroll-padding-top: 72px; }
+  .bt-site-header-inner { min-height: 68px; gap: 10px; }
+  .bt-brand-mark { width: 38px; height: 38px; }
+  .bt-header-actions { gap: 8px; }
+  .bt-header-download { display: none; }
+  .bt-header-actions .bt-login-link { display: none; }
+  .bt-main-hero { padding-block: 36px 28px; }
+  .bt-main-copy h1 { font-size: clamp(3.35rem, 15vw, 5rem); }
+  .bt-main-copy .bt-gold-kicker { font-size: .68rem; letter-spacing: .1em; }
+  .bt-main-lead { font-size: 1rem; line-height: 1.58; }
+  .bt-main-actions { display: grid; grid-template-columns: 1fr; }
+  .bt-main-actions > a { width: 100%; }
+  .bt-trust-row { gap: 8px 14px; font-size: .75rem; }
+  .bt-package-stage { aspect-ratio: .94 / 1; border-radius: 16px; }
+  .bt-package-cta { right: 12px; bottom: 12px; }
+  .bt-section-frame, .bt-studio-product-shell { padding: 20px 16px; }
+  .bt-category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .bt-category-grid a { min-height: 86px; }
+  .bt-category-grid a:last-child { grid-column: 1 / -1; }
+  .bt-daily-art { aspect-ratio: .92 / 1; }
+  .bt-daily-copy { padding: 24px 18px; }
+  .bt-daily-copy h2 { font-size: 2.35rem; }
+  .bt-collection-grid-new { grid-template-columns: 1fr; gap: 12px; }
+  .bt-collection-tile { min-height: 250px; }
+  .bt-studio-product-grid { grid-template-columns: 1fr; }
+  .bt-values-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .bt-values-grid>div { padding: 13px 10px; gap: 9px; }
+  .bt-values-grid small { font-size: .68rem; }
+  .bt-store-footer-grid { align-items: flex-start; flex-direction: column; }
+  .bt-footer-links { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; }
+}
+
+@media (max-width: 360px) {
+  .bt-values-grid { grid-template-columns: 1fr; }
+  .bt-mobile-sticky-download { right: 12px; left: 12px; text-align: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}
+
+@media (max-width: 760px) {
+  .bt-install-button { display: none !important; }
+}

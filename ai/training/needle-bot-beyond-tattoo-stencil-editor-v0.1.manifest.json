@@ -1,0 +1,30 @@
+{
+  "name": "needle-bot-beyond-tattoo-stencil-editor",
+  "version": "0.1",
+  "scope": "beyond-tattoo",
+  "assistant": "needle-bot",
+  "target_app": "beyond-tattoo",
+  "status": "review_required",
+  "base_revision": "202b7397b12c16421b0367b77afb54196fdf5e82",
+  "dataset": "needle-bot-beyond-tattoo-stencil-editor-v0.1.jsonl",
+  "sources": [
+    {
+      "path": "beyond-tattoo/stencil-editor.php",
+      "sha256": "C0B00A0797B8E94A4B7D6AE5604018862EC4F0821FBBB5A9FD6EF5E215B53BDF"
+    },
+    {
+      "path": "JaguarApple/Sources/JaguarDrawStudioView.swift",
+      "sha256": "DB299613129B6D3D71CBE753D8916FE18B8FC8EDE27509F17B201B92083A3AC3"
+    },
+    {
+      "path": "JaguarApple/Sources/RootView.swift",
+      "sha256": "0EEEAA37AD9061BF7EC5BCF405920A688161B5A4DFD9DDFC343CC2103D518A8F"
+    },
+    {
+      "path": "JaguarApple/project.yml",
+      "sha256": "E138F11BFBBEE7115E52915832BFCA5BABD8F790606005635911969B273E4218"
+    }
+  ],
+  "created_at": "2026-09-26",
+  "training_status": "source changed after review; re-approval is required before Needle Bot retrieval; endpoint integration is pending, and this is not fine-tuning or a live weight update"
+}

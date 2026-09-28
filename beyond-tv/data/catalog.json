@@ -1809,10 +1809,11 @@
     "genre": "Anime · Adventure · Fantasy",
     "runtime": "Feature film",
     "source_type": "direct_video",
+    "language": "Japanese with English subtitles",
     "video_url": "https://archive.org/download/zatch-bell-collection/Zatch%20Bell/Movies/Zatch%20Bell%20Movie%2001%20-%20%20Unlisted%20Demon%20101%20%28101st%20Devil%29.mp4",
     "thumbnail": "https://archive.org/services/img/zatch-bell-collection",
     "source_label": "Internet Archive item zatch-bell-collection",
-    "channel_slug": "classic-cinema"
+    "channel_slug": "yugioh-tv"
   },
   {
     "slug": "zatch-bell-movie-attack-of-the-mechavulcan",
@@ -1827,10 +1828,11 @@
     "genre": "Anime · Action · Adventure",
     "runtime": "Feature film",
     "source_type": "direct_video",
+    "language": "Japanese with English subtitles",
     "video_url": "https://archive.org/download/zatch-bell-collection/Zatch%20Bell/Movies/Zatch%20Bell%20Movie%2002%20-%20Attack%20of%20The%20Mechavulcan.mp4",
     "thumbnail": "https://archive.org/services/img/zatch-bell-collection",
     "source_label": "Internet Archive item zatch-bell-collection",
-    "channel_slug": "classic-cinema"
+    "channel_slug": "yugioh-tv"
   },
   {
     "slug": "pokemon-indigo-league",
@@ -2127,8 +2129,10 @@
     "runtime": "6 min",
     "genre": "Fantasy · French Cinema",
     "source_type": "direct_video",
+    "language": "French",
     "video_url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Cinderella_(1899_film).webm",
-    "source_label": "Public-domain media edition",
+    "source_label": "Public-domain French cinema edition",
+    "channel_slug": "cinema-francais-classique",
     "thumbnail": "https://archive.org/services/img/Cendrillon_1899"
   },
   {
@@ -2210,6 +2214,7 @@
     "runtime": "Plus de 60 min",
     "genre": "Préscolaire · Français · Apprentissage",
     "source_type": "direct_video",
+    "language": "French",
     "video_url": "https://archive.org/download/oos1ouBoow6eipata1go/Caillou%20FRAN%C3%87AIS%20-%20PLUS%20QU%27UNE%20HEURE%20COMPL%C3%88TE%20DE%20CAILLOU%20S1%20%7C%20conte%20pour%20enfant-Vqf3PcxownA-nomusic.mp4",
     "archive_id": "oos1ouBoow6eipata1go",
     "candidate_url": "https://archive.org/details/oos1ouBoow6eipata1go",
@@ -4198,29 +4203,6 @@
     "approved_by": "owner_and_beyond_os_admin",
     "approved_at": "2026-09-27",
     "channel_slug": "classic-cinema"
-  },
-  {
-    "slug": "taking-woodstock",
-    "type": "movie",
-    "title": "Taking Woodstock",
-    "subtitle": "Internet Archive poster source",
-    "description": "A catalogue poster entry backed by the Internet Archive movie poster item supplied by the owner. Playback remains disabled until a verified video source is connected.",
-    "icon": "🎸",
-    "gradient": "linear-gradient(135deg,#263b2b,#7a8f52 55%,#e5b85a)",
-    "rating": "R",
-    "year": "2009",
-    "genre": "Comedy · Drama · Music",
-    "runtime": "Feature film",
-    "source_type": "watchlist",
-    "source_label": "Internet Archive · Poster source",
-    "source_url": "https://archive.org/details/taking-woodstock-ds",
-    "candidate_url": "https://archive.org/details/taking-woodstock-ds",
-    "poster_url": "https://archive.org/download/taking-woodstock-ds/Taking%20Woodstock%20%28DS%29.jpg",
-    "poster_source_label": "Internet Archive · taking-woodstock-ds",
-    "archive_id": "taking-woodstock-ds",
-    "thumbnail": "https://archive.org/services/img/taking-woodstock-ds",
-    "channel_slug": "classic-cinema",
-    "new_addition": true
   },
   {
     "slug": "enola-holmes-3",

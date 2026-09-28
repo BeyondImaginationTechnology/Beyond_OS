@@ -251,5 +251,39 @@
         "reason": "Playable file exists, but the item lacks a clear creator/source record; hold for manual approval."
       }
     ]
+  },
+  {
+    "title": "Beyond TV dead-link and language cleanup",
+    "archive_id": "catalog-cleanup-20260927",
+    "status": "completed",
+    "reviewed_at": "2026-09-27",
+    "dead_link_check": {
+      "archive_item_ids_checked": 73,
+      "missing_archive_downloads": 0,
+      "result": "All remaining Archive item IDs and direct download filenames resolved in public metadata."
+    },
+    "removed_unplayable_titles": [
+      {
+        "title": "Taking Woodstock",
+        "reason": "Poster-only watchlist row with no playable video source; removed from the public catalog."
+      }
+    ],
+    "language_routes": [
+      {
+        "title": "Cendrillon",
+        "language": "French",
+        "channel_slug": "cinema-francais-classique"
+      },
+      {
+        "title": "Caillou Français",
+        "language": "French",
+        "channel_slug": "preschool-francais"
+      },
+      {
+        "title": "Zatch Bell! Movie 1: 101st Devil; Zatch Bell! Movie 2: Attack of the Mechavulcan",
+        "language": "Japanese with English subtitles",
+        "channel_slug": "yugioh-tv"
+      }
+    ]
   }
 ]

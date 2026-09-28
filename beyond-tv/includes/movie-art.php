@@ -55,7 +55,6 @@ function beyond_tv_rpdb_known_ids(): array
         'up' => ['imdb', 'tt1049413'],
         'wall-e' => ['imdb', 'tt0910970'],
         'transformers' => ['imdb', 'tt0418279'],
-        'taking-woodstock' => ['imdb', 'tt1127896'],
     ];
 }
 

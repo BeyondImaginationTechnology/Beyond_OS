@@ -33,6 +33,7 @@ $experiences = [
     'jaguar' => ['Llama Jaguar', 'AI fuel for the BIT ecosystem', 'J', '#8f38f4', '#e83bc7'],
     'beyond-os' => ['BIT OS', 'Continue securely to BIT OS', 'B', '#6d66ff', '#e044a7'],
     'bit-os' => ['BIT OS', 'Continue securely to BIT OS', 'B', '#6d66ff', '#e044a7'],
+    'beyond-webs' => ['Beyond Webs', 'Your BIT OS cloud seat', 'B', '#6d9dff', '#a268ff'],
 ];
 
 $experience = ['Beyond ID', 'One account for BIT OS and Beyond apps', 'B', '#6d66ff', '#e044a7'];

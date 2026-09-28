@@ -134,6 +134,17 @@ function safe_return_path(?string $path, string $fallback = '../dashboard/'): st
             && ($returnParts['host'] ?? '') === ($originParts['host'] ?? '')
             && !isset($returnParts['user']) && !isset($returnParts['pass'])) return $path;
     }
+    $websOrigin = rtrim((string)(getenv('BEYOND_WEBS_ORIGIN') ?: 'https://host.beyondimagination.co.technology'), '/');
+    if ($websOrigin !== '' && str_starts_with($decoded, $websOrigin . '/')) {
+        $originParts = parse_url($websOrigin);
+        $returnParts = parse_url($decoded);
+        if ($originParts && $returnParts
+            && ($originParts['scheme'] ?? '') === 'https'
+            && ($returnParts['scheme'] ?? '') === 'https'
+            && ($originParts['host'] ?? '') === 'host.beyondimagination.co.technology'
+            && ($returnParts['host'] ?? '') === ($originParts['host'] ?? '')
+            && !isset($returnParts['user']) && !isset($returnParts['pass'])) return $path;
+    }
     $aiOrigin = rtrim((string)(getenv('BEYOND_AI_ORIGIN') ?: 'https://ai.beyondimagination.co.technology'), '/');
     if ($aiOrigin !== '' && str_starts_with($decoded, $aiOrigin . '/')) {
         $originParts = parse_url($aiOrigin);

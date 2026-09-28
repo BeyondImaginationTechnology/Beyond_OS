@@ -36,6 +36,7 @@ $youtubePlaylistId = preg_replace('/[^A-Za-z0-9_-]/', '', (string) ($title['yout
 $showEpisodes = array_values(array_filter(
     $episodes,
     static fn(array $episode): bool => ($episode['show_slug'] ?? '') === $slug
+        && strtolower(trim((string) ($episode['status'] ?? ''))) !== 'unavailable'
 ));
 $episodeLibrary = beyond_tv_build_episode_library($title, $showEpisodes, __DIR__ . '/data');
 $requestedSeason = max(1, (int) ($_GET['season'] ?? (beyond_tv_forced_season($title) ?: 1)));

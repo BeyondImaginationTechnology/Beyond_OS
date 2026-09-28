@@ -1484,34 +1484,6 @@
     "seasons": 1
   },
   {
-    "source_type": "watchlist",
-    "source_label": "Owner-approved discovery · Media item required",
-    "source_approved": true,
-    "source_bookmark": "kareneliot",
-    "subtitle": "Owner-approved source search · TV series",
-    "slug": "are-you-afraid-of-the-dark",
-    "type": "show",
-    "title": "Are You Afraid of the Dark?",
-    "year": "1990–2000",
-    "rating": "TV-Y7",
-    "genre": "Horror · Mystery · Kids",
-    "icon": "🔥",
-    "gradient": "linear-gradient(135deg,#111827,#34355d 55%,#c96b39)",
-    "description": "The Midnight Society gathers around a campfire to tell frightening stories.",
-    "candidate_url": "https://archive.org/search?query=title%3A%28Are+You+Afraid+of+the+Dark%29",
-    "season_episode_counts": {
-      "1": 13,
-      "2": 13,
-      "3": 13,
-      "4": 13,
-      "5": 13,
-      "6": 13,
-      "7": 13
-    },
-    "episode_count": 91,
-    "seasons": 7
-  },
-  {
     "source_type": "archive_episode_map",
     "source_label": "Internet Archive · Owner-verified Season 1",
     "source_bookmark": "kareneliot",
@@ -2026,26 +1998,6 @@
     "seasons": 10,
     "episode_count": 172,
     "network": "Nickelodeon",
-    "episode_catalog": "catalogued"
-  },
-  {
-    "slug": "teen-titans",
-    "type": "show",
-    "title": "Teen Titans",
-    "subtitle": "Action Toons",
-    "description": "Robin, Starfire, Cyborg, Raven and Beast Boy protect Jump City. Episode records remain visible while a playable media source is being connected.",
-    "icon": "⚡",
-    "gradient": "linear-gradient(135deg,#10152f,#3947b7 55%,#f33d75)",
-    "rating": "TV-Y7",
-    "year": "2003–2006",
-    "genre": "Animation · Action · Superhero",
-    "source_type": "none",
-    "source_label": "Catalogue listing · Media source required",
-    "channel_slug": "action-toons",
-    "thumbnail": "",
-    "seasons": 5,
-    "episode_count": 65,
-    "network": "Cartoon Network",
     "episode_catalog": "catalogued"
   },
   {

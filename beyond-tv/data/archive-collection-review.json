@@ -266,6 +266,21 @@
       {
         "title": "Taking Woodstock",
         "reason": "Poster-only watchlist row with no playable video source; removed from the public catalog."
+      },
+      {
+        "title": "Teen Titans",
+        "reason": "Catalog and channel entries had no playable video or YouTube source; removed from the public catalog."
+      },
+      {
+        "title": "Are You Afraid of the Dark?",
+        "reason": "Owner-approved watchlist row had no media item or playable source; removed from the public catalog."
+      }
+    ],
+    "filtered_unplayable_episode_rows": [
+      {
+        "show": "The Fairly OddParents",
+        "count": 171,
+        "reason": "Unavailable placeholder episodes are hidden from title pages; the one verified YouTube compilation remains playable."
       }
     ],
     "language_routes": [

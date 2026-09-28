@@ -169,5 +169,80 @@
     "source_bookmark": "kareneliot",
     "status": "pending_manual_review",
     "reason": "Bookmark appears to represent a broader multi-title collection; no contained titles were imported."
+  },
+  {
+    "title": "Karen Eliot Favorites — modern/current filter",
+    "archive_id": "kareneliot-bookmarks",
+    "url": "https://archive.org/bookmarks/kareneliot",
+    "source_bookmark": "kareneliot",
+    "status": "reviewed_no_legacy_imports",
+    "reason": "User preference is to avoid older shows and movies that are unlikely to be watched. The bookmark page was reviewed for current or recent titles with playable video files and no matching catalog title/year or archive item.",
+    "selection_rule": "Prefer 2015–2026 releases or current recognizable series; require at least one playable MP4/M4V/WebM/OGV file; skip missing metadata, screen recordings, duplicate archive files, and broad collections without a verified item-level review.",
+    "reviewed_at": "2026-09-27",
+    "verified_candidates": [
+      {
+        "title": "Enola Holmes 3",
+        "year": "2026",
+        "archive_id": "enola-holmes-3-free-download-4k",
+        "source_url": "https://archive.org/details/enola-holmes-3-free-download-4k",
+        "playable_files": 1,
+        "duplicate_catalog_match": false,
+        "action": "candidate_for_library_approval"
+      },
+      {
+        "title": "Shelter",
+        "year": "2026",
+        "archive_id": "shelter-2026_202606",
+        "source_url": "https://archive.org/details/shelter-2026_202606",
+        "playable_files": 1,
+        "duplicate_catalog_match": false,
+        "action": "candidate_for_library_approval"
+      },
+      {
+        "title": "Gunslingers",
+        "year": "2025",
+        "archive_id": "gunslingers.-2025.720p.-webrip.x-264.-aac-yts.-mx",
+        "source_url": "https://archive.org/details/gunslingers.-2025.720p.-webrip.x-264.-aac-yts.-mx",
+        "playable_files": 4,
+        "duplicate_catalog_match": false,
+        "note": "The item also contains duplicate encode files and a separate The Unholy Trinity file; import only the Gunslingers feature after file-level selection.",
+        "action": "candidate_for_library_approval"
+      },
+      {
+        "title": "Better Call Saul",
+        "year": "2015–2022",
+        "archive_id": "better.-call.-saul.-s-01-e-01.-uno.-blu-ray.-10-bit.-1080p.-ddp-5.1.-h-265-d-3g",
+        "source_url": "https://archive.org/details/better.-call.-saul.-s-01-e-01.-uno.-blu-ray.-10-bit.-1080p.-ddp-5.1.-h-265-d-3g",
+        "playable_files": 36,
+        "duplicate_catalog_match": false,
+        "action": "candidate_for_library_approval"
+      },
+      {
+        "title": "A Series of Unfortunate Events",
+        "year": "2017–2019",
+        "archive_id": "asoue-netflix",
+        "source_url": "https://archive.org/details/asoue-netflix",
+        "playable_files": 8,
+        "duplicate_catalog_match": false,
+        "action": "candidate_for_library_approval"
+      }
+    ],
+    "skipped_items": [
+      {
+        "title": "Young Sheldon Complete Series",
+        "archive_id": "young-sheldon-complete-series-tv-series-2017-2024",
+        "reason": "Archive item returned no usable metadata or playable video files."
+      },
+      {
+        "title": "Murder at Highland Manor",
+        "archive_id": "screen-recording-03-02-2026-15-56-59-1",
+        "reason": "Source is a screen recording rather than a verified movie master."
+      },
+      {
+        "title": "The Backrooms Movie",
+        "archive_id": "the-backrooms-movie_20260603",
+        "reason": "Playable file exists, but the item lacks a clear creator/source record; hold for manual approval."
+      }
+    ]
   }
 ]

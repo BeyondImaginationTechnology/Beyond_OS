@@ -122,12 +122,44 @@ $modeDefinition = jaguar_mode($mode);
 if ($modeDefinition === null) { http_response_code(422); echo json_encode(['error' => 'Choose a valid Jaguar Thinking mode.']); exit; }
 if (!jaguar_mode_is_enabled($mode)) { http_response_code(501); echo json_encode(['error' => 'Jaguar Thinking ' . $modeDefinition['label'] . ' is planned, not available in this preview yet.']); exit; }
 if (in_array($mode, ['draw', 'video'], true)) {
-    http_response_code(503);
-    $drawPayload = ['error' => 'Jaguar ' . ucfirst($mode) . ' is selectable in preview, but its GPU generation worker is not connected yet. No media was generated and no BIT$ was charged.'];
-    if ($signedIn) {
-        try { $drawPayload['wallet_bit_balance'] = jaguar_wallet_bit_balance(beyond_db(), (int)$_SESSION['user_id']); } catch (Throwable $exception) {}
+    if ($mode === 'draw') {
+        if (!$signedIn) { http_response_code(401); echo json_encode(['error' => 'Sign in to use Draw. A successful image uses 10 BIT$ from your Beyond wallet.']); exit; }
+        try {
+            $drawRate = beyond_rate_limit_consume(beyond_db(), 'jaguar-draw', (string)$_SESSION['user_id'], 3, 300, 600);
+            if (!$drawRate['allowed']) { http_response_code(429); header('Retry-After: ' . $drawRate['retry_after']); echo json_encode(['error' => 'Draw is resting for a moment. Please try again shortly.']); exit; }
+        } catch (Throwable $exception) { error_log('Jaguar Draw rate limiter unavailable: ' . $exception->getMessage()); }
+        $drawMessages = is_array($payload['messages'] ?? null) ? $payload['messages'] : [];
+        $drawLast = $drawMessages === [] ? null : $drawMessages[array_key_last($drawMessages)];
+        $drawPrompt = is_array($drawLast) && is_string($drawLast['content'] ?? null) ? trim((string)$drawLast['content']) : '';
+        if ($drawPrompt === '' || mb_strlen($drawPrompt) > 8000) { http_response_code(422); echo json_encode(['error' => 'Provide a valid image prompt.']); exit; }
+        if (preg_match('/\b(?:porn|nudes?|nudity|naked|explicit sexual|child.{0,60}(?:sex|nude|porn)|minor.{0,60}(?:sex|nude|porn))\b/iu', $drawPrompt) === 1) { http_response_code(422); echo json_encode(['error' => 'Jaguar Draw cannot help with explicit sexual content.']); exit; }
+        $drawPrice = 10.0;
+        $drawUrl = rtrim(jaguar_runtime_config('draw_runtime_url'), '/');
+        $drawBalance = null;
+        try { $drawBalance = jaguar_wallet_bit_balance(beyond_db(), (int)$_SESSION['user_id']); } catch (Throwable $exception) {}
+        if ($drawBalance === null) { http_response_code(503); echo json_encode(['error' => 'Your BIT$ wallet is temporarily unavailable. No BIT$ was charged.']); exit; }
+        if ($drawBalance < $drawPrice) { http_response_code(402); echo json_encode(['error' => 'You need 10 BIT$ to generate an image. Add BIT$ to your Beyond wallet, then try again.', 'wallet_bit_balance' => $drawBalance]); exit; }
+        if ($drawUrl === '' || !filter_var($drawUrl, FILTER_VALIDATE_URL) || !function_exists('curl_init')) { http_response_code(503); echo json_encode(['error' => 'Jaguar Draw is not connected to its GPU image worker yet. No BIT$ was charged.', 'wallet_bit_balance' => $drawBalance]); exit; }
+        $drawToken = jaguar_runtime_config('runtime_token');
+        if ($drawToken === '') { http_response_code(503); echo json_encode(['error' => 'Jaguar Draw authentication is not configured. No BIT$ was charged.', 'wallet_bit_balance' => $drawBalance]); exit; }
+        $drawKey = 'draw:v1:u' . (int)$_SESSION['user_id'] . ':' . bin2hex(random_bytes(16));
+        $drawRequest = curl_init($drawUrl . '/v1/draw');
+        curl_setopt_array($drawRequest, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 15, CURLOPT_TIMEOUT => 180, CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $drawToken], CURLOPT_POSTFIELDS => json_encode(['prompt' => $drawPrompt, 'language' => (string)($payload['language'] ?? 'en')], JSON_THROW_ON_ERROR)]);
+        $drawResponse = curl_exec($drawRequest); $drawStatus = (int)curl_getinfo($drawRequest, CURLINFO_RESPONSE_CODE); curl_close($drawRequest);
+        $drawResult = is_string($drawResponse) && strlen($drawResponse) <= 15 * 1024 * 1024 ? json_decode($drawResponse, true) : null;
+        $imageUrl = is_array($drawResult) && is_string($drawResult['image_url'] ?? null) ? trim($drawResult['image_url']) : '';
+        $isDataImage = preg_match('/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+\/=]+$/', $imageUrl) === 1 && strlen($imageUrl) <= 12 * 1024 * 1024;
+        $isHttpsImage = filter_var($imageUrl, FILTER_VALIDATE_URL) !== false && strtolower((string)parse_url($imageUrl, PHP_URL_SCHEME)) === 'https';
+        if ($drawStatus < 200 || $drawStatus >= 300 || (!$isDataImage && !$isHttpsImage)) {
+            http_response_code(503); echo json_encode(['error' => 'Jaguar Draw could not generate an image. No BIT$ was charged.', 'wallet_bit_balance' => $drawBalance]); exit;
+        }
+        $debit = jaguar_wallet_debit(beyond_db(), (int)$_SESSION['user_id'], $drawPrice, $drawKey, 'Jaguar Draw image generation');
+        if (!$debit['ok']) { http_response_code(402); echo json_encode(['error' => 'The image was generated, but your BIT$ wallet could not complete the charge. The image was not delivered.', 'wallet_bit_balance' => $debit['balance'] ?? $drawBalance]); exit; }
+        echo json_encode(['model' => 'jaguar-draw-gpu', 'adapter' => $drawResult['adapter'] ?? null, 'mode' => 'draw', 'message' => 'Your Jaguar Draw image is ready.', 'image_url' => $imageUrl, 'wallet_bit_balance' => $debit['balance'], 'charged_bit_dollars' => $drawPrice], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
     }
-    echo json_encode($drawPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    http_response_code(501);
+    echo json_encode(['error' => 'Jaguar Video is not available in this preview. No BIT$ was charged.']);
     exit;
 }
 try {
@@ -351,9 +383,9 @@ if ($mode === 'core' && $guide !== '') {
         echo json_encode(['model' => 'jaguar-dailybreath-fast-lane', 'adapter' => 'local', 'mode' => $mode, 'message' => $guideName . ' is available here for Daily Breath and sacred-text questions only. This no-GPU chat can offer concise, best-effort guidance from Jaguar’s built-in knowledge; for a specific passage, include its book, chapter, and verse.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
-$runtimeUrl = rtrim((string) getenv('JAGUAR_RUNTIME_URL'), '/');
+$runtimeUrl = rtrim(jaguar_runtime_config('runtime_url'), '/');
 if ($runtimeUrl === '' || !filter_var($runtimeUrl, FILTER_VALIDATE_URL) || !function_exists('curl_init')) { http_response_code(503); echo json_encode(['error' => 'Jaguar is not available yet.']); exit; }
-$runtimeToken = trim((string) getenv('JAGUAR_RUNTIME_TOKEN'));
+$runtimeToken = jaguar_runtime_config('runtime_token');
 if ($runtimeToken === '') { http_response_code(503); echo json_encode(['error' => 'Jaguar runtime authentication is not configured.']); exit; }
 $headers = ['Content-Type: application/json'];
 $headers[] = 'Authorization: Bearer ' . $runtimeToken;

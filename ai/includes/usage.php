@@ -201,6 +201,50 @@ function jaguar_wallet_bit_balance(PDO $pdo, int $userId): float
     return is_numeric($balance) ? max(0.0, (float)$balance) : 0.0;
 }
 
+/** Debit a signed-in user's BITS wallet exactly once after media succeeds. */
+function jaguar_wallet_debit(PDO $pdo, int $userId, float $amount, string $idempotencyKey, string $description): array
+{
+    if ($userId < 1 || !is_finite($amount) || $amount <= 0 || trim($idempotencyKey) === '') {
+        return ['ok' => false, 'charged' => false, 'balance' => null, 'error' => 'Invalid wallet debit.'];
+    }
+    $amount = round($amount, 6);
+    $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+    $insert = $driver === 'sqlite'
+        ? "INSERT OR IGNORE INTO beyond_wallets(user_id,balance,currency,status) VALUES(?,0,'BITS','active')"
+        : "INSERT IGNORE INTO beyond_wallets(user_id,balance,currency,status) VALUES(?,0,'BITS','active')";
+    try {
+        $pdo->beginTransaction();
+        $pdo->prepare($insert)->execute([$userId]);
+        $walletSql = "SELECT id,balance,status FROM beyond_wallets WHERE user_id=? AND currency='BITS' LIMIT 1" . ($driver === 'sqlite' ? '' : ' FOR UPDATE');
+        $walletStatement = $pdo->prepare($walletSql);
+        $walletStatement->execute([$userId]);
+        $wallet = $walletStatement->fetch(PDO::FETCH_ASSOC);
+        if (!$wallet || ($wallet['status'] ?? '') !== 'active') throw new RuntimeException('Wallet is unavailable or not active.');
+        $existing = $pdo->prepare('SELECT amount FROM beyond_wallet_transactions WHERE idempotency_key=? LIMIT 1');
+        $existing->execute([$idempotencyKey]);
+        if ($existing->fetchColumn() !== false) {
+            $pdo->commit();
+            return ['ok' => true, 'charged' => false, 'balance' => (float)$wallet['balance'], 'already_charged' => true];
+        }
+        if ((float)$wallet['balance'] < $amount) {
+            $pdo->commit();
+            return ['ok' => false, 'charged' => false, 'balance' => (float)$wallet['balance'], 'error' => 'Insufficient BIT$ balance.'];
+        }
+        $transaction = $pdo->prepare("INSERT INTO beyond_wallet_transactions(wallet_id,amount,type,app_slug,description,idempotency_key) VALUES(?,?,'debit','jaguar',?,?)");
+        $transaction->execute([(int)$wallet['id'], -$amount, substr($description, 0, 255), $idempotencyKey]);
+        $update = $pdo->prepare('UPDATE beyond_wallets SET balance=balance-? WHERE id=? AND balance>=?');
+        $update->execute([$amount, (int)$wallet['id'], $amount]);
+        if ($update->rowCount() !== 1) throw new RuntimeException('Wallet balance changed before debit.');
+        $balance = max(0.0, (float)$wallet['balance'] - $amount);
+        $pdo->commit();
+        return ['ok' => true, 'charged' => true, 'balance' => $balance];
+    } catch (Throwable $exception) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        error_log('Jaguar wallet debit unavailable: ' . $exception->getMessage());
+        return ['ok' => false, 'charged' => false, 'balance' => null, 'error' => 'BIT$ wallet debit is temporarily unavailable.'];
+    }
+}
+
 /** @return array{requests:int,request_limit:int,bit_dollars_left:float,period:string,wallet_bit_balance?:float} */
 function jaguar_usage_public(array $usage, ?float $walletBalance = null): array
 {

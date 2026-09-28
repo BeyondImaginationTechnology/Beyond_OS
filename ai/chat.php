@@ -85,6 +85,12 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
         usageStatus.textContent = `This month: ${usage.requests || 0}/${requestLimit} model requests · ${bitDollarsLeft} BIT$ left${walletCopy}`;
     }
 
+    function updateWalletStatus(balance) {
+        const amount = Number(balance);
+        if (!Number.isFinite(amount)) return;
+        usageStatus.textContent = usageStatus.textContent.replace(/\s· Wallet:.*$/, '') + ` · Wallet: ${amount.toLocaleString()} BIT$`;
+    }
+
     fetch(`${appBasePath}/api/usage.php`, {credentials: 'same-origin', cache: 'no-store'})
         .then(response => response.ok ? response.json() : null)
         .then(data => {
@@ -111,8 +117,8 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
             suggestions: ['Explain AI tokens with a memorable analogy.', 'Help me turn a rough idea into a clear project plan.', 'Teach me something difficult in plain language.'],
             buildIntro: 'Brainstorm software ideas, design how an app should work, or explore coding approaches. Build cannot inspect your repository or generate images or video.',
             buildSuggestions: ['Brainstorm useful features and an MVP for a neighborhood tool library.', 'Design the API and data model for a simple appointment app.', 'Sketch the main screens, interaction states, and accessibility needs for a study planner.'],
-            drawIntro: 'Draw is Jaguar’s image-generation mode. Its GPU worker is not connected in this preview yet.', videoIntro: 'Video is a planned Jaguar generation mode. Its GPU worker is not connected in this preview yet.',
-            placeholder: 'Message Jaguar…', fine: 'Jaguar can make mistakes. Check important information. Explain uses your monthly model allowance for questions; greetings, arithmetic, weather, and place lookups use the fast lane.', waking: 'Jaguar is thinking…', thinkingStages: ['Understanding your request…', 'Preparing a response…', 'Checking the result…'], timedOut: 'Jaguar is taking longer than expected. Please try again.', explicit: 'Jaguar cannot help with explicit sexual content.', coreStatus: 'Explain · model reasoning enabled', buildStatus: 'Build preview · software design', drawStatus: 'Draw preview · generation not connected', videoStatus: 'Video preview · generation not connected', user: 'YOU',
+            drawIntro: 'Draw generates an image through Jaguar’s private GPU worker. Sign in and use 10 BIT$ per successful image.', videoIntro: 'Video is a planned Jaguar generation mode. Its GPU worker is not connected in this preview yet.',
+            placeholder: 'Message Jaguar…', fine: 'Jaguar can make mistakes. Check important information. Explain uses your monthly model allowance for questions; greetings, arithmetic, weather, and place lookups use the fast lane.', waking: 'Jaguar is thinking…', thinkingStages: ['Understanding your request…', 'Preparing a response…', 'Checking the result…'], timedOut: 'Jaguar is taking longer than expected. Please try again.', explicit: 'Jaguar cannot help with explicit sexual content.', coreStatus: 'Explain · model reasoning enabled', buildStatus: 'Build preview · software design', drawStatus: 'Draw preview · 10 BIT$ per successful image', videoStatus: 'Video preview · generation not connected', user: 'YOU',
             newChat: '＋ New conversation', verifyTitle: 'One quick check', verifyCopy: 'Verify that you are human, then Jaguar will send your message.', cancel: 'Cancel'
         },
         fr: {
@@ -121,8 +127,8 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
             suggestions: ['Explique les jetons IA avec une analogie mémorable.', 'Transforme mon idée en plan de projet clair.', 'Enseigne-moi un sujet difficile simplement.'],
             buildIntro: 'Imaginez des idées de logiciels, concevez le fonctionnement d’une application ou comparez des approches de programmation. Build ne consulte pas votre dépôt et ne génère ni images ni vidéos.',
             buildSuggestions: ['Imagine des fonctionnalités utiles et un MVP pour une bibliothèque d’outils de quartier.', 'Conçois l’API et le modèle de données d’une application de rendez-vous.', 'Décris les écrans, les interactions et les besoins d’accessibilité d’un agenda d’étude.'],
-            drawIntro: 'Draw est le mode de génération d’images de Jaguar. Son GPU de génération n’est pas encore connecté.', videoIntro: 'Video est un mode de génération prévu pour Jaguar. Son GPU de génération n’est pas encore connecté.',
-            placeholder: 'Écrivez à Jaguar…', fine: 'Jaguar peut se tromper. Vérifiez les informations importantes. Explain utilise votre quota mensuel de modèle pour répondre aux questions ; les salutations, calculs et recherches restent sur la voie rapide.', waking: 'Jaguar réfléchit…', thinkingStages: ['Compréhension de votre demande…', 'Préparation de la réponse…', 'Vérification du résultat…'], timedOut: 'Jaguar met plus de temps que prévu. Veuillez réessayer.', explicit: 'Jaguar ne peut pas aider avec du contenu sexuel explicite.', coreStatus: 'Explain · raisonnement du modèle activé', buildStatus: 'Aperçu Build · conception logicielle', drawStatus: 'Aperçu Draw · génération non connectée', videoStatus: 'Aperçu Video · génération non connectée', user: 'VOUS',
+            drawIntro: 'Draw génère une image avec le GPU privé de Jaguar. Connectez-vous et utilisez 10 BIT$ par image réussie.', videoIntro: 'Video est un mode de génération prévu pour Jaguar. Son GPU de génération n’est pas encore connecté.',
+            placeholder: 'Écrivez à Jaguar…', fine: 'Jaguar peut se tromper. Vérifiez les informations importantes. Explain utilise votre quota mensuel de modèle pour répondre aux questions ; les salutations, calculs et recherches restent sur la voie rapide.', waking: 'Jaguar réfléchit…', thinkingStages: ['Compréhension de votre demande…', 'Préparation de la réponse…', 'Vérification du résultat…'], timedOut: 'Jaguar met plus de temps que prévu. Veuillez réessayer.', explicit: 'Jaguar ne peut pas aider avec du contenu sexuel explicite.', coreStatus: 'Explain · raisonnement du modèle activé', buildStatus: 'Aperçu Build · conception logicielle', drawStatus: 'Aperçu Draw · 10 BIT$ par image réussie', videoStatus: 'Aperçu Video · génération non connectée', user: 'VOUS',
             newChat: '＋ Nouvelle conversation', verifyTitle: 'Une vérification rapide', verifyCopy: 'Confirmez que vous êtes une personne, puis Jaguar enverra votre message.', cancel: 'Annuler'
         },
         es: {
@@ -131,8 +137,8 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
             suggestions: ['Explica los tokens de IA con una analogía memorable.', 'Convierte mi idea en un plan de proyecto claro.', 'Enséñame algo difícil con palabras sencillas.'],
             buildIntro: 'Propón ideas de software, diseña cómo debería funcionar una aplicación o compara formas de programarla. Build no puede inspeccionar tu repositorio ni generar imágenes o videos.',
             buildSuggestions: ['Propón funciones útiles y un MVP para una biblioteca comunitaria de herramientas.', 'Diseña la API y el modelo de datos para una app de citas.', 'Describe las pantallas, interacciones y necesidades de accesibilidad de un planificador de estudio.'],
-            drawIntro: 'Draw es el modo de generación de imágenes de Jaguar. Su GPU de generación aún no está conectada.', videoIntro: 'Video es un modo de generación previsto para Jaguar. Su GPU de generación aún no está conectada.',
-            placeholder: 'Escribe a Jaguar…', fine: 'Jaguar puede equivocarse. Verifica la información importante. Explain usa tu cuota mensual de modelo para responder preguntas; los saludos, cálculos y consultas siguen en la vía rápida.', waking: 'Jaguar está pensando…', thinkingStages: ['Entendiendo tu solicitud…', 'Preparando una respuesta…', 'Comprobando el resultado…'], timedOut: 'Jaguar está tardando más de lo esperado. Inténtalo de nuevo.', explicit: 'Jaguar no puede ayudar con contenido sexual explícito.', coreStatus: 'Explain · razonamiento del modelo activado', buildStatus: 'Vista previa Build · diseño de software', drawStatus: 'Vista previa Draw · generación no conectada', videoStatus: 'Vista previa Video · generación no conectada', user: 'TÚ',
+            drawIntro: 'Draw genera una imagen con el GPU privado de Jaguar. Inicia sesión y usa 10 BIT$ por imagen exitosa.', videoIntro: 'Video es un modo de generación previsto para Jaguar. Su GPU de generación aún no está conectada.',
+            placeholder: 'Escribe a Jaguar…', fine: 'Jaguar puede equivocarse. Verifica la información importante. Explain usa tu cuota mensual de modelo para responder preguntas; los saludos, cálculos y consultas siguen en la vía rápida.', waking: 'Jaguar está pensando…', thinkingStages: ['Entendiendo tu solicitud…', 'Preparando una respuesta…', 'Comprobando el resultado…'], timedOut: 'Jaguar está tardando más de lo esperado. Inténtalo de nuevo.', explicit: 'Jaguar no puede ayudar con contenido sexual explícito.', coreStatus: 'Explain · razonamiento del modelo activado', buildStatus: 'Vista previa Build · diseño de software', drawStatus: 'Vista previa Draw · 10 BIT$ por imagen exitosa', videoStatus: 'Vista previa Video · generación no conectada', user: 'TÚ',
             newChat: '＋ Nueva conversación', verifyTitle: 'Una verificación rápida', verifyCopy: 'Confirma que eres una persona y Jaguar enviará tu mensaje.', cancel: 'Cancelar'
         }
     };
@@ -322,9 +328,19 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
                 }, 1000);
                 return;
             }
+            updateWalletStatus(data.wallet_bit_balance);
             if (!response.ok) throw new Error(data.error || 'Jaguar is unavailable.');
             updateUsageStatus(data.usage);
             thinking.textContent = data.message;
+            if (requestMode === 'draw' && typeof data.image_url === 'string') {
+                const image = document.createElement('img');
+                image.src = data.image_url;
+                image.alt = 'Jaguar Draw result';
+                image.loading = 'lazy';
+                image.referrerPolicy = 'no-referrer';
+                image.style.cssText = 'display:block;max-width:100%;margin-top:14px;border-radius:14px;border:1px solid rgba(199,123,255,.3)';
+                thinking.appendChild(image);
+            }
             history.push({role: 'assistant', content: data.message});
             attachFeedback(thinking, text, data.message, requestMode);
         } catch (error) {

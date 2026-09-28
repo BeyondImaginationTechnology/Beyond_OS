@@ -93,9 +93,14 @@ BEYOND_AI_ORIGIN=https://ai.beyondimagination.co.technology
 BEYOND_SESSION_COOKIE_DOMAIN=.beyondimagination.co.technology
 JAGUAR_RUNTIME_URL=https://your-private-jaguar-runtime.example
 JAGUAR_RUNTIME_TOKEN=a-long-random-secret-shared-only-with-the-runtime
+JAGUAR_DRAW_RUNTIME_URL=https://your-private-draw-worker.example
 ```
 
 The shared hosting account serves the PHP interface and authenticated proxy. The model runtime must run separately on GPU-capable infrastructure. Set the same non-empty `JAGUAR_RUNTIME_TOKEN` on both hosts: the PHP proxy sends it as a bearer token and the runtime rejects unauthenticated chat requests.
+
+On the PHP host, the protected `var/config/live.php` may hold the endpoint settings under `jaguar.runtime_url`, `jaguar.draw_runtime_url`, and `jaguar.runtime_token`. Environment variables `JAGUAR_RUNTIME_URL`, `JAGUAR_DRAW_RUNTIME_URL`, and `JAGUAR_RUNTIME_TOKEN` take precedence when present; never commit live credentials.
+
+Draw uses a separate private GPU worker configured as `JAGUAR_DRAW_RUNTIME_URL`. Deploy `draw_modal_app.py` with the existing Hugging Face and runtime secrets. It accepts `POST /v1/draw` with `{ "prompt": "...", "language": "en" }` and returns a bounded PNG data URL. The PHP proxy requires a signed-in user with at least 10 BIT$, validates the image result, and records the idempotent 10 BIT$ debit only after the worker succeeds. If the worker is absent or fails, no debit is recorded.
 
 The PHP proxy answers greetings, capability/version questions, thanks, and basic two-number arithmetic through `jaguar-fast-lane`. These requests never start a Modal GPU. Prompts that require language-model reasoning continue to the scale-to-zero L4 runtime.
 
@@ -125,6 +130,12 @@ Then deploy from `ai/runtime`:
 
 ```powershell
 python -m modal deploy modal_app.py
+```
+
+Deploy the Draw worker separately when the Hugging Face account has accepted the selected model license:
+
+```powershell
+python -m modal deploy draw_modal_app.py
 ```
 
 Deployment builds the container and publishes the endpoint but does not load Llama onto a GPU. Copy the resulting Modal URL into `JAGUAR_RUNTIME_URL` on the PHP host, and configure the matching `JAGUAR_RUNTIME_TOKEN` there. The first authenticated `/v1/chat` request is the first GPU-backed model invocation.

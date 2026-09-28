@@ -107,6 +107,13 @@ return [
             'region' => 'canadacentral',
         ],
     ],
+    'jaguar' => [
+        // Keep these values in the protected var/config/live.php on production.
+        // The runtime token may also be supplied through the environment.
+        'runtime_url' => 'https://your-private-jaguar-runtime.example',
+        'draw_runtime_url' => 'https://your-private-draw-worker.example',
+        'runtime_token' => '',
+    ],
     'music' => [
         'youtube' => [
             // Optional: leave blank to reuse the first key from config/youtube.php.

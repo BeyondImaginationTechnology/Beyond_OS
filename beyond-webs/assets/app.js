@@ -27,8 +27,8 @@
     render();
   }));
   $('#startSeat')?.addEventListener('click', () => {
-    $('#seatState').textContent = 'SEAT REQUESTED';
-    $('#startSeat').innerHTML = 'Cloud seat request saved <span>✓</span>';
+    $('#seatState').textContent = 'SESSION REQUESTED';
+    $('#startSeat').innerHTML = 'VPS session request saved <span>✓</span>';
     $('#startSeat').disabled = true;
   });
   $('#signInSeat')?.addEventListener('click', () => localStorage.setItem('beyondWebsSeat', JSON.stringify(state)));

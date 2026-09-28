@@ -30,6 +30,7 @@ function bos_log(string $event, array $details=[]): void {
 }
 function bos_app_platforms(string $title, string $copy=''): array {
     $haystack = strtolower($title.' '.$copy);
+    if (str_contains($haystack, 'beyond webs')) return ['Web','Desktop'];
     if (str_contains($haystack, 'chromium') || str_contains($haystack, 'beyond ai') || str_contains($haystack, 'bit os')) return ['Desktop'];
     if (str_contains($haystack, 'coding school')) return ['Web','Apple','Google'];
     if (str_contains($haystack, 'beyond french')) return ['Web','Apple'];

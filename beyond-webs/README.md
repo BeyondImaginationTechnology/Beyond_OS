@@ -1,6 +1,8 @@
-# Beyond Webs App v0.1
+# Beyond Webs App v0.0.1
 
 This folder is the document root for `host.beyondimagination.co.technology`.
+
+Beyond Webs v0.0.1 is the BIT OS VPS session landing page. Signed-in users choose a BIT OS flavour and resource tier, then usage is charged by the hour. The page avoids naming a single VPS provider so multiple infrastructure plugs can be added behind the product.
 
 ## Host configuration
 

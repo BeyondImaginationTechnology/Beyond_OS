@@ -130,7 +130,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 <header class="top wrap site-header">
     <a class="brand" href="./"><b class="brand-atom" aria-hidden="true"><img src="/assets/images/bos-logo-mark.svg?v=20260828-1" alt=""></b>BEYOND <span>IMAGINATION</span><small>TECHNOLOGY · BIT</small></a>
     <nav class="nav" aria-label="Primary navigation">
-          <a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a><a href="/ai/">AI</a><a href="https://os.beyondimagination.co.technology/">OS</a><a href="https://host.beyondimagination.co.technology/">Hosting</a>
+          <a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a><a href="/ai/">AI</a><a href="https://os.beyondimagination.co.technology/">OS</a><a href="https://host.beyondimagination.co.technology/">VPS</a>
           <a href="/beyond-market/">Store</a>
           <label class="currency-picker"><span aria-hidden="true">BIT$</span><span class="visually-hidden">Display currency</span><select id="homeCurrency" aria-label="Display currency"><option value="BITS">BIT$</option><option value="USD">USD</option><option value="CAD">CAD</option></select></label>
     </nav>
@@ -139,7 +139,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 <div class="mobile-drawer-backdrop" aria-hidden="true"></div>
 <aside class="mobile-drawer" id="mobileNavigation" aria-label="Mobile navigation" aria-hidden="true">
     <div class="mobile-drawer-head"><strong>BEYOND IMAGINATION</strong><button class="drawer-close" type="button" aria-label="Close navigation menu">×</button></div>
-    <nav aria-label="Primary navigation"><a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a><a href="/ai/">AI</a><a href="https://os.beyondimagination.co.technology/">OS</a><a href="https://host.beyondimagination.co.technology/">Hosting</a><a href="/beyond-market/">Store</a></nav>
+    <nav aria-label="Primary navigation"><a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a><a href="/ai/">AI</a><a href="https://os.beyondimagination.co.technology/">OS</a><a href="https://host.beyondimagination.co.technology/">VPS</a><a href="/beyond-market/">Store</a></nav>
     <a class="primary" href="/app-store/">Open App Store</a>
     <label class="mobile-currency">Display currency <span class="currency-picker"><span aria-hidden="true">BIT$</span><select id="mobileCurrency" aria-label="Display currency"><option value="BITS">BIT$</option><option value="USD">USD</option><option value="CAD">CAD</option></select></span></label>
 </aside>

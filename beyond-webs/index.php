@@ -37,7 +37,7 @@ $loginUrl = $identityOrigin . '/beyond-id/auth/login.php?app=beyond-webs&return=
       <div class="hero-copy">
         <p class="eyebrow"><i></i> Beyond Webs App · v0.0.1</p>
         <h1>Your <em>BIT OS.</em><br>Always ready.</h1>
-        <p class="lede">A cloud hosting and development platform for BIT OS. Signed-in users start a VPS session, pick a flavour, and pay by the hour for the resources they use.</p>
+        <p class="lede">A VPS and development platform for BIT OS. Signed-in users start a session, pick a flavour, and pay by the hour for the resources they use.</p>
         <div class="hero-actions"><a class="button primary" href="#launch">Configure VPS usage <span>→</span></a><a class="button ghost" href="#flavours">See BIT OS flavours</a></div>
         <p class="identity"><span>✦</span> One Beyond ID connects your session, hourly usage, and workspace.</p>
       </div>

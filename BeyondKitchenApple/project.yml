@@ -17,6 +17,7 @@ targets:
     sources: [Sources]
     resources:
       - path: ../beyond-kitchen/data/recipes.json
+      - path: ../beyond-kitchen/assets/images/recipes
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: technology.co.beyondimagination.beyondkitchen

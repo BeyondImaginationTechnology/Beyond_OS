@@ -1,16 +1,11 @@
-const CACHE_NAME = 'beyond-kitchen-0.0.2-assets-v4';
+const CACHE_NAME = 'beyond-kitchen-0.0.2-assets-v5';
 const APP_FILES = [
   './',
   './offline.html',
-  './assets/css/app.css?v=0.0.4',
+  './assets/css/app.css?v=0.0.5',
   './assets/js/recipe-library.js?v=0.0.2',
-  './assets/js/app.js?v=0.0.4',
+  './assets/js/app.js?v=0.0.5',
   './assets/kitchen-mark.svg',
-  './assets/images/lemon-chickpea-carousel/slide-01.jpg',
-  './assets/images/lemon-chickpea-carousel/slide-02.jpg',
-  './assets/images/lemon-chickpea-carousel/slide-03.jpg',
-  './assets/images/lemon-chickpea-carousel/slide-04.jpg',
-  './assets/images/lemon-chickpea-carousel/slide-05.jpg',
   './assets/images/recipes/lemon-chickpea-bowls.png',
   './assets/images/recipes/tomato-butter-beans.jpg',
   './assets/images/recipes/ginger-salmon-tray.jpg',

@@ -11,10 +11,32 @@ The web page follows the PHP architecture in this repository and can run from
 the same PHP-capable web server as Beyond OS. Its nine recipes include three
 Haitian plates. It is also an installable PWA when served over HTTPS (or
 localhost), with its recipe library, interface, and bundled photography cached
-for offline visits. The lemon chickpea feature carousel uses five local 4:5
-images and includes Gloria Liu's Unsplash photo credit.
-The native clients use their platform UI and bundled recipes, and work without
-network access.
+for offline visits. The daily carousel follows the same featured recipe and
+shows five slides covering the dish, ingredients, cooking steps, and finished
+plate. The page uses rendered 1080 × 1350 JPEGs when they are available and
+falls back to readable recipe slides while offline or before the daily render.
+The native clients bundle the recipe catalog and photos, so their carousels
+work without network access.
+
+## Daily Instagram carousel draft
+
+The CLI renderer needs PHP GD with JPEG and FreeType support and a readable
+TrueType font. It checks common DejaVu and Liberation font paths on Linux;
+set `BEYOND_KITCHEN_FONT_FILE` if needed. The calendar defaults to
+`America/Vancouver`; `BEYOND_KITCHEN_TIMEZONE` can override it. Add this cron
+entry in the hosting control panel after deploying:
+
+```cron
+15 6 * * * cd /path/to/www && /usr/bin/php81 server/cron/daily-kitchen-carousel.php >> /path/to/private/logs/daily-kitchen-carousel.log 2>&1
+```
+
+Run `php server/cron/daily-kitchen-carousel.php` once to create today's draft.
+An optional `YYYY-MM-DD` argument renders a specific date. The output is
+`assets/images/daily/YYYY-MM-DD/slide-01.jpg` through `slide-05.jpg`, a dated
+`manifest.json`, and `assets/images/daily/latest.json`. This directory is
+ignored by Git so daily renders do not block deployments. The manifest includes
+the slide copy, image paths, and a caption draft. Publishing to Instagram is
+manual in this release; the cron prepares the draft.
 
 ## Native clients
 

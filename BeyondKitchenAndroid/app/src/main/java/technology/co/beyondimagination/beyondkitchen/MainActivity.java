@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.graphics.Insets;
 import android.graphics.Color;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
@@ -18,6 +19,7 @@ import android.view.WindowInsets;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -33,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -131,7 +134,11 @@ public final class MainActivity extends Activity {
             return;
         }
 
-        page.addView(featuredCard(), params(0, 0, 0, 23));
+        Recipe featured = dailyRecipe();
+        page.addView(featuredCard(featured), params(0, 0, 0, 23));
+        page.addView(text("TODAY'S CAROUSEL", 10, GREEN, true), params(0, 0, 0, 8));
+        page.addView(text("From ingredients to the finished plate", 20, INK, false), params(0, 0, 0, 12));
+        page.addView(dailyCarousel(featured), params(0, 0, 0, 24));
         searchInput = new EditText(this);
         searchInput.setSingleLine(true);
         searchInput.setTextSize(13);
@@ -150,7 +157,7 @@ public final class MainActivity extends Activity {
         HorizontalScrollView filterScroll = new HorizontalScrollView(this);
         filterScroll.setHorizontalScrollBarEnabled(false);
         LinearLayout filters = row();
-        String[] choices = {"All", "Quick", "Vegetarian", "Dinner"};
+        String[] choices = {"All", "Quick", "Vegetarian", "Dinner", "Haitian"};
         for (String choice : choices) {
             TextView chip = text(choice, 11, GREEN, true);
             chip.setGravity(Gravity.CENTER);
@@ -177,14 +184,17 @@ public final class MainActivity extends Activity {
         setContentView(scroll);
     }
 
-    private View featuredCard() {
+    private Recipe dailyRecipe() {
+        return recipes.get(Math.floorMod((int) LocalDate.now().toEpochDay(), recipes.size()));
+    }
+
+    private View featuredCard(Recipe recipe) {
         LinearLayout card = column();
         card.setPadding(dp(21), dp(21), dp(21), dp(21));
         card.setBackground(shape(GREEN, 21, 0x00405b42));
         TextView kicker = text("✳  TODAY'S RECIPE", 10, GOLD, true);
         kicker.setLetterSpacing(0.12f);
         card.addView(kicker, params(0, 0, 0, 12));
-        Recipe recipe = recipes.get(Math.floorMod((int) LocalDate.now().toEpochDay(), recipes.size()));
         card.addView(text(recipe.name, 28, Color.WHITE, false), params(0, 0, 0, 8));
         TextView description = text(recipe.description, 12, 0xffe4e8dc, false);
         description.setLineSpacing(dp(3), 1f);
@@ -200,6 +210,63 @@ public final class MainActivity extends Activity {
         cook.setOnClickListener(view -> showRecipe(recipe));
         card.addView(cook, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(43)));
         return card;
+    }
+
+    private View dailyCarousel(Recipe recipe) {
+        List<String> labels = Arrays.asList("TODAY'S RECIPE", "WHAT YOU'LL NEED", "LET'S MAKE IT · 1", "LET'S MAKE IT · 2", "MAKE IT YOUR OWN");
+        List<String> titles = Arrays.asList(recipe.name, "The ingredients", "Get started", "Bring it together", "Ready to enjoy");
+        DecimalFormat format = new DecimalFormat("#.#");
+        StringBuilder ingredients = new StringBuilder();
+        for (Recipe.Ingredient item : recipe.ingredients) {
+            if (ingredients.length() > 0) ingredients.append('\n');
+            ingredients.append("• ").append(format.format(item.amount)).append(' ');
+            if (!item.unit.isEmpty()) ingredients.append(item.unit).append(' ');
+            ingredients.append(item.name);
+        }
+        String remainingSteps = String.join("\n\n", recipe.steps.subList(1, recipe.steps.size()));
+        List<String> bodies = Arrays.asList(recipe.description, ingredients.toString(), recipe.steps.get(0), remainingSteps,
+                "Save this recipe for later. Find the full method in Beyond Kitchen.");
+        HorizontalScrollView scroller = new HorizontalScrollView(this);
+        scroller.setHorizontalScrollBarEnabled(false);
+        LinearLayout cards = row();
+        for (int i = 0; i < labels.size(); i++) {
+            LinearLayout card = column();
+            card.setPadding(dp(18), dp(18), dp(18), dp(16));
+            card.setBackground(shape(i == 0 || i == 4 ? GREEN : CARD, 19, 0xffe5e4da));
+            int color = i == 0 || i == 4 ? Color.WHITE : INK;
+            if (i == 0 || i == 4) {
+                ImageView photo = recipePhoto(recipe);
+                card.addView(photo, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(150)));
+            }
+            TextView label = text(labels.get(i), 10, i == 0 || i == 4 ? GOLD : GREEN, true);
+            card.addView(label, params(0, 16, 0, 9));
+            card.addView(text(titles.get(i), 23, color, true), params(0, 0, 0, 12));
+            TextView body = text(bodies.get(i), i == 1 ? 12 : 13, color, false);
+            body.setLineSpacing(dp(4), 1f);
+            card.addView(body, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
+            card.addView(text((i + 1) + " / 5  ·  Tap for full recipe", 10, color, true), params(0, 12, 0, 0));
+            card.setOnClickListener(view -> showRecipe(recipe));
+            LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(dp(265), dp(420));
+            cardParams.setMargins(0, 0, dp(12), 0);
+            cards.addView(card, cardParams);
+        }
+        scroller.addView(cards);
+        return scroller;
+    }
+
+    private ImageView recipePhoto(Recipe recipe) {
+        ImageView image = new ImageView(this);
+        image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        String fileName = recipe.image.substring(recipe.image.lastIndexOf('/') + 1);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 4;
+        try (InputStream source = getAssets().open(fileName)) {
+            image.setImageBitmap(BitmapFactory.decodeStream(source, null, options));
+        } catch (IOException error) {
+            image.setBackgroundColor(0xffe7ecdf);
+            Log.e("BeyondKitchen", "Unable to load bundled recipe photo: " + fileName, error);
+        }
+        return image;
     }
 
     private void renderRecipes() {
@@ -236,6 +303,7 @@ public final class MainActivity extends Activity {
         if ("All".equals(filter)) return true;
         if ("Quick".equals(filter)) return recipe.timeMinutes < 30;
         if ("Vegetarian".equals(filter)) return recipe.tags.contains("Vegetarian");
+        if ("Haitian".equals(filter)) return recipe.tags.contains("Haitian");
         return recipe.category.equals(filter);
     }
 

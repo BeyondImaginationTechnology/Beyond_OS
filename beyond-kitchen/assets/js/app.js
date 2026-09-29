@@ -12,8 +12,10 @@
   const status = $('#statusMessage');
   const search = $('#recipeSearch');
   const carouselTrack = $('#carouselTrack');
-  const carouselSlides = carouselTrack ? $$('[data-carousel-slide]', carouselTrack) : [];
-  const carouselDots = $$('#recipeCarousel [data-carousel-to]');
+  let carouselSlides = [];
+  let carouselDots = [];
+  let carouselImages = [];
+  let carouselCaption = '';
   const fmt = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
   const recipesApi = window.BeyondKitchenRecipes;
   const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({
@@ -51,6 +53,7 @@
   }
 
   function showCarouselSlide(index) {
+    if (!carouselSlides.length) return;
     const nextIndex = Math.min(carouselSlides.length - 1, Math.max(0, index));
     const slideOffset = carouselSlides[nextIndex].getBoundingClientRect().left - carouselTrack.getBoundingClientRect().left;
     carouselTrack.scrollTo({
@@ -65,25 +68,85 @@
     const activeIndex = Math.min(carouselSlides.length - 1, Math.max(0, index));
     carouselDots.forEach((dot, dotIndex) => dot.setAttribute('aria-current', String(dotIndex === activeIndex)));
     $('#carouselCount').textContent = `${activeIndex + 1} / ${carouselSlides.length}`;
+    const download = $('#carouselDownload');
+    download.hidden = !carouselImages[activeIndex];
+    if (carouselImages[activeIndex]) {
+      download.href = carouselImages[activeIndex];
+      download.download = `beyond-kitchen-slide-${String(activeIndex + 1).padStart(2, '0')}.jpg`;
+      download.textContent = `Download slide ${activeIndex + 1}`;
+    }
   }
 
-  if (carouselTrack && carouselSlides.length) {
-    $('#carouselPrevious').addEventListener('click', () => {
-      showCarouselSlide(Math.round(carouselTrack.scrollLeft / carouselTrack.clientWidth) - 1);
-    });
-    $('#carouselNext').addEventListener('click', () => {
-      showCarouselSlide(Math.round(carouselTrack.scrollLeft / carouselTrack.clientWidth) + 1);
-    });
-    carouselDots.forEach((dot) => dot.addEventListener('click', () => showCarouselSlide(Number(dot.dataset.carouselTo))));
-    carouselTrack.addEventListener('scroll', () => {
-      window.requestAnimationFrame(() => updateCarouselControls());
-    }, { passive: true });
-  }
+  $('#carouselPrevious').addEventListener('click', () => showCarouselSlide(Math.round(carouselTrack.scrollLeft / carouselTrack.clientWidth) - 1));
+  $('#carouselNext').addEventListener('click', () => showCarouselSlide(Math.round(carouselTrack.scrollLeft / carouselTrack.clientWidth) + 1));
+  $('#carouselDots').addEventListener('click', (event) => {
+    const dot = event.target.closest('[data-carousel-to]');
+    if (dot) showCarouselSlide(Number(dot.dataset.carouselTo));
+  });
+  $('#carouselCaption').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(carouselCaption);
+      announce('Post caption copied.');
+    } catch (error) {
+      window.prompt('Copy the post caption:', carouselCaption);
+    }
+  });
+  carouselTrack.addEventListener('scroll', () => window.requestAnimationFrame(() => updateCarouselControls()), { passive: true });
 
   function dailyRecipe() {
     const now = new Date();
     const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     return recipesApi.featuredRecipe(state.recipes, localDate);
+  }
+
+  function localDate() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  }
+
+  function carouselContent(recipe) {
+    const ingredients = recipe.ingredients.map((item) => `${fmt.format(item.amount)} ${item.unit} ${item.name}`.replace(/\s+/g, ' ').trim()).join('\n');
+    return [
+      { label: "Today's recipe", title: recipe.name, body: recipe.description },
+      { label: "What you'll need", title: 'The ingredients', body: ingredients },
+      { label: "Let's make it · 1", title: 'Get started', body: recipe.steps[0] },
+      { label: "Let's make it · 2", title: 'Bring it together', body: recipe.steps.slice(1).join('\n\n') },
+      { label: 'Make it your own', title: 'Ready to enjoy', body: 'Save this recipe for later. Find the full method on Beyond Kitchen.' }
+    ];
+  }
+
+  function renderCarousel(recipe, manifest = null) {
+    const slides = carouselContent(recipe);
+    const generated = manifest && manifest.date === localDate() && manifest.recipeId === recipe.id
+      && Array.isArray(manifest.images) && manifest.images.length === slides.length;
+    carouselImages = generated ? manifest.images.map((path) => `./${path}`) : [];
+    carouselCaption = generated && typeof manifest.caption === 'string' ? manifest.caption : '';
+    $('#carouselCaption').hidden = !carouselCaption;
+    $('#carouselHeading').textContent = recipe.name;
+    $('#carouselDescription').textContent = `Five slides with ingredients and steps for ${recipe.name}. Swipe through, then make it your own.`;
+    $('#carouselRecipeButton').hidden = false;
+    $('#carouselRecipeButton').dataset.open = recipe.id;
+    $('#recipeCarousel').setAttribute('aria-label', `${recipe.name} recipe carousel`);
+    carouselTrack.innerHTML = slides.map((slide, index) => `<figure class="carousel-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="${index + 1} of ${slides.length}">${generated
+      ? `<img src="${escapeHtml(carouselImages[index])}" alt="${escapeHtml(`${slide.label}. ${slide.title}. ${slide.body}`)}" width="1080" height="1350" ${index === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>`
+      : `<div class="carousel-slide-content" style="--carousel-photo:url('${escapeHtml(recipe.image)}')"><span class="eyebrow">${escapeHtml(slide.label)}</span><h3>${escapeHtml(slide.title)}</h3><p>${escapeHtml(slide.body)}</p><small>Beyond Kitchen · ${index + 1} / 5</small></div>`}</figure>`).join('');
+    $('#carouselDots').innerHTML = slides.map((_, index) => `<button type="button" data-carousel-to="${index}" aria-label="Show slide ${index + 1}" aria-current="${index === 0}"></button>`).join('');
+    carouselSlides = $$('[data-carousel-slide]', carouselTrack);
+    carouselDots = $$('#carouselDots [data-carousel-to]');
+    carouselTrack.scrollLeft = 0;
+    updateCarouselControls(0);
+  }
+
+  async function loadCarousel(recipe) {
+    renderCarousel(recipe);
+    try {
+      const response = await fetch('./assets/images/daily/latest.json', { cache: 'no-store' });
+      if (!response.ok) return;
+      const manifest = await response.json();
+      if (manifest.date === localDate() && manifest.recipeId === recipe.id) renderCarousel(recipe, manifest);
+    } catch (error) {
+      // The recipe cards remain usable before the first cron render or while offline.
+    }
   }
 
   function recipeMeta(recipe, servings = recipe.servings) {
@@ -261,6 +324,7 @@
       state.recipes = recipes;
       readFavorites();
       renderDaily();
+      loadCarousel(dailyRecipe());
       renderRecipes();
     })
     .catch((error) => {

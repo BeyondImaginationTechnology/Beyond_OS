@@ -23,6 +23,7 @@ final class Recipe {
     final String name;
     final String description;
     final String category;
+    final String image;
     final int timeMinutes;
     final String difficulty;
     final int servings;
@@ -35,6 +36,7 @@ final class Recipe {
         name = source.optString("name");
         description = source.optString("description");
         category = source.optString("category");
+        image = source.optString("image");
         timeMinutes = source.optInt("timeMinutes");
         difficulty = source.optString("difficulty");
         servings = source.optInt("servings");

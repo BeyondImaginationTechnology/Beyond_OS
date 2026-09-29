@@ -89,6 +89,12 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .carousel-track::-webkit-scrollbar { display: none; }
 .carousel-slide { min-width: 100%; margin: 0; scroll-snap-align: start; }
 .carousel-slide img { width: 100%; height: auto; display: block; aspect-ratio: 4 / 5; object-fit: cover; }
+.carousel-slide-content { aspect-ratio: 4 / 5; display: flex; flex-direction: column; justify-content: center; gap: 16px; padding: clamp(24px, 5vw, 54px); color: var(--ink); background: var(--paper); }
+.carousel-slide:first-child .carousel-slide-content, .carousel-slide:last-child .carousel-slide-content { color: var(--white); background: linear-gradient(#1c2a1b99, #1c2a1bdd), var(--carousel-photo) center / cover; }
+.carousel-slide-content .eyebrow { margin: 0; color: inherit; opacity: .75; }
+.carousel-slide-content h3 { margin: 0; font: 500 clamp(29px, 4vw, 45px)/1.12 "Playfair Display", Georgia, serif; }
+.carousel-slide-content p { margin: 0; font-size: clamp(13px, 1.5vw, 17px); line-height: 1.55; white-space: pre-line; }
+.carousel-slide-content small { margin-top: auto; font-size: 11px; opacity: .7; }
 .carousel-controls { min-height: 58px; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 8px 13px; }
 .carousel-arrow { width: 34px; height: 34px; flex: 0 0 auto; border: 1px solid var(--line); border-radius: 50%; background: var(--white); font-size: 16px; cursor: pointer; }
 .carousel-arrow:hover { border-color: #aeb5a3; background: var(--sage); }

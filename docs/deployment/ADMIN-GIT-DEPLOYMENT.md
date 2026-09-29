@@ -38,6 +38,14 @@ Node.js dependencies on the production host with
 `/dailybreath/assets/videos/breathing/latest.json` as the current-video pointer.
 See the [Daily Breath Remotion configuration and setup](../../tools/daily-stencil-video/README.md#daily-breath-video).
 
+The Beyond Kitchen image draft has a separate daily cron. It needs PHP GD with
+JPEG and FreeType support; see the [Kitchen setup](../../beyond-kitchen/README.md#daily-instagram-carousel-draft).
+For the site's Vancouver publishing day, add:
+
+```cron
+15 6 * * * cd /home/sites/42b/a/a9823859bb/beyondimagination.co.technology/www && /usr/bin/php81 server/cron/daily-kitchen-carousel.php >> "$BEYOND_VAR_PATH/logs/daily-kitchen-carousel.log" 2>&1
+```
+
 ## StartCP deployment shortcut
 
 The existing StartCP repository can use this Deployment Script:

@@ -13,6 +13,7 @@ struct Recipe: Identifiable, Decodable, Hashable {
     let name: String
     let description: String
     let category: String
+    let image: String
     let timeMinutes: Int
     let difficulty: String
     let servings: Int

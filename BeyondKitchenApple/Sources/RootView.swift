@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 private enum KitchenStyle {
     static let paper = Color(red: 0.965, green: 0.961, blue: 0.937)
@@ -41,7 +42,7 @@ private struct RecipeLibraryView: View {
     @State private var query = ""
     @State private var filter = "All"
     @State private var selected: Recipe?
-    private let filters = ["All", "Quick", "Vegetarian", "Dinner"]
+    private let filters = ["All", "Quick", "Vegetarian", "Dinner", "Haitian"]
 
     private var saved: Set<String> { Set(savedIDs.split(separator: ",").map(String.init)) }
     private var featured: Recipe? {
@@ -64,6 +65,7 @@ private struct RecipeLibraryView: View {
             let matchesFilter = filter == "All"
                 || (filter == "Quick" && recipe.timeMinutes < 30)
                 || (filter == "Vegetarian" && recipe.tags.contains("Vegetarian"))
+                || (filter == "Haitian" && recipe.tags.contains("Haitian"))
                 || recipe.category == filter
             return matchesQuery && matchesFilter && (!savedOnly || saved.contains(recipe.id))
         }
@@ -77,7 +79,10 @@ private struct RecipeLibraryView: View {
                         heading("Your saved recipes", subtitle: "Little favourites, ready when you are.")
                     } else {
                         heading("Good food,\nmade simple.", subtitle: "A fresh recipe and a little inspiration for today.")
-                        if let featured { FeaturedRecipeCard(recipe: featured) { selected = featured } }
+                        if let featured {
+                            FeaturedRecipeCard(recipe: featured) { selected = featured }
+                            DailyCarouselView(recipe: featured) { selected = featured }
+                        }
                     }
 
                     if !savedOnly {
@@ -199,6 +204,87 @@ private struct FeaturedRecipeCard: View {
         }
         .buttonStyle(.plain)
         .accessibilityHint("Opens ingredients and cooking steps")
+    }
+}
+
+private struct DailyCarouselView: View {
+    let recipe: Recipe
+    let open: () -> Void
+
+    private var photo: UIImage? {
+        let file = URL(fileURLWithPath: recipe.image)
+        let name = file.deletingPathExtension().lastPathComponent
+        let extensionName = file.pathExtension
+        guard let url = Bundle.main.url(forResource: name, withExtension: extensionName, subdirectory: "recipes")
+            ?? Bundle.main.url(forResource: name, withExtension: extensionName) else { return nil }
+        return UIImage(contentsOfFile: url.path)
+    }
+
+    private var slides: [(label: String, title: String, body: String)] {
+        let ingredients = recipe.ingredients.map { item in
+            [String(format: "%g", item.amount), item.unit, item.name].filter { !$0.isEmpty }.joined(separator: " ")
+        }.joined(separator: "\n")
+        return [
+            ("TODAY'S RECIPE", recipe.name, recipe.description),
+            ("WHAT YOU'LL NEED", "The ingredients", ingredients),
+            ("LET'S MAKE IT · 1", "Get started", recipe.steps.first ?? ""),
+            ("LET'S MAKE IT · 2", "Bring it together", recipe.steps.dropFirst().joined(separator: "\n\n")),
+            ("MAKE IT YOUR OWN", "Ready to enjoy", "Save this recipe for later. Find the full method in Beyond Kitchen.")
+        ]
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("TODAY'S CAROUSEL")
+                .font(.system(size: 10, weight: .bold, design: .rounded))
+                .tracking(1.5)
+                .foregroundStyle(KitchenStyle.green)
+            Text("From ingredients to the finished plate")
+                .font(.system(size: 23, weight: .medium, design: .serif))
+                .foregroundStyle(KitchenStyle.ink)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .top, spacing: 12) {
+                    ForEach(Array(slides.enumerated()), id: \.offset) { entry in
+                        let index = entry.offset
+                        let slide = entry.element
+                        Button(action: open) {
+                            VStack(alignment: .leading, spacing: 11) {
+                                if (index == 0 || index == 4), let photo {
+                                    Image(uiImage: photo)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 238, height: 126)
+                                        .clipped()
+                                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                                }
+                                Text(slide.label)
+                                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                                    .tracking(1)
+                                    .foregroundStyle(index == 0 || index == 4 ? KitchenStyle.gold : KitchenStyle.green)
+                                Text(slide.title)
+                                    .font(.system(size: 24, weight: .medium, design: .serif))
+                                    .foregroundStyle(index == 0 || index == 4 ? .white : KitchenStyle.ink)
+                                Text(slide.body)
+                                    .font(.system(size: index == 1 ? 12 : 13))
+                                    .lineSpacing(index == 1 ? 3 : 5)
+                                    .foregroundStyle(index == 0 || index == 4 ? .white.opacity(0.9) : KitchenStyle.muted)
+                                Spacer(minLength: 0)
+                                Text("\(index + 1) / 5  ·  Tap for full recipe")
+                                    .font(.system(size: 10, weight: .semibold))
+                                    .foregroundStyle(index == 0 || index == 4 ? .white.opacity(0.8) : KitchenStyle.muted)
+                            }
+                            .padding(16)
+                            .frame(width: 270, height: 405, alignment: .topLeading)
+                            .background(index == 0 || index == 4 ? KitchenStyle.green : .white, in: RoundedRectangle(cornerRadius: 19))
+                            .overlay(RoundedRectangle(cornerRadius: 19).stroke(KitchenStyle.ink.opacity(0.06)))
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Slide \(index + 1) of 5. \(slide.label). \(slide.title). \(slide.body)")
+                    }
+                }
+                .padding(.trailing, 18)
+            }
+        }
     }
 }
 

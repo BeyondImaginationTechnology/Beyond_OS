@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -57,7 +58,13 @@ public final class MainActivity extends Activity {
     private static final int GREEN = Color.rgb(67, 205, 133);
     private static final String BASE = "https://beyondimagination.co.technology/beyond-french/";
     private static final String[] TABS = {"Today", "Academy", "Translate", "Dictionary", "More"};
-    private static final String[] ICONS = {"☀", "◆", "⇄", "▤", "•••"};
+    private static final int[] NAV_ICONS = {
+        R.drawable.ic_nav_today,
+        R.drawable.ic_nav_academy,
+        R.drawable.ic_nav_translate,
+        R.drawable.ic_nav_dictionary,
+        R.drawable.ic_nav_more
+    };
     private static final String[] GUIDE_NAMES = {"Louis", "Irie", "Jazzy", "Pablo"};
     private static final String[] GUIDE_LANGUAGES = {"French", "Patois", "Kreyòl", "Spanish"};
     private static final int[] GUIDE_COLORS = {BLUE, GREEN, Color.rgb(236, 84, 100), GOLD};
@@ -186,10 +193,16 @@ public final class MainActivity extends Activity {
             final int selected = i;
             LinearLayout item = column();
             item.setGravity(Gravity.CENTER);
-            int tint = tab == i ? BLUE : MUTED;
-            TextView symbol = text(ICONS[i], 22, tint, true);
-            symbol.setGravity(Gravity.CENTER);
-            item.addView(symbol);
+            boolean active = tab == i;
+            int tint = active ? GOLD : MUTED;
+            item.setPadding(dp(4), dp(5), dp(4), dp(4));
+            item.setBackground(round(active ? Color.argb(30, 246, 193, 71) : Color.TRANSPARENT, dp(14), 0));
+            ImageView symbol = new ImageView(this);
+            symbol.setImageResource(NAV_ICONS[i]);
+            symbol.setColorFilter(tint, PorterDuff.Mode.SRC_IN);
+            symbol.setContentDescription(TABS[i]);
+            symbol.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+            item.addView(symbol, new LinearLayout.LayoutParams(dp(24), dp(24)));
             boolean largeText = getResources().getConfiguration().fontScale >= 1.3f;
             String[] compact = {"Today", "Learn", "Translate", "Words", "More"};
             TextView label = text(largeText ? compact[i] : TABS[i], largeText ? 9 : 10, tint, tab == i);

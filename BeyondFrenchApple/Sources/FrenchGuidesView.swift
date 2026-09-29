@@ -15,7 +15,9 @@ enum FrenchGuide: String, CaseIterable, Identifiable {
         }
     }
 
-    var image: String { "Guide\(name)" }
+    func imageName(borderless: Bool = false) -> String {
+        borderless ? "Home\(name)" : "Guide\(name)"
+    }
 
     var audioLocale: String {
         switch self {
@@ -48,6 +50,7 @@ enum FrenchGuide: String, CaseIterable, Identifiable {
 struct FrenchGuidesView: View {
     var selectedGuide: FrenchGuide?
     var onSelect: ((FrenchGuide) -> Void)?
+    var borderless = false
 
     var body: some View {
         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 4), spacing: 8) {
@@ -65,9 +68,9 @@ struct FrenchGuidesView: View {
 
     private func guideCard(_ guide: FrenchGuide) -> some View {
         VStack(spacing: 5) {
-            Image(guide.image)
-                .resizable()
-                .scaledToFill()
+                Image(guide.imageName(borderless: borderless))
+                    .resizable()
+                .scaledToFit()
                 .frame(height: 74)
                 .frame(maxWidth: .infinity)
                 .clipped()

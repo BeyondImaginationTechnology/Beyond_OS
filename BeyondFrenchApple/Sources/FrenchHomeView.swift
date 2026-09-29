@@ -45,7 +45,7 @@ struct FrenchHomeView: View {
                     Text("Louis, Irie, Jazzy, and Pablo bring different voices and cultures to the same French lesson.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    FrenchGuidesView()
+                    FrenchGuidesView(borderless: true)
                 }
 
                 NavigationLink { AcademyView() } label: {

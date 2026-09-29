@@ -89,11 +89,26 @@ a { color: inherit; }
 .bt-studio-product-grid article p { color: var(--bt20-muted); }
 .bt-values-grid>div { border-color: var(--bt20-border); }
 
+/* Needle Bot suit sketch backdrop: a quiet line-art layer for the public home page. */
+:root { --bt-needle-sketch-bg: url('../img/backgrounds/needle-bot-suit-sketch-bg.png'); }
+.bt-storefront .bt-main-hero {
+  background:
+    linear-gradient(90deg, rgba(247,244,239,.96) 0%, rgba(247,244,239,.9) 48%, rgba(247,244,239,.76) 100%),
+    var(--bt-needle-sketch-bg) center / cover no-repeat;
+}
+.bt-storefront .bt-needle-feature {
+  background:
+    radial-gradient(ellipse at 22% 50%, rgba(121,61,188,.22), transparent 52%),
+    linear-gradient(90deg, rgba(7,6,12,.88), rgba(7,6,12,.74)),
+    var(--bt-needle-sketch-bg) center / cover fixed;
+}
+
 /* Keep dark mode available for a future preference toggle. */
 body[data-theme="dark"] { background: #07060C; color: #F7F4FF; }
 body[data-theme="dark"] .panel, body[data-theme="dark"] .card, body[data-theme="dark"] .auth-card { background: #11101A; border-color: rgba(255,255,255,.09); color: #F7F4FF; }
 
 @media (max-width: 760px) {
+  .bt-storefront .bt-needle-feature { background-attachment: scroll; background-position: center top; }
   .bt-mobile-menu { background: var(--bt20-surface); border-color: var(--bt20-border); }
   .bt-mobile-menu summary { background: var(--bt20-surface); color: var(--bt20-ink); border-color: var(--bt20-border); }
   .bt-mobile-menu > div { background: var(--bt20-surface); border-color: var(--bt20-border); box-shadow: var(--bt20-shadow); }

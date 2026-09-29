@@ -56,6 +56,7 @@ if (!empty($stencilDay['iso_date'])) {
 
       <nav class="bt-desktop-nav" aria-label="Beyond Tattoo navigation">
         <a class="is-active" href="#top">Home</a>
+        <a href="tattoo-generator.php">Idea generator</a>
         <a href="stencils.php">Stencils</a>
         <a href="collections.php">Collections</a>
         <a href="tools.php">Tools</a>
@@ -72,6 +73,7 @@ if (!empty($stencilDay['iso_date'])) {
           <summary aria-label="Open menu">☰</summary>
           <div>
             <a href="stencils.php">Stencils</a>
+            <a href="tattoo-generator.php">Idea generator</a>
             <a href="collections.php">Collections</a>
             <a href="store.php">Store</a>
             <a href="studios.php">Studios</a>
@@ -92,13 +94,13 @@ if (!empty($stencilDay['iso_date'])) {
         <p class="bt-stencil-drop">STENCIL DROP</p>
         <p class="bt-main-lead">Premium tattoo stencils plus a focused operating workspace for modern shop owners.</p>
         <div class="bt-main-actions">
-          <a class="bt-glow-button" href="<?= e(bt_app_url('downloads/tattoo-procedure-consent-bc.pdf')) ?>" download>↓ Download consent waiver form</a>
-          <a class="bt-outline-button" href="stencil-editor.php">Stencil Editor</a>
+          <a class="bt-glow-button" href="tattoo-generator.php">✦ Generate 6 stencil ideas</a>
+          <a class="bt-outline-button" href="<?= e(bt_app_url('downloads/tattoo-procedure-consent-bc.pdf')) ?>" download>↓ Download consent waiver form</a>
         </div>
-        <div class="bt-trust-row" aria-label="Consent form features">
-          <span><i>▣</i> Fillable PDF</span>
-          <span><i>◇</i> Online signing</span>
-          <span><i>✦</i> Studio records</span>
+        <div class="bt-trust-row" aria-label="Idea generator features">
+          <span><i>✦</i> Six directions</span>
+          <span><i>◇</i> Stencil-ready briefs</span>
+          <span><i>▣</i> Needle Bot guided</span>
         </div>
       </div>
 
@@ -121,12 +123,12 @@ if (!empty($stencilDay['iso_date'])) {
       <div class="bt-needle-feature-copy">
         <p class="bt-purple-kicker">Your tattoo AI companion</p>
         <h2 id="needle-feature-title">Meet Needle Bot</h2>
-        <p>Plan tattoo concepts, get stencil-prep guidance, and ask questions about Beyond Tattoo. Needle Bot is here in the editor and whenever you need a hand.</p>
+        <p>Turn a rough idea into six connected tattoo directions with Needle Bot and Llama Jaguar, then carry the strongest brief into your stencil workflow.</p>
         <div class="bt-needle-feature-actions">
-          <a class="bt-glow-button" href="<?= e(bt_app_url('needle-bot.php')) ?>">Chat with Needle Bot</a>
-          <a class="bt-outline-button" href="<?= e(bt_app_url('stencil-editor.php')) ?>">Open Stencil Editor</a>
+          <a class="bt-glow-button" href="<?= e(bt_app_url('tattoo-generator.php')) ?>">Generate six ideas</a>
+          <a class="bt-outline-button" href="<?= e(bt_app_url('needle-bot.php')) ?>">Chat with Needle Bot</a>
         </div>
-        <small>Jaguar Draw creates images. Needle Bot is your tattoo guidance and editor companion.</small>
+        <small>Llama Jaguar shapes the concepts. Needle Bot keeps the tattoo direction practical and studio-ready.</small>
       </div>
     </div>
   </section>

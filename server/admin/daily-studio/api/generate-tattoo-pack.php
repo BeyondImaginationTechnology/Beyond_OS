@@ -62,8 +62,14 @@ try {
     }
     $title = tattooPackText($input, 'title', 100, 'Daily Stencil');
     $collection = tattooPackText($input, 'collection', 100, 'Beyond Tattoo Collection');
+    $campaign = tattooPackText($input, 'campaign', 30, 'season-one');
+    if (!in_array($campaign, ['season-one', 'autumn-ink', 'season-two'], true)) {
+        throw new RuntimeException('Choose a supported publishing program.');
+    }
+    $seasonTotal = $campaign === 'autumn-ink' ? 31 : ($campaign === 'season-two' ? 100 : 55);
+    $campaignLabel = $campaign === 'autumn-ink' ? 'Autumn Ink · Halloween 31/31' : ($campaign === 'season-two' ? 'Season 2 · 56–100' : 'Season 1 · Archive');
     $releaseDate = tattooPackText($input, 'release_date', 20);
-    $sequence = max(1, min(55, (int)($input['sequence'] ?? 1)));
+    $sequence = max(1, min($seasonTotal, (int)($input['sequence'] ?? 1)));
     $packStyle = tattooPackText($input, 'pack_style', 100, 'Premium retail hanging pack');
     $concept = tattooPackText($input, 'concept', 700);
     $placement = tattooPackText($input, 'placement', 100, 'Artist-selected placement');
@@ -84,7 +90,8 @@ DROP METADATA
 - Scheduled design: {$title}
 - Collection: {$collection}
 - Release date: {$releaseDate}
-- Season sequence: {$sequence} of 55
+- Program: {$campaignLabel}
+- Program sequence: {$sequence} of {$seasonTotal}
 - Creative context: {$concept}
 - Tattoo style: {$style}
 - Realism detail: {$detail}
@@ -104,7 +111,8 @@ Use the attached black-and-white tattoo stencil as the exact design blueprint. P
 
 DROP DIRECTION
 - Collection: {$collection}
-- Scheduled sequence: {$sequence} of 55
+- Program: {$campaignLabel}
+- Program sequence: {$sequence} of {$seasonTotal}
 - Creative context: {$concept}
 - Tattoo style: {$style}
 - Realism detail: {$detail}

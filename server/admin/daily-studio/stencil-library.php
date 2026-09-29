@@ -66,15 +66,72 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
         ];
     }
 }
-$today = (new DateTimeImmutable('today', new DateTimeZone('America/Vancouver')))->format('Y-m-d');
+$campaignTz = new DateTimeZone('America/Vancouver');
+$campaignToday = new DateTimeImmutable('today', $campaignTz);
+$campaignYear = (int)$campaignToday->format('Y');
+if ($campaignToday->format('Y-m-d') > $campaignYear . '-10-31') $campaignYear++;
+$autumnTitles = [
+    'Pumpkin Style Sheet · 12 Original Styles', 'Haunted Pumpkin Patch', 'Pumpkin, Thorns and Autumn Roses', 'Crow in the Pumpkin Patch',
+    'Harvest Moon Pumpkins', 'Scarecrow Portrait Sheet', 'Corn, Hay and Rusted Tools', 'Autumn Leaves Ornament', 'Fox, Acorns and Ferns',
+    'Apple Harvest and Moth', 'Mushrooms, Beetles and Fallen Leaves', 'Abandoned Barn in Fall', 'Black Cat and Crescent Moon',
+    'Witch Cauldron Botanical Sheet', 'Haunted Gate and Thorned Roses', 'Cemetery Gate and Weathered Stone', 'Raven, Candle and Branches',
+    'Floating Ghost and Lanterns', 'Skeleton Hand and Candle', 'Spiderweb, Rose and Skull', 'Haunted Mirror', 'Werewolf Harvest Moon',
+    'Vampire Rose and Coffin', 'Plague Doctor Autumn Mask', 'Reaper Scythe and Pumpkin Vines', 'Stitched Doll and Broken Toy',
+    'Original Monster Mask Sheet', 'Bat Swarm and Gothic Moon', 'Halloween Symbol Sheet · 12 Icons', 'Haunted House Master Composition',
+    'Halloween Finale Crest',
+];
+$autumnSchedule = [];
+$autumnStart = new DateTimeImmutable($campaignYear . '-10-01', $campaignTz);
+foreach ($autumnTitles as $index => $title) {
+    $date = $autumnStart->modify('+' . $index . ' days');
+    $autumnSchedule[] = [
+        'campaign' => 'autumn-ink', 'campaign_label' => 'Autumn Ink · Halloween 31/31', 'season_total' => 31,
+        'sequence' => $index + 1, 'title' => $title, 'release_date' => $date->format('Y-m-d'), 'display_date' => $date->format('l, F j, Y'),
+        'collection' => 'Autumn Ink · Halloween 31/31', 'collection_slug' => 'autumn-ink', 'collection_description' => 'A separate 31-day autumn and Halloween stylesheet program.',
+        'style' => 'Autumn tattoo flash · orange, violet and black', 'placement' => 'Artist-selected placement', 'composition' => 'Centered vertical flash sheet',
+        'accent' => 'pumpkin orange, plum violet and warm cream', 'concept' => 'original autumn harvest and Halloween tattoo motifs with clean sticker-sheet readability',
+        'lore' => $title . ' opens the Autumn Ink 31/31 program as a seasonal, original tattoo flash direction.',
+    ];
+}
+$seasonTwoCollections = [
+    ['label' => 'Ritual Mechanics', 'slug' => 'ritual-mechanics', 'style' => 'Industrial ornamental blackwork', 'concept' => 'original mechanical reliquaries, engraved metal, symbolic tools and controlled geometric structure', 'titles' => ['Brass Reliquary Lantern', 'Mechanical Moth', 'Iron Key and Thorned Heart', 'Gear Halo and Suspended Crystal', 'Alchemist Flask and Smoke', 'Ornamental Bell Mechanism', 'Caged Compass', 'Thorn-Wrapped Piston Rose', 'Mask of Silence', 'Twin Locks and Chain', 'Unwound Crown']],
+    ['label' => 'Wildwood Relics', 'slug' => 'wildwood-relics', 'style' => 'Botanical blackwork realism', 'concept' => 'original woodland flora, animals, seed forms and natural relics with durable line hierarchy', 'titles' => ['Stag, Fern and Crescent Branch', 'Owl Carrying a Moon Seed', 'Foxglove and Luna Moth', 'Bear Skull and Pine', 'Heron and Reeds', 'Snake and Acorn', 'Mushroom Shrine', 'Hare and Bramble', 'Raven on Birch', 'Beetle and Sunflower', 'Wolf, Mountain and Wild Herbs']],
+    ['label' => 'Astral Cartography', 'slug' => 'astral-cartography', 'style' => 'Celestial engraving and fine line', 'concept' => 'original star maps, navigation instruments, orbit geometry and cosmic passage symbols', 'titles' => ['Eclipse Compass', 'Lunar Map and Phases', 'Hand Holding a Star Atlas', 'Comet Ceremonial Dagger', 'Orbiting Eye', 'Original Zodiac Wheel', 'Meteor Shrine', 'Ringed Planet Chart', 'Solar Flare Mask', 'Constellation Anchor', 'Astral Doorway']],
+    ['label' => 'Tidebound Legends', 'slug' => 'tidebound-legends', 'style' => 'Maritime illustrative blackwork', 'concept' => 'original nautical tools, deep-sea creatures, tide symbols and weathered maritime textures', 'titles' => ['Lighthouse in a Storm', 'Ship Wheel and Kelp', 'Jellyfish Lantern', 'Whale Tail and Waves', 'Octopus Compass', 'Original Siren Silhouette', 'Armored Seahorse', 'Anchor and Thorned Rope', 'Barnacled Diving Helmet', 'Moon Tide Shell', 'Original Deep-Sea Guardian']],
+];
+$seasonTwoSchedule = [];
+$seasonTwoStart = new DateTimeImmutable($campaignYear . '-11-01', $campaignTz);
+$seasonSequence = 56;
+foreach ($seasonTwoCollections as $collection) {
+    foreach ($collection['titles'] as $title) {
+        $offset = count($seasonTwoSchedule);
+        $date = $seasonTwoStart->modify('+' . $offset . ' days');
+        $seasonTwoSchedule[] = [
+            'campaign' => 'season-two', 'campaign_label' => 'Season 2 · 56–100', 'season_total' => 100,
+            'sequence' => $seasonSequence++, 'title' => $title, 'release_date' => $date->format('Y-m-d'), 'display_date' => $date->format('l, F j, Y'),
+            'collection' => $collection['label'], 'collection_slug' => $collection['slug'], 'collection_description' => 'Season 2 collection · 11 original commercial-safe stencil directions.',
+            'style' => $collection['style'], 'placement' => 'Artist-selected placement', 'composition' => 'Full-panel narrative composition',
+            'accent' => 'obsidian black with a restrained collection accent', 'concept' => $title . ' interpreted through ' . $collection['concept'] . '.',
+            'lore' => $title . ' is a Season 2 ' . $collection['label'] . ' direction focused on original symbols, clear body flow and artist-led adaptation.',
+        ];
+    }
+}
+$campaignSchedules = [
+    'season-one' => array_map(static fn(array $drop): array => $drop + ['campaign' => 'season-one', 'campaign_label' => 'Season 1 · Archive', 'season_total' => 55], $dropSchedule),
+    'autumn-ink' => $autumnSchedule,
+    'season-two' => $seasonTwoSchedule,
+];
+$defaultCampaign = 'autumn-ink';
+$defaultSchedule = $campaignSchedules[$defaultCampaign];
+$today = $campaignToday->format('Y-m-d');
 $nextDropDate = $today;
 $publishedDrop = bt_stencil_content();
 $publishedDate = trim((string)($publishedDrop['iso_date'] ?? ''));
 if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $publishedDate) && $publishedDate >= $today) {
     $nextDropDate = (new DateTimeImmutable($publishedDate, new DateTimeZone('America/Vancouver')))->modify('+1 day')->format('Y-m-d');
 }
-$defaultDropIndex = count($dropSchedule) - 1;
-foreach ($dropSchedule as $index => $drop) {
+$defaultDropIndex = 0;
+foreach ($defaultSchedule as $index => $drop) {
     if ($drop['release_date'] >= $nextDropDate) {
         $defaultDropIndex = $index;
         break;
@@ -112,15 +169,21 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     <article class="panel">
       <div class="workflow" aria-label="Generation workflow"><span class="active">1 · Create</span><span>2 · Review</span><span>3 · Publish / Video</span></div>
       <div class="schedule-card">
+        <label for="campaignSelect">Publishing program</label>
+        <select id="campaignSelect">
+          <option value="autumn-ink">Autumn Ink · Halloween 31/31</option>
+          <option value="season-two">Season 2 · Drops 56–100</option>
+          <option value="season-one">Season 1 · Archive</option>
+        </select>
         <label for="dropSchedule">Scheduled drop</label>
         <select id="dropSchedule">
-          <?php foreach ($dropSchedule as $index => $drop): ?>
+          <?php foreach ($defaultSchedule as $index => $drop): ?>
             <option value="<?=$index?>" <?=$index === $defaultDropIndex ? 'selected' : ''?>>
               #<?=str_pad((string)$drop['sequence'], 2, '0', STR_PAD_LEFT)?> · <?=htmlspecialchars($drop['display_date'])?> · <?=htmlspecialchars($drop['title'])?>
             </option>
           <?php endforeach; ?>
         </select>
-        <div class="drop-meta"><span id="dropNumber">Drop — / 55</span><span id="dropDate">Choose a release</span><span id="dropCollection">Collection</span></div>
+        <div class="drop-meta"><span id="dropNumber">Drop — / —</span><span id="dropDate">Choose a release</span><span id="dropCollection">Collection</span></div>
       </div>
       <h2 class="section-title">Creative direction</h2>
       <div class="field">
@@ -139,7 +202,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       <div class="field"><label for="detail">Realism detail</label><select id="detail"><optgroup label="Realism-focused"><option>High realism · anatomical accuracy, material texture and controlled skin breaks</option><option>Hyperreal detail · pores, weathering, reflections and crisp depth cues</option><option>Portrait realism · accurate features, expression, hair and fabric texture</option><option>Dark realism · deep value separation, aged texture and cinematic focal detail</option><option>Micro realism · selective fine texture with durable open space</option></optgroup><optgroup label="General"><option>High detail with controlled open skin breaks</option><option>Medium detail with generous negative space</option><option>Intricate ornamental detail</option><option>Minimal, iconic and highly readable</option></optgroup></select><small>Realism presets prioritize believable anatomy, surface texture, light direction and dimensional depth.</small></div>
       <div class="row">
         <div class="field"><label for="title">Stencil title</label><input id="title" maxlength="100" placeholder="Celestial Lion"></div>
-        <div class="field"><label for="collection">Collection</label><select id="collection"><option>Divine Realism Collection</option><option>Beyond Ancient Collection</option><option>Japanese Legends Collection</option><option>Dark Realism Collection</option></select></div>
+        <div class="field"><label for="collection">Collection</label><select id="collection"><option>Autumn Ink · Halloween 31/31</option><option>Ritual Mechanics</option><option>Wildwood Relics</option><option>Astral Cartography</option><option>Tidebound Legends</option><option>Divine Realism Collection</option><option>Beyond Ancient Collection</option><option>Japanese Legends Collection</option><option>Dark Realism Collection</option></select></div>
       </div>
       <div class="field"><label for="lore">Stencil lore</label><textarea class="lore-box" id="lore" maxlength="1200" placeholder="Collection story, symbolism and artist-facing meaning."></textarea><small>Schedule-aware lore is prepared automatically and can be edited before publishing.</small></div>
       <div class="actions"><button class="btn secondary" id="generateLore" type="button">Generate scheduled lore</button><button class="btn secondary" id="copyCaption" type="button">Copy drop caption</button></div>
@@ -211,7 +274,8 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
 (() => {
   'use strict';
   const csrf = <?=json_encode($csrf)?>;
-  const drops = <?=json_encode($dropSchedule, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)?>;
+  const schedules = <?=json_encode($campaignSchedules, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT)?>;
+  const initialCampaign = <?=json_encode($defaultCampaign)?>;
   const $ = (id) => document.getElementById(id);
   const status = $('status');
   const preview = $('preview');
@@ -293,7 +357,8 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       `Scheduled design: ${drop.title}`,
       `Collection: ${drop.collection}`,
       `Release date: ${drop.release_date}`,
-      `Season sequence: ${drop.sequence} of 55`,
+      `Program: ${drop.campaign_label}`,
+      `Program sequence: ${drop.sequence} of ${drop.season_total}`,
       `Creative context: ${$('idea').value.trim()}`,
       `Tattoo style: ${$('style').value}`,
       `Realism detail: ${$('detail').value}`,
@@ -336,7 +401,20 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     line_weight: $('lineWeight').value,
     detail: $('detail').value,
   });
-  const activeDrop = () => drops[Number($('dropSchedule').value)] || drops[0];
+  const activeSchedule = () => schedules[$('campaignSelect').value] || schedules[initialCampaign];
+  const activeDrop = () => activeSchedule()[Number($('dropSchedule').value)] || activeSchedule()[0];
+  const rebuildDropOptions = () => {
+    const select = $('dropSchedule');
+    const drops = activeSchedule();
+    select.replaceChildren(...drops.map((drop, index) => {
+      const option = document.createElement('option');
+      option.value = String(index);
+      option.textContent = `#${String(drop.sequence).padStart(2, '0')} · ${drop.display_date} · ${drop.title}`;
+      return option;
+    }));
+    select.value = '0';
+    applyDrop(true);
+  };
   const slug = (value) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'daily-stencil';
   const assetSource = (mode) => ({
     reference: referenceImage,
@@ -350,7 +428,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   const renderPreview = () => {
     const source = assetSource(previewMode);
     const drop = activeDrop();
-    assetIntel.innerHTML = `<p class="asset-intel-kicker">${previewLabels[previewMode] || 'Daily asset'}</p><h3>${drop.title}</h3><p>${assetIntelCopy[previewMode] || drop.lore}</p><div class="asset-intel-grid"><span>${drop.collection}</span><span>Drop ${drop.sequence} / 55</span><span>${$('placement').value}</span></div>`;
+    assetIntel.innerHTML = `<p class="asset-intel-kicker">${previewLabels[previewMode] || 'Daily asset'}</p><h3>${drop.title}</h3><p>${assetIntelCopy[previewMode] || drop.lore}</p><div class="asset-intel-grid"><span>${drop.collection}</span><span>Drop ${drop.sequence} / ${drop.season_total}</span><span>${$('placement').value}</span></div>`;
     preview.innerHTML = '';
     if (!source) {
       preview.innerHTML = emptyPreview(previewMode);
@@ -415,7 +493,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
         ? 'High realism · anatomical accuracy, material texture and controlled skin breaks'
         : 'High detail with controlled open skin breaks';
     $('lore').value = drop.lore;
-    $('dropNumber').textContent = `Drop ${drop.sequence} / 55`;
+    $('dropNumber').textContent = `Drop ${drop.sequence} / ${drop.season_total}`;
     $('dropDate').textContent = drop.display_date;
     $('dropCollection').textContent = drop.collection;
     message(`Scheduled metadata loaded for ${drop.title}.`);
@@ -423,7 +501,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   const dropCaption = () => {
     const drop = activeDrop();
     return [
-      `BEYOND TATTOO · DAILY STENCIL DROP ${drop.sequence}/55`,
+      `BEYOND TATTOO · ${drop.campaign_label.toUpperCase()} · DROP ${drop.sequence}/${drop.season_total}`,
       `${drop.title} — ${drop.display_date}`,
       drop.collection,
       $('lore').value.trim(),
@@ -614,7 +692,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     ctx.fillStyle = '#f1d28a';
     ctx.font = '900 23px Arial';
     ctx.fillText(drop.release_date, 750, 468);
-    ctx.fillText(`DROP ${drop.sequence} / 55`, 750, 505);
+    ctx.fillText(`DROP ${drop.sequence} / ${drop.season_total}`, 750, 505);
     ctx.fillStyle = '#d0c2aa';
     ctx.font = '700 19px Arial';
     wrapCanvasText($('placement').value.toUpperCase(), 750, 566, 260, 27, 3, 'left');
@@ -668,7 +746,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     });
     ctx.fillStyle = '#d8ab52';
     ctx.font = '900 23px Arial';
-    ctx.fillText(`${drop.sequence} / 55  ·  ${drop.release_date}`, 512, 1464);
+    ctx.fillText(`${drop.sequence} / ${drop.season_total}  ·  ${drop.release_date}`, 512, 1464);
     return canvas.toDataURL('image/png');
   };
   const composeStyleCard = async () => {
@@ -690,7 +768,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       ['DESIGN', drop.title.toUpperCase()],
       ['STYLE', $('style').value.toUpperCase()],
       ['PLACEMENT', $('placement').value.toUpperCase()],
-      ['RELEASE', `${drop.sequence} / 55`],
+      ['RELEASE', `${drop.sequence} / ${drop.season_total}`],
       ['DATE', drop.release_date],
     ];
     rows.forEach(([label, value], index) => {
@@ -710,7 +788,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     ctx.textAlign = 'center';
     ctx.fillStyle = '#d8ab52';
     ctx.font = '900 24px Arial';
-    ctx.fillText('55 DAYS  ·  55 MASTERPIECES', 512, 1452);
+    ctx.fillText(`${drop.campaign_label.toUpperCase()}  ·  ${drop.season_total} MASTERPIECES`, 512, 1452);
     return canvas.toDataURL('image/png');
   };
   const buildLocalCards = async () => {
@@ -852,6 +930,8 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
         stencil_image: image,
         title: drop.title,
         collection: drop.collection,
+        campaign: drop.campaign,
+        season_total: drop.season_total,
         release_date: drop.release_date,
         sequence: drop.sequence,
         pack_style: $('packStyle').value,
@@ -970,7 +1050,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
 
   $('generateLore').onclick = () => {
     const drop = activeDrop();
-    $('lore').value = `${drop.lore} The composition is built around ${drop.concept.toLowerCase()} Its scheduled place as drop ${drop.sequence} of 55 connects the piece to a season-long progression from sacred iconography through ancient, Japanese and dark-realism traditions.`;
+    $('lore').value = `${drop.lore} The composition is built around ${drop.concept.toLowerCase()} Its scheduled place as drop ${drop.sequence} of ${drop.season_total} connects the piece to the ${drop.campaign_label} program and its original artist-led progression.`;
     message(`Lore prepared for ${drop.title}.`);
   };
   $('copyCaption').onclick = async () => {
@@ -1025,6 +1105,8 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
           style: $('style').value,
           placement: $('placement').value,
           collection: $('collection').value,
+          campaign: drop.campaign,
+          season_total: drop.season_total,
           release_date: drop.release_date,
           sequence: drop.sequence,
           lore: $('lore').value.trim(),
@@ -1136,11 +1218,13 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       $('renderVideo').disabled = false;
     }
   };
+  $('campaignSelect').value = initialCampaign;
+  $('campaignSelect').addEventListener('change', rebuildDropOptions);
   $('dropSchedule').addEventListener('change', () => applyDrop(true));
   document.querySelectorAll('[data-preview]').forEach((button) => {
     button.addEventListener('click', () => selectPreview(button.dataset.preview));
   });
-  applyDrop(false);
+  rebuildDropOptions();
 })();
 </script>
 </body>

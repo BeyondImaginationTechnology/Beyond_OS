@@ -10,7 +10,7 @@ require_once __DIR__ . '/includes/stencil-content.php';
 
 // The public storefront uses its own compact navigation instead of the full OS shell.
 $disableBeyondShell = true;
-$pageTitle = 'Beyond Tattoo — Daily Stencil Releases';
+$pageTitle = 'Beyond Tattoo — Stencils, Stylesheets and Studio Tools';
 require __DIR__ . '/includes/header.php';
 
 $stencilDay = bt_stencil_content();
@@ -42,6 +42,8 @@ if (!empty($stencilDay['iso_date'])) {
       <span>◆ Premium quality</span>
       <span>Studio ready</span>
       <span>Daily release calendar</span>
+      <span>Autumn Ink · Oct 1</span>
+      <span>Season 2 · 56–100</span>
     </div>
   </div>
 
@@ -89,17 +91,17 @@ if (!empty($stencilDay['iso_date'])) {
   <section class="bt-main-hero">
     <div class="bt-wrap bt-main-hero-grid">
       <div class="bt-main-copy">
-        <p class="bt-gold-kicker">✦ DAILY RELEASES · STUDIO WORKSPACE</p>
+        <p class="bt-gold-kicker">✦ STENCILS · STYLESHEETS · STUDIO WORKSPACE</p>
         <h1><span>BEYOND</span><strong>TATTOO</strong></h1>
-        <p class="bt-stencil-drop">STENCIL DROP</p>
-        <p class="bt-main-lead">Premium tattoo stencils plus a focused operating workspace for modern shop owners.</p>
+        <p class="bt-stencil-drop">TATTOO IMAGINATION PROMPT</p>
+        <p class="bt-main-lead">Turn a tattoo idea into a six-piece creative direction: stencil, stylesheet, lore, reference artwork, placement mockup and printer-ready studio asset.</p>
         <div class="bt-main-actions">
-          <a class="bt-glow-button" href="tattoo-generator.php">✦ Generate 6 stencil ideas</a>
+          <a class="bt-glow-button" href="tattoo-generator.php">✦ Start the stencil generator</a>
           <a class="bt-outline-button" href="<?= e(bt_app_url('downloads/tattoo-procedure-consent-bc.pdf')) ?>" download>↓ Download consent waiver form</a>
         </div>
         <div class="bt-trust-row" aria-label="Idea generator features">
-          <span><i>✦</i> Six directions</span>
-          <span><i>◇</i> Stencil-ready briefs</span>
+          <span><i>✦</i> Six connected assets</span>
+          <span><i>◇</i> Stylesheet-led prompts</span>
           <span><i>▣</i> Needle Bot guided</span>
         </div>
       </div>
@@ -129,6 +131,24 @@ if (!empty($stencilDay['iso_date'])) {
           <a class="bt-outline-button" href="<?= e(bt_app_url('needle-bot.php')) ?>">Chat with Needle Bot</a>
         </div>
         <small>Llama Jaguar shapes the concepts. Needle Bot keeps the tattoo direction practical and studio-ready.</small>
+      </div>
+    </div>
+  </section>
+
+  <section class="bt-category-section" aria-labelledby="imagination-title">
+    <div class="bt-wrap bt-section-frame">
+      <p class="bt-purple-kicker">From imagination to skin-ready planning</p>
+      <h2 id="imagination-title">One prompt. A complete tattoo direction.</h2>
+      <p class="bt-main-lead">Describe the feeling, subject or story you want to wear. Needle Bot and Llama Jaguar shape the idea into a practical studio brief while you keep control of the final design.</p>
+      <div class="bt-pack-grid" style="margin-top:24px">
+        <div><b>01</b><strong>Stencil</strong><small>Clean transfer hierarchy with open negative space.</small></div>
+        <div><b>02</b><strong>Stylesheet</strong><small>Original variations grouped for fast artist review.</small></div>
+        <div><b>03</b><strong>Studio pack</strong><small>Lore, reference, placement and printer-ready delivery.</small></div>
+        <div><b>04</b><strong>Shop workflow</strong><small>Move from a saved concept to a studio conversation.</small></div>
+      </div>
+      <div class="bt-main-actions" style="max-width:420px;margin-top:24px">
+        <a class="bt-glow-button" href="tattoo-generator.php">Write a tattoo imagination prompt</a>
+        <a class="bt-outline-button" href="needle-bot.php">Ask Needle Bot for a direction</a>
       </div>
     </div>
   </section>

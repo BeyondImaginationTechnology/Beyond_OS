@@ -1,0 +1,36 @@
+{
+  "brand": "Daily Breath",
+  "title": "Return to this moment",
+  "subtitle": "A gentle guided breathing practice",
+  "opening": "Settle in and relax your shoulders.",
+  "closing": "Carry this calm with you.",
+  "safetyNote": "Breathe comfortably. Pause or stop at any time.",
+  "date": "",
+  "timezone": "America/Vancouver",
+  "introSeconds": 3,
+  "outroSeconds": 4,
+  "cycleCount": 6,
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "phases": [
+    {
+      "label": "Breathe in",
+      "durationSeconds": 4,
+      "fromScale": 0.92,
+      "toScale": 1.12
+    },
+    {
+      "label": "Breathe out",
+      "durationSeconds": 6,
+      "fromScale": 1.12,
+      "toScale": 0.92
+    }
+  ],
+  "palette": {
+    "background": "#10271F",
+    "foreground": "#F5F1E8",
+    "accent": "#B9D6A1",
+    "muted": "#B9C5BB"
+  }
+}

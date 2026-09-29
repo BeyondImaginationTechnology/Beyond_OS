@@ -14,6 +14,7 @@
 **/storage/**
 !**/storage/.htaccess
 **/out/
+/dailybreath/assets/videos/breathing/
 **/generated-*
 **/node_modules/
 **/vendor/

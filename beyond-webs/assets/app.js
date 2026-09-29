@@ -12,6 +12,12 @@
     $('#cpu').textContent = state.plan.cpu;
     $('#gpu').textContent = state.plan.gpu;
     $('#storage').textContent = state.plan.storage;
+    $('#previewFlavour').textContent = state.flavour.name;
+    $('#previewPlan').textContent = state.plan.name;
+    $('#previewRam').textContent = state.plan.ram;
+    $('#previewCpu').textContent = state.plan.cpu;
+    $('#previewGpu').textContent = state.plan.gpu;
+    $('#previewStorage').textContent = state.plan.storage;
     localStorage.setItem('beyondWebsSeat', JSON.stringify(state));
   };
   document.querySelectorAll('.flavour').forEach((button) => button.addEventListener('click', () => {
@@ -28,6 +34,7 @@
   }));
   $('#startSeat')?.addEventListener('click', () => {
     $('#seatState').textContent = 'SESSION REQUESTED';
+    $('#previewState').textContent = 'REQUEST SAVED';
     $('#startSeat').innerHTML = 'VPS session request saved <span>✓</span>';
     $('#startSeat').disabled = true;
   });

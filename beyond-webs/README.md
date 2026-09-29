@@ -2,7 +2,7 @@
 
 This folder is the document root for `host.beyondimagination.co.technology`.
 
-Beyond Webs v0.0.1 is the BIT OS VPS session landing page. Signed-in users choose a BIT OS flavour and resource tier, then usage is charged by the hour. The page avoids naming a single VPS provider so multiple infrastructure plugs can be added behind the product.
+Beyond Webs v0.0.1 is the VPS session control page, distinct from the BIT OS product page. It helps users configure a metered VPS session, choose the BIT OS flavour that will run inside it, review the selected resources, and start a session request. Usage is described as hourly; this page does not display rates or claim live VPS availability. The page avoids naming a single VPS provider so multiple infrastructure plugs can be added behind the product.
 
 ## Host configuration
 

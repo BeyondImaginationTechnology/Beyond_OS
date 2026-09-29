@@ -23,7 +23,7 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
   <title>Beyond Kitchen | A little inspiration for today</title>
   <link rel="manifest" href="<?= e(beyond_url('beyond-kitchen/manifest.webmanifest')) ?>">
   <link rel="icon" href="<?= e(beyond_url('beyond-kitchen/assets/kitchen-mark.svg')) ?>" type="image/svg+xml">
-  <link rel="stylesheet" href="<?= e(beyond_url('beyond-kitchen/assets/css/app.css?v=0.0.3')) ?>">
+  <link rel="stylesheet" href="<?= e(beyond_url('beyond-kitchen/assets/css/app.css?v=0.0.4')) ?>">
 </head>
 <body>
   <div class="app-shell">
@@ -153,7 +153,7 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
   <p class="sr-status" id="statusMessage" role="status" aria-live="polite"></p>
 
   <script src="<?= e(beyond_url('beyond-kitchen/assets/js/recipe-library.js?v=0.0.2')) ?>" defer></script>
-  <script src="<?= e(beyond_url('beyond-kitchen/assets/js/app.js?v=0.0.3')) ?>" defer></script>
+  <script src="<?= e(beyond_url('beyond-kitchen/assets/js/app.js?v=0.0.4')) ?>" defer></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('<?= e(beyond_url('beyond-kitchen/service-worker.js')) ?>'));

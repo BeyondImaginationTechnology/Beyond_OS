@@ -100,7 +100,7 @@
   }
 
   function imageStyle(recipe) {
-    return `background-image:linear-gradient(135deg,#71836b44,#d4c69833),url("${escapeHtml(recipe.image)}")`;
+    return `background-image:linear-gradient(135deg,#71836b44,#d4c69833),url('${escapeHtml(recipe.image)}')`;
   }
 
   function renderDaily() {

@@ -12,8 +12,10 @@ the same PHP-capable web server as Beyond OS. It is also an installable PWA
 when served over HTTPS (or localhost), with its recipe library and interface
 cached for offline visits. Web recipe photography is loaded from Unsplash and
 needs an internet connection; the interface remains readable if an image is
-unavailable. The native clients use their platform UI and bundled recipes, and
-work without network access.
+unavailable. The lemon chickpea recipe carousel uses five local 4:5 images,
+includes Gloria Liu's Unsplash photo credit, and is cached for offline viewing.
+The native clients use their platform UI and bundled recipes, and work without
+network access.
 
 ## Native clients
 

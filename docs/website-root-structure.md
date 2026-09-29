@@ -10,7 +10,7 @@ project or in a protected operations folder.
 | Area | Examples | Rule |
 | --- | --- | --- |
 | Public entry points | `index.php`, `about.php`, `contact.php`, `service-worker.js` | Keep at the root because the site and browser clients request these paths directly. |
-| Public product routes | `academy/`, `api/`, `app-store/`, `beyond-id/`, `beyond-math/`, `beyond-tv/`, `dailybreath/`, `os/`, `u/` | Keep route names stable; move internals only after checking URL and code references. |
+| Public product routes | `academy/`, `api/`, `app-store/`, `beyond-id/`, `beyond-kitchen/`, `beyond-math/`, `beyond-tv/`, `dailybreath/`, `os/`, `u/` | Keep route names stable; move internals only after checking URL and code references. |
 | Shared web code | `assets/`, `includes/`, `config/`, `server/` | Keep implementation grouped by responsibility; `config/` contains production wiring and stays protected. |
 | Product source projects | `*Android/`, `*Apple/`, `beyond-os-desktop/` | Keep native build trees together by project. Their case-sensitive folder names are part of the source and store workflows. |
 | Operations and data | `.git/`, `tools/`, `sql/`, `docs/`, `exports/` | Keep operational material grouped. `.git/` supports StartCP deployment; `tools/`, `sql/`, and `docs/` are protected/excluded from production sync. |

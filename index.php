@@ -257,6 +257,11 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
             <p>Live thematic channels and on-demand discovery turn the ecosystem into an always-on destination.</p>
             <span class="product-link">Watch the live demo →</span>
         </a>
+        <a class="product-card kitchen" href="/beyond-kitchen/">
+            <span class="product-number">05 · COOK</span><h3>Beyond Kitchen</h3>
+            <p>A fresh daily recipe, practical cooking details, and a personal list of meals worth making again.</p>
+            <span class="product-link">Find today's recipe →</span>
+        </a>
     </div>
     <div class="platform-loop">
         <div><span class="platform-kicker">The connected loop</span><h3>Every app builds the foundation for what comes next.</h3></div>

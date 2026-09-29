@@ -1,0 +1,164 @@
+[
+  {
+    "id": "lemon-chickpea-bowls",
+    "name": "Lemon chickpea bowls",
+    "description": "Crispy chickpeas, cool cucumber, and a bright lemon-herb dressing make a satisfying bowl for any day.",
+    "category": "Lunch",
+    "timeMinutes": 25,
+    "difficulty": "Easy",
+    "servings": 2,
+    "tags": ["Vegetarian", "High protein", "Meal prep"],
+    "image": "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1500&q=85",
+    "imageAlt": "Colorful grain bowl topped with fresh vegetables and herbs",
+    "ingredients": [
+      {"name": "Cooked chickpeas, drained", "amount": 1, "unit": "can"},
+      {"name": "Cooked brown rice", "amount": 1.5, "unit": "cups"},
+      {"name": "English cucumber", "amount": 0.5, "unit": ""},
+      {"name": "Cherry tomatoes", "amount": 1, "unit": "cup"},
+      {"name": "Plain Greek yogurt", "amount": 0.25, "unit": "cup"},
+      {"name": "Lemon, juiced", "amount": 1, "unit": ""},
+      {"name": "Fresh dill, chopped", "amount": 2, "unit": "tbsp"},
+      {"name": "Olive oil", "amount": 1, "unit": "tbsp"}
+    ],
+    "steps": [
+      "Heat the oven to 425°F (220°C). Pat the chickpeas dry, toss with olive oil, salt, and pepper, then roast for 20 minutes until crisp.",
+      "Stir the yogurt with lemon juice, dill, a pinch of salt, and a splash of water until spoonable.",
+      "Divide the warm rice, cucumber, and tomatoes between bowls. Add the chickpeas and finish with the lemon-herb dressing."
+    ]
+  },
+  {
+    "id": "tomato-butter-beans",
+    "name": "Tomato butter beans",
+    "description": "Creamy beans simmered in garlicky tomato sauce with wilted greens and plenty of crusty bread.",
+    "category": "Dinner",
+    "timeMinutes": 30,
+    "difficulty": "Easy",
+    "servings": 2,
+    "tags": ["Vegetarian", "One pan", "Comfort food"],
+    "image": "https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&w=1500&q=85",
+    "imageAlt": "Warm tomato and bean stew served in a bowl",
+    "ingredients": [
+      {"name": "Butter beans, drained", "amount": 2, "unit": "cans"},
+      {"name": "Crushed tomatoes", "amount": 1, "unit": "can"},
+      {"name": "Baby spinach", "amount": 2, "unit": "cups"},
+      {"name": "Garlic cloves, minced", "amount": 2, "unit": ""},
+      {"name": "Vegetable broth", "amount": 0.5, "unit": "cup"},
+      {"name": "Smoked paprika", "amount": 1, "unit": "tsp"},
+      {"name": "Crusty bread", "amount": 4, "unit": "slices"},
+      {"name": "Olive oil", "amount": 1, "unit": "tbsp"}
+    ],
+    "steps": [
+      "Warm the olive oil in a deep skillet over medium heat. Add the garlic and smoked paprika and stir for 30 seconds.",
+      "Pour in the tomatoes and broth. Add the beans, season with salt and pepper, and simmer for 15 minutes.",
+      "Fold in the spinach until just wilted. Serve warm with toasted crusty bread."
+    ]
+  },
+  {
+    "id": "ginger-salmon-tray",
+    "name": "Ginger salmon tray",
+    "description": "A sweet-savory ginger glaze brings salmon, broccoli, and fluffy rice together with barely any cleanup.",
+    "category": "Dinner",
+    "timeMinutes": 28,
+    "difficulty": "Easy",
+    "servings": 2,
+    "tags": ["Gluten-free option", "Weeknight", "High protein"],
+    "image": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=1500&q=85",
+    "imageAlt": "Glazed salmon fillet served with vegetables",
+    "ingredients": [
+      {"name": "Salmon fillets", "amount": 2, "unit": ""},
+      {"name": "Broccoli florets", "amount": 3, "unit": "cups"},
+      {"name": "Cooked jasmine rice", "amount": 1.5, "unit": "cups"},
+      {"name": "Fresh ginger, grated", "amount": 1, "unit": "tbsp"},
+      {"name": "Soy sauce or tamari", "amount": 2, "unit": "tbsp"},
+      {"name": "Honey", "amount": 1, "unit": "tbsp"},
+      {"name": "Rice vinegar", "amount": 1, "unit": "tsp"},
+      {"name": "Sesame seeds", "amount": 1, "unit": "tsp"}
+    ],
+    "steps": [
+      "Heat the oven to 425°F (220°C). Whisk together the ginger, soy sauce, honey, and rice vinegar.",
+      "Arrange the salmon and broccoli on a lined sheet pan. Spoon the glaze over the salmon and roast for 12–15 minutes, until the fish flakes easily.",
+      "Serve over warm rice and spoon any pan juices over the top. Finish with sesame seeds."
+    ]
+  },
+  {
+    "id": "green-goddess-toast",
+    "name": "Green goddess toast",
+    "description": "A creamy herby spread, ripe avocado, and crunchy seeds turn a quick breakfast into a little ritual.",
+    "category": "Breakfast",
+    "timeMinutes": 12,
+    "difficulty": "Easy",
+    "servings": 2,
+    "tags": ["Vegetarian", "Quick", "No cook"],
+    "image": "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=1500&q=85",
+    "imageAlt": "Avocado toast with fresh greens on toasted bread",
+    "ingredients": [
+      {"name": "Sourdough bread", "amount": 2, "unit": "thick slices"},
+      {"name": "Ripe avocado", "amount": 1, "unit": ""},
+      {"name": "Cottage cheese", "amount": 0.5, "unit": "cup"},
+      {"name": "Fresh parsley", "amount": 0.25, "unit": "cup"},
+      {"name": "Fresh chives", "amount": 1, "unit": "tbsp"},
+      {"name": "Lemon juice", "amount": 1, "unit": "tsp"},
+      {"name": "Pumpkin seeds", "amount": 1, "unit": "tbsp"},
+      {"name": "Chili flakes", "amount": 1, "unit": "pinch"}
+    ],
+    "steps": [
+      "Toast the sourdough until golden and crisp.",
+      "Mash the cottage cheese with parsley, chives, lemon juice, and a pinch of salt. Spread generously over the toast.",
+      "Slice the avocado over each piece. Scatter with pumpkin seeds, chili flakes, and a little black pepper."
+    ]
+  },
+  {
+    "id": "crispy-chicken-couscous",
+    "name": "Crispy chicken couscous",
+    "description": "Golden spiced chicken, fluffy couscous, and a quick cucumber salad make a fresh, filling supper.",
+    "category": "Dinner",
+    "timeMinutes": 32,
+    "difficulty": "Easy",
+    "servings": 2,
+    "tags": ["High protein", "Weeknight", "Meal prep"],
+    "image": "https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=1500&q=85",
+    "imageAlt": "Roasted chicken dinner with fresh vegetables",
+    "ingredients": [
+      {"name": "Boneless chicken thighs", "amount": 2, "unit": ""},
+      {"name": "Couscous", "amount": 1, "unit": "cup"},
+      {"name": "Cucumber", "amount": 0.5, "unit": ""},
+      {"name": "Plain yogurt", "amount": 0.25, "unit": "cup"},
+      {"name": "Ground cumin", "amount": 1, "unit": "tsp"},
+      {"name": "Ground coriander", "amount": 0.5, "unit": "tsp"},
+      {"name": "Lemon", "amount": 1, "unit": ""},
+      {"name": "Olive oil", "amount": 1, "unit": "tbsp"}
+    ],
+    "steps": [
+      "Rub the chicken with cumin, coriander, olive oil, salt, and pepper. Sear in a hot skillet for 5–6 minutes per side, until the thickest part reaches 165°F (74°C).",
+      "Put the couscous in a bowl with a pinch of salt. Pour over 1 cup of boiling water, cover for 5 minutes, then fluff with a fork and lemon zest.",
+      "Mix the yogurt with lemon juice. Slice the cucumber and serve everything together with the lemon yogurt."
+    ]
+  },
+  {
+    "id": "peach-oat-crumble",
+    "name": "Peach oat crumble",
+    "description": "Juicy peaches bake under a crisp, cinnamon-scented oat topping for a simple dessert to share.",
+    "category": "Dessert",
+    "timeMinutes": 35,
+    "difficulty": "Easy",
+    "servings": 4,
+    "tags": ["Vegetarian", "Make ahead", "Comfort food"],
+    "image": "https://images.unsplash.com/photo-1629828874514-c1e5103f0ae5?auto=format&fit=crop&w=1500&q=85",
+    "imageAlt": "Fresh baked fruit dessert with a golden oat topping",
+    "ingredients": [
+      {"name": "Ripe peaches, sliced", "amount": 4, "unit": ""},
+      {"name": "Rolled oats", "amount": 0.75, "unit": "cup"},
+      {"name": "All-purpose flour", "amount": 0.33, "unit": "cup"},
+      {"name": "Brown sugar", "amount": 0.25, "unit": "cup"},
+      {"name": "Cold butter, cubed", "amount": 3, "unit": "tbsp"},
+      {"name": "Ground cinnamon", "amount": 0.5, "unit": "tsp"},
+      {"name": "Lemon juice", "amount": 1, "unit": "tbsp"},
+      {"name": "Vanilla yogurt, to serve", "amount": 0.5, "unit": "cup"}
+    ],
+    "steps": [
+      "Heat the oven to 375°F (190°C). Toss the sliced peaches with lemon juice and spread in a small baking dish.",
+      "Rub the oats, flour, brown sugar, cinnamon, and cold butter together with your fingertips until crumbly. Scatter over the peaches.",
+      "Bake for 25 minutes until bubbling and golden. Let rest for 5 minutes and serve with vanilla yogurt."
+    ]
+  }
+]

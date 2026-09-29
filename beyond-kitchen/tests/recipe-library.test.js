@@ -1,5 +1,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
 const recipes = require('../data/recipes.json');
 const library = require('../assets/js/recipe-library.js');
 
@@ -32,4 +34,15 @@ test('saved recipe filtering and serving scaling remain local and predictable', 
   assert.deepEqual(library.filterRecipes(recipes, { favoritesOnly: true, favorites: saved }).map((recipe) => recipe.id), ['green-goddess-toast']);
   assert.equal(library.scaledAmount(1.5, 4, 2), 3);
   assert.throws(() => library.scaledAmount(1, 2, 0), TypeError);
+});
+
+test('the lemon chickpea carousel photos are bundled and precached for offline visits', () => {
+  const relativePaths = Array.from({ length: 5 }, (_, index) =>
+    `assets/images/lemon-chickpea-carousel/slide-${String(index + 1).padStart(2, '0')}.jpg`);
+  const serviceWorker = fs.readFileSync(path.join(__dirname, '..', 'service-worker.js'), 'utf8');
+
+  for (const relativePath of relativePaths) {
+    assert.ok(fs.existsSync(path.join(__dirname, '..', relativePath)), `${relativePath} should exist`);
+    assert.ok(serviceWorker.includes(`'./${relativePath}'`), `${relativePath} should be precached`);
+  }
 });

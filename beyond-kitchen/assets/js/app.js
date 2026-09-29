@@ -11,6 +11,9 @@
   const details = $('#recipeDetails');
   const status = $('#statusMessage');
   const search = $('#recipeSearch');
+  const carouselTrack = $('#carouselTrack');
+  const carouselSlides = carouselTrack ? $$('[data-carousel-slide]', carouselTrack) : [];
+  const carouselDots = $$('#recipeCarousel [data-carousel-to]');
   const fmt = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
   const recipesApi = window.BeyondKitchenRecipes;
   const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({
@@ -45,6 +48,36 @@
   function updateSavedCount() {
     $('#savedCount').textContent = String(state.favorites.size);
     $('#favoritesToggle').setAttribute('aria-pressed', String(state.favoritesOnly));
+  }
+
+  function showCarouselSlide(index) {
+    const nextIndex = Math.min(carouselSlides.length - 1, Math.max(0, index));
+    const slideOffset = carouselSlides[nextIndex].getBoundingClientRect().left - carouselTrack.getBoundingClientRect().left;
+    carouselTrack.scrollTo({
+      left: carouselTrack.scrollLeft + slideOffset,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
+    updateCarouselControls(nextIndex);
+  }
+
+  function updateCarouselControls(index = Math.round(carouselTrack.scrollLeft / carouselTrack.clientWidth)) {
+    if (!carouselSlides.length) return;
+    const activeIndex = Math.min(carouselSlides.length - 1, Math.max(0, index));
+    carouselDots.forEach((dot, dotIndex) => dot.setAttribute('aria-current', String(dotIndex === activeIndex)));
+    $('#carouselCount').textContent = `${activeIndex + 1} / ${carouselSlides.length}`;
+  }
+
+  if (carouselTrack && carouselSlides.length) {
+    $('#carouselPrevious').addEventListener('click', () => {
+      showCarouselSlide(Math.round(carouselTrack.scrollLeft / carouselTrack.clientWidth) - 1);
+    });
+    $('#carouselNext').addEventListener('click', () => {
+      showCarouselSlide(Math.round(carouselTrack.scrollLeft / carouselTrack.clientWidth) + 1);
+    });
+    carouselDots.forEach((dot) => dot.addEventListener('click', () => showCarouselSlide(Number(dot.dataset.carouselTo))));
+    carouselTrack.addEventListener('scroll', () => {
+      window.requestAnimationFrame(() => updateCarouselControls());
+    }, { passive: true });
   }
 
   function dailyRecipe() {

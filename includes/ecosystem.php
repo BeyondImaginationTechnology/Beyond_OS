@@ -45,7 +45,7 @@ function beyond_base_path(): string {
     }
 
     // Fallback for hosts that do not expose a usable DOCUMENT_ROOT.
-    $known = ['/app-store/','/academy/','/coding-school/','/beyond-id/','/beyond-math/','/beyond-french/','/dailybreath/','/beyond-health/','/beyond-tv/','/beyond-media/','/beyond-games/','/beyond-jobs/','/beyond-radio/','/beyond-casino/','/beyond-skate/','/beyond-catering/','/beyond-baby-names/','/beyond-tattoo/','/beyond-space/','/beyond-ancient/','/beyond-careers/','/beyond-sell/','/beyond-market/','/beyond-finance/','/beyond-investing/','/dashboard/','/admin/','/api-hub/'];
+    $known = ['/app-store/','/academy/','/coding-school/','/beyond-id/','/beyond-math/','/beyond-french/','/dailybreath/','/beyond-health/','/beyond-tv/','/beyond-media/','/beyond-games/','/beyond-jobs/','/beyond-radio/','/beyond-casino/','/beyond-skate/','/beyond-catering/','/beyond-kitchen/','/beyond-baby-names/','/beyond-tattoo/','/beyond-space/','/beyond-ancient/','/beyond-careers/','/beyond-sell/','/beyond-market/','/beyond-finance/','/beyond-investing/','/dashboard/','/admin/','/api-hub/'];
     foreach ($known as $marker) {
         $position = strpos($script, $marker);
         if ($position !== false) return substr($script, 0, $position);

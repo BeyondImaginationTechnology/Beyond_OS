@@ -1,0 +1,18 @@
+{
+  "name": "Beyond Kitchen",
+  "short_name": "Kitchen",
+  "description": "A little inspiration for what to cook today.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f5ef",
+  "theme_color": "#f6f5ef",
+  "icons": [
+    {
+      "src": "assets/kitchen-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

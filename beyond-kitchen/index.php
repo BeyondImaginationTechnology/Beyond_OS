@@ -1,0 +1,121 @@
+<?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../includes/ecosystem.php';
+
+$recipesPath = __DIR__ . '/data/recipes.json';
+$recipesJson = file_get_contents($recipesPath);
+if ($recipesJson === false) {
+    throw new RuntimeException('Beyond Kitchen recipe data could not be loaded.');
+}
+$recipes = json_decode($recipesJson, true, 512, JSON_THROW_ON_ERROR);
+if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
+    throw new RuntimeException('Beyond Kitchen recipe data must be a non-empty list.');
+}
+?>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f5ef">
+  <meta name="description" content="A fresh recipe for today, with simple ingredients, clear steps, and ideas worth making again.">
+  <title>Beyond Kitchen | A little inspiration for today</title>
+  <link rel="manifest" href="<?= e(beyond_url('beyond-kitchen/manifest.webmanifest')) ?>">
+  <link rel="icon" href="<?= e(beyond_url('beyond-kitchen/assets/kitchen-mark.svg')) ?>" type="image/svg+xml">
+  <link rel="stylesheet" href="<?= e(beyond_url('beyond-kitchen/assets/css/app.css?v=0.0.1')) ?>">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="<?= e(beyond_url('')) ?>" aria-label="Beyond Kitchen home">
+        <span class="brand-mark" aria-hidden="true">b</span>
+        <span>Beyond <strong>Kitchen</strong></span>
+      </a>
+      <nav class="top-actions" aria-label="Main navigation">
+        <a href="#recipes">Recipes</a>
+        <button class="favorite-nav" id="favoritesToggle" type="button" aria-pressed="false">
+          <span aria-hidden="true">♡</span> <span>Saved</span> <span class="saved-count" id="savedCount">0</span>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="welcome" aria-labelledby="welcomeTitle">
+        <div class="welcome-copy">
+          <p class="eyebrow"><span class="eyebrow-dot"></span> A fresh start, every day</p>
+          <h1 id="welcomeTitle">Good food, <em>made simple.</em></h1>
+          <p class="welcome-description">A little inspiration for what to make next. Thoughtful recipes, everyday ingredients, and no-fuss steps.</p>
+          <div class="welcome-note"><span aria-hidden="true">✳</span><span>Take what you need. Make it your own.</span></div>
+        </div>
+        <div class="welcome-stamp" aria-label="Good things are cooking">
+          <span class="stamp-leaves" aria-hidden="true">✳</span>
+          <span>MADE FOR<br>YOUR EVERYDAY</span>
+          <span class="stamp-small">GOOD THINGS ARE COOKING</span>
+        </div>
+      </section>
+
+      <section class="daily-section" aria-labelledby="dailyHeading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Your daily inspiration</p>
+            <h2 id="dailyHeading">Today's recipe</h2>
+          </div>
+          <time id="todayDate"></time>
+        </div>
+        <article class="daily-card" id="dailyRecipe" aria-live="polite"></article>
+      </section>
+
+      <section class="recipe-section" id="recipes" aria-labelledby="recipesHeading">
+        <div class="section-heading recipe-heading">
+          <div>
+            <p class="eyebrow">A good place to start</p>
+            <h2 id="recipesHeading">Find your next favourite</h2>
+          </div>
+          <p class="recipe-count" id="recipeCount" aria-live="polite"></p>
+        </div>
+        <div class="discovery-controls">
+          <label class="search-box">
+            <span aria-hidden="true">⌕</span>
+            <span class="visually-hidden">Search recipes</span>
+            <input id="recipeSearch" type="search" placeholder="Search recipes or ingredients" autocomplete="off">
+            <kbd>/</kbd>
+          </label>
+          <div class="filter-list" role="group" aria-label="Filter recipes">
+            <button class="filter-chip active" type="button" data-filter="All">All recipes</button>
+            <button class="filter-chip" type="button" data-filter="Quick">Under 30 min</button>
+            <button class="filter-chip" type="button" data-filter="Vegetarian">Vegetarian</button>
+            <button class="filter-chip" type="button" data-filter="Dinner">Dinner</button>
+          </div>
+        </div>
+        <div class="recipe-grid" id="recipeGrid" aria-live="polite"></div>
+        <p class="empty-state" id="emptyState" hidden>No recipes match just yet. Try another search or filter.</p>
+      </section>
+
+      <section class="closing-note" aria-label="A note about cooking">
+        <span aria-hidden="true">✳</span>
+        <p>Cooking is better when it feels like yours.<br><strong>Start with a recipe. Finish with your own touch.</strong></p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a href="<?= e(beyond_url('')) ?>">← Beyond Imagination Technology</a>
+      <span>Beyond Kitchen · 0.0.1</span>
+    </footer>
+  </div>
+
+  <dialog class="recipe-dialog" id="recipeDialog" aria-labelledby="dialogTitle">
+    <button class="dialog-close" id="dialogClose" type="button" aria-label="Close recipe">×</button>
+    <div id="recipeDetails"></div>
+  </dialog>
+  <p class="sr-status" id="statusMessage" role="status" aria-live="polite"></p>
+
+  <script src="<?= e(beyond_url('beyond-kitchen/assets/js/recipe-library.js?v=0.0.1')) ?>" defer></script>
+  <script src="<?= e(beyond_url('beyond-kitchen/assets/js/app.js?v=0.0.1')) ?>" defer></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('<?= e(beyond_url('beyond-kitchen/service-worker.js')) ?>'));
+    }
+  </script>
+</body>
+</html>

@@ -1,16 +1,25 @@
-const CACHE_NAME = 'beyond-kitchen-0.0.1-assets-v2';
+const CACHE_NAME = 'beyond-kitchen-0.0.2-assets-v3';
 const APP_FILES = [
   './',
   './offline.html',
-  './assets/css/app.css?v=0.0.2',
-  './assets/js/recipe-library.js?v=0.0.1',
-  './assets/js/app.js?v=0.0.2',
+  './assets/css/app.css?v=0.0.3',
+  './assets/js/recipe-library.js?v=0.0.2',
+  './assets/js/app.js?v=0.0.3',
   './assets/kitchen-mark.svg',
   './assets/images/lemon-chickpea-carousel/slide-01.jpg',
   './assets/images/lemon-chickpea-carousel/slide-02.jpg',
   './assets/images/lemon-chickpea-carousel/slide-03.jpg',
   './assets/images/lemon-chickpea-carousel/slide-04.jpg',
   './assets/images/lemon-chickpea-carousel/slide-05.jpg',
+  './assets/images/recipes/lemon-chickpea-bowls.png',
+  './assets/images/recipes/tomato-butter-beans.jpg',
+  './assets/images/recipes/ginger-salmon-tray.jpg',
+  './assets/images/recipes/green-goddess-toast.jpg',
+  './assets/images/recipes/crispy-chicken-couscous.jpg',
+  './assets/images/recipes/peach-oat-crumble.jpg',
+  './assets/images/recipes/haitian-griot-plate.jpg',
+  './assets/images/recipes/haitian-diri-djon-djon.jpg',
+  './assets/images/recipes/haitian-tassot-plantains.jpg',
   './data/recipes.json',
   './manifest.webmanifest'
 ];

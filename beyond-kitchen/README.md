@@ -1,6 +1,6 @@
-# Beyond Kitchen 0.0.1
+# Beyond Kitchen 0.0.2
 
-Beyond Kitchen 0.0.1 includes a responsive PHP web app and starter native
+Beyond Kitchen 0.0.2 includes a responsive PHP web app and starter native
 Android and iOS clients. Each has a date-based daily pick, recipe search and
 filters, step-by-step instructions, adjustable servings, and favorites stored
 on the device. Recipe content is maintained once in `data/recipes.json` and
@@ -8,12 +8,11 @@ bundled directly from that shared catalog into the native apps. Favorites are
 not synced to a Beyond ID account.
 
 The web page follows the PHP architecture in this repository and can run from
-the same PHP-capable web server as Beyond OS. It is also an installable PWA
-when served over HTTPS (or localhost), with its recipe library and interface
-cached for offline visits. Web recipe photography is loaded from Unsplash and
-needs an internet connection; the interface remains readable if an image is
-unavailable. The lemon chickpea recipe carousel uses five local 4:5 images,
-includes Gloria Liu's Unsplash photo credit, and is cached for offline viewing.
+the same PHP-capable web server as Beyond OS. Its nine recipes include three
+Haitian plates. It is also an installable PWA when served over HTTPS (or
+localhost), with its recipe library, interface, and bundled photography cached
+for offline visits. The lemon chickpea feature carousel uses five local 4:5
+images and includes Gloria Liu's Unsplash photo credit.
 The native clients use their platform UI and bundled recipes, and work without
 network access.
 

@@ -26,7 +26,7 @@ test('recipe filtering searches ingredients and applies discovery filters', () =
   assert.deepEqual(library.filterRecipes(recipes, { query: 'chickpeas' }).map((recipe) => recipe.id), ['lemon-chickpea-bowls']);
   assert.ok(library.filterRecipes(recipes, { filter: 'Vegetarian' }).every((recipe) => recipe.tags.includes('Vegetarian')));
   assert.ok(library.filterRecipes(recipes, { filter: 'Quick' }).every((recipe) => recipe.timeMinutes < 30));
-  assert.deepEqual(library.filterRecipes(recipes, { filter: 'Dinner' }).map((recipe) => recipe.category), ['Dinner', 'Dinner', 'Dinner']);
+  assert.deepEqual(library.filterRecipes(recipes, { filter: 'Dinner' }).map((recipe) => recipe.category), Array(6).fill('Dinner'));
 });
 
 test('saved recipe filtering and serving scaling remain local and predictable', () => {

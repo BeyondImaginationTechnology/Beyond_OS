@@ -19,6 +19,7 @@
       const matchesFilter = filter === 'All'
         || (filter === 'Quick' && recipe.timeMinutes < 30)
         || (filter === 'Vegetarian' && recipe.tags.includes('Vegetarian'))
+        || (filter === 'Haitian' && recipe.tags.includes('Haitian'))
         || recipe.category === filter;
       return matchesSearch && matchesFilter && (!options.favoritesOnly || favorites.has(recipe.id));
     });

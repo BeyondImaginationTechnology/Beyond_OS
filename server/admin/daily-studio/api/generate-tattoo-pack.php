@@ -68,6 +68,7 @@ try {
     }
     $seasonTotal = $campaign === 'autumn-ink' ? 31 : ($campaign === 'season-two' ? 100 : 55);
     $campaignLabel = $campaign === 'autumn-ink' ? 'Autumn Ink · Halloween 31/31' : ($campaign === 'season-two' ? 'Season 2 · 56–100' : 'Season 1 · Archive');
+    $sheetFormat = tattooPackText($input, 'sheet_format', 30, 'single');
     $releaseDate = tattooPackText($input, 'release_date', 20);
     $sequence = max(1, min($seasonTotal, (int)($input['sequence'] ?? 1)));
     $packStyle = tattooPackText($input, 'pack_style', 100, 'Premium retail hanging pack');
@@ -92,6 +93,7 @@ DROP METADATA
 - Release date: {$releaseDate}
 - Program: {$campaignLabel}
 - Program sequence: {$sequence} of {$seasonTotal}
+- Output format: {$sheetFormat}
 - Creative context: {$concept}
 - Tattoo style: {$style}
 - Realism detail: {$detail}

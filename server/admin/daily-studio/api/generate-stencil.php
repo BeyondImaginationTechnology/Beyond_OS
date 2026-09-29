@@ -38,6 +38,10 @@ try {
     $idea = mb_substr(trim((string)($input['idea'] ?? '')), 0, 700);
     $style = mb_substr(trim((string)($input['style'] ?? 'Fine-line blackwork')), 0, 80);
     $placement = mb_substr(trim((string)($input['placement'] ?? 'Outer forearm')), 0, 80);
+    $campaign = mb_substr(trim((string)($input['campaign'] ?? 'season-one')), 0, 30);
+    if (!in_array($campaign, ['season-one', 'autumn-ink', 'season-two'], true)) $campaign = 'season-one';
+    $sheetFormat = mb_substr(trim((string)($input['sheet_format'] ?? 'single')), 0, 30);
+    $autumnSheet = $campaign === 'autumn-ink' && $sheetFormat === 'autumn-12';
     $composition = mb_substr(trim((string)($input['composition'] ?? 'Centered vertical emblem')), 0, 100);
     $lineWeight = mb_substr(trim((string)($input['line_weight'] ?? 'Balanced transfer-ready hierarchy')), 0, 100);
     $detail = mb_substr(trim((string)($input['detail'] ?? 'High detail with controlled open skin breaks')), 0, 120);
@@ -80,8 +84,19 @@ try {
     }
     if (mb_strlen($idea) < 8) stencilJson(['ok'=>false,'error'=>'Describe the stencil concept in a little more detail.'], 422);
     if (!function_exists('curl_init')) stencilJson(['ok'=>false,'error'=>'The server cURL extension is required.'], 503);
-    $prompt = <<<PROMPT
+    $prompt = $autumnSheet
+        ? <<<PROMPT
+Create one original, premium Autumn Ink tattoo stylesheet containing exactly 12 coordinated, tattooable mini designs on one printable sheet.
+
+PROGRAM DIRECTION
+- Campaign: Autumn Ink · Halloween 31/31
+- Format: 12 distinct original motifs arranged in one balanced stylesheet
+- Placement: None; this is a stylesheet-only generation
+PROMPT
+        : <<<PROMPT
 Create one original, premium tattoo stencil master suitable for a professional artist.
+PROMPT;
+    $prompt .= <<<PROMPT
 
 DESIGN BRIEF
 - Concept: {$idea}
@@ -96,8 +111,10 @@ ART DIRECTION
 Build a strong readable silhouette first, then intentional internal detail. Follow the natural anatomy and visual flow of the stated placement. Use confident black transfer lines with a deliberate hierarchy: bold structural contours, medium secondary forms, and restrained fine detail. Preserve generous, purposeful negative space and open skin breaks so the design remains readable after transfer and aging. Keep the focal point unmistakable. Make every ornamental element structurally connected and tattooable. Use clean symmetry only when the concept calls for it; otherwise use balanced organic flow.
 
 OUTPUT REQUIREMENTS
-Return a single isolated vertical stencil on a pure white background. Crisp black linework only. No skin, body, person, studio scene, paper texture, mockup, frame, border, crop marks, typography, letters, numbers, signature, logo, watermark, color, gray wash, soft shading, drop shadow, glow, or photographic rendering. Keep the entire design inside the canvas with comfortable white margins. The result must look like a high-end transfer-ready master an experienced tattoo artist can print, size, and refine.
 PROMPT;
+    $prompt .= $autumnSheet
+        ? "Return one vertical printable stylesheet on a pure white background with exactly 12 distinct original motifs arranged in a clean, balanced grid. Separate each motif with generous white space and make every icon individually readable as a tattoo stencil. Use crisp black linework with restrained pumpkin orange and plum violet accents allowed for the preview, but keep the forms transfer-ready. No skin, body, person, studio scene, paper texture, mockup, frame, border, crop marks, invented brand text, signature, logo or watermark."
+        : "Return a single isolated vertical stencil on a pure white background. Crisp black linework only. No skin, body, person, studio scene, paper texture, mockup, frame, border, crop marks, typography, letters, numbers, signature, logo, watermark, color, gray wash, soft shading, drop shadow, glow, or photographic rendering. Keep the entire design inside the canvas with comfortable white margins. The result must look like a high-end transfer-ready master an experienced tattoo artist can print, size, and refine.";
     $openAiKey = trim((string)beyond_ai_config('api_key', ''));
     $azureImageKey = trim((string)beyond_ai_config('azure_image_key', ''));
     $azureImageEndpoint = rtrim(trim((string)beyond_ai_config('azure_image_endpoint', '')), '/');

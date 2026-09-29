@@ -186,17 +186,18 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
         <div class="drop-meta"><span id="dropNumber">Drop — / —</span><span id="dropDate">Choose a release</span><span id="dropCollection">Collection</span></div>
       </div>
       <h2 class="section-title">Creative direction</h2>
+      <div class="field"><label for="sheetFormat">Output format</label><select id="sheetFormat"><option value="autumn-12">Autumn Ink · 12-piece stylesheet</option><option value="single">Single transfer-ready stencil</option></select><small>Autumn Ink opens as a coordinated 12-piece sheet. Season 2 uses a focused single design with placement-aware mockups.</small></div>
       <div class="field">
-        <label for="idea">Describe the original stencil</label>
+        <label for="idea">Describe the original stencil or stylesheet</label>
         <textarea id="idea" maxlength="700" placeholder="Example: A celestial lion with a crescent halo, sacred geometry, botanical accents, and a strong central silhouette."></textarea>
         <small>Describe an original concept. The API prompt automatically enforces clean, transfer-ready black linework.</small>
       </div>
       <div class="row">
-        <div class="field"><label for="style">Tattoo style</label><select id="style"><optgroup label="Season recommendation"><option>Dark realism · Season recommended</option></optgroup><optgroup label="Realism"><option>Black-and-grey realism</option><option>Hyperrealism</option><option>Portrait realism</option><option>Engraving realism</option><option>Surreal realism</option><option>Micro realism</option></optgroup><optgroup label="Other styles"><option>Fine-line blackwork</option><option>Neo-traditional linework</option><option>Geometric ornamental</option><option>Japanese-inspired flow</option><option>Dark illustrative blackwork</option><option>Minimalist single-line</option></optgroup></select><small>Dark Realism drops automatically use the Season One recommended style.</small></div>
-        <div class="field"><label for="placement">Body placement</label><select id="placement"><optgroup label="Arms"><option>Inner forearm</option><option>Outer forearm</option><option>Full forearm wrap</option><option>Inner bicep</option><option>Outer upper arm</option><option>Shoulder cap</option><option>Elbow panel</option><option>Wrist</option><option>Full sleeve focal panel</option><option>Half sleeve</option></optgroup><optgroup label="Torso"><option>Upper chest</option><option>Full chest panel</option><option>Sternum</option><option>Ribs / side torso</option><option>Upper back</option><option>Full back panel</option><option>Spine</option><option>Shoulder blade</option><option>Abdomen</option></optgroup><optgroup label="Legs"><option>Front thigh</option><option>Outer thigh</option><option>Inner thigh</option><option>Calf</option><option>Shin</option><option>Knee panel</option><option>Full leg sleeve focal panel</option><option>Ankle</option></optgroup><optgroup label="Other"><option>Nape / back of neck</option><option>Side of neck</option><option>Hand</option><option>Foot</option></optgroup></select><small>Choose the exact anatomy so the composition and placement mockup follow the body’s flow.</small></div>
+        <div class="field"><label for="style">Tattoo style</label><select id="style"><optgroup label="Autumn Ink"><option>Autumn Ink · 12-piece flash stylesheet</option><option>Dark illustrative blackwork</option><option>Neo-traditional linework</option></optgroup><optgroup label="Season recommendation"><option>Dark realism · Season recommended</option></optgroup><optgroup label="Realism"><option>Black-and-grey realism</option><option>Hyperrealism</option><option>Portrait realism</option><option>Engraving realism</option><option>Surreal realism</option><option>Micro realism</option></optgroup><optgroup label="Season 2 collections"><option>Industrial ornamental blackwork</option><option>Botanical blackwork realism</option><option>Celestial engraving and fine line</option><option>Maritime illustrative blackwork</option></optgroup><optgroup label="Other styles"><option>Fine-line blackwork</option><option>Geometric ornamental</option><option>Japanese-inspired flow</option><option>Minimalist single-line</option></optgroup></select><small>Autumn Ink starts with a curated flash-sheet style; Season 2 keeps the collection style from its schedule.</small></div>
+        <div class="field" id="placementField"><label for="placement">Body placement</label><select id="placement"><option>No placement · stylesheet only</option><optgroup label="Arms"><option>Inner forearm</option><option>Outer forearm</option><option>Full forearm wrap</option><option>Inner bicep</option><option>Outer upper arm</option><option>Shoulder cap</option><option>Elbow panel</option><option>Wrist</option><option>Full sleeve focal panel</option><option>Half sleeve</option></optgroup><optgroup label="Torso"><option>Upper chest</option><option>Full chest panel</option><option>Sternum</option><option>Ribs / side torso</option><option>Upper back</option><option>Full back panel</option><option>Spine</option><option>Shoulder blade</option><option>Abdomen</option></optgroup><optgroup label="Legs"><option>Front thigh</option><option>Outer thigh</option><option>Inner thigh</option><option>Calf</option><option>Shin</option><option>Knee panel</option><option>Full leg sleeve focal panel</option><option>Ankle</option></optgroup><optgroup label="Hands and small placements"><option>Hand</option><option>Knuckles / finger panel</option><option>Finger side</option><option>Palm heel</option><option>Back of hand</option><option>Foot</option></optgroup><optgroup label="Other"><option>Nape / back of neck</option><option>Side of neck</option></optgroup></select><small id="placementHint">Choose anatomy for the mockup. Autumn Ink stylesheet generation does not require a location.</small></div>
       </div>
       <div class="row">
-        <div class="field"><label for="composition">Composition</label><select id="composition"><option>Centered vertical emblem</option><option>Organic vertical flow</option><option>Symmetrical ornamental crest</option><option>Diagonal anatomical sweep</option><option>Full-panel narrative composition</option></select></div>
+        <div class="field"><label for="composition">Composition</label><select id="composition"><option>12-piece icon sheet · balanced grid</option><option>Centered vertical emblem</option><option>Organic vertical flow</option><option>Symmetrical ornamental crest</option><option>Diagonal anatomical sweep</option><option>Full-panel narrative composition</option></select></div>
         <div class="field"><label for="lineWeight">Line-weight plan</label><select id="lineWeight"><option>Balanced transfer-ready hierarchy</option><option>Bold structural contours</option><option>Fine-line dominant with bold anchors</option><option>Graphic blackwork contrast</option></select></div>
       </div>
       <div class="field"><label for="detail">Realism detail</label><select id="detail"><optgroup label="Realism-focused"><option>High realism · anatomical accuracy, material texture and controlled skin breaks</option><option>Hyperreal detail · pores, weathering, reflections and crisp depth cues</option><option>Portrait realism · accurate features, expression, hair and fabric texture</option><option>Dark realism · deep value separation, aged texture and cinematic focal detail</option><option>Micro realism · selective fine texture with durable open space</option></optgroup><optgroup label="General"><option>High detail with controlled open skin breaks</option><option>Medium detail with generous negative space</option><option>Intricate ornamental detail</option><option>Minimal, iconic and highly readable</option></optgroup></select><small>Realism presets prioritize believable anatomy, surface texture, light direction and dimensional depth.</small></div>
@@ -213,9 +214,9 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       <div class="actions"><button class="btn" id="generate" type="button">✦ Prepare free prompt</button><button class="btn secondary" id="generatePaidFallback" type="button">Use paid API fallback</button><button class="btn secondary" id="clear" type="button">Clear</button></div>
       <p class="status" id="status" role="status" aria-live="polite"></p>
       <div class="fallback-panel" id="freeFallback" aria-live="polite">
-        <h3>Free image fallback sources</h3>
-        <p>Copy this prompt into a fallback image source, generate the image there, then upload the saved PNG/JPG/WebP above to continue the tattoo kit. Pexels, Unsplash and Pixabay are better for reference photos than final stencil output.</p>
-        <div class="field"><label for="fallbackProvider">Fallback source</label><select id="fallbackProvider"><optgroup label="Free browser tools"><option value="meta">Meta AI</option><option value="designer">Microsoft Designer</option><option value="firefly">Adobe Firefly</option><option value="canva">Canva Text to Image</option><option value="ideogram">Ideogram</option></optgroup><optgroup label="API candidates"><option value="runware">Runware API</option><option value="openrouter">OpenRouter Image API</option><option value="leonardo">Leonardo.AI API</option><option value="deepai">DeepAI Pro API</option></optgroup></select></div>
+        <h3>Fallback prompt sources</h3>
+        <p>Use GPT to refine the prompt or send it to an image source, then upload the saved PNG/JPG/WebP above to continue the tattoo kit. The prompt is tailored to the active Autumn Ink stylesheet or Season 2 placement.</p>
+        <div class="field"><label for="fallbackProvider">Fallback source</label><select id="fallbackProvider"><optgroup label="Prompt assistants"><option value="gpt">GPT · prompt assistant</option></optgroup><optgroup label="Free browser tools"><option value="meta">Meta AI</option><option value="designer">Microsoft Designer</option><option value="firefly">Adobe Firefly</option><option value="canva">Canva Text to Image</option><option value="ideogram">Ideogram</option></optgroup><optgroup label="API candidates"><option value="runware">Runware API</option><option value="openrouter">OpenRouter Image API</option><option value="leonardo">Leonardo.AI API</option><option value="deepai">DeepAI Pro API</option></optgroup></select></div>
         <textarea id="fallbackPrompt" readonly></textarea>
         <div class="fallback-actions">
           <button class="btn secondary" id="copyFallbackPrompt" type="button">Copy fallback prompt</button>
@@ -283,6 +284,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   const freeFallback = $('freeFallback');
   const fallbackPrompt = $('fallbackPrompt');
   const fallbackSources = {
+    gpt: {label: 'GPT prompt assistant', url: 'https://chatgpt.com/'},
     meta: {label: 'Meta AI', url: 'https://www.meta.ai/'},
     designer: {label: 'Microsoft Designer', url: 'https://designer.microsoft.com/image-creator'},
     firefly: {label: 'Adobe Firefly', url: 'https://firefly.adobe.com/generate/images'},
@@ -332,23 +334,28 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   };
   const buildMetaStencilPrompt = () => {
     const payload = generationPayload();
+    const isAutumnSheet = payload.sheet_format === 'autumn-12';
     const realismDirection = payload.style.toLowerCase().includes('realism')
       ? ['', 'REALISM DIRECTION', 'Prioritize believable anatomy and proportions, coherent lighting, convincing material and surface texture, dimensional foreground/midground/background separation, and a sharply resolved focal area. Translate values into tattooable contour, hatching, stipple and deliberate black shapes instead of muddy gray shading.']
       : [];
     return [
-      'Create one original, premium tattoo stencil master suitable for a professional artist.',
+      isAutumnSheet
+        ? 'Create one original, premium Autumn Ink tattoo stylesheet containing exactly 12 coordinated, tattooable mini designs on one printable sheet.'
+        : 'Create one original, premium tattoo stencil master suitable for a professional artist.',
       '',
       'DESIGN BRIEF',
       `- Concept: ${payload.idea}`,
       `- Tattoo style: ${payload.style}`,
-      `- Intended body placement: ${payload.placement}`,
+      `- Intended body placement: ${isAutumnSheet ? 'None · stylesheet only' : payload.placement}`,
       `- Composition: ${payload.composition}`,
       `- Line-weight plan: ${payload.line_weight}`,
       `- Detail density: ${payload.detail}`,
       ...realismDirection,
       '',
       'OUTPUT REQUIREMENTS',
-      'Return a single isolated vertical stencil on a pure white background. Crisp black linework only. No skin, body, person, studio scene, paper texture, mockup, frame, border, crop marks, typography, letters, numbers, signature, logo, watermark, color, gray wash, soft shading, drop shadow, glow, or photographic rendering. Keep the entire design inside the canvas with comfortable white margins.',
+      isAutumnSheet
+        ? 'Return one vertical printable stylesheet on a pure white background with exactly 12 distinct original motifs arranged in a clean balanced grid, each separated by generous white space and individually readable. Crisp black linework only with restrained pumpkin orange and plum violet registration accents allowed for the preview. No skin, body, person, studio scene, paper texture, mockup, frame, border, crop marks, invented brand text, signature, logo or watermark.'
+        : 'Return a single isolated vertical stencil on a pure white background. Crisp black linework only. No skin, body, person, studio scene, paper texture, mockup, frame, border, crop marks, typography, letters, numbers, signature, logo, watermark, color, gray wash, soft shading, drop shadow, glow, or photographic rendering. Keep the entire design inside the canvas with comfortable white margins.',
     ].join('\n');
   };
   const buildMetaAssetPrompt = (assetType) => {
@@ -359,6 +366,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       `Release date: ${drop.release_date}`,
       `Program: ${drop.campaign_label}`,
       `Program sequence: ${drop.sequence} of ${drop.season_total}`,
+      `Output format: ${$('sheetFormat').value === 'autumn-12' ? '12-piece stylesheet' : 'single stencil'}`,
       `Creative context: ${$('idea').value.trim()}`,
       `Tattoo style: ${$('style').value}`,
       `Realism detail: ${$('detail').value}`,
@@ -397,12 +405,33 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     idea: $('idea').value.trim(),
     style: $('style').value,
     placement: $('placement').value,
+    campaign: $('campaignSelect').value,
+    sheet_format: $('sheetFormat').value,
     composition: $('composition').value,
     line_weight: $('lineWeight').value,
     detail: $('detail').value,
   });
   const activeSchedule = () => schedules[$('campaignSelect').value] || schedules[initialCampaign];
   const activeDrop = () => activeSchedule()[Number($('dropSchedule').value)] || activeSchedule()[0];
+  const syncCampaignForm = () => {
+    const autumn = $('campaignSelect').value === 'autumn-ink';
+    $('sheetFormat').value = autumn ? 'autumn-12' : 'single';
+    $('placement').disabled = autumn;
+    $('placementField').style.display = autumn ? 'none' : '';
+    $('placementField').style.opacity = autumn ? '.55' : '1';
+    $('placementHint').textContent = autumn
+      ? 'Placement is intentionally omitted: this program generates the 12-piece stylesheet only.'
+      : 'Choose anatomy for the mockup. Knuckles, finger sides, palm heel and back of hand are available for Season 2.';
+    if (autumn) {
+      $('placement').value = 'No placement · stylesheet only';
+      const drop = activeDrop();
+      $('idea').value = `${drop.title}: a coordinated 12-piece Autumn Ink stylesheet of original autumn and Halloween motifs, each icon separated for clean tattoo transfer and arranged as one balanced printable sheet. ${drop.concept}`;
+      $('style').value = 'Autumn Ink · 12-piece flash stylesheet';
+      $('composition').value = '12-piece icon sheet · balanced grid';
+      $('lineWeight').value = 'Bold structural contours';
+      $('detail').value = 'High detail with controlled open skin breaks';
+    }
+  };
   const rebuildDropOptions = () => {
     const select = $('dropSchedule');
     const drops = activeSchedule();
@@ -493,6 +522,8 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
         ? 'High realism · anatomical accuracy, material texture and controlled skin breaks'
         : 'High detail with controlled open skin breaks';
     $('lore').value = drop.lore;
+    if (![...$('placement').options].some((option) => option.value === $('placement').value)) $('placement').value = 'Outer forearm';
+    syncCampaignForm();
     $('dropNumber').textContent = `Drop ${drop.sequence} / ${drop.season_total}`;
     $('dropDate').textContent = drop.display_date;
     $('dropCollection').textContent = drop.collection;
@@ -932,6 +963,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
         collection: drop.collection,
         campaign: drop.campaign,
         season_total: drop.season_total,
+        sheet_format: $('sheetFormat').value,
         release_date: drop.release_date,
         sequence: drop.sequence,
         pack_style: $('packStyle').value,

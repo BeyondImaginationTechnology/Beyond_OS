@@ -44,6 +44,7 @@ $types = [
     'sensitive_support' => 'Sensitive support and recovery',
     'lesson_qa' => 'General lesson Q&A',
     'socratic_tutor' => 'Socratic tutoring',
+    'tattoo_stencil_adapter' => 'Llama Jaguar · Beyond Tattoo adapter',
 ];
 $statuses = ['draft' => 'Draft', 'approved' => 'Approved', 'rejected' => 'Rejected'];
 
@@ -55,9 +56,13 @@ if (($_GET['download'] ?? '') === 'approved') {
         exit;
     }
     header('Content-Type: application/x-ndjson; charset=utf-8');
-    header('Content-Disposition: attachment; filename="jaguar-approved-training.jsonl"');
+    $tattooTarget = ($_GET['target'] ?? '') === 'tattoo';
+    header('Content-Disposition: attachment; filename="' . ($tattooTarget ? 'llama-jaguar-beyond-tattoo-adapter.jsonl' : 'jaguar-approved-training.jsonl') . '"');
     try {
-        foreach ($db->query("SELECT instruction,input_text,output_text,example_type FROM jaguar_training_examples WHERE status='approved' ORDER BY id ASC") as $row) {
+        $trainingQuery = $tattooTarget
+            ? "SELECT instruction,input_text,output_text,example_type FROM jaguar_training_examples WHERE status='approved' AND example_type='tattoo_stencil_adapter' ORDER BY id ASC"
+            : "SELECT instruction,input_text,output_text,example_type FROM jaguar_training_examples WHERE status='approved' ORDER BY id ASC";
+        foreach ($db->query($trainingQuery) as $row) {
             echo json_encode(['instruction'=>$row['instruction'],'input'=>$row['input_text'],'output'=>$row['output_text'],'type'=>$row['example_type']], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
         }
     } catch (Throwable $exception) {
@@ -129,12 +134,12 @@ require dirname(__DIR__) . '/_header.php';
 .jaguar-training .training-card{color:#172033;background:#fff}.jaguar-training .training-card h2{color:#172033}.jaguar-training .training-card .muted{color:#475467!important}.jaguar-training .training-stat{color:#172033;background:#edf2ff}.jaguar-training .training-stat small{color:#475467}.jaguar-training .training-card input::placeholder,.jaguar-training .training-card textarea::placeholder{color:#667085;opacity:1;font-weight:500}
 </style>
 <section class="studio-console jaguar-training">
-  <header class="studio-head"><div><p class="studio-eyebrow">Beyond Studio · DailyBreath · Jaguar</p><h1>Teach Jaguar to answer <span>with care.</span></h1><p class="lead">Create reviewed examples for scripture history, terminology, passage themes, app help, breathing prompts, and sensitive support. Approved examples export in the JSONL format used by Beyond-1.</p></div><a class="btn" href="?download=approved">Download approved JSONL</a></header>
+  <header class="studio-head"><div><p class="studio-eyebrow">Beyond Studio · Llama Jaguar</p><h1>Teach Jaguar to answer <span>with care.</span></h1><p class="lead">Create reviewed examples for DailyBreath and Beyond Tattoo. Tattoo generator briefs can be queued as drafts, reviewed here, and exported as a focused Llama Jaguar adapter dataset.</p></div><div class="training-actions"><a class="btn" href="?download=approved">Download approved JSONL</a><a class="btn alt" href="?download=approved&amp;target=tattoo">Export tattoo adapter JSONL</a></div></header>
   <?php if ($notice): ?><div class="studio-alert"><?=DailyStudio::esc($notice)?></div><?php endif; ?><?php if ($error): ?><div class="studio-alert error"><?=DailyStudio::esc($error)?></div><?php endif; ?>
   <div class="training-stats"><?php foreach ($statuses as $status=>$label): ?><div class="training-stat"><strong><?=number_format($counts[$status])?></strong><small><?=DailyStudio::esc($label)?> examples</small></div><?php endforeach; ?></div>
   <div class="training-grid">
     <article class="training-card"><h2>Add a training example</h2><p class="muted">Write the ideal answer Jaguar should learn. Never include private chats, personal data, API keys, or copyrighted training dumps.</p><form method="post"><input type="hidden" name="csrf" value="<?=DailyStudio::esc(Auth::csrf())?>"><input type="hidden" name="action" value="create"><label>Category<select name="example_type" required><?php foreach($types as $value=>$label): ?><option value="<?=DailyStudio::esc($value)?>"><?=DailyStudio::esc($label)?></option><?php endforeach; ?></select></label><label>Instruction<input name="instruction" maxlength="4000" placeholder="Explain when the Quran was compiled." required></label><label>Optional context or user question<textarea name="input_text" maxlength="8000" rows="4" placeholder="A learner asks this in a DailyBreath chat."></textarea></label><label>Ideal answer<textarea name="output_text" maxlength="12000" rows="9" placeholder="Write a careful, concise, respectful answer. Mention uncertainty when dates or traditions differ." required></textarea></label><button class="btn" type="submit">Save draft</button></form></article>
-    <article class="training-card"><h2>Training workflow</h2><p class="muted">DailyBreath training is separated from production content so an editor can review every example before it is exported.</p><ol><li>Add a human-edited example.</li><li>Approve only accurate, safe examples.</li><li>Download the approved JSONL.</li><li>Upload it to the deliberate Jaguar training job.</li></ol><p class="muted">This page does not start GPU jobs or store Hugging Face, Modal, or runtime credentials.</p></article>
+    <article class="training-card"><h2>Training workflow</h2><p class="muted">DailyBreath and Beyond Tattoo training stay separated from production content so an editor can review every example before export.</p><ol><li>Queue a tattoo brief from the admin generator or add a human-edited example.</li><li>Approve only accurate, safe examples.</li><li>Export the focused tattoo adapter JSONL.</li><li>Upload it to the deliberate Llama Jaguar adapter job.</li></ol><p class="muted">This page prepares and exports the dataset; it does not start GPU jobs or store Hugging Face, Modal, or runtime credentials.</p></article>
   </div>
   <article class="training-card" style="margin-top:18px"><div class="studio-head"><div><p class="studio-eyebrow">Review queue</p><h2>Recent examples</h2></div><span class="muted">Up to 100 latest</span></div><div style="overflow:auto"><table class="training-table"><thead><tr><th>Example</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead><tbody><?php foreach($rows as $row): ?><tr><td><strong><?=DailyStudio::esc($row['instruction'])?></strong><?php if($row['input_text']!==''): ?><small><?=DailyStudio::esc($row['input_text'])?></small><?php endif; ?><small><?=DailyStudio::esc(jaguar_excerpt($row['output_text']))?></small></td><td><?=DailyStudio::esc($types[$row['example_type']]??$row['example_type'])?></td><td><?=DailyStudio::esc($statuses[$row['status']]??$row['status'])?></td><td><form class="training-actions" method="post"><input type="hidden" name="csrf" value="<?=DailyStudio::esc(Auth::csrf())?>"><input type="hidden" name="id" value="<?=(int)$row['id']?>"><?php if($row['status']!=='approved'): ?><button class="btn alt" name="action" value="approve">Approve</button><?php endif; ?><?php if($row['status']!=='rejected'): ?><button class="btn alt" name="action" value="reject">Reject</button><?php endif; ?><button class="btn alt" name="action" value="delete">Delete</button></form></td></tr><?php endforeach; ?><?php if(!$rows): ?><tr><td colspan="4" class="muted">No training examples yet.</td></tr><?php endif; ?></tbody></table></div></article>
 </section>

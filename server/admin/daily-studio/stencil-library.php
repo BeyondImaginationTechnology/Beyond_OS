@@ -211,7 +211,8 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       <div class="field"><label for="stencilUpload">Or upload the approved stencil</label><input id="stencilUpload" type="file" accept="image/png,image/jpeg,image/webp"><small>The selected schedule supplies the title, collection, date, sequence and lore automatically.</small></div>
       <div class="actions" style="margin-bottom:15px"><a class="btn secondary" href="tattoo-asset-import.php" style="text-decoration:none">Upload assets to the private inbox →</a></div>
       <label class="check"><input id="preferFreeFallback" type="checkbox" checked> Use free image source before paid API</label>
-      <div class="actions"><button class="btn" id="generate" type="button">✦ Prepare free prompt</button><button class="btn secondary" id="generatePaidFallback" type="button">Use paid API fallback</button><button class="btn secondary" id="clear" type="button">Clear</button></div>
+      <div class="field"><label for="creativeEngine">Creative engine</label><select id="creativeEngine"><option value="llama-jaguar">Llama Jaguar · tattoo adapter prompt</option><option value="gpt-image-2">GPT Image 2 · paid image API</option><option value="prompt-fallback">GPT/browser prompt fallback</option></select><small>Llama Jaguar prepares the adapter-ready tattoo brief. The training action saves it as a reviewed draft; it does not start a GPU job from the admin page. Review drafts in <a href="jaguar-training.php" style="color:#f0cf87">Jaguar Training →</a></small></div>
+      <div class="actions"><button class="btn" id="generate" type="button">✦ Prepare prompt</button><button class="btn secondary" id="generatePaidFallback" type="button">Use paid API fallback</button><button class="btn secondary" id="queueJaguarAdapter" type="button">Queue Llama Jaguar adapter example</button><button class="btn secondary" id="clear" type="button">Clear</button></div>
       <p class="status" id="status" role="status" aria-live="polite"></p>
       <div class="fallback-panel" id="freeFallback" aria-live="polite">
         <h3>Fallback prompt sources</h3>
@@ -407,6 +408,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     placement: $('placement').value,
     campaign: $('campaignSelect').value,
     sheet_format: $('sheetFormat').value,
+    creative_engine: $('creativeEngine').value,
     composition: $('composition').value,
     line_weight: $('lineWeight').value,
     detail: $('detail').value,
@@ -893,14 +895,48 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       message('Describe the stencil concept in a little more detail.', true);
       return;
     }
-    if (!$('preferFreeFallback').checked) {
+    if ($('creativeEngine').value === 'gpt-image-2' || !$('preferFreeFallback').checked) {
       await runPaidStencilGeneration();
       return;
     }
     const source = fallbackSources[$('fallbackProvider').value] || fallbackSources.meta;
-    setFallbackPrompt(buildMetaStencilPrompt(), `${source.label} prompt is ready. Generate there first, then upload the result here.`);
+    const engine = $('creativeEngine').value;
+    setFallbackPrompt(buildMetaStencilPrompt(), engine === 'llama-jaguar'
+      ? 'Llama Jaguar adapter prompt is ready. Queue it for review or open GPT to refine it before generating.'
+      : `${source.label} prompt is ready. Generate there first, then upload the result here.`);
   };
   $('generatePaidFallback').onclick = runPaidStencilGeneration;
+
+  $('queueJaguarAdapter').onclick = async () => {
+    const idea = $('idea').value.trim();
+    if (idea.length < 8) {
+      message('Describe the stencil concept before queueing an adapter example.', true);
+      return;
+    }
+    const button = $('queueJaguarAdapter');
+    button.disabled = true;
+    message('Saving this brief as a Llama Jaguar adapter draft…');
+    try {
+      const response = await fetch('api/save-jaguar-tattoo-example.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf},
+        body: JSON.stringify({
+          instruction: 'Create a Beyond Tattoo tattoo direction from the brief. Preserve the requested campaign format, line hierarchy, originality and artist review requirements.',
+          input_text: JSON.stringify(generationPayload()),
+          output_text: buildMetaStencilPrompt(),
+          campaign: activeDrop().campaign,
+          collection: $('collection').value,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || 'The adapter example could not be saved.');
+      message('Llama Jaguar adapter example saved as a draft for review in Jaguar Training.');
+    } catch (error) {
+      message(error.message || 'The adapter example could not be saved.', true);
+    } finally {
+      button.disabled = false;
+    }
+  };
 
   const stageUploadedStencil = async (file) => {
     message(`Staging ${activeDrop().title} for pack, publish and video tools…`);

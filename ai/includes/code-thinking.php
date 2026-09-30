@@ -94,8 +94,9 @@ function jaguar_code_repository_root(string $path): ?string
 }
 
 /** Always read committed blobs: a HEAD citation must never describe working-tree edits. */
-function jaguar_code_committed_file(string $root, string $relative, string $revision = 'HEAD'): ?string
+function jaguar_code_committed_file(string $root, string $relative, string $revision = 'HEAD', int $maxBytes = 24000): ?string
 {
+    $maxBytes = min(128000, max(1, $maxBytes));
     $repository = jaguar_code_repository_root($root);
     if ($repository === null) return null;
     $projectPrefix = str_replace('\\', '/', ltrim(substr($root, strlen($repository)), DIRECTORY_SEPARATOR));
@@ -103,9 +104,9 @@ function jaguar_code_committed_file(string $root, string $relative, string $revi
     $type = jaguar_code_command(['git', 'ls-tree', $revision, '--', $gitPath], $repository, 5);
     if (!$type['ok'] || !preg_match('/^100(?:644|755) blob [a-f0-9]{40,64}\t/', $type['output'])) return null;
     $size = jaguar_code_command(['git', 'cat-file', '-s', $revision . ':' . $gitPath], $repository, 5);
-    if (!$size['ok'] || !ctype_digit(trim($size['output'])) || (int)trim($size['output']) > 24000) return null;
-    $content = jaguar_code_command(['git', 'show', $revision . ':' . $gitPath], $repository, 5, 24001, true);
-    return $content['ok'] && strlen($content['output']) <= 24000 && !str_contains($content['output'], "\0") ? $content['output'] : null;
+    if (!$size['ok'] || !ctype_digit(trim($size['output'])) || (int)trim($size['output']) > $maxBytes) return null;
+    $content = jaguar_code_command(['git', 'show', $revision . ':' . $gitPath], $repository, 5, $maxBytes + 1, true);
+    return $content['ok'] && strlen($content['output']) <= $maxBytes && !str_contains($content['output'], "\0") ? $content['output'] : null;
 }
 
 /** Create and remove a detached checkout; no proposed patch touches the configured project. */
@@ -208,10 +209,17 @@ function jaguar_code_read_context(array $project, array $requestedFiles, string 
     $root = $project['path'];
     $files = [];
     foreach (['AGENTS.md', 'README.md'] as $relative) {
-        if (jaguar_code_committed_file($root, $relative, $revision) !== null) $files[$relative] = $relative;
+        if (jaguar_code_committed_file($root, $relative, $revision) !== null) $files[$relative] = null;
     }
-    foreach (array_slice($requestedFiles, 0, 10) as $relative) {
-        if (!is_string($relative) || strlen($relative) > 240 || str_contains($relative, "\0")) continue;
+    foreach (array_slice($requestedFiles, 0, 10) as $specification) {
+        if (!is_string($specification) || strlen($specification) > 240 || str_contains($specification, "\0")) continue;
+        $range = null;
+        if (preg_match('/^(.+):([1-9][0-9]{0,5})-([1-9][0-9]{0,5})$/', $specification, $match)) {
+            $range = [(int)$match[2], (int)$match[3]];
+            if ($range[1] < $range[0] || $range[1] - $range[0] > 249) continue;
+            $specification = $match[1];
+        }
+        $relative = $specification;
         $relative = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relative);
         if ($relative === '' || str_starts_with($relative, DIRECTORY_SEPARATOR)) continue;
         $segments = array_map('strtolower', explode(DIRECTORY_SEPARATOR, $relative));
@@ -223,12 +231,26 @@ function jaguar_code_read_context(array $project, array $requestedFiles, string 
             || preg_match('/(secret|credential|private[-_]?key)/i', $baseName)) continue;
         $path = realpath($root . DIRECTORY_SEPARATOR . $relative);
         if ($path === false || !str_starts_with($path, rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR) || !is_file($path)) continue;
-        $files[$relative] = $relative;
+        $files[$relative] = $range;
     }
     $context = [];
-    foreach ($files as $relative) {
-        $content = jaguar_code_committed_file($root, $relative, $revision);
-        if ($content !== null && strlen($content) <= 24000) $context[] = "--- PROJECT FILE: {$relative} ---\n" . mb_substr($content, 0, 18000);
+    foreach ($files as $relative => $range) {
+        $content = jaguar_code_committed_file($root, $relative, $revision, $range === null ? 24000 : 128000);
+        if ($content === null) continue;
+        $displayPath = str_replace('\\', '/', $relative);
+        if ($range !== null) {
+            $lines = preg_split('/(?<=\n)/', $content);
+            if (is_array($lines) && end($lines) === '') array_pop($lines);
+            if (!is_array($lines) || $range[0] > count($lines) || $range[1] > count($lines)) continue;
+            $excerpt = implode('', array_slice($lines, $range[0] - 1, $range[1] - $range[0] + 1));
+            if (strlen($excerpt) > 16000) continue;
+            $context[] = "--- PROJECT FILE: {$displayPath} ---\nCommitted lines {$range[0]}-{$range[1]} of " . count($lines) . "; other lines were not supplied.\n" . $excerpt;
+        } elseif (in_array($relative, ['AGENTS.md', 'README.md'], true)) {
+            $excerpt = substr($content, 0, 4000);
+            $context[] = "--- PROJECT FILE: {$displayPath} ---\n" . (strlen($content) > 4000 ? "First 4,000 bytes only; remaining instructions were not supplied.\n" : '') . $excerpt;
+        } elseif (strlen($content) <= 16000) {
+            $context[] = "--- PROJECT FILE: {$displayPath} ---\n" . $content;
+        }
     }
     return $context;
 }

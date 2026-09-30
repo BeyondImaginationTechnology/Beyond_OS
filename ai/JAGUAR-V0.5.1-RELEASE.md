@@ -8,7 +8,9 @@ in their separate training scope and do not become a public Jaguar mode.
 
 - Code Thinking reads files from the cited Git revision, accepts diffs only for
   supplied existing files, applies them in a disposable checkout, and displays
-  the actual diff and check status for human review. Checks that could execute
+  the actual diff and check status for human review. Files larger than the
+  full-file input limit can be supplied as cited line ranges, such as
+  `ai/chat.php:280-380`; omitted lines are explicitly identified. Checks that could execute
   project code are skipped on the PHP host until an isolated runner exists.
 - Draw atomically reserves 10 BIT$ before invoking the GPU worker, captures one
   wallet debit after a valid image, and releases the hold on failure. A

@@ -63,6 +63,8 @@ files not supplied in the request, applies candidate diffs to a detached
 checkout, records the actual diff, and reports static check results. The local
 fixture test passed for a valid PHP repair, an invented JavaScript filename,
 an unappliable hunk, a PHP syntax failure, and uncommitted source at `HEAD`.
+It also passed a bounded line-range read of a committed large PHP file while
+rejecting the same file as an oversized full-file read.
 It also confirmed that the configured project working tree was untouched.
 Checks that would execute project code are skipped on the PHP host until an
 isolated runner is available. These are API guard tests, not model-quality

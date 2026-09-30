@@ -27,8 +27,9 @@ try {
         expect(jaguar_code_command($argv, $fixture, 10)['ok'], 'Could not initialize Git fixture.');
     }
     file_put_contents($fixture . DIRECTORY_SEPARATOR . 'sample.php', "<?php echo 'old';\n");
-    file_put_contents($fixture . DIRECTORY_SEPARATOR . 'large.php', '<?php ' . str_repeat('x', 24001));
-    expect(jaguar_code_command(['git', 'add', 'sample.php', 'large.php'], $fixture, 10)['ok'], 'Could not stage fixture.');
+    mkdir($fixture . DIRECTORY_SEPARATOR . 'src');
+    file_put_contents($fixture . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'large.php', "<?php\n" . implode('', array_map(static fn($line) => '// line-' . $line . ' ' . str_repeat('x', 80) . "\n", range(1, 350))));
+    expect(jaguar_code_command(['git', 'add', 'sample.php', 'src/large.php'], $fixture, 10)['ok'], 'Could not stage fixture.');
     expect(jaguar_code_command(['git', 'commit', '-m', 'fixture'], $fixture, 10)['ok'], 'Could not commit fixture.');
     $revision = jaguar_code_revision($fixture);
     expect($revision !== null, 'Fixture has no revision.');
@@ -37,7 +38,9 @@ try {
     $context = jaguar_code_read_context($project, ['sample.php'], $revision);
     expect(count($context) === 1 && str_contains($context[0], "echo 'old'"), 'Context did not use the cited commit.');
     expect(!str_contains($context[0], 'uncommitted'), 'Uncommitted content leaked into cited context.');
-    expect(jaguar_code_committed_file($fixture, 'large.php', $revision) === null, 'Oversized Git blob was loaded into context.');
+    expect(jaguar_code_committed_file($fixture, 'src/large.php', $revision) === null, 'Oversized Git blob was loaded into full-file context.');
+    $largeExcerpt = jaguar_code_read_context($project, ['src/large.php:120-125'], $revision);
+    expect(count($largeExcerpt) === 1 && str_contains($largeExcerpt[0], 'PROJECT FILE: src/large.php') && str_contains($largeExcerpt[0], 'line-120') && !str_contains($largeExcerpt[0], 'line-150'), 'Bounded committed line range was not supplied accurately.');
     $valid = "diff --git a/sample.php b/sample.php\n--- a/sample.php\n+++ b/sample.php\n@@ -1 +1 @@\n-<?php echo 'old';\n+<?php echo 'new';\n";
     expect(jaguar_code_patch_diff($valid, ['sample.php']) !== null, 'Valid source diff was rejected.');
     expect(jaguar_code_patch_diff(str_replace('sample.php', 'invented.js', $valid), ['sample.php']) === null, 'Invented file was accepted.');

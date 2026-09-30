@@ -2,147 +2,98 @@ import SwiftUI
 
 struct TodayView: View {
     @EnvironmentObject private var store: HealthStore
+    @State private var selectedMood: Mood?
+    @State private var energy = 3
+    @State private var stress = 3
+    @State private var sleep = 3
+    @State private var saved = false
+
+    private var suggestedMood: Mood? { selectedMood ?? store.latestMood }
 
     var body: some View {
         HealthScreen(title: "Today") {
-            FamilySwitcher()
-
-            HealthPanel {
-                HealthEyebrow(text: store.selectedMember.name)
-                Text(Date.now.fullDayText)
-                    .font(.title2.weight(.black))
-                    .foregroundStyle(.white)
-                Text("A daily body calendar for food, sleep, meds, smoke sessions, care routines, and anything worth remembering.")
+            VStack(alignment: .leading, spacing: 7) {
+                Text(Date.now.formatted(date: .complete, time: .omitted).uppercased())
+                    .font(.caption.weight(.bold)).foregroundStyle(Color.healthGreen)
+                Text("How are you arriving?")
+                    .font(.largeTitle.bold()).foregroundStyle(Color.healthInk)
+                Text("Notice where you are. One honest signal is enough.")
                     .foregroundStyle(.secondary)
-                HStack(spacing: 10) {
-                    StatTile(title: "Entries", value: "\(store.selectedDayEntries.count)")
-                    StatTile(title: "Checklist", value: "\(Int(store.completionRatio * 100))%")
+            }
+
+            HealthCard {
+                Text("Daily check-in").font(.headline)
+                Text("Right now, I feel").font(.subheadline).foregroundStyle(.secondary)
+                FlowMoodPicker(selection: $selectedMood)
+                RatingRow(title: "Energy", value: $energy)
+                RatingRow(title: "Stress", value: $stress)
+                RatingRow(title: "Sleep", value: $sleep)
+                Button {
+                    guard let selectedMood else { return }
+                    store.addCheckIn(mood: selectedMood, energy: energy, stress: stress, sleep: sleep)
+                    saved = store.errorMessage == nil
+                } label: {
+                    Text("Save today’s check-in")
+                        .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(.borderedProminent)
+                .tint(.healthGreen)
+                .disabled(selectedMood == nil)
+                if saved { Label("Saved on this device", systemImage: "checkmark.circle.fill").font(.footnote).foregroundStyle(.healthGreen) }
             }
 
-            if let workout = store.recommendedWorkout {
-                WorkoutCard(workout: workout)
-            }
-
-            HealthPanel {
-                HealthEyebrow(text: "Reminders")
-                ForEach(store.selectedDayRoutineItems) { item in
-                    Button {
-                        store.toggleRoutine(item)
+            HealthCard {
+                Text("A gentle next step").font(.caption.weight(.bold)).foregroundStyle(.healthGreen)
+                Text(suggestedMood?.suggestion ?? "Start with a pause.")
+                    .font(.title3.weight(.semibold))
+                if let practice = suggestedMood?.suggestedPractice {
+                    NavigationLink {
+                        PracticeSessionView(practice: practice)
                     } label: {
-                        HStack(spacing: 12) {
-                            Image(systemName: item.isComplete ? "checkmark.circle.fill" : "circle")
-                                .font(.title3)
-                                .foregroundStyle(item.isComplete ? Color.healthTeal : .secondary)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(item.title)
-                                    .font(.subheadline.weight(.bold))
-                                    .foregroundStyle(.white)
-                                Text(item.dueTime)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            CategoryPill(category: item.category)
-                        }
+                        Label("\(practice.rawValue) · \(practice.seconds / 60) min", systemImage: practice.symbol)
                     }
-                    .buttonStyle(.plain)
-                }
-            }
-
-            HealthPanel {
-                HealthEyebrow(text: "Timeline")
-                if store.selectedDayEntries.isEmpty {
-                    EmptyState(title: "No entries for this day yet", systemImage: "calendar.badge.plus")
+                    .buttonStyle(.bordered)
+                    .tint(.healthGreen)
                 } else {
-                    ForEach(store.selectedDayEntries) { entry in
-                        LogEntryRow(entry: entry)
-                    }
+                    Text("Choose a feeling to find one small thing that may help.")
+                        .foregroundStyle(.secondary)
                 }
             }
         }
     }
 }
 
-struct WorkoutCard: View {
-    let workout: WorkoutRecommendation
-
+private struct FlowMoodPicker: View {
+    @Binding var selection: Mood?
     var body: some View {
-        HealthPanel {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    HealthEyebrow(text: "Recommended workout")
-                    Text(workout.title)
-                        .font(.title3.weight(.black))
-                        .foregroundStyle(.white)
-                    Text(workout.reason)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 8)], spacing: 8) {
+            ForEach(Mood.allCases) { mood in
+                Button {
+                    selection = mood
+                } label: {
+                    Label(mood.rawValue, systemImage: mood.symbol)
+                        .font(.caption.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
                 }
-                Spacer()
-                VStack {
-                    Text("\(workout.durationMinutes)")
-                        .font(.title.weight(.black))
-                        .foregroundStyle(Color.healthTeal)
-                    Text("min")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(.secondary)
-                }
-            }
-            Text(workout.moves.joined(separator: " / "))
-                .font(.footnote.weight(.semibold))
-                .foregroundStyle(.white)
-        }
-    }
-}
-
-struct LogEntryRow: View {
-    let entry: HealthLogEntry
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: entry.category.systemImage)
-                .frame(width: 34, height: 34)
-                .foregroundStyle(entry.category.color)
-                .background(entry.category.color.opacity(0.14), in: RoundedRectangle(cornerRadius: 8))
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
-                    Text(entry.title)
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(.white)
-                    Spacer()
-                    Text(entry.date.timeText)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Text(entry.detail)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                if let attachmentLabel = entry.attachmentLabel {
-                    Label(attachmentLabel, systemImage: "photo.fill")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(Color.healthGold)
-                }
+                .buttonStyle(.plain)
+                .foregroundStyle(selection == mood ? .white : Color.healthInk)
+                .background(selection == mood ? Color.healthGreen : Color.healthMint, in: Capsule())
             }
         }
     }
 }
 
-struct StatTile: View {
+private struct RatingRow: View {
     let title: String
-    let value: String
-
+    @Binding var value: Int
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(title.uppercased())
-                .font(.caption2.weight(.black))
-                .foregroundStyle(.secondary)
-            Text(value)
-                .font(.headline.weight(.black))
-                .foregroundStyle(.white)
+        Stepper(value: $value, in: 1...5) {
+            HStack {
+                Text(title)
+                Spacer()
+                Text("\(value) / 5").foregroundStyle(.secondary)
+            }
         }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color.healthPanelSoft, in: RoundedRectangle(cornerRadius: 8))
     }
 }

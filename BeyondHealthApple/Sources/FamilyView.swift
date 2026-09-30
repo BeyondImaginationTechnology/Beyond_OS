@@ -1,43 +1,28 @@
 import SwiftUI
 
-struct FamilyView: View {
+struct SettingsView: View {
     @EnvironmentObject private var store: HealthStore
-
+    @State private var confirmClear = false
     var body: some View {
-        HealthScreen(title: "Family") {
-            HealthPanel {
-                HealthEyebrow(text: "Profile switcher")
-                Text("Track care separately for each person while keeping one shared family timeline.")
+        HealthScreen(title: "Settings") {
+            Text("Your space").font(.largeTitle.bold()).foregroundStyle(.healthInk)
+            HealthCard {
+                Label("Private on this device", systemImage: "lock.shield")
+                    .font(.headline)
+                Text("Check-ins and notes are stored in this app on this device. v0.0.1 does not sync with the web app or another phone.")
                     .foregroundStyle(.secondary)
-                FamilySwitcher()
             }
-
-            ForEach(store.members) { member in
-                HealthPanel {
-                    HStack {
-                        Circle()
-                            .fill(member.accent.color)
-                            .frame(width: 42, height: 42)
-                            .overlay(
-                                Text(String(member.name.prefix(1)))
-                                    .font(.headline.weight(.black))
-                                    .foregroundStyle(.white)
-                            )
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(member.name)
-                                .font(.headline.weight(.black))
-                                .foregroundStyle(.white)
-                            Text("\(member.relationship) / \(member.ageSummary)")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Text("\(store.entries.filter { $0.memberID == member.id }.count) logs")
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(Color.healthTeal)
-                    }
-                }
+            HealthCard {
+                Text("Your data").font(.headline)
+                Text("\(store.checkIns.count) check-ins · \(store.notes.count) notes")
+                    .foregroundStyle(.secondary)
+                Button("Delete all local data", role: .destructive) { confirmClear = true }
             }
+        }
+        .confirmationDialog("Delete all Beyond Health data on this device?", isPresented: $confirmClear) {
+            Button("Delete all data", role: .destructive) { store.clearAll() }
+        } message: {
+            Text("This removes your check-ins and notes from this device.")
         }
     }
 }

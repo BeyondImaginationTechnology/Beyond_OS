@@ -2,46 +2,50 @@ import SwiftUI
 
 struct InsightsView: View {
     @EnvironmentObject private var store: HealthStore
-
     var body: some View {
         HealthScreen(title: "Insights") {
-            FamilySwitcher()
-
-            HealthPanel {
-                HealthEyebrow(text: "Across time")
-                Text("\(store.selectedMember.name)'s health patterns")
-                    .font(.title3.weight(.black))
-                    .foregroundStyle(.white)
-                Text("Early MVP insights stay simple: category totals, routine completion, and recent notes grouped by day.")
-                    .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Your rhythm, in context.").font(.largeTitle.bold()).foregroundStyle(.healthInk)
+                Text("Personal reflections, never a diagnosis.").foregroundStyle(.secondary)
             }
-
-            HealthPanel {
-                HealthEyebrow(text: "Log mix")
-                ForEach(HealthCategory.allCases) { category in
-                    let count = store.categoryCount(category, memberID: store.selectedMemberID)
-                    HStack {
-                        Label(category.rawValue, systemImage: category.systemImage)
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(.white)
-                        Spacer()
-                        Text("\(count)")
-                            .font(.headline.weight(.black))
-                            .foregroundStyle(category.color)
-                    }
-                    ProgressView(value: Double(count), total: 5)
-                        .tint(category.color)
+            HealthCard {
+                Text("This week").font(.caption.weight(.bold)).foregroundStyle(.healthGreen)
+                if store.recentCheckIns.isEmpty {
+                    Text("Your rhythm starts here.").font(.title3.weight(.semibold))
+                    Text("Check in a few times to see your own patterns.")
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("\(store.recentCheckIns.count) check-in\(store.recentCheckIns.count == 1 ? "" : "s") this week")
+                        .font(.title3.weight(.semibold))
+                    Text("Average energy: \(average(\.energy)) / 5")
+                    Text("Average stress: \(average(\.stress)) / 5")
+                    Text("Average sleep: \(average(\.sleep)) / 5")
+                    Text("Notice what helped on your steadier days.")
+                        .font(.footnote).foregroundStyle(.secondary)
                 }
             }
-
-            HealthPanel {
-                HealthEyebrow(text: "Checklist momentum")
-                ProgressView(value: store.completionRatio)
-                    .tint(Color.healthTeal)
-                Text("\(Int(store.completionRatio * 100))% complete today")
-                    .font(.headline.weight(.bold))
-                    .foregroundStyle(.white)
+            HealthCard {
+                Text("Recent check-ins").font(.headline)
+                if store.checkIns.isEmpty {
+                    Text("No check-ins yet. Begin with Today.").foregroundStyle(.secondary)
+                } else {
+                    ForEach(store.checkIns.prefix(12)) { item in
+                        HStack {
+                            Label(item.mood.rawValue, systemImage: item.mood.symbol)
+                            Spacer()
+                            Text(item.date.formatted(date: .abbreviated, time: .omitted))
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                        Divider()
+                    }
+                }
             }
         }
+    }
+
+    private func average(_ keyPath: KeyPath<CheckIn, Int>) -> Int {
+        let items = store.recentCheckIns
+        guard !items.isEmpty else { return 0 }
+        return Int((Double(items.reduce(0) { $0 + $1[keyPath: keyPath] }) / Double(items.count)).rounded())
     }
 }

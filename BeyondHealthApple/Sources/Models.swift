@@ -1,85 +1,82 @@
 import Foundation
 
-struct FamilyMember: Identifiable, Hashable {
-    let id: String
-    let name: String
-    let relationship: String
-    let ageSummary: String
-    let accent: HealthAccent
-
-    static let seed: [FamilyMember] = [
-        FamilyMember(id: "mia", name: "Mia", relationship: "You", ageSummary: "Adult", accent: .teal),
-        FamilyMember(id: "zak", name: "Zak", relationship: "Child", ageSummary: "7 years", accent: .gold),
-        FamilyMember(id: "nana", name: "Nana", relationship: "Parent", ageSummary: "64 years", accent: .rose)
-    ]
-}
-
-enum HealthAccent: String, Hashable {
-    case teal
-    case gold
-    case rose
-    case sky
-}
-
-enum HealthCategory: String, CaseIterable, Identifiable, Hashable {
-    case body = "Body"
-    case food = "Food"
-    case sleep = "Sleep"
-    case medication = "Meds"
-    case smoke = "Smoke"
-    case workout = "Workout"
-    case hygiene = "Care"
+enum Mood: String, CaseIterable, Codable, Identifiable {
+    case grounded = "Grounded"
+    case tired = "Tired"
+    case stretched = "Stretched"
+    case hopeful = "Hopeful"
+    case heavy = "Heavy"
 
     var id: String { rawValue }
 
-    var systemImage: String {
+    var symbol: String {
         switch self {
-        case .body: "heart.text.square.fill"
-        case .food: "camera.macro"
-        case .sleep: "moon.zzz.fill"
-        case .medication: "pills.fill"
-        case .smoke: "smoke.fill"
-        case .workout: "figure.strengthtraining.traditional"
-        case .hygiene: "shower.fill"
+        case .grounded: "sun.max"
+        case .tired: "moon"
+        case .stretched: "wind"
+        case .hopeful: "sparkles"
+        case .heavy: "heart"
+        }
+    }
+
+    var suggestion: String {
+        switch self {
+        case .grounded: "Keep the rhythm. Notice one good thing."
+        case .tired: "Make the next thing smaller. Try a brief movement reset."
+        case .stretched: "Pause before you push. Take one quiet breath."
+        case .hopeful: "Build on what feels possible. Capture one thought."
+        case .heavy: "Be gentle with the next hour. One step is enough."
+        }
+    }
+
+    var suggestedPractice: PracticeKind {
+        switch self {
+        case .grounded, .hopeful: .nameTheGood
+        case .tired: .bodyReset
+        case .stretched, .heavy: .boxBreathing
         }
     }
 }
 
-struct HealthLogEntry: Identifiable, Hashable {
-    let id: UUID
-    let memberID: String
+struct CheckIn: Codable, Identifiable {
+    var id: UUID = UUID()
     let date: Date
-    let category: HealthCategory
-    let title: String
-    let detail: String
-    let attachmentLabel: String?
+    let mood: Mood
+    let energy: Int
+    let stress: Int
+    let sleep: Int
+}
 
-    init(id: UUID = UUID(), memberID: String, date: Date, category: HealthCategory, title: String, detail: String, attachmentLabel: String? = nil) {
-        self.id = id
-        self.memberID = memberID
-        self.date = date
-        self.category = category
-        self.title = title
-        self.detail = detail
-        self.attachmentLabel = attachmentLabel
+struct JournalNote: Codable, Identifiable {
+    var id: UUID = UUID()
+    let date: Date
+    let text: String
+}
+
+enum PracticeKind: String, CaseIterable, Identifiable {
+    case boxBreathing = "Box breathing"
+    case bodyReset = "Reset your body"
+    case nameTheGood = "Name the good"
+
+    var id: String { rawValue }
+    var seconds: Int {
+        switch self {
+        case .boxBreathing, .nameTheGood: 60
+        case .bodyReset: 120
+        }
     }
-}
-
-struct RoutineItem: Identifiable, Hashable {
-    let id: String
-    let memberID: String
-    let title: String
-    let category: HealthCategory
-    let dueTime: String
-    var isComplete: Bool
-}
-
-struct WorkoutRecommendation: Identifiable, Hashable {
-    let id: String
-    let memberID: String
-    let title: String
-    let durationMinutes: Int
-    let intensity: String
-    let reason: String
-    let moves: [String]
+    var symbol: String {
+        switch self {
+        case .boxBreathing: "circle.dotted"
+        case .bodyReset: "figure.walk"
+        case .nameTheGood: "square.and.pencil"
+        }
+    }
+    var detail: String {
+        switch self {
+        case .boxBreathing: "Breathe in, hold, breathe out, and hold for four counts each."
+        case .bodyReset: "Look away from the screen, roll your shoulders, and walk if you can."
+        case .nameTheGood: "Write one sentence about something steady, kind, or possible today."
+        }
+    }
 }

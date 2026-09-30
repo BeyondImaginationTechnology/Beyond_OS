@@ -1,78 +1,68 @@
 import SwiftUI
+import Combine
 
-struct HealthCalendarView: View {
-    @EnvironmentObject private var store: HealthStore
-
-    private var days: [Date] {
-        let calendar = Calendar.current
-        return (0..<14).compactMap { offset in
-            calendar.date(byAdding: .day, value: -offset, to: calendar.startOfDay(for: .now))
+struct PracticesView: View {
+    var body: some View {
+        HealthScreen(title: "Practices") {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Meet the moment.").font(.largeTitle.bold()).foregroundStyle(.healthInk)
+                Text("Short enough to begin. Stop whenever you need.")
+                    .foregroundStyle(.secondary)
+            }
+            ForEach(PracticeKind.allCases) { practice in
+                HealthCard {
+                    Label(practice.rawValue, systemImage: practice.symbol)
+                        .font(.headline).foregroundStyle(.healthInk)
+                    Text(practice.detail).foregroundStyle(.secondary)
+                    NavigationLink("Begin · \(practice.seconds / 60) min") {
+                        PracticeSessionView(practice: practice)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.healthGreen)
+                }
+            }
         }
     }
+}
+
+struct PracticeSessionView: View {
+    let practice: PracticeKind
+    @State private var remaining = 0
+    @State private var running = false
+    private let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        HealthScreen(title: "Calendar") {
-            FamilySwitcher()
-
-            HealthPanel {
-                HealthEyebrow(text: "Daily body calendar")
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 10) {
-                        ForEach(days, id: \.self) { day in
-                            let isSelected = Calendar.current.isDate(day, inSameDayAs: store.selectedDate)
-                            Button {
-                                store.selectedDate = day
-                            } label: {
-                                VStack(spacing: 6) {
-                                    Text(day.shortDayText)
-                                        .font(.caption.weight(.bold))
-                                    Text(day.dayNumberText)
-                                        .font(.title3.weight(.black))
-                                    Text("\(store.entries(on: day, memberID: store.selectedMemberID).count)")
-                                        .font(.caption2.weight(.black))
-                                        .foregroundStyle(isSelected ? .white : Color.healthTeal)
-                                }
-                                .foregroundStyle(isSelected ? .white : .secondary)
-                                .frame(width: 58, height: 78)
-                                .background(isSelected ? Color.healthTeal : Color.healthPanelSoft, in: RoundedRectangle(cornerRadius: 8))
-                            }
-                            .buttonStyle(.plain)
-                        }
+        HealthScreen(title: practice.rawValue) {
+            HealthCard {
+                Image(systemName: practice.symbol)
+                    .font(.largeTitle).foregroundStyle(.healthGreen)
+                Text(practice.detail).font(.title3)
+                Text("\(remaining / 60):\(String(format: "%02d", remaining % 60))")
+                    .font(.system(size: 58, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(.healthInk)
+                    .frame(maxWidth: .infinity)
+                HStack {
+                    Button(running ? "Pause" : remaining == 0 ? "Restart" : "Start") {
+                        if remaining == 0 { remaining = practice.seconds }
+                        running.toggle()
                     }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.healthGreen)
+                    Button("Reset") {
+                        running = false
+                        remaining = practice.seconds
+                    }
+                    .buttonStyle(.bordered)
                 }
             }
-
-            HealthPanel {
-                HealthEyebrow(text: store.selectedDate.fullDayText)
-                if store.selectedDayEntries.isEmpty {
-                    EmptyState(title: "Nothing logged on this date", systemImage: "calendar")
-                } else {
-                    ForEach(store.selectedDayEntries) { entry in
-                        LogEntryRow(entry: entry)
-                    }
-                }
-            }
-
-            HealthPanel {
-                HealthEyebrow(text: "Category totals")
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 132), spacing: 10)], spacing: 10) {
-                    ForEach(HealthCategory.allCases) { category in
-                        HStack {
-                            Image(systemName: category.systemImage)
-                                .foregroundStyle(category.color)
-                            Text(category.rawValue)
-                                .font(.caption.weight(.bold))
-                                .foregroundStyle(.white)
-                            Spacer()
-                            Text("\(store.categoryCount(category, memberID: store.selectedMemberID))")
-                                .font(.caption.weight(.black))
-                                .foregroundStyle(.secondary)
-                        }
-                        .padding(12)
-                        .background(Color.healthPanelSoft, in: RoundedRectangle(cornerRadius: 8))
-                    }
-                }
-            }
+        }
+        .onAppear { remaining = practice.seconds }
+        .onDisappear { running = false }
+        .onReceive(ticker) { _ in
+            guard running else { return }
+            if remaining > 0 { remaining -= 1 }
+            if remaining == 0 { running = false }
         }
     }
 }

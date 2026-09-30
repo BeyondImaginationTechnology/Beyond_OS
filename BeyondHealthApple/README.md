@@ -1,17 +1,15 @@
-# Beyond Health Mobile Apple
+# Beyond Health iOS v0.0.1
 
-Beyond Health Mobile is a calendar-first SwiftUI MVP for body and family health logging.
+Native SwiftUI daily wellbeing companion for iOS 17 and later.
 
-## MVP Shape
+The app has five tabs: Today, Journal, Practices, Insights, and Settings. Check-ins record mood, energy, stress, and sleep. A selected mood suggests one short practice. Journal notes and check-ins are stored in the app's private Application Support directory with iOS file protection. Settings can delete all local entries.
 
-- Today screen with family switching, routine checklist, recommended workout, and daily timeline.
-- Calendar screen for recent days and category totals.
-- Add Log screen for body notes, food photo markers, wake and dream notes, medications, smoke sessions, workouts, and hygiene care.
-- Insights screen for early trend summaries.
-- Family screen with separate profile context.
+This first native release is offline and does not sync with the web app or Android. It does not ask for HealthKit or network access.
 
-Generate the Xcode project with XcodeGen from this folder:
+Open `BeyondHealthMobile.xcodeproj` in Xcode or regenerate it with XcodeGen:
 
 ```sh
 xcodegen generate
 ```
+
+Select the `BeyondHealthMobile` scheme and build for an iOS 17+ device or simulator. Bundle ID: `technology.co.beyondimagination.beyondhealthmobile`.

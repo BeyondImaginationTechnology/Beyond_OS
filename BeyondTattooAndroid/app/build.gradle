@@ -1,5 +1,7 @@
 plugins { id 'com.android.application' }
 
+dependencies { implementation 'androidx.core:core:1.13.1' }
+
 android {
     namespace 'technology.co.beyondimagination.beyondtattoo'
     compileSdk 37
@@ -8,8 +10,8 @@ android {
         applicationId 'technology.co.beyondimagination.beyondtattoo'
         minSdk 26
         targetSdk 37
-        versionCode providers.gradleProperty('versionCode').map { it.toInteger() }.getOrElse(4)
-        versionName providers.gradleProperty('versionName').getOrElse('1.2.0')
+        versionCode providers.gradleProperty('versionCode').map { it.toInteger() }.getOrElse(5)
+        versionName providers.gradleProperty('versionName').getOrElse('1.2.1')
     }
 
     buildTypes {

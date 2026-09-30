@@ -169,7 +169,7 @@ struct LibraryAsset: Decodable, Identifiable, Hashable {
             summary: summary,
             placement: placement,
             rewardBits: rewardBits,
-            packageURL: URL(string: "https://beyondimagination.co.technology/beyond-tattoo/api/stencil-download.php?type=package")!,
+            packageURL: URL(string: "https://beyondimagination.co.technology/beyond-tattoo/api/stencil-download.php?type=package&id=\(id)")!,
             previewURL: previewURL,
             stencilURL: stencilURL,
             transferURL: transferURL,
@@ -277,6 +277,8 @@ enum WebDestination: String, Identifiable, CaseIterable {
     case dashboard = "Dashboard"
     case studios = "Studios"
     case stencil = "Stencil of day"
+    case generator = "Stencil generator"
+    case camera = "Violet Trace"
     case editor = "Stencil editor"
     case needleBot = "Needle Bot"
 
@@ -292,6 +294,10 @@ enum WebDestination: String, Identifiable, CaseIterable {
             URL(string: "https://beyondimagination.co.technology/beyond-tattoo/studios.php")!
         case .stencil:
             URL(string: "https://beyondimagination.co.technology/beyond-tattoo/stencil-of-day.php")!
+        case .generator:
+            URL(string: "https://beyondimagination.co.technology/beyond-tattoo/tattoo-generator.php")!
+        case .camera:
+            URL(string: "https://beyondimagination.co.technology/beyond-tattoo/stencil-camera.php")!
         case .editor:
             URL(string: "https://beyondimagination.co.technology/beyond-tattoo/stencil-editor.php")!
         case .needleBot:

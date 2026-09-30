@@ -5,12 +5,10 @@ require_once dirname(__DIR__, 3) . '/beyond-tattoo/includes/library-catalog.php'
 
 $csrf = Auth::csrf();
 $drops = [];
-$sequence = 0;
 $uploadRoot = dirname(__DIR__, 3) . '/beyond-tattoo/uploads/stencil-library';
 $bundledRoot = dirname(__DIR__, 3) . '/beyond-tattoo/assets/stencils';
-foreach (bt_library_collections() as $collectionSlug => $collection) {
-    foreach ($collection['stencils'] as $collectionIndex => [$title, $releaseDate]) {
-        $sequence++;
+foreach (bt_season_one_drops() as $scheduledDrop) {
+        ['sequence' => $sequence, 'title' => $title, 'release_date' => $releaseDate, 'collection' => $collectionName, 'collection_slug' => $collectionSlug, 'collection_index' => $collectionIndex] = $scheduledDrop;
         $slug = strtolower(trim((string)(preg_replace('/[^a-z0-9]+/i', '-', $title) ?? ''), '-'));
         $folderName = sprintf('%02d-%s', $collectionIndex + 1, $slug);
         $folder = $uploadRoot . '/' . $collectionSlug . '/' . $folderName;
@@ -18,27 +16,38 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
         $metadataFile = is_file($folder . '/metadata.json') ? $folder . '/metadata.json' : $bundledFolder . '/metadata.json';
         $metadata = is_file($metadataFile) ? json_decode((string)file_get_contents($metadataFile), true) : [];
         $publicationStatus = is_array($metadata) ? strtolower(trim((string)($metadata['status'] ?? 'draft'))) : 'draft';
+        $hasAsset = static function (string $stem, array $extensions) use ($folder, $bundledFolder): bool {
+            foreach ([$folder, $bundledFolder] as $directory) {
+                foreach ($extensions as $extension) {
+                    if (is_file($directory . '/' . $stem . '.' . $extension)) return true;
+                }
+            }
+            return false;
+        };
         $drops[] = [
             'sequence' => $sequence,
             'title' => $title,
             'release_date' => $releaseDate,
-            'collection' => $collection['name'],
+            'collection' => $collectionName,
             'collection_slug' => $collectionSlug,
             'assets' => [
-                'preview' => is_file($folder . '/preview-watermarked.png') || is_file($bundledFolder . '/preview-watermarked.png'),
-                'stencil' => is_file($folder . '/stencil-print-ready.png') || is_file($bundledFolder . '/stencil-print-ready.png'),
-                'outline' => is_file($folder . '/stencil-outline.png') || is_file($bundledFolder . '/stencil-outline.png'),
-                'transfer' => is_file($folder . '/studio-transfer-template.png') || is_file($bundledFolder . '/studio-transfer-template.png'),
-                'pdf' => is_file($folder . '/stencil-print-ready.pdf') || is_file($bundledFolder . '/stencil-print-ready.pdf'),
-                'reference' => is_file($folder . '/reference-artwork.webp') || is_file($bundledFolder . '/reference-artwork.webp'),
-                'placement' => is_file($folder . '/placement-mockup.webp') || is_file($bundledFolder . '/placement-mockup.webp'),
-                'pack' => is_file($folder . '/premium-packaging.webp') || is_file($bundledFolder . '/premium-packaging.webp'),
-                'lore' => is_file($folder . '/lore-card.webp') || is_file($bundledFolder . '/lore-card.webp'),
-                'style' => is_file($folder . '/style-card.webp') || is_file($bundledFolder . '/style-card.webp'),
+                'preview' => $hasAsset('preview-watermarked', ['png', 'jpg']),
+                'stencil' => $hasAsset('stencil-print-ready', ['png', 'jpg']),
+                'outline' => $hasAsset('stencil-outline', ['png', 'jpg']),
+                'transfer' => $hasAsset('studio-transfer-template', ['png', 'jpg']),
+                'pdf' => $hasAsset('stencil-print-ready', ['pdf']),
+                'reference' => $hasAsset('reference-artwork', ['webp', 'jpg']),
+                'placement' => $hasAsset('placement-mockup', ['webp', 'jpg']),
+                'pack' => $hasAsset('premium-packaging', ['webp', 'jpg']),
+                'lore' => $hasAsset('lore-card', ['webp', 'jpg']),
+                'style' => $hasAsset('style-card', ['webp', 'jpg']),
             ],
             'status' => in_array($publicationStatus, ['approved', 'published'], true) ? 'approved' : 'draft',
+            'quality_note' => is_array($metadata) ? trim((string)($metadata['quality_note'] ?? '')) : '',
+            'stage' => in_array($publicationStatus, ['approved', 'published'], true)
+                ? ($releaseDate <= (new DateTimeImmutable('today', new DateTimeZone('America/Vancouver')))->format('Y-m-d') ? 'Live' : 'Scheduled')
+                : 'Draft',
         ];
-    }
 }
 ?>
 <!doctype html>
@@ -89,9 +98,9 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
       <p class="status" id="status" role="status" aria-live="polite">Choose images to preview their scheduled mapping.</p>
     </article>
     <article class="panel">
-      <div class="summary"><div><b>55</b><span>Season drops</span></div><div><b id="selectedCount">0</b><span>Selected</span></div><div><b id="mappedCount">0</b><span>Mapped</span></div><div><b id="readyCount">0</b><span>Role ready</span></div><div><b id="approvedCount">0</b><span>Published</span></div></div>
+      <div class="summary"><div><b>55</b><span>Season drops</span></div><div><b id="selectedCount">0</b><span>Selected</span></div><div><b id="mappedCount">0</b><span>Mapped</span></div><div><b id="readyCount">0</b><span>Role ready</span></div><div><b id="approvedCount">0</b><span>Approved</span></div></div>
       <div class="table-wrap"><table><thead><tr><th>Drop</th><th>Schedule</th><th>Mapped file</th><th>Status</th></tr></thead><tbody>
-      <?php foreach ($drops as $drop): ?><tr data-sequence="<?= (int)$drop['sequence'] ?>"><td><?= str_pad((string)$drop['sequence'], 2, '0', STR_PAD_LEFT) ?></td><td><div class="drop-title"><?= htmlspecialchars($drop['title']) ?></div><div class="drop-meta"><?= htmlspecialchars($drop['collection']) ?> · <?= htmlspecialchars($drop['release_date']) ?></div></td><td class="file-name" data-file>—</td><td><span class="asset-state<?= $drop['assets']['preview'] ? ' ready' : '' ?>" data-state><?= $drop['assets']['preview'] ? 'Ready' : 'Missing' ?></span><button class="approve-btn<?= $drop['status'] === 'approved' ? ' published' : '' ?>" type="button" data-approve><?= $drop['status'] === 'approved' ? 'Published' : 'Approve drop' ?></button></td></tr><?php endforeach; ?>
+      <?php foreach ($drops as $drop): ?><tr data-sequence="<?= (int)$drop['sequence'] ?>"><td><?= str_pad((string)$drop['sequence'], 2, '0', STR_PAD_LEFT) ?></td><td><div class="drop-title"><?= htmlspecialchars($drop['title']) ?></div><div class="drop-meta"><?= htmlspecialchars($drop['collection']) ?> · <?= htmlspecialchars($drop['release_date']) ?></div><?php if ($drop['quality_note'] !== ''): ?><div class="drop-meta" style="color:#e7c778">Review: <?= htmlspecialchars($drop['quality_note']) ?></div><?php endif; ?></td><td class="file-name" data-file>—</td><td><span class="asset-state<?= $drop['assets']['preview'] ? ' ready' : '' ?>" data-state><?= $drop['assets']['preview'] ? 'Ready' : 'Missing' ?></span><button class="approve-btn<?= $drop['status'] === 'approved' ? ' published' : '' ?>" type="button" data-approve><?= $drop['status'] === 'approved' ? htmlspecialchars($drop['stage']) : 'Approve drop' ?></button></td></tr><?php endforeach; ?>
       </tbody></table></div>
     </article>
   </section>
@@ -100,6 +109,7 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
 (() => {
   'use strict';
   const csrf = <?= json_encode($csrf) ?>;
+  const today = <?= json_encode((new DateTimeImmutable('today', new DateTimeZone('America/Vancouver')))->format('Y-m-d')) ?>;
   const drops = <?= json_encode($drops, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
   const roleLabels = {preview:'Preview',outline:'Outline stencil',stencil:'Stencil',transfer:'Transfer',pdf:'PDF',reference:'Reference',placement:'Placement',pack:'Packaging',lore:'Lore',style:'Style'};
   const $ = (id) => document.getElementById(id);
@@ -172,9 +182,9 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
       }
       const approve = rows.get(drop.sequence).querySelector('[data-approve]');
       const approved = runtimeStatus[drop.sequence] === 'approved';
-      approve.textContent = approved ? 'Published' : 'Approve drop';
+      approve.textContent = approved ? (drop.release_date <= today ? 'Live' : 'Scheduled') : 'Approve drop';
       approve.classList.toggle('published', approved);
-      approve.disabled = !approved && !(runtimeAssets[drop.sequence]?.preview && runtimeAssets[drop.sequence]?.stencil);
+      approve.disabled = !approved && !(runtimeAssets[drop.sequence]?.preview && (runtimeAssets[drop.sequence]?.stencil || runtimeAssets[drop.sequence]?.outline));
     });
     $('readyCount').textContent = String(count);
     $('approvedCount').textContent = String(Object.values(runtimeStatus).filter((value) => value === 'approved').length);

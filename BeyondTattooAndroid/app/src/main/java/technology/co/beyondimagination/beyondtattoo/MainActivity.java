@@ -3,6 +3,7 @@ package technology.co.beyondimagination.beyondtattoo;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.provider.MediaStore;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +20,9 @@ import android.webkit.ValueCallback;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import androidx.core.content.FileProvider;
+import java.io.File;
+import java.io.IOException;
 
 /** Native Android container for the responsive Beyond Tattoo 1.2 experience. */
 public final class MainActivity extends Activity {
@@ -27,6 +31,7 @@ public final class MainActivity extends Activity {
     private TextView title;
     private Button selectedButton;
     private ValueCallback<Uri[]> fileUploadCallback;
+    private Uri cameraUri;
     private static final int FILE_REQUEST = 4102;
 
     @Override @SuppressLint("SetJavaScriptEnabled")
@@ -48,7 +53,7 @@ public final class MainActivity extends Activity {
         title.setTypeface(null, 1);
         header.addView(title);
         TextView subtitle = new TextView(this);
-        subtitle.setText("Beyond Tattoo 1.2 · mobile studio");
+        subtitle.setText("Beyond Tattoo 1.2.1 · mobile studio");
         subtitle.setTextColor(Color.rgb(196, 174, 210));
         subtitle.setTextSize(12);
         header.addView(subtitle);
@@ -69,7 +74,18 @@ public final class MainActivity extends Activity {
                 Intent picker = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                 picker.addCategory(Intent.CATEGORY_OPENABLE);
                 picker.setType("image/*");
-                startActivityForResult(picker, FILE_REQUEST);
+                Intent chooser = Intent.createChooser(picker, "Choose a drawing or picture");
+                try {
+                    File capture = File.createTempFile("violet-trace-", ".jpg", getCacheDir());
+                    cameraUri = FileProvider.getUriForFile(MainActivity.this, getPackageName() + ".files", capture);
+                    Intent camera = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    camera.putExtra(MediaStore.EXTRA_OUTPUT, cameraUri);
+                    camera.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                    chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{camera});
+                } catch (IOException error) {
+                    cameraUri = null;
+                }
+                startActivityForResult(chooser, FILE_REQUEST);
                 return true;
             }
         });
@@ -87,7 +103,7 @@ public final class MainActivity extends Activity {
         navigation.setBackgroundColor(Color.rgb(23, 16, 30));
         addNav(navigation, getString(R.string.home), BASE, "Today");
         addNav(navigation, getString(R.string.library), BASE + "stencils.php", "Library");
-        addNav(navigation, getString(R.string.create), BASE + "stencil-editor.php", "Create");
+        addNav(navigation, getString(R.string.create), BASE + "tattoo-generator.php", "Create");
         addNav(navigation, getString(R.string.needle_bot), BASE + "needle-bot.php?embed=1", "Needle Bot");
         addNav(navigation, getString(R.string.profile), BASE + "profile.php", "Profile");
         root.addView(navigation);
@@ -98,10 +114,11 @@ public final class MainActivity extends Activity {
     @Override protected void onActivityResult(int requestCode, int resultCode, android.content.Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode != FILE_REQUEST || fileUploadCallback == null) return;
-        Uri[] result = resultCode == RESULT_OK && data != null && data.getData() != null
-                ? new Uri[]{data.getData()} : null;
+        Uri selected = resultCode == RESULT_OK ? (data != null && data.getData() != null ? data.getData() : cameraUri) : null;
+        Uri[] result = selected == null ? null : new Uri[]{selected};
         fileUploadCallback.onReceiveValue(result);
         fileUploadCallback = null;
+        cameraUri = null;
     }
 
     private void addNav(LinearLayout navigation, String label, String url, String pageTitle) {

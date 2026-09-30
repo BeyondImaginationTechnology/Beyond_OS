@@ -17,6 +17,7 @@ $stencilDay = bt_stencil_content();
 $downloadFile = $stencilDay['package_url'];
 $packImage = trim((string)($stencilDay['pack_image_url'] ?? '')) ?: $stencilDay['preview_url'];
 $libraryAssets = bt_asset_library();
+$seasonOneReleasedCount = count(array_filter($libraryAssets, static fn(array $asset): bool => $asset['season_drop'] !== null));
 $libraryCatalog = bt_library_collections();
 $homeCollectionSlugs = ['divine-realism', 'beyond-ancient', 'japanese-legends', 'dark-realism'];
 $libraryCounts = [];
@@ -59,6 +60,7 @@ if (!empty($stencilDay['iso_date'])) {
       <nav class="bt-desktop-nav" aria-label="Beyond Tattoo navigation">
         <a class="is-active" href="#top">Home</a>
         <a href="tattoo-generator.php">Idea generator</a>
+        <a href="stencil-camera.php">Violet Trace</a>
         <a href="stencils.php">Stencils</a>
         <a href="collections.php">Collections</a>
         <a href="tools.php">Tools</a>
@@ -76,6 +78,7 @@ if (!empty($stencilDay['iso_date'])) {
           <div>
             <a href="stencils.php">Stencils</a>
             <a href="tattoo-generator.php">Idea generator</a>
+            <a href="stencil-camera.php">Violet Trace</a>
             <a href="collections.php">Collections</a>
             <a href="store.php">Store</a>
             <a href="studios.php">Studios</a>
@@ -103,6 +106,7 @@ if (!empty($stencilDay['iso_date'])) {
           <span><i>✦</i> Six connected assets</span>
           <span><i>◇</i> Stylesheet-led prompts</span>
           <span><i>▣</i> Needle Bot guided</span>
+          <span><i>◆</i> Season 1 · <?= (int)$seasonOneReleasedCount ?>/55 live</span>
         </div>
       </div>
 
@@ -149,6 +153,7 @@ if (!empty($stencilDay['iso_date'])) {
       <div class="bt-main-actions" style="max-width:420px;margin-top:24px">
         <a class="bt-glow-button" href="tattoo-generator.php">Write a tattoo imagination prompt</a>
         <a class="bt-outline-button" href="needle-bot.php">Ask Needle Bot for a direction</a>
+        <a class="bt-outline-button" href="stencil-camera.php">Picture to stencil · Violet Trace</a>
       </div>
     </div>
   </section>

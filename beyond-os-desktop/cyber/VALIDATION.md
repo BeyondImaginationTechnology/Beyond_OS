@@ -1,6 +1,6 @@
 # BIT OS Cyber 0.1 validation — 2026-09-30
 
-Status: **Development candidate built and booted under QEMU/OVMF. Stable release gates remain open; Cyber 0.1 is not published.**
+Status: **Development preview packaged for publication. Stable release gates remain open.**
 
 ## Build
 
@@ -12,16 +12,16 @@ Status: **Development candidate built and booted under QEMU/OVMF. Stable release
 
 | Raw image | SHA-256 |
 | --- | --- |
-| `bit-os-cyber-0.1-installer.img` | `08beef578deea86e6aeec3623b5c9120017a10e818ae2010150b45cf97356a0d` |
-| `bitCyberos.iso` | `49083488f79b464499ef8dab737535e9069249b77a01ab77472ad24324e96d2d` |
-| `rootfs.ext2` | `1aa50f6619b06717a5a9fc0b99909f6206051102b944908e7c75d1c718f35fa9` |
+| `bit-os-cyber-0.1-installer.img` | `8a4b204f0454f4ef070865747cb023e6b0bda5dd1ff0ab73e7a67a49dede7aa3` |
+| `bitCyberos.iso` | `9a091201bfc54de40cfa2c3f7802ade6f78b32e706c7538655533aabe8b9ec27` |
+| `rootfs.ext2` | `e7f4ada3f4f7159ca180c9d75c5f9ee1a762946d8d9bbbcb5d4220f009de7764` |
 
 Candidate download archives are staged locally in `.local/cyber-v0.1/release-candidate/` (ignored by Git). `gzip -t` and `sha256sum -c` passed on the build host; local downloaded files also matched the compressed-file manifest:
 
 | Download archive | Size | SHA-256 |
 | --- | ---: | --- |
-| `bitCyberos.iso.gz` | 41,866,136 bytes | `70eb95e7aec5471b32f87d04e7aee2bd0c291a182e90bb361af952c3a83ee0e8` |
-| `bit-os-cyber-0.1-installer.img.gz` | 59,601,114 bytes | `8a95de1b3d55158c0d280a312ceadf2a3e1caaa9023f8bf4743fa0a84a2ba7ad` |
+| `bitCyberos.iso.gz` | 41,866,165 bytes | `51f3f3d8fc2ae5f728049c8b1e4840d61015ad6b0b2a77d73ca8dd5c167bf163` |
+| `bit-os-cyber-0.1-installer.img.gz` | 59,601,150 bytes | `e8a868005d0dbc9a1d8dcffbe637657cbb7fbfa2b456f3d836f2b30ce27168e6` |
 
 `SHA256SUMS` hashes the compressed downloads. `SHA256SUMS.raw` preserves the Buildroot raw-image hashes.
 
@@ -31,7 +31,7 @@ Candidate download archives are staged locally in `.local/cyber-v0.1/release-can
 - The GPT image's Try entry reached the live Cyber desktop. Its Install entry refused to erase its own `/dev/vda` installer disk with `Installer stopped: the installer USB disk cannot be erased`. The latter check used the final GPT image after the `lsblk -dn` fix.
 - The final ISO's Install entry completed the explicit whole-disk workflow on a fresh disposable 6 GiB qcow2 `/dev/vda`, including the exact `ERASE /dev/vda` confirmation.
 - After removing the ISO, OVMF loaded the installed disk's `BIT OS Cyber` NVRAM entry at `\EFI\BITOS\bootx64.efi`; GRUB loaded the system, and the Cyber desktop appeared. The serial log showed nftables rules loading and DHCP obtaining `10.0.2.15`. Evidence: `/tmp/cyber-v01-iso-final-installed-serial.log` on the VM and local screenshot `.local/cyber-v0.1/iso-final-installed.png`.
-- The installed disk still labels its boot menu entry **Try BIT OS Cyber Edition 0.1**. This wording should be changed before stable release.
+- A later installer build completed the selected-partition workflow to `/dev/vda3` with the EFI system partition on GPT partition 2. The pre-existing EFI marker and partition 1 label remained intact. Its new GRUB configuration and kernel were present on the EFI partition. The installed disk was not cold-booted without the ISO after this change.
 
 ## Fixes found during installation testing
 
@@ -42,9 +42,11 @@ Candidate download archives are staged locally in `.local/cyber-v0.1/release-can
 - Use the correct single-backslash EFI path for the NVRAM entry.
 - Limit disk-type detection to the selected block device with `lsblk -dn`, so a USB disk's child partitions cannot mask the self-erase guard.
 - Refresh the target's GRUB template in the post-build hook and include serial output for boot diagnostics.
+- Use a separate installed-system GRUB template that finds the selected EFI partition by filesystem UUID and stores the kernel under `EFI/BITOS`; this avoids assuming the EFI partition is GPT partition 1 or overwriting an ESP-root kernel file.
+- Read the EFI GPT type with `lsblk`; `blkid -s PART_ENTRY_TYPE` returned no value for a valid EFI partition in the selected-partition test.
 
 ## Remaining release gates
 
-The clean system build and standalone system-image cold boot, selected-partition install, remaining installer rejection cases, persistence after reboot, detailed firewall checks, physical-device checks, legal/source review, signed Windows installer, and public download checks are still open. See `RELEASE.md`. Secure Boot, full-disk encryption, and signed in-system updates are not implemented in this candidate.
+The clean system build was stopped at the user's request after successful installer-image validation. The standalone system-image cold boot, final selected-partition disk-only boot, remaining installer rejection cases, persistence after reboot, detailed firewall checks, physical-device checks, legal/source review, signed Windows installer, and public download checks remain open. See `RELEASE.md`. Secure Boot, full-disk encryption, and signed in-system updates are not implemented in this candidate.
 
 The VM also hosts active Home testing sessions. Do not stop it as part of Cyber cleanup. The Cyber QEMU session used for the final installed-disk check was stopped after the result was recorded.

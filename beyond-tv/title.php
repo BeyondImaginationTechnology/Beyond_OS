@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/../includes/ecosystem.php';
+require_once __DIR__ . '/includes/my-list.php';
 if (!empty($_SESSION['user_id'])) {
     beyond_track_app('Beyond TV');
 }
@@ -27,6 +28,8 @@ if (!$title) {
         'source_type' => 'none',
     ];
 }
+$signedIn = !empty($_SESSION['user_id']);
+$titleInMyList = $signedIn && !empty($title['slug']) ? beyond_tv_my_list_has((int)$_SESSION['user_id'], 'title', $slug) : false;
 
 $sourceType = (string) ($title['source_type'] ?? 'none');
 $archiveId = preg_replace('/[^A-Za-z0-9_.-]/', '', (string) ($title['archive_id'] ?? ''));
@@ -138,6 +141,7 @@ function beyond_tv_episode_code(array $episode): string
 <aside class="title-info">
 <span class="source-pill"><?= ($title['type'] ?? '') === 'movie' ? 'FREE MOVIE' : 'TV SHOW' ?></span>
 <h1><?= htmlspecialchars((string) $title['title']) ?></h1>
+<?php if ($signedIn && !empty($title['slug'])): ?><button class="btn btn-secondary" type="button" data-my-list data-list-type="title" data-list-slug="<?=htmlspecialchars($slug)?>" data-list-token="<?=htmlspecialchars(beyond_tv_my_list_token())?>" aria-pressed="<?=$titleInMyList?'true':'false'?>"><?=$titleInMyList?'✓ Added to My List':'＋ My List'?></button><?php elseif (!$signedIn && !empty($title['slug'])): ?><a class="btn btn-secondary" href="/beyond-id/auth/login.php?return=<?=urlencode($_SERVER['REQUEST_URI']??'/beyond-tv/browse.php')?>">Sign in to save</a><?php endif; ?>
 <p class="title-meta"><?= htmlspecialchars((string) ($title['year'] ?? '')) ?> · <?= htmlspecialchars((string) ($title['rating'] ?? 'NR')) ?><?php if (!empty($title['runtime'])): ?> · <?= htmlspecialchars((string) $title['runtime']) ?><?php endif; ?></p>
 <p><?= htmlspecialchars((string) ($title['description'] ?? '')) ?></p>
 <p><strong><?= htmlspecialchars((string) ($title['genre'] ?? '')) ?></strong></p>
@@ -145,6 +149,7 @@ function beyond_tv_episode_code(array $episode): string
 <p class="catalog-summary"><strong><?= count($episodeSeasons) ?> season<?= count($episodeSeasons) === 1 ? '' : 's' ?></strong> · <?= count($episodeLibrary) ?> episode<?= count($episodeLibrary) === 1 ? '' : 's' ?> listed<?php if ($playableEpisodeCount > 0): ?> · <?= $playableEpisodeCount ?> playable<?php endif; ?></p>
 <?php endif; ?>
 <?php if (!empty($title['source_label'])): ?><p class="source-note"><span class="source-pill"><?= htmlspecialchars(strtoupper((string) $title['source_label'])) ?></span></p><?php endif; ?>
+<p class="rights-note"><a href="/beyond-tv/source-safety.php?<?=htmlspecialchars(http_build_query(['page'=>'https://beyondimagination.co.technology'.($_SERVER['REQUEST_URI']??'/beyond-tv/browse.php'),'title'=>(string)$title['title'],'source'=>(string)($currentVideoUrl?:($title['candidate_url']??''))]))?>">Source details & report</a> · Testing · Rights unverified</p>
 <?php if ($youtubePlaylistId !== ''): ?><a class="btn btn-secondary" target="_blank" rel="noopener" href="https://www.youtube.com/playlist?list=<?= htmlspecialchars($youtubePlaylistId) ?>">Open official collection ↗</a><?php endif; ?>
 </aside>
 </section>
@@ -203,7 +208,7 @@ function beyond_tv_episode_code(array $episode): string
   } catch (error) {}
 })();
 </script>
-<script src="/beyond-tv/assets/js/app.js?v=3.0.4"></script>
+<script src="/beyond-tv/assets/js/app.js?v=1.1.1"></script>
 <script src="/assets/js/visitor-analytics.js" defer></script>
 </body>
 </html>

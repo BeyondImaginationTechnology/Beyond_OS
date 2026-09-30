@@ -300,5 +300,35 @@
         "channel_slug": "yugioh-tv"
       }
     ]
+  },
+  {
+    "title": "Karen Eliot favorites — September 29 playable additions",
+    "archive_id": "kareneliot-bookmarks-20260929",
+    "url": "https://archive.org/bookmarks/kareneliot",
+    "source_bookmark": "kareneliot",
+    "status": "approved_and_imported",
+    "approved_by": "owner",
+    "reviewed_at": "2026-09-29",
+    "verification": "Each selected MP4 returned HTTP 200 and a video content type. Series maps pin one file per episode and omit duplicate Archive derivatives.",
+    "imported_titles": [
+      "Tooth Fairy",
+      "Hell's Kitchen · Season 1",
+      "Hell's Kitchen · Season 3",
+      "Summer Wars",
+      "Are You Afraid of the Dark? · Season 1"
+    ],
+    "verified_mp4_counts": {
+      "tooth-fairy-2010": 1,
+      "hells-kitchen-season-1": 10,
+      "hells-kitchen-season-3": 11,
+      "summer-wars-2009": 1,
+      "are-you-afraid-of-the-dark-season-1": 13
+    },
+    "notes": [
+      "Tooth Fairy's Archive file reports a 147-minute duration; this check confirms the MP4 resolves but does not establish the feature cut or rights.",
+      "Are You Afraid of the Dark? has a new playable Season 1 item after its earlier source-free catalog row was removed.",
+      "Peanuts (Specials) remains on hold while the Archive item is being modified.",
+      "Media availability does not establish distribution or ad monetization rights; confirm rights before a distributed app release."
+    ]
   }
 ]

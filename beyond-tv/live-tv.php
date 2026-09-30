@@ -57,7 +57,7 @@ $currentHour = (int)(new DateTimeImmutable('now', $timezone))->format('G');
   </div>
 </main>
 <?php include 'partials/footer.php'; ?>
-<script src="/beyond-tv/assets/js/app.js?v=3.0.4"></script>
+<script src="/beyond-tv/assets/js/app.js?v=1.1.1"></script>
 <script src="/assets/js/visitor-analytics.js" defer></script>
 </body>
 </html>

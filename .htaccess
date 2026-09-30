@@ -63,6 +63,12 @@ DirectoryIndex index.php index.html
   RewriteEngine On
   RewriteBase /
 
+  # Keep the Breathe subdomain on the complete Daily Breath app. Its document
+  # root is this shared www directory so existing /dailybreath assets and APIs
+  # resolve on the same host.
+  RewriteCond %{HTTP_HOST} ^breathe\.beyondimagination\.co\.technology$ [NC]
+  RewriteRule ^(?:index\.php)?$ /dailybreath/ [R=302,L]
+
   # Pass the download mirror noindex marker through any internal rewrite.
   RewriteRule ^downloads(?:/|$) - [E=beyond_noindex:1]
 

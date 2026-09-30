@@ -226,7 +226,7 @@ function beyond_shell_markup(string $appName, array $wallet): string {
     $app = e($appName);
     $home = e(beyond_url());
     // Version the navbar asset so browsers receive logo updates immediately.
-    $homeIcon = '<span class="bos-logo-mark" aria-hidden="true"><img src="' . e(beyond_url('assets/images/bos-logo-mark.svg?v=20260828-1')) . '" alt=""></span>';
+    $homeIcon = '<span class="bos-logo-mark" aria-hidden="true"><img src="' . e(beyond_url('assets/images/bos-logo-mark.svg?v=20260930-1')) . '" alt=""></span>';
     $currentIconPath = beyond_app_icon($appName);
     $currentIcon = $currentIconPath ? '<img class="bos-current-icon" src="' . e($currentIconPath) . '" alt="">' : '';
     $appIdentity = strcasecmp(trim($appName), 'Beyond OS') === 0

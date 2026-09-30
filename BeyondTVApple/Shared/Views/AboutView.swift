@@ -30,6 +30,7 @@ struct AboutView: View {
                     Label("Sunset, dark, and light themes", systemImage: "sunset.fill")
                     Label("Live channel guide and Browse library", systemImage: "square.grid.2x2.fill")
                     Label("Native AVPlayer with web playback fallback on iPhone and iPad", systemImage: "play.tv.fill")
+                    Label("Source Safety: source verification, evidence, and abuse review", systemImage: "checkmark.shield")
                 }
                 .listRowBackground(Color.white.opacity(0.08))
 
@@ -42,6 +43,7 @@ struct AboutView: View {
                 .listRowBackground(Color.white.opacity(0.08))
 
                 Section("Legal") {
+                    Link("Report a source", destination: URL(string: "https://beyondimagination.co.technology/beyond-tv/source-safety.php")!)
                     Link("Privacy Policy", destination: URL(string: "https://beyondimagination.co.technology/legal/privacy.php")!)
                     Link("Terms of Use", destination: URL(string: "https://beyondimagination.co.technology/legal/terms.php")!)
                 }

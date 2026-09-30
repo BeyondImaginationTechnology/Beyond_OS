@@ -15,7 +15,7 @@ $wallet = bos_page_start('Beyond OS', 'Privacy Policy', 'Privacy practices for B
 
     <section class="bos-section">
         <h2>Information we collect</h2>
-        <p>We collect information you provide, such as name, email address, profile details, preferences, support messages, marketplace listings, submissions, comments, uploaded files, and other content you choose to add. We also collect information needed to create and protect your account, including hashed credentials, verification status, security events, app connections, session records, and login activity.</p>
+        <p>We collect information you provide, such as name, email address, profile details, preferences, support messages, source safety reports (including submitted links and observations), marketplace listings, submissions, comments, uploaded files, and other content you choose to add. We also collect information needed to create and protect your account, including hashed credentials, verification status, security events, app connections, session records, and login activity.</p>
 
         <h2>App, wallet, marketplace, and subscription data</h2>
         <p>When you use connected apps, we may process progress, lessons, watch activity, wellness entries, creative projects, purchases, rewards, bit$ activity, transaction records, subscription status, task submissions, payout status, creator or seller activity, and related operational data. Sensitive journal, wellness, identity, and payment-related information should be access-controlled and used only for the service feature that needs it.</p>

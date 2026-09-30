@@ -142,7 +142,7 @@ html[data-db-theme=dusk] .top,html[data-db-theme=dusk] .hero,html[data-db-theme=
 @media(prefers-reduced-motion:reduce){.breath-sphere,.breath-sphere:before,.breath-sphere:after{transition:none}}
 </style>
 <style>
-.breath-stage{min-height:254px;margin:20px 0;border:1px solid #2d694b2e;border-radius:32px;background:linear-gradient(145deg,#ffffffa8,#eef6f09a);box-shadow:0 12px 24px #173f2c24;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+.breath-stage{min-height:254px;margin:20px 0;border:0;border-radius:0;background:transparent;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
 .breath-rings{display:none}.breath-orb{--top-fill:.86;--bottom-fill:.14;width:100%;height:254px;background:none!important;box-shadow:none!important;transform:none!important;color:#173f2c}
 .breath-hourglass{position:relative;width:116px;height:148px;margin:0 0 2px;filter:drop-shadow(0 8px 8px #173f2c47);transition:transform .48s cubic-bezier(.22,1,.36,1)}
 .breath-orb.active-inhale .breath-hourglass,.breath-orb.active-hold .breath-hourglass,.breath-orb.active-exhale .breath-hourglass{transform:scale(1.025)}

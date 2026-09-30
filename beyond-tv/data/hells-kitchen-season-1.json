@@ -1,0 +1,72 @@
+[
+  {
+    "season": 1,
+    "episode": 1,
+    "title": "Episode 1",
+    "archive_file": "Hell's Kitchen S01E01.mp4",
+    "runtime": "39 min"
+  },
+  {
+    "season": 1,
+    "episode": 2,
+    "title": "Episode 2",
+    "archive_file": "Hell's Kitchen S01E02.mp4",
+    "runtime": "38 min"
+  },
+  {
+    "season": 1,
+    "episode": 3,
+    "title": "Episode 3",
+    "archive_file": "Hell's Kitchen S01E03.mp4",
+    "runtime": "38 min"
+  },
+  {
+    "season": 1,
+    "episode": 4,
+    "title": "Episode 4",
+    "archive_file": "Hell's Kitchen S01E04.mp4",
+    "runtime": "38 min"
+  },
+  {
+    "season": 1,
+    "episode": 5,
+    "title": "Episode 5",
+    "archive_file": "Hell's Kitchen S01E05.mp4",
+    "runtime": "39 min"
+  },
+  {
+    "season": 1,
+    "episode": 6,
+    "title": "Episode 6",
+    "archive_file": "Hell's Kitchen S01E06.mp4",
+    "runtime": "40 min"
+  },
+  {
+    "season": 1,
+    "episode": 7,
+    "title": "Episode 7",
+    "archive_file": "Hell's Kitchen S01E07.mp4",
+    "runtime": "40 min"
+  },
+  {
+    "season": 1,
+    "episode": 8,
+    "title": "Episode 8",
+    "archive_file": "Hell's Kitchen S01E08.mp4",
+    "runtime": "40 min"
+  },
+  {
+    "season": 1,
+    "episode": 9,
+    "title": "Episode 9",
+    "archive_file": "Hell's Kitchen S01E09.mp4",
+    "runtime": "40 min"
+  },
+  {
+    "season": 1,
+    "episode": 10,
+    "title": "Episode 10",
+    "archive_file": "Hell's Kitchen S01E10.mp4",
+    "runtime": "80 min"
+  }
+]

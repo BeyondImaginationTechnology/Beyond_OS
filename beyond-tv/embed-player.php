@@ -16,7 +16,7 @@ $streamEndpoint = $streamEndpoints[$slug] ?? ('api/channel-stream.php?slug=' . r
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="dark">
   <title>Beyond TV Live Player</title>
-  <link rel="stylesheet" href="/beyond-tv/assets/css/video-ads.css?v=1.0.0">
+  <link rel="stylesheet" href="/beyond-tv/assets/css/video-ads.css?v=1.2.0">
   <style>
     *{box-sizing:border-box}html,body{height:100%;margin:0;background:#050715;color:#fff;font-family:Inter,system-ui,sans-serif}body{overflow:hidden}.player,video{width:100%;height:100%}.player{position:relative;background:radial-gradient(circle at 50% 15%,#37205d,#070916 62%)}video{display:block;object-fit:contain;background:#050715}.status{position:absolute;left:18px;right:18px;bottom:18px;display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid rgba(255,255,255,.16);border-radius:12px;background:rgba(5,7,21,.78);backdrop-filter:blur(14px);font-size:13px;transition:opacity .35s ease,transform .35s ease}.status.is-hiding{opacity:0;transform:translateY(8px);pointer-events:none}.status[hidden]{display:none}.status i{flex:0 0 auto;width:9px;height:9px;border-radius:50%;background:#b8e600;box-shadow:0 0 12px #b8e600}.status b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.countdown{display:inline-grid;flex:0 0 auto;place-items:center;min-width:25px;height:25px;margin-left:auto;padding:0 7px;border:1px solid rgba(184,230,0,.35);border-radius:999px;background:rgba(184,230,0,.12);color:#d9ff45;font-size:11px;font-weight:900;font-variant-numeric:tabular-nums}.error{color:#ffd1da}.error .countdown{display:none}.unmute{position:absolute;right:18px;top:18px;border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(5,7,21,.82);color:#fff;padding:10px 14px;font-weight:800;cursor:pointer}
   </style>
@@ -25,9 +25,9 @@ $streamEndpoint = $streamEndpoints[$slug] ?? ('api/channel-stream.php?slug=' . r
 <main class="player">
   <video id="video" controls playsinline autoplay muted preload="metadata"></video>
   <button class="unmute" id="unmute" type="button">🔊 Tap for sound</button>
-  <div class="status" id="status" role="status" aria-live="polite"><i></i><b>Tuning Beyond TV…</b><span class="countdown" id="status-countdown" hidden aria-label="Overlay countdown"></span></div>
+    <div class="status" id="status" role="status" aria-live="polite"><i></i><b>Tuning Beyond TV…</b><span class="countdown" id="status-countdown" hidden aria-label="Overlay countdown"></span></div>
 </main>
-<script src="/beyond-tv/assets/js/video-ads.js?v=1.0.0"></script>
+<script src="/beyond-tv/assets/js/video-ads.js?v=1.2.0"></script>
 <script>
 (()=>{'use strict';
 const endpoint=<?=json_encode($streamEndpoint, JSON_UNESCAPED_SLASHES)?>;

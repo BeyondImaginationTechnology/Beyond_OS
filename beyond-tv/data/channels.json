@@ -35,7 +35,7 @@
     "release_status": "released",
     "source_type": "scheduled_youtube",
     "schedule_endpoint": "/beyond-tv/api/beyond-cartoons-live.php",
-    "source_label": "Approved YouTube embeds; playback remains hosted by YouTube",
+    "source_label": "YouTube embeds · Rights review pending",
     "number": 2,
     "featured": true
   },
@@ -338,7 +338,7 @@
     "icon": "🌴",
     "now": "Haitian Méringue and Island Culture",
     "up_next": "Caribbean language and heritage",
-    "description": "Haitian and Caribbean dance, language and cultural shorts from verified open-media sources.",
+    "description": "Haitian and Caribbean dance, language and cultural shorts from open-media sources under rights review.",
     "gradient": "linear-gradient(135deg,#052f34,#0c8b83 52%,#f2bb3a)",
     "progress": 58,
     "stream_endpoint": "/beyond-tv/api/channel-stream.php?slug=ayiti-caribbean",
@@ -544,7 +544,7 @@
     "stream_endpoint": "/beyond-tv/api/channel-stream.php?slug=beyond-after-dark",
     "thumbnail": "https://archive.org/services/img/rl-stines-the-haunting-hour-full-series",
     "rating": "TV-PG",
-    "source_label": "Internet Archive · Owner-verified Haunting Hour library"
+    "source_label": "Internet Archive · Testing · Rights unverified"
   },
   {
     "slug": "beyond-family",

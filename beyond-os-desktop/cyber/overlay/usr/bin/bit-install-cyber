@@ -60,8 +60,10 @@ case "$mode" in
     [ -b "$target_esp" ] || fail "EFI System Partition is not a block device"
     [ "$(partition_type "$target_esp")" = part ] || fail "EFI System Partition must be a partition"
     [ "$(partition_disk "$target_esp")" = "$target_disk" ] || fail "EFI System Partition is not on the target disk"
-    esp_type=$(blkid -s PART_ENTRY_TYPE -o value "$target_esp" || true)
+    esp_type=$(lsblk -dn -o PARTTYPE "$target_esp" | tr '[:upper:]' '[:lower:]')
     [ "$esp_type" = "$efi_guid" ] || fail "chosen partition is not an EFI System Partition"
+    esp_fs=$(blkid -s TYPE -o value "$target_esp" || true)
+    [ "$esp_fs" = vfat ] || fail "EFI System Partition must contain a FAT filesystem"
     unmounted "$target_esp" || fail "EFI System Partition is mounted"
 
     notice "\nThe next step replaces only $target_root and adds a BIT OS Cyber UEFI entry."
@@ -132,7 +134,7 @@ if [ "$target_esp_new" = true ]; then
 fi
 mount "$target_esp" /mnt/bit-target-esp
 install -d /mnt/bit-target-esp/EFI/BITOS
-cp /boot/bzImage /mnt/bit-target-esp/bzImage
+cp /boot/bzImage /mnt/bit-target-esp/EFI/BITOS/bzImage
 if [ "$source_kind" = usb ]; then
   source_esp=$(lsblk -nrpo NAME,PARTTYPE "$source_disk" | awk -v type="$efi_guid" 'tolower($2) == type { print $1; exit }')
   [ -n "$source_esp" ] && [ -b "$source_esp" ] || fail "could not locate the installer EFI partition"
@@ -143,7 +145,10 @@ if [ "$source_kind" = usb ]; then
 else
   mcopy -o -i /boot/fat.efi ::EFI/BOOT/bootx64.efi /mnt/bit-target-esp/EFI/BITOS/bootx64.efi
 fi
-sed "s/%PARTUUID%/$target_uuid/g" /usr/share/beyond-cyber/grub.cfg.in > /mnt/bit-target-esp/EFI/BITOS/grub.cfg
+esp_uuid=$(blkid -s UUID -o value "$target_esp" || true)
+[ -n "$esp_uuid" ] || fail "could not read EFI filesystem UUID"
+sed -e "s/%PARTUUID%/$target_uuid/g" -e "s/%ESP_UUID%/$esp_uuid/g" \
+  /usr/share/beyond-cyber/grub-installed.cfg.in > /mnt/bit-target-esp/EFI/BITOS/grub.cfg
 if [ "$target_esp_new" = true ]; then
   # A fresh disk can use the standard UEFI fallback path even when the
   # firmware cannot save a boot entry. Leave existing ESP fallbacks alone.

@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "reviewed_at": "2026-09-30",
+  "purpose": "Incremental evidence tracking. This file does not authorize or change playback.",
+  "statuses": {
+    "rights_unverified": "A source is available, but permission for Beyond TV playback has not been established.",
+    "license_documented_review_pending": "A source page records a license; provenance, embedded rights, terms and attribution still require review.",
+    "public_domain_claim_review_pending": "A source page claims public-domain status; edition and territory review remain.",
+    "verified_for_beyond_tv": "Documented permission or public-domain analysis covers the exact media, territories, platforms and planned use."
+  },
+  "reviews": [
+    {
+      "id": "beyond-after-dark:internet-archive",
+      "channel": "beyond-after-dark",
+      "status": "rights_unverified",
+      "source": "https://archive.org/details/rl-stines-the-haunting-hour-full-series",
+      "finding": "Archive availability and internal curation do not establish public streaming rights. The channel also rotates other archive and YouTube sources that need item-level review.",
+      "next_step": "Obtain the applicable streaming grant or replace each scheduled item with documented permitted media.",
+      "priority": "high"
+    },
+    {
+      "id": "beyond-cartoons:youtube-rotation",
+      "channel": "beyond-cartoons",
+      "status": "rights_unverified",
+      "source": "/beyond-tv/api/beyond-cartoons-live.php",
+      "finding": "An embeddable YouTube video is not by itself evidence of permission for Beyond TV's curated channel use.",
+      "next_step": "Review each scheduled video's uploader, embed terms and rights evidence; retain only sources that pass.",
+      "priority": "high"
+    },
+    {
+      "id": "kreyol-lakay:wikitongues-castelline",
+      "channel": "kreyol-lakay",
+      "status": "license_documented_review_pending",
+      "source": "https://commons.wikimedia.org/wiki/File:WIKITONGUES-_Castelline_speaking_Haitian_Creole.webm",
+      "recorded_license": "CC BY-SA 4.0",
+      "recorded_creator": "Wikitongues and Casteline Titus",
+      "evidence": "Commons records the license and a 2019 check of the original YouTube video's license setting.",
+      "next_step": "Check embedded rights and add visible creator, license, source and modification credits for the playing item.",
+      "priority": "first_clearance_candidate"
+    },
+    {
+      "id": "ayiti-caribbean:merengue-haitian-havana",
+      "channel": "ayiti-caribbean",
+      "status": "license_documented_review_pending",
+      "source": "https://commons.wikimedia.org/wiki/File:Merengue_Haitian,_Havana,_2012.webm",
+      "recorded_license": "CC BY 3.0",
+      "recorded_creator": "Nastya Yagushchenko",
+      "evidence": "Commons records the license and a human review of the original YouTube license setting in 2017.",
+      "next_step": "Check music and performance rights, then add visible creator, license, source and modification credits.",
+      "priority": "first_clearance_candidate"
+    },
+    {
+      "id": "cinema-francais-classique:cinderella-1899",
+      "channel": "cinema-francais-classique",
+      "status": "public_domain_claim_review_pending",
+      "source": "https://commons.wikimedia.org/wiki/File:Cinderella_(1899_film).webm",
+      "recorded_creator": "Georges Méliès",
+      "evidence": "Commons identifies the 1899 film as public domain in its country of origin and countries with life-plus-70-year terms.",
+      "next_step": "Check this file's edition, soundtrack and target territories before marking it verified for Beyond TV.",
+      "priority": "first_clearance_candidate"
+    }
+  ]
+}

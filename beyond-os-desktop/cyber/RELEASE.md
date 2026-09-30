@@ -21,10 +21,10 @@ record; do not overwrite it until it has been retained separately.
 - [ ] Cold-boot the system image to the Cyber desktop as the non-root user.
 - [x] Boot `bitCyberos.iso` with OVMF UEFI and verify both Try Cyber and Install Cyber entries.
 - [x] Boot the GUID Partition Table (GPT) USB image with OVMF UEFI and verify both menu entries.
-- [ ] Install to a disposable virtual disk using the selected-partition workflow.
+- [x] Install to a disposable virtual disk using the selected-partition workflow; the existing EFI marker and another partition were preserved.
 - [x] Install to a disposable virtual disk using the explicit whole-disk workflow.
 - [ ] Confirm that the installer rejects its own USB, mounted targets, undersized targets, invalid EFI partitions, and mismatched confirmation text.
-- [x] Reboot the installed disk without installer media and reach the Cyber desktop.
+- [ ] Reboot the final selected-partition candidate without installer media and reach the Cyber desktop. An earlier whole-disk candidate passed this check.
 
 ## Product and security behavior
 

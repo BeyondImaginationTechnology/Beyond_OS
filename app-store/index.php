@@ -78,10 +78,10 @@ $wallet = beyond_nav_bootstrap('Beyond App Store');
   <section class="bos-section" id="explore">
     <span class="bos-kicker">Explore</span><h2>Entertainment & creation</h2><p>Watch, listen, create and play across Beyond.</p>
     <div class="bos-grid">
-      <?=bos_app_card('Beyond TV','Live channels and an on-demand catalogue.','beyond-tv/','TV','Live demo','assets/icons/app-store/beyond-tv.jpg')?>
+      <?=bos_app_card('Beyond TV','Source safety reports for video links, plus live channels and an on-demand catalogue.','beyond-tv/','TV','Explore app','assets/icons/app-store/beyond-tv.jpg')?>
       <?=bos_app_card('Beyond AI','Jaguar AI for explaining ideas, shaping plans, and building across the Beyond ecosystem.','https://ai.beyondimagination.co.technology/','AI','Open Jaguar','@blank')?>
       <?=bos_app_card('BIT OS','The planned Beyond operating environment for connected home, learning, creating, and organizational work.','https://os.beyondimagination.co.technology/','OS','Explore OS','@blank')?>
-      <?=bos_app_card('Beyond Webs','BIT OS VPS sessions for signed-in users, metered by the hour and ready for multiple provider plugs.','https://host.beyondimagination.co.technology/','VPS','Open VPS','@blank')?>
+      <?=bos_app_card('Beyond Webs','Hourly VPS sessions on machines with BIT OS installed. Choose your flavour and session size.','https://hosting.beyondimagination.co.technology/','VPS','Open VPS','@blank')?>
       <?=bos_locked_app_card('Beyond Audio','Listen across the Beyond universe.','BA','@blank')?>
       <?=bos_app_card('Beyond Media','Watch Beyond TV, preview private media and find licensed downloads.','beyond-media/','MEDIA','Open media hub','@blank')?>
       <?=bos_app_card('Canvas in Beyond Market','Customize mugs, posters, stickers, apparel and visual products.','beyond-market/#canvas-studio','CAN','Shop & create','@blank')?>

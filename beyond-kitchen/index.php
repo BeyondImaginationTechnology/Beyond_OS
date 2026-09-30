@@ -23,7 +23,7 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
   <title>Beyond Kitchen | A little inspiration for today</title>
   <link rel="manifest" href="<?= e(beyond_url('beyond-kitchen/manifest.webmanifest')) ?>">
   <link rel="icon" href="<?= e(beyond_url('beyond-kitchen/assets/kitchen-mark.svg')) ?>" type="image/svg+xml">
-  <link rel="stylesheet" href="<?= e(beyond_url('beyond-kitchen/assets/css/app.css?v=0.0.5')) ?>">
+  <link rel="stylesheet" href="<?= e(beyond_url('beyond-kitchen/assets/css/app.css?v=0.0.6')) ?>">
 </head>
 <body>
   <div class="app-shell">
@@ -33,6 +33,7 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
         <span>Beyond <strong>Kitchen</strong></span>
       </a>
       <nav class="top-actions" aria-label="Main navigation">
+        <a href="#dinner">Dinner ideas</a>
         <a href="#recipes">Recipes</a>
         <button class="favorite-nav" id="favoritesToggle" type="button" aria-pressed="false">
           <span aria-hidden="true">♡</span> <span>Saved</span> <span class="saved-count" id="savedCount">0</span>
@@ -53,6 +54,28 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
           <span>MADE FOR<br>YOUR EVERYDAY</span>
           <span class="stamp-small">GOOD THINGS ARE COOKING</span>
         </div>
+      </section>
+
+      <section class="dinner-section" id="dinner" aria-labelledby="dinnerHeading">
+        <div class="dinner-intro">
+          <p class="eyebrow">Dinner guide · beta 0.0.1</p>
+          <h2 id="dinnerHeading">What's for dinner?</h2>
+          <p>Tell us your mood, time, budget, or what's in the fridge. Get one idea to cook, one to pick up, and one to have delivered.</p>
+        </div>
+        <form id="dinnerForm" class="dinner-form">
+          <label for="dinnerPrompt">What sounds good tonight?</label>
+          <textarea id="dinnerPrompt" rows="3" maxlength="400" placeholder="I'm tired, want something spicy, and have about $25…"></textarea>
+          <div class="dinner-hints" aria-label="Quick dinner preferences">
+            <button type="button" data-dinner-hint="under 20 minutes">20 min</button>
+            <button type="button" data-dinner-hint="under $25">Under $25</button>
+            <button type="button" data-dinner-hint="low energy">Low energy</button>
+            <button type="button" data-dinner-hint="spicy">Spicy</button>
+            <button type="button" data-dinner-hint="vegetarian">Vegetarian</button>
+          </div>
+          <button class="primary-button" id="dinnerSubmit" type="submit">Find dinner ideas <span aria-hidden="true">→</span></button>
+          <p class="dinner-fineprint">Pickup and delivery are dish ideas. Check nearby menus, prices, and availability before ordering.</p>
+        </form>
+        <div class="dinner-results" id="dinnerResults" aria-live="polite" hidden></div>
       </section>
 
       <section class="daily-section" aria-labelledby="dailyHeading">
@@ -132,7 +155,7 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
   <p class="sr-status" id="statusMessage" role="status" aria-live="polite"></p>
 
   <script src="<?= e(beyond_url('beyond-kitchen/assets/js/recipe-library.js?v=0.0.2')) ?>" defer></script>
-  <script src="<?= e(beyond_url('beyond-kitchen/assets/js/app.js?v=0.0.5')) ?>" defer></script>
+  <script src="<?= e(beyond_url('beyond-kitchen/assets/js/app.js?v=0.0.6')) ?>" defer></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('<?= e(beyond_url('beyond-kitchen/service-worker.js')) ?>'));

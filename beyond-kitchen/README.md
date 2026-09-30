@@ -18,6 +18,22 @@ falls back to readable recipe slides while offline or before the daily render.
 The native clients bundle the recipe catalog and photos, so their carousels
 work without network access.
 
+## What's for dinner? · beta 0.0.1
+
+The dinner guide accepts a short free-text prompt, with optional time, budget,
+energy, spice, and vegetarian shortcuts. A server-side OpenAI request returns
+three cards: one recipe from the shared catalog, one pickup dish idea, and one
+delivery dish idea. Pickup and delivery links open a nearby web search. The
+guide does not claim live menus, prices, restaurant availability, or order
+placement. When the AI service is unavailable, each client offers a recipe.
+
+Set `OPENAI_API_KEY` on the PHP host (or `ai.openai.api_key` in the protected
+live configuration). The optional `BEYOND_AI_QUICK_MODEL` setting overrides the
+default `gpt-4o-mini`. The public endpoint at `api/dinner.php` uses a per-IP
+daily request cap and a site-wide daily cap; prompt text is not saved. Native
+clients call the hosted endpoint over HTTPS, so deploy it before using their
+AI dinner guide.
+
 ## Daily Instagram carousel draft
 
 The CLI renderer needs PHP GD with JPEG and FreeType support and a readable

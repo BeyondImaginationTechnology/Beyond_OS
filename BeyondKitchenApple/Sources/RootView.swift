@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-private enum KitchenStyle {
+enum KitchenStyle {
     static let paper = Color(red: 0.965, green: 0.961, blue: 0.937)
     static let ink = Color(red: 0.157, green: 0.192, blue: 0.145)
     static let green = Color(red: 0.251, green: 0.357, blue: 0.259)
@@ -81,6 +81,7 @@ private struct RecipeLibraryView: View {
                         heading("Good food,\nmade simple.", subtitle: "A fresh recipe and a little inspiration for today.")
                         if let featured {
                             FeaturedRecipeCard(recipe: featured) { selected = featured }
+                            DinnerPlannerView(recipes: recipes, fallbackRecipe: featured) { selected = $0 }
                             DailyCarouselView(recipe: featured) { selected = featured }
                         }
                     }

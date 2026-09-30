@@ -11,6 +11,8 @@
   const details = $('#recipeDetails');
   const status = $('#statusMessage');
   const search = $('#recipeSearch');
+  const dinnerPrompt = $('#dinnerPrompt');
+  const dinnerResults = $('#dinnerResults');
   const carouselTrack = $('#carouselTrack');
   let carouselSlides = [];
   let carouselDots = [];
@@ -148,6 +150,60 @@
       // The recipe cards remain usable before the first cron render or while offline.
     }
   }
+
+  function renderDinnerIdeas(data) {
+    const recipe = state.recipes.find((item) => item.id === data.cook.recipeId);
+    const pickupUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${data.pickup.dish} pickup near me`)}`;
+    const deliveryUrl = `https://www.google.com/search?q=${encodeURIComponent(`${data.delivery.dish} delivery near me`)}`;
+    dinnerResults.innerHTML = `
+      <article class="dinner-result-card"><span class="eyebrow">Cook</span><h3>${escapeHtml(data.cook.name)}</h3><p>${escapeHtml(data.cook.why)}${recipe ? ` · ${recipe.timeMinutes} min` : ''}</p>${recipe
+        ? `<button class="dinner-result-action" type="button" data-open="${escapeHtml(recipe.id)}">Open recipe →</button>`
+        : '<a class="dinner-result-action" href="#recipes">Browse recipes →</a>'}</article>
+      <article class="dinner-result-card"><span class="eyebrow">Pick up</span><h3>${escapeHtml(data.pickup.dish)}</h3><p>${escapeHtml(data.pickup.why)}</p><a class="dinner-result-action" href="${escapeHtml(pickupUrl)}" target="_blank" rel="noopener noreferrer">Search nearby pickup →</a></article>
+      <article class="dinner-result-card"><span class="eyebrow">Deliver</span><h3>${escapeHtml(data.delivery.dish)}</h3><p>${escapeHtml(data.delivery.why)}</p><a class="dinner-result-action" href="${escapeHtml(deliveryUrl)}" target="_blank" rel="noopener noreferrer">Search delivery →</a></article>`;
+    dinnerResults.hidden = false;
+    announce('Three dinner ideas are ready.');
+  }
+
+  function renderDinnerUnavailable(message) {
+    const recipe = state.recipes.length ? dailyRecipe() : null;
+    dinnerResults.innerHTML = `<p class="dinner-message">${escapeHtml(message)}</p>${recipe
+      ? `<article class="dinner-result-card"><span class="eyebrow">A recipe for now</span><h3>${escapeHtml(recipe.name)}</h3><p>${escapeHtml(recipe.description)}</p><button class="dinner-result-action" type="button" data-open="${escapeHtml(recipe.id)}">Open recipe →</button></article>`
+      : ''}`;
+    dinnerResults.hidden = false;
+    announce(message);
+  }
+
+  $$('.dinner-hints [data-dinner-hint]').forEach((chip) => chip.addEventListener('click', () => {
+    const hint = chip.dataset.dinnerHint;
+    const separator = dinnerPrompt.value.trim() ? ', ' : '';
+    dinnerPrompt.value = (dinnerPrompt.value.trim() + separator + hint).slice(0, 400);
+    dinnerPrompt.focus();
+  }));
+  $('#dinnerForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const submit = $('#dinnerSubmit');
+    const prompt = dinnerPrompt.value.trim() || 'Surprise me with a good dinner tonight.';
+    submit.disabled = true;
+    submit.textContent = 'Finding ideas…';
+    dinnerResults.hidden = false;
+    dinnerResults.innerHTML = '<p class="dinner-message">Putting a few dinner ideas together…</p>';
+    try {
+      const response = await fetch('./api/dinner.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
+      });
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || 'AI dinner ideas are unavailable right now.');
+      renderDinnerIdeas(data);
+    } catch (error) {
+      renderDinnerUnavailable(error.message || 'AI dinner ideas are unavailable right now.');
+    } finally {
+      submit.disabled = false;
+      submit.innerHTML = 'Find dinner ideas <span aria-hidden="true">→</span>';
+    }
+  });
 
   function recipeMeta(recipe, servings = recipe.servings) {
     return `<div class="recipe-meta">

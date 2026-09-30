@@ -256,7 +256,7 @@ if ($slug === 'classic-cinema') {
         'title' => (string)$movie['title'],
         'duration' => (int)$movie['duration'],
         'creator' => '',
-        'license' => 'Public-domain source edition',
+        'license' => 'Testing · Rights unverified',
         'rights_url' => (string)$movie['rights_url'],
     ], $movieState['movies']);
     $config['embed'] = (string)$movieState['player_url'];
@@ -287,12 +287,24 @@ foreach ((array)($config['episode_maps'] ?? []) as $episodeMap) {
         'title' => $seriesTitle . ' · S' . (int)($episode['season'] ?? 1) . ' E' . (int)($episode['episode'] ?? 0) . ' · ' . (string)($episode['title'] ?? 'Episode'),
         'duration' => max(60, (int)($episode['runtime_seconds'] ?? 1380)),
         'creator' => $seriesCreator,
-        'license' => 'Owner-verified archive source',
+        'license' => 'Testing',
         'rights_url' => $seriesRightsUrl,
     ], array_values($preferred));
     $config['items'] = array_merge((array)($config['items'] ?? []), $mappedItems);
 }
 if ($slug === 'beyond-after-dark') {
+    $catalog = json_decode((string)@file_get_contents(dirname(__DIR__) . '/data/catalog.json'), true) ?: [];
+    foreach (beyond_tv_catalog_entries_for_channel($catalog, $slug) as $entry) {
+        if (($entry['archive_id'] ?? '') !== 'comedy-collection' || empty($entry['video_url'])) continue;
+        $config['items'][] = [
+            'url' => (string)$entry['video_url'],
+            'title' => (string)$entry['title'],
+            'duration' => max(60, (int)($entry['duration'] ?? 7200)),
+            'creator' => '',
+            'license' => 'Testing',
+            'rights_url' => (string)($entry['source_url'] ?? ''),
+        ];
+    }
     $goosebumpsRows = json_decode((string)@file_get_contents(dirname(__DIR__) . '/data/goosebumps-library.json'), true) ?: [];
     foreach ($goosebumpsRows as $episode) {
         if (!is_array($episode) || empty($episode['video_url'])) continue;
@@ -301,7 +313,7 @@ if ($slug === 'beyond-after-dark') {
             'title' => 'Goosebumps · S1 E' . (int)($episode['episode'] ?? 0) . ' · ' . (string)($episode['title'] ?? 'Episode'),
             'duration' => max(60, (int)($episode['runtime_seconds'] ?? 1320)),
             'creator' => 'Goosebumps',
-            'license' => 'Owner-verified archive source',
+            'license' => 'Testing',
             'rights_url' => 'https://archive.org/details/goosebumps-s01',
         ];
     }
@@ -326,7 +338,7 @@ $archiveUrls=resolve_archives($archiveIds);
 $resolved=[];
 foreach($config['items'] as $item){ $url=$item['url']??null; if(!$url&&!empty($item['archive']))$url=$archiveUrls[(string)$item['archive']]??null; if(!$url)continue;
     $provider = !empty($item['archive']) || str_contains((string)$url, 'archive.org/') ? 'Internet Archive' : 'Wikimedia Commons';
-    $resolved[]=['provider'=>$provider,'title'=>$item['title'],'url'=>$url,'duration'=>(int)$item['duration'],'type'=>str_contains($url,'.webm')?'video/webm':'video/mp4','creator'=>(string)($item['creator']??''),'license'=>(string)($item['license']??''),'rights_url'=>(string)($item['rights_url']??'')]; }
+    $resolved[]=['provider'=>$provider,'title'=>$item['title'],'url'=>$url,'duration'=>(int)$item['duration'],'type'=>str_contains($url,'.webm')?'video/webm':'video/mp4','creator'=>(string)($item['creator']??''),'license'=>$provider==='Internet Archive'?'':(string)($item['license']??''),'review_status'=>'testing','rights_status'=>'unverified','rights_url'=>(string)($item['rights_url']??'')]; }
 $total=array_sum(array_column($resolved,'duration')); $position=$total>0?time()%$total:0; $current=0; $offset=0;
 foreach($resolved as $i=>$item){ if($position<$item['duration']){$current=$i;$offset=$position;break;} $position-=$item['duration']; }
 $ordered=$resolved; if($resolved){$ordered=array_merge(array_slice($resolved,$current),array_slice($resolved,0,$current));}

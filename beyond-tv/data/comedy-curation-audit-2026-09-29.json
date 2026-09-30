@@ -1,0 +1,74 @@
+{
+  "channel": "beyond-comedy",
+  "reviewed_at": "2026-09-29",
+  "scope": "Catalog and channel rotation compared with Karen Eliot favorites and the bookmarked Comedy Collection item",
+  "current_rotation_candidates": 55,
+  "beyond_movies_schedule_entries": 13,
+  "source_file_inventory": "comedy-collection-file-inventory-2026-09-29.csv",
+  "file_level_curation": "comedy-collection-curation-2026-09-29.csv",
+  "file_level_curation_counts": {
+    "candidate_rights_pending": 87,
+    "already_in_catalog": 5,
+    "duplicate_or_alternate_file": 3,
+    "defer_browser_format": 1,
+    "defer_language": 4,
+    "hold_metadata_review": 8,
+    "defer_low_priority": 133
+  },
+  "user_requested_examples": [
+    {"title": "Dazed and Confused", "year": 1993, "proposed_channel": "classic-cinema", "status": "candidate_rights_pending"},
+    {"title": "Holes", "year": 2003, "proposed_channel": "beyond-family", "status": "candidate_rights_pending"}
+  ],
+  "source_files_with_exact_title_and_year_catalog_match": 5,
+  "inventory_note": "Filename matching is conservative and cannot prove that a nonmatch is a missing title; every row still needs editorial and rights review.",
+  "source_items": [
+    {
+      "url": "https://archive.org/details/american.-pie.-1999.720p.-blu-ray.x-264-yts.-ag",
+      "archive_title": "American. Pie. 1999.",
+      "films_seen": ["American Pie (1999)"],
+      "catalog_status": "missing",
+      "rights_status": "unconfirmed"
+    },
+    {
+      "url": "https://archive.org/details/american.-pie.-presents.-the.-naked.-mile.-2006.720p.-webrip.x-264.-aac-yts.-mx",
+      "archive_title": "American. Pie films",
+      "films_seen": ["American Pie Presents: Band Camp (2005)", "American Pie Presents: The Naked Mile (2006)"],
+      "catalog_status": "both missing",
+      "rights_status": "unconfirmed"
+    },
+    {
+      "url": "https://archive.org/details/comedy-collection",
+      "archive_title": "Comedy Collection",
+      "original_video_file_count": 241,
+      "catalog_status": "87 selected files imported as source-testing catalog entries on 2026-09-30",
+      "rights_status": "uploader license claim does not establish rights to the individual films"
+    }
+  ],
+  "other_confirmed_catalog_gaps_from_comedy_collection": [
+    "13 Going on 30 (2004)",
+    "A Man Called Otto (2022)",
+    "Asteroid City (2023)",
+    "Daddy's Home (2015)",
+    "Daddy's Home 2 (2017)",
+    "Eurotrip (2004)",
+    "Groundhog Day (1993)",
+    "Mean Girls (2024)",
+    "Mr. Deeds (2002)",
+    "No Hard Feelings (2023)",
+    "Pineapple Express (2008)",
+    "Rush Hour (1998)",
+    "Rush Hour 2 (2001)",
+    "Rush Hour 3 (2007)",
+    "The Devil Wears Prada (2006)",
+    "The Grand Budapest Hotel (2014)",
+    "The Naked Gun (1988)",
+    "Uncle Buck (1989)"
+  ],
+  "present_in_catalog_but_excluded_from_comedy_rotation": [
+    {"title": "Click", "channel_slug": "classic-cinema"},
+    {"title": "Elf", "channel_slug": "classic-cinema"}
+  ],
+  "present_in_catalog_and_comedy_rotation": ["Mean Girls", "Wedding Crashers", "3rd Rock from the Sun"],
+  "finding": "The prior review log does not cover the American Pie favorites or the Comedy Collection at the file level. Beyond Comedy is assembled from explicit channel_slug values and genre fallbacks, so catalog presence alone does not guarantee channel inclusion. The separate Beyond Movies schedule is a fixed 13-film list and also omits American Pie.",
+  "release_decision": "Owner directed public source-testing import of the 87 selected files on 2026-09-30. Rights remain unverified; Archive availability and uploader license fields do not establish distribution permission."
+}

@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 function beyond_movies_catalog(): array {
-    return [
+    $movies = [
         [
             'title' => 'Little Fockers', 'year' => '2010', 'genre' => 'Comedy · Family',
             'runtime' => '1 hr 38 min', 'duration' => 5861, 'rating' => 'PG-13',
@@ -82,6 +82,24 @@ function beyond_movies_catalog(): array {
             'rights_url' => 'https://archive.org/details/ben-stiller-movies',
         ],
     ];
+    $catalog = json_decode((string)@file_get_contents(__DIR__ . '/../data/catalog.json'), true) ?: [];
+    foreach ($catalog as $entry) {
+        if (!is_array($entry)
+            || ($entry['channel_slug'] ?? '') !== 'classic-cinema'
+            || ($entry['archive_id'] ?? '') !== 'comedy-collection'
+            || empty($entry['video_url'])) continue;
+        $movies[] = [
+            'title' => (string)$entry['title'],
+            'year' => (string)($entry['year'] ?? ''),
+            'genre' => (string)($entry['genre'] ?? 'Movies'),
+            'runtime' => (string)($entry['runtime'] ?? 'Feature film'),
+            'duration' => max(60, (int)($entry['duration'] ?? 7200)),
+            'rating' => (string)($entry['rating'] ?? 'NR'),
+            'url' => (string)$entry['video_url'],
+            'rights_url' => (string)($entry['source_url'] ?? ''),
+        ];
+    }
+    return $movies;
 }
 
 function beyond_movies_schedule_state(?DateTimeImmutable $now = null): array {

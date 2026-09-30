@@ -102,6 +102,8 @@ function jaguar_code_committed_file(string $root, string $relative, string $revi
     $gitPath = ltrim(($projectPrefix === '' ? '' : rtrim($projectPrefix, '/') . '/') . str_replace('\\', '/', $relative), '/');
     $type = jaguar_code_command(['git', 'ls-tree', $revision, '--', $gitPath], $repository, 5);
     if (!$type['ok'] || !preg_match('/^100(?:644|755) blob [a-f0-9]{40,64}\t/', $type['output'])) return null;
+    $size = jaguar_code_command(['git', 'cat-file', '-s', $revision . ':' . $gitPath], $repository, 5);
+    if (!$size['ok'] || !ctype_digit(trim($size['output'])) || (int)trim($size['output']) > 24000) return null;
     $content = jaguar_code_command(['git', 'show', $revision . ':' . $gitPath], $repository, 5, 24001, true);
     return $content['ok'] && strlen($content['output']) <= 24000 && !str_contains($content['output'], "\0") ? $content['output'] : null;
 }

@@ -42,3 +42,9 @@ model evidence is the 2026-09-25 base Llama 3.1 8B run in
 `CODE-THINKING-EVALUATION.md`, which failed all three grounded coding tasks.
 The v0.5.1 API guards reduce fabricated patch acceptance; they do not improve
 the model's code reasoning or establish correctness.
+
+An authenticated admin attempt on 2026-09-30 stopped before the model call:
+the live PHP configuration contains the runtime URLs but no Jaguar runtime
+token entry. Restore the matching token in the protected PHP configuration and
+Modal secret through the administrator's credential workflow, then repeat the
+four evaluations. Do not copy the token into this repository or evaluation log.

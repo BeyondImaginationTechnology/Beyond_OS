@@ -71,8 +71,14 @@ isolated runner is available. These are API guard tests, not model-quality
 scores or proof that a patch is correct.
 
 The four representative BIT prompts must be repeated through the authenticated
-admin API before calling the model release ready. This environment has no
-authenticated Beyond ID admin browser session or local runtime token, so no
-v0.5.1 model calls were made. Correctness, regressions, unsupported repository
-claims, and test usefulness for those four new attempts remain **unmeasured**.
-The prior 0/5 grounded-task scores above remain the last model evidence.
+admin API before calling the model release ready. On 2026-09-30, an authenticated
+admin selected the authorized Beyond OS project and submitted the guest-challenge
+bug repair in Patch mode. The deployed API returned its runtime-authentication
+configuration message before any model call. The protected live configuration
+has Jaguar runtime URLs but no `jaguar.runtime_token` entry; the effective
+runtime token was empty. The deployed API also omitted the oversized
+`ai/chat.php` from context. The v0.5.1 line-range input is available in this
+branch but has not yet been deployed. No model diff was returned or applied.
+Correctness, regressions, unsupported repository claims, and test usefulness
+for the four new model attempts remain **unmeasured**. The prior 0/5
+grounded-task scores above remain the last model evidence.

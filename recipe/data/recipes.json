@@ -1,0 +1,167 @@
+[
+  {
+    "id": "lemon-chickpea-bowls",
+    "name": "Lemon chickpea bowls",
+    "description": "Crispy chickpeas, cool cucumber, and a bright lemon-herb dressing make a satisfying bowl for any day.",
+    "category": "Lunch",
+    "timeMinutes": 25,
+    "difficulty": "Easy",
+    "servings": 2,
+    "tags": ["Vegetarian", "High protein", "Meal prep"],
+    "image": "assets/images/recipes/lemon-chickpea-bowls.png",
+    "imageAlt": "Lemon chickpea bowls with cucumber, tomatoes, rice, and lemon-herb dressing",
+    "ingredients": [{"name": "Cooked chickpeas, drained", "amount": 1, "unit": "can"}, {"name": "Cooked brown rice", "amount": 1.5, "unit": "cups"}, {"name": "English cucumber", "amount": 0.5, "unit": ""}, {"name": "Cherry tomatoes", "amount": 1, "unit": "cup"}, {"name": "Plain Greek yogurt", "amount": 0.25, "unit": "cup"}, {"name": "Lemon, juiced", "amount": 1, "unit": ""}, {"name": "Fresh dill, chopped", "amount": 2, "unit": "tbsp"}, {"name": "Olive oil", "amount": 1, "unit": "tbsp"}],
+    "steps": [
+      "Heat the oven to 425°F (220°C). Pat the chickpeas dry, toss with olive oil, salt, and pepper, then roast for 20 minutes until crisp.",
+      "Stir the yogurt with lemon juice, dill, a pinch of salt, and a splash of water until spoonable.",
+      "Divide the warm rice, cucumber, and tomatoes between bowls. Add the chickpeas and finish with the lemon-herb dressing."
+    ]
+  },
+  {
+    "id": "tomato-butter-beans",
+    "name": "Tomato butter beans",
+    "description": "Creamy beans simmered in garlicky tomato sauce with wilted greens and plenty of crusty bread.",
+    "category": "Dinner",
+    "timeMinutes": 30,
+    "difficulty": "Easy",
+    "servings": 2,
+    "tags": ["Vegetarian", "One pan", "Comfort food"],
+    "image": "assets/images/recipes/tomato-butter-beans.jpg",
+    "imageAlt": "Creamy tomato butter beans with wilted greens and crusty bread",
+    "ingredients": [{"name": "Butter beans, drained", "amount": 2, "unit": "cans"}, {"name": "Crushed tomatoes", "amount": 1, "unit": "can"}, {"name": "Baby spinach", "amount": 2, "unit": "cups"}, {"name": "Garlic cloves, minced", "amount": 2, "unit": ""}, {"name": "Vegetable broth", "amount": 0.5, "unit": "cup"}, {"name": "Smoked paprika", "amount": 1, "unit": "tsp"}, {"name": "Crusty bread", "amount": 4, "unit": "slices"}, {"name": "Olive oil", "amount": 1, "unit": "tbsp"}],
+    "steps": [
+      "Warm the olive oil in a deep skillet over medium heat. Add the garlic and smoked paprika and stir for 30 seconds.",
+      "Pour in the tomatoes and broth. Add the beans, season with salt and pepper, and simmer for 15 minutes.",
+      "Fold in the spinach until just wilted. Serve warm with toasted crusty bread."
+    ]
+  },
+  {
+    "id": "ginger-salmon-tray",
+    "name": "Ginger salmon tray",
+    "description": "A sweet-savory ginger glaze brings salmon, broccoli, and fluffy rice together with barely any cleanup.",
+    "category": "Dinner",
+    "timeMinutes": 28,
+    "difficulty": "Easy",
+    "servings": 2,
+    "tags": ["Gluten-free option", "Weeknight", "High protein"],
+    "image": "assets/images/recipes/ginger-salmon-tray.jpg",
+    "imageAlt": "Ginger-glazed salmon with broccoli and rice",
+    "ingredients": [{"name": "Salmon fillets", "amount": 2, "unit": ""}, {"name": "Broccoli florets", "amount": 3, "unit": "cups"}, {"name": "Cooked jasmine rice", "amount": 1.5, "unit": "cups"}, {"name": "Fresh ginger, grated", "amount": 1, "unit": "tbsp"}, {"name": "Soy sauce or tamari", "amount": 2, "unit": "tbsp"}, {"name": "Honey", "amount": 1, "unit": "tbsp"}, {"name": "Rice vinegar", "amount": 1, "unit": "tsp"}, {"name": "Sesame seeds", "amount": 1, "unit": "tsp"}],
+    "steps": [
+      "Heat the oven to 425°F (220°C). Whisk together the ginger, soy sauce, honey, and rice vinegar.",
+      "Arrange the salmon and broccoli on a lined sheet pan. Spoon the glaze over the salmon and roast for 12–15 minutes, until the fish flakes easily.",
+      "Serve over warm rice and spoon any pan juices over the top. Finish with sesame seeds."
+    ]
+  },
+  {
+    "id": "green-goddess-toast",
+    "name": "Green goddess toast",
+    "description": "A creamy herby spread, ripe avocado, and crunchy seeds turn a quick breakfast into a little ritual.",
+    "category": "Breakfast",
+    "timeMinutes": 12,
+    "difficulty": "Easy",
+    "servings": 2,
+    "tags": ["Vegetarian", "Quick", "No cook"],
+    "image": "assets/images/recipes/green-goddess-toast.jpg",
+    "imageAlt": "Sourdough toast with green herb spread, avocado, and pumpkin seeds",
+    "ingredients": [{"name": "Sourdough bread", "amount": 2, "unit": "thick slices"}, {"name": "Ripe avocado", "amount": 1, "unit": ""}, {"name": "Cottage cheese", "amount": 0.5, "unit": "cup"}, {"name": "Fresh parsley", "amount": 0.25, "unit": "cup"}, {"name": "Fresh chives", "amount": 1, "unit": "tbsp"}, {"name": "Lemon juice", "amount": 1, "unit": "tsp"}, {"name": "Pumpkin seeds", "amount": 1, "unit": "tbsp"}, {"name": "Chili flakes", "amount": 1, "unit": "pinch"}],
+    "steps": [
+      "Toast the sourdough until golden and crisp.",
+      "Mash the cottage cheese with parsley, chives, lemon juice, and a pinch of salt. Spread generously over the toast.",
+      "Slice the avocado over each piece. Scatter with pumpkin seeds, chili flakes, and a little black pepper."
+    ]
+  },
+  {
+    "id": "crispy-chicken-couscous",
+    "name": "Crispy chicken couscous",
+    "description": "Golden spiced chicken, fluffy couscous, and a quick cucumber salad make a fresh, filling supper.",
+    "category": "Dinner",
+    "timeMinutes": 32,
+    "difficulty": "Easy",
+    "servings": 2,
+    "tags": ["High protein", "Weeknight", "Meal prep"],
+    "image": "assets/images/recipes/crispy-chicken-couscous.jpg",
+    "imageAlt": "Spiced chicken with couscous, cucumber salad, and lemon yogurt",
+    "ingredients": [{"name": "Boneless chicken thighs", "amount": 2, "unit": ""}, {"name": "Couscous", "amount": 1, "unit": "cup"}, {"name": "Cucumber", "amount": 0.5, "unit": ""}, {"name": "Plain yogurt", "amount": 0.25, "unit": "cup"}, {"name": "Ground cumin", "amount": 1, "unit": "tsp"}, {"name": "Ground coriander", "amount": 0.5, "unit": "tsp"}, {"name": "Lemon", "amount": 1, "unit": ""}, {"name": "Olive oil", "amount": 1, "unit": "tbsp"}],
+    "steps": [
+      "Rub the chicken with cumin, coriander, olive oil, salt, and pepper. Sear in a hot skillet for 5–6 minutes per side, until the thickest part reaches 165°F (74°C).",
+      "Put the couscous in a bowl with a pinch of salt. Pour over 1 cup of boiling water, cover for 5 minutes, then fluff with a fork and lemon zest.",
+      "Mix the yogurt with lemon juice. Slice the cucumber and serve everything together with the lemon yogurt."
+    ]
+  },
+  {
+    "id": "peach-oat-crumble",
+    "name": "Peach oat crumble",
+    "description": "Juicy peaches bake under a crisp, cinnamon-scented oat topping for a simple dessert to share.",
+    "category": "Dessert",
+    "timeMinutes": 35,
+    "difficulty": "Easy",
+    "servings": 4,
+    "tags": ["Vegetarian", "Make ahead", "Comfort food"],
+    "image": "assets/images/recipes/peach-oat-crumble.jpg",
+    "imageAlt": "Warm peach crumble with a crisp oat topping and vanilla yogurt",
+    "ingredients": [{"name": "Ripe peaches, sliced", "amount": 4, "unit": ""}, {"name": "Rolled oats", "amount": 0.75, "unit": "cup"}, {"name": "All-purpose flour", "amount": 0.33, "unit": "cup"}, {"name": "Brown sugar", "amount": 0.25, "unit": "cup"}, {"name": "Cold butter, cubed", "amount": 3, "unit": "tbsp"}, {"name": "Ground cinnamon", "amount": 0.5, "unit": "tsp"}, {"name": "Lemon juice", "amount": 1, "unit": "tbsp"}, {"name": "Vanilla yogurt, to serve", "amount": 0.5, "unit": "cup"}],
+    "steps": [
+      "Heat the oven to 375°F (190°C). Toss the sliced peaches with lemon juice and spread in a small baking dish.",
+      "Rub the oats, flour, brown sugar, cinnamon, and cold butter together with your fingertips until crumbly. Scatter over the peaches.",
+      "Bake for 25 minutes until bubbling and golden. Let rest for 5 minutes and serve with vanilla yogurt."
+    ]
+  },
+  {
+    "id": "haitian-griot-plate",
+    "name": "Griot plate with pikliz",
+    "description": "Citrus-marinated griot, golden bannann peze, and bright pikliz make a celebratory Haitian plate.",
+    "category": "Dinner",
+    "timeMinutes": 90,
+    "difficulty": "Easy",
+    "servings": 4,
+    "tags": ["Haitian", "High protein", "Traditional"],
+    "image": "assets/images/recipes/haitian-griot-plate.jpg",
+    "imageAlt": "Haitian griot with golden bannann peze and pikliz cabbage slaw",
+    "ingredients": [{"name": "Pork shoulder, cut into chunks", "amount": 2, "unit": "lb"}, {"name": "Sour orange juice or orange-lime juice", "amount": 0.5, "unit": "cup"}, {"name": "Haitian epis seasoning", "amount": 0.25, "unit": "cup"}, {"name": "Garlic cloves, minced", "amount": 3, "unit": ""}, {"name": "Fresh thyme", "amount": 4, "unit": "sprigs"}, {"name": "Green plantains", "amount": 2, "unit": ""}, {"name": "Pikliz", "amount": 1, "unit": "cup"}, {"name": "Neutral oil for frying", "amount": 2, "unit": "cups"}],
+    "steps": [
+      "Toss the pork with citrus juice, epis, garlic, thyme, salt, and pepper. Cover and marinate in the refrigerator for at least 1 hour.",
+      "Add the pork and marinade to a pot with 1 cup of water. Cover and simmer gently until fork-tender, about 45–55 minutes. Uncover and cook until the liquid evaporates.",
+      "Shallow-fry the pork in a little oil, turning until crisp and deeply browned. Drain on a rack.",
+      "Peel and cut the plantains into thick pieces. Fry at 350°F (175°C) until lightly golden, flatten each piece, then fry again until crisp. Serve with pikliz."
+    ]
+  },
+  {
+    "id": "haitian-diri-djon-djon-chicken",
+    "name": "Diri ak djon djon with chicken",
+    "description": "Earthy black mushroom rice with tender epis-seasoned chicken and a lively spoonful of pikliz.",
+    "category": "Dinner",
+    "timeMinutes": 75,
+    "difficulty": "Easy",
+    "servings": 4,
+    "tags": ["Haitian", "Gluten-free", "Traditional"],
+    "image": "assets/images/recipes/haitian-diri-djon-djon.jpg",
+    "imageAlt": "Haitian black djon djon rice with lima beans, roast chicken, and pikliz",
+    "ingredients": [{"name": "Dried djon djon mushrooms", "amount": 0.75, "unit": "oz"}, {"name": "Long-grain rice, rinsed", "amount": 2, "unit": "cups"}, {"name": "Lima beans, cooked", "amount": 1, "unit": "cup"}, {"name": "Chicken thighs", "amount": 4, "unit": ""}, {"name": "Haitian epis seasoning", "amount": 3, "unit": "tbsp"}, {"name": "Garlic cloves, minced", "amount": 2, "unit": ""}, {"name": "Fresh thyme", "amount": 3, "unit": "sprigs"}, {"name": "Pikliz, to serve", "amount": 1, "unit": "cup"}],
+    "steps": [
+      "Soak the djon djon in 3 cups of hot water for 20 minutes. Strain and reserve the dark mushroom broth; discard any grit.",
+      "Season the chicken with half the epis, salt, and pepper. Brown in a covered pot with a little oil, then add a splash of water and cook until the thickest part reaches 165°F (74°C). Set aside.",
+      "In the same pot, soften the remaining epis and garlic. Stir in the rice and lima beans, then add the mushroom broth and thyme. Bring to a boil, cover, and cook on low until the rice is tender, 18–22 minutes.",
+      "Rest the rice covered for 5 minutes, fluff with a fork, and serve with the chicken and pikliz."
+    ]
+  },
+  {
+    "id": "haitian-tassot-plantains",
+    "name": "Tassot beef with plantains",
+    "description": "Tender citrus-seasoned beef is browned until crisp and served with twice-fried plantains and pikliz.",
+    "category": "Dinner",
+    "timeMinutes": 85,
+    "difficulty": "Easy",
+    "servings": 4,
+    "tags": ["Haitian", "High protein", "Traditional"],
+    "image": "assets/images/recipes/haitian-tassot-plantains.jpg",
+    "imageAlt": "Haitian tassot beef with golden plantains, pikliz, and lime",
+    "ingredients": [{"name": "Beef chuck or stew meat, cubed", "amount": 2, "unit": "lb"}, {"name": "Sour orange or orange-lime juice", "amount": 0.5, "unit": "cup"}, {"name": "Haitian epis seasoning", "amount": 0.25, "unit": "cup"}, {"name": "Garlic cloves, crushed", "amount": 3, "unit": ""}, {"name": "Fresh thyme", "amount": 3, "unit": "sprigs"}, {"name": "Green plantains", "amount": 2, "unit": ""}, {"name": "Pikliz", "amount": 1, "unit": "cup"}, {"name": "Neutral oil", "amount": 2, "unit": "tbsp"}],
+    "steps": [
+      "Mix the beef with citrus juice, epis, garlic, thyme, salt, and pepper. Cover and marinate for at least 30 minutes.",
+      "Transfer the beef and marinade to a pot with 1 cup of water. Cover and simmer gently until tender, about 50–60 minutes. Remove the beef and pat dry.",
+      "Sear the beef in a hot skillet with oil, turning until browned and crisp around the edges.",
+      "Cut peeled plantains into thick pieces and fry at 350°F (175°C) until lightly golden. Flatten each piece and fry again until crisp. Serve with the beef and pikliz."
+    ]
+  }
+]

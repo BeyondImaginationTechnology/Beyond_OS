@@ -1,11 +1,10 @@
 # Beyond Kitchen 0.0.2
 
 Primary address: `https://recipe.beyondimagination.co.technology/`. StartCP
-points this subdomain to `beyondimagination.co.technology/www/recipe`, a local
-copy of `beyond-kitchen/` with its assets, PWA, and API at the subdomain root.
-The existing main-domain path `/beyond-kitchen/` continues to work. Changes to
-the recipe catalog or app should be copied to both folders until the legacy path
-is retired.
+points this subdomain to `beyondimagination.co.technology/www/recipe`, so this
+folder serves its index, assets, PWA, and API directly at the subdomain root.
+This is a copy of `beyond-kitchen/`; keep changes to both folders in sync while
+the main-domain path remains available.
 
 Beyond Kitchen 0.0.2 includes a responsive PHP web app and starter native
 Android and iOS clients. Each has a date-based daily pick, recipe search and
@@ -77,7 +76,7 @@ part of this starter release.
 
 ## Local check
 
-From the repository root, run `php -l beyond-kitchen/index.php`,
-`node --check beyond-kitchen/assets/js/app.js`, and
-`node --test beyond-kitchen/tests/recipe-library.test.js`. Native build commands
+From the repository root, run `php -l recipe/index.php`,
+`node --check recipe/assets/js/app.js`, and
+`node --test recipe/tests/recipe-library.test.js`. Native build commands
 are listed above and require the platform SDKs.

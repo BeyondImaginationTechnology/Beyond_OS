@@ -165,7 +165,7 @@ struct DinnerPlannerView: View {
         suggestion = nil
         defer { loading = false }
         do {
-            let url = URL(string: "https://beyondimagination.co.technology/beyond-kitchen/api/dinner.php")!
+            let url = URL(string: "https://recipe.beyondimagination.co.technology/api/dinner.php")!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")

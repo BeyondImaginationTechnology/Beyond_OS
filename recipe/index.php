@@ -22,14 +22,14 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
   <meta name="description" content="A fresh recipe for today, with simple ingredients, clear steps, and ideas worth making again.">
   <title>Beyond Kitchen | A little inspiration for today</title>
   <link rel="canonical" href="https://recipe.beyondimagination.co.technology/">
-  <link rel="manifest" href="<?= e(beyond_url('beyond-kitchen/manifest.webmanifest')) ?>">
-  <link rel="icon" href="<?= e(beyond_url('beyond-kitchen/assets/kitchen-mark.svg')) ?>" type="image/svg+xml">
-  <link rel="stylesheet" href="<?= e(beyond_url('beyond-kitchen/assets/css/app.css?v=0.0.6')) ?>">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/kitchen-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/css/app.css?v=0.0.6">
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <a class="brand" href="<?= e(beyond_url('')) ?>" aria-label="Beyond Kitchen home">
+      <a class="brand" href="./" aria-label="Beyond Kitchen home">
         <span class="brand-mark" aria-hidden="true">b</span>
         <span>Beyond <strong>Kitchen</strong></span>
       </a>
@@ -144,7 +144,7 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
     </main>
 
     <footer class="site-footer">
-      <a href="<?= e(beyond_url('')) ?>">← Beyond Imagination Technology</a>
+      <a href="https://beyondimagination.co.technology/">← Beyond Imagination Technology</a>
       <span>Beyond Kitchen · 0.0.2</span>
     </footer>
   </div>
@@ -155,11 +155,11 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
   </dialog>
   <p class="sr-status" id="statusMessage" role="status" aria-live="polite"></p>
 
-  <script src="<?= e(beyond_url('beyond-kitchen/assets/js/recipe-library.js?v=0.0.2')) ?>" defer></script>
-  <script src="<?= e(beyond_url('beyond-kitchen/assets/js/app.js?v=0.0.6')) ?>" defer></script>
+  <script src="./assets/js/recipe-library.js?v=0.0.2" defer></script>
+  <script src="./assets/js/app.js?v=0.0.6" defer></script>
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('<?= e(beyond_url('beyond-kitchen/service-worker.js')) ?>'));
+      window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js'));
     }
   </script>
 </body>

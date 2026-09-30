@@ -50,7 +50,7 @@ import java.util.Locale;
 import java.util.Set;
 
 public final class MainActivity extends Activity {
-    private static final String DINNER_ENDPOINT = "https://beyondimagination.co.technology/beyond-kitchen/api/dinner.php";
+    private static final String DINNER_ENDPOINT = "https://recipe.beyondimagination.co.technology/api/dinner.php";
     private static final int PAPER = Color.rgb(246, 245, 239);
     private static final int CARD = Color.rgb(255, 254, 250);
     private static final int INK = Color.rgb(40, 49, 38);

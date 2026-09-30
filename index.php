@@ -63,8 +63,8 @@ if (is_file($frenchLessonsPath)) {
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['fall','dark','light','sunset','ocean','forest'].includes(t)?t:'fall';}catch(e){document.documentElement.dataset.theme='fall';}try{const c=localStorage.getItem('beyond-currency');document.documentElement.dataset.currency=['BITS','USD','CAD'].includes(c)?c:'BITS';}catch(e){document.documentElement.dataset.currency='BITS';}})();</script>
 <meta name="theme-color" content="#24140d">
-<title>Beyond Imagination Technology | Live. Learn. Earn. Explore.</title>
-<meta name="description" content="Beyond Imagination Technology connects health, education, creator commerce and entertainment through Beyond ID, with BIT OS environments in development.">
+<title>Beyond Imagination Technology | Live. Learn. Earn. Explore. Protect.</title>
+<meta name="description" content="Beyond Imagination Technology connects health, education, creator commerce, entertainment and protection through Beyond ID and BIT OS.">
 <link rel="canonical" href="https://beyondimagination.co.technology/">
 <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
 <link rel="stylesheet" href="/assets/css/beyond-splash.css?v=20260828-1">
@@ -92,6 +92,7 @@ html[data-theme="sunset"]{background:#1a0d24}html[data-theme="sunset"] body{colo
 <style>
 .login-btn{display:inline-flex!important;align-items:center;justify-content:center;min-height:47px;padding:0 21px!important;border:1px solid rgba(255,255,255,.28)!important;border-radius:9px;text-decoration:none!important;font-weight:850!important;font-size:13px!important;background:rgba(255,255,255,.04);transition:.2s}
 .login-btn:hover{border-color:#a99cff!important;background:rgba(112,87,255,.14)}
+.hero .s{color:#a78bfa}.product-card.protection{--card-accent:#a78bfa}
 .core{font-size:0}.core .atom{position:relative;display:block;width:104px;height:104px;background:none;color:inherit}.core .atom i{position:absolute;display:block;inset:28px 4px;border:5px solid #7f6dff;border-radius:50%;transform:rotate(0deg)}.core .atom i:nth-child(2){transform:rotate(60deg);border-color:#3f91ff}.core .atom i:nth-child(3){transform:rotate(120deg);border-color:#35d69b}.core .atom b{position:absolute;left:50%;top:50%;width:62px;height:62px;border-radius:18px;transform:translate(-50%,-50%);background:#090519 url('assets/img/keyhole-hero.webp') center 72%/180% auto no-repeat;border:2px solid rgba(212,141,255,.82);box-shadow:0 0 0 5px rgba(90,70,255,.12),0 0 28px #8a61ff;z-index:2}
 @media(max-width:560px){.nav{gap:8px}.nav .login-btn,.nav .primary{min-height:42px;padding:0 12px!important}.nav .login-btn{display:inline-flex!important}}
 </style>
@@ -147,9 +148,9 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 <section class="hero wrap">
     <div>
         <span class="hero-kicker">Connected apps · BIT OS in development</span>
-        <h1><span class="h">Health.</span><span class="e">Education.</span><span class="f">Wallet.</span><span class="x">Entertainment.</span></h1>
-        <p class="tagline">Live. Learn. Earn. Explore.</p>
-        <p class="intro">Useful apps for wellness, learning, creator commerce and entertainment—connected through Beyond ID. BIT OS is the planned operating-environment layer for home, learning, creating and organizational work.</p>
+        <h1><span class="h">Health.</span><span class="e">Education.</span><span class="f">Wallet.</span><span class="x">Entertainment.</span><span class="s">Protection.</span></h1>
+        <p class="tagline">Live. Learn. Earn. Explore. Protect.</p>
+        <p class="intro">Useful apps for wellness, learning, creator commerce, entertainment and digital protection—connected through Beyond ID. BIT OS is the planned operating-environment layer for home, learning, creating and organizational work.</p>
         <div class="hero-actions">
             <a class="primary" href="https://ai.beyondimagination.co.technology/">Explore AI &nbsp;→</a>
             <a class="ghost" href="https://os.beyondimagination.co.technology/">Install OS ▶</a>
@@ -237,9 +238,9 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
             <span class="platform-kicker">One connected ecosystem</span>
             <h2 id="platform-title">Useful tools for every part of life.</h2>
         </div>
-        <p>Discover experiences for health, learning, entertainment, and creator commerce. Beyond brings them together through a shared identity and a connected path across the products you use.</p>
+        <p>Discover experiences for health, learning, entertainment, creator commerce and protection. Beyond brings them together through a shared identity and a connected path across the products you use.</p>
     </div>
-    <div class="product-grid" aria-label="Explore flagship Beyond Imagination Technology web products">
+    <div class="product-grid" aria-label="Explore flagship Beyond Imagination Technology products and protection resources">
         <a class="product-card health" href="/dailybreath/">
             <span class="product-number">01 · LIVE</span><h3>DailyBreath</h3>
             <p>Daily readings, breathing practices, recovery support, private reflection, and a gentle Trivia mode in an installable web experience.</p>
@@ -260,10 +261,30 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
             <p>Live thematic channels and on-demand discovery turn the ecosystem into an always-on destination.</p>
             <span class="product-link">Watch the live demo →</span>
         </a>
-        <a class="product-card kitchen" href="/beyond-kitchen/">
-            <span class="product-number">05 · COOK</span><h3>Beyond Kitchen</h3>
-            <p>A fresh daily recipe, practical cooking details, and a personal list of meals worth making again.</p>
-            <span class="product-link">Find today's recipe →</span>
+        <a class="product-card protection" href="/beyond-id/">
+            <span class="product-number">05 · PROTECT</span><h3>Beyond ID</h3>
+            <p>Connect to Beyond with a shared identity and account access.</p>
+            <span class="product-link">Manage your identity →</span>
+        </a>
+        <a class="product-card protection" href="/beyond/os/">
+            <span class="product-number">06 · PROTECT</span><h3>BIT OS Cyber</h3>
+            <p>A defensive desktop environment for focused, authorized security work.</p>
+            <span class="product-link">Explore BIT OS Cyber →</span>
+        </a>
+        <a class="product-card protection" href="/beyond-id/dashboard/wallet.php">
+            <span class="product-number">07 · PROTECT</span><h3>Beyond Wallet</h3>
+            <p>Review your bit$ activity and keep rewards separate from provider-backed funds.</p>
+            <span class="product-link">Review wallet activity →</span>
+        </a>
+        <a class="product-card protection" href="/legal/privacy.php">
+            <span class="product-number">08 · PROTECT</span><h3>Privacy &amp; Data</h3>
+            <p>Learn how Beyond handles account information and privacy safeguards.</p>
+            <span class="product-link">Read the privacy policy →</span>
+        </a>
+        <a class="product-card protection" href="/beyond-tv/">
+            <span class="product-number">09 · PROTECT</span><h3>Beyond TV Safety Reports</h3>
+            <p>Check source safety reports for video links before exploring live channels and on-demand media.</p>
+            <span class="product-link">Review TV safety reports →</span>
         </a>
     </div>
     <div class="platform-loop">

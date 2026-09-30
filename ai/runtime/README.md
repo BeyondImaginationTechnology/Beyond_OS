@@ -64,11 +64,13 @@ from browser input. By default, a Git checkout of this repository is listed as
 
 Every configured path must be a Git-tracked project directory inside a checkout
 (a monorepo subdirectory is allowed and becomes the file-access boundary). Check entries are
-argument arrays and run with that checkout as the working directory, without a
-shell, only after an administrator selects **Run configured checks**. Keep them
+argument arrays and run in a disposable detached checkout, without a shell,
+when an administrator selects **Run configured checks** or submits a valid patch. Keep them
 to local lint/test commands; do not configure deploy, publish, merge, migration,
-or production-data commands. Returned patches are review-only unified diffs;
-Code Thinking does not apply them. Project notes are stored under private
+or production-data commands. Code Thinking reads committed blobs at the displayed
+revision. It accepts patches only for source files supplied to the model, applies
+them only in the disposable checkout, and returns the actual diff and check results
+for human review; the configured project checkout is never patched. Project notes are stored under private
 Beyond runtime data and are included only when their recorded Git revision
 matches the selected checkout. To share a note across project contexts, an
 administrator must check the explicit BIT-wide approval box when saving it.
@@ -100,7 +102,7 @@ The shared hosting account serves the PHP interface and authenticated proxy. The
 
 On the PHP host, the protected `var/config/live.php` may hold the endpoint settings under `jaguar.runtime_url`, `jaguar.draw_runtime_url`, and `jaguar.runtime_token`. Environment variables `JAGUAR_RUNTIME_URL`, `JAGUAR_DRAW_RUNTIME_URL`, and `JAGUAR_RUNTIME_TOKEN` take precedence when present; never commit live credentials.
 
-Draw uses a separate private GPU worker configured as `JAGUAR_DRAW_RUNTIME_URL`. Deploy `draw_modal_app.py` with the existing Hugging Face and runtime secrets. It accepts `POST /v1/draw` with `{ "prompt": "...", "language": "en" }` and returns a bounded PNG data URL. The PHP proxy requires a signed-in user with at least 10 BIT$, validates the image result, and records the idempotent 10 BIT$ debit only after the worker succeeds. If the worker is absent or fails, no debit is recorded.
+Draw uses a separate private GPU worker configured as `JAGUAR_DRAW_RUNTIME_URL`. Deploy `draw_modal_app.py` with the existing Hugging Face and runtime secrets. It accepts `POST /v1/draw` with `{ "prompt": "...", "language": "en" }` and returns a bounded PNG data URL. The PHP proxy requires a signed-in user with at least 10 BIT$ and a prompt of at most 2,000 characters. Apply the `20260929_01_jaguar_draw_holds` database migration before enabling this path. PHP reserves 10 BIT$ atomically before the GPU call, records an idempotent debit only after a valid image, and releases the hold on failure. An abandoned hold is recovered after ten minutes on the next Jaguar balance read for that user.
 
 The PHP proxy answers greetings, capability/version questions, thanks, and basic two-number arithmetic through `jaguar-fast-lane`. These requests never start a Modal GPU. Prompts that require language-model reasoning continue to the scale-to-zero L4 runtime.
 

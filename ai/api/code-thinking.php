@@ -95,36 +95,23 @@ if (in_array($action, ['note_add', 'note_edit', 'note_delete'], true)) {
 if ($revision === null) code_json(200, ['project' => $project['label'], 'revision' => null, 'action' => $action, 'message' => 'I cannot inspect or cite this workspace because Git did not provide a repository revision. No files were read or changed. Plan: configure this authorized workspace as a readable Git checkout, then retry; until then, provide the relevant files or ask for a general plan that does not claim repository knowledge.']);
 
 if ($action === 'check') {
-    $results = [];
-    foreach (array_slice($project['checks'], 0, 5) as $argv) {
-        $pipes = [];
-        $process = @proc_open($argv, [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, $project['path'], null, ['bypass_shell' => true]);
-        if (!is_resource($process)) { $results[] = ['command' => implode(' ', $argv), 'ok' => false, 'output' => 'Configured check could not start.']; continue; }
-        fclose($pipes[0]);
-        stream_set_blocking($pipes[1], false); stream_set_blocking($pipes[2], false);
-        $stdout = ''; $stderr = ''; $deadline = microtime(true) + 45; $exitCode = null;
-        do {
-            $stdout .= (string)stream_get_contents($pipes[1]); $stderr .= (string)stream_get_contents($pipes[2]);
-            $state = proc_get_status($process);
-            if (!$state['running']) { $exitCode = (int)$state['exitcode']; break; }
-            usleep(100000);
-        } while (microtime(true) < $deadline);
-        $timedOut = $state['running'];
-        if ($timedOut) proc_terminate($process);
-        $stdout .= (string)stream_get_contents($pipes[1]); $stderr .= (string)stream_get_contents($pipes[2]);
-        fclose($pipes[1]); fclose($pipes[2]);
-        $exit = proc_close($process);
-        if ($exit === -1 && $exitCode !== null) $exit = $exitCode;
-        $results[] = ['command' => implode(' ', $argv), 'ok' => !$timedOut && $exit === 0, 'timed_out' => $timedOut, 'output' => mb_substr(trim($stdout . "\n" . $stderr), 0, 5000)];
-    }
-    code_json(200, ['revision' => $revision, 'results' => $results, 'configured' => count($project['checks'])]);
+    $review = jaguar_code_with_checkout($project, $revision, static function (string $checkout, string $projectCheckout) use ($project): array {
+        $results = [];
+        foreach (array_slice($project['checks'], 0, 5) as $argv) {
+            $results[] = ['command' => implode(' ', $argv), ...jaguar_code_review_check($argv, $projectCheckout)];
+        }
+        return ['results' => $results];
+    });
+    if (isset($review['error'])) code_json(503, ['error' => $review['error']]);
+    code_json(200, ['revision' => $revision, 'results' => $review['results'], 'configured' => count($project['checks']), 'checkout' => 'detached review checkout']);
 }
 
 if (!in_array($action, ['read', 'plan', 'patch'], true)) code_json(422, ['error' => 'Choose read, plan, patch, or a configured project check.']);
 $task = trim((string)($payload['task'] ?? ''));
 if ($task === '' || mb_strlen($task) > 2500) code_json(422, ['error' => 'Describe the project question or change in 1–2,500 characters.']);
-$contextParts = jaguar_code_read_context($project, is_array($payload['files'] ?? null) ? $payload['files'] : []);
+$contextParts = jaguar_code_read_context($project, is_array($payload['files'] ?? null) ? $payload['files'] : [], $revision);
 $fileContext = array_values(array_filter($contextParts, static fn($entry) => str_starts_with($entry, '--- PROJECT FILE: ')));
+$contextFiles = array_values(array_filter(array_map(static fn($entry) => preg_match('/^--- PROJECT FILE: (.+) ---/', $entry, $m) ? $m[1] : null, $fileContext)));
 if ($fileContext === []) code_json(200, ['revision' => $revision, 'action' => $action, 'message' => 'I could not read project files for this request, so I will not make repository-specific claims. No files were changed. Plan: provide relative paths for the relevant files or add an AGENTS.md/README.md project guide, then retry. I verified only the workspace Git revision.']);
 $notes = jaguar_code_current_notes($projectId, $revision);
 $contextParts[] = "PROJECT ID: {$projectId}\nPROJECT LABEL: {$project['label']}\nGIT REVISION: {$revision}";
@@ -141,7 +128,7 @@ foreach ($sharedNotes as $note) {
 $instructions = [
     'read' => 'Read the selected project context and answer the administrator. Cite file paths for repository claims. State which files were available. Use a BIT-wide architecture note only as explicitly approved shared guidance, not as evidence about this project.',
     'plan' => 'Create a concise implementation plan for the selected project. Show affected files (or say they are not yet known), assumptions, risks, and verification steps. Cite file paths for claims. Use approved BIT-wide notes only as shared guidance.',
-    'patch' => 'Draft a review-only unified diff for the selected project. First state affected files, assumptions, risks, and verification steps. Then provide a unified diff. Do not claim it was applied or that checks ran. If context is insufficient, ask for the missing files instead of inventing code. Use approved BIT-wide notes only as shared guidance.',
+    'patch' => 'Draft a review-only unified Git diff against the supplied revision. First state affected files, assumptions, risks, and verification steps. Then provide a diff starting with diff --git lines. Edit only the existing project files supplied in this request; no new files, renames, or binary changes. The server will apply it only in a disposable checkout and run configured checks there. Do not claim checks passed. If context is insufficient, ask for missing files instead of inventing code.',
 ];
 $runtimeUrl = rtrim(jaguar_runtime_config('runtime_url'), '/');
 if ($runtimeUrl === '' || !filter_var($runtimeUrl, FILTER_VALIDATE_URL) || !function_exists('curl_init')) code_json(200, ['revision' => $revision, 'action' => $action, 'context_files' => array_map(static fn($entry) => preg_match('/^--- PROJECT FILE: (.+) ---/', $entry, $m) ? $m[1] : null, $fileContext), 'message' => 'Jaguar’s model runtime is unavailable, so I could not analyze the supplied files or draft a repository-grounded diff. No files were changed. Plan: configure the private runtime URL and token, then retry this task; the selected context is ready.']);
@@ -150,9 +137,12 @@ if ($runtimeToken === '') code_json(200, ['revision' => $revision, 'action' => $
 $headers = ['Content-Type: application/json'];
 $headers[] = 'Authorization: Bearer ' . $runtimeToken;
 $runtime = curl_init($runtimeUrl . '/v1/chat');
+$fullProjectContext = implode("\n\n", $contextParts);
+$phpContextTruncated = mb_strlen($fullProjectContext) > 24000;
+if ($action === 'patch' && $phpContextTruncated) code_json(200, ['revision' => $revision, 'action' => 'patch', 'context_files' => $contextFiles, 'message' => 'The selected project context exceeds the 24,000-character limit. Select fewer files before requesting a patch; no diff was accepted or checks run.', 'verified' => false]);
 $request = [
     'mode' => 'code', 'language' => 'en', 'max_new_tokens' => 1024,
-    'project_context' => mb_substr(implode("\n\n", $contextParts), 0, 24000),
+    'project_context' => mb_substr($fullProjectContext, 0, 24000),
     'messages' => [['role' => 'user', 'content' => $instructions[$action] . "\n\nTask: " . $task]],
 ];
 curl_setopt_array($runtime, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 12, CURLOPT_TIMEOUT => 110, CURLOPT_HTTPHEADER => $headers, CURLOPT_POSTFIELDS => json_encode($request, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)]);
@@ -160,4 +150,14 @@ $response = curl_exec($runtime); $status = (int)curl_getinfo($runtime, CURLINFO_
 $decoded = is_string($response) ? json_decode($response, true) : null;
 if (is_array($decoded) && $status === 422 && is_string($decoded['detail'] ?? null)) code_json(422, ['error' => $decoded['detail'], 'revision' => $revision]);
 if (!is_array($decoded) || $status < 200 || $status >= 300 || !is_string($decoded['message'] ?? null)) code_json(200, ['revision' => $revision, 'action' => $action, 'message' => 'Jaguar’s model runtime did not complete this request. No repository files were changed. Plan: confirm the private runtime is healthy, then retry the same task at the displayed revision.']);
-code_json(200, ['revision' => $revision, 'action' => $action, 'message' => $decoded['message'], 'context_truncated' => !empty($decoded['context_truncated']), 'context_files' => array_map(static fn($entry) => preg_match('/^--- PROJECT FILE: (.+) ---/', $entry, $m) ? $m[1] : null, $fileContext)]);
+if ($action === 'patch') {
+    if (!empty($decoded['context_truncated'])) code_json(200, ['revision' => $revision, 'action' => 'patch', 'context_files' => $contextFiles, 'message' => 'The supplied project context exceeded the model limit. No diff was accepted or checks run. Select fewer files and retry.', 'verified' => false]);
+    $diff = jaguar_code_patch_diff($decoded['message'], $contextFiles);
+    if ($diff === null) code_json(200, ['revision' => $revision, 'action' => 'patch', 'context_files' => $contextFiles, 'message' => 'Jaguar did not produce a bounded unified diff for the supplied files. No patch was accepted or checks run. Review the task and provide the affected source files; do not use the model text as a patch.', 'verified' => false]);
+    $review = jaguar_code_verify_patch($project, $revision, $diff, $contextFiles);
+    if (isset($review['error'])) code_json(200, ['revision' => $revision, 'action' => 'patch', 'context_files' => $contextFiles, 'message' => $review['error'] . ' No project files were changed. ' . ($review['detail'] ?? ''), 'verified' => false]);
+    $checkSummary = implode("\n", array_map(static fn($check) => ($check['ok'] ? 'PASS' : 'FAIL') . ' ' . $check['command'] . ($check['timed_out'] ? ' (timed out)' : '') . ($check['output'] !== '' ? "\n" . $check['output'] : ''), $review['checks']));
+    $modelNotes = trim(substr($decoded['message'], 0, (int)strpos($decoded['message'], 'diff --git')));
+    code_json(200, ['revision' => $revision, 'action' => 'patch', 'context_files' => $contextFiles, 'affected_files' => $review['affected_files'], 'checks' => $review['checks'], 'verified' => $review['verified'], 'review' => ['diff_applies' => true, 'checks_passed' => $review['verified'], 'human_review_required' => true], 'diff' => $review['diff'], 'message' => "Affected files: " . implode(', ', $review['affected_files']) . "\nModel assumptions, risks, and plan (unverified):\n" . ($modelNotes === '' ? 'Not supplied; review these before using the patch.' : mb_substr($modelNotes, 0, 3000)) . "\nVerification: " . ($review['verified'] ? 'all configured checks passed' : 'one or more checks failed') . " in a detached checkout; human review is still required. No project files were changed.\n\n" . $checkSummary . "\n\nReview diff:\n" . $review['diff']]);
+}
+code_json(200, ['revision' => $revision, 'action' => $action, 'message' => $decoded['message'], 'context_truncated' => $phpContextTruncated || !empty($decoded['context_truncated']), 'context_files' => $contextFiles]);

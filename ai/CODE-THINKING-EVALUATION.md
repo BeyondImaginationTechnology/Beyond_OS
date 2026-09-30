@@ -54,3 +54,23 @@ revision and record: requirement correctness, introduced regressions, claims
 without a supporting file citation, useful versus irrelevant checks, and
 whether assumptions and risks are stated. Do not treat a syntactically valid
 diff as a correct change. Start with one reviewer-approved patch at a time.
+
+## v0.5.1 release gate (2026-09-29)
+
+The model and adapter have not changed since the four calls above. The new PHP
+patch workflow reads committed blobs at the cited revision, rejects diffs for
+files not supplied in the request, applies candidate diffs to a detached
+checkout, records the actual diff, and reports static check results. The local
+fixture test passed for a valid PHP repair, an invented JavaScript filename,
+an unappliable hunk, a PHP syntax failure, and uncommitted source at `HEAD`.
+It also confirmed that the configured project working tree was untouched.
+Checks that would execute project code are skipped on the PHP host until an
+isolated runner is available. These are API guard tests, not model-quality
+scores or proof that a patch is correct.
+
+The four representative BIT prompts must be repeated through the authenticated
+admin API before calling the model release ready. This environment has no
+authenticated Beyond ID admin browser session or local runtime token, so no
+v0.5.1 model calls were made. Correctness, regressions, unsupported repository
+claims, and test usefulness for those four new attempts remain **unmeasured**.
+The prior 0/5 grounded-task scores above remain the last model evidence.

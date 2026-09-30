@@ -24,7 +24,7 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
   <link rel="canonical" href="https://recipe.beyondimagination.co.technology/">
   <link rel="manifest" href="<?= e(beyond_url('beyond-kitchen/manifest.webmanifest')) ?>">
   <link rel="icon" href="<?= e(beyond_url('beyond-kitchen/assets/kitchen-mark.svg')) ?>" type="image/svg+xml">
-  <link rel="stylesheet" href="<?= e(beyond_url('beyond-kitchen/assets/css/app.css?v=0.0.6')) ?>">
+  <link rel="stylesheet" href="<?= e(beyond_url('beyond-kitchen/assets/css/app.css?v=0.0.7')) ?>">
 </head>
 <body>
   <div class="app-shell">
@@ -35,6 +35,7 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
       </a>
       <nav class="top-actions" aria-label="Main navigation">
         <a href="#dinner">Dinner ideas</a>
+        <a href="#budget">Budget</a>
         <a href="#recipes">Recipes</a>
         <button class="favorite-nav" id="favoritesToggle" type="button" aria-pressed="false">
           <span aria-hidden="true">♡</span> <span>Saved</span> <span class="saved-count" id="savedCount">0</span>
@@ -110,6 +111,23 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
         </div>
       </section>
 
+      <section class="budget-section" id="budget" aria-labelledby="budgetHeading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Plan your plate</p>
+            <h2 id="budgetHeading">What might it cost?</h2>
+          </div>
+        </div>
+        <p class="budget-intro">Pick a recipe, region, and store to compare a cooking budget in CAD or USD.</p>
+        <div class="budget-controls">
+          <label>Recipe <select id="budgetRecipe" aria-label="Recipe to compare"></select></label>
+          <label>Region <select id="budgetRegion" aria-label="Region for budget"></select></label>
+          <label>Store <select id="budgetStore" aria-label="Preferred store"></select></label>
+        </div>
+        <div class="budget-result" id="budgetResult" aria-live="polite">Loading recipe budgets…</div>
+        <p class="budget-note">Illustrative ingredient-use estimates seeded September 2026, including small pantry portions. Regional and store differences are planning assumptions, not live shelf prices or exchange quotes. Package sizes, sales, tax, and availability can change your checkout total. <a href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810024502" target="_blank" rel="noopener noreferrer">Canadian food prices ↗</a> · <a href="https://www.ers.usda.gov/data-products/food-price-outlook/" target="_blank" rel="noopener noreferrer">U.S. food price outlook ↗</a></p>
+      </section>
+
       <section class="recipe-section" id="recipes" aria-labelledby="recipesHeading">
         <div class="section-heading recipe-heading">
           <div>
@@ -156,7 +174,7 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
   <p class="sr-status" id="statusMessage" role="status" aria-live="polite"></p>
 
   <script src="<?= e(beyond_url('beyond-kitchen/assets/js/recipe-library.js?v=0.0.2')) ?>" defer></script>
-  <script src="<?= e(beyond_url('beyond-kitchen/assets/js/app.js?v=0.0.6')) ?>" defer></script>
+  <script src="<?= e(beyond_url('beyond-kitchen/assets/js/app.js?v=0.0.7')) ?>" defer></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('<?= e(beyond_url('beyond-kitchen/service-worker.js')) ?>'));

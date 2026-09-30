@@ -3,8 +3,9 @@
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const state = { recipes: [], filter: 'All', favoritesOnly: false, favorites: new Set(), activeRecipe: null, servings: 2 };
+  const state = { recipes: [], filter: 'All', favoritesOnly: false, favorites: new Set(), activeRecipe: null, servings: 2, budget: null, regionId: 'ca-bc', storeId: '', budgetRecipeId: '' };
   const favoritesKey = 'beyond-kitchen-favorites-v1';
+  const budgetPreferencesKey = 'beyond-kitchen-budget-v1';
   const grid = $('#recipeGrid');
   const daily = $('#dailyRecipe');
   const dialog = $('#recipeDialog');
@@ -14,6 +15,10 @@
   const dinnerPrompt = $('#dinnerPrompt');
   const dinnerResults = $('#dinnerResults');
   const carouselTrack = $('#carouselTrack');
+  const budgetRegion = $('#budgetRegion');
+  const budgetStore = $('#budgetStore');
+  const budgetRecipe = $('#budgetRecipe');
+  const budgetResult = $('#budgetResult');
   let carouselSlides = [];
   let carouselDots = [];
   let carouselImages = [];
@@ -23,6 +28,96 @@
   const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   })[char]);
+
+  function selectedRegion() {
+    return state.budget?.regions.find((region) => region.id === state.regionId) || null;
+  }
+
+  function selectedStore() {
+    const region = selectedRegion();
+    return region?.stores.find((store) => store.id === state.storeId) || region?.stores[0] || null;
+  }
+
+  function estimatedCost(recipe, servings = recipe.servings, store = selectedStore()) {
+    const region = selectedRegion();
+    if (!region || !store) return null;
+    const unitCosts = state.budget.ingredientUnitCosts;
+    if (recipe.ingredients.some((item) => !Object.hasOwn(unitCosts, item.name))) return null;
+    const ingredients = recipe.ingredients.reduce((total, item) => total + item.amount * unitCosts[item.name], 0);
+    return ingredients * (servings / recipe.servings) * region.priceScale * region.factor * store.factor;
+  }
+
+  function money(amount) {
+    const currency = selectedRegion()?.currency || 'CAD';
+    return new Intl.NumberFormat('en-CA', { style: 'currency', currency, currencyDisplay: 'narrowSymbol', maximumFractionDigits: 0 }).format(amount);
+  }
+
+  function budgetLine(recipe, servings = recipe.servings) {
+    const cost = estimatedCost(recipe, servings);
+    return cost === null ? '' : `<span class="budget-chip">≈ ${money(cost)} · ${escapeHtml(selectedRegion().currency)}</span>`;
+  }
+
+  function storeComparison(recipe, servings) {
+    const region = selectedRegion();
+    if (!region) return '';
+    return `<div class="store-comparison" role="list">${region.stores.map((store) => {
+      const cost = estimatedCost(recipe, servings, store);
+      return `<div class="store-comparison-row${store.id === selectedStore().id ? ' selected' : ''}" role="listitem">
+        <button type="button" data-budget-store="${escapeHtml(store.id)}" aria-pressed="${store.id === selectedStore().id}">${escapeHtml(store.name)}</button>
+        <strong>${cost === null ? 'Unavailable' : `≈ ${money(cost)}`}</strong>
+        ${store.url ? `<a href="${escapeHtml(store.url)}" target="_blank" rel="noopener noreferrer" aria-label="Check current prices at ${escapeHtml(store.name)}">Check prices ↗</a>` : '<span class="budget-shop-note">Check a local flyer</span>'}
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  function saveBudgetPreferences() {
+    try {
+      localStorage.setItem(budgetPreferencesKey, JSON.stringify({ regionId: state.regionId, storeId: state.storeId }));
+    } catch (error) {
+      // Budget controls continue to work for this visit when storage is blocked.
+    }
+  }
+
+  function renderBudgetControls() {
+    if (!state.budget) return;
+    const region = selectedRegion();
+    if (!region) return;
+    budgetRegion.innerHTML = ['Canada', 'United States'].map((country) => `<optgroup label="${country}">${state.budget.regions.filter((item) => item.country === country).map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}</option>`).join('')}</optgroup>`).join('');
+    budgetRegion.value = region.id;
+    budgetStore.innerHTML = region.stores.map((store) => `<option value="${escapeHtml(store.id)}">${escapeHtml(store.name)}</option>`).join('');
+    state.storeId = selectedStore().id;
+    budgetStore.value = state.storeId;
+    budgetRecipe.innerHTML = state.recipes.map((recipe) => `<option value="${escapeHtml(recipe.id)}">${escapeHtml(recipe.name)}</option>`).join('');
+    if (!state.recipes.some((recipe) => recipe.id === state.budgetRecipeId)) state.budgetRecipeId = dailyRecipe().id;
+    budgetRecipe.value = state.budgetRecipeId;
+  }
+
+  function renderBudget() {
+    if (!state.budget) {
+      budgetResult.textContent = 'Budget estimates are unavailable right now.';
+      return;
+    }
+    const recipe = state.recipes.find((item) => item.id === state.budgetRecipeId) || dailyRecipe();
+    const cost = estimatedCost(recipe);
+    const region = selectedRegion();
+    const store = selectedStore();
+    budgetResult.innerHTML = cost === null
+      ? '<p>We cannot estimate this recipe yet.</p>'
+      : `<div class="budget-summary"><div><span class="eyebrow">${escapeHtml(recipe.name)}</span><p>Estimated ingredients for ${recipe.servings} servings at ${escapeHtml(store.name)}</p></div><div class="budget-total">≈ ${money(cost)}<small>${escapeHtml(region.currency)} total · ≈ ${money(cost / recipe.servings)} per serving</small></div></div>
+        <h3>Compare stores in ${escapeHtml(region.name)}</h3>
+        ${storeComparison(recipe, recipe.servings)}`;
+  }
+
+  function refreshBudgetViews() {
+    renderBudgetControls();
+    renderBudget();
+    if (state.recipes.length) {
+      renderDaily();
+      renderRecipes();
+      if (dialog.open && state.activeRecipe) renderDetails();
+    }
+    saveBudgetPreferences();
+  }
 
   function announce(message) {
     status.textContent = message;
@@ -230,6 +325,7 @@
         <h3>${escapeHtml(recipe.name)}</h3>
         <p>${escapeHtml(recipe.description)}</p>
         ${recipeMeta(recipe)}
+        ${budgetLine(recipe)}
         <div class="daily-actions">
           <button class="primary-button" type="button" data-open="${escapeHtml(recipe.id)}">Get cooking <span aria-hidden="true">→</span></button>
           ${favoriteButton(recipe)}
@@ -259,6 +355,7 @@
           <span class="category-label">${escapeHtml(recipe.category)}</span>
           <h3>${escapeHtml(recipe.name)}</h3>
           <p>${escapeHtml(recipe.description)}</p>
+          ${budgetLine(recipe)}
           <div class="card-footer"><span>◷ ${recipe.timeMinutes} min · ${escapeHtml(recipe.difficulty)}</span><span>${escapeHtml(recipe.tags[0])}</span></div>
         </div>
       </article>`).join('');
@@ -285,6 +382,7 @@
           ${favoriteButton(recipe, 'favorite-button detail-favorite')}
         </div>
         ${recipeMeta(recipe, state.servings)}
+        ${state.budget && estimatedCost(recipe, state.servings) !== null ? `<section class="detail-budget" aria-label="Estimated recipe budget"><div><span class="eyebrow">Cooking budget</span><strong>≈ ${money(estimatedCost(recipe, state.servings))} <small>${escapeHtml(selectedRegion().currency)} for ${state.servings} servings</small></strong></div><p>Ingredient-use estimate in ${escapeHtml(selectedRegion().name)}. Select a store to compare.</p>${storeComparison(recipe, state.servings)}</section>` : ''}
         <div class="detail-columns">
           <section aria-labelledby="ingredientsHeading">
             <h3 id="ingredientsHeading">What you'll need</h3>
@@ -331,7 +429,7 @@
   }
 
   document.addEventListener('click', (event) => {
-    const target = event.target.closest('[data-open], [data-favorite], [data-filter], [data-servings], #favoritesToggle, #dialogClose');
+    const target = event.target.closest('[data-open], [data-favorite], [data-filter], [data-servings], [data-budget-store], #favoritesToggle, #dialogClose');
     if (!target) return;
     if (target.matches('[data-open]')) openRecipe(target.dataset.open);
     if (target.matches('[data-favorite]')) {
@@ -357,6 +455,10 @@
       state.servings = Math.min(12, Math.max(1, state.servings + Number(target.dataset.servings)));
       renderDetails();
     }
+    if (target.matches('[data-budget-store]')) {
+      state.storeId = target.dataset.budgetStore;
+      refreshBudgetViews();
+    }
   });
 
   document.addEventListener('keydown', (event) => {
@@ -367,18 +469,51 @@
   });
 
   search.addEventListener('input', renderRecipes);
+  budgetRegion.addEventListener('change', () => {
+    state.regionId = budgetRegion.value;
+    state.storeId = '';
+    refreshBudgetViews();
+  });
+  budgetStore.addEventListener('change', () => {
+    state.storeId = budgetStore.value;
+    refreshBudgetViews();
+  });
+  budgetRecipe.addEventListener('change', () => {
+    state.budgetRecipeId = budgetRecipe.value;
+    renderBudget();
+  });
   const now = new Date();
   $('#todayDate').textContent = new Intl.DateTimeFormat(undefined, { weekday: 'long', month: 'long', day: 'numeric' }).format(now);
 
-  fetch('./data/recipes.json')
-    .then((response) => {
+  Promise.all([
+    fetch('./data/recipes.json').then((response) => {
       if (!response.ok) throw new Error(`Recipe data request failed (${response.status}).`);
       return response.json();
+    }),
+    fetch('./data/budget-estimates.json').then((response) => {
+      if (!response.ok) throw new Error(`Budget data request failed (${response.status}).`);
+      return response.json();
+    }).catch((error) => {
+      console.warn('Beyond Kitchen budgets are unavailable:', error);
+      return null;
     })
-    .then((recipes) => {
+  ])
+    .then(([recipes, budget]) => {
       if (!Array.isArray(recipes) || recipes.length === 0) throw new Error('Recipe data is empty.');
       state.recipes = recipes;
+      state.budget = budget && Array.isArray(budget.regions) ? budget : null;
+      if (state.budget) {
+        try {
+          const saved = JSON.parse(localStorage.getItem(budgetPreferencesKey) || '{}');
+          if (state.budget.regions.some((region) => region.id === saved.regionId)) state.regionId = saved.regionId;
+          if (typeof saved.storeId === 'string') state.storeId = saved.storeId;
+        } catch (error) {
+          // Default to British Columbia when preferences cannot be read.
+        }
+      }
       readFavorites();
+      renderBudgetControls();
+      renderBudget();
       renderDaily();
       loadCarousel(dailyRecipe());
       renderRecipes();

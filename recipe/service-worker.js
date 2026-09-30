@@ -1,10 +1,10 @@
-const CACHE_NAME = 'beyond-kitchen-0.0.2-assets-v6';
+const CACHE_NAME = 'beyond-kitchen-0.0.2-assets-v7';
 const APP_FILES = [
   './',
   './offline.html',
-  './assets/css/app.css?v=0.0.6',
+  './assets/css/app.css?v=0.0.7',
   './assets/js/recipe-library.js?v=0.0.2',
-  './assets/js/app.js?v=0.0.6',
+  './assets/js/app.js?v=0.0.7',
   './assets/kitchen-mark.svg',
   './assets/images/recipes/lemon-chickpea-bowls.png',
   './assets/images/recipes/tomato-butter-beans.jpg',
@@ -16,6 +16,7 @@ const APP_FILES = [
   './assets/images/recipes/haitian-diri-djon-djon.jpg',
   './assets/images/recipes/haitian-tassot-plantains.jpg',
   './data/recipes.json',
+  './data/budget-estimates.json',
   './manifest.webmanifest'
 ];
 

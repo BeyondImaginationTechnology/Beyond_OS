@@ -24,6 +24,24 @@ falls back to readable recipe slides while offline or before the daily render.
 The native clients bundle the recipe catalog and photos, so their carousels
 work without network access.
 
+## Recipe budget planner
+
+The web app shows an ingredient-use estimate for every recipe, scales it with
+servings, and compares three store choices. The region selector covers all 13
+Canadian provinces and territories and all 50 U.S. states plus Washington, DC,
+and Puerto Rico. Canadian estimates display CAD; U.S. estimates display USD.
+The chosen region and store are saved in the browser.
+
+`data/budget-estimates.json` contains the September 2026 planning assumptions:
+ingredient unit costs, coarse regional factors, and store profile factors.
+These values are editorial estimates, not current retailer quotes or a live
+currency conversion. They estimate the share of ingredients used, including
+small pantry portions, rather than the full cost of buying every package.
+Store links let readers check current prices. Statistics Canada provincial food
+price data and the USDA Food Price Outlook provide context, but the per-item
+and per-store factors are not official figures from either source. Refresh the
+data file before using estimates as current shopping guidance.
+
 ## What's for dinner? · beta 0.0.1
 
 The dinner guide accepts a short free-text prompt, with optional time, budget,

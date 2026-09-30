@@ -4,9 +4,11 @@ set -eu
 case "${1:-}" in
   start)
     nft -f /etc/nftables.conf
+    printf 'Cyber inbound and forwarding policy loaded at startup.\n' > /run/bit-cyber-firewall.status
     ;;
   stop)
     nft flush ruleset
+    rm -f /run/bit-cyber-firewall.status
     ;;
   restart)
     "$0" stop

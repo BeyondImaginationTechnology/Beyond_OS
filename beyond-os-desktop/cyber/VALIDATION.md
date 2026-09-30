@@ -1,50 +1,50 @@
-# BIT OS Cyber 0.1 validation — 2026-09-26
+# BIT OS Cyber 0.1 validation — 2026-09-30
 
-Status: **0.1 identity and post-build preflight pass; the installer build is running on the GCP test VM. UEFI boot and public download availability remain pending.**
+Status: **Development candidate built and booted under QEMU/OVMF. Stable release gates remain open; Cyber 0.1 is not published.**
 
-## Cyber 0.1 build checkpoint — 2026-09-26
+## Build
 
-- Cyber product identity, on-screen version, installer name, and release paths now use 0.1 / `cyber-0.1-dev.1`.
-- `python3 tests/post-build-test.py` passed on `bit-os-core-test-a` before the installer build.
-- The installer build is running with `BR2_JLEVEL=2` in `/home/goldenghostog/cyber-v0.1-work/cyber/out/installer-output`; log: `/home/goldenghostog/cyber-v0.1-build.log`.
-- Buildroot host GCC is compiling. The only messages found so far are optional missing `makeinfo` documentation notices; no build failure has occurred.
-- Public files are intended for `/releases/cyber/0.1/` as compressed ISO and GPT image with a SHA-256 manifest. The host currently serves the Core release files but has no known upload credentials from this workspace.
+- Build host: Google Compute Engine `bit-os-core-test-a`, x86-64 Linux, project `project-79ff0164-14f2-4be2-ba5`, zone `northamerica-northeast2-a`.
+- Isolated checkout: `/home/goldenghostog/cyber-v0.1-work/cyber`.
+- `BR2_JLEVEL=2 bash build.sh installer` completed successfully. Final build log: `/home/goldenghostog/cyber-v0.1-lsblk-build.log`.
+- `tools/verify-config.py` passed: 70 requested settings retained; root password login and SSH disabled.
+- Buildroot installer output: `out/installer-output/images`. Its original `SHA256SUMS` verified with `sha256sum -c`:
 
-## Completed in this workspace
+| Raw image | SHA-256 |
+| --- | --- |
+| `bit-os-cyber-0.1-installer.img` | `08beef578deea86e6aeec3623b5c9120017a10e818ae2010150b45cf97356a0d` |
+| `bitCyberos.iso` | `49083488f79b464499ef8dab737535e9069249b77a01ab77472ad24324e96d2d` |
+| `rootfs.ext2` | `1aa50f6619b06717a5a9fc0b99909f6206051102b944908e7c75d1c718f35fa9` |
 
-- Cyber uses the pinned Buildroot 2026.02.3 source archive and recorded SHA-256.
-- Static configuration verification rejects dropped settings, root password login, Dropbear, and OpenSSH.
-- The installer requires UEFI, explicit target selection, and exact confirmation text. It refuses its own USB, mounted targets, invalid EFI partitions, and undersized destinations.
-- The post-build hook now creates installer mount points before the live ISO remounts `/` read-only. This repairs a failure path where the ISO installer could not create `/mnt/bit-*` after the remount.
-- The post-build test now covers Cyber identity, display startup replacement, firewall startup, the evidence workspace, and installer mount-point creation.
-- The shared Windows USB creator builds successfully with the .NET Framework compiler and requires administrator elevation. Its release URLs now use the canonical `os.beyondimagination.co.technology/releases/` paths.
-- The public OS page now uses the same canonical Cyber release directory and only exposes download buttons for files present on the release host.
-- The known Core candidate manifest is reachable on the canonical release host. The Cyber release directory was not available during this audit.
+Candidate download archives are staged locally in `.local/cyber-v0.1/release-candidate/` (ignored by Git). `gzip -t` and `sha256sum -c` passed on the build host; local downloaded files also matched the compressed-file manifest:
 
-## Still required on a Linux build host
+| Download archive | Size | SHA-256 |
+| --- | ---: | --- |
+| `bitCyberos.iso.gz` | 41,866,136 bytes | `70eb95e7aec5471b32f87d04e7aee2bd0c291a182e90bb361af952c3a83ee0e8` |
+| `bit-os-cyber-0.1-installer.img.gz` | 59,601,114 bytes | `8a95de1b3d55158c0d280a312ceadf2a3e1caaa9023f8bf4743fa0a84a2ba7ad` |
 
-```sh
-cd beyond-os-desktop/cyber
-bash build.sh configure
-bash build.sh build
-bash build.sh installer
-python3 tests/post-build-test.py
-bash build.sh legal-info
-```
+`SHA256SUMS` hashes the compressed downloads. `SHA256SUMS.raw` preserves the Buildroot raw-image hashes.
 
-Retain the build logs and the complete `output/images` and `installer-output/images` metadata. Then perform every boot, disposable-disk, firewall, persistence, and hardware check in `RELEASE.md`.
+## UEFI boot and installation
 
-## Publication layout
+- The ISO and GPT USB image displayed both **Try BIT OS Cyber Edition 0.1** and **Install BIT OS Cyber Edition 0.1** in QEMU with OVMF UEFI and software emulation.
+- The GPT image's Try entry reached the live Cyber desktop. Its Install entry refused to erase its own `/dev/vda` installer disk with `Installer stopped: the installer USB disk cannot be erased`. The latter check used the final GPT image after the `lsblk -dn` fix.
+- The final ISO's Install entry completed the explicit whole-disk workflow on a fresh disposable 6 GiB qcow2 `/dev/vda`, including the exact `ERASE /dev/vda` confirmation.
+- After removing the ISO, OVMF loaded the installed disk's `BIT OS Cyber` NVRAM entry at `\EFI\BITOS\bootx64.efi`; GRUB loaded the system, and the Cyber desktop appeared. The serial log showed nftables rules loading and DHCP obtaining `10.0.2.15`. Evidence: `/tmp/cyber-v01-iso-final-installed-serial.log` on the VM and local screenshot `.local/cyber-v0.1/iso-final-installed.png`.
+- The installed disk still labels its boot menu entry **Try BIT OS Cyber Edition 0.1**. This wording should be changed before stable release.
 
-After the applicable release gates pass, publish the verified candidate files together:
+## Fixes found during installation testing
 
-```text
-/releases/cyber/0.1/bitCyberos.iso.gz
-/releases/cyber/0.1/bit-os-cyber-0.1-installer.img.gz
-/releases/cyber/0.1/SHA256SUMS
-```
+- Include `wipefs` and GNU tar in the installer image.
+- Avoid creating live-root mount points after the ISO has remounted its root read-only.
+- Restore runtime directories in the installed root and boot it read/write.
+- Copy the kernel to the installed EFI system partition, mount `efivarfs` before registering the boot entry, and provide a standard UEFI fallback path on a newly formatted ESP.
+- Use the correct single-backslash EFI path for the NVRAM entry.
+- Limit disk-type detection to the selected block device with `lsblk -dn`, so a USB disk's child partitions cannot mask the self-erase guard.
+- Refresh the target's GRUB template in the post-build hook and include serial output for boot diagnostics.
 
-The Windows USB creator is not part of this initial 0.1 candidate download set.
-Do not enable the Cyber profile in `windows-installer/Program.cs` until its
-unsigned status is resolved and the image and manifest return successfully
-from the public URLs.
+## Remaining release gates
+
+The clean system build and standalone system-image cold boot, selected-partition install, remaining installer rejection cases, persistence after reboot, detailed firewall checks, physical-device checks, legal/source review, signed Windows installer, and public download checks are still open. See `RELEASE.md`. Secure Boot, full-disk encryption, and signed in-system updates are not implemented in this candidate.
+
+The VM also hosts active Home testing sessions. Do not stop it as part of Cyber cleanup. The Cyber QEMU session used for the final installed-disk check was stopped after the result was recorded.

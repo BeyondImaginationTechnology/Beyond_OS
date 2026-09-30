@@ -1,5 +1,5 @@
 #!/bin/sh
-# A Try Home ISO mounts its root filesystem read-only. Give services and the
+# A Try Cyber ISO mounts its root filesystem read-only. Give services and the
 # unprivileged desktop account ephemeral writable locations without changing
 # the installed-system path.
 case "$(awk '$2 == "/" { print $4 }' /proc/mounts)" in

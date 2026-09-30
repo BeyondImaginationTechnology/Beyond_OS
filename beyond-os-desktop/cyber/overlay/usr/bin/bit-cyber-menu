@@ -1,0 +1,57 @@
+#!/bin/sh
+set -eu
+
+workspace="${HOME:-/home/home}/Documents/Cyber"
+scope_file="$workspace/Scope.txt"
+mkdir -p "$workspace/Evidence"
+
+while :; do
+    printf '\033[2J\033[H'
+    printf 'BIT OS Cyber 0.1 - local defensive workspace\n\n'
+    printf '1. Record authorized scope\n'
+    printf '2. Show local network inventory\n'
+    printf '3. Show firewall status\n'
+    printf '4. Show evidence folder\n'
+    printf '5. Open command shell\n'
+    printf 'q. Quit\n\nChoice: '
+    IFS= read -r choice || exit 0
+    case "$choice" in
+        1)
+            printf 'Organization or owner: '
+            IFS= read -r owner || exit 0
+            printf 'Authorized systems or purpose: '
+            IFS= read -r purpose || exit 0
+            printf 'Authorization reference: '
+            IFS= read -r reference || exit 0
+            if [ -z "$owner" ] || [ -z "$purpose" ] || [ -z "$reference" ]; then
+                printf '\nAll three fields are required.\n'
+            else
+                umask 077
+                { printf 'Owner: %s\nPurpose and systems: %s\nAuthorization: %s\n' \
+                    "$owner" "$purpose" "$reference"; } > "$scope_file"
+                printf '\nSaved %s\n' "$scope_file"
+            fi
+            ;;
+        2)
+            printf '\nLocal interfaces:\n'
+            ip -brief address 2>&1 || true
+            printf '\nRoutes:\n'
+            ip route 2>&1 || true
+            ;;
+        3)
+            printf '\nFirewall startup status:\n'
+            if [ -f /run/bit-cyber-firewall.status ]; then
+                cat /run/bit-cyber-firewall.status
+            else
+                printf 'The firewall startup status is unavailable.\n'
+            fi
+            printf 'Configured policy: deny unsolicited inbound and forwarded traffic.\n'
+            ;;
+        4) printf '\nEvidence: %s\n' "$workspace/Evidence"; ls -la "$workspace/Evidence" ;;
+        5) printf '\nType exit to return to Cyber.\n'; /bin/sh ;;
+        q|Q) exit 0 ;;
+        *) printf '\nChoose 1-5 or q.\n' ;;
+    esac
+    printf '\nPress Enter to continue...'
+    IFS= read -r _ || exit 0
+done

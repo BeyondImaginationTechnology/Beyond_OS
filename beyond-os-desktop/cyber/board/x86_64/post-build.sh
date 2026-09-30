@@ -1,13 +1,15 @@
 #!/bin/sh
 set -eu
 target=$(realpath "$1")
+board_dir=$(dirname "$0")
 [ "$target" != / ] || exit 1
 [ -d "$target/etc" ] && [ -d "$target/usr" ] || exit 1
 # Our session owns display :0. The upstream default would start a second server.
 rm -f "$target/etc/init.d/S40xorg"
 # Normalize executable modes even when the checkout originated on Windows.
 chmod 0755 "$target/etc/init.d/S00beyond-live-runtime" "$target/etc/init.d/S01beyond-splash" "$target/etc/init.d/S42bitos-cyber-firewall" "$target/etc/init.d/S99beyond-cyber"
-chmod 0755 "$target/usr/bin/beyond-session" "$target/usr/bin/beyond-user-session" "$target/usr/bin/bit-install-cyber"
+chmod 0755 "$target/usr/bin/beyond-session" "$target/usr/bin/beyond-user-session" "$target/usr/bin/bit-install-cyber" "$target/usr/bin/bit-cyber-menu"
+install -D -m 0644 "$board_dir/grub.cfg.in" "$target/usr/share/beyond-cyber/grub.cfg.in"
 # The skeleton may use a symlink; remove it inside the target before writing.
 rm -f "$target/etc/os-release"
 cat > "$target/etc/os-release" <<'EOF'

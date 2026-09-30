@@ -8,7 +8,7 @@ linux_guid=0fc63daf-8483-4772-8e79-3d69d8477de4
 fail() { printf '%s\n' "Installer stopped: $*" >&2; exit 1; }
 notice() { printf '%s\n' "$*"; }
 partition_disk() { printf '/dev/%s\n' "$(lsblk -n -o PKNAME "$1" | head -n 1)"; }
-partition_type() { lsblk -n -o TYPE "$1"; }
+partition_type() { lsblk -dn -o TYPE "$1"; }
 unmounted() { ! mountpoint -q "$1"; }
 
 [ "$(id -u)" -eq 0 ] || fail "installer must start from the installer boot entry"
@@ -108,29 +108,35 @@ if [ "$source_kind" = usb ]; then
   resize2fs "$target_root"
 else
   mkfs.ext4 -F -L BEYOND_CYBER "$target_root"
-  install -d /mnt/bit-target-root
+  [ -d /mnt/bit-target-root ] || fail "installer root mount point is missing"
   mount "$target_root" /mnt/bit-target-root
   tar -C / --one-file-system --exclude=./dev --exclude=./proc --exclude=./sys \
     --exclude=./run --exclude=./tmp --exclude=./mnt --exclude=./media --exclude=./var -cpf - . |
     tar -C /mnt/bit-target-root -xpf -
-  install -d -m 0755 /mnt/bit-target-root/var/cache /mnt/bit-target-root/var/lib /mnt/bit-target-root/var/log
-  install -d -m 1777 /mnt/bit-target-root/var/tmp
+  install -d -m 0755 \
+    /mnt/bit-target-root/dev /mnt/bit-target-root/proc /mnt/bit-target-root/sys \
+    /mnt/bit-target-root/run /mnt/bit-target-root/mnt /mnt/bit-target-root/media \
+    /mnt/bit-target-root/var/cache /mnt/bit-target-root/var/lib /mnt/bit-target-root/var/log
+  install -d -m 1777 /mnt/bit-target-root/tmp /mnt/bit-target-root/var/tmp
+  ln -s /run /mnt/bit-target-root/var/run
+  ln -s /run/lock /mnt/bit-target-root/var/lock
   sync
   umount /mnt/bit-target-root
 fi
 
 target_uuid=$(blkid -s PARTUUID -o value "$target_root" || true)
 [ -n "$target_uuid" ] || fail "could not read target partition UUID"
-install -d /mnt/bit-target-esp
+[ -d /mnt/bit-target-esp ] || fail "installer EFI mount point is missing"
 if [ "$target_esp_new" = true ]; then
   mkfs.vfat -F 32 -n BITOS_EFI "$target_esp"
 fi
 mount "$target_esp" /mnt/bit-target-esp
 install -d /mnt/bit-target-esp/EFI/BITOS
+cp /boot/bzImage /mnt/bit-target-esp/bzImage
 if [ "$source_kind" = usb ]; then
   source_esp=$(lsblk -nrpo NAME,PARTTYPE "$source_disk" | awk -v type="$efi_guid" 'tolower($2) == type { print $1; exit }')
   [ -n "$source_esp" ] && [ -b "$source_esp" ] || fail "could not locate the installer EFI partition"
-  install -d /mnt/bit-source-esp
+  [ -d /mnt/bit-source-esp ] || fail "installer source EFI mount point is missing"
   mount -o ro "$source_esp" /mnt/bit-source-esp
   cp /mnt/bit-source-esp/EFI/BOOT/bootx64.efi /mnt/bit-target-esp/EFI/BITOS/bootx64.efi
   umount /mnt/bit-source-esp
@@ -138,10 +144,24 @@ else
   mcopy -o -i /boot/fat.efi ::EFI/BOOT/bootx64.efi /mnt/bit-target-esp/EFI/BITOS/bootx64.efi
 fi
 sed "s/%PARTUUID%/$target_uuid/g" /usr/share/beyond-cyber/grub.cfg.in > /mnt/bit-target-esp/EFI/BITOS/grub.cfg
+if [ "$target_esp_new" = true ]; then
+  # A fresh disk can use the standard UEFI fallback path even when the
+  # firmware cannot save a boot entry. Leave existing ESP fallbacks alone.
+  install -d /mnt/bit-target-esp/EFI/BOOT
+  cp /mnt/bit-target-esp/EFI/BITOS/bootx64.efi /mnt/bit-target-esp/EFI/BOOT/BOOTX64.EFI
+  cp /mnt/bit-target-esp/EFI/BITOS/grub.cfg /mnt/bit-target-esp/EFI/BOOT/grub.cfg
+fi
 sync
 umount /mnt/bit-target-esp
 
 esp_number=$(lsblk -n -o PARTN "$target_esp")
-efibootmgr -c -d "$target_disk" -p "$esp_number" -L "BIT OS Cyber" -l '\\EFI\\BITOS\\bootx64.efi'
+if ! mountpoint -q /sys/firmware/efi/efivars; then
+  mount -t efivarfs efivarfs /sys/firmware/efi/efivars || \
+    notice "Could not mount UEFI variables; trying firmware fallback."
+fi
+if ! efibootmgr -c -d "$target_disk" -p "$esp_number" -L "BIT OS Cyber" -l '\EFI\BITOS\bootx64.efi'; then
+  [ "$target_esp_new" = true ] || fail "could not register a UEFI boot entry for the existing EFI partition"
+  notice "Firmware boot entry unavailable; the new disk has a UEFI fallback bootloader."
+fi
 notice "Installation completed. Remove the USB and choose BIT OS Cyber from UEFI boot options."
 exec /sbin/reboot -f

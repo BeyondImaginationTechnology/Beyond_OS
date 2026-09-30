@@ -302,7 +302,7 @@ if ($slug === 'beyond-after-dark') {
             'duration' => max(60, (int)($entry['duration'] ?? 7200)),
             'creator' => '',
             'license' => 'Testing',
-            'rights_url' => (string)($entry['source_url'] ?? ''),
+            'rights_url' => '',
         ];
     }
     $goosebumpsRows = json_decode((string)@file_get_contents(dirname(__DIR__) . '/data/goosebumps-library.json'), true) ?: [];

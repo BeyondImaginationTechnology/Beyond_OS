@@ -96,7 +96,7 @@ function beyond_movies_catalog(): array {
             'duration' => max(60, (int)($entry['duration'] ?? 7200)),
             'rating' => (string)($entry['rating'] ?? 'NR'),
             'url' => (string)$entry['video_url'],
-            'rights_url' => (string)($entry['source_url'] ?? ''),
+            'rights_url' => '',
         ];
     }
     return $movies;

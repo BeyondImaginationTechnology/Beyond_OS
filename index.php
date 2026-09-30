@@ -1,5 +1,10 @@
 <?php
 declare(strict_types=1);
+header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
+header('CDN-Cache-Control: no-store');
+header('Surrogate-Control: no-store');
+header('Pragma: no-cache');
+header('Expires: 0');
 require_once __DIR__ . '/includes/ecosystem.php';
 require_once __DIR__ . '/beyond-tv/includes/classic-schedule.php';
 require_once __DIR__ . '/beyond-tv/includes/beyond-cartoons-schedule.php';

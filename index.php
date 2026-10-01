@@ -73,7 +73,6 @@ if (is_file($frenchLessonsPath)) {
 <link rel="canonical" href="https://beyondimagination.co.technology/">
 <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
 <link rel="stylesheet" href="/assets/css/beyond-splash.css?v=20260828-1">
-<link rel="stylesheet" href="/assets/css/stylesheet-1-31.css?v=20261001-1">
 <link rel="stylesheet" href="/beyond-tv/assets/css/video-ads.css?v=1.0.0">
 <script src="/assets/js/beyond-splash.js?v=20260904-1" defer></script>
 <style>
@@ -226,7 +225,6 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
                     <ellipse rx="72" ry="31" transform="rotate(0)"/>
                     <ellipse rx="72" ry="31" transform="rotate(60)"/>
                     <ellipse rx="72" ry="31" transform="rotate(120)"/>
-                    <ellipse rx="80" ry="17" transform="rotate(30)" stroke-width="5" opacity=".82"/>
                 </g>
                 <g class="svg-nucleus" transform="scale(.7)">
                     <path d="M0-25A17 17 0 0 0-9.5 6L-17 32H17L9.5 6A17 17 0 0 0 0-25Z" fill="none" stroke="#d7d1ff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" style="filter:drop-shadow(0 0 7px rgba(181,172,255,.46))"/>

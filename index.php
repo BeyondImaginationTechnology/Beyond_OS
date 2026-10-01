@@ -190,6 +190,9 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 .planet.ps{left:92%;top:60%;right:auto;bottom:auto}
 @media(max-width:560px){.planet.ph{left:16%;top:30%}.planet.pe{left:84%;top:24%}.planet.pf{left:25%;top:82%}.planet.px{left:72%;top:82%}.planet.ps{left:92%;top:60%}}
 </style>
+<style>
+.hero-primary-actions{display:grid;gap:10px}
+</style>
 </head>
 <body class="home-page">
 <header class="top wrap site-header">
@@ -216,7 +219,10 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
         <p class="tagline">Live. Learn. Earn. Explore. Protect.</p>
         <p class="intro">Useful apps for wellness, learning, creator commerce, entertainment and digital protection—connected through Beyond ID. BIT OS is the planned operating-environment layer for home, learning, creating and organizational work.</p>
         <div class="hero-actions">
-            <a class="primary" href="https://host.beyondimagination.co.technology/">Open Desktop &nbsp;→</a>
+            <div class="hero-primary-actions">
+                <a class="primary" href="https://host.beyondimagination.co.technology/">Open Desktop &nbsp;→</a>
+                <a class="ghost beyond-ai-demo" href="/ai/chat.php">Beyond -1 AI Llama Jaguar Demo &nbsp;→</a>
+            </div>
             <a class="ghost" href="/beyond-tv/">Watch TV ▶</a>
         </div>
         <div class="benefits"><span><b>∞</b> Every possibility, connected</span></div>

@@ -1,0 +1,79 @@
+{
+  "brand": "Daily Breath",
+  "series": "A story to carry with you",
+  "title": "A moment that changed everything",
+  "subtitle": "A 60-second story",
+  "beats": [
+    {
+      "id": "intro",
+      "label": "The familiar world",
+      "startSeconds": 0,
+      "durationSeconds": 10,
+      "narration": "Everything seemed as it always had—until one moment changed the course of the day.",
+      "onScreenText": "Before everything changed",
+      "visualPrompt": "Quiet dawn light over an ordinary landscape, intimate cinematic framing, gentle camera drift."
+    },
+    {
+      "id": "inciting",
+      "label": "The turning begins",
+      "startSeconds": 10,
+      "durationSeconds": 10,
+      "narration": "Then came the unexpected event that made the familiar feel uncertain.",
+      "onScreenText": "Then, something changed",
+      "visualPrompt": "A sudden detail interrupts a still scene; shift from soft light to a focused, high-contrast close-up."
+    },
+    {
+      "id": "rising",
+      "label": "The struggle",
+      "startSeconds": 20,
+      "durationSeconds": 15,
+      "narration": "Each choice carried a consequence. The way forward was not clear, but small signs began to gather.",
+      "onScreenText": "One choice at a time",
+      "visualPrompt": "Three escalating visual beats: a difficult path, a decisive gesture, and a new clue revealed in warm light."
+    },
+    {
+      "id": "peak",
+      "label": "The turning point",
+      "startSeconds": 35,
+      "durationSeconds": 7,
+      "narration": "At the center of it all, one truth came into focus.",
+      "onScreenText": "The moment of truth",
+      "visualPrompt": "Hold on one powerful symbolic image as light breaks through shadow; slow, deliberate camera push."
+    },
+    {
+      "id": "falling",
+      "label": "What followed",
+      "startSeconds": 42,
+      "durationSeconds": 4,
+      "narration": "The immediate tension gave way to a consequence.",
+      "onScreenText": "A new way forward",
+      "visualPrompt": "The scene settles after the turning point; soften contrast and let motion ease to stillness."
+    },
+    {
+      "id": "resolution",
+      "label": "What remains",
+      "startSeconds": 46,
+      "durationSeconds": 4,
+      "narration": "And a meaning worth carrying into today.",
+      "onScreenText": "Carry this with you",
+      "visualPrompt": "Quiet closing image with open space and a hopeful horizon, calm natural light, gentle fade."
+    }
+  ],
+  "sources": [
+    {
+      "citation": "Add a verified source before production.",
+      "url": "",
+      "notes": ""
+    }
+  ],
+  "outroText": "Take a breath. Carry the story forward.",
+  "fps": 30,
+  "width": 1080,
+  "height": 1920,
+  "palette": {
+    "background": "#10271F",
+    "foreground": "#F5F1E8",
+    "accent": "#B9D6A1",
+    "muted": "#B9C5BB"
+  }
+}

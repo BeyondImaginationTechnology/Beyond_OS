@@ -66,7 +66,56 @@ if (is_file($frenchLessonsPath)) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['fall','dark','light','sunset','ocean','forest'].includes(t)?t:'fall';}catch(e){document.documentElement.dataset.theme='fall';}try{const c=localStorage.getItem('beyond-currency');document.documentElement.dataset.currency=['BITS','USD','CAD'].includes(c)?c:'BITS';}catch(e){document.documentElement.dataset.currency='BITS';}})();</script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var themes = ['fall', 'dark', 'light', 'sunset', 'ocean', 'forest'];
+  var icons = { fall: '\uD83C\uDF42', dark: '\uD83C\uDF19', light: '\u2600\uFE0F', sunset: '\uD83C\uDF05', ocean: '\uD83C\uDF0A', forest: '\uD83C\uDF32' };
+  var labels = { fall: 'Fall', dark: 'Dark', light: 'Light', sunset: 'Sunset', ocean: 'Ocean', forest: 'Forest' };
+  var colors = { fall: '#24140d', dark: '#050817', light: '#f4f6fc', sunset: '#32113d', ocean: '#071E2E', forest: '#101C16' };
+
+  function themeForCurrentTime() {
+    var hour = new Date().getHours();
+    if (hour >= 5 && hour < 9) return 'light';
+    if (hour >= 9 && hour < 13) return 'forest';
+    if (hour >= 13 && hour < 17) return 'ocean';
+    if (hour >= 17 && hour < 19) return 'fall';
+    if (hour >= 19 && hour < 22) return 'sunset';
+    return 'dark';
+  }
+
+  function updateTheme(theme) {
+    root.dataset.theme = theme;
+    root.dataset.defaultTheme = theme;
+    var next = themes[(themes.indexOf(theme) + 1) % themes.length];
+    var buttons = document.querySelectorAll('.theme-toggle');
+    for (var index = 0; index < buttons.length; index += 1) {
+      buttons[index].textContent = icons[theme];
+      buttons[index].title = labels[theme] + ' theme - switch to ' + labels[next];
+      buttons[index].setAttribute('aria-label', 'Current theme ' + labels[theme] + '. Switch to ' + labels[next] + ' theme');
+    }
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', colors[theme]);
+  }
+
+  var scheduledTheme = themeForCurrentTime();
+  updateTheme(scheduledTheme);
+  window.setInterval(function () {
+    var nextScheduledTheme = themeForCurrentTime();
+    if (nextScheduledTheme !== scheduledTheme) {
+      scheduledTheme = nextScheduledTheme;
+      updateTheme(scheduledTheme);
+    }
+  }, 60000);
+
+  try {
+    var currency = localStorage.getItem('beyond-currency');
+    root.dataset.currency = ['BITS', 'USD', 'CAD'].indexOf(currency) !== -1 ? currency : 'BITS';
+  } catch (error) {
+    root.dataset.currency = 'BITS';
+  }
+})();
+</script>
 <meta name="theme-color" content="#24140d">
 <title>Beyond Imagination Technology | Live. Learn. Earn. Explore. Protect.</title>
 <meta name="description" content="Beyond Imagination Technology connects health, education, creator commerce, entertainment and protection through Beyond ID and BIT OS.">

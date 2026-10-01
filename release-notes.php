@@ -23,7 +23,7 @@ function whats_new_card(string $title, string $copy, string $href, string $actio
 <body class="bos-page">
 <main class="bos-main whats-new-main">
   <section class="bos-hero whats-new-hero">
-    <span class="bos-kicker">Weekly update · <time datetime="2026-09-26">Saturday, September 26, 2026</time></span>
+    <span class="bos-kicker">Weekly update · <time datetime="2026-10-01">Thursday, October 1, 2026</time></span>
     <h1>What’s new.</h1>
     <p>This week across Beyond: app updates, creative tools, and OS milestones. Preview and development work are clearly marked.</p>
     <div class="bos-actions">
@@ -81,6 +81,7 @@ function whats_new_card(string $title, string $copy, string $href, string $actio
     <p>More ways to read, reflect, learn, and create across web and native experiences.</p>
     <div class="bos-grid">
       <?=whats_new_card('DailyBreath Web','Daily readings, reflection, breathing practices, recovery challenges, and faith journeys come together in the installable web app.','dailybreath/','Open DailyBreath','WEB')?>
+      <?=whats_new_card('DailyBreath guided video workflow','A new 9:16 Remotion practice turns JSON-configured breathing cues into a dated MP4, with the existing Daily Studio daily cron and a latest-video manifest. Production Node.js dependencies and cron setup are still required before daily videos are generated.','dailybreath/','Explore DailyBreath','AUTOMATION · SETUP REQUIRED')?>
       <?=whats_new_card('DailyBreath for iOS 2.3','Multilingual Bible, Tanakh, and Quran reading; faith and recovery journeys; guide chat; and private journaling. Bundled readings work offline. Approved narration streams online.','app-store/','Explore the app catalog','IOS BUILD UPDATE')?>
       <?=whats_new_card('Beyond Tattoo 1.2','Browse released stencil drops, preview the available artwork, and download the files included with each drop. The native companion adds healing milestones and nearby Canadian studios.','beyond-tattoo/','Explore Beyond Tattoo','WEB + NATIVE UPDATE')?>
     </div>

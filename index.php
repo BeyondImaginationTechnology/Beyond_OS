@@ -192,8 +192,9 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 @media(max-width:560px){.planet.ph{left:16%;top:30%}.planet.pe{left:84%;top:24%}.planet.pf{left:25%;top:82%}.planet.px{left:72%;top:82%}.planet.ps{left:92%;top:60%}}
 </style>
 <style>
-.hero-primary-actions{display:grid;gap:12px;width:100%;flex-basis:100%}
-.home-jaguar{width:min(100%,480px);padding:15px;border:1px solid rgba(179,92,255,.36);border-radius:18px;background:linear-gradient(145deg,rgba(24,14,43,.94),rgba(8,10,24,.94));box-shadow:0 18px 45px rgba(0,0,0,.22)}
+.hero-actions{display:grid;gap:14px;margin-top:30px}
+.hero-action-buttons{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.home-jaguar{width:100%;max-width:640px;padding:18px;border:1px solid rgba(179,92,255,.36);border-radius:18px;background:linear-gradient(145deg,rgba(24,14,43,.94),rgba(8,10,24,.94));box-shadow:0 18px 45px rgba(0,0,0,.22)}
 .home-jaguar__heading{display:flex;align-items:center;gap:9px;margin:0 0 11px;color:#f4eaff;font-size:12px;font-weight:900}
 .home-jaguar__heading i{width:8px;height:8px;border-radius:50%;background:#83efa8;box-shadow:0 0 12px #83efa8}
 .home-jaguar__composer{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:end}
@@ -206,7 +207,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 .home-jaguar__response:empty{display:none}
 .home-jaguar__response[data-state="error"]{color:#ffc2d3;border-color:rgba(255,100,150,.32)}
 .home-jaguar__note{margin:8px 0 0;color:#a9a1b9;font-size:10px;line-height:1.45}
-@media(max-width:560px){.home-jaguar{width:100%;padding:12px}.home-jaguar__composer{grid-template-columns:1fr}.home-jaguar__send{width:100%}}
+@media(max-width:560px){.hero-action-buttons{display:grid;grid-template-columns:1fr}.hero-action-buttons>*{width:100%}.home-jaguar{width:100%;padding:12px}.home-jaguar__composer{grid-template-columns:1fr}.home-jaguar__send{width:100%}}
 </style>
 </head>
 <body class="home-page">
@@ -234,19 +235,19 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
         <p class="tagline">Live. Learn. Earn. Explore. Protect.</p>
         <p class="intro">Useful apps for wellness, learning, creator commerce, entertainment and digital protection—connected through Beyond ID. BIT OS is the planned operating-environment layer for home, learning, creating and organizational work.</p>
         <div class="hero-actions">
-            <div class="hero-primary-actions">
+            <div class="hero-action-buttons">
                 <a class="primary" href="https://host.beyondimagination.co.technology/">Open Desktop &nbsp;→</a>
-                <section class="home-jaguar" aria-label="Beyond-1 AI Llama Jaguar prompt">
-                    <h2 class="home-jaguar__heading"><i aria-hidden="true"></i>Beyond-1 AI · Llama Jaguar</h2>
-                    <form class="home-jaguar__composer" id="homeJaguarForm">
-                        <textarea class="home-jaguar__prompt" id="homeJaguarPrompt" rows="2" maxlength="8000" placeholder="Ask Jaguar anything…" aria-label="Prompt Llama Jaguar" required></textarea>
-                        <button class="home-jaguar__send" id="homeJaguarSend" type="submit">Ask Jaguar</button>
-                    </form>
-                    <p class="home-jaguar__note">Jaguar can make mistakes. Check important information.</p>
-                    <div class="home-jaguar__response" id="homeJaguarResponse" role="status" aria-live="polite"></div>
-                </section>
+                <a class="ghost" href="/beyond-tv/">Watch TV ▶</a>
             </div>
-            <a class="ghost" href="/beyond-tv/">Watch TV ▶</a>
+            <section class="home-jaguar" aria-label="Beyond-1 AI Llama Jaguar prompt">
+                <h2 class="home-jaguar__heading"><i aria-hidden="true"></i>Beyond-1 AI · Llama Jaguar</h2>
+                <form class="home-jaguar__composer" id="homeJaguarForm">
+                    <textarea class="home-jaguar__prompt" id="homeJaguarPrompt" rows="2" maxlength="8000" placeholder="Ask Jaguar anything…" aria-label="Prompt Llama Jaguar" required></textarea>
+                    <button class="home-jaguar__send" id="homeJaguarSend" type="submit">Ask Jaguar</button>
+                </form>
+                <p class="home-jaguar__note">Jaguar can make mistakes. Check important information.</p>
+                <div class="home-jaguar__response" id="homeJaguarResponse" role="status" aria-live="polite"></div>
+            </section>
         </div>
         <div class="benefits"><span><b>∞</b> Every possibility, connected</span></div>
     </div>

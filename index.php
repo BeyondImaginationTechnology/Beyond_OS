@@ -73,7 +73,7 @@ if (is_file($frenchLessonsPath)) {
 <link rel="canonical" href="https://beyondimagination.co.technology/">
 <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
 <link rel="stylesheet" href="/assets/css/beyond-splash.css?v=20260828-1">
-<link rel="stylesheet" href="/assets/css/stylesheet-1-31.css?v=20261001-2">
+<link rel="stylesheet" href="/assets/css/stylesheet-1-31.css?v=20261001-3">
 <link rel="stylesheet" href="/beyond-tv/assets/css/video-ads.css?v=1.0.0">
 <script src="/assets/js/beyond-splash.js?v=20260904-1" defer></script>
 <style>

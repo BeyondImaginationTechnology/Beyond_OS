@@ -282,9 +282,17 @@ html[data-theme="fall"] .mobile-currency {
 }
 
 html[data-theme="fall"] .footer {
-  background: transparent;
+  background: transparent !important;
   box-shadow: none;
   backdrop-filter: none;
+}
+
+html[data-theme="fall"] .footer,
+html[data-theme="fall"] .footer a,
+html[data-theme="fall"] .footer h4,
+html[data-theme="fall"] .footer .brand span,
+html[data-theme="fall"] .footer .brand small {
+  color: #fff !important;
 }
 
 html[data-theme="fall"] .top.site-header {

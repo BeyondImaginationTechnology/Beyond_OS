@@ -281,9 +281,14 @@ html[data-theme="fall"] .mobile-currency {
   }
 }
 
-html[data-theme="fall"] .top.site-header,
 html[data-theme="fall"] .footer {
   background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+html[data-theme="fall"] .top.site-header {
+  background: transparent !important;
   box-shadow: none;
   backdrop-filter: none;
 }

@@ -11,6 +11,7 @@ require_once __DIR__ . '/beyond-tv/includes/beyond-cartoons-schedule.php';
 require_once __DIR__ . '/beyond-tv/includes/public-channel-catalog.php';
 beyond_nav_bootstrap('Beyond Imagination Technology');
 $signedIn = isset($_SESSION['user_id']);
+$homeJaguarCsrf = csrf_token();
 $homeTvRelease = json_decode((string)@file_get_contents(__DIR__ . '/beyond-tv/data/release.json'), true) ?: [];
 $homeTvVersion = (string)($homeTvRelease['web']['version'] ?? $homeTvRelease['version'] ?? '1.0');
 $homeTvBuild = (int)($homeTvRelease['web']['build'] ?? $homeTvRelease['build'] ?? 2001);
@@ -191,7 +192,21 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 @media(max-width:560px){.planet.ph{left:16%;top:30%}.planet.pe{left:84%;top:24%}.planet.pf{left:25%;top:82%}.planet.px{left:72%;top:82%}.planet.ps{left:92%;top:60%}}
 </style>
 <style>
-.hero-primary-actions{display:grid;gap:10px}
+.hero-primary-actions{display:grid;gap:12px;width:100%;flex-basis:100%}
+.home-jaguar{width:min(100%,480px);padding:15px;border:1px solid rgba(179,92,255,.36);border-radius:18px;background:linear-gradient(145deg,rgba(24,14,43,.94),rgba(8,10,24,.94));box-shadow:0 18px 45px rgba(0,0,0,.22)}
+.home-jaguar__heading{display:flex;align-items:center;gap:9px;margin:0 0 11px;color:#f4eaff;font-size:12px;font-weight:900}
+.home-jaguar__heading i{width:8px;height:8px;border-radius:50%;background:#83efa8;box-shadow:0 0 12px #83efa8}
+.home-jaguar__composer{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:end}
+.home-jaguar__prompt{min-height:48px;max-height:130px;padding:12px;border:1px solid rgba(255,255,255,.16);border-radius:12px;resize:vertical;color:#fff;background:rgba(4,6,17,.7);font:inherit;font-size:13px;line-height:1.5}
+.home-jaguar__prompt:focus{outline:2px solid rgba(179,92,255,.6);outline-offset:1px}
+.home-jaguar__prompt::placeholder{color:#aaa2b9}
+.home-jaguar__send{min-height:46px;padding:0 16px;border:0;border-radius:12px;color:#fff;background:linear-gradient(100deg,#7359ee,#dc43a7);font:inherit;font-size:12px;font-weight:900;cursor:pointer}
+.home-jaguar__send:disabled{opacity:.55;cursor:wait}
+.home-jaguar__response{margin:12px 0 0;padding:12px;border:1px solid rgba(255,255,255,.11);border-radius:12px;color:#f0eafa;background:rgba(255,255,255,.045);font-size:13px;line-height:1.6;white-space:pre-wrap}
+.home-jaguar__response:empty{display:none}
+.home-jaguar__response[data-state="error"]{color:#ffc2d3;border-color:rgba(255,100,150,.32)}
+.home-jaguar__note{margin:8px 0 0;color:#a9a1b9;font-size:10px;line-height:1.45}
+@media(max-width:560px){.home-jaguar{width:100%;padding:12px}.home-jaguar__composer{grid-template-columns:1fr}.home-jaguar__send{width:100%}}
 </style>
 </head>
 <body class="home-page">
@@ -221,7 +236,15 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
         <div class="hero-actions">
             <div class="hero-primary-actions">
                 <a class="primary" href="https://host.beyondimagination.co.technology/">Open Desktop &nbsp;→</a>
-                <a class="ghost beyond-ai-demo" href="/ai/chat.php">Beyond -1 AI Llama Jaguar Demo &nbsp;→</a>
+                <section class="home-jaguar" aria-label="Beyond-1 AI Llama Jaguar prompt">
+                    <h2 class="home-jaguar__heading"><i aria-hidden="true"></i>Beyond-1 AI · Llama Jaguar</h2>
+                    <form class="home-jaguar__composer" id="homeJaguarForm">
+                        <textarea class="home-jaguar__prompt" id="homeJaguarPrompt" rows="2" maxlength="8000" placeholder="Ask Jaguar anything…" aria-label="Prompt Llama Jaguar" required></textarea>
+                        <button class="home-jaguar__send" id="homeJaguarSend" type="submit">Ask Jaguar</button>
+                    </form>
+                    <p class="home-jaguar__note">Jaguar can make mistakes. Check important information.</p>
+                    <div class="home-jaguar__response" id="homeJaguarResponse" role="status" aria-live="polite"></div>
+                </section>
             </div>
             <a class="ghost" href="/beyond-tv/">Watch TV ▶</a>
         </div>
@@ -439,6 +462,87 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
 .home-live-player{position:relative}
 #homeLivePlayerStatus[hidden]{display:none!important}
 </style>
+
+<script>
+(() => {
+ const form=document.getElementById('homeJaguarForm');
+ if(!form)return;
+ const prompt=form.querySelector('#homeJaguarPrompt');
+ const send=form.querySelector('#homeJaguarSend');
+ const responseOutput=document.getElementById('homeJaguarResponse');
+ const signedIn=<?=json_encode($signedIn)?>;
+ const csrf=<?=json_encode($homeJaguarCsrf)?>;
+
+ async function solveProof(challenge,difficulty){
+   const parsedDifficulty=Number(difficulty);
+   if(typeof challenge!=='string'||!/^[a-f0-9]{36}$/.test(challenge)||!Number.isInteger(parsedDifficulty)||parsedDifficulty<1||parsedDifficulty>20){
+     throw new Error('Jaguar’s security check returned invalid challenge data.');
+   }
+   const requiredNibbles=Math.ceil(parsedDifficulty/4);
+   for(let counter=0;counter<1000000000;counter++){
+     const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(`${challenge}:${counter}`));
+     const bytes=new Uint8Array(digest);
+     let valid=true;
+     for(let nibble=0;nibble<requiredNibbles;nibble++){
+       const value=nibble%2===0?bytes[Math.floor(nibble/2)]>>4:bytes[Math.floor(nibble/2)]&15;
+       if(value!==0){valid=false;break;}
+     }
+     if(valid)return{challenge,counter:String(counter)};
+     if(counter%500===0)await new Promise(resolve=>window.setTimeout(resolve,0));
+   }
+   throw new Error('The local security check could not complete.');
+ }
+
+ async function getGuestProof(){
+   const challengeResponse=await fetch('/ai/api/challenge.php?v=20260926-1',{credentials:'same-origin',cache:'no-store'});
+   const challengeText=await challengeResponse.text();
+   let challengeData;
+   try{challengeData=JSON.parse(challengeText)}catch(error){throw new Error('Jaguar’s security check returned an unexpected response. Please refresh and try again.')}
+   if(!challengeResponse.ok||!challengeData.challenge)throw new Error(challengeData.error||'Jaguar’s security check is unavailable.');
+   return solveProof(challengeData.challenge,challengeData.difficulty);
+ }
+
+ form.addEventListener('submit',async event=>{
+   event.preventDefault();
+   const text=prompt.value.trim();
+   if(!text||send.disabled)return;
+   send.disabled=true;
+   responseOutput.dataset.state='loading';
+   responseOutput.textContent='Jaguar is thinking…';
+   try{
+     const proof=signedIn?null:await getGuestProof();
+     const controller=new AbortController();
+     const timeout=window.setTimeout(()=>controller.abort(),115000);
+     let result;
+     try{
+       const apiResponse=await fetch('/ai/api/chat.php?v=20260927-1',{
+         method:'POST',
+         credentials:'same-origin',
+         cache:'no-store',
+         headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+         body:JSON.stringify({mode:'core',language:'en',messages:[{role:'user',content:text}],proof}),
+         signal:controller.signal
+       });
+       const body=await apiResponse.text();
+       try{result=JSON.parse(body)}catch(error){throw new Error(`Jaguar returned an unexpected ${apiResponse.status} response. Please try again.`)}
+       if(!apiResponse.ok)throw new Error(result.error||'Jaguar is unavailable right now.');
+       if(typeof result.message!=='string'||result.message.trim()==='')throw new Error('Jaguar returned an empty response. Please try again.');
+     }finally{window.clearTimeout(timeout)}
+     responseOutput.dataset.state='answer';
+     responseOutput.textContent=result.message;
+     prompt.value='';
+   }catch(error){
+     responseOutput.dataset.state='error';
+     responseOutput.textContent=error instanceof DOMException&&error.name==='AbortError'
+       ?'Jaguar is taking longer than expected. Please try again.'
+       :error instanceof Error?error.message:'Jaguar is unavailable right now.';
+   }finally{send.disabled=false}
+ });
+ prompt.addEventListener('keydown',event=>{
+   if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();form.requestSubmit()}
+ });
+})();
+</script>
 
 <script>
 (function(){

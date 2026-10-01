@@ -25,7 +25,7 @@ beyond_nav_bootstrap('Investor Brief');
 </header>
 <main>
     <section class="hero wrap">
-        <span class="eyebrow">Beyond Imagination Technology · September 2026</span>
+        <span class="eyebrow">Beyond Imagination Technology · October 2026</span>
         <h1>Useful apps.<span>A shared operating foundation.</span></h1>
         <div class="hero-copy">
             <p>BIT connects health, education, creator commerce and entertainment through Beyond ID. The next layer adds BIT OS and Jaguar, an in-development teaching-model capability designed to make the ecosystem's learning experiences more distinctive and useful.</p>
@@ -42,7 +42,7 @@ beyond_nav_bootstrap('Investor Brief');
         <div class="section-head"><div><span class="eyebrow">The platform thesis</span><h2>Connect the apps to the environment people work in.</h2></div><p>BIT is expanding from connected consumer experiences toward purpose-built operating environments. Beyond ID, shared progress and the app catalog provide a foundation; BIT OS is intended to bring those tools into a more integrated workspace.</p></div>
         <div class="thesis-grid">
             <article class="thesis-card main"><span class="index">01 · THE OPPORTUNITY</span><h3>Start with useful apps.<br>Extend into daily workspaces.</h3><p>The consumer ecosystem gives BIT a product foundation for Home, Creator and Academy environments. Cyber, Sentinel and Gaming extend the longer-term roadmap into specialized workflows. Adoption and cross-product retention still need to be demonstrated.</p></article>
-            <article class="thesis-card"><span class="index">02 · THE WEDGE</span><h3>Working apps, native development and a model lab.</h3><p>DailyBreath now includes an installable web experience, narration and encrypted journaling. Jaguar extends the Academy opportunity with an in-development AI teaching model trained for plain-language explanations, prompt coaching and a recognizable Beyond voice. <a href="/release-notes.php">See product updates →</a></p></article>
+            <article class="thesis-card"><span class="index">02 · THE WEDGE</span><h3>Working apps, native development and a model lab.</h3><p>DailyBreath now includes an installable web experience, narration and encrypted journaling, plus a JSON-driven Remotion workflow designed to publish a daily guided-breathing video through the existing server cron. Production rendering still requires server dependency and schedule setup. Jaguar extends the Academy opportunity with an in-development AI teaching model trained for plain-language explanations, prompt coaching and a recognizable Beyond voice. <a href="/release-notes.php">See product updates →</a></p></article>
             <article class="thesis-card"><span class="index">03 · THE FOUNDATION</span><h3>One relationship across products.</h3><p>Beyond ID, bit$ rewards and a shared catalog connect the app experience. The BIT OS roadmap adds portable workspaces and mobile companion access; these OS capabilities remain in development.</p></article>
         </div>
     </section>
@@ -71,7 +71,7 @@ beyond_nav_bootstrap('Investor Brief');
             <article class="focus"><span class="eyebrow">Planned Home 1.0 release</span><h3>One starting point. Multiple ways to try it.</h3><p>The release plan covers a universal Live USB and installer image, a VM image, and a Lite / Net Installer. BIT OS Setup for Windows is the intended recommended installation path. Browser Guest mode addresses public-computer access; a cloud workspace is a later possibility. These are roadmap items, not available downloads.</p></article>
             <div class="milestones">
                 <article class="milestone"><b>01</b><div><h3>Validate Home installation</h3><p>Test hardware compatibility, installation completion, recovery and first-session activation before a public release.</p></div></article>
-                <article class="milestone"><b>02</b><div><h3>Strengthen the shared platform</h3><p>Continue Beyond ID integration across web and native apps, with reliable sessions, rewards and cross-product measurement.</p></div></article>
+                <article class="milestone"><b>02</b><div><h3>Strengthen the shared platform</h3><p>Continue Beyond ID integration across web and native apps, with reliable sessions, rewards and cross-product measurement. Validate the DailyBreath video pipeline in production after the scheduled renderer is configured.</p></div></article>
                 <article class="milestone"><b>03</b><div><h3>Measure retention and willingness to pay</h3><p>Track repeat use, cross-app adoption, paid conversion and support costs for the initial products and pilots.</p></div></article>
                 <article class="milestone"><b>04</b><div><h3>Validate Jaguar's learning loop</h3><p>Expand reviewed training data, evaluate teaching quality and safety, and test whether AI tutoring improves Academy engagement before introducing paid model-powered features.</p></div></article>
             </div>

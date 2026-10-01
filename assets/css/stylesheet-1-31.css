@@ -301,6 +301,10 @@ html[data-theme="fall"] .top.site-header {
   backdrop-filter: none;
 }
 
+html[data-theme="fall"] .site-header .nav > a:not(.primary) {
+  color: #fff;
+}
+
 html[data-theme="fall"] .top.site-header .nav a:not(.primary),
 html[data-theme="fall"] .top.site-header .login-btn,
 html[data-theme="fall"] .top.site-header .ghost,

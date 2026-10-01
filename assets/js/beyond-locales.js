@@ -3,7 +3,7 @@
     en: {
       language: 'Choose language', apps: 'Apps', health: 'Health', education: 'Education', wallet: 'Wallet', entertainment: 'Entertainment',
       heroHealth: 'Health.', heroEducation: 'Education.', heroWallet: 'Wallet.', heroEntertainment: 'Entertainment.',
-      tagline: 'Live. Learn. Earn. Explore.', intro: 'Everything you need to grow, create and discover—connected in one ecosystem.', explore: 'Explore the Ecosystem ▶',
+      tagline: 'Live. Learn. Earn. Explore.', intro: 'Everything you need to grow, create and discover—connected in one ecosystem.', explore: 'Watch TV ▶',
       healthHeadline: 'Live your best life.', healthCopy: 'Mind, body and soul. Everything you need to feel better every day.',
       educationHeadline: 'Knowledge without limits.', educationCopy: 'Learn anything. Anywhere. Unlock your potential across every subject.',
       walletHeadline: 'Spend, earn and cash out.', walletCopy: 'Your bit$, purchases and verified creator earnings in one customer-friendly wallet.',
@@ -13,7 +13,7 @@
     fr: {
       language: 'Choisir la langue', apps: 'Apps', health: 'Santé', education: 'Éducation', wallet: 'Portefeuille', entertainment: 'Divertissement',
       heroHealth: 'Santé.', heroEducation: 'Éducation.', heroWallet: 'Portefeuille.', heroEntertainment: 'Divertissement.',
-      tagline: 'Vivre. Apprendre. Gagner. Explorer.', intro: 'Tout ce qu’il vous faut pour grandir, créer et découvrir—réuni dans un seul écosystème.', explore: 'Explorer l’écosystème ▶',
+      tagline: 'Vivre. Apprendre. Gagner. Explorer.', intro: 'Tout ce qu’il vous faut pour grandir, créer et découvrir—réuni dans un seul écosystème.', explore: 'Regarder la télévision ▶',
       healthHeadline: 'Vivez pleinement.', healthCopy: 'L’esprit, le corps et l’âme. Tout pour vous sentir mieux chaque jour.',
       educationHeadline: 'Le savoir sans limites.', educationCopy: 'Apprenez partout et développez votre potentiel dans chaque domaine.',
       walletHeadline: 'Dépensez, gagnez et retirez.', walletCopy: 'Vos bit$, achats et revenus de créateur vérifiés dans un portefeuille simple.',
@@ -23,7 +23,7 @@
     ht: {
       language: 'Chwazi lang', apps: 'Aplikasyon', health: 'Sante', education: 'Edikasyon', wallet: 'Bous', entertainment: 'Divètisman',
       heroHealth: 'Sante.', heroEducation: 'Edikasyon.', heroWallet: 'Bous.', heroEntertainment: 'Divètisman.',
-      tagline: 'Viv. Aprann. Touche. Eksplore.', intro: 'Tout sa ou bezwen pou grandi, kreye epi dekouvri—konekte nan yon sèl ekosistèm.', explore: 'Eksplore ekosistèm nan ▶',
+      tagline: 'Viv. Aprann. Touche. Eksplore.', intro: 'Tout sa ou bezwen pou grandi, kreye epi dekouvri—konekte nan yon sèl ekosistèm.', explore: 'Gade televizyon ▶',
       healthHeadline: 'Viv pi bon lavi ou.', healthCopy: 'Lespri, kò ak nanm. Tout sa ou bezwen pou santi ou pi byen chak jou.',
       educationHeadline: 'Konesans san limit.', educationCopy: 'Aprann nenpòt kote epi devlope kapasite ou nan tout sijè.',
       walletHeadline: 'Depanse, touche epi retire.', walletCopy: 'bit$, acha ak revni kreyatè verifye ou yo nan yon sèl bous fasil.',
@@ -33,7 +33,7 @@
     es: {
       language: 'Elegir idioma', apps: 'Aplicaciones', health: 'Salud', education: 'Educación', wallet: 'Billetera', entertainment: 'Entretenimiento',
       heroHealth: 'Salud.', heroEducation: 'Educación.', heroWallet: 'Billetera.', heroEntertainment: 'Entretenimiento.',
-      tagline: 'Vive. Aprende. Gana. Explora.', intro: 'Todo lo que necesitas para crecer, crear y descubrir—conectado en un solo ecosistema.', explore: 'Explorar el ecosistema ▶',
+      tagline: 'Vive. Aprende. Gana. Explora.', intro: 'Todo lo que necesitas para crecer, crear y descubrir—conectado en un solo ecosistema.', explore: 'Ver TV ▶',
       healthHeadline: 'Vive tu mejor vida.', healthCopy: 'Mente, cuerpo y alma. Todo para sentirte mejor cada día.',
       educationHeadline: 'Conocimiento sin límites.', educationCopy: 'Aprende en cualquier lugar y desarrolla tu potencial en cada materia.',
       walletHeadline: 'Gasta, gana y retira.', walletCopy: 'Tus bit$, compras e ingresos verificados de creador en una sola billetera.',
@@ -148,7 +148,6 @@
   function apply(locale) {
     var dictionary = dictionaries[locale] || dictionaries.en;
     var appStoreLabels = { en: 'App Store', fr: 'Boutique apps', ht: 'Magazen aplikasyon', es: 'Tienda de apps' };
-    var osInstallCtas = { en: 'Install OS ▶', fr: 'Installer l’OS ▶', ht: 'Enstale OS ▶', es: 'Instalar OS ▶' };
     var root = document.documentElement;
     if (!root) return;
     root.lang = locale;
@@ -160,7 +159,6 @@
     document.querySelectorAll('.bos-locale').forEach(function (label) { label.title = dictionary.language; });
     document.querySelectorAll('.bos-locale-picker').forEach(function (picker) { picker.setAttribute('aria-label', dictionary.language); });
     document.querySelectorAll('.bos-app-store-label-full').forEach(function (label) { var value = appStoreLabels[locale] || appStoreLabels.en; if (label.textContent !== value) label.textContent = value; });
-    document.querySelectorAll('.hero-actions .ghost').forEach(function (link) { var value = osInstallCtas[locale] || osInstallCtas.en; if (link.textContent !== value) link.textContent = value; });
     document.querySelectorAll('#beyond-os-shell .bos-home-label').forEach(function (label) { if (label.textContent !== 'BEYOND IMAGINATION') label.textContent = 'BEYOND IMAGINATION'; });
     document.querySelectorAll('.bos-kicker,.bos-hero h1,.os,.logo').forEach(function (label) {
       var nextText = label.textContent

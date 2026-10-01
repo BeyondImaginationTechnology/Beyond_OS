@@ -280,3 +280,39 @@ html[data-theme="fall"] .mobile-currency {
     text-shadow: 0 1px 0 rgba(255,255,255,0.3);
   }
 }
+
+html[data-theme="fall"] .footer {
+  background: transparent !important;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+html[data-theme="fall"] .footer,
+html[data-theme="fall"] .footer a,
+html[data-theme="fall"] .footer h4,
+html[data-theme="fall"] .footer .brand span,
+html[data-theme="fall"] .footer .brand small {
+  color: #fff !important;
+}
+
+html[data-theme="fall"] .top.site-header {
+  background: transparent !important;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+html[data-theme="fall"] .site-header .nav > a:not(.primary) {
+  color: #fff;
+}
+
+html[data-theme="fall"] .top.site-header .nav a:not(.primary),
+html[data-theme="fall"] .top.site-header .login-btn,
+html[data-theme="fall"] .top.site-header .ghost,
+html[data-theme="fall"] .top.site-header .menu-toggle,
+html[data-theme="fall"] .top.site-header .drawer-close,
+html[data-theme="fall"] .top.site-header .currency-picker,
+html[data-theme="fall"] .top.site-header .theme-toggle,
+html[data-theme="fall"] .top.site-header .brand-atom {
+  background: transparent;
+  box-shadow: none;
+}

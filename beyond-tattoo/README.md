@@ -1,5 +1,9 @@
 # Beyond Tattoo operations
 
+## Autumn Ink stylesheets
+
+`stylesheets.php` is the public landing page for the October 1–31 Autumn Ink series. Each release has exactly one dedicated image asset. The catalog in `data/autumn-ink-stylesheets.json` maps each numbered release to its date, title, guide details and a single file under `assets/stylesheets/`. The calendar marks a release available only after its date and when that file exists; add each new release to the JSON and upload its single asset to publish it. The same asset powers the preview, download and print view.
+
 ## Version 1.2 nightly stencil publication
 
 The 55-drop catalog is a schedule, not a claim that all files exist. The public web library and Apple API scan the actual asset folders and expose a drop only when it is approved, its release date has arrived, a preview exists, and either `stencil-print-ready.png` or the official `stencil-outline.png` exists.

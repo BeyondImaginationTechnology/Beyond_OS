@@ -2,7 +2,7 @@
 
 ## Autumn Ink stylesheets
 
-`stylesheets.php` is the public landing page for the October 1–31 Autumn Ink series. Stylesheet 01/31, Pumpkin Harvest, includes a printable guide and a plain-text download. To publish a later day, add its guide and title to `stylesheets.php` before marking its calendar entry available. Published stencil style cards are listed automatically when their approved packs include `style-card.webp` (or a supported image fallback).
+`stylesheets.php` is the public landing page for the October 1–31 Autumn Ink series. Each release has exactly one dedicated image asset. The catalog in `data/autumn-ink-stylesheets.json` maps each numbered release to its date, title, guide details and a single file under `assets/stylesheets/`. The calendar marks a release available only after its date and when that file exists; add each new release to the JSON and upload its single asset to publish it. The same asset powers the preview, download and print view.
 
 ## Version 1.2 nightly stencil publication
 

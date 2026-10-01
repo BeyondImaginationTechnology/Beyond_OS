@@ -221,7 +221,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
         <div class="hero-actions">
             <div class="hero-primary-actions">
                 <a class="primary" href="https://host.beyondimagination.co.technology/">Open Desktop &nbsp;→</a>
-                <a class="ghost beyond-ai-demo" href="/ai/chat.php">Beyond-1* AI Demo &nbsp;→</a>
+                <a class="ghost beyond-ai-demo" href="/ai/chat.php">Beyond -1 AI Llama Jaguar Demo &nbsp;→</a>
             </div>
             <a class="ghost" href="/beyond-tv/">Watch TV ▶</a>
         </div>

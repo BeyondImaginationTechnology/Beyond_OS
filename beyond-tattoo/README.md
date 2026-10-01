@@ -1,5 +1,9 @@
 # Beyond Tattoo operations
 
+## Autumn Ink stylesheets
+
+`stylesheets.php` is the public landing page for the October 1–31 Autumn Ink series. Stylesheet 01/31, Pumpkin Harvest, includes a printable guide and a plain-text download. To publish a later day, add its guide and title to `stylesheets.php` before marking its calendar entry available. Published stencil style cards are listed automatically when their approved packs include `style-card.webp` (or a supported image fallback).
+
 ## Version 1.2 nightly stencil publication
 
 The 55-drop catalog is a schedule, not a claim that all files exist. The public web library and Apple API scan the actual asset folders and expose a drop only when it is approved, its release date has arrived, a preview exists, and either `stencil-print-ready.png` or the official `stencil-outline.png` exists.

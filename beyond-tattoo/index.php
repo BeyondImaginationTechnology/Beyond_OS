@@ -62,6 +62,7 @@ if (!empty($stencilDay['iso_date'])) {
         <a href="tattoo-generator.php">Idea generator</a>
         <a href="stencil-camera.php">Violet Trace</a>
         <a href="stencils.php">Stencils</a>
+        <a href="stylesheets.php">Stylesheets</a>
         <a href="collections.php">Collections</a>
         <a href="tools.php">Tools</a>
         <a href="store.php">Store</a>
@@ -79,6 +80,7 @@ if (!empty($stencilDay['iso_date'])) {
             <a href="stencils.php">Stencils</a>
             <a href="tattoo-generator.php">Idea generator</a>
             <a href="stencil-camera.php">Violet Trace</a>
+            <a href="stylesheets.php">Stylesheets</a>
             <a href="collections.php">Collections</a>
             <a href="store.php">Store</a>
             <a href="studios.php">Studios</a>

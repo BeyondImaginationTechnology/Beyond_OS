@@ -1,0 +1,282 @@
+:root {
+  --sheet31-bg: #f5f0e8;
+  --sheet31-panel: rgba(255,255,255,0.5);
+  --sheet31-ink: #1b120d;
+  --sheet31-line: rgba(27,18,13,0.35);
+  --sheet31-accent: #c46a2d;
+  --sheet31-gold: #d7b66a;
+  --sheet31-olive: #7a8a5c;
+  --sheet31-rose: #b95b4d;
+  --sheet31-shadow: rgba(41, 25, 17, 0.14);
+}
+
+html[data-theme="fall"] body.home-page {
+  background:
+    radial-gradient(circle at 15% 12%, rgba(238,185,99,0.18), transparent 20%),
+    radial-gradient(circle at 85% 18%, rgba(198,110,58,0.14), transparent 22%),
+    linear-gradient(180deg, #f6efe6 0%, #e8dfd2 30%, #efe7dd 100%);
+}
+
+html[data-theme="fall"] .top.site-header,
+html[data-theme="fall"] .mobile-drawer,
+html[data-theme="fall"] .welcome,
+html[data-theme="fall"] .world,
+html[data-theme="fall"] .identity,
+html[data-theme="fall"] .jaguar-banner,
+html[data-theme="fall"] .investor-banner,
+html[data-theme="fall"] .platform-loop,
+html[data-theme="fall"] .proof-strip,
+html[data-theme="fall"] .product-card,
+html[data-theme="fall"] .footer {
+  box-shadow: inset 0 0 0 1px rgba(70, 46, 31, 0.1);
+}
+
+html[data-theme="fall"] .top.site-header {
+  background: rgba(255, 249, 241, 0.72);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(73, 45, 30, 0.25);
+}
+
+html[data-theme="fall"] .brand,
+html[data-theme="fall"] .brand small,
+html[data-theme="fall"] .nav a,
+html[data-theme="fall"] .tagline,
+html[data-theme="fall"] .hero h1,
+html[data-theme="fall"] .world h2,
+html[data-theme="fall"] .world h3,
+html[data-theme="fall"] .identity h2,
+html[data-theme="fall"] .footer h4 {
+  color: var(--sheet31-ink);
+}
+
+html[data-theme="fall"] .brand span {
+  background: linear-gradient(100deg, #c86a2c 0%, #d59a4e 35%, #8a5a2d 100%);
+  background-clip: text;
+  color: transparent;
+}
+
+html[data-theme="fall"] .nav a:not(.primary),
+html[data-theme="fall"] .ghost,
+html[data-theme="fall"] .menu-toggle,
+html[data-theme="fall"] .drawer-close,
+html[data-theme="fall"] .currency-picker,
+html[data-theme="fall"] .theme-toggle {
+  border-color: rgba(31, 17, 10, 0.18);
+  background: rgba(255,255,255,0.45);
+  color: var(--sheet31-ink);
+}
+
+html[data-theme="fall"] .primary {
+  background: linear-gradient(105deg, #b9482b 0%, #d98238 52%, #d7b66a 100%);
+  box-shadow: 0 16px 34px rgba(113, 62, 29, 0.18), inset 0 1px rgba(255,255,255,0.28);
+}
+
+html[data-theme="fall"] .ghost {
+  background: rgba(255,255,255,0.18);
+}
+
+html[data-theme="fall"] .hero-kicker,
+html[data-theme="fall"] .platform-kicker {
+  color: #8b4f2a;
+}
+
+html[data-theme="fall"] .hero-kicker:before,
+html[data-theme="fall"] .platform-kicker:before {
+  background: #b65a36;
+  box-shadow: 0 0 0 4px rgba(182, 91, 54, 0.14);
+}
+
+html[data-theme="fall"] .intro,
+html[data-theme="fall"] .world p,
+html[data-theme="fall"] .identity p,
+html[data-theme="fall"] .footer,
+html[data-theme="fall"] .proof-stat span,
+html[data-theme="fall"] .loop-step span,
+html[data-theme="fall"] .product-card p {
+  color: rgba(27, 18, 13, 0.74);
+}
+
+html[data-theme="fall"] .ring,
+html[data-theme="fall"] .core,
+html[data-theme="fall"] .planet,
+html[data-theme="fall"] .app,
+html[data-theme="fall"] .welcome,
+html[data-theme="fall"] .world,
+html[data-theme="fall"] .product-card,
+html[data-theme="fall"] .platform-loop,
+html[data-theme="fall"] .jaguar-banner,
+html[data-theme="fall"] .investor-banner,
+html[data-theme="fall"] .identity,
+html[data-theme="fall"] .loop-step,
+html[data-theme="fall"] .proof-stat {
+  border-color: rgba(62, 40, 28, 0.18);
+}
+
+html[data-theme="fall"] .core {
+  background: radial-gradient(circle at 38% 30%, #f4cf8e 0%, #e3914a 28%, #7e432c 62%, #2d1a12 100%);
+  border-width: 2px;
+  box-shadow: inset 0 0 0 1px rgba(255, 240, 204, 0.5), 0 0 0 12px rgba(214, 125, 51, 0.08), 0 0 52px rgba(191, 95, 48, 0.18);
+}
+
+html[data-theme="fall"] .core .atom i {
+  border-color: var(--sheet31-accent);
+}
+
+html[data-theme="fall"] .core .atom i:nth-child(2) {
+  border-color: #d7b66a;
+}
+
+html[data-theme="fall"] .core .atom i:nth-child(3) {
+  border-color: #7a8a5c;
+}
+
+html[data-theme="fall"] .core .atom b {
+  background: #271912 url('/assets/images/bos-logo-mark.svg?v=20260930-1') center 70%/190% no-repeat;
+  border-color: rgba(96, 48, 33, 0.5);
+  box-shadow: 0 0 0 6px rgba(212, 131, 59, 0.12), 0 0 28px rgba(194, 110, 61, 0.3);
+}
+
+html[data-theme="fall"] .planet {
+  background: rgba(78, 48, 32, 0.88);
+  color: #f4d79a;
+  box-shadow: 0 0 22px rgba(199, 103, 47, 0.18);
+}
+
+html[data-theme="fall"] .world::before {
+  background: linear-gradient(90deg, rgba(60, 36, 23, 0.9), rgba(90, 62, 35, 0.72) 42%, rgba(210, 155, 87, 0.12) 78%, rgba(45, 28, 18, 0.72));
+}
+
+html[data-theme="fall"] .world.health,
+html[data-theme="fall"] .world.education,
+html[data-theme="fall"] .world.finance,
+html[data-theme="fall"] .world.entertainment,
+html[data-theme="fall"] .world.wallet {
+  background: linear-gradient(130deg, rgba(255,255,255,0.4), rgba(240, 225, 204, 0.75));
+}
+
+html[data-theme="fall"] .world.health .world-icon { background: rgba(123, 143, 89, 0.14); color: #5e6d3d; }
+html[data-theme="fall"] .world.education .world-icon { background: rgba(215, 182, 106, 0.14); color: #7a5e2d; }
+html[data-theme="fall"] .world.finance .world-icon,
+html[data-theme="fall"] .world.wallet .world-icon { background: rgba(158, 125, 86, 0.14); color: #744a2c; }
+html[data-theme="fall"] .world.entertainment .world-icon { background: rgba(185, 97, 77, 0.12); color: #7d4027; }
+
+html[data-theme="fall"] .world-title { color: #5a3824; }
+html[data-theme="fall"] .world .explore,
+html[data-theme="fall"] .product-link,
+html[data-theme="fall"] .primary {
+  letter-spacing: -0.02em;
+}
+
+html[data-theme="fall"] .proof-strip {
+  background: rgba(255,255,255,0.26);
+}
+
+html[data-theme="fall"] .proof-stat strong {
+  color: #5a3824;
+}
+
+html[data-theme="fall"] .product-card {
+  background: linear-gradient(145deg, rgba(249,243,236,0.9), rgba(237,228,216,0.8));
+}
+
+html[data-theme="fall"] .product-card .product-number {
+  color: #9a5a34;
+}
+
+html[data-theme="fall"] .product-card h3 {
+  color: #261914;
+}
+
+html[data-theme="fall"] .product-card .product-link {
+  color: #472d20;
+}
+
+html[data-theme="fall"] .loop-step {
+  background: rgba(255,255,255,0.16);
+}
+
+html[data-theme="fall"] .loop-step b,
+html[data-theme="fall"] .loop-step span {
+  color: #402920;
+}
+
+html[data-theme="fall"] .jaguar-banner,
+html[data-theme="fall"] .investor-banner,
+html[data-theme="fall"] .platform-loop,
+html[data-theme="fall"] .welcome,
+html[data-theme="fall"] .identity {
+  background: linear-gradient(120deg, rgba(255, 248, 239, 0.9), rgba(238, 225, 209, 0.9));
+}
+
+html[data-theme="fall"] .jaguar-banner .ghost,
+html[data-theme="fall"] .investor-banner .primary,
+html[data-theme="fall"] .welcome .primary {
+  border-color: rgba(88, 58, 34, 0.14);
+}
+
+html[data-theme="fall"] .jaguar-banner h2,
+html[data-theme="fall"] .investor-banner h2,
+html[data-theme="fall"] .platform-loop h3,
+html[data-theme="fall"] .welcome strong,
+html[data-theme="fall"] .identity h2 {
+  color: #291a13;
+}
+
+html[data-theme="fall"] .jaguar-banner p,
+html[data-theme="fall"] .investor-banner p,
+html[data-theme="fall"] .welcome p {
+  color: rgba(28, 18, 12, 0.7);
+}
+
+html[data-theme="fall"] .footer {
+  background: rgba(255,255,255,0.28);
+  border-top: 1px solid rgba(80, 56, 37, 0.18);
+}
+
+html[data-theme="fall"] .footer a {
+  color: rgba(27, 18, 13, 0.9);
+}
+
+html[data-theme="fall"] .brand-atom {
+  background: radial-gradient(circle at 35% 25%, rgba(255, 203, 120, 0.44), rgba(91, 46, 32, 0.96) 68%);
+  border-color: rgba(207, 129, 59, 0.3);
+  box-shadow: 0 10px 24px rgba(162, 89, 42, 0.16), inset 0 1px rgba(255,240,214,0.18);
+}
+
+html[data-theme="fall"] .brand-atom img {
+  filter: sepia(0.3) saturate(1.35) hue-rotate(-18deg);
+}
+
+html[data-theme="fall"] .ecosystem-svg .svg-ambient circle:first-child { fill: #d08448; opacity: 0.12; }
+html[data-theme="fall"] .ecosystem-svg .svg-ambient circle:nth-child(2) { fill: #f0c276; opacity: 0.09; }
+html[data-theme="fall"] .ecosystem-svg .svg-orbits use:nth-child(1) { stroke: rgba(160, 106, 59, 0.76); }
+html[data-theme="fall"] .ecosystem-svg .svg-orbits use:nth-child(2) { stroke: rgba(182, 123, 69, 0.7); }
+html[data-theme="fall"] .ecosystem-svg .svg-orbits use:nth-child(3) { stroke: rgba(118, 141, 86, 0.7); }
+html[data-theme="fall"] .ecosystem-svg .svg-orbits use:nth-child(4) { stroke: rgba(178, 92, 66, 0.72); }
+html[data-theme="fall"] .ecosystem-svg .svg-gateway>circle:first-child { stroke: rgba(169, 104, 46, 0.8); }
+html[data-theme="fall"] .ecosystem-svg .svg-gateway>circle:nth-of-type(2) { fill: url(#gatewaySurfaceFall); stroke: rgba(146, 72, 31, 0.9); }
+html[data-theme="fall"] .ecosystem-svg .svg-atom { stroke: url(#atomStrokeFall) !important; filter: drop-shadow(0 0 10px rgba(190, 98, 48, 0.52)); }
+html[data-theme="fall"] .ecosystem-svg .svg-gateway { filter: drop-shadow(0 0 14px rgba(190, 100, 52, 0.3)); }
+html[data-theme="fall"] .ecosystem-svg .svg-nucleus path { stroke: rgba(118, 88, 39, 0.7); }
+
+html[data-theme="fall"] .hero .h { color: #6c7d3a; }
+html[data-theme="fall"] .hero .e { color: #bb7e2d; }
+html[data-theme="fall"] .hero .f { color: #9b4f2c; }
+html[data-theme="fall"] .hero .x { color: #b15a46; }
+html[data-theme="fall"] .hero .s { color: #82633c; }
+
+html[data-theme="fall"] .brand small,
+html[data-theme="fall"] .intro,
+html[data-theme="fall"] .identity p,
+html[data-theme="fall"] .world p,
+html[data-theme="fall"] .footer,
+html[data-theme="fall"] .mobile-drawer nav a,
+html[data-theme="fall"] .mobile-currency {
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 560px) {
+  html[data-theme="fall"] .hero h1 {
+    text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+  }
+}

@@ -205,7 +205,6 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
                 <path d="M389 370 C432 418 490 462 544 505" stroke="#f2469d" stroke-opacity=".34"/>
             </g>
             <g class="svg-gateway" transform="translate(360 306)" filter="url(#gatewayGlow)">
-                <circle r="84" fill="url(#gatewaySurface)"/>
                 <g class="svg-atom" fill="none" stroke="url(#atomStroke)" stroke-width="8" stroke-linecap="round">
                     <ellipse rx="72" ry="31" transform="rotate(0)"/>
                     <ellipse rx="72" ry="31" transform="rotate(60)"/>

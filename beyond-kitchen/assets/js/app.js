@@ -3,9 +3,10 @@
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-  const state = { recipes: [], filter: 'All', favoritesOnly: false, favorites: new Set(), activeRecipe: null, servings: 2, budget: null, regionId: 'ca-bc', storeId: '', budgetRecipeId: '' };
+  const state = { recipes: [], filter: 'All', favoritesOnly: false, favorites: new Set(), activeRecipe: null, servings: 2, budget: null, regionId: 'ca-bc', storeId: '', budgetRecipeId: '', shoppingRecipeIds: new Set() };
   const favoritesKey = 'beyond-kitchen-favorites-v1';
   const budgetPreferencesKey = 'beyond-kitchen-budget-v1';
+  const shoppingListKey = 'beyond-kitchen-shopping-v1';
   const grid = $('#recipeGrid');
   const daily = $('#dailyRecipe');
   const dialog = $('#recipeDialog');
@@ -19,6 +20,7 @@
   const budgetStore = $('#budgetStore');
   const budgetRecipe = $('#budgetRecipe');
   const budgetResult = $('#budgetResult');
+  const shoppingList = $('#shoppingList');
   let carouselSlides = [];
   let carouselDots = [];
   let carouselImages = [];
@@ -38,18 +40,28 @@
     return region?.stores.find((store) => store.id === state.storeId) || region?.stores[0] || null;
   }
 
-  function estimatedCost(recipe, servings = recipe.servings, store = selectedStore()) {
+  function ingredientCostRows(recipe, servings = recipe.servings, store = selectedStore()) {
     const region = selectedRegion();
     if (!region || !store) return null;
     const unitCosts = state.budget.ingredientUnitCosts;
     if (recipe.ingredients.some((item) => !Object.hasOwn(unitCosts, item.name))) return null;
-    const ingredients = recipe.ingredients.reduce((total, item) => total + item.amount * unitCosts[item.name], 0);
-    return ingredients * (servings / recipe.servings) * region.priceScale * region.factor * store.factor;
+    const scale = (servings / recipe.servings) * region.priceScale * region.factor * store.factor;
+    return recipe.ingredients.map((item) => ({
+      name: item.name,
+      amount: item.amount * (servings / recipe.servings),
+      unit: item.unit,
+      cost: item.amount * unitCosts[item.name] * scale
+    }));
   }
 
-  function money(amount) {
+  function estimatedCost(recipe, servings = recipe.servings, store = selectedStore()) {
+    const rows = ingredientCostRows(recipe, servings, store);
+    return rows ? rows.reduce((total, item) => total + item.cost, 0) : null;
+  }
+
+  function money(amount, digits = 0) {
     const currency = selectedRegion()?.currency || 'CAD';
-    return new Intl.NumberFormat('en-CA', { style: 'currency', currency, currencyDisplay: 'narrowSymbol', maximumFractionDigits: 0 }).format(amount);
+    return new Intl.NumberFormat('en-CA', { style: 'currency', currency, currencyDisplay: 'narrowSymbol', minimumFractionDigits: digits, maximumFractionDigits: digits }).format(amount);
   }
 
   function budgetLine(recipe, servings = recipe.servings) {
@@ -103,14 +115,62 @@
     const store = selectedStore();
     budgetResult.innerHTML = cost === null
       ? '<p>We cannot estimate this recipe yet.</p>'
-      : `<div class="budget-summary"><div><span class="eyebrow">${escapeHtml(recipe.name)}</span><p>Estimated ingredients for ${recipe.servings} servings at ${escapeHtml(store.name)}</p></div><div class="budget-total">≈ ${money(cost)}<small>${escapeHtml(region.currency)} total · ≈ ${money(cost / recipe.servings)} per serving</small></div></div>
+      : `<div class="budget-summary"><div><span class="eyebrow">${escapeHtml(recipe.name)}</span><p>Estimated ingredients for ${recipe.servings} servings at ${escapeHtml(store.name)}</p><button class="text-action" type="button" data-shopping-toggle="${escapeHtml(recipe.id)}">${state.shoppingRecipeIds.has(recipe.id) ? 'Remove from' : 'Add to'} shopping list</button></div><div class="budget-total">≈ ${money(cost)}<small>${escapeHtml(region.currency)} total · ≈ ${money(cost / recipe.servings)} per serving</small></div></div>
         <h3>Compare stores in ${escapeHtml(region.name)}</h3>
-        ${storeComparison(recipe, recipe.servings)}`;
+        ${storeComparison(recipe, recipe.servings)}
+        <details class="ingredient-breakdown"><summary>See ingredient estimate breakdown</summary><ul>${ingredientCostRows(recipe).map((item) => `<li><span>${escapeHtml(fmt.format(item.amount))} ${escapeHtml(item.unit)} ${escapeHtml(item.name)}</span><strong>≈ ${money(item.cost, 2)}</strong></li>`).join('')}</ul></details>`;
+  }
+
+  function saveShoppingList() {
+    try {
+      localStorage.setItem(shoppingListKey, JSON.stringify([...state.shoppingRecipeIds]));
+    } catch (error) {
+      // The list remains usable during this visit when storage is blocked.
+    }
+  }
+
+  function renderShoppingList() {
+    if (!shoppingList) return;
+    const recipes = [...state.shoppingRecipeIds]
+      .map((id) => state.recipes.find((recipe) => recipe.id === id))
+      .filter(Boolean);
+    if (!recipes.length) {
+      shoppingList.innerHTML = `<div class="shopping-list-heading"><div><p class="eyebrow">Bring it together</p><h3 id="shoppingListHeading">Your shopping list</h3></div><span>Choose a recipe above or from the recipe cards.</span></div><p class="shopping-empty">Your list is empty for now.</p>`;
+      return;
+    }
+
+    const combined = new Map();
+    recipes.forEach((recipe) => ingredientCostRows(recipe)?.forEach((item) => {
+      const key = `${item.name}\u001f${item.unit}`;
+      const current = combined.get(key) || { name: item.name, unit: item.unit, amount: 0, cost: 0 };
+      current.amount += item.amount;
+      current.cost += item.cost;
+      combined.set(key, current);
+    }));
+    const total = recipes.reduce((sum, recipe) => sum + (estimatedCost(recipe) || 0), 0);
+    shoppingList.innerHTML = `<div class="shopping-list-heading"><div><p class="eyebrow">Bring it together</p><h3 id="shoppingListHeading">Your shopping list</h3></div><div class="shopping-list-total">≈ ${money(total)}<small>${escapeHtml(selectedRegion()?.currency || '')} at ${escapeHtml(selectedStore()?.name || '')}</small></div></div>
+      <div class="shopping-recipe-chips">${recipes.map((recipe) => `<span>${escapeHtml(recipe.name)} <button type="button" data-shopping-remove="${escapeHtml(recipe.id)}" aria-label="Remove ${escapeHtml(recipe.name)} from shopping list">×</button></span>`).join('')}</div>
+      <ul class="shopping-ingredients">${[...combined.values()].map((item) => `<li><span>${escapeHtml(fmt.format(item.amount))} ${escapeHtml(item.unit)} ${escapeHtml(item.name)}</span><strong>≈ ${money(item.cost, 2)}</strong></li>`).join('')}</ul>
+      <div class="shopping-list-actions"><span>${combined.size} combined ingredients · amounts cover each recipe's listed servings</span><button class="text-action" type="button" data-shopping-clear>Clear list</button></div>`;
+  }
+
+  function toggleShoppingRecipe(id) {
+    if (!state.recipes.some((recipe) => recipe.id === id)) return;
+    if (state.shoppingRecipeIds.has(id)) state.shoppingRecipeIds.delete(id);
+    else state.shoppingRecipeIds.add(id);
+    saveShoppingList();
+    renderShoppingList();
+    renderRecipes();
+    if (dialog.open && state.activeRecipe) renderDetails();
+    if (state.budget) renderBudget();
+    const recipe = state.recipes.find((item) => item.id === id);
+    announce(`${recipe.name} ${state.shoppingRecipeIds.has(id) ? 'added to' : 'removed from'} your shopping list.`);
   }
 
   function refreshBudgetViews() {
     renderBudgetControls();
     renderBudget();
+    renderShoppingList();
     if (state.recipes.length) {
       renderDaily();
       renderRecipes();
@@ -226,7 +286,7 @@
     $('#recipeCarousel').setAttribute('aria-label', `${recipe.name} recipe carousel`);
     carouselTrack.innerHTML = slides.map((slide, index) => `<figure class="carousel-slide" data-carousel-slide role="group" aria-roledescription="slide" aria-label="${index + 1} of ${slides.length}">${generated
       ? `<img src="${escapeHtml(carouselImages[index])}" alt="${escapeHtml(`${slide.label}. ${slide.title}. ${slide.body}`)}" width="1080" height="1350" ${index === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}>`
-      : `<div class="carousel-slide-content" style="--carousel-photo:url('${escapeHtml(recipe.image)}')"><span class="eyebrow">${escapeHtml(slide.label)}</span><h3>${escapeHtml(slide.title)}</h3><p>${escapeHtml(slide.body)}</p><small>Beyond Kitchen · ${index + 1} / 5</small></div>`}</figure>`).join('');
+      : `<div class="carousel-slide-content" style="--carousel-photo:url('${escapeHtml(imageUrl(recipe))}')"><span class="eyebrow">${escapeHtml(slide.label)}</span><h3>${escapeHtml(slide.title)}</h3><p>${escapeHtml(slide.body)}</p><small>Beyond Kitchen · ${index + 1} / 5</small></div>`}</figure>`).join('');
     $('#carouselDots').innerHTML = slides.map((_, index) => `<button type="button" data-carousel-to="${index}" aria-label="Show slide ${index + 1}" aria-current="${index === 0}"></button>`).join('');
     carouselSlides = $$('[data-carousel-slide]', carouselTrack);
     carouselDots = $$('#carouselDots [data-carousel-to]');
@@ -313,8 +373,12 @@
     return `<button class="${className}" type="button" data-favorite="${escapeHtml(recipe.id)}" aria-label="${isSaved ? 'Remove' : 'Save'} ${escapeHtml(recipe.name)} ${isSaved ? 'from' : 'to'} saved recipes" aria-pressed="${isSaved}">${isSaved ? '♥' : '♡'}</button>`;
   }
 
+  function imageUrl(recipe) {
+    return new URL(recipe.image, document.baseURI).href;
+  }
+
   function imageStyle(recipe) {
-    return `background-image:linear-gradient(135deg,#71836b44,#d4c69833),url('${escapeHtml(recipe.image)}')`;
+    return `background-image:linear-gradient(135deg,#71836b44,#d4c69833),url('${escapeHtml(imageUrl(recipe))}')`;
   }
 
   function renderDaily() {
@@ -356,6 +420,7 @@
           <h3>${escapeHtml(recipe.name)}</h3>
           <p>${escapeHtml(recipe.description)}</p>
           ${budgetLine(recipe)}
+          <button class="card-list-button" type="button" data-shopping-toggle="${escapeHtml(recipe.id)}" aria-pressed="${state.shoppingRecipeIds.has(recipe.id)}">${state.shoppingRecipeIds.has(recipe.id) ? 'Added to list ✓' : 'Add to shopping list +'}</button>
           <div class="card-footer"><span>◷ ${recipe.timeMinutes} min · ${escapeHtml(recipe.difficulty)}</span><span>${escapeHtml(recipe.tags[0])}</span></div>
         </div>
       </article>`).join('');
@@ -429,7 +494,7 @@
   }
 
   document.addEventListener('click', (event) => {
-    const target = event.target.closest('[data-open], [data-favorite], [data-filter], [data-servings], [data-budget-store], #favoritesToggle, #dialogClose');
+    const target = event.target.closest('[data-open], [data-favorite], [data-filter], [data-servings], [data-budget-store], [data-shopping-toggle], [data-shopping-remove], [data-shopping-clear], #favoritesToggle, #dialogClose');
     if (!target) return;
     if (target.matches('[data-open]')) openRecipe(target.dataset.open);
     if (target.matches('[data-favorite]')) {
@@ -458,6 +523,16 @@
     if (target.matches('[data-budget-store]')) {
       state.storeId = target.dataset.budgetStore;
       refreshBudgetViews();
+    }
+    if (target.matches('[data-shopping-toggle], [data-shopping-remove]')) toggleShoppingRecipe(target.dataset.shoppingToggle || target.dataset.shoppingRemove);
+    if (target.matches('[data-shopping-clear]')) {
+      state.shoppingRecipeIds.clear();
+      saveShoppingList();
+      renderShoppingList();
+      renderRecipes();
+      if (dialog.open && state.activeRecipe) renderDetails();
+      if (state.budget) renderBudget();
+      announce('Shopping list cleared.');
     }
   });
 
@@ -512,8 +587,15 @@
         }
       }
       readFavorites();
+      try {
+        const savedShoppingList = JSON.parse(localStorage.getItem(shoppingListKey) || '[]');
+        if (Array.isArray(savedShoppingList)) state.shoppingRecipeIds = new Set(savedShoppingList.filter((id) => state.recipes.some((recipe) => recipe.id === id)));
+      } catch (error) {
+        // Start with an empty list when saved data cannot be read.
+      }
       renderBudgetControls();
       renderBudget();
+      renderShoppingList();
       renderDaily();
       loadCarousel(dailyRecipe());
       renderRecipes();

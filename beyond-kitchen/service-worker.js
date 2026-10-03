@@ -1,10 +1,10 @@
-const CACHE_NAME = 'beyond-kitchen-0.0.2-assets-v7';
+const CACHE_NAME = 'beyond-kitchen-0.0.2-assets-v9';
 const APP_FILES = [
   './',
   './offline.html',
-  './assets/css/app.css?v=0.0.7',
+  './assets/css/app.css?v=0.0.8',
   './assets/js/recipe-library.js?v=0.0.2',
-  './assets/js/app.js?v=0.0.7',
+  './assets/js/app.js?v=0.0.9',
   './assets/kitchen-mark.svg',
   './assets/images/recipes/lemon-chickpea-bowls.png',
   './assets/images/recipes/tomato-butter-beans.jpg',

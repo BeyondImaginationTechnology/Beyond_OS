@@ -135,6 +135,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .budget-summary p { margin: 0; color: #687165; font-size: 12px; line-height: 1.5; }
 .budget-total { flex: 0 0 auto; color: var(--green); font: 500 29px/1.15 "Playfair Display", Georgia, serif; text-align: right; }
 .budget-total small { display: block; margin-top: 4px; color: #70786a; font: 500 10px "DM Sans", sans-serif; }
+.text-action { margin-top: 9px; padding: 0; border: 0; color: var(--green); background: transparent; font-size: 11px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .budget-result h3 { margin: 20px 0 11px; font: 500 21px "Playfair Display", Georgia, serif; }
 .store-comparison { display: grid; gap: 8px; }
 .store-comparison-row { display: grid; grid-template-columns: minmax(120px, 1fr) auto auto; align-items: center; gap: 13px; min-width: 0; padding: 12px 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--white); }
@@ -155,6 +156,26 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .detail-budget strong small { font-size: 10px; font-weight: 600; }
 .detail-budget p { margin: 7px 0 15px; color: #657161; font-size: 11px; line-height: 1.5; }
 .detail-budget .store-comparison-row { padding: 9px 11px; }
+.ingredient-breakdown { margin-top: 13px; padding: 13px 15px; border: 1px solid var(--line); border-radius: 12px; background: var(--white); }
+.ingredient-breakdown summary { color: var(--green); font-size: 11px; font-weight: 700; cursor: pointer; }
+.ingredient-breakdown ul, .shopping-ingredients { margin: 11px 0 0; padding: 0; list-style: none; }
+.ingredient-breakdown li, .shopping-ingredients li { display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-top: 1px solid #ecece5; color: #586252; font-size: 11px; line-height: 1.45; }
+.ingredient-breakdown li strong, .shopping-ingredients li strong { flex: 0 0 auto; color: var(--green); }
+.shopping-list { margin-top: 26px; padding: 20px 22px; border: 1px solid #dce4d7; border-radius: 16px; background: #f8faf5; }
+.shopping-list-heading { display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+.shopping-list-heading .eyebrow { margin: 0 0 4px; }
+.shopping-list-heading h3 { margin: 0; font: 500 21px "Playfair Display", Georgia, serif; }
+.shopping-list-heading>span { color: #71796c; font-size: 11px; }
+.shopping-list-total { color: var(--green); font: 500 23px "Playfair Display", Georgia, serif; text-align: right; }
+.shopping-list-total small { display: block; margin-top: 3px; color: #70786a; font: 500 10px "DM Sans", sans-serif; }
+.shopping-recipe-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 15px; }
+.shopping-recipe-chips>span { display: inline-flex; align-items: center; gap: 8px; padding: 6px 9px; border-radius: 999px; color: var(--green); background: #e8eee2; font-size: 10px; font-weight: 700; }
+.shopping-recipe-chips button { padding: 0; border: 0; color: inherit; background: transparent; font-size: 16px; line-height: 1; cursor: pointer; }
+.shopping-empty { margin: 13px 0 0; color: #71796c; font-size: 11px; }
+.shopping-list-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 12px; color: #71796c; font-size: 10px; }
+.shopping-list-actions .text-action { margin: 0; }
+.card-list-button { margin-top: 10px; padding: 0; border: 0; color: var(--green); background: transparent; font-size: 10px; font-weight: 700; cursor: pointer; }
+.card-list-button:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 .recipe-section { scroll-margin-top: 25px; }
 .recipe-heading { margin-bottom: 22px; }
@@ -233,6 +254,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .store-comparison-row { grid-template-columns: 1fr auto; }
   .store-comparison-row a { grid-column: 1 / -1; }
   .detail-budget>div:first-child { align-items: flex-start; flex-direction: column; }
+  .shopping-list-heading { align-items: flex-start; flex-direction: column; }
+  .shopping-list-total { text-align: left; }
+  .shopping-list-actions { align-items: flex-start; flex-direction: column; }
   .dinner-section { margin-bottom: 46px; padding: 23px; border-radius: 18px; }
   .dinner-results { grid-template-columns: 1fr; }
   .dinner-result-card { min-height: 150px; }

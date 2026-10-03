@@ -22,14 +22,14 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
   <meta name="description" content="A fresh recipe for today, with simple ingredients, clear steps, and ideas worth making again.">
   <title>Beyond Kitchen | A little inspiration for today</title>
   <link rel="canonical" href="https://recipe.beyondimagination.co.technology/">
-  <link rel="manifest" href="<?= e(beyond_url('beyond-kitchen/manifest.webmanifest')) ?>">
-  <link rel="icon" href="<?= e(beyond_url('beyond-kitchen/assets/kitchen-mark.svg')) ?>" type="image/svg+xml">
-  <link rel="stylesheet" href="<?= e(beyond_url('beyond-kitchen/assets/css/app.css?v=0.0.7')) ?>">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/kitchen-mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/css/app.css?v=0.0.8">
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <a class="brand" href="<?= e(beyond_url('')) ?>" aria-label="Beyond Kitchen home">
+      <a class="brand" href="./" aria-label="Beyond Kitchen home">
         <span class="brand-mark" aria-hidden="true">b</span>
         <span>Beyond <strong>Kitchen</strong></span>
       </a>
@@ -125,6 +125,7 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
           <label>Store <select id="budgetStore" aria-label="Preferred store"></select></label>
         </div>
         <div class="budget-result" id="budgetResult" aria-live="polite">Loading recipe budgets…</div>
+        <section class="shopping-list" id="shoppingList" aria-labelledby="shoppingListHeading" aria-live="polite"></section>
         <p class="budget-note">Illustrative ingredient-use estimates seeded September 2026, including small pantry portions. Regional and store differences are planning assumptions, not live shelf prices or exchange quotes. Package sizes, sales, tax, and availability can change your checkout total. <a href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810024502" target="_blank" rel="noopener noreferrer">Canadian food prices ↗</a> · <a href="https://www.ers.usda.gov/data-products/food-price-outlook/" target="_blank" rel="noopener noreferrer">U.S. food price outlook ↗</a></p>
       </section>
 
@@ -162,7 +163,7 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
     </main>
 
     <footer class="site-footer">
-      <a href="<?= e(beyond_url('')) ?>">← Beyond Imagination Technology</a>
+      <a href="https://beyondimagination.co.technology/">← Beyond Imagination Technology</a>
       <span>Beyond Kitchen · 0.0.2</span>
     </footer>
   </div>
@@ -173,11 +174,11 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
   </dialog>
   <p class="sr-status" id="statusMessage" role="status" aria-live="polite"></p>
 
-  <script src="<?= e(beyond_url('beyond-kitchen/assets/js/recipe-library.js?v=0.0.2')) ?>" defer></script>
-  <script src="<?= e(beyond_url('beyond-kitchen/assets/js/app.js?v=0.0.7')) ?>" defer></script>
+  <script src="./assets/js/recipe-library.js?v=0.0.2" defer></script>
+  <script src="./assets/js/app.js?v=0.0.9" defer></script>
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('<?= e(beyond_url('beyond-kitchen/service-worker.js')) ?>'));
+      window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js'));
     }
   </script>
 </body>

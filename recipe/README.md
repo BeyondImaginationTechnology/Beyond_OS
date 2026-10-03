@@ -40,7 +40,10 @@ small pantry portions, rather than the full cost of buying every package.
 Store links let readers check current prices. Statistics Canada provincial food
 price data and the USDA Food Price Outlook provide context, but the per-item
 and per-store factors are not official figures from either source. Refresh the
-data file before using estimates as current shopping guidance.
+data file before using estimates as current shopping guidance. The budget panel
+shows each ingredient's estimated share and lets users add several recipes to a
+saved shopping list. Matching ingredient names and units are combined; the list
+total follows the selected region and store.
 
 ## What's for dinner? · beta 0.0.1
 

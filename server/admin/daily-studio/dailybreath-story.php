@@ -16,18 +16,18 @@ $csrf = Auth::csrf();
 </style>
 <section class="story-builder" data-csrf="<?=DailyStudio::esc($csrf)?>">
   <header class="story-head">
-    <div><p class="story-eyebrow">Daily Breath · Remotion production template</p><h1>Story Builder</h1><p>Enter a topic and verified source notes. Generate a source-grounded six-beat script, then review, revise, download the story brief, or render the finished vertical video.</p></div>
+    <div><p class="story-eyebrow">Daily Breath · Bible devotional production</p><h1>Bible Devotional Builder</h1><p>Enter a Bible topic and verified Bible source notes. Generate a source-grounded six-beat devotional, then review, revise, download the story brief, or render the finished vertical video.</p></div>
     <span class="story-duration">60 SEC · 9:16 · 30 FPS</span>
   </header>
   <div class="story-columns">
     <section class="story-panel">
       <div class="story-panel-head">1 · Story brief</div>
       <div class="story-panel-body">
-        <div class="story-field"><label for="storyTopic">Topic</label><textarea id="storyTopic" maxlength="2000" placeholder="What story should Daily Breath tell? Include the person, event, scripture, place, or historical setting."></textarea><small>Include relevant context and the intended audience. Generated factual claims must be supported by the notes below.</small></div>
-        <div class="story-field"><label for="storySources">Sources and supporting notes</label><textarea class="sources-input" id="storySources" placeholder="One source per block, separated by a blank line:&#10;Citation or source title | https://example.org/reference | Paste the relevant excerpt or verified notes here."></textarea><small>Provide 1–4 sources. Each block must contain a citation, optional HTTP(S) URL, and excerpt or notes. URLs are credited but not fetched; paste the evidence used for drafting.</small></div>
+        <div class="story-field"><label for="storyTopic">Bible topic</label><textarea id="storyTopic" maxlength="2000" placeholder="What Bible verse, person, event, or theme should this devotional explore?"></textarea><small>Include the intended audience and any relevant pastoral context. Generated claims must be supported by the Bible notes below.</small></div>
+        <div class="story-field"><label for="storySources">Bible sources and supporting notes</label><textarea class="sources-input" id="storySources" placeholder="One source per block, separated by a blank line:&#10;Bible reference | https://example.org/reference | Paste the relevant Bible text or verified editorial notes here."></textarea><small>Provide 1–4 Bible sources. Each block needs a citation, optional HTTP(S) URL, and excerpt or notes. URLs are credited but not fetched; paste the evidence used for drafting.</small></div>
         <div class="story-action"><button type="button" id="generateStory">Generate six beats</button></div>
         <p class="story-status" id="storyStatus" role="status" aria-live="polite"></p>
-        <div class="story-help">Drafts are generated for editorial review and are never published automatically. Narration is delivered as a voiceover script; the MP4 is a silent motion-graphics render. Visual prompts are production directions—the template does not generate or fetch imagery.</div>
+        <div class="story-help">This builder produces Bible devotionals only. Drafts are generated for editorial review and are never published automatically. Narration is delivered as a voiceover script; visual prompts are production directions—the template does not generate or fetch imagery.</div>
       </div>
     </section>
     <section class="story-panel">
@@ -168,7 +168,7 @@ $csrf = Auth::csrf();
       const topic = $('storyTopic').value.trim();
       if (!topic) throw new Error('Enter a story topic.');
       const sources = parseSources();
-      status('Generating a source-grounded six-beat story…', false, true);
+      status('Generating a source-grounded six-beat Bible devotional…', false, true);
       const response = await fetch('api/generate-dailybreath-story.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'X-CSRF-Token': root.dataset.csrf},

@@ -49,10 +49,10 @@ npm run render:breath
 
 The Remotion `DailyBreathStory` composition reads its length from the editable
 beat timeline, source-card duration, and outro duration. The current first
-episode is **Enough for Today**, a Bible-only reflection on Matthew 6:25–34.
-Its current timeline is about 3½ minutes. The MP4 is a silent motion-graphics
-draft with the narration displayed as captions; record and mix the voiceover
-before treating it as a finished episode.
+episode is **A Strong Tower**, a Bible-only reflection on the Bible Verse of
+the Day, Proverbs 18:10. Its current timeline is just over three minutes.
+The finished render can include an ElevenLabs voiceover; the motion-graphics
+draft displays its narration as captions.
 `public/daily-breath-story.json` contains the narration, on-screen captions,
 visual direction, citation, and timing. Render a motion-graphics draft with:
 
@@ -60,14 +60,13 @@ visual direction, citation, and timing. Render a motion-graphics draft with:
 npm run render:story
 ```
 
-In Daily Studio, open DailyBreath → **Story Builder**. Enter a topic
-and up to four source blocks in `citation | URL | excerpt or notes` format.
-Generation uses only the supplied excerpt/notes (URLs are credited but not
-fetched), returns the beat narration, concise screen text, and visual-production
-prompts, and requires an editor to review the draft before downloading the
-story brief or rendering an MP4. The Remotion export is a motion-graphics
-template; visual prompts are provided for a separate image-production step and
-are not represented as generated images in the exported video.
+In Daily Studio, open DailyBreath → **Bible Devotional Builder**. Enter a
+Bible topic and up to four Bible source blocks in `citation | URL | excerpt or
+notes` format. Generation uses only the supplied excerpts and notes (URLs are
+credited but not fetched), returns the beat narration, concise screen text,
+and visual-production prompts, and requires an editor to review the draft
+before downloading the story brief or rendering an MP4. This production tool
+is Bible-only; Daily Breath’s Tanakh and Quran readings remain in the app.
 
 The existing `server/cron/daily-studio-daily.php` worker also renders one video
 for the current date in the configured timezone. It saves the public MP4 at

@@ -248,6 +248,19 @@ function resolve_archives(array $ids): array {
     return $resolved;
 }
 $config=$channels[$slug];
+if ($slug === 'mrbeast-tv') {
+    $manifestFile = dirname(__DIR__, 2) . '/dailybreath/assets/videos/daily-breath-tv/rotation.json';
+    $manifest = is_file($manifestFile) ? json_decode((string)@file_get_contents($manifestFile), true) : [];
+    $items = [];
+    foreach ((array)($manifest['episodes'] ?? []) as $episode) {
+        if (!is_array($episode)) continue;
+        $url = (string)($episode['video_url'] ?? '');
+        if (!str_starts_with($url, '/dailybreath/assets/videos/daily-breath-tv/') || !str_ends_with(strtolower($url), '.mp4')) continue;
+        $items[] = ['url' => $url, 'title' => (string)($episode['title'] ?? 'Daily Breath'), 'duration' => max(30, (int)($episode['duration_seconds'] ?? 180)), 'creator' => 'Daily Breath TV', 'license' => 'Original production', 'rights_url' => ''];
+    }
+    $channels[$slug] = ['name' => 'Daily Breath TV', 'items' => $items, 'embed' => ''];
+}
+$config=$channels[$slug];
 if ($slug === 'classic-cinema') {
     require_once dirname(__DIR__) . '/includes/movies-schedule.php';
     $movieState = beyond_movies_schedule_state();
@@ -337,7 +350,7 @@ $archiveIds=[];foreach($config['items'] as $item){if(empty($item['url'])&&!empty
 $archiveUrls=resolve_archives($archiveIds);
 $resolved=[];
 foreach($config['items'] as $item){ $url=$item['url']??null; if(!$url&&!empty($item['archive']))$url=$archiveUrls[(string)$item['archive']]??null; if(!$url)continue;
-    $provider = !empty($item['archive']) || str_contains((string)$url, 'archive.org/') ? 'Internet Archive' : 'Wikimedia Commons';
+    $provider = str_starts_with((string)$url, '/dailybreath/assets/videos/daily-breath-tv/') ? 'Daily Breath TV' : (!empty($item['archive']) || str_contains((string)$url, 'archive.org/') ? 'Internet Archive' : 'Wikimedia Commons');
     $resolved[]=['provider'=>$provider,'title'=>$item['title'],'url'=>$url,'duration'=>(int)$item['duration'],'type'=>str_contains($url,'.webm')?'video/webm':'video/mp4','creator'=>(string)($item['creator']??''),'license'=>$provider==='Internet Archive'?'':(string)($item['license']??''),'review_status'=>'testing','rights_status'=>'unverified','rights_url'=>(string)($item['rights_url']??'')]; }
 $total=array_sum(array_column($resolved,'duration')); $position=$total>0?time()%$total:0; $current=0; $offset=0;
 foreach($resolved as $i=>$item){ if($position<$item['duration']){$current=$i;$offset=$position;break;} $position-=$item['duration']; }

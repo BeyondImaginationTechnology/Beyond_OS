@@ -667,13 +667,13 @@
       "lineup": "Bedtime Classics"
     }
   ],
-  "mrbeast-tv": [
-    {"start":0,"end":6,"icon":"🌙","title":"Night Breath · Planned","lineup":"Night Breath · Nature & Wonder · Daily Breath encores"},
-    {"start":6,"end":12,"icon":"☀️","title":"Daily Breath TV Morning · Planned","lineup":"Morning Breath · Daily Breath · Little Lessons · Moe, Dovi & Chris · Stories of Faith"},
-    {"start":12,"end":18,"icon":"🌍","title":"Discover & Learn · Planned","lineup":"The World of Faith · Faith Kitchen · Breath of History · Big Questions · Daily Breath Stories"},
-    {"start":18,"end":21,"icon":"📖","title":"Stories & Culture · Planned","lineup":"Moe, Dovi & Chris · Stories of Faith · Daily Breath Stories · The World of Faith"},
-    {"start":21,"end":24,"icon":"🌙","title":"Night Breath · Planned","lineup":"Night Breath · Nature & Wonder · reflection and calm"}
-  ],
+    "mrbeast-tv": [
+      {"start":0,"end":6,"icon":"🌿","title":"A Strong Tower · Daily Breath","lineup":"Original Bible devotional rotation"},
+      {"start":6,"end":12,"icon":"🌿","title":"A Strong Tower · Daily Breath","lineup":"Original Bible devotional rotation"},
+      {"start":12,"end":18,"icon":"🌿","title":"A Strong Tower · Daily Breath","lineup":"Original Bible devotional rotation"},
+      {"start":18,"end":21,"icon":"🌿","title":"A Strong Tower · Daily Breath","lineup":"Original Bible devotional rotation"},
+      {"start":21,"end":24,"icon":"🌿","title":"A Strong Tower · Daily Breath","lineup":"Original Bible devotional rotation"}
+    ],
   "redbull-tv": [
     {"start":0,"end":3,"icon":"🌙","title":"Red Bull After Dark","lineup":"Official films and action sports stories"},
     {"start":3,"end":6,"icon":"🧗","title":"Adventure Sessions","lineup":"Climbing, mountain, and outdoor films"},

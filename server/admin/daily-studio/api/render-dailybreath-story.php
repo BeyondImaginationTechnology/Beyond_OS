@@ -38,6 +38,7 @@ $title = trim((string)($input['title'] ?? ''));
 $subtitle = trim((string)($input['subtitle'] ?? ''));
 $outroText = trim((string)($input['outroText'] ?? ''));
 $recordVoiceover = ($input['recordVoiceover'] ?? false) === true;
+$publishToDailyBreathTv = ($input['publishToDailyBreathTv'] ?? false) === true;
 $beats = $input['beats'] ?? null;
 $sources = $input['sources'] ?? null;
 if ($title === '' || mb_strlen($title) > 100 || $subtitle === '' || mb_strlen($subtitle) > 140 || $outroText === '' || mb_strlen($outroText) > 180) {
@@ -171,6 +172,49 @@ try {
         $details = is_file($logFile) ? trim((string)file_get_contents($logFile)) : '';
         error_log('Daily Breath Remotion story render failed: ' . $details);
         throw new RuntimeException('The Daily Breath story video could not be rendered.');
+    }
+    if ($publishToDailyBreathTv) {
+        $rotationDirectory = dirname(__DIR__, 4) . '/dailybreath/assets/videos/daily-breath-tv';
+        if (!is_dir($rotationDirectory) && !mkdir($rotationDirectory, 0775, true) && !is_dir($rotationDirectory)) {
+            throw new RuntimeException('The Daily Breath TV video library could not be created.');
+        }
+        if (!is_writable($rotationDirectory)) throw new RuntimeException('The Daily Breath TV video library is not writable.');
+        $episodeId = trim((string)preg_replace('/[^a-z0-9]+/', '-', strtolower($title)), '-');
+        $episodeId = $episodeId !== '' ? $episodeId : 'daily-breath-episode';
+        $publishedFile = $rotationDirectory . '/' . $episodeId . '.mp4';
+        if (!@rename($outputFile, $publishedFile)) {
+            if (!@copy($outputFile, $publishedFile) || !@unlink($outputFile)) {
+                throw new RuntimeException('The completed episode could not be placed in the Daily Breath TV rotation.');
+            }
+        }
+        @chmod($publishedFile, 0644);
+        $outputFile = '';
+        $manifestFile = $rotationDirectory . '/rotation.json';
+        $manifest = is_file($manifestFile) ? json_decode((string)file_get_contents($manifestFile), true) : [];
+        $manifest = is_array($manifest) ? $manifest : [];
+        $episodes = array_values(array_filter((array)($manifest['episodes'] ?? []), static fn($episode): bool => is_array($episode) && ($episode['id'] ?? '') !== $episodeId));
+        array_unshift($episodes, [
+            'id' => $episodeId,
+            'title' => $title,
+            'subtitle' => $subtitle,
+            'show' => 'Daily Breath',
+            'video_url' => '/dailybreath/assets/videos/daily-breath-tv/' . rawurlencode($episodeId) . '.mp4',
+            'duration_seconds' => (int)ceil(max(array_map(static fn(array $beat): float => (float)$beat['startSeconds'] + (float)$beat['durationSeconds'], $orderedBeats)) + $props['sourceSeconds'] + $props['outroSeconds']),
+            'published_at' => gmdate(DATE_ATOM),
+            'voiceover' => $recordVoiceover ? 'elevenlabs' : 'none',
+        ]);
+        $manifest['channel'] = 'Daily Breath TV';
+        $manifest['updated_at'] = gmdate(DATE_ATOM);
+        $manifest['episodes'] = $episodes;
+        $temporaryManifest = $manifestFile . '.tmp';
+        if (file_put_contents($temporaryManifest, json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . PHP_EOL, LOCK_EX) === false || !rename($temporaryManifest, $manifestFile)) {
+            @unlink($temporaryManifest);
+            throw new RuntimeException('The Daily Breath TV rotation manifest could not be updated.');
+        }
+        header('Content-Type: application/json; charset=UTF-8');
+        header('Cache-Control: private, no-store');
+        echo json_encode(['ok' => true, 'episode' => $episodes[0]], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
     }
     header('Content-Type: video/mp4');
     header('Content-Length: ' . filesize($outputFile));

@@ -34,7 +34,10 @@ git merge --ff-only origin/main
 # Check after the fast-forward so newly added ignore rules can account for
 # host-side convenience files without deleting or staging them.
 UNEXPECTED_UNTRACKED="$(git ls-files --others --exclude-standard | grep -v '^dailybreath/assets/audio/' || true)"
-[[ -z "${UNEXPECTED_UNTRACKED}" ]] || { echo "Refusing to deploy unexpected untracked files." >&2; exit 1; }
+if [[ -n "${UNEXPECTED_UNTRACKED}" ]]; then
+  printf 'Refusing to deploy unexpected untracked files:\n%s\n' "${UNEXPECTED_UNTRACKED}" >&2
+  exit 1
+fi
 
 # Git respects the private umask for newly checked-out files and directories.
 # Make only tracked content web-readable; ignored config and runtime data stay private.

@@ -30,6 +30,8 @@ foreach ($libraryAssets as $asset) {
 // Keep the homepage package stage aligned with the public Autumn Ink release.
 // A malformed catalog or a missing asset must never take the storefront down.
 $dailyStylesheet = null;
+$currentStylesheetSequence = null;
+$stylesheetPosterUrl = '';
 try {
     $stylesheetCatalog = json_decode(
         (string) file_get_contents(__DIR__ . '/data/autumn-ink-stylesheets.json'),
@@ -39,13 +41,25 @@ try {
     );
     $timezone = new DateTimeZone((string) ($stylesheetCatalog['campaign']['timezone'] ?? 'America/Vancouver'));
     $today = new DateTimeImmutable('today', $timezone);
+    $campaignStart = new DateTimeImmutable((string) ($stylesheetCatalog['campaign']['start_date'] ?? ''), $timezone);
+    $totalReleases = (int) ($stylesheetCatalog['campaign']['total_releases'] ?? 31);
+    $daysIntoCampaign = (int) $campaignStart->diff($today)->format('%r%a');
+    if ($daysIntoCampaign >= 0 && $daysIntoCampaign < $totalReleases) {
+        $currentStylesheetSequence = $daysIntoCampaign + 1;
+    }
+    $poster = ltrim((string) ($stylesheetCatalog['campaign']['poster'] ?? ''), '/');
+    if ($poster !== '' && is_file(__DIR__ . '/' . $poster)) {
+        $stylesheetPosterUrl = bt_app_url($poster);
+    }
     foreach ((array) ($stylesheetCatalog['releases'] ?? []) as $release) {
         if (!is_array($release) || empty($release['asset']) || empty($release['title'])) {
             continue;
         }
         $releaseDate = new DateTimeImmutable((string) ($release['date'] ?? ''), $timezone);
         $asset = ltrim((string) $release['asset'], '/');
-        if ($releaseDate <= $today && is_file(__DIR__ . '/' . $asset)) {
+        if ($currentStylesheetSequence === (int) ($release['sequence'] ?? 0)
+            && $releaseDate <= $today
+            && is_file(__DIR__ . '/' . $asset)) {
             $dailyStylesheet = [
                 'sequence' => max(1, (int) ($release['sequence'] ?? 1)),
                 'title' => (string) $release['title'],
@@ -142,13 +156,13 @@ if (!empty($stencilDay['iso_date'])) {
         </div>
       </div>
 
-      <a class="bt-package-stage" href="<?= e($dailyStylesheet !== null ? 'stylesheets.php#stylesheet-' . sprintf('%02d', $dailyStylesheet['sequence']) : 'stencils.php') ?>" aria-label="<?= e($dailyStylesheet !== null ? 'View today’s Autumn Ink stylesheet' : 'Browse the stencil release calendar') ?>">
+      <a class="bt-package-stage" href="<?= e($dailyStylesheet !== null ? 'stylesheets.php#stylesheet-' . sprintf('%02d', $dailyStylesheet['sequence']) : 'stylesheets.php') ?>" aria-label="<?= e($dailyStylesheet !== null ? 'View today’s Autumn Ink stylesheet' : 'View the Autumn Ink stylesheet calendar') ?>">
         <span class="bt-package-glow" aria-hidden="true"></span>
         <img
-          src="<?= e($dailyStylesheet['asset_url'] ?? $packImage) ?>?v=<?= e((string)($stencilDay['updated_at'] ?: '1')) ?>"
-          alt="<?= e($dailyStylesheet !== null ? 'Today’s Autumn Ink stylesheet: ' . $dailyStylesheet['title'] : $stencilDay['title'] . ' generated stencil package') ?>"
+          src="<?= e($dailyStylesheet['asset_url'] ?? $stylesheetPosterUrl ?: $packImage) ?>?v=<?= e((string)($stencilDay['updated_at'] ?: '1')) ?>"
+          alt="<?= e($dailyStylesheet !== null ? 'Today’s Autumn Ink stylesheet: ' . $dailyStylesheet['title'] : 'Autumn Ink daily stylesheet ' . sprintf('%02d', $currentStylesheetSequence ?? 1) . ' of 31 is in preparation') ?>"
         >
-        <span class="bt-package-cta"><?= e($dailyStylesheet !== null ? 'Today’s stylesheet · ' . sprintf('%02d', $dailyStylesheet['sequence']) . '/31' : 'Browse release') ?></span>
+        <span class="bt-package-cta"><?= e($currentStylesheetSequence !== null ? 'Today’s stylesheet · ' . sprintf('%02d', $currentStylesheetSequence) . '/31' : 'Browse stylesheets') ?></span>
       </a>
     </div>
   </section>

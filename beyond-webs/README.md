@@ -10,11 +10,13 @@ Suggested Linux creator apps are Blender, Krita, GIMP, and Kdenlive. Suggested n
 
 ## Machine profiles and browser access
 
+`machine-profiles.json` is the source for the profile cards and accepted plan IDs. The web app reads it when rendering the page and the request API validates against the same catalog.
+
 | Profile | vCPU | RAM | Capped SSD | GPU |
 | --- | ---: | ---: | ---: | --- |
-| Launch | 4 | 16 GB | 128 GB | None |
-| Build | 8 | 32 GB | 256 GB | Optional, subject to capacity |
-| Power | 16 | 64 GB | 512 GB | Required, subject to quota and region |
+| Launch | 4 | 16 GB | 256 GB | None |
+| Build | 8 | 32 GB | 512 GB | Optional, subject to capacity |
+| Power | 16 | 64 GB | 1 TB | Required, subject to quota and region |
 
 These are initial product targets. Select compatible Compute Engine machine types only after checking regional capacity, GPU quota, disk type, and current price. Do not silently substitute a different profile. Keep each VM disk at or below the selected cap.
 

@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "access_method": "noVNC",
+  "profiles": [
+    {
+      "id": "Launch",
+      "label": "Standard",
+      "vcpus": 4,
+      "ram_gb": 16,
+      "ssd_gb": 256,
+      "gpu": "none",
+      "summary": "For a personal desktop, learning, and small projects.",
+      "included": ["4 vCPUs", "16 GB RAM", "256 GB capped SSD", "Browser desktop via noVNC"]
+    },
+    {
+      "id": "Build",
+      "label": "Performance",
+      "vcpus": 8,
+      "ram_gb": 32,
+      "ssd_gb": 512,
+      "gpu": "optional",
+      "summary": "For development, creation, and larger work sessions.",
+      "included": ["8 vCPUs", "32 GB RAM", "512 GB capped SSD", "Optional GPU where available"]
+    },
+    {
+      "id": "Power",
+      "label": "GPU",
+      "vcpus": 16,
+      "ram_gb": 64,
+      "ssd_gb": 1024,
+      "gpu": "required",
+      "summary": "For demanding builds and GPU accelerated work.",
+      "included": ["16 vCPUs", "64 GB RAM", "1 TB capped SSD", "GPU subject to region and quota"]
+    }
+  ]
+}

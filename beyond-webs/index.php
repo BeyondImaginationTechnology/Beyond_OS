@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../beyond-id/includes/session.php';
 header('Cache-Control: no-store');
+$profileCatalog = json_decode((string)file_get_contents(__DIR__ . '/machine-profiles.json'), true);
+$machineProfiles = is_array($profileCatalog['profiles'] ?? null) ? $profileCatalog['profiles'] : [];
 
 $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
 $configuredOrigin = rtrim((string)getenv('BEYOND_WEBS_ORIGIN'), '/');
@@ -25,7 +27,7 @@ $loginUrl = $identityOrigin . '/beyond-id/auth/login.php?app=beyond-webs&return=
   <meta name="description" content="Configure an hourly VPS session on a machine with BIT OS installed. Choose your BIT OS flavour and session size with Beyond Webs.">
   <title>Beyond Webs - VPS session control</title>
   <link rel="stylesheet" href="assets/app.css?v=0.0.1">
-  <link rel="stylesheet" href="assets/overrides.css?v=0.0.4">
+  <link rel="stylesheet" href="assets/overrides.css?v=0.0.5">
 </head>
 <body data-request-token="<?= htmlspecialchars((string)($_SESSION['beyond_webs_csrf'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
   <header class="site-header wrap">
@@ -53,10 +55,10 @@ $loginUrl = $identityOrigin . '/beyond-id/auth/login.php?app=beyond-webs&return=
             <article class="session-card">
               <small>CONFIGURATION PREVIEW · NOT A LIVE VPS</small>
               <strong><span id="previewFlavour">Gaming</span> <i>·</i> <span id="previewPlan">Build</span></strong>
-              <div class="resource"><span>RAM</span><b id="previewRam">16 GB</b></div>
-              <div class="resource"><span>CPU</span><b id="previewCpu">8 cores</b></div>
-              <div class="resource"><span>GPU</span><b id="previewGpu">Performance GPU</b></div>
-              <div class="resource"><span>STORAGE</span><b id="previewStorage">256 GB SSD</b></div>
+              <div class="resource"><span>RAM</span><b id="previewRam">32 GB</b></div>
+              <div class="resource"><span>CPU</span><b id="previewCpu">8 vCPUs</b></div>
+              <div class="resource"><span>GPU</span><b id="previewGpu">GPU optional by capacity</b></div>
+              <div class="resource"><span>STORAGE</span><b id="previewStorage">512 GB SSD</b></div>
               <p>Request only · No machine or charge is started here</p>
             </article>
           </section>
@@ -80,7 +82,21 @@ $loginUrl = $identityOrigin . '/beyond-id/auth/login.php?app=beyond-webs&return=
       </div>
     </section>
 
-    <section class="section plans-section" id="plans"><div class="wrap"><div class="section-head"><div><p class="eyebrow">VPS session configuration</p><h2>Choose a machine profile.</h2></div><p>Each profile describes the compute and capped SSD assigned to a BIT OS desktop. Actual capacity and hourly rates are confirmed before a session starts.</p></div><div class="plan-grid"><button class="plan" data-plan="Launch" data-ram="16 GB" data-cpu="4 vCPUs" data-gpu="CPU profile · no GPU" data-storage="128 GB SSD"><span>01 / STANDARD</span><strong>Launch</strong><p>For a personal desktop, learning, and small projects.</p><ul><li>4 vCPUs</li><li>16 GB RAM</li><li>128 GB capped SSD</li><li>Browser desktop via noVNC</li></ul></button><button class="plan selected" data-plan="Build" data-ram="32 GB" data-cpu="8 vCPUs" data-gpu="GPU optional by capacity" data-storage="256 GB SSD"><span>02 / PERFORMANCE</span><strong>Build</strong><p>For development, creation, and larger work sessions.</p><ul><li>8 vCPUs</li><li>32 GB RAM</li><li>256 GB capped SSD</li><li>Optional GPU where available</li></ul></button><button class="plan" data-plan="Power" data-ram="64 GB" data-cpu="16 vCPUs" data-gpu="GPU profile · quota required" data-storage="512 GB SSD"><span>03 / GPU</span><strong>Power</strong><p>For demanding builds and GPU accelerated work.</p><ul><li>16 vCPUs</li><li>64 GB RAM</li><li>512 GB capped SSD</li><li>GPU subject to region and quota</li></ul></button></div></div></section>
+    <section class="section plans-section" id="plans"><div class="wrap"><div class="section-head"><div><p class="eyebrow">VPS session configuration</p><h2>Choose a machine profile.</h2></div><p>Each profile describes the compute and capped SSD assigned to a BIT OS desktop. Actual capacity and hourly rates are confirmed before a session starts.</p></div><div class="plan-grid">
+      <?php foreach ($machineProfiles as $index => $profile):
+        $profileId = (string)($profile['id'] ?? '');
+        $ram = (int)($profile['ram_gb'] ?? 0);
+        $vcpus = (int)($profile['vcpus'] ?? 0);
+        $ssd = (int)($profile['ssd_gb'] ?? 0);
+        $gpu = (string)($profile['gpu'] ?? 'none');
+        $gpuLabel = $gpu === 'none' ? 'CPU profile · no GPU' : ($gpu === 'required' ? 'GPU profile · quota required' : 'GPU optional by capacity');
+        $storageLabel = $ssd >= 1024 ? number_format($ssd / 1024, $ssd % 1024 === 0 ? 0 : 1) . ' TB SSD' : $ssd . ' GB SSD';
+      ?>
+      <button class="plan<?= $profileId === 'Build' ? ' selected' : '' ?>" data-plan="<?= htmlspecialchars($profileId, ENT_QUOTES, 'UTF-8') ?>" data-ram="<?= $ram ?> GB" data-cpu="<?= $vcpus ?> vCPUs" data-gpu="<?= htmlspecialchars($gpuLabel, ENT_QUOTES, 'UTF-8') ?>" data-storage="<?= htmlspecialchars($storageLabel, ENT_QUOTES, 'UTF-8') ?>">
+        <span><?= sprintf('%02d', $index + 1) ?> / <?= htmlspecialchars(strtoupper((string)($profile['label'] ?? $profileId)), ENT_QUOTES, 'UTF-8') ?></span><strong><?= htmlspecialchars($profileId, ENT_QUOTES, 'UTF-8') ?></strong><p><?= htmlspecialchars((string)($profile['summary'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p><ul><?php foreach (($profile['included'] ?? []) as $item): ?><li><?= htmlspecialchars((string)$item, ENT_QUOTES, 'UTF-8') ?></li><?php endforeach; ?></ul>
+      </button>
+      <?php endforeach; ?>
+    </div></div></section>
 
     <section class="section wrap tools-section" id="tools">
       <div class="section-head"><div><p class="eyebrow">VPS tools</p><h2>Pick a ready to work setup.</h2></div><p>Choose the tool environment you want on your session request. App and operating system compatibility is confirmed before a machine is offered.</p></div>
@@ -92,7 +108,7 @@ $loginUrl = $identityOrigin . '/beyond-id/auth/login.php?app=beyond-webs&return=
       <p class="mode-note">These are requested Linux work modes. The app and its license notices will be included in the session image; game add-ons and user content may have separate terms.</p>
     </section>
 
-    <section class="launch wrap" id="launch"><div class="launch-copy"><p class="eyebrow">VPS session request</p><h2>Review your configuration.</h2><p id="flavourDescription">A performance focused desktop for your games and play.</p><div class="chosen"><span id="chosenFlavour">Gaming</span><i></i><span id="chosenPlan">Build</span></div><div class="chosen"><span id="chosenMode">Developer workstation</span></div></div><div class="seat-summary"><div class="summary-top"><span>PROPOSED SESSION</span><b id="seatState">READY TO REQUEST</b></div><div class="resource"><span>RAM</span><strong id="ram">16 GB</strong></div><div class="resource"><span>CPU</span><strong id="cpu">8 cores</strong></div><div class="resource"><span>GPU</span><strong id="gpu">Performance GPU</strong></div><div class="resource"><span>STORAGE</span><strong id="storage">256 GB SSD</strong></div><div class="resource"><span>USAGE</span><strong>Not started</strong></div><?php if ($signedIn): ?><button class="start-seat" id="startSeat">Save session request <span>→</span></button><?php else: ?><a class="start-seat" id="signInSeat" href="<?= htmlspecialchars($loginUrl, ENT_QUOTES, 'UTF-8') ?>">Continue with Beyond ID <span>→</span></a><?php endif; ?><p class="request-note" id="requestMessage" role="status" aria-live="polite">No charge or machine starts when you save a request.</p></div></section>
+    <section class="launch wrap" id="launch"><div class="launch-copy"><p class="eyebrow">VPS session request</p><h2>Review your configuration.</h2><p id="flavourDescription">A performance focused desktop for your games and play.</p><div class="chosen"><span id="chosenFlavour">Gaming</span><i></i><span id="chosenPlan">Build</span></div><div class="chosen"><span id="chosenMode">Developer workstation</span></div></div><div class="seat-summary"><div class="summary-top"><span>PROPOSED SESSION</span><b id="seatState">READY TO REQUEST</b></div><div class="resource"><span>RAM</span><strong id="ram">32 GB</strong></div><div class="resource"><span>CPU</span><strong id="cpu">8 vCPUs</strong></div><div class="resource"><span>GPU</span><strong id="gpu">GPU optional by capacity</strong></div><div class="resource"><span>STORAGE</span><strong id="storage">512 GB SSD</strong></div><div class="resource"><span>ACCESS</span><strong>Browser desktop · noVNC</strong></div><div class="resource"><span>USAGE</span><strong>Not started</strong></div><?php if ($signedIn): ?><button class="start-seat" id="startSeat">Save session request <span>→</span></button><?php else: ?><a class="start-seat" id="signInSeat" href="<?= htmlspecialchars($loginUrl, ENT_QUOTES, 'UTF-8') ?>">Continue with Beyond ID <span>→</span></a><?php endif; ?><p class="request-note" id="requestMessage" role="status" aria-live="polite">No charge or machine starts when you save a request.</p></div></section>
 
     <section class="requests-section" id="requests"><div class="wrap requests-grid"><div><p class="eyebrow">Beyond ID account</p><h2>My VPS request</h2><p>View the configuration saved to your account. Machine access and hourly usage will appear here after provisioning is available.</p></div><div class="request-card" id="requestCard"><?php if ($signedIn): ?><span class="request-kicker">CURRENT STATUS</span><strong id="accountStatus">Loading request…</strong><p id="accountDetails">Checking your Beyond ID account.</p><dl><div><dt>Request ID</dt><dd id="accountId">—</dd></div><div><dt>Requested</dt><dd id="accountDate">—</dd></div><div><dt>Browser desktop</dt><dd>noVNC · pending provisioning</dd></div><div><dt>Usage time</dt><dd>Not started</dd></div><div><dt>Charges</dt><dd>None</dd></div></dl><p class="access-note">When a session is provisioned, its protected noVNC link will appear here. No VNC port is exposed from this app.</p><?php else: ?><strong>Sign in to view your request</strong><p>Your saved VPS configuration will be linked to your Beyond ID.</p><a class="button primary" href="<?= htmlspecialchars($loginUrl, ENT_QUOTES, 'UTF-8') ?>">Continue with Beyond ID <span>→</span></a><?php endif; ?></div></div></section>
 

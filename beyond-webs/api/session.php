@@ -3,6 +3,11 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../../beyond-id/includes/session.php';
 require_once __DIR__ . '/../../includes/ecosystem.php';
+$profileCatalog = json_decode((string)file_get_contents(__DIR__ . '/../machine-profiles.json'), true);
+$allowedProfiles = array_values(array_filter(array_map(
+    static fn(array $profile): string => (string)($profile['id'] ?? ''),
+    is_array($profileCatalog['profiles'] ?? null) ? $profileCatalog['profiles'] : []
+)));
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -58,7 +63,7 @@ try {
     $plan = $input['plan'] ?? null;
     $workMode = $input['work_mode'] ?? null;
     if (!is_string($flavour) || !in_array($flavour, ['Home', 'Core', 'Creator', 'Academy', 'Cyber', 'Sentinel', 'Gaming'], true)
-        || !is_string($plan) || !in_array($plan, ['Launch', 'Build', 'Power'], true)
+        || !is_string($plan) || !in_array($plan, $allowedProfiles, true)
         || !is_string($workMode) || !in_array($workMode, ['developer', 'creative', 'gaming'], true)) {
         webs_reply(422, ['error' => 'Choose a listed BIT OS flavour, session size, and work mode.']);
     }

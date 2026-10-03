@@ -19,8 +19,8 @@ browser endpoint should require the Google account used for the test project.
 Use an incognito window on shared computers and sign out when testing ends.
 
 For Beyond Webs production, use one isolated Compute Engine VM per active seat.
-The initial product targets are Launch (4 vCPU, 16 GB RAM, 128 GB SSD), Build
-(8 vCPU, 32 GB RAM, 256 GB SSD), and Power (16 vCPU, 64 GB RAM, 512 GB SSD).
+The initial product targets are Launch (4 vCPU, 16 GB RAM, 256 GB SSD), Build
+(8 vCPU, 32 GB RAM, 512 GB SSD), and Power (16 vCPU, 64 GB RAM, 1 TB SSD).
 These are requested targets only; verify machine availability, disk pricing,
 GPU quota, and region support before provisioning. Beyond Webs does not yet
 create these VMs or issue a noVNC connection.

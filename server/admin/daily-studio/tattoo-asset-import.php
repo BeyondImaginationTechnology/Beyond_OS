@@ -61,6 +61,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
 </style>
 <style>
 .inbox{margin-bottom:20px;border-color:#674f27;background:linear-gradient(135deg,rgba(41,31,17,.96),rgba(18,18,20,.96))}.inbox-grid{display:grid;grid-template-columns:1fr auto;align-items:end;gap:16px}.inbox .field{margin:0}.inbox .btn{width:auto;min-width:220px}.batch-id{margin:9px 0 0;color:var(--muted);font:12px ui-monospace,monospace}@media(max-width:900px){.inbox-grid{grid-template-columns:1fr}.inbox .btn{width:100%}}
+.browser{margin-bottom:20px}.browser-controls{display:flex;gap:12px;align-items:end;flex-wrap:wrap}.browser-controls .field{flex:1;min-width:220px;margin:0}.asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-top:18px}.asset-card{min-width:0;padding:10px;border:1px solid #343438;border-radius:12px;background:#0d0e10}.asset-card img{display:block;width:100%;height:190px;object-fit:contain;background:#fff;border-radius:8px}.asset-card b{display:block;margin-top:8px;color:#e7ca8f}.asset-card small{display:block;color:var(--muted);overflow-wrap:anywhere}.asset-browser-status{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -76,6 +77,13 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
     <div class="progress" aria-hidden="true"><span id="inboxProgress"></span></div>
     <p class="status" id="inboxStatus" role="status" aria-live="polite">Choose any assets you have so far. You can organize them later.</p>
     <p class="batch-id" id="inboxBatchId"></p>
+  </section>
+  <section class="panel browser">
+    <h2>Browse uploaded inbox</h2>
+    <p class="lead">Review originals already stored in private batches. This view does not assign, change, or publish files.</p>
+    <div class="browser-controls"><div class="field"><label for="storedBatch">Private upload batch</label><select id="storedBatch"><option value="">Loading batches…</option></select></div><div class="field"><label for="assetSearch">Filter filenames</label><input id="assetSearch" type="search" placeholder="Search original filenames"></div></div>
+    <p class="asset-browser-status" id="assetBrowserStatus" role="status" aria-live="polite">Loading private upload batches…</p>
+    <div class="asset-grid" id="assetGrid"></div>
   </section>
   <section class="grid">
     <article class="panel">
@@ -117,6 +125,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
   const runtimeAssets = Object.fromEntries(drops.map((drop) => [drop.sequence, {...drop.assets}]));
   const runtimeStatus = Object.fromEntries(drops.map((drop) => [drop.sequence, drop.status]));
   let queue = [];
+  let storedItems = [];
   let inboxBatchId = '';
   let inboxCompleted = 0;
   const syncInbox = () => {
@@ -133,6 +142,35 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
     inboxCompleted = 0;
   };
   $('inboxFiles').addEventListener('change', syncInbox);
+  const loadStoredBatches = async () => {
+    const select = $('storedBatch');
+    try {
+      const response = await fetch('api/browse-tattoo-asset-inbox.php', {credentials:'same-origin'});
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || 'Could not load private batches.');
+      select.innerHTML = '<option value="">Choose a batch</option>' + data.batches.map((batch) => `<option value="${escapeHtml(batch.id)}">${escapeHtml(batch.id)} · ${batch.uploaded}/${batch.total} files</option>`).join('');
+      const latest = data.batches[0];
+      if (latest) { select.value = latest.id; await loadStoredBatch(latest.id); }
+      else $('assetBrowserStatus').textContent = 'No private upload batches yet.';
+    } catch (error) { $('assetBrowserStatus').textContent = error.message || 'Could not load private batches.'; }
+  };
+  const renderStoredItems = () => {
+    const term = $('assetSearch').value.trim().toLowerCase();
+    const filtered = storedItems.filter((item) => item.name.toLowerCase().includes(term));
+    $('assetGrid').innerHTML = filtered.map((item) => `<article class="asset-card">${item.preview ? `<img loading="lazy" src="${escapeHtml(item.preview)}" alt="Private upload ${item.position}">` : '<div class="asset-card" style="height:190px;display:grid;place-items:center;color:#888">No image preview</div>'}<b>${String(item.position).padStart(3,'0')} · ${escapeHtml(item.name)}</b><small>${escapeHtml(item.mime)} · ${item.width && item.height ? `${item.width} × ${item.height} · ` : ''}${(item.bytes/1048576).toFixed(2)} MB</small></article>`).join('');
+    $('assetBrowserStatus').textContent = `${filtered.length} of ${storedItems.length} files shown. Originals remain private and unchanged.`;
+  };
+  const loadStoredBatch = async (batchId) => {
+    if (!batchId) { storedItems = []; $('assetGrid').innerHTML = ''; $('assetBrowserStatus').textContent = 'Choose a batch to browse.'; return; }
+    $('assetBrowserStatus').textContent = 'Loading batch manifest…';
+    const response = await fetch(`api/browse-tattoo-asset-inbox.php?batch=${encodeURIComponent(batchId)}`, {credentials:'same-origin'});
+    const data = await response.json();
+    if (!response.ok || !data.ok) throw new Error(data.error || 'Could not load this batch.');
+    storedItems = data.items || []; renderStoredItems();
+  };
+  $('storedBatch').addEventListener('change', () => loadStoredBatch($('storedBatch').value).catch((error) => { $('assetBrowserStatus').textContent = error.message || 'Could not load this batch.'; }));
+  $('assetSearch').addEventListener('input', renderStoredItems);
+  loadStoredBatches();
   $('uploadInbox').addEventListener('click', async () => {
     const files = [...$('inboxFiles').files];
     if (files.length < 1 || files.length > 500) return syncInbox();

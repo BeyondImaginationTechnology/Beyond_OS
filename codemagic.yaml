@@ -466,7 +466,6 @@ workflows:
     publishing:
       app_store_connect:
         auth: integration
-        submit_to_testflight: true
 
   beyond-tattoo-android-simulator:
     name: Beyond Tattoo Android 1.2 simulator

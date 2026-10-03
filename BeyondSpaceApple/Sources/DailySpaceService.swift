@@ -5,6 +5,18 @@ struct DailySpaceEnvelope: Decodable {
     let fact: RemoteDailyFact?
 }
 
+struct DailyHoroscopeEnvelope: Decodable {
+    let date: String
+    let items: [RemoteDailyHoroscope]
+}
+
+struct RemoteDailyHoroscope: Decodable {
+    let sign: String
+    let mood: String?
+    let paragraphs: [String]
+    let source: String?
+}
+
 struct RemoteDailyFact: Decodable {
     let number: Int
     let title: String
@@ -36,6 +48,7 @@ struct SpaceDistribution: Decodable {
 
 enum DailySpaceService {
     static let endpoint = URL(string: "https://beyondimagination.co.technology/beyond-space/api/daily-space-fact.php")!
+    static let horoscopeEndpoint = URL(string: "https://beyondimagination.co.technology/beyond-space/api/daily-horoscope.php")!
 
     static func today() async throws -> (fact: RemoteDailyFact, date: String) {
         var request = URLRequest(url: endpoint)
@@ -52,5 +65,16 @@ enum DailySpaceService {
             throw URLError(.cannotParseResponse)
         }
         return (fact, envelope.date)
+    }
+
+    static func horoscopes() async throws -> (items: [RemoteDailyHoroscope], date: String) {
+        var request = URLRequest(url: horoscopeEndpoint)
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let response = response as? HTTPURLResponse, (200..<300).contains(response.statusCode) else {
+            throw URLError(.badServerResponse)
+        }
+        let envelope = try JSONDecoder().decode(DailyHoroscopeEnvelope.self, from: data)
+        return (envelope.items, envelope.date)
     }
 }

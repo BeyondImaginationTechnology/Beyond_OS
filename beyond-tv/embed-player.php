@@ -38,6 +38,7 @@ const countdown=document.getElementById('status-countdown');
 const unmute=document.getElementById('unmute');
 let sources=[],index=0,offset=0,failures=0,countdownTimer=0,hideTimer=0,secondsSinceBreak=0;
 const breakEverySeconds=<?=json_encode($slug==='space-tv'?1800:1)?>;
+const refreshAfterSource=<?=json_encode($slug==='space-tv')?>;
 
 function clearStatusTimers(){
   if(countdownTimer)window.clearInterval(countdownTimer);
@@ -102,6 +103,7 @@ function playCurrent(){
     playCurrent();
   };
   video.onended=()=>{
+    if(refreshAfterSource){window.location.reload();return;}
     secondsSinceBreak+=Number.isFinite(video.duration)?video.duration:0;
     const continuePlayback=()=>{
       index=(index+1)%sources.length;

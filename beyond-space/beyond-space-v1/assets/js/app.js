@@ -53,6 +53,7 @@
   fetch('/beyond-space/api/daily-horoscope.php',{headers:{Accept:'application/json'}}).then(response=>response.ok?response.json():null).then(payload=>{
     if(!payload?.items?.length)return;
     dailyHoroscopes=Object.fromEntries(payload.items.map(item=>[String(item.sign||'').toLowerCase(),item]));
+    if(payload.date)one('#readingDate').textContent=payload.date;
     const active=all('#zodiacGrid button').find(button=>button.classList.contains('active'));
     renderSign(Number(active?.dataset.sign||0));
   }).catch(()=>{});

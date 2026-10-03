@@ -50,6 +50,13 @@ const calculateDailyBreathStoryMetadata: CalculateMetadataFunction<
   height: props.height,
 });
 
+const calculateSpaceHoroscopeMetadata: CalculateMetadataFunction<SpaceHoroscopeProps> = ({props}) => ({
+  durationInFrames: Math.round((props.durationSeconds ?? 300) * 30),
+  fps: 30,
+  width: 1920,
+  height: 1080,
+});
+
 export const RemotionRoot: React.FC = () => (
   <>
     <Composition
@@ -63,7 +70,7 @@ export const RemotionRoot: React.FC = () => (
       calculateMetadata={calculateDailyBreathStoryMetadata}
     />
     <Composition id="DailyStencilPack" component={DailyStencilPack} durationInFrames={600} fps={60} width={1080} height={1080} defaultProps={defaultDailyStencilProps} calculateMetadata={calculateMetadata}/>
-    <Composition id="SpaceHoroscopeVideo" component={SpaceHoroscopeVideo} durationInFrames={900} fps={30} width={1080} height={1080} defaultProps={defaultSpaceHoroscopeProps as SpaceHoroscopeProps}/>
+    <Composition id="SpaceHoroscopeVideo" component={SpaceHoroscopeVideo} durationInFrames={9000} fps={30} width={1920} height={1080} defaultProps={defaultSpaceHoroscopeProps as SpaceHoroscopeProps} calculateMetadata={calculateSpaceHoroscopeMetadata}/>
     <Composition
       id="DailyBreathVideo"
       component={DailyBreathVideo}

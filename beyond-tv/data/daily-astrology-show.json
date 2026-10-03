@@ -1,0 +1,18 @@
+{
+  "show": "Cosmic Compass: Daily Astrology",
+  "channel": "Space TV",
+  "status": "development",
+  "airtimes": ["8:45 AM", "8:45 PM"],
+  "timezone": "America/Vancouver",
+  "duration_seconds": 300,
+  "audience_note": "Entertainment and personal reflection. This program does not present astrology as science or professional advice.",
+  "episode_template": [
+    {"seconds":"0–10","beat":"Beyond Space TV ident and Cosmic Compass title."},
+    {"seconds":"10–35","beat":"Host welcomes viewers and names the day’s reflective theme."},
+    {"seconds":"35–215","beat":"Twelve concise sign readings, drawn from the Daily Astrology feed."},
+    {"seconds":"215–275","beat":"A shared reflection, night-sky image, and reminder to use personal judgment."},
+    {"seconds":"275–300","beat":"Tomorrow teaser, in-app prompt, and credits."}
+  ],
+  "host_direction": "Warm, observatory-set delivery with a calm, inviting voice. Never state readings as facts, guarantees, medical guidance, financial guidance, or scientific claims.",
+  "data_source": "/beyond-space/api/daily-horoscope.php"
+}

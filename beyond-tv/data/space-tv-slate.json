@@ -3,7 +3,7 @@
   "channel_number": 10,
   "name": "Space TV",
   "status": "development",
-  "current_programming": "Eight daily three-hour blocks of official NASA and NASA Goddard YouTube content, scheduled in America/Vancouver time. Videos or playlists repeat within each block until the next block begins.",
+  "current_programming": "Eight daily three-hour blocks scheduled in America/Vancouver time. Reviewed silent NASA SVS archive clips take priority when they match a block; official NASA and NASA Goddard YouTube videos remain the fallback while the local library grows. Cosmic Compass: Daily Astrology airs at 8:45 AM and 8:45 PM.",
   "current_schedule_file": "channel-schedules.json",
   "identity": "A 24/7 channel for astronomy, space exploration, planetary science, spacecraft, and cosmic history.",
   "show_boundary": "Space TV owns the space subject. Beyond Technology's Beyond Space focuses on the technology enabling exploration.",
@@ -19,7 +19,8 @@
     {"name":"Cosmic History","format":"Documentary","episode_length":"15–30 min","concept":"The universe from the Big Bang through stars and galaxies to the formation of our solar system."},
     {"name":"Beyond Earth","format":"Future exploration","episode_length":"10–20 min","concept":"Moon bases, Mars exploration, habitats, robotics, asteroid resources, and possible future missions."},
     {"name":"Space Pioneers","format":"Biography / history","episode_length":"10–20 min","concept":"Scientists, engineers, astronauts, and other people who shaped space exploration."},
-    {"name":"Deep Space","format":"Ambient / visual","episode_length":"15–60 min","concept":"Cinematic journeys through planets, nebulae, and galaxies with narration, music, or long ambient sequences."}
+    {"name":"Deep Space","format":"Ambient / visual","episode_length":"15–60 min","concept":"Cinematic journeys through planets, nebulae and galaxies with narration, music or long ambient sequences."},
+    {"name":"Cosmic Compass: Daily Astrology","format":"Daily reflection","episode_length":"5 min","concept":"A warm observatory-set host shares twelve short, entertainment-only zodiac reflections from the Beyond Space Daily Astrology feed."}
   ],
   "proposed_block": [
     {"time":"6:00 AM","show":"Space Today"},
@@ -31,9 +32,11 @@
     {"time":"7:45 AM","show":"Mission Control"},
     {"time":"8:15 AM","show":"Space Pioneers"},
     {"time":"8:35 AM","show":"Cosmic History"},
+    {"time":"8:45 AM","show":"Cosmic Compass: Daily Astrology"},
     {"time":"9:05 AM","show":"Cosmic Mysteries"},
     {"time":"9:35 AM","show":"Beyond Earth"},
-    {"time":"10:00 AM","show":"Deep Space"}
+    {"time":"10:00 AM","show":"Deep Space"},
+    {"time":"8:45 PM","show":"Cosmic Compass: Daily Astrology · Encore"}
   ],
   "reusable_assets": ["Solar System models","Earth and Moon","spacecraft","rockets","astronauts","observatories","mission-control environments","star fields","galaxies","scientific visualization components"]
 }

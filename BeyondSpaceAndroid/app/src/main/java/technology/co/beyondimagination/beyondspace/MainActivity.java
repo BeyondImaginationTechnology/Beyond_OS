@@ -12,10 +12,14 @@ import android.os.Looper;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -28,6 +32,7 @@ import java.util.concurrent.Executors;
 
 public class MainActivity extends Activity {
     private static final String FACT_ENDPOINT = "https://beyondimagination.co.technology/beyond-space/api/daily-space-fact.php";
+    private static final String HOROSCOPE_ENDPOINT = "https://beyondimagination.co.technology/beyond-space/api/daily-horoscope.php";
     private static final int INK = Color.rgb(7, 11, 24);
     private static final int PANEL = Color.rgb(17, 28, 48);
     private static final int CYAN = Color.rgb(142, 233, 255);
@@ -44,6 +49,10 @@ public class MainActivity extends Activity {
     private TextView statusText;
     private Button retryButton;
     private Button saveButton;
+    private TextView astrologyReading;
+    private TextView astrologyDate;
+    private JSONObject astrologyItems = new JSONObject();
+    private String selectedSign = "Virgo";
     private String currentFactId = "";
     private String sourceUrl = "";
     private String academyUrl = "https://beyondimagination.co.technology/beyond-space/academy.php";
@@ -57,6 +66,7 @@ public class MainActivity extends Activity {
         getWindow().setNavigationBarColor(INK);
         buildScreen();
         loadToday();
+        loadDailyAstrology();
     }
 
     private void buildScreen() {
@@ -120,6 +130,36 @@ public class MainActivity extends Activity {
         academyButton.setOnClickListener(view -> open(academyUrl));
         add(page, academyButton, 0, 22);
 
+        TextView astrologyHeading = text("Daily Astrology", 20, WHITE, true);
+        add(page, astrologyHeading, 0, 9);
+        TextView astrologyNote = text("A daily cosmic reflection for entertainment and personal reflection.", 14, MUTED, false);
+        add(page, astrologyNote, 0, 10);
+        LinearLayout astrologyCard = new LinearLayout(this);
+        astrologyCard.setOrientation(LinearLayout.VERTICAL);
+        astrologyCard.setPadding(dp(20), dp(20), dp(20), dp(20));
+        astrologyCard.setBackground(rounded(PANEL, dp(22), 0x36FFFFFF));
+        page.addView(astrologyCard, new LinearLayout.LayoutParams(-1, -2));
+        Spinner signPicker = new Spinner(this);
+        String[] signs = {"Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"};
+        selectedSign = getPreferences(MODE_PRIVATE).getString("selected_zodiac_sign", "Virgo");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, signs);
+        signPicker.setAdapter(adapter);
+        for (int i = 0; i < signs.length; i++) if (signs[i].equals(selectedSign)) signPicker.setSelection(i);
+        astrologyCard.addView(signPicker);
+        astrologyReading = text("Loading today’s reflection…", 17, WHITE, false);
+        add(astrologyCard, astrologyReading, 0, 14);
+        astrologyDate = text("", 13, MUTED, false);
+        astrologyCard.addView(astrologyDate);
+        signPicker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedSign = signs[position];
+                getPreferences(MODE_PRIVATE).edit().putString("selected_zodiac_sign", selectedSign).apply();
+                renderDailyAstrology();
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) { }
+        });
+        addSpace(page, 22);
+
         TextView watchHeading = text("Watch Beyond Space", 20, WHITE, true);
         add(page, watchHeading, 0, 9);
         LinearLayout watchRow = new LinearLayout(this);
@@ -136,6 +176,56 @@ public class MainActivity extends Activity {
         page.addView(watchRow);
         setContentView(scroll);
         refreshSaveButton();
+    }
+
+    private void loadDailyAstrology() {
+        executor.execute(() -> {
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) new URL(HOROSCOPE_ENDPOINT).openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(10000);
+                connection.setReadTimeout(10000);
+                connection.setRequestProperty("Accept", "application/json");
+                if (connection.getResponseCode() < 200 || connection.getResponseCode() >= 300) throw new IllegalStateException();
+                StringBuilder body = new StringBuilder();
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) body.append(line);
+                }
+                JSONObject response = new JSONObject(body.toString());
+                JSONObject indexed = new JSONObject();
+                JSONArray items = response.optJSONArray("items");
+                if (items != null) for (int i = 0; i < items.length(); i++) {
+                    JSONObject item = items.optJSONObject(i);
+                    if (item != null) indexed.put(item.optString("sign", "").toLowerCase(), item);
+                }
+                String date = response.optString("date", "");
+                mainHandler.post(() -> {
+                    astrologyItems = indexed;
+                    astrologyDate.setText(date.isEmpty() ? "" : "Daily Astrology · " + date);
+                    renderDailyAstrology();
+                });
+            } catch (Exception exception) {
+                mainHandler.post(() -> astrologyReading.setText("Today’s reflection is unavailable. Try again later."));
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+        });
+    }
+
+    private void renderDailyAstrology() {
+        if (astrologyReading == null) return;
+        JSONObject item = astrologyItems.optJSONObject(selectedSign.toLowerCase());
+        if (item == null) return;
+        JSONArray paragraphs = item.optJSONArray("paragraphs");
+        StringBuilder reading = new StringBuilder();
+        if (paragraphs != null) for (int i = 0; i < paragraphs.length(); i++) {
+            if (reading.length() > 0) reading.append(' ');
+            reading.append(paragraphs.optString(i));
+        }
+        String mood = item.optString("mood", "");
+        astrologyReading.setText((mood.isEmpty() ? "" : mood + "\n") + reading);
     }
 
     private void loadToday() {

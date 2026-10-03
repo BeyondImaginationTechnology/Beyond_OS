@@ -55,6 +55,31 @@ function beyond_space_schedule_state(?DateTimeImmutable $now = null): array
     }
     $current = $blocks[$index];
     $next = $blocks[($index + 1) % count($blocks)];
+    $minuteOfDay = $hour * 60 + (int)$now->format('i');
+    foreach ([8 * 60 + 45, 20 * 60 + 45] as $airtime) {
+        if ($minuteOfDay < $airtime || $minuteOfDay >= $airtime + 5) {
+            continue;
+        }
+        $start = $now->setTime(intdiv($airtime, 60), $airtime % 60, 0);
+        $episode = [
+            'id' => 'cosmic-compass-2026-10-03',
+            'title' => 'Cosmic Compass: Daily Astrology',
+            'program' => 'Cosmic Compass',
+            'url' => '/beyond-tv/assets/media/space-tv/cosmic-compass-2026-10-03.mp4',
+            'duration' => 300,
+            'type' => 'video/mp4',
+        ];
+        $episodeCurrent = ['key'=>'cosmic-compass','start'=>intdiv($airtime, 60),'end'=>intdiv($airtime, 60),'title'=>'Cosmic Compass: Daily Astrology','lineup'=>'Today’s entertainment-only zodiac reflections','icon'=>'✨'];
+        return [
+            'timezone'=>'America/Vancouver','timezone_label'=>$now->format('T'),
+            'time_label'=>$now->format('g:i A'),'date_label'=>$now->format('l, F j'),
+            'current'=>$episodeCurrent,'next'=>$current,'blocks'=>$blocks,'playing'=>$episode,
+            'sources'=>[$episode],'source_key'=>'cosmic-compass-' . $now->format('Y-m-d') . '-' . $airtime,
+            'start_offset'=>max(0, $now->getTimestamp() - $start->getTimestamp()),
+            'player_url'=>'/beyond-tv/embed-player.php?slug=space-tv',
+            'server_time'=>$now->getTimestamp(),'source_label'=>'Beyond Space TV · Original silent visual episode',
+        ];
+    }
     $local = beyond_space_local_rotation($current, $now);
     if ($local !== null) {
         $localCurrent = $local['current'];

@@ -257,7 +257,6 @@ workflows:
     publishing:
       app_store_connect:
         auth: integration
-        submit_to_testflight: true
 
   daily-breath-ios:
     name: Daily Breath iOS checks
@@ -505,3 +504,45 @@ workflows:
     artifacts:
       - app/build/outputs/apk/debug/*.apk
       - $CM_BUILD_DIR/android-emulator.log
+
+  beyond-kitchen-ios-testflight:
+    name: Beyond Kitchen iOS TestFlight
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    working_directory: BeyondKitchenApple
+    triggering:
+      events: []
+    integrations:
+      app_store_connect: beyond-apple-api
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: technology.co.beyondimagination.beyondkitchen
+      xcode: latest
+    scripts:
+      - name: Generate Xcode project
+        script: |
+          set -euo pipefail
+          command -v xcodegen >/dev/null || brew install xcodegen
+          xcodegen generate
+      - name: Configure App Store signing profiles
+        script: |
+          set -euo pipefail
+          xcode-project use-profiles --verbose
+      - name: Set a unique App Store build number
+        script: |
+          set -euo pipefail
+          agvtool new-version -all "$(date +%s)"
+      - name: Build signed IPA
+        script: |
+          set -euo pipefail
+          xcode-project build-ipa \
+            --project "$CM_BUILD_DIR/BeyondKitchenApple/BeyondKitchen.xcodeproj" \
+            --scheme BeyondKitchen
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true

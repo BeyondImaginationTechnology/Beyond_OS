@@ -2,6 +2,12 @@
 
 Native SwiftUI app powered by Jaguar, with a local Draw Studio for transparent tattoo-sketch exports.
 
+## v0.5.1
+
+- Updates the release and build versions for the Jaguar reliability release.
+- Keeps the mobile model request connected for up to 120 seconds, matching the
+  server-side request window during a cold model start.
+
 ## v0.5 Draw preview
 
 - Open **Draw Studio** from the chat header and sketch with touch or Apple Pencil.

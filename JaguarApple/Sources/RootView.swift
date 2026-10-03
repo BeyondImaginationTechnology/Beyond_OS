@@ -468,7 +468,7 @@ private struct JaguarAccountView: View {
                 }
                 Section("About") {
                     LabeledContent("App", value: "Beyond-1")
-                    LabeledContent("Version", value: "0.5.0 (Draw preview)")
+                    LabeledContent("Version", value: "0.5.1 (Draw preview)")
                     Text("Conversation history stays on this device. Messages are sent to Beyond-1 when you ask a question.")
                 }
             }

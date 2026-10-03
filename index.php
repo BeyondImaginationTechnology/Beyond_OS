@@ -670,7 +670,13 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
      const response=await fetch(requestedEndpoint,{cache:'no-store'});
      if(!response.ok)throw new Error('HTTP '+response.status);
      const data=await response.json();
-     if(button.classList.contains('active'))render(button,data.state||data);
+     if(button.classList.contains('active')){
+       const playbackState={...(data.state||data)};
+       if(Array.isArray(data.sources))playbackState.sources=data.sources;
+       if(data.start_offset!==undefined)playbackState.start_offset=data.start_offset;
+       if(data.player_url)playbackState.player_url=data.player_url;
+       render(button,playbackState);
+     }
    }catch(error){
      console.warn('Beyond TV channel refresh unavailable',error);
      if(button.classList.contains('active')&&frame.hidden&&video.hidden&&playerStatus){

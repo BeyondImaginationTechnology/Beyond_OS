@@ -48,4 +48,10 @@ return [
         'scheme' => 'jaguar',
         'scopes' => ['profile:read'],
     ],
+    'jaguar-android' => [
+        'name' => 'Llama Jaguar for Android',
+        'app_slug' => 'jaguar',
+        'scheme' => 'jaguarandroid',
+        'scopes' => ['profile:read'],
+    ],
 ];

@@ -102,7 +102,8 @@ $authorization = beyond_mobile_authorization_header();
 if ($authorization !== '') {
     try {
         $token = beyond_mobile_bearer_token();
-        $mobileAudience = $isDailyBreathChat ? 'daily-breath-ios' : 'jaguar-ios';
+        $jaguarClient = strtolower(trim((string)($_SERVER['HTTP_X_JAGUAR_CLIENT'] ?? '')));
+        $mobileAudience = $isDailyBreathChat ? 'daily-breath-ios' : ($jaguarClient === 'android' ? 'jaguar-android' : 'jaguar-ios');
         $mobileClaims = beyond_mobile_verify_token($token, $mobileAudience, beyond_db());
         beyond_mobile_require_scope($mobileClaims, 'profile:read');
         $_SESSION['user_id'] = (int)$mobileClaims['user_id'];

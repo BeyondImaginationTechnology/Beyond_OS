@@ -72,6 +72,34 @@ workflows:
     artifacts:
       - app/build/outputs/apk/play/debug/*.apk
 
+  beyond1-android-internal:
+    name: Beyond-1 Android Internal testing
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    working_directory: JaguarAndroid
+    environment:
+      java: 17
+      android_signing:
+        - beyond1-play-upload
+      vars:
+        ANDROID_VERSION_CODE: 2
+        ANDROID_VERSION_NAME: 0.5.1
+    scripts:
+      - name: Set Android SDK location
+        script: |
+          set -euo pipefail
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/JaguarAndroid/local.properties"
+      - name: Build signed Android App Bundle
+        script: |
+          set -euo pipefail
+          ./gradlew --no-daemon --console=plain \
+            -PversionCode="$ANDROID_VERSION_CODE" \
+            -PversionName="$ANDROID_VERSION_NAME" \
+            bundleRelease
+    artifacts:
+      - app/build/outputs/bundle/release/*.aab
+      - app/build/outputs/mapping/release/mapping.txt
+
   beyond1-ios-testflight:
     name: Beyond-1 iOS TestFlight
     max_build_duration: 120

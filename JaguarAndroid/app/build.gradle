@@ -8,8 +8,27 @@ android {
         applicationId 'technology.co.beyondimagination.beyond1'
         minSdk 26
         targetSdk 37
-        versionCode 2
-        versionName '0.5.1'
+        versionCode providers.gradleProperty('versionCode').map { it.toInteger() }.getOrElse(2)
+        versionName providers.gradleProperty('versionName').getOrElse('0.5.1')
+    }
+
+    signingConfigs {
+        release {
+            if (System.getenv()['CI']) {
+                storeFile file(System.getenv()['CM_KEYSTORE_PATH'])
+                storePassword System.getenv()['CM_KEYSTORE_PASSWORD']
+                keyAlias System.getenv()['CM_KEY_ALIAS']
+                keyPassword System.getenv()['CM_KEY_PASSWORD']
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            if (System.getenv()['CI']) {
+                signingConfig signingConfigs.release
+            }
+        }
     }
 
     compileOptions {

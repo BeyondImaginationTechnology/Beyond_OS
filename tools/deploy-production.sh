@@ -27,11 +27,14 @@ CURRENT_BRANCH="$(git symbolic-ref --quiet --short HEAD || true)"
 # Keep the safety check strict for tracked edits and every other untracked path.
 TRACKED_CHANGES="$(git diff --name-only; git diff --cached --name-only)"
 [[ -z "${TRACKED_CHANGES}" ]] || { echo "Refusing to deploy a repository with tracked local changes." >&2; exit 1; }
-UNEXPECTED_UNTRACKED="$(git ls-files --others --exclude-standard | grep -v '^dailybreath/assets/audio/' || true)"
-[[ -z "${UNEXPECTED_UNTRACKED}" ]] || { echo "Refusing to deploy unexpected untracked files." >&2; exit 1; }
 
 git fetch --prune origin main
 git merge --ff-only origin/main
+
+# Check after the fast-forward so newly added ignore rules can account for
+# host-side convenience files without deleting or staging them.
+UNEXPECTED_UNTRACKED="$(git ls-files --others --exclude-standard | grep -v '^dailybreath/assets/audio/' || true)"
+[[ -z "${UNEXPECTED_UNTRACKED}" ]] || { echo "Refusing to deploy unexpected untracked files." >&2; exit 1; }
 
 # Git respects the private umask for newly checked-out files and directories.
 # Make only tracked content web-readable; ignored config and runtime data stay private.

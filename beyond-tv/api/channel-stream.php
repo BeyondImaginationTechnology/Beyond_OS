@@ -168,6 +168,11 @@ if (!isset($channels[$slug])) {
         ];
     }
 }
+// Daily Breath TV uses an on-site original-video manifest below. Register the
+// channel before the shared validation, then replace its items from that manifest.
+if ($slug === 'mrbeast-tv') {
+    $channels[$slug] = ['name' => 'Daily Breath TV', 'items' => [], 'embed' => ''];
+}
 if (!isset($channels[$slug])) { http_response_code(404); echo json_encode(['ok'=>false,'error'=>'Unknown channel']); exit; }
 
 function fetch_json(string $url): ?array {

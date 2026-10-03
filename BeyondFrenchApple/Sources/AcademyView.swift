@@ -29,7 +29,7 @@ struct AcademyView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 14) {
-                    AccessPill(text: "ALL LESSONS FREE · 1.2 BETA")
+                    AccessPill(text: "ALL LESSONS FREE · 1.3")
                     Text("Choose a path and start speaking.")
                         .font(.largeTitle.weight(.black))
                     Text("Learn French through short lessons, speaking, and everyday situations.")

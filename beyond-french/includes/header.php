@@ -34,6 +34,7 @@ $academyCssVersion = (string)(@filemtime(__DIR__ . '/../assets/css/academy.css')
         <a href="<?= h($frenchBase) ?>">Home</a>
         <a href="<?= h($frenchBase) ?>academy.php">Academy</a>
         <a href="<?= h($frenchBase) ?>translate.php">Translate</a>
+        <a href="<?= h($frenchBase) ?>dictionary.php">Dictionary</a>
         <a href="<?= h($frenchBase) ?>game.php">Trivia</a>
         <a class="nav-cta" href="<?= h($frenchBase) ?>settings.php">Settings</a>
     </nav>

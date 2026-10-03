@@ -264,7 +264,7 @@ public final class MainActivity extends Activity {
     }
 
     private void academyScreen(LinearLayout body) {
-        label(body, "ALL LESSONS FREE · 1.2 BETA", GREEN);
+        label(body, "ALL LESSONS FREE · 1.3", GREEN);
         title(body, "Academy");
         LinearLayout intro = card(body, CARD);
         add(intro, "Choose your level. No beret required.", 26, Color.WHITE, true, 8);

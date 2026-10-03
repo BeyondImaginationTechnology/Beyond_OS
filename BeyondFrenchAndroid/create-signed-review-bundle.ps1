@@ -4,7 +4,7 @@ $projectRoot = $PSScriptRoot
 $keystorePath = 'C:\Users\Greg\Documents\keystore\beyondfrench'
 $existingBundle = Join-Path $projectRoot 'app\release\app-release.aab'
 $bundleOutput = Join-Path $projectRoot 'app\build\outputs\bundle\release\app-release.aab'
-$reviewBundle = Join-Path $projectRoot 'app\release\app-release-v1.2.0-2.aab'
+$reviewBundle = Join-Path $projectRoot 'app\release\app-release-v1.3.0-3.aab'
 $javaHome = 'C:\Program Files\Android\Android Studio\jbr'
 $gradle = 'C:\Users\Greg\.gradle\wrapper\dists\gradle-9.7.1-bin\1w1c7tv4s851m17nbqdsro2tv\gradle-9.7.1\bin\gradle.bat'
 $keytool = Join-Path $javaHome 'bin\keytool.exe'
@@ -55,7 +55,7 @@ try {
 
     Copy-Item -LiteralPath $bundleOutput -Destination $reviewBundle
     Write-Output "Signed review bundle: $reviewBundle"
-    Write-Output "Version code 2 · version name 1.2.0 · SHA-256 signing fingerprint $newFingerprint"
+    Write-Output "Version code 3 · version name 1.3.0 · SHA-256 signing fingerprint $newFingerprint"
 }
 finally {
     foreach ($name in @('CM_KEYSTORE_PATH', 'CM_KEY_ALIAS', 'CM_KEYSTORE_PASSWORD', 'CM_KEY_PASSWORD')) {

@@ -4,14 +4,13 @@
     $currentFrenchPage = basename($_SERVER['SCRIPT_NAME'] ?? '');
     $isFrenchHome = in_array($currentFrenchPage, ['index.php', ''], true);
     $isFrenchAcademy = in_array($currentFrenchPage, ['academy.php', 'archive.php', 'progress.php'], true);
-    $isFrenchTrivia = $currentFrenchPage === 'game.php';
-    $isFrenchSettings = $currentFrenchPage === 'settings.php';
+    $isFrenchMore = in_array($currentFrenchPage, ['game.php', 'settings.php'], true);
     ?>
     <a class="<?= $isFrenchHome ? 'active' : '' ?>" href="<?= h($frenchBase) ?>"><span>⌂</span><small>Home</small></a>
     <a class="<?= $isFrenchAcademy ? 'active' : '' ?>" href="<?= h($frenchBase) ?>academy.php"><span>▤</span><small>Academy</small></a>
     <a href="<?= h($frenchBase) ?>translate.php"><span>文</span><small>Translate</small></a>
-    <a class="<?= $isFrenchTrivia ? 'active' : '' ?>" href="<?= h($frenchBase) ?>game.php"><span>✧</span><small>Trivia</small></a>
-    <a class="<?= $isFrenchSettings ? 'active' : '' ?>" href="<?= h($frenchBase) ?>settings.php"><span>○</span><small>Settings</small></a>
+    <a class="<?= $currentFrenchPage === 'dictionary.php' ? 'active' : '' ?>" href="<?= h($frenchBase) ?>dictionary.php"><span>▣</span><small>Dictionary</small></a>
+    <a class="<?= $isFrenchMore ? 'active' : '' ?>" href="<?= h($frenchBase) ?>settings.php"><span>•••</span><small>More</small></a>
 </nav>
 <footer class="site-footer">
     <p>© <?= date('Y') ?> Beyond French · French first. 12 language bridges. Every day.</p>

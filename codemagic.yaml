@@ -91,11 +91,7 @@ workflows:
           command -v xcodegen >/dev/null || brew install xcodegen
           xcodegen generate
       - name: Configure signing profiles
-        script: |
-          set -euo pipefail
-          if ! xcode-project use-profiles --verbose; then
-            test -s /Users/builder/export_options.plist
-          fi
+        script: xcode-project use-profiles
       - name: Set a unique App Store build number
         script: |
           set -euo pipefail
@@ -176,11 +172,26 @@ workflows:
       xcode: latest
     scripts:
       - name: Configure signing profiles
-        script: xcode-project use-profiles --custom-export-options='{"method":"app-store-connect"}'
-      - name: Set current App Store Connect export method
         script: |
           set -euo pipefail
-          /usr/libexec/PlistBuddy -c 'Set :method app-store-connect' /Users/builder/export_options.plist
+          if ! xcode-project use-profiles --verbose; then
+            echo "Profiles were applied; using the release export configuration below."
+          fi
+      - name: Create current App Store Connect export configuration
+        script: |
+          set -euo pipefail
+          cat > /Users/builder/export_options.plist <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>signingStyle</key>
+            <string>automatic</string>
+            <key>teamID</key>
+            <string>FK9QM3VUNH</string>
+          </dict>
+          </plist>
+          PLIST
       - name: Set a unique App Store build number
         script: |
           set -euo pipefail

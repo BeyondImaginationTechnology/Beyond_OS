@@ -44,8 +44,8 @@ function createOverlay(container,label,experience){
   };
   const gameExperience=gameExperiences[experience]||gameExperiences['mini-game'];
   overlay.innerHTML=experience==='breath-hourglass'
-    ? '<div class="btv-breath-break" data-btv-breath-break><span class="btv-breath-eyebrow">DAILY BREATH TV · BREATH HOURGLASS</span><div class="btv-hourglass" aria-hidden="true"><span class="btv-hourglass-frame"></span><span class="btv-hourglass-top"></span><span class="btv-hourglass-stream"></span><span class="btv-hourglass-bottom"></span></div><strong class="btv-breath-cue" data-btv-breath-cue>Breathe in</strong><p class="btv-breath-copy" data-btv-breath-copy>Settle in. Programming returns shortly.</p><time class="btv-breath-time" data-btv-ad-countdown>5:00</time><small data-btv-ad-label></small></div><div class="btv-ad-slot" data-btv-ad-slot></div>'
-    : `<iframe class="btv-ad-game" data-btv-ad-game src="${gameExperience.url}" title="${gameExperience.title}" loading="eager" allow="autoplay"></iframe><div class="btv-ad-slot" data-btv-ad-slot></div><div class="btv-ad-filler"><span>${gameExperience.eyebrow}</span><strong data-btv-ad-label></strong><p>Programming resumes in <b data-btv-ad-countdown>5:00</b></p></div>`;
+    ? '<div class="btv-breath-break" data-btv-breath-break><span class="btv-breath-eyebrow">DAILY BREATH TV · BREATH HOURGLASS</span><div class="btv-hourglass" aria-hidden="true"><span class="btv-hourglass-frame"></span><span class="btv-hourglass-top"></span><span class="btv-hourglass-stream"></span><span class="btv-hourglass-bottom"></span></div><strong class="btv-breath-cue" data-btv-breath-cue>Breathe in</strong><p class="btv-breath-copy" data-btv-breath-copy>Settle in. Programming returns shortly.</p><time class="btv-breath-time" data-btv-ad-countdown>5:00</time><small data-btv-ad-label></small><button class="btv-ad-change-channel" type="button" data-btv-change-channel>Change channel</button></div><div class="btv-ad-slot" data-btv-ad-slot></div>'
+    : `<iframe class="btv-ad-game" data-btv-ad-game src="${gameExperience.url}" title="${gameExperience.title}" loading="eager" allow="autoplay"></iframe><div class="btv-ad-slot" data-btv-ad-slot></div><div class="btv-ad-filler"><span>${gameExperience.eyebrow}</span><strong data-btv-ad-label></strong><p>Programming resumes in <b data-btv-ad-countdown>5:00</b></p><button class="btv-ad-change-channel" type="button" data-btv-change-channel>Change channel</button></div>`;
   const style=getComputedStyle(container);
   if(style.position==='static')container.style.position='relative';
   container.appendChild(overlay);
@@ -169,6 +169,12 @@ function playBreak(options={}){
     const breath=overlay.querySelector('[data-btv-breath-break]');
     const breathCue=overlay.querySelector('[data-btv-breath-cue]');
     const breathCopy=overlay.querySelector('[data-btv-breath-copy]');
+    let endBreak;
+    const endEarly=new Promise(resolve=>{endBreak=resolve});
+    overlay.querySelector('[data-btv-change-channel]')?.addEventListener('click',()=>{
+      window.dispatchEvent(new CustomEvent('beyond-tv:change-channel'));
+      endBreak();
+    });
     const endsAt=Date.now()+duration*1000;
     const breathPhases=[
       {cue:'Breathe in',copy:'Slowly inhale through your nose.',className:'is-inhaling'},
@@ -207,7 +213,7 @@ function playBreak(options={}){
       }
     }catch(error){console.warn('Beyond TV ad unavailable',error);}
     const remaining=endsAt-Date.now();
-    if(remaining>0)await new Promise(resolve=>window.setTimeout(resolve,remaining));
+    if(remaining>0)await Promise.race([new Promise(resolve=>window.setTimeout(resolve,remaining)),endEarly]);
     window.clearInterval(countdownTimer);
     overlay.remove();
   })().finally(()=>{activeBreak=null});

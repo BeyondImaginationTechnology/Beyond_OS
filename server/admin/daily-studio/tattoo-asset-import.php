@@ -62,6 +62,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
 <style>
 .inbox{margin-bottom:20px;border-color:#674f27;background:linear-gradient(135deg,rgba(41,31,17,.96),rgba(18,18,20,.96))}.inbox-grid{display:grid;grid-template-columns:1fr auto;align-items:end;gap:16px}.inbox .field{margin:0}.inbox .btn{width:auto;min-width:220px}.batch-id{margin:9px 0 0;color:var(--muted);font:12px ui-monospace,monospace}@media(max-width:900px){.inbox-grid{grid-template-columns:1fr}.inbox .btn{width:100%}}
 .browser{margin-bottom:20px}.browser-controls{display:flex;gap:12px;align-items:end;flex-wrap:wrap}.browser-controls .field{flex:1;min-width:220px;margin:0}.asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-top:18px}.asset-card{min-width:0;padding:10px;border:1px solid #343438;border-radius:12px;background:#0d0e10}.asset-card img{display:block;width:100%;height:190px;object-fit:contain;background:#fff;border-radius:8px}.asset-card b{display:block;margin-top:8px;color:#e7ca8f}.asset-card small{display:block;color:var(--muted);overflow-wrap:anywhere}.asset-browser-status{color:var(--muted)}
+.promote{margin-bottom:20px}.promote-grid{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:12px;align-items:end}.promote-grid .field{margin:0}.promote .btn{width:auto;min-width:180px}@media(max-width:900px){.promote-grid{grid-template-columns:1fr}.promote .btn{width:100%}}
 </style>
 </head>
 <body>
@@ -84,6 +85,19 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
     <div class="browser-controls"><div class="field"><label for="storedBatch">Private upload batch</label><select id="storedBatch"><option value="">Loading batches…</option></select></div><div class="field"><label for="assetSearch">Filter filenames</label><input id="assetSearch" type="search" placeholder="Search original filenames"></div></div>
     <p class="asset-browser-status" id="assetBrowserStatus" role="status" aria-live="polite">Loading private upload batches…</p>
     <div class="asset-grid" id="assetGrid"></div>
+  </section>
+  <section class="panel promote">
+    <h2>Promote a reviewed original</h2>
+    <p class="lead">Copy one chosen private image into a draft library slot. The original remains in the inbox, and the assignment is recorded against it. This does not approve or publish the drop.</p>
+    <div class="promote-grid">
+      <div class="field"><label for="promoteItem">Reviewed inbox image</label><select id="promoteItem" disabled><option>Choose a private batch first</option></select></div>
+      <div class="field"><label for="promoteDrop">Library drop</label><select id="promoteDrop"><?php foreach ($drops as $drop): ?><option value="<?= (int)$drop['sequence'] ?>"><?= str_pad((string)$drop['sequence'], 2, '0', STR_PAD_LEFT) ?> · <?= htmlspecialchars($drop['title']) ?></option><?php endforeach; ?></select></div>
+      <div class="field"><label for="promoteRole">Asset type</label><select id="promoteRole"><option value="reference">Reference artwork</option><option value="transfer">Studio transfer template</option><option value="outline">Official outline stencil</option><option value="stencil">Print-ready stencil</option><option value="preview">Public preview</option><option value="placement">Placement mockup</option><option value="pack">Premium packaging</option><option value="lore">Lore card</option><option value="style">Style card</option></select></div>
+      <button class="btn" id="promote" type="button" disabled>Promote to draft</button>
+    </div>
+    <label class="check"><input id="promoteWatermark" type="checkbox" checked> Watermark a public preview</label>
+    <label class="check"><input id="promoteReplace" type="checkbox"> Replace the existing asset in that slot</label>
+    <p class="status" id="promoteStatus" role="status" aria-live="polite">Choose a batch item, then review and assign it deliberately.</p>
   </section>
   <section class="grid">
     <article class="panel">
@@ -166,10 +180,35 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
     const response = await fetch(`api/browse-tattoo-asset-inbox.php?batch=${encodeURIComponent(batchId)}`, {credentials:'same-origin'});
     const data = await response.json();
     if (!response.ok || !data.ok) throw new Error(data.error || 'Could not load this batch.');
-    storedItems = data.items || []; renderStoredItems();
+    storedItems = data.items || [];
+    const promotable = storedItems.filter((item) => item.image && item.width >= 600 && item.height >= 600);
+    $('promoteItem').innerHTML = '<option value="">Choose a reviewed image</option>' + promotable.map((item) => `<option value="${item.position}">${String(item.position).padStart(3,'0')} · ${escapeHtml(item.name)} · ${item.width} × ${item.height}</option>`).join('');
+    $('promoteItem').disabled = promotable.length === 0;
+    $('promote').disabled = true;
+    $('promoteStatus').textContent = promotable.length ? `${promotable.length} eligible images in this private batch. Promotion keeps the source original private.` : 'No library-sized images are available in this batch.';
+    renderStoredItems();
   };
   $('storedBatch').addEventListener('change', () => loadStoredBatch($('storedBatch').value).catch((error) => { $('assetBrowserStatus').textContent = error.message || 'Could not load this batch.'; }));
   $('assetSearch').addEventListener('input', renderStoredItems);
+  $('promoteItem').addEventListener('change', () => { $('promote').disabled = !$('promoteItem').value; });
+  $('promote').addEventListener('click', async () => {
+    const position = $('promoteItem').value;
+    if (!position || !$('storedBatch').value) return;
+    $('promote').disabled = true;
+    $('promoteStatus').textContent = 'Copying the reviewed original into the draft library slot…';
+    const body = new URLSearchParams({batch:$('storedBatch').value,position,sequence:$('promoteDrop').value,role:$('promoteRole').value,watermark:$('promoteWatermark').checked ? '1' : '0',replace:$('promoteReplace').checked ? '1' : '0'});
+    try {
+      const response = await fetch('api/promote-tattoo-inbox-asset.php', {method:'POST',headers:{'X-CSRF-Token':csrf,'Content-Type':'application/x-www-form-urlencoded'},body});
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || 'Promotion failed.');
+      runtimeAssets[data.sequence][data.role] = true;
+      runtimeStatus[data.sequence] = 'draft';
+      updateRoleStates();
+      $('promoteStatus').textContent = data.message;
+      $('promoteItem').value = '';
+    } catch (error) { $('promoteStatus').textContent = error.message || 'Promotion failed.'; }
+    $('promote').disabled = !$('promoteItem').value;
+  });
   loadStoredBatches();
   $('uploadInbox').addEventListener('click', async () => {
     const files = [...$('inboxFiles').files];

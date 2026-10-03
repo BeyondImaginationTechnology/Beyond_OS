@@ -191,6 +191,15 @@ workflows:
             <string>automatic</string>
             <key>teamID</key>
             <string>FK9QM3VUNH</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>technology.co.beyondimagination.thedailybreath</key>
+              <string>Daily Breath Codemagic 2026</string>
+              <key>technology.co.beyondimagination.thedailybreath.widget</key>
+              <string>Daily Breath Widget Codemagic 2026</string>
+              <key>technology.co.beyondimagination.thedailybreath.Clip</key>
+              <string>Daily Breath App Clip Codemagic 2026</string>
+            </dict>
           </dict>
           </plist>
           PLIST

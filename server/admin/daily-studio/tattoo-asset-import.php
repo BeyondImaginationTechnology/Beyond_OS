@@ -61,7 +61,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
 </style>
 <style>
 .inbox{margin-bottom:20px;border-color:#674f27;background:linear-gradient(135deg,rgba(41,31,17,.96),rgba(18,18,20,.96))}.inbox-grid{display:grid;grid-template-columns:1fr auto;align-items:end;gap:16px}.inbox .field{margin:0}.inbox .btn{width:auto;min-width:220px}.batch-id{margin:9px 0 0;color:var(--muted);font:12px ui-monospace,monospace}@media(max-width:900px){.inbox-grid{grid-template-columns:1fr}.inbox .btn{width:100%}}
-.browser{margin-bottom:20px}.browser-controls{display:flex;gap:12px;align-items:end;flex-wrap:wrap}.browser-controls .field{flex:1;min-width:220px;margin:0}.asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-top:18px}.asset-card{min-width:0;padding:10px;border:1px solid #343438;border-radius:12px;background:#0d0e10}.asset-card img{display:block;width:100%;height:190px;object-fit:contain;background:#fff;border-radius:8px}.asset-card b{display:block;margin-top:8px;color:#e7ca8f}.asset-card small{display:block;color:var(--muted);overflow-wrap:anywhere}.asset-browser-status{color:var(--muted)}
+.browser{margin-bottom:20px}.browser-controls{display:flex;gap:12px;align-items:end;flex-wrap:wrap}.browser-controls .field{flex:1;min-width:220px;margin:0}.asset-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px}.asset-actions .btn{width:auto;background:#5a2528;color:#fff}.asset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-top:18px}.asset-card{min-width:0;padding:10px;border:1px solid #343438;border-radius:12px;background:#0d0e10}.asset-card img{display:block;width:100%;height:190px;object-fit:contain;background:#fff;border-radius:8px}.asset-card b{display:block;margin-top:8px;color:#e7ca8f}.asset-card small{display:block;color:var(--muted);overflow-wrap:anywhere}.asset-browser-status{color:var(--muted)}
 .promote{margin-bottom:20px}.promote-grid{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:12px;align-items:end}.promote-grid .field{margin:0}.promote .btn{width:auto;min-width:180px}@media(max-width:900px){.promote-grid{grid-template-columns:1fr}.promote .btn{width:100%}}
 </style>
 </head>
@@ -84,6 +84,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
     <p class="lead">Review originals already stored in private batches. This view does not assign, change, or publish files.</p>
     <div class="browser-controls"><div class="field"><label for="storedBatch">Private upload batch</label><select id="storedBatch"><option value="">Loading batches…</option></select></div><div class="field"><label for="assetSearch">Filter filenames</label><input id="assetSearch" type="search" placeholder="Search original filenames"></div></div>
     <p class="asset-browser-status" id="assetBrowserStatus" role="status" aria-live="polite">Loading private upload batches…</p>
+    <div class="asset-actions"><label class="check"><input id="deleteAllFiltered" type="checkbox"> Select all filtered assets</label><button class="btn" id="deleteSelected" type="button" disabled>Delete selected private uploads</button></div>
     <div class="asset-grid" id="assetGrid"></div>
   </section>
   <section class="panel promote">
@@ -142,6 +143,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
   let storedItems = [];
   let inboxBatchId = '';
   let inboxCompleted = 0;
+  let selectedInboxPositions = new Set();
   const syncInbox = () => {
     const count = $('inboxFiles').files.length;
     const valid = count > 0 && count <= 500;
@@ -171,8 +173,10 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
   const renderStoredItems = () => {
     const term = $('assetSearch').value.trim().toLowerCase();
     const filtered = storedItems.filter((item) => item.name.toLowerCase().includes(term));
-    $('assetGrid').innerHTML = filtered.map((item) => `<article class="asset-card">${item.preview ? `<img loading="lazy" src="${escapeHtml(item.preview)}" alt="Private upload ${item.position}">` : '<div class="asset-card" style="height:190px;display:grid;place-items:center;color:#888">No image preview</div>'}<b>${String(item.position).padStart(3,'0')} · ${escapeHtml(item.name)}</b><small>${escapeHtml(item.mime)} · ${item.width && item.height ? `${item.width} × ${item.height} · ` : ''}${(item.bytes/1048576).toFixed(2)} MB</small></article>`).join('');
-    $('assetBrowserStatus').textContent = `${filtered.length} of ${storedItems.length} files shown. Originals remain private and unchanged.`;
+    $('assetGrid').innerHTML = filtered.map((item) => `<article class="asset-card"><label class="check"><input class="asset-select" type="checkbox" value="${item.position}" ${selectedInboxPositions.has(item.position) ? 'checked' : ''}> Remove after review</label>${item.preview ? `<img loading="lazy" src="${escapeHtml(item.preview)}" alt="Private upload ${item.position}">` : '<div class="asset-card" style="height:190px;display:grid;place-items:center;color:#888">No image preview</div>'}<b>${String(item.position).padStart(3,'0')} · ${escapeHtml(item.name)}</b><small>${escapeHtml(item.mime)} · ${item.width && item.height ? `${item.width} × ${item.height} · ` : ''}${(item.bytes/1048576).toFixed(2)} MB</small></article>`).join('');
+    $('assetBrowserStatus').textContent = `${filtered.length} of ${storedItems.length} files shown. Originals remain private; select only reviewed assets for removal.`;
+    document.querySelectorAll('.asset-select').forEach((input) => input.addEventListener('change', () => { const position = Number(input.value); input.checked ? selectedInboxPositions.add(position) : selectedInboxPositions.delete(position); syncDeleteSelection(); }));
+    syncDeleteSelection();
   };
   const loadStoredBatch = async (batchId) => {
     if (!batchId) { storedItems = []; $('assetGrid').innerHTML = ''; $('assetBrowserStatus').textContent = 'Choose a batch to browse.'; return; }
@@ -181,6 +185,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
     const data = await response.json();
     if (!response.ok || !data.ok) throw new Error(data.error || 'Could not load this batch.');
     storedItems = data.items || [];
+    selectedInboxPositions = new Set();
     const promotable = storedItems.filter((item) => item.image && item.width >= 600 && item.height >= 600);
     $('promoteItem').innerHTML = '<option value="">Choose a reviewed image</option>' + promotable.map((item) => `<option value="${item.position}">${String(item.position).padStart(3,'0')} · ${escapeHtml(item.name)} · ${item.width} × ${item.height}</option>`).join('');
     $('promoteItem').disabled = promotable.length === 0;
@@ -189,6 +194,33 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
     renderStoredItems();
   };
   $('storedBatch').addEventListener('change', () => loadStoredBatch($('storedBatch').value).catch((error) => { $('assetBrowserStatus').textContent = error.message || 'Could not load this batch.'; }));
+  const syncDeleteSelection = () => {
+    const filtered = storedItems.filter((item) => item.name.toLowerCase().includes($('assetSearch').value.trim().toLowerCase()));
+    $('deleteAllFiltered').checked = filtered.length > 0 && filtered.every((item) => selectedInboxPositions.has(item.position));
+    $('deleteSelected').disabled = selectedInboxPositions.size === 0;
+    $('deleteSelected').textContent = selectedInboxPositions.size ? `Delete ${selectedInboxPositions.size} selected private upload${selectedInboxPositions.size === 1 ? '' : 's'}` : 'Delete selected private uploads';
+  };
+  $('deleteAllFiltered').addEventListener('change', () => {
+    const filtered = storedItems.filter((item) => item.name.toLowerCase().includes($('assetSearch').value.trim().toLowerCase()));
+    filtered.forEach((item) => $('deleteAllFiltered').checked ? selectedInboxPositions.add(item.position) : selectedInboxPositions.delete(item.position));
+    renderStoredItems();
+  });
+  $('deleteSelected').addEventListener('click', async () => {
+    if (!selectedInboxPositions.size || !$('storedBatch').value) return;
+    $('deleteSelected').disabled = true;
+    $('assetBrowserStatus').textContent = 'Removing selected private uploads…';
+    const body = new URLSearchParams({batch:$('storedBatch').value});
+    [...selectedInboxPositions].forEach((position) => body.append('positions[]', String(position)));
+    try {
+      const response = await fetch('api/delete-tattoo-inbox-assets.php', {method:'POST',headers:{'X-CSRF-Token':csrf,'Content-Type':'application/x-www-form-urlencoded'},body});
+      const data = await response.json();
+      if (!response.ok || !data.ok) throw new Error(data.error || 'Removal failed.');
+      selectedInboxPositions = new Set();
+      await loadStoredBatch($('storedBatch').value);
+      $('assetBrowserStatus').textContent = data.message;
+    } catch (error) { $('assetBrowserStatus').textContent = error.message || 'Removal failed.'; }
+    syncDeleteSelection();
+  });
   $('assetSearch').addEventListener('input', renderStoredItems);
   $('promoteItem').addEventListener('change', () => { $('promote').disabled = !$('promoteItem').value; });
   $('promote').addEventListener('click', async () => {

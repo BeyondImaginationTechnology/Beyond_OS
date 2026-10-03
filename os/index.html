@@ -1139,10 +1139,13 @@
               Creator Hub is ready for hands-on preview: select a studio
               identity, choose creative apps, set a wallpaper and a background
               playlist, then begin with prepared project folders. The source
-              image reached the Creator desktop in QEMU. Downloadable installer
-              media is still being packaged.
+              image reached the Creator desktop in QEMU. Verify each download
+              against its published SHA-256 checksum before use.
             </p>
             <div class="actions">
+              <a class="button" href="/releases/creator/0.1/SHA256SUMS"
+                >SHA-256 checksums ↓</a
+              >
               <a
                 class="button"
                 href="https://github.com/BeyondImaginationTechnology/Beyond_OS/issues/new"
@@ -1151,25 +1154,26 @@
             </div>
           </div>
           <div class="options">
-            <div class="option unavailable" aria-disabled="true">
-              <span
-                ><b>Creator Hub v0.1</b
+            <a class="option" href="/releases/creator/0.1/bitCreatoros.iso.gz"
+              ><span
+                ><b>BIT OS Creator v0.1 ISO</b
                 ><small
-                  >Source image built and QEMU desktop preview completed</small
+                  >Compressed bootable UEFI live and installer media ·
+                  preview</small
                 ></span
-              >
-              <span>Preview verified</span>
-            </div>
-            <div class="option unavailable" aria-disabled="true">
-              <span
-                ><b>Installer media</b
+              ><span>Download ISO.GZ ↓</span></a
+            >
+            <a
+              class="option"
+              href="/releases/creator/0.1/bit-os-creator-0.1-installer.img.gz"
+              ><span
+                ><b>Creator USB Installer Image</b
                 ><small
-                  >ISO, USB image and SHA-256 manifest will publish
-                  together</small
+                  >Compressed GPT USB image · extract before direct
+                  writing</small
                 ></span
-              >
-              <span>Packaging next</span>
-            </div>
+              ><span>Download IMG.GZ ↓</span></a
+            >
           </div>
         </div>
       </section>

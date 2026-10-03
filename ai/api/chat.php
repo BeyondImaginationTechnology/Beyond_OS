@@ -283,6 +283,76 @@ if (preg_match('/^(hi|hello|hey|bonjour|salut|allo|hola|buenas)(?:[\s,]+(?:there
     $simpleReply = $simpleCopy[$language]['help'];
 } elseif (preg_match('/^(what version is this|version|quelle version|qué versión)[\s!.?¿¡]*$/u', $simplePrompt)) {
     $simpleReply = $simpleCopy[$language]['version'];
+} elseif ($mode === 'core' && preg_match('/\b(?:ai\s+)?tokens?\b/iu', $simplePrompt)
+    && preg_match('/\b(?:explain|what|how|analogy|metaphor|token)\b/iu', $simplePrompt)) {
+    // A token definition is stable reference material. Keep it off the GPU so a
+    // short learning question is immediate and never consumes model allowance.
+    $simpleReply = [
+        'en' => 'Think of AI tokens as the small puzzle pieces of language. A word such as “sunshine” might be one piece, while a longer word can be split into several. Jaguar reads your message piece by piece, then places new pieces one at a time to form its answer. More pieces mean more work; clear, shorter prompts usually need fewer.',
+        'fr' => 'Imaginez que les tokens d’IA sont de petites pièces de puzzle du langage. Un mot comme « soleil » peut être une pièce, tandis qu’un mot plus long peut être découpé en plusieurs. Jaguar lit votre message pièce par pièce, puis ajoute une pièce à la fois pour former sa réponse. Plus il y a de pièces, plus il y a de travail.',
+        'es' => 'Piensa en los tokens de IA como pequeñas piezas de rompecabezas del lenguaje. Una palabra como «sol» puede ser una pieza, mientras que una palabra larga puede dividirse en varias. Jaguar lee tu mensaje pieza por pieza y luego añade una pieza a la vez para formar su respuesta. Más piezas requieren más trabajo.',
+    ][$language];
+} elseif ($mode === 'core'
+    && preg_match('/\b(?:what is|what are|explain|define|definition|meaning|how does|qu[’\']est-ce que|qu[’\']est ce que|explique|définis|qué es|que es|define|cómo funciona)\b/iu', $simplePrompt)
+    && preg_match('/\b(?:artificial intelligence|\bai\b|intelligence artificielle|inteligencia artificial|large language model|\bllm\b|language model|mod[eè]le de langage|modelo de lenguaje|machine learning|\bml\b|apprentissage automatique|aprendizaje autom[aá]tico|prompt|instruction|invite|gpu|graphics processing unit|carte graphique|procesador gr[aá]fico|\bapi\b|application programming interface|interface de programmation|interfaz de programaci[oó]n|database|data base|base de donn[eé]es|base de datos|cloud computing|the cloud|\bcloud\b|informatique en nuage|la nube)\b/iu', $simplePrompt)) {
+    // These are stable, introductory concepts. Answer them locally so Explain
+    // feels instant for everyday learning instead of waking the GPU runtime.
+    $fastLaneConcepts = [
+        'ai' => [
+            'pattern' => '/\b(?:artificial intelligence|\bai\b|intelligence artificielle|inteligencia artificial)\b/iu',
+            'en' => 'AI is like a very fast pattern finder. It studies many examples, notices relationships, then uses those patterns to help with a new question. It can be useful and creative, but it can still be wrong, so important answers should be checked.',
+            'fr' => 'L’IA est comme un détecteur de motifs très rapide. Elle étudie beaucoup d’exemples, remarque des relations, puis utilise ces motifs pour aider sur une nouvelle question. Elle peut se tromper ; les informations importantes doivent être vérifiées.',
+            'es' => 'La IA es como un detector de patrones muy rápido. Estudia muchos ejemplos, encuentra relaciones y usa esos patrones para ayudar con una pregunta nueva. Puede equivocarse, así que conviene verificar la información importante.',
+        ],
+        'llm' => [
+            'pattern' => '/\b(?:large language model|\bllm\b|language model|mod[eè]le de langage|modelo de lenguaje)\b/iu',
+            'en' => 'A large language model is autocomplete grown up into a conversation partner. It predicts the next useful piece of text from patterns learned in training, one small piece at a time.',
+            'fr' => 'Un grand modèle de langage est une saisie prédictive devenue partenaire de conversation. Il prédit le prochain morceau de texte utile à partir de motifs appris pendant son entraînement.',
+            'es' => 'Un modelo de lenguaje grande es como el autocompletado convertido en compañero de conversación. Predice la siguiente parte útil del texto a partir de patrones aprendidos durante el entrenamiento.',
+        ],
+        'machine-learning' => [
+            'pattern' => '/\b(?:machine learning|\bml\b|apprentissage automatique|aprendizaje autom[aá]tico)\b/iu',
+            'en' => 'Machine learning teaches a computer by showing examples instead of writing every rule by hand. It is like coaching someone with many practice rounds: the examples shape how it recognizes the next situation.',
+            'fr' => 'L’apprentissage automatique apprend à un ordinateur avec des exemples plutôt qu’avec chaque règle écrite à la main. C’est comme entraîner quelqu’un avec beaucoup de séances pratiques.',
+            'es' => 'El aprendizaje automático enseña a una computadora con ejemplos en lugar de escribir cada regla a mano. Es como entrenar a alguien con muchas rondas de práctica.',
+        ],
+        'prompt' => [
+            'pattern' => '/\b(?:prompt|instruction|invite)\b/iu',
+            'en' => 'A prompt is the brief you give an AI. Think of it like a note to a skilled assistant: the clearer the goal, context, limits, and desired format, the more useful the result.',
+            'fr' => 'Un prompt est la consigne donnée à une IA. C’est comme une note à un assistant compétent : plus le but, le contexte, les limites et le format sont clairs, plus le résultat est utile.',
+            'es' => 'Un prompt es la instrucción que le das a una IA. Es como una nota para un asistente experto: cuanto más claros sean el objetivo, contexto, límites y formato, más útil será el resultado.',
+        ],
+        'gpu' => [
+            'pattern' => '/\b(?:gpu|graphics processing unit|carte graphique|procesador gr[aá]fico)\b/iu',
+            'en' => 'A GPU is a processor built to do many similar calculations at once. Think of a kitchen with hundreds of burners instead of one: it is especially good for graphics and AI workloads.',
+            'fr' => 'Un GPU est un processeur conçu pour faire beaucoup de calculs semblables en même temps. Imaginez une cuisine avec des centaines de brûleurs plutôt qu’un seul : il convient très bien aux images et à l’IA.',
+            'es' => 'Una GPU es un procesador diseñado para hacer muchos cálculos parecidos a la vez. Imagínala como una cocina con cientos de quemadores en vez de uno: es ideal para gráficos y tareas de IA.',
+        ],
+        'api' => [
+            'pattern' => '/\b(?:\bapi\b|application programming interface|interface de programmation|interfaz de programaci[oó]n)\b/iu',
+            'en' => 'An API is a waiter between software systems. One app asks for something in an agreed format, the API carries the request to the right service, then brings back the result.',
+            'fr' => 'Une API est comme un serveur entre des systèmes logiciels. Une application demande quelque chose dans un format convenu, l’API transmet la demande au bon service puis rapporte le résultat.',
+            'es' => 'Una API es como un camarero entre sistemas de software. Una aplicación pide algo con un formato acordado, la API lleva la solicitud al servicio correcto y devuelve el resultado.',
+        ],
+        'database' => [
+            'pattern' => '/\b(?:database|data base|base de donn[eé]es|base de datos)\b/iu',
+            'en' => 'A database is an organized store of information. Think of a library that can quickly find, add, update, and connect records without losing track of what belongs together.',
+            'fr' => 'Une base de données est un magasin organisé d’informations. C’est comme une bibliothèque capable de trouver, ajouter, mettre à jour et relier rapidement des fiches.',
+            'es' => 'Una base de datos es un almacén organizado de información. Es como una biblioteca que puede encontrar, añadir, actualizar y relacionar registros rápidamente.',
+        ],
+        'cloud' => [
+            'pattern' => '/\b(?:cloud computing|the cloud|\bcloud\b|informatique en nuage|la nube)\b/iu',
+            'en' => 'The cloud means using computers and storage run in data centers over the internet. It is like renting workshop space and tools when you need them instead of owning every machine.',
+            'fr' => 'Le cloud consiste à utiliser, via Internet, des ordinateurs et du stockage gérés dans des centres de données. C’est comme louer un atelier et ses outils selon vos besoins.',
+            'es' => 'La nube consiste en usar computadoras y almacenamiento de centros de datos por internet. Es como alquilar un taller y sus herramientas cuando los necesitas.',
+        ],
+    ];
+    foreach ($fastLaneConcepts as $concept) {
+        if (preg_match($concept['pattern'], $simplePrompt)) {
+            $simpleReply = $concept[$language];
+            break;
+        }
+    }
 } elseif (preg_match('/^(how old are you|what(?:[’\']s| is) your age|when were you (?:made|created|born)|quel âge as-tu|cuántos años tienes)[\s!.?¿¡]*$/u', $simplePrompt)) {
     $simpleReply = [
         'en' => 'I don’t have a human age. I’m Llama Jaguar v0.5.1 Preview, an AI system being built for the BIT ecosystem.',

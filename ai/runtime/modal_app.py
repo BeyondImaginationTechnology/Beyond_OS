@@ -38,7 +38,9 @@ image = (
             "JAGUAR_DEVICE_MAP": "auto",
             "JAGUAR_LOAD_IN_4BIT": "1",
             "JAGUAR_MAX_INPUT_TOKENS": "4096",
-            "JAGUAR_MAX_NEW_TOKENS": "512",
+            # Explain answers should be concise by default. This keeps warm GPU
+            # responses responsive; local fast-lane answers do not use the GPU.
+            "JAGUAR_MAX_NEW_TOKENS": "192",
         }
     )
     .add_local_file(runtime_source, f"{RUNTIME_DIR}/app.py", copy=True)

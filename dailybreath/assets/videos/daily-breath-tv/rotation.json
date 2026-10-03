@@ -1,0 +1,16 @@
+{
+  "channel": "Daily Breath TV",
+  "updated_at": "2026-10-03T19:20:00Z",
+  "episodes": [
+    {
+      "id": "a-strong-tower",
+      "title": "A Strong Tower",
+      "subtitle": "A reflection on Proverbs 18:10",
+      "show": "Daily Breath",
+      "video_url": "/dailybreath/assets/videos/daily-breath-tv/a-strong-tower.mp4",
+      "duration_seconds": 200,
+      "published_at": "2026-10-03T19:20:00Z",
+      "voiceover": "captioned draft"
+    }
+  ]
+}

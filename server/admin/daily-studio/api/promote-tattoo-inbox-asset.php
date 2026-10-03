@@ -10,7 +10,8 @@ header('Cache-Control: no-store');
 function inboxPromoteJson(array $payload, int $status = 200): never { http_response_code($status); echo json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); exit; }
 function inboxPromoteSlug(string $value): string { return trim((string)(preg_replace('/[^a-z0-9]+/', '-', strtolower(trim($value))) ?? ''), '-'); }
 function inboxPromoteImage(string $bytes, string $format, bool $watermark): string {
-    if (!$watermark && $format === 'png' && @getimagesizefromstring($bytes)['mime'] === 'image/png') return $bytes;
+    $imageInfo = @getimagesizefromstring($bytes);
+    if (!$watermark && $format === 'png' && is_array($imageInfo) && ($imageInfo['mime'] ?? '') === 'image/png') return $bytes;
     if (!function_exists('imagecreatefromstring')) throw new RuntimeException('PHP GD is required to prepare this library image.');
     $canvas = @imagecreatefromstring($bytes);
     if ($canvas === false) throw new RuntimeException('The stored image could not be decoded.');

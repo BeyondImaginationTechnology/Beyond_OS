@@ -9,6 +9,8 @@ struct RootView: View {
                 .tabItem { Label("Today", systemImage: "sun.max.fill") }
             NavigationStack { JournalView() }
                 .tabItem { Label("Journal", systemImage: "square.and.pencil") }
+            NavigationStack { MealPlannerView() }
+                .tabItem { Label("Calendar", systemImage: "calendar") }
             NavigationStack { PracticesView() }
                 .tabItem { Label("Practices", systemImage: "circle.dotted") }
             NavigationStack { InsightsView() }

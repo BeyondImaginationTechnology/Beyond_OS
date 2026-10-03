@@ -326,6 +326,8 @@
       renderDaily();
       loadCarousel(dailyRecipe());
       renderRecipes();
+      const requestedRecipe = new URLSearchParams(window.location.search).get('recipe');
+      if (requestedRecipe && state.recipes.some((recipe) => recipe.id === requestedRecipe)) openRecipe(requestedRecipe);
     })
     .catch((error) => {
       console.error('Beyond Kitchen could not start:', error);

@@ -163,5 +163,47 @@
       "Sear the beef in a hot skillet with oil, turning until browned and crisp around the edges.",
       "Cut peeled plantains into thick pieces and fry at 350°F (175°C) until lightly golden. Flatten each piece and fry again until crisp. Serve with the beef and pikliz."
     ]
+  },
+  {
+    "id": "peach-oat-breakfast-cups",
+    "name": "Peach oat breakfast cups",
+    "description": "Soft peaches, yogurt, and oats come together in a cool breakfast cup in minutes.",
+    "category": "Breakfast",
+    "timeMinutes": 5,
+    "difficulty": "Easy",
+    "servings": 2,
+    "tags": ["Vegetarian", "Quick", "No cook"],
+    "image": "assets/images/recipes/peach-oat-crumble.jpg",
+    "imageAlt": "Peaches and oats served in a small bowl",
+    "ingredients": [{"name": "Plain Greek yogurt", "amount": 1, "unit": "cup"}, {"name": "Rolled oats", "amount": 0.5, "unit": "cup"}, {"name": "Ripe peaches, sliced", "amount": 2, "unit": ""}, {"name": "Pumpkin seeds", "amount": 2, "unit": "tbsp"}, {"name": "Honey", "amount": 2, "unit": "tsp"}],
+    "steps": ["Divide the yogurt between two bowls or jars.", "Add oats and sliced peaches, then finish with pumpkin seeds and a little honey.", "Eat right away, or cover and chill until breakfast."]
+  },
+  {
+    "id": "quick-avocado-toast",
+    "name": "Quick avocado toast",
+    "description": "A simple toast with creamy avocado and lemon for a ten-minute morning.",
+    "category": "Breakfast",
+    "timeMinutes": 10,
+    "difficulty": "Easy",
+    "servings": 2,
+    "tags": ["Vegetarian", "Quick"],
+    "image": "assets/images/recipes/green-goddess-toast.jpg",
+    "imageAlt": "Avocado toast with green herbs and seeds",
+    "ingredients": [{"name": "Sourdough bread", "amount": 2, "unit": "thick slices"}, {"name": "Ripe avocado", "amount": 1, "unit": ""}, {"name": "Lemon juice", "amount": 1, "unit": "tsp"}, {"name": "Pumpkin seeds", "amount": 1, "unit": "tbsp"}],
+    "steps": ["Toast the sourdough until crisp.", "Mash the avocado with lemon juice and a pinch of salt.", "Spread over the toast and scatter with pumpkin seeds and black pepper."]
+  },
+  {
+    "id": "savory-chickpea-breakfast-bowls",
+    "name": "Savory chickpea breakfast bowls",
+    "description": "Warm chickpeas, rice, and crisp vegetables make a filling morning bowl when there is more time.",
+    "category": "Breakfast",
+    "timeMinutes": 25,
+    "difficulty": "Easy",
+    "servings": 2,
+    "tags": ["Vegetarian", "Meal prep"],
+    "image": "assets/images/recipes/lemon-chickpea-bowls.png",
+    "imageAlt": "Chickpea and rice bowls with vegetables",
+    "ingredients": [{"name": "Cooked chickpeas, drained", "amount": 1, "unit": "can"}, {"name": "Cooked brown rice", "amount": 1.5, "unit": "cups"}, {"name": "Cherry tomatoes", "amount": 1, "unit": "cup"}, {"name": "English cucumber", "amount": 0.5, "unit": ""}, {"name": "Olive oil", "amount": 1, "unit": "tbsp"}, {"name": "Lemon juice", "amount": 1, "unit": "tbsp"}],
+    "steps": ["Warm the rice and chickpeas in a skillet with olive oil for a few minutes.", "Chop the tomatoes and cucumber while the chickpeas heat.", "Divide everything between bowls and finish with lemon juice, salt, and pepper."]
   }
 ]

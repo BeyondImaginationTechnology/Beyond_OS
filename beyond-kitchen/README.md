@@ -8,8 +8,9 @@ bundled directly from that shared catalog into the native apps. Favorites are
 not synced to a Beyond ID account.
 
 The web page follows the PHP architecture in this repository and can run from
-the same PHP-capable web server as Beyond OS. Its nine recipes include three
-Haitian plates. It is also an installable PWA when served over HTTPS (or
+the same PHP-capable web server as Beyond OS. Its twelve recipes include three
+Haitian plates and four breakfast options with prep times from 5 to 25 minutes.
+It is also an installable PWA when served over HTTPS (or
 localhost), with its recipe library, interface, and bundled photography cached
 for offline visits. The daily carousel follows the same featured recipe and
 shows five slides covering the dish, ingredients, cooking steps, and finished

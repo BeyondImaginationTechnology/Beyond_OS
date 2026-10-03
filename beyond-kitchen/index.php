@@ -132,7 +132,7 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
   <p class="sr-status" id="statusMessage" role="status" aria-live="polite"></p>
 
   <script src="<?= e(beyond_url('beyond-kitchen/assets/js/recipe-library.js?v=0.0.2')) ?>" defer></script>
-  <script src="<?= e(beyond_url('beyond-kitchen/assets/js/app.js?v=0.0.5')) ?>" defer></script>
+  <script src="<?= e(beyond_url('beyond-kitchen/assets/js/app.js?v=0.0.6')) ?>" defer></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => navigator.serviceWorker.register('<?= e(beyond_url('beyond-kitchen/service-worker.js')) ?>'));

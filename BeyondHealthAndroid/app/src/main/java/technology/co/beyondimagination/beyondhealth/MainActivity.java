@@ -21,9 +21,20 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /** Native, offline v0.0.1 daily wellbeing companion. */
 public final class MainActivity extends Activity {
@@ -33,7 +44,9 @@ public final class MainActivity extends Activity {
     private static final int GREEN = Color.rgb(22, 122, 89);
     private static final int MINT = Color.rgb(223, 243, 229);
     private static final String[] MOODS = {"Grounded", "Tired", "Stretched", "Hopeful", "Heavy"};
-    private static final String[] TABS = {"Today", "Journal", "Practices", "Insights", "Settings"};
+    private static final String[] TABS = {"Today", "Calendar", "Journal", "Practices", "Insights", "Settings"};
+    private static final String[] MEAL_SLOTS = {"Breakfast", "Lunch", "Dinner"};
+    private static final int[] PREP_OPTIONS = {5, 10, 15, 20, 30, 45};
     private static final String[] PRACTICES = {"Box breathing", "Reset your body", "Name the good"};
     private static final String[] PRACTICE_DETAILS = {
         "Breathe in, hold, breathe out, and hold for four counts each.",
@@ -44,8 +57,12 @@ public final class MainActivity extends Activity {
     private SharedPreferences preferences;
     private JSONArray checkIns = new JSONArray();
     private JSONArray notes = new JSONArray();
+    private JSONArray recipes = new JSONArray();
+    private JSONObject mealPlan = new JSONObject();
+    private JSONObject prepMinutes = new JSONObject();
     private LinearLayout content;
     private int selectedTab = 0;
+    private int weekOffset;
     private String selectedMood;
     private int energy = 3, stress = 3, sleep = 3;
     private int activePractice = -1, remainingSeconds;
@@ -58,7 +75,21 @@ public final class MainActivity extends Activity {
         preferences = getSharedPreferences("wellbeing-v0.0.1", MODE_PRIVATE);
         try { checkIns = new JSONArray(preferences.getString("checkIns", "[]")); } catch (JSONException ignored) { checkIns = new JSONArray(); }
         try { notes = new JSONArray(preferences.getString("notes", "[]")); } catch (JSONException ignored) { notes = new JSONArray(); }
+        try { mealPlan = new JSONObject(preferences.getString("mealPlan", "{}")); } catch (JSONException ignored) { mealPlan = new JSONObject(); }
+        try { prepMinutes = new JSONObject(preferences.getString("prepMinutes", "{}")); } catch (JSONException ignored) { prepMinutes = new JSONObject(); }
+        loadRecipes();
         render();
+    }
+
+    private void loadRecipes() {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(getAssets().open("recipes.json"), StandardCharsets.UTF_8))) {
+            StringBuilder content = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) content.append(line);
+            recipes = new JSONArray(content.toString());
+        } catch (IOException | JSONException ignored) {
+            recipes = new JSONArray();
+        }
     }
 
     private int dp(float value) { return Math.round(getResources().getDisplayMetrics().density * value); }
@@ -116,6 +147,8 @@ public final class MainActivity extends Activity {
         boolean saved = preferences.edit()
             .putString("checkIns", checkIns.toString())
             .putString("notes", notes.toString())
+            .putString("mealPlan", mealPlan.toString())
+            .putString("prepMinutes", prepMinutes.toString())
             .commit();
         if (!saved) Toast.makeText(this, "Could not save on this device.", Toast.LENGTH_LONG).show();
     }
@@ -135,9 +168,10 @@ public final class MainActivity extends Activity {
 
         switch (selectedTab) {
             case 0: today(); break;
-            case 1: journal(); break;
-            case 2: practices(); break;
-            case 3: insights(); break;
+            case 1: meals(); break;
+            case 2: journal(); break;
+            case 3: practices(); break;
+            case 4: insights(); break;
             default: settings(); break;
         }
 
@@ -261,6 +295,146 @@ public final class MainActivity extends Activity {
         if ("Grounded".equals(mood) || "Hopeful".equals(mood)) return 2;
         return 0;
     }
+    private LocalDate weekStart() {
+        return LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).plusWeeks(weekOffset);
+    }
+    private String mealKey(LocalDate day, String slot) { return day + "|" + slot; }
+    private JSONObject recipeFor(String id) {
+        for (int i = 0; i < recipes.length(); i++) {
+            JSONObject recipe = recipes.optJSONObject(i);
+            if (recipe != null && id.equals(recipe.optString("id"))) return recipe;
+        }
+        return null;
+    }
+    private JSONObject suggestedBreakfast(int minutes) {
+        JSONObject best = null;
+        for (int i = 0; i < recipes.length(); i++) {
+            JSONObject recipe = recipes.optJSONObject(i);
+            if (recipe == null || !"Breakfast".equals(recipe.optString("category"))) continue;
+            int time = recipe.optInt("timeMinutes", Integer.MAX_VALUE);
+            if (time <= minutes && (best == null || time > best.optInt("timeMinutes"))) best = recipe;
+        }
+        return best;
+    }
+    private void setMeal(LocalDate day, String slot, String id) {
+        String key = mealKey(day, slot);
+        try {
+            if (id.isEmpty()) mealPlan.remove(key);
+            else mealPlan.put(key, id);
+            persist();
+            render();
+        } catch (JSONException error) {
+            Toast.makeText(this, "Could not save this meal.", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void chooseMeal(LocalDate day, String slot) {
+        String[] options = new String[recipes.length() + 1];
+        options[0] = "No recipe";
+        for (int i = 0; i < recipes.length(); i++) {
+            JSONObject recipe = recipes.optJSONObject(i);
+            options[i + 1] = recipe == null ? "Recipe unavailable" : recipe.optString("name") + " · " + recipe.optInt("timeMinutes") + " min";
+        }
+        new AlertDialog.Builder(this)
+            .setTitle(day + " · " + slot)
+            .setItems(options, (dialog, which) -> {
+                JSONObject recipe = which == 0 ? null : recipes.optJSONObject(which - 1);
+                setMeal(day, slot, recipe == null ? "" : recipe.optString("id"));
+            })
+            .setNegativeButton("Cancel", null)
+            .show();
+    }
+    private void showRecipe(JSONObject recipe) {
+        StringBuilder details = new StringBuilder(recipe.optString("description"));
+        details.append("\n\n").append(recipe.optInt("timeMinutes")).append(" min · ").append(recipe.optInt("servings")).append(" servings\n\nIngredients\n");
+        JSONArray ingredients = recipe.optJSONArray("ingredients");
+        if (ingredients != null) for (int i = 0; i < ingredients.length(); i++) {
+            JSONObject item = ingredients.optJSONObject(i);
+            if (item != null) details.append("• ").append(item.optDouble("amount")).append(" ").append(item.optString("unit")).append(" ").append(item.optString("name")).append("\n");
+        }
+        details.append("\nSteps\n");
+        JSONArray steps = recipe.optJSONArray("steps");
+        if (steps != null) for (int i = 0; i < steps.length(); i++) details.append(i + 1).append(". ").append(steps.optString(i)).append("\n\n");
+        new AlertDialog.Builder(this).setTitle(recipe.optString("name")).setMessage(details.toString()).setPositiveButton("Done", null).show();
+    }
+    private void meals() {
+        heading("Powered by Beyond Kitchen", "Meal calendar", "Choose meals and set the time you have for breakfast each morning.");
+        if (recipes.length() == 0) {
+            card().addView(text("Beyond Kitchen recipes are unavailable in this build.", 15, MUTED, false));
+            return;
+        }
+        LocalDate start = weekStart();
+        LinearLayout controls = card();
+        controls.addView(text(start.format(DateTimeFormatter.ofPattern("MMM d", Locale.getDefault())) + " – " + start.plusDays(6).format(DateTimeFormatter.ofPattern("MMM d", Locale.getDefault())), 19, INK, true));
+        LinearLayout buttons = row();
+        buttons.addView(button("← Previous", false, () -> { weekOffset--; render(); }), new LinearLayout.LayoutParams(0, dp(42), 1));
+        buttons.addView(button("This week", false, () -> { weekOffset = 0; render(); }), new LinearLayout.LayoutParams(0, dp(42), 1));
+        buttons.addView(button("Next →", false, () -> { weekOffset++; render(); }), new LinearLayout.LayoutParams(0, dp(42), 1));
+        controls.addView(buttons);
+
+        for (int dayIndex = 0; dayIndex < 7; dayIndex++) {
+            LocalDate day = start.plusDays(dayIndex);
+            LinearLayout card = card();
+            card.addView(text(day.format(DateTimeFormatter.ofPattern("EEEE, MMM d", Locale.getDefault())), 20, INK, true));
+            int minutes = prepMinutes.optInt(day.toString(), 15);
+            gap(card, 8);
+            card.addView(button("Morning prep: " + minutes + " min", false, () -> {
+                String[] options = new String[PREP_OPTIONS.length];
+                for (int i = 0; i < PREP_OPTIONS.length; i++) options[i] = PREP_OPTIONS[i] + " minutes";
+                new AlertDialog.Builder(this).setTitle("Time available on " + day).setItems(options, (dialog, which) -> {
+                    try { prepMinutes.put(day.toString(), PREP_OPTIONS[which]); persist(); render(); }
+                    catch (JSONException error) { Toast.makeText(this, "Could not save prep time.", Toast.LENGTH_SHORT).show(); }
+                }).setNegativeButton("Cancel", null).show();
+            }));
+            JSONObject suggested = suggestedBreakfast(minutes);
+            gap(card, 9);
+            if (suggested != null) {
+                card.addView(text("Fits your morning: " + suggested.optString("name") + " · " + suggested.optInt("timeMinutes") + " min", 13, MUTED, false));
+                if (!suggested.optString("id").equals(mealPlan.optString(mealKey(day, "Breakfast")))) {
+                    card.addView(button("Add suggested breakfast", false, () -> setMeal(day, "Breakfast", suggested.optString("id"))));
+                }
+            } else card.addView(text("No breakfast recipe fits this prep window yet.", 13, MUTED, false));
+            for (String slot : MEAL_SLOTS) {
+                gap(card, 12);
+                String id = mealPlan.optString(mealKey(day, slot));
+                JSONObject chosen = recipeFor(id);
+                card.addView(text(slot, 13, MUTED, true));
+                card.addView(button(chosen == null ? "Choose a recipe" : chosen.optString("name") + " · " + chosen.optInt("timeMinutes") + " min", false, () -> chooseMeal(day, slot)));
+                if (chosen != null) card.addView(button("See recipe", false, () -> showRecipe(chosen)));
+            }
+        }
+        groceryList(start);
+    }
+    private void groceryList(LocalDate start) {
+        Map<String, Double> amounts = new LinkedHashMap<>();
+        Map<String, String> labels = new LinkedHashMap<>();
+        int planned = 0;
+        for (int dayIndex = 0; dayIndex < 7; dayIndex++) {
+            LocalDate day = start.plusDays(dayIndex);
+            for (String slot : MEAL_SLOTS) {
+                JSONObject recipe = recipeFor(mealPlan.optString(mealKey(day, slot)));
+                if (recipe == null) continue;
+                planned++;
+                JSONArray ingredients = recipe.optJSONArray("ingredients");
+                if (ingredients == null) continue;
+                for (int i = 0; i < ingredients.length(); i++) {
+                    JSONObject item = ingredients.optJSONObject(i);
+                    if (item == null) continue;
+                    String key = item.optString("name").toLowerCase(Locale.ROOT) + "|" + item.optString("unit").toLowerCase(Locale.ROOT);
+                    amounts.put(key, amounts.getOrDefault(key, 0.0) + item.optDouble("amount"));
+                    labels.put(key, (item.optString("unit") + " " + item.optString("name")).trim());
+                }
+            }
+        }
+        LinearLayout grocery = card();
+        grocery.addView(text("Grocery list", 19, INK, true));
+        grocery.addView(text(planned + " planned meals · ingredients use the recipes' default servings", 13, MUTED, false));
+        if (amounts.isEmpty()) grocery.addView(text("Choose a recipe to build your list.", 14, MUTED, false));
+        DecimalFormat format = new DecimalFormat("0.##");
+        for (String key : amounts.keySet()) {
+            gap(grocery, 6);
+            grocery.addView(text("• " + format.format(amounts.get(key)) + " " + labels.get(key), 14, INK, false));
+        }
+    }
     private void journal() {
         heading("A private record", "Keep what mattered.", "A thought, a win, a worry, or a small thing that helped.");
         LinearLayout editor = card();
@@ -357,7 +531,7 @@ public final class MainActivity extends Activity {
         stopTimer();
         activePractice = index;
         remainingSeconds = PRACTICE_SECONDS[index];
-        selectedTab = 2;
+        selectedTab = 3;
         render();
     }
     private String timerLabel() {
@@ -427,19 +601,21 @@ public final class MainActivity extends Activity {
         LinearLayout privacy = card();
         privacy.addView(text("Local data", 19, INK, true));
         gap(privacy, 8);
-        privacy.addView(text("Check-ins and notes stay inside this app on this phone. v0.0.1 does not sync with the web app or another phone.", 15, MUTED, false));
+        privacy.addView(text("Check-ins, notes, and your meal calendar stay inside this app on this phone. This release does not sync with the web app or another phone.", 15, MUTED, false));
         LinearLayout data = card();
         data.addView(text("Your data", 19, INK, true));
         gap(data, 8);
-        data.addView(text(checkIns.length() + " check-ins · " + notes.length() + " notes", 15, MUTED, false));
+        data.addView(text(checkIns.length() + " check-ins · " + notes.length() + " notes · " + mealPlan.length() + " meals", 15, MUTED, false));
         gap(data, 14);
         data.addView(button("Delete all local data", false, () -> new AlertDialog.Builder(this)
             .setTitle("Delete all Beyond Health data on this device?")
-            .setMessage("This removes your check-ins and notes from this phone.")
+            .setMessage("This removes your check-ins, notes, and meal calendar from this phone.")
             .setNegativeButton("Cancel", null)
             .setPositiveButton("Delete all data", (dialog, which) -> {
                 checkIns = new JSONArray();
                 notes = new JSONArray();
+                mealPlan = new JSONObject();
+                prepMinutes = new JSONObject();
                 persist();
                 render();
             }).show()));

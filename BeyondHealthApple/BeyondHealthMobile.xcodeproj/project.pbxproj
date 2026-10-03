@@ -18,6 +18,8 @@
 		300000000000000000000009 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000009 /* TodayView.swift */; };
 		300000000000000000000010 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000010 /* Assets.xcassets */; };
 		300000000000000000000011 /* BeyondHealthMobileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000011 /* BeyondHealthMobileTests.swift */; };
+		300000000000000000000015 /* MealPlannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000015 /* MealPlannerView.swift */; };
+		300000000000000000000016 /* recipes.json in Resources */ = {isa = PBXBuildFile; fileRef = 100000000000000000000016 /* recipes.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +47,8 @@
 		100000000000000000000012 /* BeyondHealthMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeyondHealthMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		100000000000000000000013 /* BeyondHealthMobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeyondHealthMobileTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		100000000000000000000014 /* BeyondHealthMobile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BeyondHealthMobile.entitlements; sourceTree = "<group>"; };
+		100000000000000000000015 /* MealPlannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealPlannerView.swift; sourceTree = "<group>"; };
+		100000000000000000000016 /* recipes.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ../beyond-kitchen/data/recipes.json; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +92,7 @@
 				100000000000000000000007 /* Models.swift */,
 				100000000000000000000008 /* RootView.swift */,
 				100000000000000000000009 /* TodayView.swift */,
+				100000000000000000000015 /* MealPlannerView.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -96,6 +101,7 @@
 			isa = PBXGroup;
 			children = (
 				100000000000000000000010 /* Assets.xcassets */,
+				100000000000000000000016 /* recipes.json */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -199,6 +205,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				300000000000000000000010 /* Assets.xcassets in Resources */,
+				300000000000000000000016 /* recipes.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -218,6 +225,7 @@
 				300000000000000000000007 /* Models.swift in Sources */,
 				300000000000000000000008 /* RootView.swift in Sources */,
 				300000000000000000000009 /* TodayView.swift in Sources */,
+				300000000000000000000015 /* MealPlannerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -363,7 +371,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -385,7 +393,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 0.0.1;
+				MARKETING_VERSION = 0.0.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -430,7 +438,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = FK9QM3VUNH;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -446,7 +454,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
-				MARKETING_VERSION = 0.0.1;
+				MARKETING_VERSION = 0.0.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

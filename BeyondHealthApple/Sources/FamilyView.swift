@@ -9,12 +9,12 @@ struct SettingsView: View {
             HealthCard {
                 Label("Private on this device", systemImage: "lock.shield")
                     .font(.headline)
-                Text("Check-ins and notes are stored in this app on this device. v0.0.1 does not sync with the web app or another phone.")
+                Text("Check-ins, notes, and your meal calendar are stored in this app on this device. This release does not sync with the web app or another phone.")
                     .foregroundStyle(.secondary)
             }
             HealthCard {
                 Text("Your data").font(.headline)
-                Text("\(store.checkIns.count) check-ins · \(store.notes.count) notes")
+                Text("\(store.checkIns.count) check-ins · \(store.notes.count) notes · \(store.mealPlan.count) meals")
                     .foregroundStyle(.secondary)
                 Button("Delete all local data", role: .destructive) { confirmClear = true }
             }
@@ -22,7 +22,7 @@ struct SettingsView: View {
         .confirmationDialog("Delete all Beyond Health data on this device?", isPresented: $confirmClear) {
             Button("Delete all data", role: .destructive) { store.clearAll() }
         } message: {
-            Text("This removes your check-ins and notes from this device.")
+            Text("This removes your check-ins, notes, and meal calendar from this device.")
         }
     }
 }

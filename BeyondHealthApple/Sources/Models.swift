@@ -80,3 +80,35 @@ enum PracticeKind: String, CaseIterable, Identifiable {
         }
     }
 }
+
+enum MealSlot: String, CaseIterable, Identifiable {
+    case breakfast = "Breakfast"
+    case lunch = "Lunch"
+    case dinner = "Dinner"
+
+    var id: String { rawValue }
+}
+
+struct KitchenRecipe: Decodable, Identifiable {
+    struct Ingredient: Decodable {
+        let name: String
+        let amount: Double
+        let unit: String
+    }
+
+    let id: String
+    let name: String
+    let description: String
+    let category: String
+    let timeMinutes: Int
+    let servings: Int
+    let ingredients: [Ingredient]
+    let steps: [String]
+
+    static func load() -> [KitchenRecipe] {
+        guard let url = Bundle.main.url(forResource: "recipes", withExtension: "json"),
+              let data = try? Data(contentsOf: url),
+              let recipes = try? JSONDecoder().decode([KitchenRecipe].self, from: data) else { return [] }
+        return recipes
+    }
+}

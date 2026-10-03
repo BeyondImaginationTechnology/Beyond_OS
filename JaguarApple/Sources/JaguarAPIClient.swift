@@ -30,7 +30,8 @@ struct JaguarAPIClient: Sendable {
         )
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
-        request.timeoutInterval = 45
+        // PHP may wait up to 105 seconds for a cold model request; keep the client connected through its response.
+        request.timeoutInterval = 120
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")

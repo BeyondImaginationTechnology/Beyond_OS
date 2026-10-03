@@ -195,54 +195,141 @@ function jaguar_usage_settle(PDO $pdo, string $identity, string $period, int $in
 /** Read the signed-in user's current closed-loop BIT$ wallet balance. */
 function jaguar_wallet_bit_balance(PDO $pdo, int $userId): float
 {
+    jaguar_wallet_release_stale_holds($pdo, $userId);
     $statement = $pdo->prepare("SELECT balance FROM beyond_wallets WHERE user_id=? AND currency='BITS' AND status='active' LIMIT 1");
     $statement->execute([$userId]);
     $balance = $statement->fetchColumn();
     return is_numeric($balance) ? max(0.0, (float)$balance) : 0.0;
 }
 
-/** Debit a signed-in user's BITS wallet exactly once after media succeeds. */
-function jaguar_wallet_debit(PDO $pdo, int $userId, float $amount, string $idempotencyKey, string $description): array
+/** Release holds abandoned after the Draw request's 180-second deadline. */
+function jaguar_wallet_release_stale_holds(PDO $pdo, int $userId): void
 {
-    if ($userId < 1 || !is_finite($amount) || $amount <= 0 || trim($idempotencyKey) === '') {
-        return ['ok' => false, 'charged' => false, 'balance' => null, 'error' => 'Invalid wallet debit.'];
-    }
-    $amount = round($amount, 6);
+    $statement = $pdo->prepare("SELECT h.idempotency_key FROM jaguar_draw_holds h JOIN beyond_wallets w ON w.id=h.wallet_id WHERE w.user_id=? AND h.status='held' AND h.created_at<? LIMIT 20");
+    $statement->execute([$userId, time() - 600]);
+    foreach ($statement->fetchAll(PDO::FETCH_COLUMN) as $key) jaguar_wallet_release($pdo, $userId, (string)$key);
+}
+
+/** Reserve wallet value before incurring GPU cost; no transaction is recorded yet. */
+function jaguar_wallet_reserve(PDO $pdo, int $userId, float $amount, string $idempotencyKey): array
+{
+    if ($userId < 1 || !is_finite($amount) || $amount <= 0 || trim($idempotencyKey) === '') return ['ok' => false, 'balance' => null];
+    $amount = round($amount, 2);
     $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
-    $insert = $driver === 'sqlite'
-        ? "INSERT OR IGNORE INTO beyond_wallets(user_id,balance,currency,status) VALUES(?,0,'BITS','active')"
-        : "INSERT IGNORE INTO beyond_wallets(user_id,balance,currency,status) VALUES(?,0,'BITS','active')";
     try {
         $pdo->beginTransaction();
-        $pdo->prepare($insert)->execute([$userId]);
         $walletSql = "SELECT id,balance,status FROM beyond_wallets WHERE user_id=? AND currency='BITS' LIMIT 1" . ($driver === 'sqlite' ? '' : ' FOR UPDATE');
         $walletStatement = $pdo->prepare($walletSql);
         $walletStatement->execute([$userId]);
         $wallet = $walletStatement->fetch(PDO::FETCH_ASSOC);
-        if (!$wallet || ($wallet['status'] ?? '') !== 'active') throw new RuntimeException('Wallet is unavailable or not active.');
-        $existing = $pdo->prepare('SELECT amount FROM beyond_wallet_transactions WHERE idempotency_key=? LIMIT 1');
-        $existing->execute([$idempotencyKey]);
-        if ($existing->fetchColumn() !== false) {
-            $pdo->commit();
-            return ['ok' => true, 'charged' => false, 'balance' => (float)$wallet['balance'], 'already_charged' => true];
-        }
+        if (!$wallet || ($wallet['status'] ?? '') !== 'active') { $pdo->commit(); return ['ok' => false, 'balance' => 0.0]; }
         if ((float)$wallet['balance'] < $amount) {
             $pdo->commit();
-            return ['ok' => false, 'charged' => false, 'balance' => (float)$wallet['balance'], 'error' => 'Insufficient BIT$ balance.'];
+            return ['ok' => false, 'balance' => (float)$wallet['balance']];
         }
-        $transaction = $pdo->prepare("INSERT INTO beyond_wallet_transactions(wallet_id,amount,type,app_slug,description,idempotency_key) VALUES(?,?,'debit','jaguar',?,?)");
-        $transaction->execute([(int)$wallet['id'], -$amount, substr($description, 0, 255), $idempotencyKey]);
         $update = $pdo->prepare('UPDATE beyond_wallets SET balance=balance-? WHERE id=? AND balance>=?');
         $update->execute([$amount, (int)$wallet['id'], $amount]);
-        if ($update->rowCount() !== 1) throw new RuntimeException('Wallet balance changed before debit.');
+        if ($update->rowCount() !== 1) throw new RuntimeException('Wallet balance changed before Draw reservation.');
+        $hold = $pdo->prepare("INSERT INTO jaguar_draw_holds(wallet_id,amount,idempotency_key,status,created_at,updated_at) VALUES(?,?,?,'held',?,?)");
+        $hold->execute([(int)$wallet['id'], $amount, $idempotencyKey, time(), time()]);
         $balance = max(0.0, (float)$wallet['balance'] - $amount);
         $pdo->commit();
-        return ['ok' => true, 'charged' => true, 'balance' => $balance];
+        return ['ok' => true, 'balance' => $balance];
     } catch (Throwable $exception) {
         if ($pdo->inTransaction()) $pdo->rollBack();
-        error_log('Jaguar wallet debit unavailable: ' . $exception->getMessage());
-        return ['ok' => false, 'charged' => false, 'balance' => null, 'error' => 'BIT$ wallet debit is temporarily unavailable.'];
+        error_log('Jaguar Draw reservation unavailable: ' . $exception->getMessage());
+        return ['ok' => false, 'balance' => null];
     }
+}
+
+/** Finalize a successful image without deducting the already reserved value twice. */
+function jaguar_wallet_capture(PDO $pdo, int $userId, string $idempotencyKey, string $description): array
+{
+    $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+    try {
+        $pdo->beginTransaction();
+        $sql = 'SELECT h.wallet_id,h.amount,h.status,w.balance FROM jaguar_draw_holds h JOIN beyond_wallets w ON w.id=h.wallet_id WHERE h.idempotency_key=? AND w.user_id=?' . ($driver === 'sqlite' ? '' : ' FOR UPDATE');
+        $statement = $pdo->prepare($sql);
+        $statement->execute([$idempotencyKey, $userId]);
+        $hold = $statement->fetch(PDO::FETCH_ASSOC);
+        if (!$hold || $hold['status'] !== 'held') { $pdo->rollBack(); return ['ok' => false, 'balance' => null]; }
+        $transaction = $pdo->prepare("INSERT INTO beyond_wallet_transactions(wallet_id,amount,type,app_slug,description,idempotency_key) VALUES(?,?,'debit','jaguar',?,?)");
+        $transaction->execute([(int)$hold['wallet_id'], -(float)$hold['amount'], substr($description, 0, 255), $idempotencyKey]);
+        $pdo->prepare("UPDATE jaguar_draw_holds SET status='charged',updated_at=? WHERE idempotency_key=? AND status='held'")->execute([time(), $idempotencyKey]);
+        $pdo->commit();
+        return ['ok' => true, 'balance' => (float)$hold['balance']];
+    } catch (Throwable $exception) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        error_log('Jaguar Draw capture unavailable: ' . $exception->getMessage());
+        return ['ok' => false, 'balance' => null];
+    }
+}
+
+/** Refund a held amount only once if the worker failed or the request was abandoned. */
+function jaguar_wallet_release(PDO $pdo, int $userId, string $idempotencyKey): bool
+{
+    $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+    try {
+        $pdo->beginTransaction();
+        $sql = 'SELECT h.wallet_id,h.amount,h.status FROM jaguar_draw_holds h JOIN beyond_wallets w ON w.id=h.wallet_id WHERE h.idempotency_key=? AND w.user_id=?' . ($driver === 'sqlite' ? '' : ' FOR UPDATE');
+        $statement = $pdo->prepare($sql);
+        $statement->execute([$idempotencyKey, $userId]);
+        $hold = $statement->fetch(PDO::FETCH_ASSOC);
+        if (!$hold) { $pdo->rollBack(); return false; }
+        if ($hold['status'] === 'released') { $pdo->commit(); return true; }
+        if ($hold['status'] !== 'held') { $pdo->rollBack(); return false; }
+        $update = $pdo->prepare("UPDATE jaguar_draw_holds SET status='released',updated_at=? WHERE idempotency_key=? AND status='held'");
+        $update->execute([time(), $idempotencyKey]);
+        if ($update->rowCount() !== 1) throw new RuntimeException('Draw hold changed before release.');
+        $pdo->prepare('UPDATE beyond_wallets SET balance=balance+? WHERE id=?')->execute([(float)$hold['amount'], (int)$hold['wallet_id']]);
+        $pdo->commit();
+        return true;
+    } catch (Throwable $exception) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        error_log('Jaguar Draw release unavailable: ' . $exception->getMessage());
+        return false;
+    }
+}
+
+/** Return only this user's latest Draw hold state, without exposing the wallet key. */
+function jaguar_wallet_draw_receipt(PDO $pdo, int $userId, ?string $idempotencyKey = null): ?array
+{
+    if ($userId < 1) return null;
+    if (function_exists('jaguar_draw_image_cleanup')) jaguar_draw_image_cleanup($pdo, 5);
+    $sql = 'SELECT h.idempotency_key,h.amount,h.status,h.created_at,h.updated_at FROM jaguar_draw_holds h JOIN beyond_wallets w ON w.id=h.wallet_id WHERE w.user_id=?';
+    $params = [$userId];
+    if ($idempotencyKey !== null) { $sql .= ' AND h.idempotency_key=?'; $params[] = $idempotencyKey; }
+    $sql .= ' ORDER BY h.created_at DESC,h.id DESC LIMIT 1';
+    $statement = $pdo->prepare($sql);
+    $statement->execute($params);
+    $hold = $statement->fetch(PDO::FETCH_ASSOC);
+    if (!$hold || !in_array($hold['status'], ['held', 'charged', 'released'], true)) return null;
+    $receiptId = substr(hash('sha256', (string)$hold['idempotency_key']), 0, 16);
+    $imageAvailable = false;
+    $imageExpiresAt = null;
+    if ($hold['status'] === 'charged') {
+        try {
+            $image = $pdo->prepare('SELECT expires_at FROM jaguar_draw_images WHERE idempotency_key=? AND expires_at>? LIMIT 1');
+            $image->execute([(string)$hold['idempotency_key'], time()]);
+            $expiresAt = $image->fetchColumn();
+            if ($expiresAt !== false) { $imageAvailable = true; $imageExpiresAt = gmdate('c', (int)$expiresAt); }
+        } catch (Throwable $exception) { /* Keep receipts useful when the optional image migration is pending. */ }
+    }
+    return [
+        'receipt_id' => $receiptId,
+        'status' => $hold['status'],
+        'amount_bit_dollars' => (float)$hold['amount'],
+        'created_at' => gmdate('c', (int)$hold['created_at']),
+        'updated_at' => gmdate('c', (int)$hold['updated_at']),
+        'image_available' => $imageAvailable,
+        'image_expires_at' => $imageExpiresAt,
+    ];
+}
+
+function jaguar_wallet_draw_receipt_safe(PDO $pdo, int $userId, ?string $idempotencyKey = null): ?array
+{
+    try { return jaguar_wallet_draw_receipt($pdo, $userId, $idempotencyKey); }
+    catch (Throwable $exception) { error_log('Jaguar Draw receipt lookup failed: ' . $exception->getMessage()); return null; }
 }
 
 /** @return array{requests:int,request_limit:int,bit_dollars_left:float,period:string,wallet_bit_balance?:float} */

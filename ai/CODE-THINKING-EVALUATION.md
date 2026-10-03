@@ -54,3 +54,31 @@ revision and record: requirement correctness, introduced regressions, claims
 without a supporting file citation, useful versus irrelevant checks, and
 whether assumptions and risks are stated. Do not treat a syntactically valid
 diff as a correct change. Start with one reviewer-approved patch at a time.
+
+## v0.5.1 release gate (2026-09-29)
+
+The model and adapter have not changed since the four calls above. The new PHP
+patch workflow reads committed blobs at the cited revision, rejects diffs for
+files not supplied in the request, applies candidate diffs to a detached
+checkout, records the actual diff, and reports static check results. The local
+fixture test passed for a valid PHP repair, an invented JavaScript filename,
+an unappliable hunk, a PHP syntax failure, and uncommitted source at `HEAD`.
+It also passed a bounded line-range read of a committed large PHP file while
+rejecting the same file as an oversized full-file read.
+It also confirmed that the configured project working tree was untouched.
+Checks that would execute project code are skipped on the PHP host until an
+isolated runner is available. These are API guard tests, not model-quality
+scores or proof that a patch is correct.
+
+The four representative BIT prompts must be repeated through the authenticated
+admin API before calling the model release ready. On 2026-09-30, an authenticated
+admin selected the authorized Beyond OS project and submitted the guest-challenge
+bug repair in Patch mode. The deployed API returned its runtime-authentication
+configuration message before any model call. The protected live configuration
+has Jaguar runtime URLs but no `jaguar.runtime_token` entry; the effective
+runtime token was empty. The deployed API also omitted the oversized
+`ai/chat.php` from context. The v0.5.1 line-range input is available in this
+branch but has not yet been deployed. No model diff was returned or applied.
+Correctness, regressions, unsupported repository claims, and test usefulness
+for the four new model attempts remain **unmeasured**. The prior 0/5
+grounded-task scores above remain the last model evidence.

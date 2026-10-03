@@ -3,6 +3,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/modes.php';
 require_once __DIR__ . '/../includes/usage.php';
+require_once __DIR__ . '/../includes/draw-images.php';
 require_once __DIR__ . '/../../beyond-id/includes/mobile-auth.php';
 require_once __DIR__ . '/../../dailybreath/includes/chat-guide.php';
 
@@ -131,7 +132,9 @@ if (in_array($mode, ['draw', 'video'], true)) {
         $drawMessages = is_array($payload['messages'] ?? null) ? $payload['messages'] : [];
         $drawLast = $drawMessages === [] ? null : $drawMessages[array_key_last($drawMessages)];
         $drawPrompt = is_array($drawLast) && is_string($drawLast['content'] ?? null) ? trim((string)$drawLast['content']) : '';
-        if ($drawPrompt === '' || mb_strlen($drawPrompt) > 8000) { http_response_code(422); echo json_encode(['error' => 'Provide a valid image prompt.']); exit; }
+        if ($drawPrompt === '' || mb_strlen($drawPrompt) > 2000) { http_response_code(422); echo json_encode(['error' => 'Provide an image prompt of 1–2,000 characters.']); exit; }
+        $drawLanguage = (string)($payload['language'] ?? 'en');
+        if (!in_array($drawLanguage, ['en', 'fr', 'es'], true)) { http_response_code(422); echo json_encode(['error' => 'Choose a supported Draw language.']); exit; }
         if (preg_match('/\b(?:porn|nudes?|nudity|naked|explicit sexual|child.{0,60}(?:sex|nude|porn)|minor.{0,60}(?:sex|nude|porn))\b/iu', $drawPrompt) === 1) { http_response_code(422); echo json_encode(['error' => 'Jaguar Draw cannot help with explicit sexual content.']); exit; }
         $drawPrice = 10.0;
         $drawUrl = rtrim(jaguar_runtime_config('draw_runtime_url'), '/');
@@ -142,20 +145,35 @@ if (in_array($mode, ['draw', 'video'], true)) {
         if ($drawUrl === '' || !filter_var($drawUrl, FILTER_VALIDATE_URL) || !function_exists('curl_init')) { http_response_code(503); echo json_encode(['error' => 'Jaguar Draw is not connected to its GPU image worker yet. No BIT$ was charged.', 'wallet_bit_balance' => $drawBalance]); exit; }
         $drawToken = jaguar_runtime_config('runtime_token');
         if ($drawToken === '') { http_response_code(503); echo json_encode(['error' => 'Jaguar Draw authentication is not configured. No BIT$ was charged.', 'wallet_bit_balance' => $drawBalance]); exit; }
-        $drawKey = 'draw:v1:u' . (int)$_SESSION['user_id'] . ':' . bin2hex(random_bytes(16));
+        $drawUserId = (int)$_SESSION['user_id'];
+        $drawKey = 'draw:v1:u' . $drawUserId . ':' . bin2hex(random_bytes(16));
+        $drawHold = jaguar_wallet_reserve(beyond_db(), $drawUserId, $drawPrice, $drawKey);
+        if (!$drawHold['ok']) {
+            http_response_code($drawHold['balance'] !== null ? 402 : 503);
+            echo json_encode(['error' => $drawHold['balance'] !== null ? 'You need 10 BIT$ to generate an image.' : 'Your BIT$ wallet could not reserve this image. No BIT$ was charged.', 'wallet_bit_balance' => $drawHold['balance'] ?? $drawBalance]);
+            exit;
+        }
+        register_shutdown_function(static function () use ($drawKey, $drawUserId): void {
+            try { jaguar_wallet_release(beyond_db(), $drawUserId, $drawKey); } catch (Throwable $exception) { error_log('Jaguar Draw shutdown release failed: ' . $exception->getMessage()); }
+        });
         $drawRequest = curl_init($drawUrl . '/v1/draw');
-        curl_setopt_array($drawRequest, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 15, CURLOPT_TIMEOUT => 180, CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $drawToken], CURLOPT_POSTFIELDS => json_encode(['prompt' => $drawPrompt, 'language' => (string)($payload['language'] ?? 'en')], JSON_THROW_ON_ERROR)]);
+        curl_setopt_array($drawRequest, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 15, CURLOPT_TIMEOUT => 180, CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $drawToken], CURLOPT_POSTFIELDS => json_encode(['prompt' => $drawPrompt, 'language' => $drawLanguage], JSON_THROW_ON_ERROR)]);
         $drawResponse = curl_exec($drawRequest); $drawStatus = (int)curl_getinfo($drawRequest, CURLINFO_RESPONSE_CODE); curl_close($drawRequest);
         $drawResult = is_string($drawResponse) && strlen($drawResponse) <= 15 * 1024 * 1024 ? json_decode($drawResponse, true) : null;
         $imageUrl = is_array($drawResult) && is_string($drawResult['image_url'] ?? null) ? trim($drawResult['image_url']) : '';
-        $isDataImage = preg_match('/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+\/=]+$/', $imageUrl) === 1 && strlen($imageUrl) <= 12 * 1024 * 1024;
-        $isHttpsImage = filter_var($imageUrl, FILTER_VALIDATE_URL) !== false && strtolower((string)parse_url($imageUrl, PHP_URL_SCHEME)) === 'https';
-        if ($drawStatus < 200 || $drawStatus >= 300 || (!$isDataImage && !$isHttpsImage)) {
-            http_response_code(503); echo json_encode(['error' => 'Jaguar Draw could not generate an image. No BIT$ was charged.', 'wallet_bit_balance' => $drawBalance]); exit;
+        $decodedImage = $imageUrl !== '' ? jaguar_draw_image_decode($imageUrl) : null;
+        if ($drawStatus < 200 || $drawStatus >= 300 || $decodedImage === null) {
+            $released = jaguar_wallet_release(beyond_db(), $drawUserId, $drawKey);
+            http_response_code(503); echo json_encode(['error' => $released ? 'Jaguar Draw could not generate an image. Your 10 BIT$ hold was released.' : 'Jaguar Draw could not generate an image. The temporary BIT$ hold is pending recovery.', 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)]); exit;
         }
-        $debit = jaguar_wallet_debit(beyond_db(), (int)$_SESSION['user_id'], $drawPrice, $drawKey, 'Jaguar Draw image generation');
-        if (!$debit['ok']) { http_response_code(402); echo json_encode(['error' => 'The image was generated, but your BIT$ wallet could not complete the charge. The image was not delivered.', 'wallet_bit_balance' => $debit['balance'] ?? $drawBalance]); exit; }
-        echo json_encode(['model' => 'jaguar-draw-gpu', 'adapter' => $drawResult['adapter'] ?? null, 'mode' => 'draw', 'message' => 'Your Jaguar Draw image is ready.', 'image_url' => $imageUrl, 'wallet_bit_balance' => $debit['balance'], 'charged_bit_dollars' => $drawPrice], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $savedImage = jaguar_draw_image_store(beyond_db(), $drawUserId, $drawKey, $decodedImage);
+        if ($savedImage === null) {
+            $released = jaguar_wallet_release(beyond_db(), $drawUserId, $drawKey);
+            http_response_code(503); echo json_encode(['error' => $released ? 'Jaguar generated an image but could not save it for recovery. Your 10 BIT$ hold was released.' : 'Jaguar generated an image but could not save it for recovery. The temporary BIT$ hold is pending recovery.', 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)]); exit;
+        }
+        $capture = jaguar_wallet_capture(beyond_db(), $drawUserId, $drawKey, 'Jaguar Draw image generation');
+        if (!$capture['ok']) { jaguar_wallet_release(beyond_db(), $drawUserId, $drawKey); http_response_code(503); echo json_encode(['error' => 'The image was generated, but the wallet charge could not be recorded. The image was not delivered.', 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)]); exit; }
+        echo json_encode(['model' => 'jaguar-draw-gpu', 'adapter' => $drawResult['adapter'] ?? null, 'mode' => 'draw', 'message' => 'Your Jaguar Draw image is ready.', 'image_url' => jaguar_draw_image_url((string)$savedImage['receipt_id']), 'wallet_bit_balance' => $capture['balance'], 'charged_bit_dollars' => $drawPrice, 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
     http_response_code(501);
@@ -248,9 +266,9 @@ if ($isDailyBreathChat) {
 }
 $simpleReply = null;
 $simpleCopy = [
-    'en' => ['hello' => 'Hello! I’m Jaguar. What would you like to explore?', 'thanks' => 'You’re welcome. What should we explore next?', 'acknowledgement' => 'I’m here when you’re ready. What should we explore?', 'help' => 'I’m Jaguar, Beyond’s AI assistant. Explain teaches ideas; Build preview turns product ideas into scoped plans. Build cannot inspect repositories or change files. Draw is intended for Jaguar image generation; the stencil editor has separate canvas drawing tools.', 'version' => 'You’re using Jaguar v0.5 Preview.'],
-    'fr' => ['hello' => 'Bonjour ! Je suis Jaguar. Qu’aimeriez-vous explorer ?', 'thanks' => 'Avec plaisir. Qu’allons-nous explorer ensuite ?', 'acknowledgement' => 'Je suis là quand vous êtes prêt. Qu’allons-nous explorer ?', 'help' => 'Je suis Jaguar, l’assistant IA de Beyond. Explain enseigne des idées ; Build transforme les idées de produit en plans structurés. Build ne peut ni consulter des dépôts ni modifier des fichiers. Draw est prévu pour la génération d’images Jaguar ; l’éditeur de pochoirs possède ses propres outils de dessin.', 'version' => 'Vous utilisez Jaguar v0.5 Preview.'],
-    'es' => ['hello' => '¡Hola! Soy Jaguar. ¿Qué te gustaría explorar?', 'thanks' => 'De nada. ¿Qué exploramos ahora?', 'acknowledgement' => 'Estoy aquí cuando estés listo. ¿Qué exploramos?', 'help' => 'Soy Jaguar, el asistente de IA de Beyond. Explain enseña ideas; Build convierte ideas de producto en planes concretos. Build no puede consultar repositorios ni cambiar archivos. Draw está pensado para la generación de imágenes de Jaguar; el editor de plantillas tiene sus propias herramientas de dibujo.', 'version' => 'Estás usando Jaguar v0.5 Preview.'],
+    'en' => ['hello' => 'Hello! I’m Jaguar. What would you like to explore?', 'thanks' => 'You’re welcome. What should we explore next?', 'acknowledgement' => 'I’m here when you’re ready. What should we explore?', 'help' => 'I’m Jaguar, Beyond’s AI assistant. Explain teaches ideas; Build preview turns product ideas into scoped plans. Build cannot inspect repositories or change files. Draw is intended for Jaguar image generation; the stencil editor has separate canvas drawing tools.', 'version' => 'You’re using Jaguar v0.5.1 Preview.'],
+    'fr' => ['hello' => 'Bonjour ! Je suis Jaguar. Qu’aimeriez-vous explorer ?', 'thanks' => 'Avec plaisir. Qu’allons-nous explorer ensuite ?', 'acknowledgement' => 'Je suis là quand vous êtes prêt. Qu’allons-nous explorer ?', 'help' => 'Je suis Jaguar, l’assistant IA de Beyond. Explain enseigne des idées ; Build transforme les idées de produit en plans structurés. Build ne peut ni consulter des dépôts ni modifier des fichiers. Draw est prévu pour la génération d’images Jaguar ; l’éditeur de pochoirs possède ses propres outils de dessin.', 'version' => 'Vous utilisez Jaguar v0.5.1 Preview.'],
+    'es' => ['hello' => '¡Hola! Soy Jaguar. ¿Qué te gustaría explorar?', 'thanks' => 'De nada. ¿Qué exploramos ahora?', 'acknowledgement' => 'Estoy aquí cuando estés listo. ¿Qué exploramos?', 'help' => 'Soy Jaguar, el asistente de IA de Beyond. Explain enseña ideas; Build convierte ideas de producto en planes concretos. Build no puede consultar repositorios ni cambiar archivos. Draw está pensado para la generación de imágenes de Jaguar; el editor de plantillas tiene sus propias herramientas de dibujo.', 'version' => 'Estás usando Jaguar v0.5.1 Preview.'],
 ];
 // Keep common greeting variations off the scale-to-zero runtime. In particular,
 // "Hello world" is a normal first message, not a request that needs a GPU cold start.
@@ -266,9 +284,9 @@ if (preg_match('/^(hi|hello|hey|bonjour|salut|allo|hola|buenas)(?:[\s,]+(?:there
     $simpleReply = $simpleCopy[$language]['version'];
 } elseif (preg_match('/^(how old are you|what(?:[’\']s| is) your age|when were you (?:made|created|born)|quel âge as-tu|cuántos años tienes)[\s!.?¿¡]*$/u', $simplePrompt)) {
     $simpleReply = [
-        'en' => 'I don’t have a human age. I’m Llama Jaguar v0.5 Preview, an AI system being built for the BIT ecosystem.',
-        'fr' => 'Je n’ai pas d’âge humain. Je suis Llama Jaguar v0.5 Preview, un système d’IA conçu pour l’écosystème BIT.',
-        'es' => 'No tengo una edad humana. Soy Llama Jaguar v0.5 Preview, un sistema de IA creado para el ecosistema BIT.',
+        'en' => 'I don’t have a human age. I’m Llama Jaguar v0.5.1 Preview, an AI system being built for the BIT ecosystem.',
+        'fr' => 'Je n’ai pas d’âge humain. Je suis Llama Jaguar v0.5.1 Preview, un système d’IA conçu pour l’écosystème BIT.',
+        'es' => 'No tengo una edad humana. Soy Llama Jaguar v0.5.1 Preview, un sistema de IA creado para el ecosistema BIT.',
     ][$language];
 } elseif (preg_match('/^(-?\d+(?:\.\d+)?)\s*([+\-*\/])\s*(-?\d+(?:\.\d+)?)\s*(?:=|\?)?$/', $simplePrompt, $math)) {
     $left = (float) $math[1];

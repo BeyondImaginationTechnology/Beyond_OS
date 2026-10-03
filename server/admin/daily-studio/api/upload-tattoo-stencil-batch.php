@@ -20,6 +20,11 @@ function tattooBatchSafeStem(string $value): string
     return substr($stem !== '' ? $stem : 'asset', 0, 120);
 }
 
+function tattooBatchText(string $value, int $limit): string
+{
+    return function_exists('mb_substr') ? mb_substr($value, 0, $limit) : substr($value, 0, $limit);
+}
+
 try {
     if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') tattooBatchJson(['ok' => false, 'error' => 'POST required.'], 405);
     if (!Auth::check()) tattooBatchJson(['ok' => false, 'error' => 'Administrator access required.'], 403);
@@ -40,7 +45,7 @@ try {
     $bytes = file_get_contents((string)$upload['tmp_name']);
     if (!is_string($bytes)) tattooBatchJson(['ok' => false, 'error' => 'The uploaded asset could not be read.'], 422);
 
-    $sourceName = mb_substr(basename((string)($upload['name'] ?? 'asset')), 0, 180);
+    $sourceName = tattooBatchText(basename((string)($upload['name'] ?? 'asset')), 180);
     $extension = strtolower((string)pathinfo($sourceName, PATHINFO_EXTENSION));
     $extension = $extension === 'jpeg' ? 'jpg' : $extension;
     $allowedExtensions = ['png', 'jpg', 'webp', 'gif', 'heic', 'heif', 'svg', 'pdf', 'zip', 'mp4', 'mov'];

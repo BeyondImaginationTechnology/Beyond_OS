@@ -9,6 +9,7 @@ header('Cache-Control: no-store');
 
 function inboxPromoteJson(array $payload, int $status = 200): never { http_response_code($status); echo json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE); exit; }
 function inboxPromoteSlug(string $value): string { return trim((string)(preg_replace('/[^a-z0-9]+/', '-', strtolower(trim($value))) ?? ''), '-'); }
+function inboxPromoteText(string $value, int $limit): string { return function_exists('mb_substr') ? mb_substr($value, 0, $limit) : substr($value, 0, $limit); }
 function inboxPromoteImage(string $bytes, string $format, bool $watermark): string {
     $imageInfo = @getimagesizefromstring($bytes);
     if (!$watermark && $format === 'png' && is_array($imageInfo) && ($imageInfo['mime'] ?? '') === 'image/png') return $bytes;
@@ -58,7 +59,7 @@ try {
     if (file_put_contents($destination, $output, LOCK_EX) === false) throw new RuntimeException('The library asset could not be saved.'); @chmod($destination, 0664);
     $metadataFile = $directory . '/metadata.json'; $metadata = is_file($metadataFile) ? json_decode((string)file_get_contents($metadataFile), true) : []; if (!is_array($metadata)) $metadata = [];
     $metadata = array_replace($metadata, ['sequence'=>$sequence,'season_drop'=>$sequence,'season_total'=>55,'title'=>$drop['title'],'collection'=>$drop['collection'],'collection_slug'=>$drop['collection_slug'],'release_date'=>$drop['release_date'],'status'=>'draft','rights_confirmed'=>(bool)($metadata['rights_confirmed'] ?? false),'updated_at'=>gmdate('c')]); unset($metadata['approved_at'],$metadata['approved_by']);
-    $metadata['assets'] = is_array($metadata['assets'] ?? null) ? $metadata['assets'] : []; $metadata['assets'][$role] = ['file'=>$specs[$role]['file'],'source_name'=>mb_substr((string)($entry['source_name'] ?? $stored),0,180),'inbox_batch'=>$batch,'inbox_position'=>$position,'mime'=>'image/'.$specs[$role]['format'],'width'=>$width,'height'=>$height,'watermarked'=>$watermark,'sha256'=>$sha,'uploaded_at'=>gmdate('c')];
+    $metadata['assets'] = is_array($metadata['assets'] ?? null) ? $metadata['assets'] : []; $metadata['assets'][$role] = ['file'=>$specs[$role]['file'],'source_name'=>inboxPromoteText((string)($entry['source_name'] ?? $stored),180),'inbox_batch'=>$batch,'inbox_position'=>$position,'mime'=>'image/'.$specs[$role]['format'],'width'=>$width,'height'=>$height,'watermarked'=>$watermark,'sha256'=>$sha,'uploaded_at'=>gmdate('c')];
     if (file_put_contents($metadataFile, json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), LOCK_EX) === false) throw new RuntimeException('The library metadata could not be saved.');
     $manifest['items'][(string)$position]['sort_status'] = 'assigned'; $manifest['items'][(string)$position]['assignment'] = ['sequence'=>$sequence,'title'=>$drop['title'],'collection'=>$drop['collection'],'role'=>$role,'category'=>'library','confidence'=>'reviewed']; $manifest['updated_at'] = gmdate('c'); file_put_contents($manifestFile, json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), LOCK_EX);
     inboxPromoteJson(['ok'=>true,'sequence'=>$sequence,'role'=>$role,'message'=>sprintf('Private upload %03d assigned to Drop %02d · %s.', $position, $sequence, $role)]);

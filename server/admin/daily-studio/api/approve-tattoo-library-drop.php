@@ -21,6 +21,11 @@ function tattooApprovalSlug(string $value): string
     return trim($value, '-');
 }
 
+function tattooApprovalText(string $value, int $limit): string
+{
+    return function_exists('mb_substr') ? mb_substr($value, 0, $limit) : substr($value, 0, $limit);
+}
+
 try {
     if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') tattooApprovalResponse(['ok' => false, 'error' => 'POST required.'], 405);
     if (!Auth::check()) tattooApprovalResponse(['ok' => false, 'error' => 'Administrator access required.'], 403);
@@ -68,7 +73,7 @@ try {
         $metadata['approved_at'] = gmdate('c');
         $metadata['approved_by'] = (int)($_SESSION['user_id'] ?? 0);
         foreach (['description' => 1200, 'style' => 180, 'placement' => 240, 'difficulty' => 80] as $field => $limit) {
-            $value = mb_substr(trim((string)($_POST[$field] ?? '')), 0, $limit);
+            $value = tattooApprovalText(trim((string)($_POST[$field] ?? '')), $limit);
             if ($value !== '') $metadata[$field] = $value;
         }
     }

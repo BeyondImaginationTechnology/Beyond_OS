@@ -136,6 +136,17 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
   const drops = <?= json_encode($drops, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
   const roleLabels = {preview:'Preview',outline:'Outline stencil',stencil:'Stencil',transfer:'Transfer',pdf:'PDF',reference:'Reference',placement:'Placement',pack:'Packaging',lore:'Lore',style:'Style'};
   const $ = (id) => document.getElementById(id);
+  const readApiJson = async (response) => {
+    const raw = await response.text();
+    try {
+      return JSON.parse(raw);
+    } catch {
+      const detail = /^\s*</.test(raw)
+        ? 'The server returned an HTML error page instead of API data.'
+        : 'The server returned an invalid API response.';
+      throw new Error(`Server error ${response.status}. ${detail}`);
+    }
+  };
   const rows = new Map([...document.querySelectorAll('[data-sequence]')].map((row) => [Number(row.dataset.sequence), row]));
   const runtimeAssets = Object.fromEntries(drops.map((drop) => [drop.sequence, {...drop.assets}]));
   const runtimeStatus = Object.fromEntries(drops.map((drop) => [drop.sequence, drop.status]));
@@ -162,7 +173,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
     const select = $('storedBatch');
     try {
       const response = await fetch('api/browse-tattoo-asset-inbox.php', {credentials:'same-origin'});
-      const data = await response.json();
+      const data = await readApiJson(response);
       if (!response.ok || !data.ok) throw new Error(data.error || 'Could not load private batches.');
       select.innerHTML = '<option value="">Choose a batch</option>' + data.batches.map((batch) => `<option value="${escapeHtml(batch.id)}">${escapeHtml(batch.id)} · ${batch.uploaded}/${batch.total} files</option>`).join('');
       const latest = data.batches[0];
@@ -182,7 +193,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
     if (!batchId) { storedItems = []; $('assetGrid').innerHTML = ''; $('assetBrowserStatus').textContent = 'Choose a batch to browse.'; return; }
     $('assetBrowserStatus').textContent = 'Loading batch manifest…';
     const response = await fetch(`api/browse-tattoo-asset-inbox.php?batch=${encodeURIComponent(batchId)}`, {credentials:'same-origin'});
-    const data = await response.json();
+    const data = await readApiJson(response);
     if (!response.ok || !data.ok) throw new Error(data.error || 'Could not load this batch.');
     storedItems = data.items || [];
     selectedInboxPositions = new Set();
@@ -213,7 +224,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
     [...selectedInboxPositions].forEach((position) => body.append('positions[]', String(position)));
     try {
       const response = await fetch('api/delete-tattoo-inbox-assets.php', {method:'POST',headers:{'X-CSRF-Token':csrf,'Content-Type':'application/x-www-form-urlencoded'},body});
-      const data = await response.json();
+      const data = await readApiJson(response);
       if (!response.ok || !data.ok) throw new Error(data.error || 'Removal failed.');
       selectedInboxPositions = new Set();
       await loadStoredBatch($('storedBatch').value);
@@ -231,7 +242,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
     const body = new URLSearchParams({batch:$('storedBatch').value,position,sequence:$('promoteDrop').value,role:$('promoteRole').value,watermark:$('promoteWatermark').checked ? '1' : '0',replace:$('promoteReplace').checked ? '1' : '0'});
     try {
       const response = await fetch('api/promote-tattoo-inbox-asset.php', {method:'POST',headers:{'X-CSRF-Token':csrf,'Content-Type':'application/x-www-form-urlencoded'},body});
-      const data = await response.json();
+      const data = await readApiJson(response);
       if (!response.ok || !data.ok) throw new Error(data.error || 'Promotion failed.');
       runtimeAssets[data.sequence][data.role] = true;
       runtimeStatus[data.sequence] = 'draft';
@@ -257,7 +268,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
         body.append('total_count', String(total));
         if (inboxBatchId) body.append('batch_id', inboxBatchId);
         const response = await fetch('api/upload-tattoo-stencil-batch.php', {method: 'POST', headers: {'X-CSRF-Token': csrf}, body});
-        const data = await response.json();
+        const data = await readApiJson(response);
         if (!response.ok || !data.ok) throw new Error(data.error || `Asset ${index + 1} failed.`);
         inboxBatchId = data.batch_id;
         inboxCompleted++;
@@ -429,7 +440,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
       body.append('replace', $('replace').checked ? '1' : '0');
       try {
         const response = await fetch('api/upload-tattoo-library-asset.php', {method: 'POST', headers: {'X-CSRF-Token': csrf}, body});
-        const data = await response.json();
+        const data = await readApiJson(response);
         if (!response.ok || !data.ok) throw new Error(data.error || 'Upload failed.');
         runtimeAssets[item.drop.sequence][item.role] = true;
         runtimeStatus[item.drop.sequence] = 'draft';
@@ -469,7 +480,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
     });
     try {
       const response = await fetch('api/approve-tattoo-library-drop.php', {method: 'POST', headers: {'X-CSRF-Token': csrf, 'Content-Type': 'application/x-www-form-urlencoded'}, body});
-      const data = await response.json();
+      const data = await readApiJson(response);
       if (!response.ok || !data.ok) throw new Error(data.error || 'Approval failed.');
       runtimeStatus[sequence] = data.status;
       status(data.message);

@@ -28,6 +28,11 @@ function tattooLibrarySchedule(): array
     return $schedule;
 }
 
+function tattooLibraryText(string $value, int $limit): string
+{
+    return function_exists('mb_substr') ? mb_substr($value, 0, $limit) : substr($value, 0, $limit);
+}
+
 function tattooLibraryImage(string $bytes, string $mime, string $format, bool $watermark): string
 {
     if ($mime === 'image/' . $format && !$watermark) return $bytes;
@@ -164,7 +169,7 @@ try {
     unset($metadata['approved_at'], $metadata['approved_by']);
     $metadata['assets'][$role] = [
         'file' => $roleSpec['file'],
-        'source_name' => mb_substr(basename((string)($upload['name'] ?? 'uploaded-image')), 0, 180),
+        'source_name' => tattooLibraryText(basename((string)($upload['name'] ?? 'uploaded-image')), 180),
         'mime' => $outputMime,
         'width' => $width,
         'height' => $height,

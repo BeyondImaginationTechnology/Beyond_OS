@@ -4,7 +4,7 @@ require_once __DIR__ . '/../../includes/ecosystem.php';
 beyond_nav_bootstrap('Beyond French');
 $pageTitle = $pageTitle ?? APP_NAME;
 $frenchBase = rtrim(beyond_url('beyond-french/'), '/') . '/';
-$frenchCssVersion = (string)(@filemtime(__DIR__ . '/../assets/css/style.css') ?: time());
+$frenchCssVersion = substr((string)(@hash_file('sha256', __DIR__ . '/../assets/css/style.css') ?: time()), 0, 12);
 $academyCssVersion = (string)(@filemtime(__DIR__ . '/../assets/css/academy.css') ?: time());
 ?>
 <!doctype html>

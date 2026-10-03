@@ -1,4 +1,4 @@
-const CACHE = "beyond-french-1.3.0";
+const CACHE = "beyond-french-1.3.1";
 const OFFLINE_ASSETS = [
   "./offline.html",
   "./assets/css/style.css",

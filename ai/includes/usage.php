@@ -332,11 +332,12 @@ function jaguar_wallet_draw_receipt_safe(PDO $pdo, int $userId, ?string $idempot
     catch (Throwable $exception) { error_log('Jaguar Draw receipt lookup failed: ' . $exception->getMessage()); return null; }
 }
 
-/** @return array{requests:int,request_limit:int,bit_dollars_left:float,period:string,wallet_bit_balance?:float} */
+/** @return array{requests:int,reserved_requests:int,request_limit:int,bit_dollars_left:float,period:string,wallet_bit_balance?:float} */
 function jaguar_usage_public(array $usage, ?float $walletBalance = null): array
 {
     $public = [
         'requests' => $usage['requests'],
+        'reserved_requests' => $usage['reserved_requests'] ?? 0,
         'request_limit' => JAGUAR_MONTHLY_REQUEST_LIMIT,
         'bit_dollars_left' => max(0.0, (JAGUAR_MONTHLY_BIT_MICRO_LIMIT - $usage['bit_micro']) / 1000000),
         'period' => $usage['period'],

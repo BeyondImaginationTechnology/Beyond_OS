@@ -86,8 +86,8 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
         const requestLimit = Number(usage.request_limit || 5);
         const wallet = Number(usage.wallet_bit_balance);
         const walletCopy = Number.isFinite(wallet) ? ` · Wallet: ${wallet.toLocaleString()} BIT$` : '';
-        const requestsLeft = Math.max(0, requestLimit - Number(usage.requests || 0));
-        usageStatus.classList.toggle('is-low', requestsLeft <= 2 || Number(bitDollarsLeft) <= 0.04);
+        const requestsLeft = Math.max(0, requestLimit - Number(usage.requests || 0) - Number(usage.reserved_requests || 0));
+        usageStatus.classList.toggle('is-low', requestsLeft <= 2 || Number(bitDollarsLeft) <= 0.04 || (Number.isFinite(wallet) && wallet <= 0.04));
         usageStatus.textContent = `This month’s Modal GPU requests: ${requestsLeft}/${requestLimit} left · ${bitDollarsLeft} BIT$ left${walletCopy}`;
     }
 

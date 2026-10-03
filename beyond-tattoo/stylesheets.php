@@ -5,6 +5,7 @@ header('Pragma: no-cache');
 header('Expires: 0');
 
 require_once __DIR__ . '/../includes/ecosystem.php';
+require_once __DIR__ . '/includes/config.php';
 $stylesheetData = json_decode(
     (string)file_get_contents(__DIR__ . '/data/autumn-ink-stylesheets.json'),
     true,

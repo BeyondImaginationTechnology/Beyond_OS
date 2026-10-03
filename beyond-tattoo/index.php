@@ -27,6 +27,36 @@ foreach ($libraryAssets as $asset) {
     $libraryPreviews[$asset['collection_slug']] ??= $asset['preview_url'];
 }
 
+// Keep the homepage package stage aligned with the public Autumn Ink release.
+// A malformed catalog or a missing asset must never take the storefront down.
+$dailyStylesheet = null;
+try {
+    $stylesheetCatalog = json_decode(
+        (string) file_get_contents(__DIR__ . '/data/autumn-ink-stylesheets.json'),
+        true,
+        512,
+        JSON_THROW_ON_ERROR
+    );
+    $timezone = new DateTimeZone((string) ($stylesheetCatalog['campaign']['timezone'] ?? 'America/Vancouver'));
+    $today = new DateTimeImmutable('today', $timezone);
+    foreach ((array) ($stylesheetCatalog['releases'] ?? []) as $release) {
+        if (!is_array($release) || empty($release['asset']) || empty($release['title'])) {
+            continue;
+        }
+        $releaseDate = new DateTimeImmutable((string) ($release['date'] ?? ''), $timezone);
+        $asset = ltrim((string) $release['asset'], '/');
+        if ($releaseDate <= $today && is_file(__DIR__ . '/' . $asset)) {
+            $dailyStylesheet = [
+                'sequence' => max(1, (int) ($release['sequence'] ?? 1)),
+                'title' => (string) $release['title'],
+                'asset_url' => bt_app_url($asset),
+            ];
+        }
+    }
+} catch (Throwable $e) {
+    // The stencil package remains the safe fallback when the stylesheet catalog is unavailable.
+}
+
 $featuredDateBadge = strtoupper($stencilDay['display_date'] ?? '');
 if (!empty($stencilDay['iso_date'])) {
     try {
@@ -112,13 +142,13 @@ if (!empty($stencilDay['iso_date'])) {
         </div>
       </div>
 
-      <a class="bt-package-stage" href="stencils.php" aria-label="Browse the stencil release calendar">
+      <a class="bt-package-stage" href="<?= e($dailyStylesheet !== null ? 'stylesheets.php#stylesheet-' . sprintf('%02d', $dailyStylesheet['sequence']) : 'stencils.php') ?>" aria-label="<?= e($dailyStylesheet !== null ? 'View today’s Autumn Ink stylesheet' : 'Browse the stencil release calendar') ?>">
         <span class="bt-package-glow" aria-hidden="true"></span>
         <img
-          src="<?= e($packImage) ?>?v=<?= e((string)($stencilDay['updated_at'] ?: '1')) ?>"
-          alt="<?= e($stencilDay['title']) ?> generated stencil package"
+          src="<?= e($dailyStylesheet['asset_url'] ?? $packImage) ?>?v=<?= e((string)($stencilDay['updated_at'] ?: '1')) ?>"
+          alt="<?= e($dailyStylesheet !== null ? 'Today’s Autumn Ink stylesheet: ' . $dailyStylesheet['title'] : $stencilDay['title'] . ' generated stencil package') ?>"
         >
-        <span class="bt-package-cta">Browse release</span>
+        <span class="bt-package-cta"><?= e($dailyStylesheet !== null ? 'Today’s stylesheet · ' . sprintf('%02d', $dailyStylesheet['sequence']) . '/31' : 'Browse release') ?></span>
       </a>
     </div>
   </section>

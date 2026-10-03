@@ -33,7 +33,7 @@ if (!in_array($method, ['GET', 'POST'], true)) {
 try {
     $pdo = beyond_db();
     if ($method === 'GET') {
-        $query = $pdo->prepare('SELECT request_id, flavour, plan, status, requested_at, updated_at FROM beyond_webs_requests WHERE user_id = ?');
+        $query = $pdo->prepare('SELECT request_id, flavour, plan, work_mode, status, requested_at, updated_at FROM beyond_webs_requests WHERE user_id = ?');
         $query->execute([$userId]);
         webs_reply(200, ['request' => $query->fetch(PDO::FETCH_ASSOC) ?: null]);
     }
@@ -56,19 +56,21 @@ try {
     }
     $flavour = $input['flavour'] ?? null;
     $plan = $input['plan'] ?? null;
+    $workMode = $input['work_mode'] ?? null;
     if (!is_string($flavour) || !in_array($flavour, ['Home', 'Core', 'Creator', 'Academy', 'Cyber', 'Sentinel', 'Gaming'], true)
-        || !is_string($plan) || !in_array($plan, ['Launch', 'Build', 'Power'], true)) {
-        webs_reply(422, ['error' => 'Choose a listed BIT OS flavour and session size.']);
+        || !is_string($plan) || !in_array($plan, ['Launch', 'Build', 'Power'], true)
+        || !is_string($workMode) || !in_array($workMode, ['developer', 'creative', 'gaming'], true)) {
+        webs_reply(422, ['error' => 'Choose a listed BIT OS flavour, session size, and work mode.']);
     }
 
     $requestId = bin2hex(random_bytes(16));
     $now = gmdate('Y-m-d H:i:s');
     $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
     $sql = $driver === 'mysql'
-        ? 'INSERT INTO beyond_webs_requests (user_id, request_id, flavour, plan, status, requested_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE flavour = IF(status = \'requested\', VALUES(flavour), flavour), plan = IF(status = \'requested\', VALUES(plan), plan), updated_at = IF(status = \'requested\', VALUES(updated_at), updated_at)'
-        : 'INSERT INTO beyond_webs_requests (user_id, request_id, flavour, plan, status, requested_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET flavour = CASE WHEN status = \'requested\' THEN excluded.flavour ELSE flavour END, plan = CASE WHEN status = \'requested\' THEN excluded.plan ELSE plan END, updated_at = CASE WHEN status = \'requested\' THEN excluded.updated_at ELSE updated_at END';
-    $pdo->prepare($sql)->execute([$userId, $requestId, $flavour, $plan, 'requested', $now, $now]);
-    $query = $pdo->prepare('SELECT request_id, flavour, plan, status, requested_at, updated_at FROM beyond_webs_requests WHERE user_id = ?');
+        ? 'INSERT INTO beyond_webs_requests (user_id, request_id, flavour, plan, work_mode, status, requested_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE flavour = IF(status = \'requested\', VALUES(flavour), flavour), plan = IF(status = \'requested\', VALUES(plan), plan), work_mode = IF(status = \'requested\', VALUES(work_mode), work_mode), updated_at = IF(status = \'requested\', VALUES(updated_at), updated_at)'
+        : 'INSERT INTO beyond_webs_requests (user_id, request_id, flavour, plan, work_mode, status, requested_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET flavour = CASE WHEN status = \'requested\' THEN excluded.flavour ELSE flavour END, plan = CASE WHEN status = \'requested\' THEN excluded.plan ELSE plan END, work_mode = CASE WHEN status = \'requested\' THEN excluded.work_mode ELSE work_mode END, updated_at = CASE WHEN status = \'requested\' THEN excluded.updated_at ELSE updated_at END';
+    $pdo->prepare($sql)->execute([$userId, $requestId, $flavour, $plan, $workMode, 'requested', $now, $now]);
+    $query = $pdo->prepare('SELECT request_id, flavour, plan, work_mode, status, requested_at, updated_at FROM beyond_webs_requests WHERE user_id = ?');
     $query->execute([$userId]);
     $saved = $query->fetch(PDO::FETCH_ASSOC);
     if (!is_array($saved)) {

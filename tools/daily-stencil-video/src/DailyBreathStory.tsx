@@ -33,6 +33,8 @@ export type DailyBreathStoryProps = {
   beats: DailyBreathStoryBeat[];
   sources: DailyBreathStorySource[];
   outroText: string;
+  sourceSeconds: number;
+  outroSeconds: number;
   fps: number;
   width: number;
   height: number;
@@ -44,17 +46,16 @@ export type DailyBreathStoryProps = {
   };
 };
 
-export const DAILY_BREATH_STORY_TIMELINE = [
-  {id: 'intro', startSeconds: 0, durationSeconds: 10},
-  {id: 'inciting', startSeconds: 10, durationSeconds: 10},
-  {id: 'rising', startSeconds: 20, durationSeconds: 15},
-  {id: 'peak', startSeconds: 35, durationSeconds: 7},
-  {id: 'falling', startSeconds: 42, durationSeconds: 4},
-  {id: 'resolution', startSeconds: 46, durationSeconds: 4},
-] as const;
-
 export const defaultDailyBreathStoryProps =
   config as DailyBreathStoryProps;
+
+export const dailyBreathStoryDurationSeconds = (props: DailyBreathStoryProps) => {
+  const storyEnd = props.beats.reduce(
+    (end, beat) => Math.max(end, beat.startSeconds + beat.durationSeconds),
+    0,
+  );
+  return storyEnd + props.sourceSeconds + props.outroSeconds;
+};
 
 const clamp = {
   extrapolateLeft: 'clamp' as const,
@@ -77,6 +78,7 @@ const Scene: React.FC<{
   const isIntro = beat.id === 'intro';
   const isPeak = beat.id === 'peak';
   const palette = props.palette;
+  const totalDurationSeconds = dailyBreathStoryDurationSeconds(props);
 
   return (
     <AbsoluteFill
@@ -140,6 +142,9 @@ const Scene: React.FC<{
             <div style={{color: palette.muted, fontSize: 30, marginTop: 20}}>
               {props.subtitle}
             </div>
+            <div style={{color: palette.muted, fontSize: 27, lineHeight: 1.4, marginTop: 34}}>
+              {beat.narration}
+            </div>
           </>
         ) : (
           <div
@@ -151,7 +156,21 @@ const Scene: React.FC<{
               marginTop: 34,
             }}
           >
-            {beat.onScreenText}
+            <>
+              <div>{beat.onScreenText}</div>
+              <div
+                style={{
+                  color: palette.muted,
+                  fontFamily: 'Arial, Helvetica, sans-serif',
+                  fontSize: beat.narration.length > 260 ? 28 : 32,
+                  fontWeight: 400,
+                  lineHeight: 1.42,
+                  marginTop: 36,
+                }}
+              >
+                {beat.narration}
+              </div>
+            </>
           </div>
         )}
       </div>
@@ -180,7 +199,7 @@ const Scene: React.FC<{
           style={{
             background: palette.accent,
             height: '100%',
-            transform: `scaleX(${(beat.startSeconds + frame / fps) / 60})`,
+            transform: `scaleX(${(beat.startSeconds + frame / fps) / totalDurationSeconds})`,
             transformOrigin: 'left',
           }}
         />
@@ -208,7 +227,8 @@ const SourcesCard: React.FC<{props: DailyBreathStoryProps}> = ({props}) => (
     <div style={{display: 'grid', gap: 18, marginTop: 44, maxWidth: 860}}>
       {props.sources.slice(0, 4).map((source, index) => (
         <div key={`${source.citation}-${index}`} style={{fontSize: 22, lineHeight: 1.3}}>
-          {source.citation}
+          <div>{source.citation}</div>
+          <div style={{color: props.palette.muted, fontSize: 16, marginTop: 8}}>{source.notes}</div>
         </div>
       ))}
     </div>
@@ -245,6 +265,10 @@ const OutroCard: React.FC<{props: DailyBreathStoryProps}> = ({props}) => (
 
 export const DailyBreathStory: React.FC<DailyBreathStoryProps> = (props) => {
   const fps = props.fps;
+  const storyEndSeconds = props.beats.reduce(
+    (end, beat) => Math.max(end, beat.startSeconds + beat.durationSeconds),
+    0,
+  );
   return (
     <AbsoluteFill style={{background: props.palette.background}}>
       {props.beats.map((beat) => (
@@ -256,10 +280,10 @@ export const DailyBreathStory: React.FC<DailyBreathStoryProps> = (props) => {
           <Scene beat={beat} props={props} />
         </Sequence>
       ))}
-      <Sequence from={50 * fps} durationInFrames={5 * fps}>
+      <Sequence from={storyEndSeconds * fps} durationInFrames={props.sourceSeconds * fps}>
         <SourcesCard props={props} />
       </Sequence>
-      <Sequence from={55 * fps} durationInFrames={5 * fps}>
+      <Sequence from={(storyEndSeconds + props.sourceSeconds) * fps} durationInFrames={props.outroSeconds * fps}>
         <OutroCard props={props} />
       </Sequence>
     </AbsoluteFill>

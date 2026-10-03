@@ -39,9 +39,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif (isset($_POST['revoke_session'])) {
         try {
-            $pdo->prepare('UPDATE user_sessions SET revoked_at=? WHERE id=? AND user_id=?')->execute([date('Y-m-d H:i:s'), (int)$_POST['revoke_session'], $uid]);
-            $message = 'Browser session revoked.';
+            $pdo->beginTransaction();
+            $revoke = $pdo->prepare('UPDATE user_sessions SET revoked_at=? WHERE id=? AND user_id=? AND revoked_at IS NULL');
+            $revoke->execute([date('Y-m-d H:i:s'), (int)$_POST['revoke_session'], $uid]);
+            if ($revoke->rowCount() < 1) throw new RuntimeException('Session not found.');
+            beyondRememberRevokeAll($pdo, $uid);
+            $pdo->commit();
+            $message = 'Browser session revoked. Saved browser sign-ins were cleared.';
         } catch (Throwable $exception) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
             $error = 'The browser session could not be revoked.';
         }
     } elseif (isset($_POST['change_password'])) {
@@ -50,10 +56,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif (($_POST['password'] ?? '') !== ($_POST['confirm'] ?? '')) {
             $error = 'Passwords do not match.';
         } else {
-            $hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $pdo->prepare('UPDATE users SET password=?,password_hash=? WHERE id=?')->execute([$hash, $hash, $uid]);
-            log_activity($pdo, $uid, 'password_changed');
-            $message = 'Password updated.';
+            try {
+                $hash = password_hash($_POST['password'], PASSWORD_DEFAULT);
+                $pdo->beginTransaction();
+                $pdo->prepare('UPDATE users SET password=?,password_hash=? WHERE id=?')->execute([$hash, $hash, $uid]);
+                beyond_revoke_all_account_access($pdo, $uid);
+                $pdo->commit();
+                log_activity($pdo, $uid, 'password_changed');
+                beyond_clear_browser_identity();
+                header('Location: ../auth/login.php?password_changed=1');
+                exit;
+            } catch (Throwable $exception) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                error_log('Password change failed: ' . $exception->getMessage());
+                $error = 'The password could not be updated. Please try again.';
+            }
         }
     }
 }
@@ -90,7 +107,7 @@ label{display:block;margin:14px 0 7px}input{width:100%;padding:14px;border:1px s
 <p><a class="app-back" href="index.php">Dashboard</a></p>
 <?php if ($message): ?><p class="ok" role="status"><?= e($message) ?></p><?php endif; ?>
 <?php if ($error): ?><p class="danger" role="alert"><?= e($error) ?></p><?php endif; ?>
-<div class="card"><span class="badge">SECURITY</span><h1>Protect your Beyond ID</h1><form method="post"><input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>"><label for="new-password">New password</label><input id="new-password" type="password" name="password" autocomplete="new-password" minlength="8" required><label for="confirm-password">Confirm password</label><input id="confirm-password" type="password" name="confirm" autocomplete="new-password" minlength="8" required><button name="change_password" value="1">Update password</button></form></div>
+<div class="card"><span class="badge">SECURITY</span><h1>Protect your Beyond ID</h1><p class="account-note">Changing your password signs out all browsers and mobile devices.</p><form method="post"><input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>"><label for="new-password">New password</label><input id="new-password" type="password" name="password" autocomplete="new-password" minlength="8" required><label for="confirm-password">Confirm password</label><input id="confirm-password" type="password" name="confirm" autocomplete="new-password" minlength="8" required><button name="change_password" value="1">Update password</button></form></div>
 <div class="card" style="margin-top:16px"><h2>Sign-in methods</h2><p class="account-note">Provider sign-ins with the same verified email connect to this Beyond ID. A provider using a different email may create a separate account.</p><?php if (!$linkedProviders): ?><p class="muted">No provider sign-ins are connected yet.</p><?php endif; ?><?php foreach ($linkedProviders as $identity): $providerName = ucfirst((string)$identity['provider']); ?><div class="social-row"><div class="social-name"><span class="social-icon" aria-hidden="true"><?= e(substr($providerName, 0, 1)) ?></span><div><strong><?= e($providerName) ?></strong><br><small class="muted"><?= e((string)($identity['email'] ?: $identity['display_name'] ?: 'Connected')) ?></small></div></div><span class="badge ok">Connected</span></div><?php endforeach; ?></div>
 <div class="card" style="margin-top:16px"><h2>Mobile app devices</h2><p class="account-note">Each device has its own Beyond ID session. Signing one out immediately revokes its access and refresh tokens.</p><?php if (!$mobileDevices): ?><p class="muted">No active mobile app sessions.</p><?php endif; ?><?php foreach ($mobileDevices as $device): $client = beyond_api_client((string)$device['audience']); ?><div class="mobile-device"><div><strong><?= e((string)($device['device_name'] ?: 'Mobile device')) ?></strong><br><small class="muted"><?= e((string)($client['name'] ?? $device['app_slug'])) ?> · Last active <?= e(date('M j, Y g:i A', strtotime((string)$device['last_used_at']))) ?></small></div><form method="post"><input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>"><button class="danger" name="revoke_mobile_device" value="<?= e((string)$device['family_id']) ?>">Sign out this device</button></form></div><?php endforeach; ?><p><a href="connected-apps.php">Manage connected apps and their permissions</a></p></div>
 <div class="card" style="margin-top:16px"><h2>Browser sessions</h2><?php if (!$sessions): ?><p class="muted">No other active browser sessions.</p><?php endif; ?><?php foreach ($sessions as $session): ?><div class="session"><div><strong><?= hash_equals($current, (string)$session['session_token_hash']) ? 'This device' : 'Signed-in browser' ?></strong><br><small class="muted"><?= e(substr((string)($session['user_agent'] ?? 'Browser'), 0, 100)) ?><br><?= e((string)($session['ip_address'] ?? '')) ?> · Last active <?= e((string)$session['last_seen_at']) ?></small></div><?php if (!hash_equals($current, (string)$session['session_token_hash'])): ?><form method="post"><input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>"><button name="revoke_session" value="<?= (int)$session['id'] ?>">Sign out browser</button></form><?php else: ?><span class="badge ok">Current</span><?php endif; ?></div><?php endforeach; ?></div>

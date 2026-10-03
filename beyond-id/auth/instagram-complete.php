@@ -25,7 +25,7 @@ $error = '';
 $success = '';
 $isSqlite = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite';
 $signedInUser = null;
-if (!empty($_SESSION['user_id'])) {
+if (!empty($_SESSION['user_id']) && beyond_refresh_browser_identity($pdo)) {
     $statement = $pdo->prepare('SELECT * FROM users WHERE id=? LIMIT 1');
     $statement->execute([(int)$_SESSION['user_id']]);
     $signedInUser = $statement->fetch(PDO::FETCH_ASSOC) ?: null;

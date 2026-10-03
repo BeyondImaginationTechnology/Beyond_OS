@@ -6,7 +6,7 @@ The seven official 1.0 flavours are defined in `catalog.json`:
 | --- | --- | --- |
 | Home | Buildable | Complete QEMU and installer acceptance |
 | Core | Buildable | Complete QEMU and installer acceptance |
-| Creator | Profile defined | Add creator package profile and native shell identity |
+| Creator | Source implemented | Build and validate the Creator 0.1 image and installer |
 | Academy | Profile defined | Add managed-learning package profile and policy defaults |
 | Cyber | Buildable | Complete defensive-workstation acceptance |
 | Sentinel | Profile defined | Add fleet/policy profile and management boundary |

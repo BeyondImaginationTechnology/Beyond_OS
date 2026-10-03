@@ -463,6 +463,91 @@ nav a:focus-visible {
   line-height: 1.5;
 }
 
+.tools-section {
+  padding-block: 82px 88px;
+}
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.mode {
+  display: flex;
+  min-height: 285px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 22px;
+  border: 1px solid #d6e0ed;
+  border-radius: 16px;
+  background: #fff;
+  color: #1b304d;
+  text-align: left;
+  cursor: pointer;
+  transition: .2s ease;
+  box-shadow: 0 8px 24px rgba(34, 58, 91, .045);
+}
+
+.mode:hover,
+.mode.selected {
+  transform: translateY(-3px);
+  border-color: #6685ea;
+  background: linear-gradient(145deg, #fff, #f3f6ff);
+  box-shadow: 0 16px 32px rgba(45, 76, 142, .11);
+}
+
+.mode:focus-visible {
+  outline: 3px solid rgba(55, 121, 232, .38);
+  outline-offset: 3px;
+}
+
+.mode-number {
+  color: #5368ba;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.mode-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  margin: 22px 0 17px;
+  place-items: center;
+  border: 1px solid #d6e0f0;
+  border-radius: 12px;
+  background: #f4f7fc;
+  color: #4d72ce;
+  font-size: 19px;
+}
+
+.mode strong {
+  font-size: 19px;
+  letter-spacing: -.025em;
+}
+
+.mode p {
+  margin: 9px 0 16px;
+  color: #61738b;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.mode small {
+  margin-top: auto;
+  color: #5368ba;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .04em;
+}
+
+.mode-note {
+  margin: 14px 0 0;
+  color: #61738b;
+  font-size: 12px;
+}
+
 .requests-section {
   padding: 76px 0;
   border-top: 1px solid #dce4ef;
@@ -540,6 +625,17 @@ nav a:focus-visible {
   text-align: right;
 }
 
+.access-note {
+  margin: 18px 0 0;
+  padding: 12px 14px;
+  border: 1px solid #d6e0ed;
+  border-radius: 10px;
+  background: #fff;
+  color: #61738b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
 .how {
   padding-block: 72px;
   background: #e9eef6;
@@ -580,6 +676,14 @@ footer {
 
   .flavour-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .mode-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mode {
+    min-height: 0;
   }
 }
 

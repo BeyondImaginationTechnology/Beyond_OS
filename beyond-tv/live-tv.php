@@ -27,7 +27,7 @@ $currentHour = (int)(new DateTimeImmutable('now', $timezone))->format('G');
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#401532">
 <title>Full <?=count($channels)?>-Channel Guide | Beyond TV</title>
-<meta name="description" content="Browse the complete Beyond TV schedule across every free live channel.">
+<meta name="description" content="Browse Beyond TV live schedules and upcoming channel programming previews.">
 <link rel="stylesheet" href="/beyond-tv/assets/css/app.css?v=3.0.1">
 </head>
 <body class="tv-app">
@@ -36,7 +36,7 @@ $currentHour = (int)(new DateTimeImmutable('now', $timezone))->format('G');
 <main class="page shell guide-page full-guide-page">
   <span class="kicker">FULL 24-HOUR SCHEDULE · AMERICA/VANCOUVER</span>
   <h1>The complete Beyond TV guide.</h1>
-  <p class="lead">See what is playing now and what comes next across all <?=count($channels)?> free channels. Scroll across the timeline to explore the full day.</p>
+  <p class="lead">See what is playing now across Beyond TV and explore planned programming for preview channels. Scroll across the timeline to explore the full day.</p>
   <div class="full-guide-meta"><strong><?=htmlspecialchars((string)$classicState['date_label'])?></strong><span><i aria-hidden="true"></i> Current time highlighted</span></div>
   <div class="epg" aria-label="Complete Beyond TV 24-hour guide">
     <div class="epg-grid">
@@ -45,10 +45,10 @@ $currentHour = (int)(new DateTimeImmutable('now', $timezone))->format('G');
         <div class="epg-cell epg-time<?=$currentHour >= $slot && $currentHour < $slot + 2 ? ' is-current-time':''?>"><?=$today->setTime($slot,0)->format('g:i A')?></div>
       <?php endforeach; ?>
       <?php foreach($guideChannels as $number=>$guideChannel): ?>
-        <a class="epg-cell epg-channel" href="/beyond-tv/channel.php?slug=<?=urlencode((string)$guideChannel['slug'])?>"><span><?=htmlspecialchars((string)$guideChannel['icon'])?></span><div><strong>CH <?=str_pad((string)($number+1),2,'0',STR_PAD_LEFT)?> · <?=htmlspecialchars((string)$guideChannel['name'])?></strong><small>Free live library</small></div></a>
+        <a class="epg-cell epg-channel" href="/beyond-tv/channel.php?slug=<?=urlencode((string)$guideChannel['slug'])?>"><span><?=htmlspecialchars((string)$guideChannel['icon'])?></span><div><strong>CH <?=str_pad((string)($number+1),2,'0',STR_PAD_LEFT)?> · <?=htmlspecialchars((string)$guideChannel['name'])?></strong><small><?=htmlspecialchars((string)$guideChannel['access'])?></small></div></a>
         <?php foreach($slots as $slot):
           $block = beyond_tv_guide_block($guideChannel['rows'], $slot);
-          $isNow = $currentHour >= (int)($block['start'] ?? 0) && $currentHour < (int)($block['end'] ?? 0);
+          $isNow = empty($guideChannel['preview']) && $currentHour >= (int)($block['start'] ?? 0) && $currentHour < (int)($block['end'] ?? 0);
         ?>
           <a class="epg-cell epg-program<?=$isNow?' current':''?>" href="/beyond-tv/channel.php?slug=<?=urlencode((string)$guideChannel['slug'])?>"><strong><?=htmlspecialchars((string)(($block['icon'] ?? '▶').' '.($block['title'] ?? 'Beyond TV')))?></strong><small><?=htmlspecialchars((string)($block['lineup'] ?? 'Curated presentation'))?></small></a>
         <?php endforeach; ?>

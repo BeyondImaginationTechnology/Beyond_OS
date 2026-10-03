@@ -1,0 +1,39 @@
+{
+  "channel_slug": "space-tv",
+  "channel_number": 10,
+  "name": "Space TV",
+  "status": "development",
+  "current_programming": "Eight daily three-hour blocks of official NASA and NASA Goddard YouTube content, scheduled in America/Vancouver time. Videos or playlists repeat within each block until the next block begins.",
+  "current_schedule_file": "channel-schedules.json",
+  "identity": "A 24/7 channel for astronomy, space exploration, planetary science, spacecraft, and cosmic history.",
+  "show_boundary": "Space TV owns the space subject. Beyond Technology's Beyond Space focuses on the technology enabling exploration.",
+  "shows": [
+    {"name":"Space Today","format":"Space news","episode_length":"10–15 min","concept":"Missions, discoveries, launches, telescopes, and major developments in space exploration."},
+    {"name":"Worlds Beyond","format":"Planetary series","episode_length":"10–20 min","concept":"One world per episode: planets, moons, dwarf planets, and exoplanets."},
+    {"name":"Cosmic Mysteries","format":"Science documentary","episode_length":"15–30 min","concept":"Black holes, dark matter, dark energy, neutron stars, and unanswered cosmic questions."},
+    {"name":"Mission Control","format":"Mission documentary","episode_length":"15–30 min","concept":"Space missions, from objectives and spacecraft to discoveries."},
+    {"name":"How Space Works","format":"Animated explainer","episode_length":"5–15 min","concept":"Orbits, gravity, rockets, stars, galaxies, light-years, and other concepts visualized simply."},
+    {"name":"Astronaut","format":"Human spaceflight","episode_length":"10–20 min","concept":"Astronaut training, life in orbit, spacewalks, spacecraft, and the challenges of humans living in space."},
+    {"name":"Rocket Lab","format":"Engineering","episode_length":"10–20 min","concept":"Rocket engines, stages, launch systems, reusable spacecraft, and the engineering behind getting to space."},
+    {"name":"The Night Sky","format":"Astronomy / observing","episode_length":"5–15 min","concept":"Constellations, planets, meteor showers, and objects viewers can find in the night sky."},
+    {"name":"Cosmic History","format":"Documentary","episode_length":"15–30 min","concept":"The universe from the Big Bang through stars and galaxies to the formation of our solar system."},
+    {"name":"Beyond Earth","format":"Future exploration","episode_length":"10–20 min","concept":"Moon bases, Mars exploration, habitats, robotics, asteroid resources, and possible future missions."},
+    {"name":"Space Pioneers","format":"Biography / history","episode_length":"10–20 min","concept":"Scientists, engineers, astronauts, and other people who shaped space exploration."},
+    {"name":"Deep Space","format":"Ambient / visual","episode_length":"15–60 min","concept":"Cinematic journeys through planets, nebulae, and galaxies with narration, music, or long ambient sequences."}
+  ],
+  "proposed_block": [
+    {"time":"6:00 AM","show":"Space Today"},
+    {"time":"6:15 AM","show":"The Night Sky"},
+    {"time":"6:30 AM","show":"Worlds Beyond"},
+    {"time":"6:50 AM","show":"How Space Works"},
+    {"time":"7:05 AM","show":"Astronaut"},
+    {"time":"7:25 AM","show":"Rocket Lab"},
+    {"time":"7:45 AM","show":"Mission Control"},
+    {"time":"8:15 AM","show":"Space Pioneers"},
+    {"time":"8:35 AM","show":"Cosmic History"},
+    {"time":"9:05 AM","show":"Cosmic Mysteries"},
+    {"time":"9:35 AM","show":"Beyond Earth"},
+    {"time":"10:00 AM","show":"Deep Space"}
+  ],
+  "reusable_assets": ["Solar System models","Earth and Moon","spacecraft","rockets","astronauts","observatories","mission-control environments","star fields","galaxies","scientific visualization components"]
+}

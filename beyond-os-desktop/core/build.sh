@@ -7,6 +7,8 @@ action=${1:-build}
 case "$action" in configure|build|installer|legal-info) ;; *) echo "Usage: bash build.sh [configure|build|installer|legal-info]" >&2; exit 2 ;; esac
 profile=${BEYOND_FLAVOUR:-core}
 case "$profile" in core|creator|academy|sentinel|gaming) ;; *) echo "This Core builder supports core, creator, academy, sentinel, and gaming; use the Home or Cyber builder for those editions." >&2; exit 2 ;; esac
+profile_version=1.0
+case "$profile" in core) profile_version=0.2 ;; creator) profile_version=0.1 ;; esac
 [[ $(uname -s) == Linux ]] || { echo "Build on a Linux host or Linux VM (not a Windows filesystem)." >&2; exit 1; }
 [[ $EUID -ne 0 ]] || { echo "Run Buildroot as a normal user." >&2; exit 1; }
 for command in make gcc g++ curl tar sha256sum python3 rsync cpio unzip patch; do
@@ -34,7 +36,22 @@ fi
 chmod +x "$core_source/board/x86_64/post-build.sh"
 chmod +x "$core_source/board/x86_64/post-image-uefi.sh"
 make -C "$source_dir" O="$output" BR2_EXTERNAL="$core_source" "$defconfig" BR2_BEYOND_PROFILE_ID="$profile"
-python3 "$core_source/tools/verify-config.py" "$core_source/configs/$defconfig" "$output/.config"
+if [[ "$profile" == creator ]]; then
+    sed -i 's/^BR2_BEYOND_PROFILE_ID=.*/BR2_BEYOND_PROFILE_ID="creator"/' "$output/.config"
+    if grep -q '^# BR2_PACKAGE_BEYOND_CREATOR is not set$' "$output/.config"; then
+        sed -i 's/^# BR2_PACKAGE_BEYOND_CREATOR is not set$/BR2_PACKAGE_BEYOND_CREATOR=y/' "$output/.config"
+    elif ! grep -q '^BR2_PACKAGE_BEYOND_CREATOR=y$' "$output/.config"; then
+        printf '%s\n' 'BR2_PACKAGE_BEYOND_CREATOR=y' >> "$output/.config"
+    fi
+    make -C "$source_dir" O="$output" BR2_EXTERNAL="$core_source" olddefconfig
+    creator_requested="$output/creator-requested.config"
+    cp "$core_source/configs/$defconfig" "$creator_requested"
+    sed -i 's/^BR2_BEYOND_PROFILE_ID=.*/BR2_BEYOND_PROFILE_ID="creator"/' "$creator_requested"
+    printf '%s\n' 'BR2_PACKAGE_BEYOND_CREATOR=y' >> "$creator_requested"
+    python3 "$core_source/tools/verify-config.py" "$creator_requested" "$output/.config"
+else
+    python3 "$core_source/tools/verify-config.py" "$core_source/configs/$defconfig" "$output/.config"
+fi
 if [[ "$action" == configure ]]; then
     echo "Configured Beyond Imagination OS. No kernel or image has been built."
     exit 0
@@ -51,11 +68,11 @@ if [[ "$action" == build ]]; then
         sha256sum bzImage rootfs.ext2 > SHA256SUMS
     )
     cp "$output/.config" "$output/images/beyond-core.config"
-    printf 'BIT OS %s v0.2 images: %s/images\n' "$profile" "$output"
+    printf 'BIT OS %s v%s images: %s/images\n' "$profile" "$profile_version" "$output"
 elif [[ "$action" == installer ]]; then
     test -s "$output/images/bit-os-core-0.2-installer.img"
     test -s "$output/images/bitCoreos.iso"
     test -s "$output/images/SHA256SUMS"
     cp "$output/.config" "$output/images/beyond-core-installer.config"
-    printf 'BIT OS %s v0.2 UEFI installer candidate: %s/images\n' "$profile" "$output"
+    printf 'BIT OS %s v%s UEFI installer candidate: %s/images\n' "$profile" "$profile_version" "$output"
 fi

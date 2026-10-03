@@ -34,11 +34,18 @@ function formatTime(seconds){
   return `${Math.floor(value/60)}:${String(value%60).padStart(2,'0')}`;
 }
 
-function createOverlay(container,label){
+function createOverlay(container,label,experience){
   const overlay=document.createElement('section');
-  overlay.className='btv-ad-break';
+  overlay.className=`btv-ad-break${experience==='breath-hourglass'?' is-breath-hourglass':''}`;
   overlay.setAttribute('aria-label',label);
-  overlay.innerHTML='<iframe class="btv-ad-game" data-btv-ad-game src="/beyond-games/bit-runner.php?break=1" title="Play Bit Runner during the Beyond TV break" loading="eager" allow="autoplay"></iframe><div class="btv-ad-slot" data-btv-ad-slot></div><div class="btv-ad-filler"><span>BEYOND TV · MINI-GAME BREAK</span><strong data-btv-ad-label></strong><p>Programming resumes in <b data-btv-ad-countdown>5:00</b></p></div>';
+  const gameExperiences={
+    'mini-game':{url:'/beyond-games/bit-runner.php?break=1',title:'Play Bit Runner during the Beyond TV break',eyebrow:'BEYOND TV · MINI-GAME BREAK'},
+    'tattoo-stencil':{url:'/beyond-games/tattoo-master.php?break=1',title:'Master a tattoo stencil during the Tattoo Channel break',eyebrow:'TATTOO CHANNEL · MASTER THE STENCIL'}
+  };
+  const gameExperience=gameExperiences[experience]||gameExperiences['mini-game'];
+  overlay.innerHTML=experience==='breath-hourglass'
+    ? '<div class="btv-breath-break" data-btv-breath-break><span class="btv-breath-eyebrow">DAILY BREATH TV · BREATH HOURGLASS</span><div class="btv-hourglass" aria-hidden="true"><span class="btv-hourglass-frame"></span><span class="btv-hourglass-top"></span><span class="btv-hourglass-stream"></span><span class="btv-hourglass-bottom"></span></div><strong class="btv-breath-cue" data-btv-breath-cue>Breathe in</strong><p class="btv-breath-copy" data-btv-breath-copy>Settle in. Programming returns shortly.</p><time class="btv-breath-time" data-btv-ad-countdown>5:00</time><small data-btv-ad-label></small></div><div class="btv-ad-slot" data-btv-ad-slot></div>'
+    : `<iframe class="btv-ad-game" data-btv-ad-game src="${gameExperience.url}" title="${gameExperience.title}" loading="eager" allow="autoplay"></iframe><div class="btv-ad-slot" data-btv-ad-slot></div><div class="btv-ad-filler"><span>${gameExperience.eyebrow}</span><strong data-btv-ad-label></strong><p>Programming resumes in <b data-btv-ad-countdown>5:00</b></p></div>`;
   const style=getComputedStyle(container);
   if(style.position==='static')container.style.position='relative';
   container.appendChild(overlay);
@@ -151,24 +158,46 @@ function playBreak(options={}){
     const container=options.container;
     if(!(container instanceof HTMLElement))return;
     const duration=Math.max(60,Number(options.duration||config.break_duration||300));
+    const experience=options.experience||window.BeyondTVAdBreakExperience||'mini-game';
     const contentVideo=options.contentVideo instanceof HTMLVideoElement?options.contentVideo:null;
     if(contentVideo)contentVideo.pause();
-    const overlay=createOverlay(container,config.label||'Commercial break');
+    const overlay=createOverlay(container,config.label||'Commercial break',experience);
     const label=overlay.querySelector('[data-btv-ad-label]');
     const countdown=overlay.querySelector('[data-btv-ad-countdown]');
     const filler=overlay.querySelector('.btv-ad-filler');
     const game=overlay.querySelector('[data-btv-ad-game]');
+    const breath=overlay.querySelector('[data-btv-breath-break]');
+    const breathCue=overlay.querySelector('[data-btv-breath-cue]');
+    const breathCopy=overlay.querySelector('[data-btv-breath-copy]');
     const endsAt=Date.now()+duration*1000;
-    const tick=()=>{countdown.textContent=formatTime((endsAt-Date.now())/1000)};
+    const breathPhases=[
+      {cue:'Breathe in',copy:'Slowly inhale through your nose.',className:'is-inhaling'},
+      {cue:'Hold gently',copy:'Let the moment become still.',className:'is-holding'},
+      {cue:'Breathe out',copy:'Release slowly and soften your shoulders.',className:'is-exhaling'},
+      {cue:'Rest',copy:'Notice the quiet before the next breath.',className:'is-resting'}
+    ];
+    const tick=()=>{
+      countdown.textContent=formatTime((endsAt-Date.now())/1000);
+      if(!breath||!breathCue||!breathCopy)return;
+      const elapsed=Math.max(0,duration-((endsAt-Date.now())/1000));
+      const phase=breathPhases[Math.floor(elapsed/4)%breathPhases.length];
+      breathCue.textContent=phase.cue;
+      breathCopy.textContent=phase.copy;
+      breath.classList.remove('is-inhaling','is-holding','is-exhaling','is-resting');
+      breath.classList.add(phase.className);
+    };
     tick();
     const countdownTimer=window.setInterval(tick,1000);
     const adState=playing=>{
-      filler.hidden=playing;
-      game.hidden=playing;
+      if(filler)filler.hidden=playing;
+      if(game)game.hidden=playing;
+      if(breath)breath.hidden=playing;
       overlay.classList.toggle('is-serving-ad',playing);
-      try{game.contentWindow?.postMessage({type:'beyond-tv:break-ad-state',playing},location.origin)}catch(_){}
+      try{game?.contentWindow?.postMessage({type:'beyond-tv:break-ad-state',playing},location.origin)}catch(_){}
     };
-    label.textContent='Play Bit Runner while you wait';
+    label.textContent=experience==='breath-hourglass'
+      ? 'Programming resumes after this mindful pause'
+      : (experience==='tattoo-stencil'?'Trace the stencil while you wait':'Play Bit Runner while you wait');
     try{
       if(window.BeyondTVNativeAds?.postMessage){
         const nativeStarted=await startNativeAd(adState);

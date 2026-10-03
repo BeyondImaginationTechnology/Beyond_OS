@@ -8,11 +8,11 @@
   {"number":7,"slug":"classic-cartoon-theater","name":"Beyond Sci-Fi","icon":"🛸","description":"Science-fiction stories, cosmic adventures, and futuristic worlds.","category":"Sci-Fi"},
   {"number":8,"slug":"bubble-guppies","name":"Preschool English","icon":"🐾","description":"Bluey, Bubble Guppies, Blue's Clues, and English preschool favorites.","category":"Preschool"},
   {"number":9,"slug":"preschool-francais","name":"Préscolaire Français","icon":"🇫🇷","description":"Caillou et des histoires éducatives dans un canal préscolaire entièrement en français.","category":"Preschool"},
-  {"number":10,"slug":"space-tv","name":"Beyond Space","icon":"🛰️","description":"Space science, NASA, and cosmic ambience.","category":"Science"},
+  {"number":10,"slug":"space-tv","name":"Space TV","icon":"🛰️","description":"24/7 astronomy, planetary science, spacecraft, space exploration, and cosmic history.","category":"Science"},
   {"number":11,"slug":"beyond-ancient","name":"Beyond History","icon":"📜","description":"History, civilizations, archaeology, and the stories that shaped the world.","category":"History"},
-  {"number":12,"slug":"beyond-french","name":"Beyond French","icon":"🇫🇷","description":"Beyond French lessons, daily practice, conversation, and French culture.","category":"Education"},
+  {"number":12,"slug":"beyond-french","name":"French","icon":"🇫🇷","description":"French-language learning and culture, with Beyond French as the flagship series.","category":"Language & Culture"},
   {"number":13,"slug":"beyond-health","name":"Beyond Health","icon":"💚","description":"Fitness, nutrition, meditation, and wellness.","category":"Wellness"},
-  {"number":14,"slug":"mrbeast-tv","name":"Daily Breath","icon":"🌿","description":"Daily scripture, reflection, prayer, and a moment to breathe.","category":"Faith & Wellness"},
+  {"number":14,"slug":"mrbeast-tv","name":"Daily Breath TV","icon":"🌿","description":"Faith, reflection, family animation, culture, nature, and wellbeing across 12 recurring shows.","category":"Faith & Wellness"},
   {"number":15,"slug":"redbull-tv","name":"Tattoo Channel","icon":"✒️","description":"Tattoo artistry, artist spotlights, and creative ink culture.","category":"Culture"},
   {"number":16,"slug":"beyond-mystery","name":"Beyond Technology","icon":"💻","description":"Technology, innovation, digital culture, and the ideas shaping tomorrow.","category":"Technology"}
 ]

@@ -103,7 +103,7 @@ function beyond_inject_splash_assets(string $html): string {
     }
     return preg_replace('/<\/head>/i', beyond_splash_assets_markup() . '</head>', $html, 1) ?? $html;
 }
-function require_beyond_id(): void { if (empty($_SESSION['user_id'])) { $_SESSION['beyond_return_to'] = beyond_return_url(); header('Location: ' . beyond_url('beyond-id/auth/login.php?required=1')); exit; } }
+function require_beyond_id(): void { if (empty($_SESSION['user_id']) || !beyond_refresh_browser_identity(beyond_db())) { $_SESSION['beyond_return_to'] = beyond_return_url(); header('Location: ' . beyond_url('beyond-id/auth/login.php?required=1')); exit; } }
 function beyond_db(): PDO {
     $databaseBootstrap = __DIR__ . '/../beyond-id/includes/db.php';
     if (!is_file($databaseBootstrap)) {

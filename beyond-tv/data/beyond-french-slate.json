@@ -1,0 +1,24 @@
+{
+  "channel_slug": "beyond-french",
+  "status": "development",
+  "theme": "Learn → Practice → Experience → Immerse",
+  "shows": [
+    {"name":"Beyond French","format":"Language learning","episode_length":"10–15 min","concept":"Practical speaking and comprehension built around the Beyond French learning project.","project_url":"/beyond-french/"},
+    {"name":"Bonjour!","format":"Daily morning","episode_length":"10–20 min","concept":"Conversational French, a phrase of the day, culture, and a short lesson."},
+    {"name":"French in 5","format":"Micro-learning","episode_length":"5 min","concept":"One useful concept per episode, from greetings and numbers to verbs, questions, and pronunciation."},
+    {"name":"Café Français","format":"Conversation","episode_length":"10–15 min","concept":"Natural dialogue in cafés, shops, and everyday situations."},
+    {"name":"French Adventures","format":"Animated series","episode_length":"8–12 min","concept":"Stories that teach vocabulary through the plot."},
+    {"name":"Speak French","format":"Pronunciation","episode_length":"5–10 min","concept":"Listening, accents, pronunciation, and speaking exercises."},
+    {"name":"French Kitchen","format":"Food & culture","episode_length":"10–20 min","concept":"Recipes, ingredients, and Francophone food culture taught in French."},
+    {"name":"Voyage en Français","format":"Travel","episode_length":"10–20 min","concept":"French for airports, hotels, restaurants, transportation, and travel."},
+    {"name":"Francophone World","format":"Culture/documentary","episode_length":"10–20 min","concept":"French-speaking communities in Canada, Europe, Africa, the Caribbean, and beyond."},
+    {"name":"French Stories","format":"Storytelling","episode_length":"10–15 min","concept":"Short French stories with vocabulary and comprehension support."},
+    {"name":"French Challenge","format":"Game/quiz","episode_length":"10–15 min","concept":"Vocabulary games, listening challenges, sentence building, and viewer quizzes."},
+    {"name":"French Cinema Club","format":"Entertainment/learning","episode_length":"15–30 min","concept":"Original French-language shorts followed by discussion of dialogue and expressions."}
+  ],
+  "blocks": [
+    {"name":"Morning · Beginner","hours":"6:00 AM–12:00 PM","goal":"Learn","shows":["Bonjour!","French in 5","Beyond French"]},
+    {"name":"Afternoon · Practical French","hours":"12:00–6:00 PM","goal":"Practice","shows":["Café Français","Speak French","Voyage en Français","French Kitchen","French Challenge"]},
+    {"name":"Evening · Immersion","hours":"6:00 PM–12:00 AM","goal":"Experience · Immerse","shows":["French Adventures","French Stories","Francophone World","French Cinema Club"]}
+  ]
+}

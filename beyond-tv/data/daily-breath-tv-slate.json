@@ -1,0 +1,39 @@
+{
+  "channel_slug": "mrbeast-tv",
+  "network_name": "Daily Breath TV",
+  "status": "development",
+  "theme": "Reflect → Learn → Wonder → Rest",
+  "project_url": "/dailybreath/",
+  "project_label": "Explore Daily Breath",
+  "shows": [
+    {"name":"Daily Breath","format":"Daily devotional","episode_length":"3–5 min","concept":"Scripture, reflection, prayer, and a thought for the day.","project_url":"/dailybreath/"},
+    {"name":"Moe, Dovi & Chris","format":"Animated series","episode_length":"5–8 min","concept":"Character-driven adventures about friendship, choices, faith, and everyday life.","flagship":true},
+    {"name":"Stories of Faith","format":"Animated anthology","episode_length":"8–12 min","concept":"Individual stories drawn from the Bible, Torah, Quran, and other faith and history traditions."},
+    {"name":"Morning Breath","format":"Morning show","episode_length":"15–30 min","concept":"Reflection, community headlines, wellness, and inspiration to start the day."},
+    {"name":"Night Breath","format":"Bedtime / evening","episode_length":"10–20 min","concept":"Calm stories, meditation, prayer, and relaxing visuals."},
+    {"name":"Big Questions","format":"Educational / discussion","episode_length":"8–15 min","concept":"Accessible conversations about forgiveness, faith, prayer, and fear."},
+    {"name":"Little Lessons","format":"Kids animation","episode_length":"3–7 min","concept":"Animated stories about kindness, honesty, patience, gratitude, and courage."},
+    {"name":"The World of Faith","format":"Documentary","episode_length":"10–20 min","concept":"Traditions, architecture, holidays, food, music, and communities around the world."},
+    {"name":"Breath of History","format":"Animated history","episode_length":"8–15 min","concept":"People, civilizations, inventions, and events connected to religion and culture."},
+    {"name":"Nature & Wonder","format":"Relaxation / educational","episode_length":"10–30 min","concept":"Animals, oceans, space, forests, and nature with narration and ambient music."},
+    {"name":"Faith Kitchen","format":"Food / culture","episode_length":"10–15 min","concept":"Foods and traditions around Ramadan, Passover, Christmas, Diwali, and other celebrations."},
+    {"name":"Daily Breath Stories","format":"Original shorts","episode_length":"5–10 min","concept":"Fictional stories about families and communities facing real-life situations."}
+  ],
+  "blocks": [
+    {"name":"Morning · Begin well","hours":"6:00 AM–12:00 PM","goal":"Reflect","shows":["Morning Breath","Daily Breath","Nature & Wonder","Little Lessons","Moe, Dovi & Chris","Stories of Faith","Breath of History","Big Questions"]},
+    {"name":"Afternoon · Discover","hours":"12:00–6:00 PM","goal":"Learn","shows":["The World of Faith","Faith Kitchen","Breath of History","Big Questions","Daily Breath Stories"]},
+    {"name":"Evening · Stories & culture","hours":"6:00–9:00 PM","goal":"Wonder","shows":["Moe, Dovi & Chris","Stories of Faith","Daily Breath Stories","The World of Faith"]},
+    {"name":"Night · Unwind","hours":"9:00 PM–6:00 AM","goal":"Rest","shows":["Night Breath","Nature & Wonder","Daily Breath"]}
+  ],
+  "sample_morning": [
+    {"time":"6:00 AM","show":"Morning Breath"},
+    {"time":"6:30 AM","show":"Daily Breath"},
+    {"time":"6:35 AM","show":"Nature & Wonder"},
+    {"time":"7:00 AM","show":"Little Lessons"},
+    {"time":"7:10 AM","show":"Moe, Dovi & Chris"},
+    {"time":"7:20 AM","show":"Stories of Faith"},
+    {"time":"7:35 AM","show":"Breath of History"},
+    {"time":"8:00 AM","show":"Big Questions"}
+  ],
+  "production_pipeline": ["Show","Season","Episode","Script","Characters","Environments","Scenes","Shots","Animation","Voice / Audio","Edit","Master","Daily Breath TV Schedule"]
+}

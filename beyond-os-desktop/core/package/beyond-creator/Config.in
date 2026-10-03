@@ -1,0 +1,8 @@
+config BR2_PACKAGE_BEYOND_CREATOR
+	bool "BIT OS Creator Hub"
+	depends on BR2_PACKAGE_SDL2
+	depends on BR2_PACKAGE_SDL2_TTF
+	depends on BR2_PACKAGE_SDL2_X11
+	help
+	  Native workspace setup, app chooser, Beyond Music and Beyond Wallpapers
+	  experience for BIT OS Creator 0.1.

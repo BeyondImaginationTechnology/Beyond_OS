@@ -24,12 +24,11 @@ if (empty($_SESSION['user_id'])) {
     }
 }
 
-if (empty($_SESSION['user_id'])) {
+if (empty($_SESSION['user_id']) || !beyond_refresh_browser_identity($pdo)) {
     $_SESSION['beyond_return_to'] = $_SERVER['REQUEST_URI'] ?? '/';
     header('Location: ../auth/login.php?required=1');
     exit;
 }
 
-touch_session($pdo, (int)$_SESSION['user_id']);
 require_once __DIR__ . '/../../includes/ecosystem.php';
 beyond_nav_bootstrap('Beyond ID');

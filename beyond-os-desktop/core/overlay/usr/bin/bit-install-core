@@ -5,6 +5,16 @@ set -o pipefail
 
 efi_guid=c12a7328-f81f-11d2-ba4b-00a0c93ec93b
 linux_guid=0fc63daf-8483-4772-8e79-3d69d8477de4
+edition=Core
+release=v0.2
+filesystem_label=BEYOND_CORE
+if [ -r /usr/share/beyond-imagination-os/flavour ] &&
+   [ "$(cat /usr/share/beyond-imagination-os/flavour)" = creator ]; then
+  edition=Creator
+  release=v0.1
+  filesystem_label=BEYOND_CREATOR
+fi
+product="BIT OS $edition"
 
 fail() { printf '%s\n' "Installer stopped: $*" >&2; exit 1; }
 notice() { printf '%s\n' "$*"; }
@@ -41,20 +51,20 @@ case "$source_root" in
     ;;
 esac
 
-notice "BIT OS Core v0.2 installer"
-notice "Choose where Core will be installed. The installer never chooses a disk automatically."
+notice "$product $release installer"
+notice "Choose where $edition will be installed. The installer never chooses a disk automatically."
 notice "\nAvailable block devices:"
 lsblk -o NAME,SIZE,TYPE,FSTYPE,PARTTYPE,MODEL,MOUNTPOINTS
 notice "\nInstallation choices:"
 notice "  1) Use an existing Linux partition (keeps Windows and other partitions)"
-notice "  2) Erase a whole non-USB disk for BIT OS Core"
+notice "  2) Erase a whole non-USB disk for $product"
 printf 'Choose 1 or 2: '
 IFS= read -r mode
 
 target_esp_new=false
 case "$mode" in
   1)
-    notice "\nSelect an empty Linux partition. It must be at least as large as the Core image."
+    notice "\nSelect an empty Linux partition. It must be at least as large as the $edition image."
     printf 'Target Linux partition (example: /dev/nvme0n1p5): '
     IFS= read -r target_root
     [ -b "$target_root" ] || fail "target is not a block device"
@@ -67,7 +77,7 @@ case "$mode" in
     root_type=$(lsblk -n -o PARTTYPE "$target_root" | head -n 1 | tr '[:upper:]' '[:lower:]')
     [ "$root_type" = "$linux_guid" ] || fail "target must use the Linux filesystem partition type; refusing to overwrite a Windows/basic-data partition"
     unmounted "$target_root" || fail "target partition is mounted"
-    [ "$(blockdev --getsize64 "$target_root")" -ge "$source_bytes" ] || fail "target partition is smaller than the Core image"
+    [ "$(blockdev --getsize64 "$target_root")" -ge "$source_bytes" ] || fail "target partition is smaller than the $edition image"
 
     printf 'EFI System Partition on %s (example: /dev/nvme0n1p1): ' "$target_disk"
     IFS= read -r target_esp
@@ -79,7 +89,7 @@ case "$mode" in
     [ "$(blkid -s TYPE -o value "$target_esp" || true)" = vfat ] || fail "EFI System Partition must contain a FAT filesystem"
     unmounted "$target_esp" || fail "EFI System Partition is mounted"
 
-    notice "\nThe next step replaces only $target_root and adds a BIT OS Core UEFI entry."
+    notice "\nThe next step replaces only $target_root and adds a $product UEFI entry."
     notice "It does not format $target_esp or replace Windows Boot Manager."
     printf 'Type exactly: INSTALL %s\n> ' "$target_root"
     IFS= read -r confirmation
@@ -98,13 +108,13 @@ case "$mode" in
     # discover that the root partition could not hold the image.
     layout_overhead=$((512 * 1024 * 1024 + 4 * 1024 * 1024))
     required_bytes=$((source_bytes + layout_overhead))
-    [ "$(blockdev --getsize64 "$target_disk")" -ge "$required_bytes" ] || fail "disk is too small for the Core image and EFI layout"
+    [ "$(blockdev --getsize64 "$target_disk")" -ge "$required_bytes" ] || fail "disk is too small for the $edition image and EFI layout"
     unmounted "$target_disk" || fail "refusing to erase a disk with mounted or active descendant devices"
     printf 'Type exactly: ERASE %s\n> ' "$target_disk"
     IFS= read -r confirmation
     [ "$confirmation" = "ERASE $target_disk" ] || fail "confirmation did not match"
 
-    notice "Creating the BIT OS Core partition layout..."
+    notice "Creating the $product partition layout..."
     wipefs -a "$target_disk"
     printf 'label: gpt\n,512M,U\n,,L\n' | sfdisk --wipe always --wipe-partitions always "$target_disk"
     blockdev --rereadpt "$target_disk" || true
@@ -112,14 +122,14 @@ case "$mode" in
     sleep 2
     target_esp=$(lsblk -nrpo NAME,PARTTYPE "$target_disk" | awk -v type="$efi_guid" 'tolower($2) == type { print $1; exit }')
     target_root=$(lsblk -nrpo NAME,PARTTYPE "$target_disk" | awk -v type="$linux_guid" 'tolower($2) == type { print $1; exit }')
-    [ -b "$target_esp" ] && [ -b "$target_root" ] || fail "could not create the Core partition layout"
-    [ "$(blockdev --getsize64 "$target_root")" -ge "$source_bytes" ] || fail "new Core partition is smaller than the Core image"
+    [ -b "$target_esp" ] && [ -b "$target_root" ] || fail "could not create the $edition partition layout"
+    [ "$(blockdev --getsize64 "$target_root")" -ge "$source_bytes" ] || fail "new $edition partition is smaller than the $edition image"
     target_esp_new=true
     ;;
   *) fail "choose 1 or 2" ;;
 esac
 
-notice "Making the installer root read-only and copying the Core filesystem..."
+notice "Making the installer root read-only and copying the $edition filesystem..."
 mount -o remount,ro / || fail "could not protect the source filesystem"
 if [ "$source_kind" = usb ]; then
   # BusyBox dd in the installer does not implement GNU dd's status=progress.
@@ -127,7 +137,7 @@ if [ "$source_kind" = usb ]; then
   e2fsck -pf "$target_root" || [ "$?" -eq 1 ] || fail "filesystem check failed"
   resize2fs "$target_root"
 else
-  mkfs.ext4 -F -L BEYOND_CORE "$target_root"
+  mkfs.ext4 -F -L "$filesystem_label" "$target_root"
   install -d /tmp/bit-target-root /tmp/bit-source-root
   mount "$target_root" /tmp/bit-target-root
   # A second read-only mount exposes the pristine ISO tree without the live
@@ -162,7 +172,8 @@ else
   cp /tmp/bit-core-bootx64.efi /tmp/bit-target-esp/EFI/BITOS/bootx64.efi
   cp /boot/bzImage /tmp/bit-target-esp/EFI/BITOS/bzImage
 fi
-sed "s/%PARTUUID%/$target_uuid/g" /usr/share/beyond-core/grub-installed.cfg.in > /tmp/bit-target-esp/EFI/BITOS/grub.cfg
+sed -e "s/%PARTUUID%/$target_uuid/g" -e "s/%PRODUCT%/$product $release/g" \
+  /usr/share/beyond-core/grub-installed.cfg.in > /tmp/bit-target-esp/EFI/BITOS/grub.cfg
 sync
 umount /tmp/bit-target-esp
 
@@ -173,6 +184,6 @@ efi_vars=/sys/firmware/efi/efivars
 if ! grep -qs " $efi_vars efivarfs " /proc/mounts; then
   mount -t efivarfs efivarfs "$efi_vars" || fail "could not mount UEFI variable storage"
 fi
-efibootmgr -c -d "$target_disk" -p "$esp_number" -L "BIT OS Core" -l '\EFI\BITOS\bootx64.efi'
-notice "Installation completed. Remove the USB and choose BIT OS Core from UEFI boot options."
+efibootmgr -c -d "$target_disk" -p "$esp_number" -L "$product" -l '\EFI\BITOS\bootx64.efi'
+notice "Installation completed. Remove the USB and choose $product from UEFI boot options."
 exec /sbin/reboot -f

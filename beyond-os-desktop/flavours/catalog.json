@@ -27,7 +27,8 @@
       "purpose": "Design, code, music, and production work.",
       "base": "core",
       "profile": "creator",
-      "status": "profile-defined"
+      "buildTree": "../core",
+      "status": "source-implemented"
     },
     {
       "id": "academy",

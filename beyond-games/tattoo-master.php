@@ -3,6 +3,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/app-layout.php';
 require_once __DIR__ . '/../beyond-tattoo/includes/library-catalog.php';
 $wallet = beyond_nav_bootstrap('Beyond Games');
+$isBreakEmbed = isset($_GET['break']) && $_GET['break'] === '1';
 $studioStencils = [];
 foreach (bt_library_collections() as $collectionSlug => $collection) {
   foreach ($collection['stencils'] as $index => [$title, $releaseDate]) {
@@ -35,7 +36,7 @@ $studioStencilsJson = json_encode($studioStencils, JSON_UNESCAPED_SLASHES | JSON
     @media(max-width:880px){.tm-game{grid-template-columns:1fr}.tm-stage{min-height:auto;padding:16px}.tm-panel{border-left:0;border-top:1px solid #3a263b}.tm-panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}.tm-action{grid-column:1/-1}.tm-status{align-items:flex-start}.tm-metrics{gap:12px}.tm-metric:first-child{display:none}}@media(max-width:560px){.tm-main{width:100%;padding:0}.tm-topbar{padding:12px}.tm-save{display:none}.tm-shell{border-radius:0;border-left:0;border-right:0}.tm-status{padding:10px 12px}.tm-client strong{font-size:.8rem}.tm-stage{padding:9px}.tm-canvas-wrap{border-width:6px;border-radius:20px}.tm-panel{padding:17px 14px}.tm-panel-grid{display:block}.tm-results{position:fixed}.tm-hint{bottom:10px;font-size:.58rem}.tm-metrics{font-size:.75rem}}
   </style>
 </head>
-<body class="bos-page tm-page">
+<body class="bos-page tm-page<?=$isBreakEmbed ? ' tm-break-mode' : ''?>">
 <main class="tm-main">
   <div class="tm-topbar"><a class="tm-back" href="/beyond-games/">← Beyond Games</a><div class="tm-brand">Beyond <b>Tattoo</b> / Master</div><span class="tm-save">● Progress saved locally</span></div>
   <section class="tm-shell">
@@ -94,7 +95,20 @@ $studioStencilsJson = json_encode($studioStencils, JSON_UNESCAPED_SLASHES | JSON
   document.querySelectorAll('[data-placement]').forEach(b=>b.onclick=()=>{placement=b.dataset.placement;document.querySelectorAll('[data-placement]').forEach(x=>x.classList.toggle('active',x===b));$('#placementText').textContent=placement[0].toUpperCase()+placement.slice(1)+' · 80%'});
   const picker=$('#stencilPicker');studioStencils.forEach((stencil,index)=>{const b=document.createElement('button');b.type='button';b.dataset.stencil=index;b.className=index===0?'active':'';b.title=stencil.title;b.innerHTML=`<img src="${stencil.image}" alt=""><span>${String(index+1).padStart(2,'0')}</span>`;b.onclick=()=>{selectedStencil=stencil;picker.querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));$('#selectedStencil').textContent=`${stencil.title} · ${stencil.style}`};picker.appendChild(b)});if(selectedStencil)$('#selectedStencil').textContent=`${selectedStencil.title} · ${selectedStencil.style}`;
   $('#clientSelect').onchange=e=>{$('#clientType').textContent={nervous:'Comfort priority',collector:'Fast decisions',coverup:'Trust builder',rush:'Time pressure',large:'Endurance session'}[e.target.value]};
-  $('#finish').onclick=finish;$('#clear').onclick=()=>reset(false);$('#nextClient').onclick=()=>reset();$('#rep').textContent=(localStorage.getItem('tattoo-master-rep')||0)+' ★';drawGuide();reset();
+  $('#finish').onclick=finish;$('#clear').onclick=()=>reset(false);$('#nextClient').onclick=()=>reset();$('#rep').textContent=(localStorage.getItem('tattoo-master-rep')||0)+' ★';window.addEventListener('message',event=>{if(event.origin!==location.origin||event.data?.type!=='beyond-tv:break-ad-state')return;clearInterval(tick);if(!event.data.playing&&!ended)tick=setInterval(time,1000)});drawGuide();reset();
 })();
 </script>
+<?php if ($isBreakEmbed): ?>
+<style>
+html,body.tm-break-mode{height:100%;overflow:hidden}
+.tm-break-mode #beyond-os-shell,.tm-break-mode .tm-topbar,.tm-break-mode .tm-panel{display:none!important}
+.tm-break-mode .tm-main{width:100%!important;height:100dvh!important;padding:0!important}
+.tm-break-mode .tm-shell{height:100dvh;border:0!important;border-radius:0!important;box-shadow:none!important}
+.tm-break-mode .tm-game{display:block;height:calc(100dvh - 72px)}
+.tm-break-mode .tm-stage{height:100%;min-height:0;padding:12px}
+.tm-break-mode .tm-canvas-wrap{height:min(100%,720px);width:auto;max-width:100%;max-height:100%;aspect-ratio:1}
+.tm-break-mode .tm-results{position:fixed}
+@media(max-width:560px){.tm-break-mode .tm-game{height:calc(100dvh - 64px)}.tm-break-mode .tm-status{min-height:64px}}
+</style>
+<?php endif; ?>
 <?php bos_page_end(); ?>

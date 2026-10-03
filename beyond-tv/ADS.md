@@ -23,8 +23,14 @@ tag value.
 
 When the tag is missing, invalid, blocked, or returns no inventory, the player
 keeps the five minute break and offers Bit Runner as an interactive intermission.
-The game pauses and hides while an ad plays. An ad impression is only recorded
-by the serving ad SDK, not by the break countdown or the game.
+Daily Breath TV is the exception: its channel page uses the branded Breath
+Hourglass with a calm breathing cycle and countdown. Either fallback pauses and
+hides while an ad plays. An ad impression is only recorded by the serving ad
+SDK, not by the break countdown, hourglass, or game.
+
+Break experiences are selected per channel. Tattoo Channel uses Tattoo Master
+in a focused stencil-tracing mode. Channels without a dedicated experience use
+Bit Runner until their own original mini-game is assigned.
 
 ## Direct sponsor inventory
 

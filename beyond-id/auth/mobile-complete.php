@@ -14,6 +14,7 @@ header('X-Content-Type-Options: nosniff');
 $scheme = strtolower(trim((string)($_GET['scheme'] ?? '')));
 $client = beyond_api_client_for_scheme($scheme);
 $userId = (int)($_SESSION['user_id'] ?? 0);
+if ($userId > 0 && !beyond_refresh_browser_identity($pdo)) $userId = 0;
 $challenge = trim((string)($_GET['code_challenge'] ?? ''));
 $callback = static function (string $scheme, string $key, string $value): never {
     header('Location: ' . $scheme . '://auth?' . http_build_query([$key => $value], '', '&', PHP_QUERY_RFC3986));

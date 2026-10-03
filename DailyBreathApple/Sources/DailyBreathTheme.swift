@@ -179,3 +179,32 @@ struct DailyBreathThemeBackground: View {
         }
     }
 }
+
+struct DailyBreathHomeBackground: View {
+    let theme: DailyBreathTheme
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                DailyBreathThemeBackground(theme: theme)
+                if let artwork = theme.artworkName {
+                    Image(artwork)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipped()
+                        .overlay {
+                            LinearGradient(
+                                colors: [.black.opacity(0.38), .black.opacity(0.20), .black.opacity(0.42)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        }
+                }
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height)
+        }
+        .ignoresSafeArea()
+        .accessibilityHidden(true)
+    }
+}

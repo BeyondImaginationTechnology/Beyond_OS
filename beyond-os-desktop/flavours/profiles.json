@@ -2,7 +2,7 @@
   "creator": {
     "base": "core",
     "displayName": "Beyond Imagination OS Creator",
-    "packages": ["blender", "gimp", "krita", "vscode", "git", "audacity", "ffmpeg"],
+    "packages": ["beyond-creator", "beyond-tattoo", "beyond-music", "beyond-wallpapers", "kdenlive", "obs", "krita", "inkscape", "gimp", "vscodium", "git", "audacity", "lmms"],
     "integrations": {
       "adobeCreativeCloud": {
         "enabled": true,
@@ -11,7 +11,13 @@
         "nativeDesktopInstaller": "unsupported-on-linux"
       }
     },
-    "defaults": ["creative-workspace", "hardware-acceleration-when-available", "large-file-workflow"]
+    "workspaces": {
+      "video": {"name": "Golden Hour Studio", "jaguarHue": "#FFB45C"},
+      "design": {"name": "Ink & Canvas", "jaguarHue": "#F07D70"},
+      "code": {"name": "Electric Atelier", "jaguarHue": "#F26BC2"},
+      "music": {"name": "Blue Note Studio", "jaguarHue": "#42D6C7"}
+    },
+    "defaults": ["creator-hub", "choose-your-apps", "beyond-music", "beyond-wallpapers", "creative-workspace", "large-file-workflow"]
   },
   "academy": {
     "base": "core",

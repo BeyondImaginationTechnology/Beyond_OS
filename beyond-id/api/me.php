@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/../includes/session.php';
+require_once __DIR__ . '/../includes/functions.php';
 require_once __DIR__ . '/../includes/mobile-auth.php';
 require_once __DIR__ . '/../includes/db.php';
 header('Content-Type: application/json; charset=utf-8');
@@ -27,6 +28,9 @@ if (beyond_mobile_authorization_header() !== '') {
         echo json_encode(['ok'=>false,'authenticated'=>false,'error'=>'Bearer token is invalid, expired, revoked, or missing the required scope.']);
         exit;
     }
+}
+elseif ($userId > 0 && !beyond_refresh_browser_identity($pdo)) {
+    $userId = 0;
 }
 if ($userId <= 0) {
     http_response_code(401);

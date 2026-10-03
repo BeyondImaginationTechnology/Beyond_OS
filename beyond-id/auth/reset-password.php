@@ -35,9 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->prepare('UPDATE users SET password_hash=? WHERE id=?')->execute([$hash, (int)$reset['user_id']]);
             }
             $pdo->prepare('UPDATE password_resets SET used_at=? WHERE id=? AND used_at IS NULL')->execute([date('Y-m-d H:i:s'), (int)$reset['id']]);
-            beyondRememberRevokeAll($pdo, (int)$reset['user_id']);
+            beyond_revoke_all_account_access($pdo, (int)$reset['user_id']);
             $pdo->commit();
             log_activity($pdo, (int)$reset['user_id'], 'password_reset');
+            if ((int)($_SESSION['user_id'] ?? 0) === (int)$reset['user_id']) beyond_clear_browser_identity();
             $done = true;
             $reset = false;
         } catch (Throwable $exception) {

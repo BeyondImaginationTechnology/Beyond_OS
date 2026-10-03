@@ -2,15 +2,20 @@
   const $ = (selector) => document.querySelector(selector);
   const flavourButtons = [...document.querySelectorAll('.flavour')];
   const planButtons = [...document.querySelectorAll('.plan')];
+  const modeButtons = [...document.querySelectorAll('.mode')];
   const requestButton = $('#startSeat');
   const csrf = document.body.dataset.requestToken;
-  const state = { flavour: 'Gaming', plan: 'Build' };
+  const state = { flavour: 'Gaming', plan: 'Build', work_mode: 'developer' };
+  const modeNames = { developer: 'Linux developer workstation', creative: 'Linux creator workstation', gaming: 'Linux game launcher' };
   let savedRequest = null;
 
   const select = (buttons, key, value) => {
     const button = buttons.find((item) => item.dataset[key] === value);
     if (!button) return false;
-    buttons.forEach((item) => item.classList.toggle('selected', item === button));
+    buttons.forEach((item) => {
+      item.classList.toggle('selected', item === button);
+      item.setAttribute('aria-pressed', item === button ? 'true' : 'false');
+    });
     state[key] = value;
     return true;
   };
@@ -22,15 +27,16 @@
   const render = () => {
     const flavour = flavourButtons.find((item) => item.dataset.flavour === state.flavour);
     const plan = planButtons.find((item) => item.dataset.plan === state.plan);
-    if (!flavour || !plan) return;
+    if (!flavour || !plan || !modeNames[state.work_mode]) return;
     $('#chosenFlavour').textContent = $('#previewFlavour').textContent = state.flavour;
     $('#chosenPlan').textContent = $('#previewPlan').textContent = state.plan;
+    $('#chosenMode').textContent = modeNames[state.work_mode];
     $('#flavourDescription').textContent = flavour.dataset.desc;
     for (const key of ['ram', 'cpu', 'gpu', 'storage']) {
       $('#' + key).textContent = $('#preview' + key[0].toUpperCase() + key.slice(1)).textContent = plan.dataset[key];
     }
     if (requestButton) {
-      const unchanged = savedRequest && savedRequest.flavour === state.flavour && savedRequest.plan === state.plan;
+      const unchanged = savedRequest && savedRequest.flavour === state.flavour && savedRequest.plan === state.plan && savedRequest.work_mode === state.work_mode;
       const locked = savedRequest && savedRequest.status !== 'requested';
       requestButton.disabled = Boolean(unchanged || locked);
       requestButton.innerHTML = locked ? 'Request is being handled <span>✓</span>'
@@ -52,8 +58,10 @@
     } else {
       select(flavourButtons, 'flavour', request.flavour);
       select(planButtons, 'plan', request.plan);
+      state.work_mode = modeNames[request.work_mode] ? request.work_mode : 'developer';
+      select(modeButtons, 'mode', state.work_mode);
       $('#accountStatus').textContent = request.status === 'requested' ? 'Request saved' : request.status;
-      $('#accountDetails').textContent = `${request.flavour} · ${request.plan}. No machine has been started from this page.`;
+      $('#accountDetails').textContent = `${request.flavour} · ${request.plan} · ${modeNames[state.work_mode]}. No machine has been started from this page.`;
       $('#accountId').textContent = request.request_id;
       const date = new Date(request.requested_at.replace(' ', 'T') + 'Z');
       $('#accountDate').textContent = Number.isNaN(date.getTime()) ? request.requested_at : date.toLocaleString();
@@ -70,12 +78,19 @@
     select(planButtons, 'plan', button.dataset.plan);
     render();
   }));
+  modeButtons.forEach((button) => button.addEventListener('click', () => {
+    state.work_mode = button.dataset.mode;
+    select(modeButtons, 'mode', state.work_mode);
+    render();
+  }));
 
   try {
     const previous = JSON.parse(localStorage.getItem('beyondWebsSeat') || 'null');
     if (previous && typeof previous === 'object') {
       select(flavourButtons, 'flavour', previous.flavour?.name || previous.flavour);
       select(planButtons, 'plan', previous.plan?.name || previous.plan);
+      state.work_mode = modeNames[previous.work_mode] ? previous.work_mode : 'developer';
+      select(modeButtons, 'mode', state.work_mode);
     }
   } catch (_) { /* Use the default configuration. */ }
   render();
@@ -99,7 +114,7 @@
       const response = await fetch('api/session.php', {
         method: 'POST', credentials: 'same-origin', cache: 'no-store',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ csrf, flavour: state.flavour, plan: state.plan })
+        body: JSON.stringify({ csrf, flavour: state.flavour, plan: state.plan, work_mode: state.work_mode })
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not save your request.');

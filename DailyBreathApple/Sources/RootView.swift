@@ -164,14 +164,19 @@ private struct DailyBreathHomeView: View {
             + (store.entries.contains { Calendar.current.isDateInToday($0.createdAt) } ? 1 : 0)
     }
     private var tradition: FaithTradition { FaithTradition(rawValue: traditionID) ?? .bible }
+    private var selectedTheme: DailyBreathTheme { DailyBreathTheme(id: selectedThemeID) }
+    private var usesArtworkBackground: Bool { selectedTheme.artworkName != nil }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                BrandHeader()
-                Text("A steady beginning").font(.largeTitle.bold())
+                BrandHeader(onArtwork: usesArtworkBackground)
+                Text("A steady beginning")
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(usesArtworkBackground ? Color.white : Color.primary)
                 Text("Make room for a small faithful step today.")
-                    .font(.title3).foregroundStyle(.secondary)
+                    .font(.title3)
+                    .foregroundStyle(usesArtworkBackground ? Color.white.opacity(0.82) : Color.secondary)
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {
                         Label("Today’s rhythm", systemImage: "checklist.checked").font(.headline)
@@ -190,7 +195,9 @@ private struct DailyBreathHomeView: View {
                 Button { onNavigate(.today) } label: {
                     Label("Open Today · \(store.dailyVerse(for: tradition).reference)", systemImage: "sun.max.fill")
                         .font(.headline).frame(maxWidth: .infinity, alignment: .leading)
-                        .padding().background(DailyBreathTheme(id: selectedThemeID).primary.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
+                        .padding()
+                        .foregroundStyle(usesArtworkBackground ? Color.white : selectedTheme.primary)
+                        .background(usesArtworkBackground ? Color.black.opacity(0.42) : selectedTheme.primary.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
                 }
                 .buttonStyle(.plain)
                 ScriptureContinueReadingLink()
@@ -207,7 +214,7 @@ private struct DailyBreathHomeView: View {
             }
             .padding()
         }
-        .background(DailyBreathThemeBackground(theme: DailyBreathTheme(id: selectedThemeID)))
+        .background(DailyBreathHomeBackground(theme: selectedTheme))
         .navigationTitle("Home")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -252,6 +259,7 @@ enum DailyBreathCaptureRoute {
 }
 
 struct BrandHeader: View {
+    var onArtwork = false
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
 
     private var selectedTheme: DailyBreathTheme {
@@ -268,9 +276,10 @@ struct BrandHeader: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text("DAILYBREATH")
                     .font(.headline.weight(.black))
+                    .foregroundStyle(onArtwork ? Color.white : Color.primary)
                 Text("Faith-centered wellness")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(onArtwork ? Color.white.opacity(0.76) : Color.secondary)
             }
             Spacer()
         }

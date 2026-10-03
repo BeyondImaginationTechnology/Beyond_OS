@@ -69,6 +69,9 @@ struct SettingsAboutView: View {
                     }
                     .buttonStyle(.plain)
                 }
+                Text("Artwork themes appear on Home. Today keeps a clean reading background for clearer text and controls.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             Section {

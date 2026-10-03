@@ -389,7 +389,7 @@ $homeLiveControls = [
     'beyond-family' => ['theme'=>'family','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=beyond-family','embed'=>'/beyond-tv/embed-player.php?slug=beyond-family','icon'=>'sparkles','now'=>'Loading the live program...','next'=>'Live schedule connecting'],
     'bubble-guppies' => ['theme'=>'preschool','endpoint'=>'/beyond-tv/api/bluey-live.php','icon'=>'paw-print','now'=>'Loading the preschool schedule...','next'=>'Next preschool program loading'],
     'preschool-francais' => ['theme'=>'preschool-fr','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=preschool-francais','embed'=>'/beyond-tv/embed-player.php?slug=preschool-francais','icon'=>'languages','now'=>'Caillou en francais','next'=>'Histoires educatives en francais'],
-    'space-tv' => ['theme'=>'space','endpoint'=>'/beyond-tv/api/space-live.php','icon'=>'satellite','now'=>'The Sun & The Milky Way','next'=>'Weekly space rotation'],
+    'space-tv' => ['theme'=>'space','endpoint'=>'/beyond-tv/api/space-live.php','icon'=>'satellite','now'=>'NASA space programming','next'=>'See the daily schedule'],
     'beyond-health' => ['theme'=>'health','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=beyond-health','icon'=>'heart-pulse'],
     'mrbeast-tv' => ['theme'=>'daily-breath','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=mrbeast-tv','icon'=>'leaf'],
     'redbull-tv' => ['theme'=>'tattoo','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=redbull-tv','icon'=>'pen-tool'],

@@ -45,19 +45,22 @@ composition reads this file directly. Preview or render it locally with:
 npm run render:breath
 ```
 
-### Daily Breath 60-second story
+### Daily Breath devotional episode
 
-The Remotion `DailyBreathStory` composition uses a fixed 60-second, 1080×1920,
-30 FPS timeline. Its six editable narrative beats occupy 0:00–0:50; source
-credits run 0:50–0:55 and the branded Daily Breath outro runs 0:55–1:00.
-`public/daily-breath-story.json` is a complete example/default props file and
-can be rendered locally with:
+The Remotion `DailyBreathStory` composition reads its length from the editable
+beat timeline, source-card duration, and outro duration. The current first
+episode is **Enough for Today**, a Bible-only reflection on Matthew 6:25–34.
+Its current timeline is about 3½ minutes. The MP4 is a silent motion-graphics
+draft with the narration displayed as captions; record and mix the voiceover
+before treating it as a finished episode.
+`public/daily-breath-story.json` contains the narration, on-screen captions,
+visual direction, citation, and timing. Render a motion-graphics draft with:
 
 ```bash
 npm run render:story
 ```
 
-In Daily Studio, open DailyBreath → **60-second Story Builder**. Enter a topic
+In Daily Studio, open DailyBreath → **Story Builder**. Enter a topic
 and up to four source blocks in `citation | URL | excerpt or notes` format.
 Generation uses only the supplied excerpt/notes (URLs are credited but not
 fetched), returns the beat narration, concise screen text, and visual-production

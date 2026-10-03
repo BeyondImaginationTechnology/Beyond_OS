@@ -6,4 +6,10 @@ export SDL_VIDEODRIVER=x11
 cd "$HOME" || exit 1
 # Openbox runs this after claiming the display and initializing window management.
 # Starting the SDL desktop concurrently can leave its first window waiting to map.
-exec openbox --startup '/bin/sh -c "beyond-core; openbox --exit"'
+flavour=core
+[ ! -r /usr/share/beyond-imagination-os/flavour ] || flavour=$(cat /usr/share/beyond-imagination-os/flavour)
+case "$flavour" in
+    creator) desktop=beyond-creator ;;
+    *) desktop=beyond-core ;;
+esac
+exec openbox --startup "/bin/sh -c '$desktop; openbox --exit'"

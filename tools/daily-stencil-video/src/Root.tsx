@@ -12,6 +12,7 @@ import {
   DailyBreathStory,
   DailyBreathStoryProps,
   defaultDailyBreathStoryProps,
+  dailyBreathStoryDurationSeconds,
 } from './DailyBreathStory';
 
 const calculateMetadata: CalculateMetadataFunction<DailyStencilProps> = async ({props}) => {
@@ -40,16 +41,26 @@ const calculateDailyBreathMetadata: CalculateMetadataFunction<
   };
 };
 
+const calculateDailyBreathStoryMetadata: CalculateMetadataFunction<
+  DailyBreathStoryProps
+> = ({props}) => ({
+  durationInFrames: Math.round(dailyBreathStoryDurationSeconds(props) * props.fps),
+  fps: props.fps,
+  width: props.width,
+  height: props.height,
+});
+
 export const RemotionRoot: React.FC = () => (
   <>
     <Composition
       id="DailyBreathStory"
       component={DailyBreathStory}
-      durationInFrames={1800}
+      durationInFrames={6330}
       fps={30}
       width={1080}
       height={1920}
       defaultProps={defaultDailyBreathStoryProps}
+      calculateMetadata={calculateDailyBreathStoryMetadata}
     />
     <Composition id="DailyStencilPack" component={DailyStencilPack} durationInFrames={600} fps={60} width={1080} height={1080} defaultProps={defaultDailyStencilProps} calculateMetadata={calculateMetadata}/>
     <Composition id="SpaceHoroscopeVideo" component={SpaceHoroscopeVideo} durationInFrames={900} fps={30} width={1080} height={1080} defaultProps={defaultSpaceHoroscopeProps as SpaceHoroscopeProps}/>

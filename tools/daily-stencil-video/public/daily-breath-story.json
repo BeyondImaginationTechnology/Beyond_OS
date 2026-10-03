@@ -1,72 +1,92 @@
 {
   "brand": "Daily Breath",
-  "series": "A story to carry with you",
-  "title": "A moment that changed everything",
-  "subtitle": "A 60-second story",
+  "series": "Bible devotional",
+  "title": "Enough for Today",
+  "subtitle": "A reflection on Matthew 6:25–34",
   "beats": [
     {
       "id": "intro",
-      "label": "The familiar world",
+      "label": "Begin",
       "startSeconds": 0,
-      "durationSeconds": 10,
-      "narration": "Everything seemed as it always had—until one moment changed the course of the day.",
-      "onScreenText": "Before everything changed",
-      "visualPrompt": "Quiet dawn light over an ordinary landscape, intimate cinematic framing, gentle camera drift."
+      "durationSeconds": 12,
+      "narration": "Welcome to Daily Breath. Take a slow breath. Let your shoulders soften. For these few minutes, you don’t have to solve everything at once.",
+      "onScreenText": "Matthew 6:25–34",
+      "visualPrompt": "Quiet morning light across a simple room; soft greens and warm cream; slow camera drift."
     },
     {
-      "id": "inciting",
-      "label": "The turning begins",
-      "startSeconds": 10,
-      "durationSeconds": 10,
-      "narration": "Then came the unexpected event that made the familiar feel uncertain.",
-      "onScreenText": "Then, something changed",
-      "visualPrompt": "A sudden detail interrupts a still scene; shift from soft light to a focused, high-contrast close-up."
+      "id": "reading",
+      "label": "Today’s passage",
+      "startSeconds": 12,
+      "durationSeconds": 28,
+      "narration": "Today’s reading is Matthew 6:25–34. Jesus teaches his listeners not to be consumed by worry about food, clothing, or tomorrow. He points to the birds and the flowers as reminders of God’s care. Then he gives this instruction: “Therefore don’t be anxious for tomorrow, for tomorrow will be anxious for itself. Each day’s own evil is sufficient.”",
+      "onScreenText": "Matthew 6:25–34 · World English Bible",
+      "visualPrompt": "Birds moving through a sunlit garden; lilies and wildflowers in a breeze; scripture reference appears quietly."
     },
     {
-      "id": "rising",
-      "label": "The struggle",
-      "startSeconds": 20,
-      "durationSeconds": 15,
-      "narration": "Each choice carried a consequence. The way forward was not clear, but small signs began to gather.",
-      "onScreenText": "One choice at a time",
-      "visualPrompt": "Three escalating visual beats: a difficult path, a decisive gesture, and a new clue revealed in warm light."
+      "id": "reflection",
+      "label": "Reflect",
+      "startSeconds": 40,
+      "durationSeconds": 34,
+      "narration": "Jesus isn’t saying that life has no real needs, or that planning is wrong. He is turning our attention toward the day in front of us. Worry pulls us into a future we can’t control. This passage invites us to meet today with trust, and to seek God’s kingdom and righteousness first.",
+      "onScreenText": "Meet today with trust.",
+      "visualPrompt": "A winding path through a green landscape, with one clear step illuminated ahead and the distant horizon soft."
     },
     {
-      "id": "peak",
-      "label": "The turning point",
-      "startSeconds": 35,
-      "durationSeconds": 7,
-      "narration": "At the center of it all, one truth came into focus.",
-      "onScreenText": "The moment of truth",
-      "visualPrompt": "Hold on one powerful symbolic image as light breaks through shadow; slow, deliberate camera push."
+      "id": "question",
+      "label": "Consider",
+      "startSeconds": 74,
+      "durationSeconds": 28,
+      "narration": "What is one thing you’re carrying from tomorrow into today? You don’t have to pretend it doesn’t matter. Name it honestly. Then ask: what is the next faithful step I can take today?",
+      "onScreenText": "What is your next faithful step?",
+      "visualPrompt": "A journal beside a window; a hand writes one small next step in morning light."
     },
     {
-      "id": "falling",
-      "label": "What followed",
-      "startSeconds": 42,
-      "durationSeconds": 4,
-      "narration": "The immediate tension gave way to a consequence.",
-      "onScreenText": "A new way forward",
-      "visualPrompt": "The scene settles after the turning point; soften contrast and let motion ease to stillness."
+      "id": "practice",
+      "label": "Practice",
+      "startSeconds": 102,
+      "durationSeconds": 31,
+      "narration": "Maybe it’s making a call, asking for help, finishing one small task, or resting when you need rest. The passage doesn’t promise that every difficulty disappears. It offers a way to face this day without letting tomorrow take all of today’s breath.",
+      "onScreenText": "One step. One day at a time.",
+      "visualPrompt": "A few ordinary acts of care: a phone placed beside a note, a task completed, a quiet cup of tea."
+    },
+    {
+      "id": "pause",
+      "label": "Pause",
+      "startSeconds": 133,
+      "durationSeconds": 18,
+      "narration": "For now, return to this moment. Breathe in. Breathe out. Take the next step you can take, and leave the rest with God.",
+      "onScreenText": "Breathe in. Breathe out.",
+      "visualPrompt": "Still leaves moving gently in a light breeze; hold a spacious, quiet frame."
+    },
+    {
+      "id": "prayer",
+      "label": "Prayer",
+      "startSeconds": 151,
+      "durationSeconds": 32,
+      "narration": "God, thank you for meeting us in this day. Help us release the worries we cannot resolve right now. Give us wisdom for the next step, courage to ask for help, and trust in your care. Teach us to seek what is good and faithful today. Amen.",
+      "onScreenText": "A prayer for today",
+      "visualPrompt": "Warm light across an open Bible on a table; gentle stillness without depicting a specific religious figure."
     },
     {
       "id": "resolution",
-      "label": "What remains",
-      "startSeconds": 46,
-      "durationSeconds": 4,
-      "narration": "And a meaning worth carrying into today.",
-      "onScreenText": "Carry this with you",
-      "visualPrompt": "Quiet closing image with open space and a hopeful horizon, calm natural light, gentle fade."
+      "label": "Carry this with you",
+      "startSeconds": 183,
+      "durationSeconds": 12,
+      "narration": "May you carry one day at a time. This has been Daily Breath.",
+      "onScreenText": "May you carry one day at a time.",
+      "visualPrompt": "A calm sunrise over a simple horizon; fade slowly to the Daily Breath mark."
     }
   ],
+  "sourceSeconds": 8,
+  "outroSeconds": 8,
   "sources": [
     {
-      "citation": "Add a verified source before production.",
-      "url": "",
-      "notes": ""
+      "citation": "Matthew 6:25–34 · World English Bible (WEB)",
+      "url": "https://ebible.org/web/MAT06.htm",
+      "notes": "Scripture text and passage summary are taken from the public-domain WEB; devotional reflection and prayer are original."
     }
   ],
-  "outroText": "Take a breath. Carry the story forward.",
+  "outroText": "Take today one step at a time.",
   "fps": 30,
   "width": 1080,
   "height": 1920,

@@ -31,12 +31,60 @@ $rawLocale = strtolower(trim((string)($request['locale'] ?? '')));
 $locale = dailybreath_scripture_locale($rawLocale);
 $expectedContentHash = strtolower(trim((string)($request['content_hash'] ?? '')));
 $date = (string)($request['date'] ?? '');
-$today = (new DateTimeImmutable('now', new DateTimeZone('America/Vancouver')))->format('Y-m-d');
+$timezone = new DateTimeZone('America/Vancouver');
+$todayDate = (new DateTimeImmutable('now', $timezone))->setTime(0, 0);
+$requestedDate = DateTimeImmutable::createFromFormat('!Y-m-d', $date, $timezone);
+$dateErrors = DateTimeImmutable::getLastErrors();
+$validDate = $requestedDate !== false
+    && $requestedDate->format('Y-m-d') === $date
+    && ($dateErrors === false || ($dateErrors['warning_count'] === 0 && $dateErrors['error_count'] === 0));
 $supported = ['bible'=>['en','fr','es'], 'torah'=>['en','he'], 'quran'=>['en','ar']];
 
-if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || $date !== $today
+// Mobile devices derive their calendar date locally. Allow the adjacent day
+// at the Vancouver date boundary while keeping requests tightly date-scoped.
+if (!$validDate || $requestedDate < $todayDate->modify('-1 day') || $requestedDate > $todayDate->modify('+1 day')
     || $rawLocale !== $locale || !isset($supported[$tradition]) || !in_array($locale, $supported[$tradition], true)) {
-    dailybreath_narration_reply(['ok'=>false,'error'=>'Narration is available for today’s Bible, Tanakh, or Quran reading only.'], 422);
+    dailybreath_narration_reply(['ok'=>false,'error'=>'Narration is available for the current daily Bible, Tanakh, or Quran reading only.'], 422);
+}
+
+function dailybreath_narration_allow_generation(string $date): bool
+{
+    $directory = beyond_private_root() . '/tmp';
+    if (!is_dir($directory) && !mkdir($directory, 0750, true) && !is_dir($directory)) {
+        throw new RuntimeException('Private narration usage storage is unavailable.');
+    }
+    $path = $directory . '/dailybreath-narration-usage-' . $date . '.json';
+    $handle = fopen($path, 'c+');
+    if ($handle === false || !flock($handle, LOCK_EX)) {
+        if (is_resource($handle)) fclose($handle);
+        throw new RuntimeException('Private narration usage storage is unavailable.');
+    }
+    try {
+        rewind($handle);
+        $usage = json_decode((string)stream_get_contents($handle), true);
+        $usage = is_array($usage) ? $usage : [];
+        $ip = (string)($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+        $ipKey = hash('sha256', $ip);
+        $ipCounts = is_array($usage['ips'] ?? null) ? $usage['ips'] : [];
+        $globalCount = max(0, (int)($usage['total'] ?? 0));
+        $ipCount = max(0, (int)($ipCounts[$ipKey] ?? 0));
+
+        // Audio is shared and cached by reading. These caps protect provider
+        // credits while still allowing one caller to prepare each locale.
+        if ($globalCount >= 21 || $ipCount >= 10) return false;
+
+        $ipCounts[$ipKey] = $ipCount + 1;
+        $payload = json_encode(['total'=>$globalCount + 1, 'ips'=>$ipCounts], JSON_UNESCAPED_SLASHES);
+        if ($payload === false) throw new RuntimeException('Could not record narration usage.');
+        rewind($handle);
+        if (!ftruncate($handle, 0) || fwrite($handle, $payload) === false || !fflush($handle)) {
+            throw new RuntimeException('Could not record narration usage.');
+        }
+        return true;
+    } finally {
+        flock($handle, LOCK_UN);
+        fclose($handle);
+    }
 }
 
 try {
@@ -102,6 +150,9 @@ try {
         $voice = studio_narration_voice('elevenlabs', $voiceLocale);
         if (trim((string)($eleven['api_key'] ?? '')) === '' || $voice === '') {
             dailybreath_narration_reply(['ok'=>false,'error'=>'A server-side ElevenLabs key and voice are required for this language.'], 503);
+        }
+        if (!dailybreath_narration_allow_generation($todayDate->format('Y-m-d'))) {
+            dailybreath_narration_reply(['ok'=>false,'error'=>'Daily narration preparation has reached its limit. Please try again tomorrow.'], 429);
         }
 
         $generated = studio_narration_generate($script, $voiceLocale, 'elevenlabs', $voice);

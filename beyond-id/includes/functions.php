@@ -194,6 +194,46 @@ function touch_session(PDO $pdo, int $userId): void {
     } catch (Throwable $e) {}
 }
 
+/** Refresh the account from the live session registry; fail closed on revoked or expired sessions. */
+function beyond_refresh_browser_identity(PDO $pdo): bool {
+    $userId = (int)($_SESSION['user_id'] ?? 0);
+    if ($userId <= 0 || session_id() === '') return false;
+    try {
+        $now = date('Y-m-d H:i:s');
+        $token = hash('sha256', session_id());
+        $stmt = $pdo->prepare("SELECT u.email,u.name,u.role,u.status FROM user_sessions s JOIN users u ON u.id=s.user_id WHERE s.user_id=? AND s.session_token_hash=? AND s.revoked_at IS NULL AND s.expires_at>? AND u.status='active' LIMIT 1");
+        $stmt->execute([$userId, $token, $now]);
+        $account = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($account) {
+            $pdo->prepare('UPDATE user_sessions SET last_seen_at=? WHERE user_id=? AND session_token_hash=? AND revoked_at IS NULL AND expires_at>?')->execute([$now, $userId, $token, $now]);
+            $_SESSION['email'] = $account['email'];
+            $_SESSION['name'] = $account['name'];
+            $_SESSION['role'] = $account['role'];
+            $_SESSION['user'] = ['id'=>$userId, 'email'=>$account['email'], 'role'=>$account['role']];
+            return true;
+        }
+    } catch (Throwable $exception) {
+        error_log('Browser session validation failed: ' . $exception->getMessage());
+    }
+    beyond_clear_browser_identity();
+    return false;
+}
+
+function beyond_clear_browser_identity(): void {
+    $_SESSION = [];
+    if (session_status() === PHP_SESSION_ACTIVE) session_regenerate_id(true);
+}
+
+/** Call inside the password update transaction so credentials and revocation commit together. */
+function beyond_revoke_all_account_access(PDO $pdo, int $userId): void {
+    $now = date('Y-m-d H:i:s');
+    $pdo->prepare('UPDATE user_sessions SET revoked_at=? WHERE user_id=? AND revoked_at IS NULL')->execute([$now, $userId]);
+    $pdo->prepare('UPDATE auth_remember_tokens SET revoked_at=? WHERE user_id=? AND revoked_at IS NULL')->execute([$now, $userId]);
+    $pdo->prepare('UPDATE mobile_refresh_tokens SET revoked_at=? WHERE family_id IN (SELECT family_id FROM mobile_token_families WHERE user_id=?) AND revoked_at IS NULL')->execute([$now, $userId]);
+    $pdo->prepare('UPDATE mobile_token_families SET revoked_at=? WHERE user_id=? AND revoked_at IS NULL')->execute([$now, $userId]);
+    $pdo->prepare('UPDATE mobile_access_tokens SET revoked_at=? WHERE user_id=? AND revoked_at IS NULL')->execute([$now, $userId]);
+}
+
 function create_notification(PDO $pdo, int $userId, string $title, string $body, ?string $url = null, string $type = 'system'): void {
     try {
         $stmt = $pdo->prepare("INSERT INTO user_notifications (user_id,type,title,body,action_url) VALUES (?,?,?,?,?)");

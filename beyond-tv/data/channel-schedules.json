@@ -177,58 +177,58 @@
     {
       "start": 0,
       "end": 3,
-      "icon": "▶",
-      "title": "Milky Way Overnight",
-      "lineup": "Milky Way Overnight"
+      "icon": "🌍",
+      "title": "Earth from Orbit",
+      "lineup": "NASA Earth science and views from space"
     },
     {
       "start": 3,
       "end": 6,
-      "icon": "▶",
-      "title": "The Sun in 4K",
-      "lineup": "The Sun in 4K"
+      "icon": "☀️",
+      "title": "Solar Cinema",
+      "lineup": "NASA Goddard Sun imagery and visualizations"
     },
     {
       "start": 6,
       "end": 9,
-      "icon": "▶",
+      "icon": "🌅",
       "title": "NASA Morning",
-      "lineup": "NASA Morning"
+      "lineup": "Mission updates and Earth science"
     },
     {
       "start": 9,
       "end": 12,
-      "icon": "▶",
-      "title": "Solar System",
-      "lineup": "Solar System"
+      "icon": "🌕",
+      "title": "Moon Missions",
+      "lineup": "NASA Artemis II and lunar exploration"
     },
     {
       "start": 12,
       "end": 15,
-      "icon": "▶",
-      "title": "Deep Space",
-      "lineup": "Deep Space"
+      "icon": "🔴",
+      "title": "Mars Missions",
+      "lineup": "NASA Perseverance and the Red Planet"
     },
     {
       "start": 15,
       "end": 18,
-      "icon": "▶",
-      "title": "Astronomy Lab",
-      "lineup": "Astronomy Lab"
+      "icon": "🔭",
+      "title": "Webb and the Universe",
+      "lineup": "NASA Webb telescope discoveries and imagery"
     },
     {
       "start": 18,
       "end": 21,
-      "icon": "▶",
-      "title": "Space Documentary",
-      "lineup": "Space Documentary"
+      "icon": "🚀",
+      "title": "Space Exploration Prime Time",
+      "lineup": "NASA Moon, Mars and mission highlights"
     },
     {
       "start": 21,
       "end": 24,
-      "icon": "▶",
-      "title": "Cosmic Ambience",
-      "lineup": "Cosmic Ambience"
+      "icon": "🌌",
+      "title": "Deep Space Night",
+      "lineup": "NASA Webb imagery and cosmic discovery"
     }
   ],
   "beyond-ancient": [
@@ -350,59 +350,31 @@
   "beyond-french": [
     {
       "start": 0,
-      "end": 3,
-      "icon": "▶",
-      "title": "French Listening",
-      "lineup": "French Listening"
-    },
-    {
-      "start": 3,
       "end": 6,
-      "icon": "▶",
-      "title": "Vocabulary Loop",
-      "lineup": "Vocabulary Loop"
+      "icon": "↻",
+      "title": "French Encore · Planned",
+      "lineup": "Proposed replays from the beginner, practical, and immersion blocks"
     },
     {
       "start": 6,
-      "end": 9,
-      "icon": "▶",
-      "title": "Bonjour Morning",
-      "lineup": "Bonjour Morning"
-    },
-    {
-      "start": 9,
       "end": 12,
-      "icon": "▶",
-      "title": "French Foundations",
-      "lineup": "French Foundations"
+      "icon": "☀️",
+      "title": "Beginner French · Planned",
+      "lineup": "Bonjour! · French in 5 · Beyond French"
     },
     {
       "start": 12,
-      "end": 15,
-      "icon": "▶",
-      "title": "Conversation Practice",
-      "lineup": "Conversation Practice"
-    },
-    {
-      "start": 15,
       "end": 18,
-      "icon": "▶",
-      "title": "Grammar Workshop",
-      "lineup": "Grammar Workshop"
+      "icon": "☕",
+      "title": "Practical French · Planned",
+      "lineup": "Café Français · Speak French · Voyage en Français · French Kitchen · French Challenge"
     },
     {
       "start": 18,
-      "end": 21,
-      "icon": "▶",
-      "title": "Français du Jour",
-      "lineup": "Français du Jour"
-    },
-    {
-      "start": 21,
       "end": 24,
-      "icon": "▶",
-      "title": "Review & Quiz",
-      "lineup": "Review & Quiz"
+      "icon": "🌙",
+      "title": "French Immersion · Planned",
+      "lineup": "French Adventures · French Stories · Francophone World · French Cinema Club"
     }
   ],
   "beyond-health": [
@@ -696,14 +668,11 @@
     }
   ],
   "mrbeast-tv": [
-    {"start":0,"end":3,"icon":"🦁","title":"MrBeast After Hours","lineup":"Official challenges and big-stakes videos"},
-    {"start":3,"end":6,"icon":"🎁","title":"Big Giveaways","lineup":"Official MrBeast competitions and surprises"},
-    {"start":6,"end":9,"icon":"☀️","title":"Morning Challenge","lineup":"Start with official MrBeast videos"},
-    {"start":9,"end":12,"icon":"🏝️","title":"Extreme Adventures","lineup":"Official endurance and travel challenges"},
-    {"start":12,"end":15,"icon":"🏆","title":"Competition Time","lineup":"Official contests and creator collaborations"},
-    {"start":15,"end":18,"icon":"❤️","title":"Beast Philanthropy Spotlight","lineup":"Official charitable projects and community stories"},
-    {"start":18,"end":21,"icon":"📺","title":"Prime-Time MrBeast","lineup":"Featured official MrBeast episodes"},
-    {"start":21,"end":24,"icon":"🔔","title":"New Episode Watch","lineup":"Follow IFTTT for official new-episode alerts"}
+    {"start":0,"end":6,"icon":"🌙","title":"Night Breath · Planned","lineup":"Night Breath · Nature & Wonder · Daily Breath encores"},
+    {"start":6,"end":12,"icon":"☀️","title":"Daily Breath TV Morning · Planned","lineup":"Morning Breath · Daily Breath · Little Lessons · Moe, Dovi & Chris · Stories of Faith"},
+    {"start":12,"end":18,"icon":"🌍","title":"Discover & Learn · Planned","lineup":"The World of Faith · Faith Kitchen · Breath of History · Big Questions · Daily Breath Stories"},
+    {"start":18,"end":21,"icon":"📖","title":"Stories & Culture · Planned","lineup":"Moe, Dovi & Chris · Stories of Faith · Daily Breath Stories · The World of Faith"},
+    {"start":21,"end":24,"icon":"🌙","title":"Night Breath · Planned","lineup":"Night Breath · Nature & Wonder · reflection and calm"}
   ],
   "redbull-tv": [
     {"start":0,"end":3,"icon":"🌙","title":"Red Bull After Dark","lineup":"Official films and action sports stories"},

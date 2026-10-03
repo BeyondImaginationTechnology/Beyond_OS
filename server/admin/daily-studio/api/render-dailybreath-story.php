@@ -41,24 +41,27 @@ $sources = $input['sources'] ?? null;
 if ($title === '' || mb_strlen($title) > 100 || $subtitle === '' || mb_strlen($subtitle) > 140 || $outroText === '' || mb_strlen($outroText) > 180) {
     dailyBreathStoryRenderError(422, 'Review the title, subtitle, and outro before rendering.');
 }
-if (!is_array($beats) || count($beats) !== 6 || !is_array($sources) || count($sources) < 1 || count($sources) > 4) {
-    dailyBreathStoryRenderError(422, 'A story needs six beats and one to four credited sources.');
+if (!is_array($beats) || count($beats) < 1 || count($beats) > 12 || !is_array($sources) || count($sources) < 1 || count($sources) > 4) {
+    dailyBreathStoryRenderError(422, 'An episode needs one to twelve beats and one to four credited sources.');
 }
-$timings = [
-    'intro' => [0, 10],
-    'inciting' => [10, 10],
-    'rising' => [20, 15],
-    'peak' => [35, 7],
-    'falling' => [42, 4],
-    'resolution' => [46, 4],
-];
-$beatsById = [];
+$orderedBeats = [];
+$beatIds = [];
 $narrationWords = 0;
+$previousEnd = 0.0;
 foreach ($beats as $beat) {
-    if (!is_array($beat) || !isset($timings[$beat['id'] ?? '']) || isset($beatsById[$beat['id']])) {
-        dailyBreathStoryRenderError(422, 'The six narrative beats are invalid or duplicated.');
+    if (!is_array($beat)) {
+        dailyBreathStoryRenderError(422, 'An episode beat is invalid.');
     }
-    $id = (string)$beat['id'];
+    $id = trim((string)($beat['id'] ?? ''));
+    $startSeconds = filter_var($beat['startSeconds'] ?? null, FILTER_VALIDATE_FLOAT);
+    $durationSeconds = filter_var($beat['durationSeconds'] ?? null, FILTER_VALIDATE_FLOAT);
+    if ($id === '' || mb_strlen($id) > 64 || isset($beatIds[$id])
+        || $startSeconds === false || $durationSeconds === false
+        || $startSeconds < $previousEnd || $durationSeconds <= 0
+        || $startSeconds > 1800 || $durationSeconds > 1800
+        || $startSeconds + $durationSeconds > 1800) {
+        dailyBreathStoryRenderError(422, 'Episode beats need unique IDs and non-overlapping timings under 30 minutes.');
+    }
     $clean = ['id' => $id];
     foreach (['label' => 70, 'narration' => 600, 'onScreenText' => 90, 'visualPrompt' => 600] as $field => $limit) {
         $value = trim((string)($beat[$field] ?? ''));
@@ -71,16 +74,13 @@ foreach ($beats as $beat) {
         }
         $clean[$field] = $value;
     }
-    $clean['startSeconds'] = $timings[$id][0];
-    $clean['durationSeconds'] = $timings[$id][1];
-    $beatsById[$id] = $clean;
+    $clean['startSeconds'] = (float)$startSeconds;
+    $clean['durationSeconds'] = (float)$durationSeconds;
+    $beatIds[$id] = true;
+    $orderedBeats[] = $clean;
+    $previousEnd = $clean['startSeconds'] + $clean['durationSeconds'];
 }
-if ($narrationWords > 95) dailyBreathStoryRenderError(422, 'Keep the spoken script to 95 words or fewer for the 50-second story window.');
-$orderedBeats = [];
-foreach (array_keys($timings) as $id) {
-    if (!isset($beatsById[$id])) dailyBreathStoryRenderError(422, 'A required narrative beat is missing.');
-    $orderedBeats[] = $beatsById[$id];
-}
+if ($narrationWords > 1200) dailyBreathStoryRenderError(422, 'Keep the spoken script to 1,200 words or fewer.');
 $cleanSources = [];
 foreach ($sources as $source) {
     if (!is_array($source)) dailyBreathStoryRenderError(422, 'Source credits are invalid.');
@@ -100,11 +100,13 @@ $default = json_decode((string)file_get_contents($project . '/public/daily-breat
 if (!is_array($default)) dailyBreathStoryRenderError(500, 'The Daily Breath Remotion template configuration is unavailable.');
 $props = [
     'brand' => 'Daily Breath',
-    'series' => 'A story to carry with you',
+    'series' => trim((string)($default['series'] ?? 'A story to carry with you')),
     'title' => $title,
     'subtitle' => $subtitle,
     'outroText' => $outroText,
     'beats' => $orderedBeats,
+    'sourceSeconds' => max(1, min(60, (float)($default['sourceSeconds'] ?? 8))),
+    'outroSeconds' => max(1, min(60, (float)($default['outroSeconds'] ?? 8))),
     'sources' => $cleanSources,
     'fps' => 30,
     'width' => 1080,

@@ -76,7 +76,7 @@ struct TodayView: View {
             }
             .padding()
         }
-        .background(todayScreenBackground)
+        .background(DailyBreathThemeBackground(theme: selectedTheme))
         .navigationTitle("Today")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
@@ -143,32 +143,12 @@ struct TodayView: View {
     @ViewBuilder
     private var todayIntro: some View {
         BrandHeader()
-        themePicker
         traditionPicker
     }
 
     @ViewBuilder
     private var todayReading: some View {
         verseCard
-    }
-
-    private var themePicker: some View {
-        Menu {
-            ForEach(DailyBreathTheme.allCases) { theme in
-                Button {
-                    selectedThemeID = theme.id
-                } label: {
-                    Label(theme.name, systemImage: theme.symbolName)
-                }
-            }
-        } label: {
-            Label(selectedTheme.name, systemImage: selectedTheme.symbolName)
-                .font(.caption.bold())
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(.background.opacity(0.86), in: Capsule())
-        }
-        .tint(selectedTheme.primary)
     }
 
     private var traditionPicker: some View {
@@ -213,24 +193,34 @@ struct TodayView: View {
                 NavigationLink {
                     VerseDetailView(verse: todayVerse, tradition: selectedTradition)
                 } label: {
-                    Label("Open", systemImage: "book.fill")
-                        .frame(maxWidth: .infinity)
+                    Image(systemName: "book.fill")
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .contentShape(Rectangle())
                 }
-                .buttonStyle(.bordered)
-                .tint(.white)
+                .buttonStyle(.plain)
+                .foregroundStyle(.white)
+                .accessibilityLabel("Open reading")
                 ShareLink(item: todayShareURL) {
-                    Label("Share", systemImage: "square.and.arrow.up")
+                    Image(systemName: "square.and.arrow.up")
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .contentShape(Rectangle())
                 }
-                .buttonStyle(.bordered)
-                .tint(.white)
+                .buttonStyle(.plain)
+                .foregroundStyle(.white)
+                .accessibilityLabel("Share reading")
                 Button {
                     exportShareImage()
                 } label: {
-                    Label("Image", systemImage: "photo")
+                    Image(systemName: "arrow.down.to.line")
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .contentShape(Rectangle())
                 }
-                .buttonStyle(.bordered)
-                .tint(.white)
+                .buttonStyle(.plain)
+                .foregroundStyle(.white)
+                .accessibilityLabel("Share or save image")
+                .accessibilityHint("Opens options to share or save the reading image.")
             }
+            .font(.title2.weight(.semibold))
             .controlSize(.large)
             Button {
                 handleNarrationTap()
@@ -255,31 +245,6 @@ struct TodayView: View {
             RoundedRectangle(cornerRadius: 26)
                 .fill(.black.opacity(selectedTheme.artworkName == nil ? 0.18 : 0.30))
         )
-    }
-
-    private var todayScreenBackground: some View {
-        GeometryReader { geometry in
-            ZStack {
-                DailyBreathThemeBackground(theme: selectedTheme)
-                if let artwork = selectedTheme.artworkName {
-                    Image(artwork)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .clipped()
-                        .overlay {
-                            LinearGradient(
-                                colors: [.black.opacity(0.22), .black.opacity(0.08), .black.opacity(0.30)],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        }
-                }
-            }
-            .frame(width: geometry.size.width, height: geometry.size.height)
-        }
-        .ignoresSafeArea()
-        .accessibilityHidden(true)
     }
 
     private var passageIsRightToLeft: Bool {

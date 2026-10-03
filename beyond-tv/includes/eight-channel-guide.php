@@ -142,7 +142,8 @@ function beyond_tv_eight_channel_guide(array $classicState, array $cartoonState)
     foreach ($featured as $channel) {
         $slug = (string)($channel['slug'] ?? '');
         $channelMeta = array_merge($catalogueBySlug[$slug] ?? [], $channel);
-        $rows = (($channelMeta['source_type'] ?? '') === 'placeholder') ? [] : ($schedules[$slug] ?? []);
+        $isPreview = ($channelMeta['source_type'] ?? '') === 'placeholder';
+        $rows = $isPreview && empty($channelMeta['slate_file']) ? [] : ($schedules[$slug] ?? []);
         if ($slug === 'classic-cartoon-theater' && ($channelMeta['source_type'] ?? '') !== 'placeholder' && !empty($classicState['blocks'])) { $rows = $classicState['blocks']; }
         if ($slug === 'beyond-cartoons' && !empty($cartoonState['blocks'])) { $rows = $cartoonState['blocks']; }
         if ($slug === 'beyond-after-dark') { $rows = beyond_tv_after_dark_hourly_rows(); }
@@ -150,13 +151,14 @@ function beyond_tv_eight_channel_guide(array $classicState, array $cartoonState)
         if ($slug === 'beyond-cartoons') { $rows = beyond_tv_cartoon_hourly_rows(); }
         if ($slug === 'classic-cinema') { $rows = beyond_tv_movie_hourly_rows(); }
         if (in_array($slug, ['bubble-guppies','preschool-francais','beyond-comedy','beyond-family','beyond-mystery'], true)) { $catalogRows=beyond_tv_catalog_hourly_rows($slug); if($catalogRows)$rows=$catalogRows; }
-        if (in_array($slug, ['space-tv','beyond-ancient','beyond-french','beyond-health'], true)) { $rows=beyond_tv_confirmed_presentation_rows($slug,$rows); }
+        if (in_array($slug, ['space-tv','beyond-ancient','beyond-health'], true)) { $rows=beyond_tv_confirmed_presentation_rows($slug,$rows); }
         if (!$rows) { $rows = beyond_tv_channel_fallback_rows($channelMeta); }
         $guide[] = [
             'slug' => $slug,
             'name' => (string)($channelMeta['name'] ?? $slug),
             'icon' => (string)($channelMeta['icon'] ?? '📺'),
-            'access' => 'Free · Live library',
+            'access' => $isPreview ? 'Programming preview' : 'Free · Live library',
+            'preview' => $isPreview,
             'rows' => $rows,
         ];
     }

@@ -99,6 +99,7 @@ $appleLogo = 'data:image/png;base64,' . base64_encode((string)file_get_contents(
 <p class="sub">Choose Google, GitHub, Apple, or X. First-time sign-in creates a Beyond ID or connects to one with the same verified email.</p>
 <?php if ($returnTo !== ''): ?><p class="return-note">After sign-in, you’ll return to <?= e($returnDestination) ?>.</p><?php endif; ?>
 <?php if ($error): ?><div class="error" role="alert" aria-live="assertive"><?= e($error) ?></div><?php endif; ?>
+<?php if (isset($_GET['password_changed'])): ?><p class="return-note" role="status">Password updated. Sign in again on your devices.</p><?php endif; ?>
 <div class="providers">
 <?php foreach ($providers as $provider => [$label]): ?>
 <?php $icon = match ($provider) {

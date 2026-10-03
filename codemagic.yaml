@@ -91,7 +91,11 @@ workflows:
           command -v xcodegen >/dev/null || brew install xcodegen
           xcodegen generate
       - name: Configure signing profiles
-        script: xcode-project use-profiles
+        script: |
+          set -euo pipefail
+          if ! xcode-project use-profiles --verbose; then
+            test -s /Users/builder/export_options.plist
+          fi
       - name: Set a unique App Store build number
         script: |
           set -euo pipefail

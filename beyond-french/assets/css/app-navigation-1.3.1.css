@@ -1,0 +1,24 @@
+/* Loaded separately so installed web apps receive this navigation correction immediately. */
+body.app-shell .mobile-tabbar a,
+body.app-shell .mobile-tabbar a.tab-primary {
+  background: rgba(255, 255, 255, .06) !important;
+  border: 1px solid rgba(255, 255, 255, .10) !important;
+  color: #c8d8ef !important;
+  opacity: .72 !important;
+  box-shadow: none !important;
+}
+
+body.app-shell .mobile-tabbar a small,
+body.app-shell .mobile-tabbar a.active small,
+body.app-shell .mobile-tabbar a.tab-primary small {
+  color: inherit !important;
+}
+
+body.app-shell .mobile-tabbar a.active,
+body.app-shell .mobile-tabbar a.tab-primary.active {
+  background: #1768ff !important;
+  border-color: #75a7ff !important;
+  color: #fff !important;
+  opacity: 1 !important;
+  box-shadow: 0 6px 18px rgba(23, 104, 255, .28) !important;
+}

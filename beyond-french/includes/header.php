@@ -22,6 +22,7 @@ $academyCssVersion = (string)(@filemtime(__DIR__ . '/../assets/css/academy.css')
     <link rel="manifest" href="<?= h($frenchBase) ?>manifest.webmanifest">
     <link rel="apple-touch-icon" href="<?= h($frenchBase) ?>assets/app-store/AppIcon-180.png">
     <link rel="stylesheet" href="<?= h($frenchBase) ?>assets/css/style.css?v=<?= h($frenchCssVersion) ?>">
+    <link rel="stylesheet" href="<?= h($frenchBase) ?>assets/css/app-navigation-1.3.1.css">
     <link rel="stylesheet" href="<?= h($frenchBase) ?>assets/css/academy.css?v=<?= h($academyCssVersion) ?>">
 </head>
 <body class="<?= !empty($appShell) ? 'app-shell' : '' ?>" data-beyond-french-base="<?= h($frenchBase) ?>">

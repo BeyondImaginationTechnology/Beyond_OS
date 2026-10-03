@@ -30,24 +30,13 @@ try {
     $requestedStatus = strtolower(trim((string)($_POST['status'] ?? 'approved')));
     if (!in_array($requestedStatus, ['approved', 'draft'], true)) tattooApprovalResponse(['ok' => false, 'error' => 'Status must be approved or draft.'], 422);
 
-    $drop = null;
-    $currentSequence = 0;
-    foreach (bt_library_collections() as $collectionSlug => $collection) {
-        foreach ($collection['stencils'] as $collectionIndex => [$title, $releaseDate]) {
-            $currentSequence++;
-            if ($currentSequence === $sequence) {
-                $drop = compact('collectionSlug', 'collectionIndex', 'title', 'releaseDate');
-                $drop['collection'] = $collection['name'];
-                break 2;
-            }
-        }
-    }
+    $drop = bt_season_one_drops()[$sequence - 1] ?? null;
     if (!is_array($drop)) tattooApprovalResponse(['ok' => false, 'error' => 'Choose a valid Season One drop from 1 to 55.'], 422);
 
-    $folderName = sprintf('%02d-%s', $drop['collectionIndex'] + 1, tattooApprovalSlug($drop['title']));
+    $folderName = sprintf('%02d-%s', $drop['collection_index'] + 1, tattooApprovalSlug($drop['title']));
     $tattooRoot = dirname(__DIR__, 4) . '/beyond-tattoo';
-    $uploadDirectory = $tattooRoot . '/uploads/stencil-library/' . $drop['collectionSlug'] . '/' . $folderName;
-    $bundledDirectory = $tattooRoot . '/assets/stencils/' . $drop['collectionSlug'] . '/' . $folderName;
+    $uploadDirectory = $tattooRoot . '/uploads/stencil-library/' . $drop['collection_slug'] . '/' . $folderName;
+    $bundledDirectory = $tattooRoot . '/assets/stencils/' . $drop['collection_slug'] . '/' . $folderName;
     if (!is_dir($uploadDirectory) && !mkdir($uploadDirectory, 0775, true) && !is_dir($uploadDirectory)) {
         throw new RuntimeException('The tattoo library metadata folder could not be created.');
     }
@@ -61,8 +50,16 @@ try {
     }
 
     if ($requestedStatus === 'approved') {
-        $previewExists = is_file($uploadDirectory . '/preview-watermarked.png') || is_file($bundledDirectory . '/preview-watermarked.png');
-        $stencilExists = is_file($uploadDirectory . '/stencil-print-ready.png') || is_file($bundledDirectory . '/stencil-print-ready.png');
+        $hasAsset = static function (string $stem, array $extensions) use ($uploadDirectory, $bundledDirectory): bool {
+            foreach ([$uploadDirectory, $bundledDirectory] as $directory) {
+                foreach ($extensions as $extension) {
+                    if (is_file($directory . '/' . $stem . '.' . $extension)) return true;
+                }
+            }
+            return false;
+        };
+        $previewExists = $hasAsset('preview-watermarked', ['png', 'jpg']);
+        $stencilExists = $hasAsset('stencil-print-ready', ['png', 'jpg']) || $hasAsset('stencil-outline', ['png', 'jpg']);
         if (!$previewExists || !$stencilExists) tattooApprovalResponse(['ok' => false, 'error' => 'Preview and print-ready stencil files are required before approval.'], 422);
         if (!filter_var($_POST['rights_confirmed'] ?? false, FILTER_VALIDATE_BOOL)) {
             tattooApprovalResponse(['ok' => false, 'error' => 'Confirm that Beyond Tattoo has permission to publish these assets.'], 422);
@@ -78,11 +75,12 @@ try {
 
     $metadata = array_replace($metadata, [
         'sequence' => $sequence,
+        'season_drop' => $sequence,
         'season_total' => 55,
         'title' => $drop['title'],
         'collection' => $drop['collection'],
-        'collection_slug' => $drop['collectionSlug'],
-        'release_date' => $drop['releaseDate'],
+        'collection_slug' => $drop['collection_slug'],
+        'release_date' => $drop['release_date'],
         'status' => $requestedStatus,
         'updated_at' => gmdate('c'),
     ]);

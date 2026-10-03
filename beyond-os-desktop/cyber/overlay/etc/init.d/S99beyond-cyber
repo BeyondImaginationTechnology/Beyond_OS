@@ -15,8 +15,19 @@ case "${1:-}" in
     xauth -f "$XAUTHORITY" add :0 . "$(mcookie)"
     chown home:home "$XAUTHORITY"
     start-stop-daemon -S -b -m -p /run/beyond-cyber.pid \
+      -O /home/home/beyond-cyber.log \
       -x /usr/bin/xinit -- /usr/bin/beyond-session -- /usr/bin/Xorg :0 vt1 \
-      -nolisten tcp -auth "$XAUTHORITY" >> /var/log/beyond-cyber.log 2>&1
+      -logfile /home/home/Xorg.0.log -nolisten tcp -auth "$XAUTHORITY"
+    (
+      sleep 20
+      if ! pidof beyond-cyber >/dev/null; then
+        {
+          printf '\nCyber desktop did not start. Session diagnostics:\n'
+          tail -n 50 /home/home/beyond-cyber.log 2>/dev/null || true
+          tail -n 50 /home/home/Xorg.0.log 2>/dev/null || true
+        } > /dev/ttyS0 2>/dev/null || true
+      fi
+    ) &
     ;;
   stop)
     start-stop-daemon -K -p /run/beyond-cyber.pid || true

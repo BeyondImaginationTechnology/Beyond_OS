@@ -9,7 +9,7 @@ BEYOND_CYBER_LICENSE_FILES = LICENSE CONTENT_RIGHTS.md
 BEYOND_CYBER_DEPENDENCIES = sdl2 sdl2_ttf host-pkgconf
 
 define BEYOND_CYBER_BUILD_CMDS
-	$(TARGET_CC) $(TARGET_CFLAGS) -std=c11 -Wall -Wextra -Werror \
+	$(TARGET_CC) $(TARGET_CFLAGS) -DBIT_EDITION_CYBER -std=c11 -Wall -Wextra -Werror \
 		$$($(PKG_CONFIG_HOST_BINARY) --cflags sdl2 SDL2_ttf) \
 		$(@D)/home.c -o $(@D)/beyond-cyber $(TARGET_LDFLAGS) \
 		$$($(PKG_CONFIG_HOST_BINARY) --libs sdl2 SDL2_ttf) -lm

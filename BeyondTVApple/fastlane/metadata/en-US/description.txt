@@ -1,0 +1,5 @@
+Source Safety is built into Beyond TV. Open it when a video link raises a rights, security, or playback concern, and send the exact source for review.
+
+When you submit a report, Beyond TV records the source link, the Beyond TV page, the title, and your observation for private review. Reports are investigated by the Beyond TV team. A working link does not confirm that a video is licensed or in the public domain.
+
+The live TV experience stays front and center: browse channels and a video catalog, watch available streams, and move between programs in a live-style guide. Some videos come from external providers, whose availability may change.

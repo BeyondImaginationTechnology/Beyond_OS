@@ -24,20 +24,7 @@ function tattooLibrarySlug(string $value): string
 function tattooLibrarySchedule(): array
 {
     $schedule = [];
-    $sequence = 0;
-    foreach (bt_library_collections() as $collectionSlug => $collection) {
-        foreach ($collection['stencils'] as $collectionIndex => [$title, $releaseDate]) {
-            $sequence++;
-            $schedule[$sequence] = [
-                'sequence' => $sequence,
-                'title' => $title,
-                'release_date' => $releaseDate,
-                'collection' => $collection['name'],
-                'collection_slug' => $collectionSlug,
-                'collection_index' => $collectionIndex,
-            ];
-        }
-    }
+    foreach (bt_season_one_drops() as $drop) $schedule[$drop['sequence']] = $drop;
     return $schedule;
 }
 
@@ -156,12 +143,14 @@ try {
 
     $metadataFile = $directory . '/metadata.json';
     $metadata = [];
-    if (is_file($metadataFile)) {
-        $decoded = json_decode((string)file_get_contents($metadataFile), true);
-        if (is_array($decoded)) $metadata = $decoded;
+    foreach ([$metadataFile, $root . '/assets/stencils/' . $drop['collection_slug'] . '/' . $folderName . '/metadata.json'] as $candidate) {
+        if (!is_file($candidate)) continue;
+        $decoded = json_decode((string)file_get_contents($candidate), true);
+        if (is_array($decoded)) { $metadata = $decoded; break; }
     }
     $metadata = array_replace($metadata, [
         'sequence' => $sequence,
+        'season_drop' => $sequence,
         'season_total' => 55,
         'title' => $drop['title'],
         'collection' => $drop['collection'],

@@ -197,7 +197,7 @@ function beyond_nav_bootstrap(string $appName, ?array $wallet = null): array {
             }
             if (!str_contains($html, 'beyond-theme-default.js')) {
                 $themeAssets = '<script src="' . e(beyond_url('assets/js/beyond-theme-default.js?v=20260901-1')) . '"></script>'
-                    . '<script src="' . e(beyond_url('assets/js/beyond-locales.js?v=20260901-1')) . '" defer></script>'
+                    . '<script src="' . e(beyond_url('assets/js/beyond-locales.js?v=20261001-2')) . '" defer></script>'
                     . '<link rel="stylesheet" href="' . e(beyond_url('assets/css/beyond-dark-default.css?v=20260918-1')) . '">';
                 $html = preg_replace('/<\/head>/i', $themeAssets . '</head>', $html, 1) ?? $html;
             }
@@ -226,7 +226,7 @@ function beyond_shell_markup(string $appName, array $wallet): string {
     $app = e($appName);
     $home = e(beyond_url());
     // Version the navbar asset so browsers receive logo updates immediately.
-    $homeIcon = '<span class="bos-logo-mark" aria-hidden="true"><img src="' . e(beyond_url('assets/images/bos-logo-mark.svg?v=20260828-1')) . '" alt=""></span>';
+    $homeIcon = '<span class="bos-logo-mark" aria-hidden="true"><img src="' . e(beyond_url('assets/images/bos-logo-mark.svg?v=20260930-1')) . '" alt=""></span>';
     $currentIconPath = beyond_app_icon($appName);
     $currentIcon = $currentIconPath ? '<img class="bos-current-icon" src="' . e($currentIconPath) . '" alt="">' : '';
     $appIdentity = strcasecmp(trim($appName), 'Beyond OS') === 0

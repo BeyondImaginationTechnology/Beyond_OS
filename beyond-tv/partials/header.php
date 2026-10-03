@@ -6,6 +6,7 @@ $currentTvPath = (string)(parse_url((string)($_SERVER['REQUEST_URI'] ?? '/beyond
 $isWatch = $currentTvPath === '/beyond-tv/' || str_ends_with($currentTvPath, '/beyond-tv/index.php');
 $isGuide = str_ends_with($currentTvPath, '/live-tv.php');
 $isBrowse = str_ends_with($currentTvPath, '/browse.php') || str_ends_with($currentTvPath, '/title.php');
+$isSafety = str_ends_with($currentTvPath, '/source-safety.php');
 ?>
 <header class="site-header tv-header">
   <div class="shell nav-wrap">
@@ -14,7 +15,7 @@ $isBrowse = str_ends_with($currentTvPath, '/browse.php') || str_ends_with($curre
       <span><b>BEYOND <em>TV</em></b><small>LIVE • LEARN • RELAX</small></span>
     </a>
     <nav class="desktop-nav" aria-label="Beyond TV">
-      <a href="/">Home</a><a href="/beyond-tv/"<?=$isWatch?' aria-current="page"':''?>>Watch</a><a href="/beyond-tv/live-tv.php"<?=$isGuide?' aria-current="page"':''?>>Guide</a><a href="/beyond-tv/browse.php"<?=$isBrowse?' aria-current="page"':''?>>Browse</a>
+      <a href="/">Home</a><a href="/beyond-tv/"<?=$isWatch?' aria-current="page"':''?>>Watch</a><a href="/beyond-tv/live-tv.php"<?=$isGuide?' aria-current="page"':''?>>Guide</a><a href="/beyond-tv/browse.php"<?=$isBrowse?' aria-current="page"':''?>>Browse</a><a href="/beyond-tv/source-safety.php"<?=$isSafety?' aria-current="page"':''?>>Source Safety</a>
       <?php if ($signedIn): ?><a href="/beyond-tv/browse.php?list=mine">My List</a><?php endif; ?>
     </nav>
     <div class="nav-actions">
@@ -24,5 +25,5 @@ $isBrowse = str_ends_with($currentTvPath, '/browse.php') || str_ends_with($curre
       <button class="menu-btn" type="button" aria-label="Toggle menu" aria-expanded="false">☰</button>
     </div>
   </div>
-  <nav class="mobile-nav" aria-label="Mobile" hidden><a href="/">Home</a><a href="/beyond-tv/">Watch</a><a href="/beyond-tv/live-tv.php">Guide</a><a href="/beyond-tv/browse.php">Browse</a><?php if (!$signedIn): ?><a href="/beyond-id/auth/login.php?return=/beyond-tv/">Sign in</a><?php endif; ?></nav>
+  <nav class="mobile-nav" aria-label="Mobile" hidden><a href="/">Home</a><a href="/beyond-tv/">Watch</a><a href="/beyond-tv/live-tv.php">Guide</a><a href="/beyond-tv/browse.php">Browse</a><a href="/beyond-tv/source-safety.php">Source Safety</a><?php if ($signedIn): ?><a href="/beyond-tv/browse.php?list=mine">My List</a><?php else: ?><a href="/beyond-id/auth/login.php?return=/beyond-tv/">Sign in</a><?php endif; ?></nav>
 </header>

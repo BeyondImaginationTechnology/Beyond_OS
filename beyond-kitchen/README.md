@@ -1,10 +1,17 @@
 # Beyond Kitchen 0.0.2
 
+Primary address: `https://recipe.beyondimagination.co.technology/`. StartCP
+points this subdomain to `beyondimagination.co.technology/www/recipe`, a local
+copy of `beyond-kitchen/` with its assets, PWA, and API at the subdomain root.
+The existing main-domain path `/beyond-kitchen/` continues to work. Changes to
+the recipe catalog or app should be copied to both folders until the legacy path
+is retired.
+
 Beyond Kitchen 0.0.2 includes a responsive PHP web app and starter native
 Android and iOS clients. Each has a date-based daily pick, recipe search and
 filters, step-by-step instructions, adjustable servings, and favorites stored
-on the device. Recipe content is maintained once in `data/recipes.json` and
-bundled directly from that shared catalog into the native apps. Favorites are
+on the device. Recipe content is copied between the web folders in
+`data/recipes.json` and bundled into the native apps. Favorites are
 not synced to a Beyond ID account.
 
 The web page follows the PHP architecture in this repository and can run from
@@ -18,6 +25,40 @@ plate. The page uses rendered 1080 × 1350 JPEGs when they are available and
 falls back to readable recipe slides while offline or before the daily render.
 The native clients bundle the recipe catalog and photos, so their carousels
 work without network access.
+
+## Recipe budget planner
+
+The web app shows an ingredient-use estimate for every recipe, scales it with
+servings, and compares three store choices. The region selector covers all 13
+Canadian provinces and territories and all 50 U.S. states plus Washington, DC,
+and Puerto Rico. Canadian estimates display CAD; U.S. estimates display USD.
+The chosen region and store are saved in the browser.
+
+`data/budget-estimates.json` contains the September 2026 planning assumptions:
+ingredient unit costs, coarse regional factors, and store profile factors.
+These values are editorial estimates, not current retailer quotes or a live
+currency conversion. They estimate the share of ingredients used, including
+small pantry portions, rather than the full cost of buying every package.
+Store links let readers check current prices. Statistics Canada provincial food
+price data and the USDA Food Price Outlook provide context, but the per-item
+and per-store factors are not official figures from either source. Refresh the
+data file before using estimates as current shopping guidance.
+
+## What's for dinner? · beta 0.0.1
+
+The dinner guide accepts a short free-text prompt, with optional time, budget,
+energy, spice, and vegetarian shortcuts. A server-side OpenAI request returns
+three cards: one recipe from the shared catalog, one pickup dish idea, and one
+delivery dish idea. Pickup and delivery links open a nearby web search. The
+guide does not claim live menus, prices, restaurant availability, or order
+placement. When the AI service is unavailable, each client offers a recipe.
+
+Set `OPENAI_API_KEY` on the PHP host (or `ai.openai.api_key` in the protected
+live configuration). The optional `BEYOND_AI_QUICK_MODEL` setting overrides the
+default `gpt-4o-mini`. The public endpoint at `api/dinner.php` uses a per-IP
+daily request cap and a site-wide daily cap; prompt text is not saved. Native
+clients call the hosted endpoint over HTTPS, so deploy it before using their
+AI dinner guide.
 
 ## Daily Instagram carousel draft
 
@@ -33,8 +74,8 @@ entry in the hosting control panel after deploying:
 
 Run `php server/cron/daily-kitchen-carousel.php` once to create today's draft.
 An optional `YYYY-MM-DD` argument renders a specific date. The output is
-`assets/images/daily/YYYY-MM-DD/slide-01.jpg` through `slide-05.jpg`, a dated
-`manifest.json`, and `assets/images/daily/latest.json`. This directory is
+`recipe/assets/images/daily/YYYY-MM-DD/slide-01.jpg` through `slide-05.jpg`, a dated
+`manifest.json`, and `recipe/assets/images/daily/latest.json`. This directory is
 ignored by Git so daily renders do not block deployments. The manifest includes
 the slide copy, image paths, and a caption draft. Publishing to Instagram is
 manual in this release; the cron prepares the draft.

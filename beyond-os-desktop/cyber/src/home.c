@@ -13,6 +13,9 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <time.h>
+#ifndef BIT_EDITION_CYBER
+#error "Cyber desktop must be built with BIT_EDITION_CYBER"
+#endif
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -40,8 +43,7 @@ static int entry_count, scroll, selected;
 static bool dirty, note_writable = true;
 static const SDL_Color white = {239, 242, 255, 255};
 static const SDL_Color muted = {153, 170, 195, 255};
-static const SDL_Color accent = {150, 174, 255, 255};
-#ifdef BIT_EDITION_CYBER
+static const SDL_Color accent = {186, 143, 255, 255};
 #define EDITION_LABEL "CYBER EDITION 0.1"
 #define HOME_KICKER "AUTHORIZED SECURITY WORKSPACE"
 #define HOME_TITLE "Know your scope."
@@ -51,17 +53,6 @@ static const SDL_Color accent = {150, 174, 255, 255};
 static const char *titles[] = {"Scope & Inventory", "Evidence", "Terminal", "About Cyber"};
 static const char *subtitles[] = {"Record authorization before network discovery", "Keep local findings together",
                                   "Your Linux command line", "Your system, at a glance"};
-#else
-#define EDITION_LABEL "HOME EDITION 1.0"
-#define HOME_KICKER "YOUR SPACE. YOUR POSSIBILITIES."
-#define HOME_TITLE "Cyber workspace."
-#define HOME_COPY "A little room to think. A new place to begin."
-#define FOUNDATION_NOTE "Linux foundation preview"
-#define UPCOMING_NOTE "Browsing, streaming, device settings and updates are upcoming milestones."
-static const char *titles[] = {"Files", "Notes", "Terminal", "About Beyond OS"};
-static const char *subtitles[] = {"Explore your computer", "A place to put your thoughts",
-                                  "Your Linux command line", "Your system, at a glance"};
-#endif
 
 static void box(int x, int y, int w, int h, int r, int g, int b)
 {
@@ -110,7 +101,7 @@ static void orbit(int cx, int cy, double radius)
             double b = (i + 1) * 6.283185307179586 / 180.0;
             double ax = radius * cos(a), ay = radius * 0.345 * sin(a);
             double bx = radius * cos(b), by = radius * 0.345 * sin(b);
-            SDL_SetRenderDrawColor(renderer, (Uint8)(105 + i / 3), 150, 250, 255);
+            SDL_SetRenderDrawColor(renderer, (Uint8)(135 + i / 3), 105, 250, 255);
             SDL_RenderDrawLine(renderer, cx + (int)(ax*cos(angle)-ay*sin(angle)),
                               cy + (int)(ax*sin(angle)+ay*cos(angle)),
                               cx + (int)(bx*cos(angle)-by*sin(angle)),
@@ -192,19 +183,18 @@ static void go_home(void)
     status[0] = 0;
 }
 
-static void launch_terminal(void)
+static void launch_terminal(bool scope_menu)
 {
 #ifndef _WIN32
     pid_t child = fork();
     if (child == 0) {
-#ifdef BIT_EDITION_CYBER
-        execlp("xterm", "xterm", "-T", "BIT OS Cyber Terminal", "-bg", "#090d16",
-               "-fg", "#eff2ff", "-fa", "DejaVu Sans Mono", "-fs", "12",
-               "-e", "bit-cyber-menu", (char *)NULL);
-#else
-        execlp("xterm", "xterm", "-T", "Beyond Terminal", "-bg", "#090d16",
-               "-fg", "#eff2ff", "-fa", "DejaVu Sans Mono", "-fs", "12", (char *)NULL);
-#endif
+        if (scope_menu)
+            execlp("xterm", "xterm", "-T", "BIT OS Cyber Scope", "-bg", "#090d16",
+                   "-fg", "#eff2ff", "-fa", "DejaVu Sans Mono", "-fs", "12",
+                   "-e", "bit-cyber-menu", (char *)NULL);
+        else
+            execlp("xterm", "xterm", "-T", "BIT OS Cyber Terminal", "-bg", "#090d16",
+                   "-fg", "#eff2ff", "-fa", "DejaVu Sans Mono", "-fs", "12", (char *)NULL);
         _exit(127);
     }
     if (child < 0) snprintf(status, sizeof status, "Could not open terminal: %s", strerror(errno));
@@ -216,8 +206,8 @@ static void launch_terminal(void)
 
 static void activate(int card)
 {
-#ifdef BIT_EDITION_CYBER
-    if (card == 0 || card == 2) launch_terminal();
+    if (card == 0) launch_terminal(true);
+    else if (card == 2) launch_terminal(false);
     else if (card == 1) {
         const char *home = getenv("HOME");
         int count = home ? snprintf(directory, sizeof directory, "%s/Documents/Cyber/Evidence", home) : -1;
@@ -228,12 +218,6 @@ static void activate(int card)
         page = FILES;
         load_directory();
     } else { page = ABOUT; status[0] = 0; }
-#else
-    if (card == 0) { page = FILES; load_directory(); }
-    else if (card == 1) { if (!note_writable) { snprintf(status, sizeof status, "Notes could not load the existing file (unreadable or over 8 KB). It has not been changed."); return; } page = NOTES; SDL_StartTextInput(); snprintf(status, sizeof status, "Type a note. Ctrl+S saves. Cyber also saves before leaving."); }
-    else if (card == 2) launch_terminal();
-    else { page = ABOUT; status[0] = 0; }
-#endif
 }
 
 static void open_entry(int index)
@@ -304,7 +288,7 @@ static void draw(void)
     } else {
         box(50, 90, 110, 44, 33, 45, 65);
         text(font, "Cyber", 72, 99, white);
-        const char *heading = page == FILES ? "Files" : page == NOTES ? "Notes" : page == VIEWER ? file_title : "About Beyond OS";
+        const char *heading = page == FILES ? "Evidence" : page == NOTES ? "Notes" : page == VIEWER ? file_title : "About Cyber";
         text(title_font, heading, 50, 153, white);
         if (page == FILES) {
             SDL_Rect clip = {50, 221, 1000, 34};

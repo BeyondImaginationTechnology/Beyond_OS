@@ -85,6 +85,28 @@ function bt_library_collections(): array
     ];
 }
 
+/** The numbered Season One schedule excludes the two opening bonuses and Studio extras. */
+function bt_season_one_drops(): array
+{
+    $drops = [];
+    foreach (bt_library_collections() as $collectionSlug => $collection) {
+        if (in_array($collectionSlug, ['beyond-studio-originals', 'beyond-studio-japanese'], true)) break;
+        foreach ($collection['stencils'] as $collectionIndex => [$title, $releaseDate]) {
+            if ($collectionSlug === 'season-one-opening' && $collectionIndex >= 4) continue;
+            $drops[] = [
+                'sequence' => count($drops) + 1,
+                'title' => $title,
+                'release_date' => $releaseDate,
+                'collection' => $collection['name'],
+                'collection_slug' => $collectionSlug,
+                'collection_index' => $collectionIndex,
+            ];
+        }
+    }
+    if (count($drops) !== 55) throw new RuntimeException('Season One schedule must contain exactly 55 numbered drops.');
+    return $drops;
+}
+
 function bt_pretty_date(string $iso): string
 {
     try { return (new DateTimeImmutable($iso))->format('M j, Y'); }

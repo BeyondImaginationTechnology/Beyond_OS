@@ -18,6 +18,5 @@ Font binaries are not included. Artwork follows the repository's
 `CONTENT_RIGHTS.md`; source code follows `LICENSE`.
 
 
-`home-preview.png` was captured from the compiled SDL2 desktop running in hidden
-screenshot mode on Windows. It demonstrates the native renderer, not a booted
-Linux image. Temporary development binaries are not included in this folder.
+`cyber-preview.png` is a QEMU/OVMF capture of the Cyber 0.1 live desktop.
+Temporary development binaries are not included in this folder.

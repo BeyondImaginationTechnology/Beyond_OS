@@ -7,7 +7,8 @@ Current work: `cyber-0.1-dev.1`. Source completion is not a stable release.
 - [ ] Resolve both Cyber Buildroot configurations against the locked upstream source.
 - [ ] Complete clean system and installer builds on an x86-64 Linux host.
 - [ ] Retain the resolved configurations, build logs, SHA-256 manifest, and Buildroot legal information.
-- [ ] Confirm that the ISO, GUID Partition Table (GPT) USB image, and root filesystem match the published manifest.
+- [x] Confirm that the ISO, GUID Partition Table (GPT) USB image, and root filesystem match the build manifest.
+- [ ] Confirm that the published downloads match the public manifest.
 - [ ] Build and Authenticode-sign `BITOSInstaller.exe`; retain its SHA-256 hash and signing evidence.
 
 For a public test-candidate download, compress the ISO and GPT image, then
@@ -18,12 +19,12 @@ record; do not overwrite it until it has been retained separately.
 ## Boot and installation
 
 - [ ] Cold-boot the system image to the Cyber desktop as the non-root user.
-- [ ] Boot `bitCyberos.iso` with OVMF UEFI and verify both Try Cyber and Install Cyber entries.
-- [ ] Boot the GUID Partition Table (GPT) USB image with OVMF UEFI and verify both menu entries.
-- [ ] Install to a disposable virtual disk using the selected-partition workflow.
-- [ ] Install to a disposable virtual disk using the explicit whole-disk workflow.
+- [x] Boot `bitCyberos.iso` with OVMF UEFI and verify both Try Cyber and Install Cyber entries.
+- [x] Boot the GUID Partition Table (GPT) USB image with OVMF UEFI and verify both menu entries.
+- [x] Install to a disposable virtual disk using the selected-partition workflow; the existing EFI marker and another partition were preserved.
+- [x] Install to a disposable virtual disk using the explicit whole-disk workflow.
 - [ ] Confirm that the installer rejects its own USB, mounted targets, undersized targets, invalid EFI partitions, and mismatched confirmation text.
-- [ ] Reboot the installed disk without installer media and reach the Cyber desktop.
+- [ ] Reboot the final selected-partition candidate without installer media and reach the Cyber desktop. An earlier whole-disk candidate passed this check.
 
 ## Product and security behavior
 

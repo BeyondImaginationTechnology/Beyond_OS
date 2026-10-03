@@ -19,6 +19,7 @@ function initProviderPlayer(container){
   const fallback=container.querySelector('.player-fallback');
   const embed=container.querySelector('.archive-embed');
   const status=document.querySelector('.provider-status');
+  const reportLink=document.getElementById('channel-report-link');
   let sources=[];
   let sourceIndex=-1;
   let embedFallback='';
@@ -44,6 +45,7 @@ function initProviderPlayer(container){
     sourceIndex+=1;
     if(sourceIndex>=sources.length){showFallback();return}
     const source=sources[sourceIndex];
+    if(reportLink){const reportUrl=new URL('/beyond-tv/source-safety.php',window.location.origin);reportUrl.searchParams.set('page',window.location.href);reportUrl.searchParams.set('channel',new URLSearchParams(window.location.search).get('slug')||'');reportUrl.searchParams.set('title',source.title||'');reportUrl.searchParams.set('source',source.url||'');reportLink.href=reportUrl.href}
     const sourceOffset=sourceIndex===0?startOffset:0;
     if(loading){loading.hidden=false;loading.textContent=`Tuning to ${source.provider}…`}
     if(fallback)fallback.hidden=true;
@@ -148,7 +150,22 @@ document.querySelectorAll('.tv-channel-tile[data-channel]').forEach(tile=>tile.a
   initProviderPlayer(player);
   window.scrollTo({top:0,behavior:'smooth'});
 }));
-document.querySelectorAll('[data-my-list]').forEach(button=>button.addEventListener('click',()=>{button.textContent=button.textContent.includes('Added')?'＋ My List':'✓ Added to My List'}));
+document.querySelectorAll('[data-my-list]').forEach(button=>button.addEventListener('click',async()=>{
+  if(button.disabled)return;
+  const saved=button.getAttribute('aria-pressed')!=='true';
+  button.disabled=true;
+  try{
+    const response=await fetch('/beyond-tv/api/my-list.php',{
+      method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','Accept':'application/json','X-CSRF-Token':button.dataset.listToken||''},
+      body:JSON.stringify({type:button.dataset.listType,slug:button.dataset.listSlug,saved})
+    });
+    const result=await response.json();
+    if(!response.ok||!result.ok)throw new Error(result.error||'Could not update My List.');
+    button.setAttribute('aria-pressed',String(result.saved));
+    button.textContent=result.saved?'✓ Added to My List':'＋ My List';
+  }catch(error){window.alert(error.message||'Could not update My List.');}
+  finally{button.disabled=false;}
+}));
 (function initRotatingNowPlaying(){
   const stage=document.querySelector('[data-tv-stage]');
   const dataNode=document.getElementById('tv-rotation-data');

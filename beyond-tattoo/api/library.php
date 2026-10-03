@@ -58,6 +58,7 @@ echo json_encode([
     'version' => '1.2',
     'season_total' => 55,
     'asset_count' => count($items),
+    'season_one_released_count' => count(array_filter($items, static fn(array $asset): bool => $asset['season_drop'] !== null && $asset['is_released'])),
     'daily_id' => $daily['id'] ?? null,
     'generated_at' => gmdate('c'),
     'collections' => array_values($collections),

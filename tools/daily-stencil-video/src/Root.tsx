@@ -8,6 +8,11 @@ import {
   DailyBreathVideoProps,
   defaultDailyBreathVideoProps,
 } from './DailyBreathVideo';
+import {
+  DailyBreathStory,
+  DailyBreathStoryProps,
+  defaultDailyBreathStoryProps,
+} from './DailyBreathStory';
 
 const calculateMetadata: CalculateMetadataFunction<DailyStencilProps> = async ({props}) => {
   const qrDataUrl = props.showQrCode && props.downloadUrl
@@ -37,6 +42,15 @@ const calculateDailyBreathMetadata: CalculateMetadataFunction<
 
 export const RemotionRoot: React.FC = () => (
   <>
+    <Composition
+      id="DailyBreathStory"
+      component={DailyBreathStory}
+      durationInFrames={1800}
+      fps={30}
+      width={1080}
+      height={1920}
+      defaultProps={defaultDailyBreathStoryProps}
+    />
     <Composition id="DailyStencilPack" component={DailyStencilPack} durationInFrames={600} fps={60} width={1080} height={1080} defaultProps={defaultDailyStencilProps} calculateMetadata={calculateMetadata}/>
     <Composition id="SpaceHoroscopeVideo" component={SpaceHoroscopeVideo} durationInFrames={900} fps={30} width={1080} height={1080} defaultProps={defaultSpaceHoroscopeProps as SpaceHoroscopeProps}/>
     <Composition

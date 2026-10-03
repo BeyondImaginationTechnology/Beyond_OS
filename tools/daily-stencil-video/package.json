@@ -6,6 +6,7 @@
     "studio": "remotion studio src/index.ts",
     "render": "mkdir -p out && remotion render src/index.ts DailyStencilPack out/daily-stencil-pack.mp4 --props=public/daily-stencil.json",
     "render:breath": "mkdir -p out && remotion render src/index.ts DailyBreathVideo out/daily-breath.mp4 --props=public/daily-breath-video.json",
+    "render:story": "mkdir -p out && remotion render src/index.ts DailyBreathStory out/daily-breath-story.mp4 --props=public/daily-breath-story.json",
     "render:space": "mkdir -p out && remotion render src/index.ts SpaceHoroscopeVideo out/beyond-space-horoscope.mp4 --props=public/space-horoscope.json",
     "still": "mkdir -p out && remotion still src/index.ts DailyStencilPack out/preview.png --frame=210 --props=public/daily-stencil.json",
     "prepare": "node scripts/prepare-remote-config.mjs",

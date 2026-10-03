@@ -45,6 +45,27 @@ composition reads this file directly. Preview or render it locally with:
 npm run render:breath
 ```
 
+### Daily Breath 60-second story
+
+The Remotion `DailyBreathStory` composition uses a fixed 60-second, 1080×1920,
+30 FPS timeline. Its six editable narrative beats occupy 0:00–0:50; source
+credits run 0:50–0:55 and the branded Daily Breath outro runs 0:55–1:00.
+`public/daily-breath-story.json` is a complete example/default props file and
+can be rendered locally with:
+
+```bash
+npm run render:story
+```
+
+In Daily Studio, open DailyBreath → **60-second Story Builder**. Enter a topic
+and up to four source blocks in `citation | URL | excerpt or notes` format.
+Generation uses only the supplied excerpt/notes (URLs are credited but not
+fetched), returns the beat narration, concise screen text, and visual-production
+prompts, and requires an editor to review the draft before downloading the
+story brief or rendering an MP4. The Remotion export is a motion-graphics
+template; visual prompts are provided for a separate image-production step and
+are not represented as generated images in the exported video.
+
 The existing `server/cron/daily-studio-daily.php` worker also renders one video
 for the current date in the configured timezone. It saves the public MP4 at
 `/dailybreath/assets/videos/breathing/YYYY-MM-DD.mp4` and atomically updates

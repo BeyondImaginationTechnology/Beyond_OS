@@ -12,8 +12,8 @@ function kitchen_daily_carousel(?string $requestedDate = null): string
     }
 
     $root = dirname(__DIR__, 2);
-    $catalogPath = $root . '/beyond-kitchen/data/recipes.json';
-    $outputRoot = $root . '/beyond-kitchen/assets/images/daily';
+    $catalogPath = $root . '/recipe/data/recipes.json';
+    $outputRoot = $root . '/recipe/assets/images/daily';
     $timezone = new DateTimeZone(getenv('BEYOND_KITCHEN_TIMEZONE') ?: 'America/Vancouver');
     $today = (new DateTimeImmutable('now', $timezone))->format('Y-m-d');
     $date = $requestedDate ?? $today;
@@ -28,8 +28,8 @@ function kitchen_daily_carousel(?string $requestedDate = null): string
     }
     $epochDay = (int)floor($day->getTimestamp() / 86400);
     $recipe = $catalog[(($epochDay % count($catalog)) + count($catalog)) % count($catalog)];
-    $photoPath = realpath($root . '/beyond-kitchen/' . $recipe['image']);
-    $photoRoot = realpath($root . '/beyond-kitchen/assets/images/recipes');
+    $photoPath = realpath($root . '/recipe/' . $recipe['image']);
+    $photoRoot = realpath($root . '/recipe/assets/images/recipes');
     if (!$photoPath || !$photoRoot || !str_starts_with($photoPath, $photoRoot . DIRECTORY_SEPARATOR)) {
         throw new RuntimeException('The daily recipe photo is unavailable.');
     }
@@ -61,7 +61,7 @@ function kitchen_daily_carousel(?string $requestedDate = null): string
             ['label' => 'What you\'ll need', 'title' => 'The ingredients', 'body' => implode("\n", $ingredients)],
             ['label' => 'Let\'s make it · 1', 'title' => 'Get started', 'body' => $steps[0]],
             ['label' => 'Let\'s make it · 2', 'title' => 'Bring it together', 'body' => implode("\n\n", array_slice($steps, 1))],
-            ['label' => 'Make it your own', 'title' => 'Ready to enjoy', 'body' => 'Save this recipe for later. Find the full method at beyondimagination.co.technology/beyond-kitchen/'],
+            ['label' => 'Make it your own', 'title' => 'Ready to enjoy', 'body' => 'Save this recipe for later. Find the full method at recipe.beyondimagination.co.technology/'],
         ];
         $relativeDirectory = 'assets/images/daily/' . $date . '/';
         $imagePaths = [];
@@ -81,7 +81,7 @@ function kitchen_daily_carousel(?string $requestedDate = null): string
             'description' => $recipe['description'],
             'images' => $imagePaths,
             'slides' => $slides,
-            'caption' => $recipe['name'] . " — " . $recipe['description'] . "\n\n" . $recipe['timeMinutes'] . ' min · ' . $recipe['servings'] . " servings. Full recipe: https://beyondimagination.co.technology/beyond-kitchen/\n\n#BeyondKitchen #EverydayCooking #RecipeIdeas",
+            'caption' => $recipe['name'] . " — " . $recipe['description'] . "\n\n" . $recipe['timeMinutes'] . ' min · ' . $recipe['servings'] . " servings. Full recipe: https://recipe.beyondimagination.co.technology/\n\n#BeyondKitchen #EverydayCooking #RecipeIdeas",
         ];
         kitchen_write_json($directory . '/manifest.json', $manifest);
         if ($date === $today) kitchen_write_json($outputRoot . '/latest.json', $manifest);

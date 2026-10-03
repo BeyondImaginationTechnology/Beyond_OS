@@ -97,6 +97,17 @@ function beyond_tv_after_dark_hourly_rows(): array {
             'video_url' => 'https://archive.org/details/17.-ghost-stories-2000-dual-audio-dvdrip-960x-720-10bit-hevc',
         ];
     }
+    $catalog = json_decode((string)@file_get_contents(__DIR__ . '/../data/catalog.json'), true) ?: [];
+    foreach (beyond_tv_catalog_entries_for_channel($catalog, 'beyond-after-dark') as $entry) {
+        if (($entry['archive_id'] ?? '') !== 'comedy-collection' || empty($entry['video_url'])) continue;
+        $playlist[] = [
+            'series' => (string)$entry['title'],
+            'title' => (string)$entry['title'],
+            'is_movie' => true,
+            'runtime_seconds' => max(60, (int)($entry['duration'] ?? 7200)),
+            'video_url' => (string)$entry['video_url'],
+        ];
+    }
     $durations = array_map(static fn(array $episode): int => max(60, (int)($episode['runtime_seconds'] ?? 1380)), $playlist);
     $total = array_sum($durations);
     if (!$playlist || $total < 1) return [];
@@ -107,7 +118,8 @@ function beyond_tv_after_dark_hourly_rows(): array {
         foreach ($durations as $candidate => $duration) { if ($position < $duration) { $index = $candidate; break; } $position -= $duration; }
         $episode = $playlist[$index];
         $series = (string)($episode['series'] ?? 'The Haunting Hour');
-        $rows[] = ['start'=>$hour,'end'=>$hour+1,'icon'=>in_array($series, ['Goosebumps','Ghost Stories'], true) ? '👻' : '🌙','title'=>$series,'lineup'=>'S1 E'.(int)($episode['episode'] ?? ($index+1)).' · '.(string)($episode['title'] ?? 'Episode')];
+        $lineup = !empty($episode['is_movie']) ? 'Feature film' : 'S1 E'.(int)($episode['episode'] ?? ($index+1)).' · '.(string)($episode['title'] ?? 'Episode');
+        $rows[] = ['start'=>$hour,'end'=>$hour+1,'icon'=>in_array($series, ['Goosebumps','Ghost Stories'], true) ? '👻' : '🌙','title'=>$series,'lineup'=>$lineup];
     }
     return $rows;
 }

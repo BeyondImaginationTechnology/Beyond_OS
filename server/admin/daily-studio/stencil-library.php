@@ -6,7 +6,6 @@ require_once dirname(__DIR__, 3) . '/beyond-tattoo/includes/stencil-content.php'
 $csrf = Auth::csrf();
 
 $dropSchedule = [];
-$sequence = 0;
 $collectionPresets = [
     'divine-realism' => [
         'label' => 'Divine Realism Collection',
@@ -45,12 +44,14 @@ $collectionPresets = [
         'lore' => 'a visual reminder that mortality, time and shadow can sharpen purpose rather than erase it',
     ],
 ];
-foreach (bt_library_collections() as $collectionSlug => $collection) {
-    $preset = $collectionPresets[$collectionSlug];
-    foreach ($collection['stencils'] as [$stencilTitle, $releaseDate]) {
-        $sequence++;
+foreach (bt_season_one_drops() as $scheduledDrop) {
+        $collectionSlug = $scheduledDrop['collection_slug'];
+        $collection = bt_library_collections()[$collectionSlug];
+        $preset = $collectionPresets[$collectionSlug];
+        $stencilTitle = $scheduledDrop['title'];
+        $releaseDate = $scheduledDrop['release_date'];
         $dropSchedule[] = [
-            'sequence' => $sequence,
+            'sequence' => $scheduledDrop['sequence'],
             'title' => $stencilTitle,
             'release_date' => $releaseDate,
             'display_date' => (new DateTimeImmutable($releaseDate))->format('l, F j, Y'),
@@ -64,7 +65,6 @@ foreach (bt_library_collections() as $collectionSlug => $collection) {
             'concept' => $stencilTitle . ' interpreted through ' . $preset['concept'] . '.',
             'lore' => $stencilTitle . ' is presented in the ' . $preset['label'] . ' as ' . $preset['lore'] . '.',
         ];
-    }
 }
 $campaignTz = new DateTimeZone('America/Vancouver');
 $campaignToday = new DateTimeImmutable('today', $campaignTz);
@@ -250,7 +250,9 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
           <label class="check"><input class="preflight" type="checkbox"> Full design in frame</label>
           <label class="check"><input class="preflight" type="checkbox"> No stray text artifacts</label>
         </div>
-        <div class="actions"><button class="btn" id="publishBtn" disabled type="button">Publish artist pack</button></div>
+        <label class="check"><input id="replaceLibraryAssets" type="checkbox"> Replace an existing Season 1 kit with this reviewed revision</label>
+        <div class="actions"><button class="btn" id="publishBtn" disabled type="button">Stage kit for library review</button></div>
+        <p><a href="tattoo-asset-import.php" style="color:#e7ca8f">Open Season 1 asset review →</a></p>
         <button class="btn remotion" id="renderVideo" disabled type="button">Export animated Remotion MP4</button>
       </div>
     </article>
@@ -316,7 +318,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   };
   const assetIntelCopy = {
     reference: 'High-detail visual reference for mood, materials, lighting, and artist consultation.',
-    stencil: 'Printer-ready transfer master with subtle bit-atom provenance marks baked into the stencil canvas.',
+    stencil: 'Clean, printer-ready transfer master. The public preview receives its own branding at the library handoff.',
     placement: 'Anatomy and scale mockup to confirm flow before final studio sizing.',
     pack: 'Instagram-square premium package post with the resealable pack kept visible and text kept off the package body.',
     lore: 'Story card for symbolism, collection context, and collector-facing release notes.',
@@ -499,7 +501,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     $('downloadMirror').disabled = true;
     $('downloadActive').disabled = true;
     $('stencilUpload').value = '';
-    $('publishBtn').textContent = 'Publish artist pack';
+    $('publishBtn').textContent = activeDrop()?.campaign === 'season-one' ? 'Stage kit for library review' : 'Publish artist pack';
     document.querySelectorAll('.preflight').forEach((checkbox) => { checkbox.checked = false; });
     $('providerMeta').textContent = 'Awaiting generation';
     $('qualityMeta').textContent = 'High quality · PNG';
@@ -592,7 +594,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     ctx.fillText('bit$', 0, size * .68);
     ctx.restore();
   };
-  const watermarkStencilDataUrl = async (source) => {
+  const cleanStencilDataUrl = async (source) => {
     const stencil = await loadImage(source);
     const canvas = document.createElement('canvas');
     canvas.width = stencil.naturalWidth || stencil.width || 1024;
@@ -601,9 +603,6 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(stencil, 0, 0, canvas.width, canvas.height);
-    const size = Math.min(canvas.width, canvas.height) * .16;
-    drawBitAtom(ctx, canvas.width - size * .7, size * .62, size, .13);
-    drawBitAtom(ctx, size * .7, canvas.height - size * .64, size, .1);
     return canvas.toDataURL('image/png');
   };
   const fitCanvasText = (ctx, text, maxWidth, start, min = 22) => {
@@ -830,7 +829,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     selectPreview('lore');
   };
   const show = async (data) => {
-    image = await watermarkStencilDataUrl(data.image);
+    image = await cleanStencilDataUrl(data.image);
     referenceImage = '';
     placementImage = '';
     packImage = '';
@@ -840,7 +839,7 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
     provider = data.provider || '';
     setFallbackPrompt('', '');
     $('publishBtn').disabled = false;
-    $('publishBtn').textContent = 'Publish artist pack';
+    $('publishBtn').textContent = activeDrop()?.campaign === 'season-one' ? 'Stage kit for library review' : 'Publish artist pack';
     $('renderVideo').disabled = !renderToken;
     $('generateReference').disabled = false;
     $('generatePlacement').disabled = false;
@@ -1156,13 +1155,44 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
   $('publishBtn').onclick = async () => {
     if (!image) return;
     if (![...document.querySelectorAll('.preflight')].every((checkbox) => checkbox.checked)) {
-      message('Complete all four artist preflight checks before publishing.', true);
+      message('Complete all four artist preflight checks before staging or publishing.', true);
       return;
     }
     const drop = activeDrop();
     $('publishBtn').disabled = true;
-    message('Building and publishing the static artist pack…');
+    const seasonOne = drop.campaign === 'season-one';
+    let stagedDraft = false;
+    message(seasonOne ? 'Staging the clean stencil and kit in the numbered library…' : 'Building and publishing the static artist pack…');
     try {
+      if (seasonOne) {
+        const stagePart = async (part) => {
+          const body = JSON.stringify({campaign: 'season-one', sequence: drop.sequence, ...part});
+          if (new Blob([body]).size > 7 * 1024 * 1024) throw new Error('One image exceeds the safe upload size. Download it and use the Asset inbox for that role.');
+          const response = await fetch('api/stage-tattoo-generator-drop.php', {
+            method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRF-Token': csrf}, body,
+          });
+          const data = await response.json().catch(() => ({error: 'The server could not accept this image. Try the Asset inbox.'}));
+          if (!response.ok || !data.ok) throw new Error(data.error || 'Library staging failed.');
+        };
+        await stagePart({png: image, lore: $('lore').value.trim(), style: $('style').value,
+          placement: $('placement').value, replace: $('replaceLibraryAssets').checked});
+        stagedDraft = true;
+        $('replaceLibraryAssets').checked = true;
+        const parts = [
+          ['reference_png', referenceImage], ['placement_png', placementImage],
+          ['pack_png', packImage], ['lore_card_png', loreCard], ['style_card_png', styleCard],
+        ];
+        let completed = 1;
+        for (const [key, value] of parts) {
+          if (!value) continue;
+          message(`Staging image ${++completed} of 6 for drop ${drop.sequence}…`);
+          await stagePart({append: true, [key]: value});
+        }
+        setStep(2);
+        message(`Drop ${drop.sequence}/55 staged with ${completed} of 6 kit images. Review the files in the Asset inbox and approve the drop to release it on schedule.`);
+        $('publishBtn').textContent = 'Staged for review ✓';
+        return;
+      }
       const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1536"><image width="1024" height="1536" href="generated-stencil-of-the-day.png"/></svg>';
       const response = await fetch('publish-tattoo.php', {
         method: 'POST',
@@ -1192,12 +1222,10 @@ button,input,textarea,select{font:inherit}.wrap{max-width:1420px;margin:auto;pad
       if (!response.ok || !data.ok) throw new Error(data.error || 'Publishing failed.');
       setStep(2);
       const completed = [referenceImage, image, placementImage, packImage, loreCard, styleCard].filter(Boolean).length;
-      message(packImage
-        ? `Artist pack published with ${completed} of 6 daily-drop assets. The storefront package stage uses the premium pack image and the daily card keeps the clean stencil.`
-        : `Artist pack published with ${completed} of 6 assets and the clean stencil remains the storefront preview. Generate packaging before the next publish to upgrade the package stage.`);
+      message(`Artist pack published with ${completed} of 6 daily-drop assets.`);
       $('publishBtn').textContent = 'Published ✓';
     } catch (error) {
-      message(error.message || 'Publishing failed.', true);
+      message((stagedDraft ? 'A partial draft is in the Asset inbox. ' : '') + (error.message || 'Publishing failed.'), true);
       $('publishBtn').disabled = false;
     }
   };

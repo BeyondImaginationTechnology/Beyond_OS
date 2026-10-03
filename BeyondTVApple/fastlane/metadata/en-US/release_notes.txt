@@ -1,0 +1,1 @@
+Added Source Safety labels and a report link for video sources. Reports can include rights, suspicious-link, and playback concerns for private review.

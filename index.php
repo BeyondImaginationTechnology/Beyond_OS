@@ -1,14 +1,20 @@
 <?php
 declare(strict_types=1);
+header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
+header('CDN-Cache-Control: no-store');
+header('Surrogate-Control: no-store');
+header('Pragma: no-cache');
+header('Expires: 0');
 require_once __DIR__ . '/includes/ecosystem.php';
 require_once __DIR__ . '/beyond-tv/includes/classic-schedule.php';
 require_once __DIR__ . '/beyond-tv/includes/beyond-cartoons-schedule.php';
 require_once __DIR__ . '/beyond-tv/includes/public-channel-catalog.php';
 beyond_nav_bootstrap('Beyond Imagination Technology');
 $signedIn = isset($_SESSION['user_id']);
+$homeJaguarCsrf = csrf_token();
 $homeTvRelease = json_decode((string)@file_get_contents(__DIR__ . '/beyond-tv/data/release.json'), true) ?: [];
-$homeTvVersion = (string)($homeTvRelease['version'] ?? '1.0');
-$homeTvBuild = (int)($homeTvRelease['build'] ?? 2001);
+$homeTvVersion = (string)($homeTvRelease['web']['version'] ?? $homeTvRelease['version'] ?? '1.0');
+$homeTvBuild = (int)($homeTvRelease['web']['build'] ?? $homeTvRelease['build'] ?? 2001);
 
 $homeVerse = [
     'text' => 'Be still, and know that I am God.',
@@ -61,18 +67,68 @@ if (is_file($frenchLessonsPath)) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<script>(function(){try{const t=localStorage.getItem('beyond-theme');document.documentElement.dataset.theme=['fall','dark','light','sunset','ocean','forest'].includes(t)?t:'fall';}catch(e){document.documentElement.dataset.theme='fall';}try{const c=localStorage.getItem('beyond-currency');document.documentElement.dataset.currency=['BITS','USD','CAD'].includes(c)?c:'BITS';}catch(e){document.documentElement.dataset.currency='BITS';}})();</script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var themes = ['fall', 'dark', 'light', 'sunset', 'ocean', 'forest'];
+  var icons = { fall: '\uD83C\uDF42', dark: '\uD83C\uDF19', light: '\u2600\uFE0F', sunset: '\uD83C\uDF05', ocean: '\uD83C\uDF0A', forest: '\uD83C\uDF32' };
+  var labels = { fall: 'Fall', dark: 'Dark', light: 'Light', sunset: 'Sunset', ocean: 'Ocean', forest: 'Forest' };
+  var colors = { fall: '#24140d', dark: '#050817', light: '#f4f6fc', sunset: '#32113d', ocean: '#071E2E', forest: '#101C16' };
+
+  function themeForCurrentTime() {
+    var hour = new Date().getHours();
+    if (hour >= 5 && hour < 9) return 'light';
+    if (hour >= 9 && hour < 13) return 'forest';
+    if (hour >= 13 && hour < 17) return 'ocean';
+    if (hour >= 17 && hour < 19) return 'fall';
+    if (hour >= 19 && hour < 22) return 'sunset';
+    return 'dark';
+  }
+
+  function updateTheme(theme) {
+    root.dataset.theme = theme;
+    root.dataset.defaultTheme = theme;
+    var next = themes[(themes.indexOf(theme) + 1) % themes.length];
+    var buttons = document.querySelectorAll('.theme-toggle');
+    for (var index = 0; index < buttons.length; index += 1) {
+      buttons[index].textContent = icons[theme];
+      buttons[index].title = labels[theme] + ' theme - switch to ' + labels[next];
+      buttons[index].setAttribute('aria-label', 'Current theme ' + labels[theme] + '. Switch to ' + labels[next] + ' theme');
+    }
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', colors[theme]);
+  }
+
+  var scheduledTheme = themeForCurrentTime();
+  updateTheme(scheduledTheme);
+  window.setInterval(function () {
+    var nextScheduledTheme = themeForCurrentTime();
+    if (nextScheduledTheme !== scheduledTheme) {
+      scheduledTheme = nextScheduledTheme;
+      updateTheme(scheduledTheme);
+    }
+  }, 60000);
+
+  try {
+    var currency = localStorage.getItem('beyond-currency');
+    root.dataset.currency = ['BITS', 'USD', 'CAD'].indexOf(currency) !== -1 ? currency : 'BITS';
+  } catch (error) {
+    root.dataset.currency = 'BITS';
+  }
+})();
+</script>
 <meta name="theme-color" content="#24140d">
-<title>Beyond Imagination Technology | Live. Learn. Earn. Explore.</title>
-<meta name="description" content="Beyond Imagination Technology connects health, education, creator commerce and entertainment through Beyond ID, with BIT OS environments in development.">
+<title>Beyond Imagination Technology | Live. Learn. Earn. Explore. Protect.</title>
+<meta name="description" content="Beyond Imagination Technology connects health, education, creator commerce, entertainment and protection through Beyond ID and BIT OS.">
 <link rel="canonical" href="https://beyondimagination.co.technology/">
 <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
 <link rel="stylesheet" href="/assets/css/beyond-splash.css?v=20260828-1">
+<link rel="stylesheet" href="/assets/css/stylesheet-1-31.css?v=20261001-4">
 <link rel="stylesheet" href="/beyond-tv/assets/css/video-ads.css?v=1.0.0">
 <script src="/assets/js/beyond-splash.js?v=20260904-1" defer></script>
 <style>
 :root{--bg:#030611;--panel:#09101f;--line:rgba(255,255,255,.13);--text:#f7f8ff;--muted:#b8bed2;--pink:#f2469d;--violet:#7057ff;--green:#51db78;--gold:#ffbf32;--blue:#448cff}
-*{box-sizing:border-box}html{scroll-behavior:smooth;background:var(--bg)}body{margin:0;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 75% 10%,rgba(73,54,204,.18),transparent 28%),linear-gradient(180deg,#050817,#02040d 72%);overflow-x:hidden}a{color:inherit}.wrap{width:min(1180px,calc(100% - 32px));margin-inline:auto}.top{min-height:84px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{text-decoration:none;font-weight:1000;font-size:23px;letter-spacing:-.045em}.brand span{background:linear-gradient(100deg,#7667ff,#ec4caa);background-clip:text;color:transparent}.brand small{display:block;margin-top:5px;font-size:9px;letter-spacing:.13em;color:#c7c9d5;font-weight:700}.nav{display:flex;align-items:center;gap:29px}.nav>a:not(.primary){text-decoration:none;font-size:13px;color:#f6f7ff;padding:12px 0;border-bottom:2px solid transparent}.nav a[href="#health"]{border-color:var(--green)}.nav a[href="#education"]{border-color:var(--gold)}.nav a[href="#finance"]{border-color:var(--blue)}.primary{display:inline-flex;align-items:center;justify-content:center;min-height:47px;padding:0 23px;border-radius:9px;text-decoration:none;font-weight:850;font-size:13px;background:linear-gradient(100deg,#586cff,#ef4897);box-shadow:0 12px 34px rgba(106,74,255,.28)}.menu{display:none;background:none;border:0;color:#fff;font-size:29px}.hero{min-height:600px;display:grid;grid-template-columns:.88fr 1.12fr;align-items:center;gap:45px;padding:46px 0 55px}.hero h1{font-size:clamp(58px,7.3vw,102px);line-height:.83;letter-spacing:-.075em;margin:0 0 26px}.hero h1 span{display:block}.hero .h{color:var(--green)}.hero .e{color:var(--gold)}.hero .f{color:var(--blue)}.hero .x{color:var(--pink)}.tagline{font-size:25px;font-weight:850;margin:0 0 20px}.intro{max-width:430px;color:var(--muted);line-height:1.65;font-size:16px}.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}.ghost{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 23px;border:1px solid rgba(255,255,255,.24);border-radius:12px;text-decoration:none;font-weight:800;background:rgba(255,255,255,.025)}.benefits{display:flex;gap:28px;flex-wrap:wrap;margin-top:26px;color:#c9cedd;font-size:12px}.benefits span{display:flex;align-items:center;gap:8px}.benefits b{font-size:16px;color:#fff}.orbit{position:relative;aspect-ratio:1.18/1;display:grid;place-items:center;isolation:isolate}.orbit:before{content:"";position:absolute;inset:5%;background:radial-gradient(circle,rgba(99,78,255,.22),transparent 50%);filter:blur(15px);z-index:-1}.ring{position:absolute;border:1px solid rgba(117,158,255,.42);border-radius:50%;width:70%;aspect-ratio:1}.ring.r2{width:91%;border-color:rgba(255,188,86,.34)}.core{width:170px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-size:74px;font-weight:1000;background:radial-gradient(circle at 40% 35%,#251b55,#090919 58%);border:2px solid #9a52ff;box-shadow:0 0 0 12px rgba(92,88,255,.09),0 0 55px #6c51ff88,inset 0 0 45px #2f225f}.core span{background:linear-gradient(145deg,#516fff,#e745a3);background-clip:text;color:transparent}.planet{position:absolute;width:112px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;text-align:center;font-weight:900;font-size:12px;border:1px solid currentColor;background:rgba(6,11,25,.9);box-shadow:0 0 33px currentColor}.planet i{font-style:normal;font-size:38px;display:block;line-height:1.1}.ph{left:13%;top:14%;color:var(--green)}.pe{right:8%;top:18%;color:var(--gold)}.pf{bottom:3%;left:24%;color:var(--blue)}.px{bottom:3%;right:8%;color:var(--pink)}.welcome{margin-bottom:18px;padding:20px 26px;border:1px solid rgba(255,255,255,.12);border-radius:17px;background:linear-gradient(100deg,rgba(82,52,217,.9),rgba(201,36,125,.86));display:flex;align-items:center;justify-content:space-between;gap:18px}.welcome-copy{display:flex;align-items:center;gap:17px}.gift{font-size:38px}.welcome strong{display:block;font-size:16px}.welcome p{margin:5px 0 0;color:#e6def4;font-size:13px}.welcome .primary{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);box-shadow:none}.world{--accent:var(--green);position:relative;margin:0 auto 18px;min-height:380px;border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);border-radius:20px;overflow:hidden;background:#08121b}.world:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 72% 40%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 38%),linear-gradient(90deg,rgba(2,7,14,.97) 0%,rgba(3,8,17,.78) 38%,rgba(3,8,17,.18) 75%,rgba(3,8,17,.65) 100%)}.world.health{--accent:var(--green);background:radial-gradient(ellipse at 72% 26%,#2bb6a055 0,transparent 28%),linear-gradient(130deg,#06170f,#052b30 55%,#06141d)}.world.education{--accent:var(--gold);background:radial-gradient(circle at 62% 32%,#7f3ad466 0,transparent 30%),linear-gradient(130deg,#1b0f08,#1d1030 56%,#2c1608)}.world.finance{--accent:var(--blue);background:radial-gradient(ellipse at 75% 30%,#2f62c555 0,transparent 34%),linear-gradient(130deg,#061328,#081d45 58%,#190c37)}.world-inner{position:relative;z-index:1;min-height:380px;padding:31px 31px 26px;display:grid;grid-template-columns:320px 1fr;align-items:end;gap:26px}.world-copy{align-self:start}.world-title{display:flex;align-items:center;gap:15px;color:var(--accent)}.world-icon{width:56px;height:56px;border-radius:15px;display:grid;place-items:center;font-size:28px;background:color-mix(in srgb,var(--accent) 18%,rgba(255,255,255,.04));border:1px solid color-mix(in srgb,var(--accent) 48%,transparent)}.world h2{font-size:32px;margin:0;letter-spacing:-.035em}.world h3{font-size:17px;margin:22px 0 9px}.world p{max-width:290px;color:#c0c6d4;line-height:1.5;font-size:14px}.explore{display:inline-flex;margin-top:8px;min-height:42px;padding:0 16px;border:1px solid color-mix(in srgb,var(--accent) 72%,transparent);border-radius:12px;align-items:center;text-decoration:none;color:var(--accent);font-weight:850;font-size:13px}.apps{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:10px;align-self:end}.app{position:relative;min-height:104px;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:rgba(5,10,22,.75);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;text-decoration:none;font-size:11px;font-weight:780;padding:8px;backdrop-filter:blur(10px);transition:.2s}.app:hover{transform:translateY(-4px);border-color:var(--accent)}.app b{font-size:25px;color:var(--accent)}.app-icon{width:48px;height:48px;border-radius:13px;object-fit:cover;border:1px solid rgba(255,255,255,.18);box-shadow:0 8px 22px rgba(0,0,0,.34)}.soon{position:absolute;right:6px;top:-8px;padding:3px 6px;border-radius:8px;background:#dedfe8;color:#202333;font-size:8px}.all{border-style:dashed}.identity{margin:18px auto 0;padding:24px 30px;border:1px solid rgba(207,107,255,.32);border-radius:18px;background:linear-gradient(100deg,rgba(61,30,151,.76),rgba(192,35,123,.72));display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:24px}.shield{width:74px;height:74px;border-radius:22px;display:grid;place-items:center;font-size:38px;overflow:hidden;background:linear-gradient(145deg,#6a57ff,#ed47a2);box-shadow:0 0 35px #8a50ff66}.shield img{width:100%;height:100%;object-fit:cover}.identity h2{font-size:24px;line-height:1.05;margin:0 0 8px}.identity p{margin:0;color:#d7d2e6;font-size:13px;line-height:1.5}.id-action{text-align:center}.id-action small{display:block;margin-top:10px;color:#ece8f4}.footer{margin-top:25px;padding:36px 0 50px;border-top:1px solid rgba(255,255,255,.09);display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:28px;color:#8f96aa;font-size:12px}.footer h4{margin:0 0 12px;color:#d7dbe8;font-size:11px;letter-spacing:.08em}.footer a{display:block;text-decoration:none;margin:7px 0}.footer .brand{color:#fff;font-size:18px}.copyright{margin-top:15px}.mobile-links{display:none}
+*{box-sizing:border-box}html{scroll-behavior:smooth;background:var(--bg)}body{margin:0;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at 75% 10%,rgba(73,54,204,.18),transparent 28%),linear-gradient(180deg,#050817,#02040d 72%);overflow-x:hidden}a{color:inherit}.wrap{width:min(1180px,calc(100% - 32px));margin-inline:auto}.top{min-height:84px;display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{text-decoration:none;font-weight:1000;font-size:23px;letter-spacing:-.045em}.brand span{background:linear-gradient(100deg,#7667ff,#ec4caa);background-clip:text;color:transparent}.brand small{display:block;margin-top:5px;font-size:9px;letter-spacing:.13em;color:#c7c9d5;font-weight:700}.nav{display:flex;align-items:center;gap:29px}.nav>a:not(.primary){text-decoration:none;font-size:13px;color:#f6f7ff;padding:12px 0;border-bottom:2px solid transparent}.nav a[href="#health"]{border-color:var(--green)}.nav a[href="#education"]{border-color:var(--gold)}.nav a[href="#finance"]{border-color:var(--blue)}.primary{display:inline-flex;align-items:center;justify-content:center;min-height:47px;padding:0 23px;border-radius:9px;text-decoration:none;font-weight:850;font-size:13px;background:linear-gradient(100deg,#586cff,#ef4897);box-shadow:0 12px 34px rgba(106,74,255,.28)}.menu{display:none;background:none;border:0;color:#fff;font-size:29px}.hero{min-height:600px;display:grid;grid-template-columns:.88fr 1.12fr;align-items:center;gap:45px;padding:46px 0 55px}.hero h1{font-size:clamp(58px,7.3vw,102px);line-height:.83;letter-spacing:-.075em;margin:0 0 26px}.hero h1 span{display:block}.hero .h{color:var(--green)}.hero .e{color:var(--gold)}.hero .f{color:var(--blue)}.hero .x{color:var(--pink)}.tagline{font-size:25px;font-weight:850;margin:0 0 20px}.intro{max-width:430px;color:var(--muted);line-height:1.65;font-size:16px}.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}.ghost{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 23px;border:1px solid rgba(255,255,255,.24);border-radius:12px;text-decoration:none;font-weight:800;background:rgba(255,255,255,.025)}.benefits{display:flex;gap:28px;flex-wrap:wrap;margin-top:26px;color:#c9cedd;font-size:12px}.benefits span{display:flex;align-items:center;gap:8px}.benefits b{font-size:16px;color:#fff}.orbit{position:relative;aspect-ratio:1.18/1;display:grid;place-items:center;isolation:isolate}.orbit:before{content:"";position:absolute;inset:5%;background:radial-gradient(circle,rgba(99,78,255,.22),transparent 50%);filter:blur(15px);z-index:-1}.ring{position:absolute;border:1px solid rgba(117,158,255,.42);border-radius:50%;width:70%;aspect-ratio:1}.ring.r2{width:91%;border-color:rgba(255,188,86,.34)}.core{width:170px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-size:74px;font-weight:1000;background:radial-gradient(circle at 40% 35%,#251b55,#090919 58%);border:2px solid #9a52ff;box-shadow:0 0 0 12px rgba(92,88,255,.09),0 0 55px #6c51ff88,inset 0 0 45px #2f225f}.core span{background:linear-gradient(145deg,#516fff,#e745a3);background-clip:text;color:transparent}.planet{position:absolute;width:112px;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;text-align:center;font-weight:900;font-size:12px;border:1px solid currentColor;background:rgba(6,11,25,.9);box-shadow:0 0 33px currentColor}.planet i{font-style:normal;font-size:38px;display:block;line-height:1.1}.ph{left:13%;top:14%;color:var(--green)}.pe{right:8%;top:18%;color:var(--gold)}.pf{bottom:3%;left:24%;color:var(--blue)}.px{bottom:3%;right:8%;color:var(--pink)}.ps{right:0;top:43%;color:#a78bfa}.welcome{margin-bottom:18px;padding:20px 26px;border:1px solid rgba(255,255,255,.12);border-radius:17px;background:linear-gradient(100deg,rgba(82,52,217,.9),rgba(201,36,125,.86));display:flex;align-items:center;justify-content:space-between;gap:18px}.welcome-copy{display:flex;align-items:center;gap:17px}.gift{font-size:38px}.welcome strong{display:block;font-size:16px}.welcome p{margin:5px 0 0;color:#e6def4;font-size:13px}.welcome .primary{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);box-shadow:none}.world{--accent:var(--green);position:relative;margin:0 auto 18px;min-height:380px;border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);border-radius:20px;overflow:hidden;background:#08121b}.world:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 72% 40%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 38%),linear-gradient(90deg,rgba(2,7,14,.97) 0%,rgba(3,8,17,.78) 38%,rgba(3,8,17,.18) 75%,rgba(3,8,17,.65) 100%)}.world.health{--accent:var(--green);background:radial-gradient(ellipse at 72% 26%,#2bb6a055 0,transparent 28%),linear-gradient(130deg,#06170f,#052b30 55%,#06141d)}.world.education{--accent:var(--gold);background:radial-gradient(circle at 62% 32%,#7f3ad466 0,transparent 30%),linear-gradient(130deg,#1b0f08,#1d1030 56%,#2c1608)}.world.finance{--accent:var(--blue);background:radial-gradient(ellipse at 75% 30%,#2f62c555 0,transparent 34%),linear-gradient(130deg,#061328,#081d45 58%,#190c37)}.world-inner{position:relative;z-index:1;min-height:380px;padding:31px 31px 26px;display:grid;grid-template-columns:320px 1fr;align-items:end;gap:26px}.world-copy{align-self:start}.world-title{display:flex;align-items:center;gap:15px;color:var(--accent)}.world-icon{width:56px;height:56px;border-radius:15px;display:grid;place-items:center;font-size:28px;background:color-mix(in srgb,var(--accent) 18%,rgba(255,255,255,.04));border:1px solid color-mix(in srgb,var(--accent) 48%,transparent)}.world h2{font-size:32px;margin:0;letter-spacing:-.035em}.world h3{font-size:17px;margin:22px 0 9px}.world p{max-width:290px;color:#c0c6d4;line-height:1.5;font-size:14px}.explore{display:inline-flex;margin-top:8px;min-height:42px;padding:0 16px;border:1px solid color-mix(in srgb,var(--accent) 72%,transparent);border-radius:12px;align-items:center;text-decoration:none;color:var(--accent);font-weight:850;font-size:13px}.apps{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:10px;align-self:end}.app{position:relative;min-height:104px;border:1px solid rgba(255,255,255,.14);border-radius:14px;background:rgba(5,10,22,.75);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;text-decoration:none;font-size:11px;font-weight:780;padding:8px;backdrop-filter:blur(10px);transition:.2s}.app:hover{transform:translateY(-4px);border-color:var(--accent)}.app b{font-size:25px;color:var(--accent)}.app-icon{width:48px;height:48px;border-radius:13px;object-fit:cover;border:1px solid rgba(255,255,255,.18);box-shadow:0 8px 22px rgba(0,0,0,.34)}.soon{position:absolute;right:6px;top:-8px;padding:3px 6px;border-radius:8px;background:#dedfe8;color:#202333;font-size:8px}.all{border-style:dashed}.identity{margin:18px auto 0;padding:24px 30px;border:1px solid rgba(207,107,255,.32);border-radius:18px;background:linear-gradient(100deg,rgba(61,30,151,.76),rgba(192,35,123,.72));display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:24px}.shield{width:74px;height:74px;border-radius:22px;display:grid;place-items:center;font-size:38px;overflow:hidden;background:linear-gradient(145deg,#6a57ff,#ed47a2);box-shadow:0 0 35px #8a50ff66}.shield img{width:100%;height:100%;object-fit:cover}.identity h2{font-size:24px;line-height:1.05;margin:0 0 8px}.identity p{margin:0;color:#d7d2e6;font-size:13px;line-height:1.5}.id-action{text-align:center}.id-action small{display:block;margin-top:10px;color:#ece8f4}.footer{margin-top:25px;padding:36px 0 50px;border-top:1px solid rgba(255,255,255,.09);display:grid;grid-template-columns:1.4fr repeat(4,1fr);gap:28px;color:#8f96aa;font-size:12px}.footer h4{margin:0 0 12px;color:#d7dbe8;font-size:11px;letter-spacing:.08em}.footer a{display:block;text-decoration:none;margin:7px 0}.footer .brand{color:#fff;font-size:18px}.copyright{margin-top:15px}.mobile-links{display:none}
 @media(max-width:850px){.nav>a:not(.primary){display:none}.hero{grid-template-columns:1fr;padding-top:34px}.orbit{max-width:590px;width:100%;margin:auto}.hero h1{font-size:clamp(58px,15vw,88px)}.world-inner{grid-template-columns:1fr;padding:25px 20px}.apps{grid-template-columns:repeat(3,1fr)}.identity{grid-template-columns:auto 1fr}.id-action{grid-column:1/-1}.id-action .primary{width:100%}.footer{grid-template-columns:1fr 1fr 1fr}.footer>div:first-child{grid-column:1/-1}}@media(max-width:560px){.wrap{width:min(100% - 22px,1180px)}.top{min-height:72px}.brand{font-size:19px}.brand small{display:none}.nav .primary{padding:0 14px;min-height:42px}.hero{gap:20px;min-height:auto;padding:35px 0}.tagline{font-size:21px}.intro{font-size:15px}.hero-actions>*{width:100%}.benefits{gap:12px 18px}.orbit{aspect-ratio:1;transform:scale(.96)}.core{width:116px;font-size:50px}.planet{width:78px;font-size:9px}.planet i{font-size:27px}.ph{left:3%}.pe{right:1%}.pf{bottom:0;left:10%}.px{bottom:0;right:1%}.welcome{padding:17px;align-items:flex-start}.welcome .primary{display:none}.world{min-height:500px}.world-inner{min-height:500px;display:flex;flex-direction:column;align-items:stretch}.world-copy{width:100%}.apps{margin-top:auto;grid-template-columns:repeat(3,1fr)}.app{min-height:94px;font-size:10px}.identity{padding:22px;grid-template-columns:1fr;text-align:left}.shield{width:60px;height:60px}.footer{grid-template-columns:1fr 1fr}.footer>div:first-child{grid-column:1/-1}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 @media(max-width:560px){.planet{overflow:hidden}.planet .label{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;font-size:8px}.planet .label i{margin-bottom:2px}.planet{width:82px;height:82px}.planet .label br{display:block}}
@@ -92,6 +148,7 @@ html[data-theme="sunset"]{background:#1a0d24}html[data-theme="sunset"] body{colo
 <style>
 .login-btn{display:inline-flex!important;align-items:center;justify-content:center;min-height:47px;padding:0 21px!important;border:1px solid rgba(255,255,255,.28)!important;border-radius:9px;text-decoration:none!important;font-weight:850!important;font-size:13px!important;background:rgba(255,255,255,.04);transition:.2s}
 .login-btn:hover{border-color:#a99cff!important;background:rgba(112,87,255,.14)}
+.hero .s{color:#a78bfa}.product-card.protection{--card-accent:#a78bfa}
 .core{font-size:0}.core .atom{position:relative;display:block;width:104px;height:104px;background:none;color:inherit}.core .atom i{position:absolute;display:block;inset:28px 4px;border:5px solid #7f6dff;border-radius:50%;transform:rotate(0deg)}.core .atom i:nth-child(2){transform:rotate(60deg);border-color:#3f91ff}.core .atom i:nth-child(3){transform:rotate(120deg);border-color:#35d69b}.core .atom b{position:absolute;left:50%;top:50%;width:62px;height:62px;border-radius:18px;transform:translate(-50%,-50%);background:#090519 url('assets/img/keyhole-hero.webp') center 72%/180% auto no-repeat;border:2px solid rgba(212,141,255,.82);box-shadow:0 0 0 5px rgba(90,70,255,.12),0 0 28px #8a61ff;z-index:2}
 @media(max-width:560px){.nav{gap:8px}.nav .login-btn,.nav .primary{min-height:42px;padding:0 12px!important}.nav .login-btn{display:inline-flex!important}}
 </style>
@@ -118,17 +175,44 @@ html[data-theme="light"] .world.wallet{background:linear-gradient(130deg,#eef5ff
 .brand,.nav,.primary,.ghost,.home-live-button{font-family:"Space Grotesk",Inter,system-ui,sans-serif}.brand{font-weight:700;letter-spacing:-.055em}.nav>a:not(.primary){font-weight:600;letter-spacing:-.015em}.primary{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.16);background:linear-gradient(105deg,#526dff 0%,#8658f6 50%,#e950aa 100%);font-weight:700;letter-spacing:-.02em;box-shadow:0 14px 36px rgba(101,72,255,.34),inset 0 1px rgba(255,255,255,.22)}.primary:hover,.primary:focus-visible{transform:translateY(-1px);box-shadow:0 18px 42px rgba(101,72,255,.42),inset 0 1px rgba(255,255,255,.28)}
 </style>
 <style>
-.hero-kicker,.platform-kicker{display:inline-flex;align-items:center;gap:9px;color:#b9adff;font-size:11px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}.hero-kicker:before,.platform-kicker:before{content:"";width:7px;height:7px;border-radius:50%;background:#7f67ff;box-shadow:0 0 14px #7f67ff}.hero .intro{max-width:500px;font-size:17px}.hero-actions .primary{min-height:50px;padding-inline:24px}.jaguar-banner{margin:0 auto 74px;padding:36px 42px;border:1px solid rgba(255,191,50,.45);border-radius:26px;background:radial-gradient(circle at 87% 16%,rgba(255,191,50,.18),transparent 27%),radial-gradient(circle at 70% 100%,rgba(112,87,255,.22),transparent 43%),linear-gradient(120deg,rgba(30,27,72,.96),rgba(56,23,66,.92));display:grid;grid-template-columns:1fr auto;align-items:center;gap:32px}.jaguar-banner .platform-kicker{color:#ffe0a0}.jaguar-banner h2{margin:12px 0 8px;font-size:clamp(31px,4.2vw,49px);line-height:1;letter-spacing:-.055em}.jaguar-banner p{max-width:700px;margin:0;color:#d6d9e9;line-height:1.65}.jaguar-banner .ghost{border-color:rgba(255,221,139,.55);color:#fff;background:rgba(255,255,255,.06)}.platform-proof{position:relative;padding:84px 0 96px}.platform-proof:before{content:"";position:absolute;inset:8% 0 auto;height:360px;background:radial-gradient(circle at 30% 40%,rgba(81,219,120,.08),transparent 34%),radial-gradient(circle at 72% 32%,rgba(112,87,255,.12),transparent 38%);pointer-events:none}.platform-head{position:relative;display:grid;grid-template-columns:1.2fr .8fr;align-items:end;gap:50px;margin-bottom:34px}.platform-head h2{max-width:760px;margin:16px 0 0;font-size:clamp(42px,6vw,74px);line-height:.95;letter-spacing:-.06em}.platform-head p{margin:0;color:var(--muted);font-size:17px;line-height:1.65}.proof-strip{position:relative;display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:18px;border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.035);overflow:hidden;box-shadow:0 28px 80px rgba(0,0,0,.22)}.proof-stat{min-height:132px;padding:27px 30px;border-right:1px solid var(--line)}.proof-stat:last-child{border-right:0}.proof-stat strong{display:block;font-size:clamp(31px,4vw,49px);line-height:1;letter-spacing:-.055em}.proof-stat span{display:block;margin-top:10px;color:#aeb5c9;font-size:12px;line-height:1.45}.product-grid{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.product-card{--card-accent:#7057ff;position:relative;min-height:280px;padding:24px;border:1px solid color-mix(in srgb,var(--card-accent) 42%,rgba(255,255,255,.08));border-radius:22px;display:flex;flex-direction:column;text-decoration:none;overflow:hidden;background:radial-gradient(circle at 90% 5%,color-mix(in srgb,var(--card-accent) 20%,transparent),transparent 38%),linear-gradient(150deg,rgba(17,23,45,.94),rgba(7,10,23,.98));transition:transform .2s,border-color .2s}.product-card:hover,.product-card:focus-visible{transform:translateY(-5px);border-color:var(--card-accent)}.product-card.health{--card-accent:var(--green)}.product-card.education{--card-accent:var(--gold)}.product-card.wallet{--card-accent:var(--blue)}.product-card.entertainment{--card-accent:var(--pink)}.product-number{color:var(--card-accent);font-size:11px;font-weight:900;letter-spacing:.14em}.product-card h3{margin:22px 0 10px;font-size:28px;letter-spacing:-.045em}.product-card p{margin:0;color:#afb6ca;font-size:14px;line-height:1.6}.product-link{margin-top:auto;padding-top:26px;color:#fff;font-size:13px;font-weight:800}.platform-loop{position:relative;margin-top:18px;padding:34px;border:1px solid rgba(112,87,255,.34);border-radius:24px;background:linear-gradient(120deg,rgba(37,32,92,.72),rgba(56,20,71,.66));display:grid;grid-template-columns:.85fr 1.15fr;gap:50px;align-items:center}.platform-loop h3{margin:10px 0 0;font-size:clamp(29px,4vw,45px);line-height:1;letter-spacing:-.05em}.loop-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.loop-step{padding:17px 12px;border:1px solid rgba(255,255,255,.12);border-radius:15px;background:rgba(255,255,255,.045);text-align:center}.loop-step b{display:block;font-size:13px}.loop-step span{display:block;margin-top:5px;color:#b8bed2;font-size:10px;line-height:1.35}.investor-banner{margin:0 auto 74px;padding:38px 42px;border:1px solid rgba(132,102,255,.38);border-radius:26px;background:radial-gradient(circle at 88% 18%,rgba(236,76,170,.2),transparent 30%),linear-gradient(120deg,rgba(32,35,92,.94),rgba(53,21,70,.9));display:flex;align-items:center;justify-content:space-between;gap:32px}.investor-banner .platform-kicker{color:#d0c7ff}.investor-banner h2{margin:12px 0 8px;font-size:clamp(29px,4vw,45px);letter-spacing:-.05em}.investor-banner p{max-width:650px;margin:0;color:#c8cede;line-height:1.6}.investor-banner .primary{flex:0 0 auto;min-height:52px;padding-inline:24px}.nav>a[href="/investors.php"]{border-color:#8f72ff!important;color:#d5ceff!important}html[data-theme="light"] .proof-strip,html[data-theme="light"] .product-card{background:rgba(255,255,255,.74)}html[data-theme="light"] .product-card p,html[data-theme="light"] .proof-stat span{color:#5b6277}html[data-theme="light"] .product-link{color:#1c2034}html[data-theme="light"] .platform-loop,html[data-theme="light"] .investor-banner,html[data-theme="light"] .jaguar-banner{color:#fff}@media(max-width:980px){.product-grid{grid-template-columns:repeat(2,1fr)}.platform-loop{grid-template-columns:1fr}.nav>a[href="/release-notes.php"]{display:none!important}}@media(max-width:760px){.jaguar-banner{grid-template-columns:1fr;padding:30px}.platform-proof{padding:58px 0 70px}.platform-head{grid-template-columns:1fr;gap:18px}.proof-strip{grid-template-columns:1fr}.proof-stat{min-height:auto;border-right:0;border-bottom:1px solid var(--line)}.proof-stat:last-child{border-bottom:0}.loop-steps{grid-template-columns:repeat(2,1fr)}.investor-banner{align-items:flex-start;flex-direction:column;padding:30px}.investor-banner .primary,.jaguar-banner .ghost{width:100%}}@media(max-width:560px){.hero-kicker{margin-bottom:14px}.platform-head h2{font-size:42px}.product-grid{grid-template-columns:1fr}.product-card{min-height:230px}.platform-loop{padding:25px 20px}.nav>a[href="/investors.php"]{display:none!important}}
+.hero-kicker,.platform-kicker{display:inline-flex;align-items:center;gap:9px;color:#b9adff;font-size:11px;font-weight:850;letter-spacing:.16em;text-transform:uppercase}.hero-kicker:before,.platform-kicker:before{content:"";width:7px;height:7px;border-radius:50%;background:#7f67ff;box-shadow:0 0 14px #7f67ff}.hero .intro{max-width:500px;font-size:17px}.hero-actions .primary{min-height:50px;padding-inline:24px}.jaguar-banner{margin:0 auto 74px;padding:36px 42px;border:1px solid rgba(255,191,50,.45);border-radius:26px;background:radial-gradient(circle at 87% 16%,rgba(255,191,50,.18),transparent 27%),radial-gradient(circle at 70% 100%,rgba(112,87,255,.22),transparent 43%),linear-gradient(120deg,rgba(30,27,72,.96),rgba(56,23,66,.92));display:grid;grid-template-columns:1fr auto;align-items:center;gap:32px}.jaguar-banner .platform-kicker{color:#ffe0a0}.jaguar-banner h2{margin:12px 0 8px;font-size:clamp(31px,4.2vw,49px);line-height:1;letter-spacing:-.055em}.jaguar-banner p{max-width:700px;margin:0;color:#d6d9e9;line-height:1.65}.jaguar-banner .ghost{border-color:rgba(255,221,139,.55);color:#fff;background:rgba(255,255,255,.06)}.platform-proof{position:relative;padding:84px 0 96px}.platform-proof:before{content:"";position:absolute;inset:8% 0 auto;height:360px;background:radial-gradient(circle at 30% 40%,rgba(81,219,120,.08),transparent 34%),radial-gradient(circle at 72% 32%,rgba(112,87,255,.12),transparent 38%);pointer-events:none}.platform-head{position:relative;display:grid;grid-template-columns:1.2fr .8fr;align-items:end;gap:50px;margin-bottom:34px}.platform-head h2{max-width:760px;margin:16px 0 0;font-size:clamp(42px,6vw,74px);line-height:.95;letter-spacing:-.06em}.platform-head p{margin:0;color:var(--muted);font-size:17px;line-height:1.65}.proof-strip{position:relative;display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:18px;border:1px solid var(--line);border-radius:22px;background:rgba(255,255,255,.035);overflow:hidden;box-shadow:0 28px 80px rgba(0,0,0,.22)}.proof-stat{min-height:132px;padding:27px 30px;border-right:1px solid var(--line)}.proof-stat:last-child{border-right:0}.proof-stat strong{display:block;font-size:clamp(31px,4vw,49px);line-height:1;letter-spacing:-.055em}.proof-stat span{display:block;margin-top:10px;color:#aeb5c9;font-size:12px;line-height:1.45}.product-grid{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.product-card{--card-accent:#7057ff;position:relative;min-height:280px;padding:24px;border:1px solid color-mix(in srgb,var(--card-accent) 42%,rgba(255,255,255,.08));border-radius:22px;display:flex;flex-direction:column;text-decoration:none;overflow:hidden;background:radial-gradient(circle at 90% 5%,color-mix(in srgb,var(--card-accent) 20%,transparent),transparent 38%),linear-gradient(150deg,rgba(17,23,45,.94),rgba(7,10,23,.98));transition:transform .2s,border-color .2s}.product-card:hover,.product-card:focus-visible{transform:translateY(-5px);border-color:var(--card-accent)}.product-card.health{--card-accent:var(--green)}.product-card.education{--card-accent:var(--gold)}.product-card.wallet{--card-accent:var(--blue)}.product-card.entertainment{--card-accent:var(--pink)}.product-number{color:var(--card-accent);font-size:11px;font-weight:900;letter-spacing:.14em}.product-card h3{margin:22px 0 10px;font-size:28px;letter-spacing:-.045em}.product-card p{margin:0;color:#afb6ca;font-size:14px;line-height:1.6}.product-link{margin-top:auto;padding-top:26px;color:#fff;font-size:13px;font-weight:800}.platform-loop{position:relative;margin-top:18px;padding:34px;border:1px solid rgba(112,87,255,.34);border-radius:24px;background:linear-gradient(120deg,rgba(37,32,92,.72),rgba(56,20,71,.66));display:grid;grid-template-columns:.85fr 1.15fr;gap:50px;align-items:center}.platform-loop h3{margin:10px 0 0;font-size:clamp(29px,4vw,45px);line-height:1;letter-spacing:-.05em}.loop-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.loop-step{padding:17px 12px;border:1px solid rgba(255,255,255,.12);border-radius:15px;background:rgba(255,255,255,.045);text-align:center}.loop-step b{display:block;font-size:13px}.loop-step span{display:block;margin-top:5px;color:#b8bed2;font-size:10px;line-height:1.35}.investor-banner{margin:0 auto 74px;padding:38px 42px;border:1px solid rgba(132,102,255,.38);border-radius:26px;background:radial-gradient(circle at 88% 18%,rgba(236,76,170,.2),transparent 30%),linear-gradient(120deg,rgba(32,35,92,.94),rgba(53,21,70,.9));display:flex;align-items:center;justify-content:space-between;gap:32px}.investor-banner .platform-kicker{color:#d0c7ff}.investor-banner h2{margin:12px 0 8px;font-size:clamp(29px,4vw,45px);letter-spacing:-.05em}.investor-banner p{max-width:650px;margin:0;color:#c8cede;line-height:1.6}.investor-banner .primary{flex:0 0 auto;min-height:52px;padding-inline:24px}.nav>a[href="/investors.php"]{border-color:#8f72ff!important;color:#d5ceff!important}html[data-theme="light"] .proof-strip,html[data-theme="light"] .product-card{background:rgba(255,255,255,.74)}html[data-theme="light"] .product-card p,html[data-theme="light"] .proof-stat span{color:#5b6277}html[data-theme="light"] .product-link{color:#1c2034}html[data-theme="light"] .platform-loop,html[data-theme="light"] .investor-banner,html[data-theme="light"] .jaguar-banner{color:#fff}@media(max-width:980px){.product-grid{grid-template-columns:repeat(2,1fr)}.platform-loop{grid-template-columns:1fr}.nav>a[href="/release-notes.php"]{display:none!important}}@media(max-width:760px){.jaguar-banner{grid-template-columns:1fr;padding:30px}.platform-proof{padding:58px 0 70px}.platform-head{grid-template-columns:1fr;gap:18px}.proof-strip{grid-template-columns:1fr}.proof-stat{min-height:auto;border-right:0;border-bottom:1px solid var(--line)}.proof-stat:last-child{border-bottom:0}.loop-steps{grid-template-columns:repeat(2,1fr)}.investor-banner{align-items:flex-start;flex-direction:column;padding:30px}.investor-banner .primary,.jaguar-banner .ghost{width:100%}}@media(max-width:560px){.hero-kicker{margin-bottom:14px}.platform-head h2{font-size:42px}.product-grid{grid-template-columns:1fr}.product-card{min-height:230px}.platform-loop{padding:25px 20px}.nav>a[href="/investors.php"]{display:none!important}}
 @media(max-width:560px){body.home-page>.top{display:none}.footer a{display:flex;align-items:center;min-height:44px;margin:0}.footer h4{margin-bottom:8px}}
 .site-header{position:relative;z-index:30;min-height:76px}.site-header .nav{gap:18px}.site-header .nav>a:not(.primary){white-space:nowrap}.site-header .nav>a[href="/ai/"]{border-color:#ffd16b}.site-header .nav>a[href="/ai/"]:hover,.site-header .nav>a[href="/ai/"]:focus-visible{color:#ffe3a2}.site-header .nav>a[href="https://os.beyondimagination.co.technology/"]{border-color:#83a7ff}.site-header .nav>a[href="https://os.beyondimagination.co.technology/"]:hover,.site-header .nav>a[href="https://os.beyondimagination.co.technology/"]:focus-visible{color:#a9c2ff}.site-header .nav>a[href="https://host.beyondimagination.co.technology/"]{border-color:#86e9ca}.site-header .nav>a[href="https://host.beyondimagination.co.technology/"]:hover,.site-header .nav>a[href="https://host.beyondimagination.co.technology/"]:focus-visible{color:#a7f4da}.menu-toggle{display:none;width:44px;height:44px;padding:0;border:1px solid rgba(255,255,255,.2);border-radius:12px;background:rgba(255,255,255,.06);color:inherit;cursor:pointer}.menu-toggle svg{width:22px;height:22px}.mobile-drawer,.mobile-drawer-backdrop{display:none}.mobile-currency{display:none}
 @media(max-width:1080px){.site-header .nav{display:none}.menu-toggle{display:grid;place-items:center}.mobile-drawer-backdrop{position:fixed;inset:0;z-index:40;background:rgba(2,4,13,.7);backdrop-filter:blur(4px)}.mobile-drawer{position:fixed;top:0;right:0;z-index:41;width:min(390px,calc(100% - 32px));height:100dvh;padding:22px;overflow:auto;flex-direction:column;background:linear-gradient(160deg,#171334,#070b1b 58%);border-left:1px solid rgba(255,255,255,.16);box-shadow:-24px 0 70px rgba(0,0,0,.38)}.mobile-drawer.is-open,.mobile-drawer-backdrop.is-open{display:flex}.mobile-drawer-backdrop.is-open{display:block}.mobile-drawer-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:19px;border-bottom:1px solid rgba(255,255,255,.13)}.mobile-drawer-head strong{font-size:14px;letter-spacing:.04em}.drawer-close{width:42px;height:42px;padding:0;border:1px solid rgba(255,255,255,.18);border-radius:12px;background:rgba(255,255,255,.06);color:inherit;font-size:27px;cursor:pointer}.mobile-drawer nav{display:grid;gap:2px;padding:18px 0}.mobile-drawer nav a{min-height:49px;display:flex;align-items:center;padding:0 13px;border-bottom:2px solid transparent;text-decoration:none;font-weight:700}.mobile-drawer nav a:nth-child(1){border-color:var(--gold)}.mobile-drawer nav a:nth-child(2){border-color:var(--pink)}.mobile-drawer nav a:nth-child(3){border-color:#a855f7}.mobile-drawer nav a:nth-child(4){border-color:var(--blue)}.mobile-drawer nav a:nth-child(5){border-color:var(--green)}.mobile-drawer nav a:nth-child(6){border-color:#8f72ff}.mobile-drawer nav a:nth-child(7){border-color:#ffd16b}.mobile-drawer nav a:nth-child(8){border-color:#83a7ff}.mobile-drawer .primary{width:100%;min-height:52px;margin-top:auto}.mobile-currency{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:22px;padding-top:20px;border-top:1px solid rgba(255,255,255,.13);font-size:12px;font-weight:800}.mobile-currency .currency-picker{display:flex}.site-header .brand{font-size:21px}body.home-page>.top.site-header{display:flex}}
 html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{border-color:rgba(23,26,46,.2);background:rgba(255,255,255,.72);color:#171a2e}html[data-theme="light"] .mobile-drawer{color:#171a2e;background:linear-gradient(160deg,#fbfcff,#e9edfb)}html[data-theme="light"] .mobile-drawer-head,html[data-theme="light"] .mobile-currency{border-color:rgba(23,26,46,.13)}
 @media(max-width:560px){.site-header{min-height:68px}.site-header .brand{font-size:18px}.site-header .brand-atom{width:34px;height:34px;margin-right:6px}.site-header .brand-atom img{width:30px;height:30px}.menu-toggle{width:42px;height:42px}.mobile-drawer{width:calc(100% - 20px);padding:19px}}
 </style>
+<style>
+.planet{transform:translate(-50%,-50%)}
+.planet.ph{left:16%;top:30%;right:auto;bottom:auto}
+.planet.pe{left:84%;top:24%;right:auto;bottom:auto}
+.planet.pf{left:25%;top:82%;right:auto;bottom:auto}
+.planet.px{left:72%;top:82%;right:auto;bottom:auto}
+.planet.ps{left:92%;top:60%;right:auto;bottom:auto}
+@media(max-width:560px){.planet.ph{left:16%;top:30%}.planet.pe{left:84%;top:24%}.planet.pf{left:25%;top:82%}.planet.px{left:72%;top:82%}.planet.ps{left:92%;top:60%}}
+</style>
+<style>
+.hero-actions{display:grid;gap:14px;margin-top:30px}
+.hero-action-buttons{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.home-jaguar{width:100%;max-width:640px;padding:18px;border:1px solid rgba(179,92,255,.36);border-radius:18px;background:linear-gradient(145deg,rgba(24,14,43,.94),rgba(8,10,24,.94));box-shadow:0 18px 45px rgba(0,0,0,.22)}
+.home-jaguar__heading{display:flex;align-items:center;gap:9px;margin:0 0 11px;color:#f4eaff;font-size:12px;font-weight:900}
+.home-jaguar__heading i{width:8px;height:8px;border-radius:50%;background:#83efa8;box-shadow:0 0 12px #83efa8}
+.home-jaguar__composer{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:end}
+.home-jaguar__prompt{min-height:48px;max-height:130px;padding:12px;border:1px solid rgba(255,255,255,.16);border-radius:12px;resize:vertical;color:#fff;background:rgba(4,6,17,.7);font:inherit;font-size:13px;line-height:1.5}
+.home-jaguar__prompt:focus{outline:2px solid rgba(179,92,255,.6);outline-offset:1px}
+.home-jaguar__prompt::placeholder{color:#aaa2b9}
+.home-jaguar__send{min-height:46px;padding:0 16px;border:0;border-radius:12px;color:#fff;background:linear-gradient(100deg,#7359ee,#dc43a7);font:inherit;font-size:12px;font-weight:900;cursor:pointer}
+.home-jaguar__send:disabled{opacity:.55;cursor:wait}
+.home-jaguar__response{margin:12px 0 0;padding:12px;border:1px solid rgba(255,255,255,.11);border-radius:12px;color:#f0eafa;background:rgba(255,255,255,.045);font-size:13px;line-height:1.6;white-space:pre-wrap}
+.home-jaguar__response:empty{display:none}
+.home-jaguar__response[data-state="error"]{color:#ffc2d3;border-color:rgba(255,100,150,.32)}
+.home-jaguar__note{margin:8px 0 0;color:#a9a1b9;font-size:10px;line-height:1.45}
+@media(max-width:560px){.hero-action-buttons{display:grid;grid-template-columns:1fr}.hero-action-buttons>*{width:100%}.home-jaguar{width:100%;padding:12px}.home-jaguar__composer{grid-template-columns:1fr}.home-jaguar__send{width:100%}}
+</style>
 </head>
 <body class="home-page">
 <header class="top wrap site-header">
-    <a class="brand" href="./"><b class="brand-atom" aria-hidden="true"><img src="/assets/images/bos-logo-mark.svg?v=20260828-1" alt=""></b>BEYOND <span>IMAGINATION</span><small>TECHNOLOGY · BIT</small></a>
+    <a class="brand" href="./"><b class="brand-atom" aria-hidden="true"><img src="/assets/images/bos-logo-mark.svg?v=20260930-1" alt=""></b>BEYOND <span>IMAGINATION</span><small>TECHNOLOGY · BIT</small></a>
     <nav class="nav" aria-label="Primary navigation">
           <a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="https://host.beyondimagination.co.technology/">VPS</a><a href="/ai/">AI</a><a href="https://os.beyondimagination.co.technology/">OS</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a>
           <a href="/beyond-market/">Store</a>
@@ -147,19 +231,30 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 <section class="hero wrap">
     <div>
         <span class="hero-kicker">Connected apps · BIT OS in development</span>
-        <h1><span class="h">Health.</span><span class="e">Education.</span><span class="f">Wallet.</span><span class="x">Entertainment.</span></h1>
-        <p class="tagline">Live. Learn. Earn. Explore.</p>
-        <p class="intro">Useful apps for wellness, learning, creator commerce and entertainment—connected through Beyond ID. BIT OS is the planned operating-environment layer for home, learning, creating and organizational work.</p>
+        <h1><span class="h">Health.</span><span class="e">Education.</span><span class="f">Wallet.</span><span class="x">Entertainment.</span><span class="s">Protection.</span></h1>
+        <p class="tagline">Live. Learn. Earn. Explore. Protect.</p>
+        <p class="intro">Useful apps for wellness, learning, creator commerce, entertainment and digital protection—connected through Beyond ID. BIT OS is the planned operating-environment layer for home, learning, creating and organizational work.</p>
         <div class="hero-actions">
-            <a class="primary" href="https://ai.beyondimagination.co.technology/">Explore AI &nbsp;→</a>
-            <a class="ghost" href="https://os.beyondimagination.co.technology/">Install OS ▶</a>
+            <div class="hero-action-buttons">
+                <a class="primary" href="https://host.beyondimagination.co.technology/">Open Desktop &nbsp;→</a>
+                <a class="ghost" href="/beyond-tv/">Watch TV ▶</a>
+            </div>
+            <section class="home-jaguar" aria-label="Beyond-1 AI Llama Jaguar prompt">
+                <h2 class="home-jaguar__heading"><i aria-hidden="true"></i>Beyond-1 AI · Llama Jaguar</h2>
+                <form class="home-jaguar__composer" id="homeJaguarForm">
+                    <textarea class="home-jaguar__prompt" id="homeJaguarPrompt" rows="2" maxlength="8000" placeholder="Ask Jaguar anything…" aria-label="Prompt Llama Jaguar" required></textarea>
+                    <button class="home-jaguar__send" id="homeJaguarSend" type="submit">Ask Jaguar</button>
+                </form>
+                <p class="home-jaguar__note">Jaguar can make mistakes. Check important information.</p>
+                <div class="home-jaguar__response" id="homeJaguarResponse" role="status" aria-live="polite"></div>
+            </section>
         </div>
         <div class="benefits"><span><b>∞</b> Every possibility, connected</span></div>
     </div>
-    <div class="orbit" aria-label="Health, education, wallet and entertainment orbit Beyond Imagination Technology">
+    <div class="orbit" aria-label="Health, education, wallet, entertainment and protection orbit Beyond Imagination Technology">
         <svg class="ecosystem-svg" viewBox="0 0 720 610" role="img" aria-labelledby="ecosystemTitle ecosystemDesc">
             <title id="ecosystemTitle">The Beyond Imagination Technology connected ecosystem</title>
-            <desc id="ecosystemDesc">Health, education, wallet and entertainment connect in one ecosystem.</desc>
+            <desc id="ecosystemDesc">Health, education, wallet, entertainment and protection connect in one ecosystem.</desc>
             <defs>
                 <radialGradient id="gatewaySurface" cx="38%" cy="30%" r="76%">
                     <stop offset="0" stop-color="#342466"/><stop offset=".58" stop-color="#0b0b1d"/><stop offset="1" stop-color="#050713"/>
@@ -199,14 +294,13 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
                 <circle r="4.5" fill="#ff6fba"><animateMotion dur="21s" begin="-9s" repeatCount="indefinite"><mpath href="#orbitD"/></animateMotion></circle>
             </g>
             <g class="svg-connections" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true">
-                <path d="M313 267 C262 228 205 210 164 192" stroke="#51db78" stroke-opacity=".32"/>
-                <path d="M407 267 C469 229 519 219 570 208" stroke="#ffbf32" stroke-opacity=".30"/>
-                <path d="M335 372 C301 421 251 463 210 505" stroke="#448cff" stroke-opacity=".34"/>
-                <path d="M389 370 C432 418 490 462 544 505" stroke="#f2469d" stroke-opacity=".34"/>
+                <path d="M313 267 C262 228 205 210 115 183" stroke="#51db78" stroke-opacity=".32"/>
+                <path d="M407 267 C469 229 519 180 605 146" stroke="#ffbf32" stroke-opacity=".30"/>
+                <path d="M335 372 C301 421 251 463 180 500" stroke="#448cff" stroke-opacity=".34"/>
+                <path d="M389 370 C432 418 490 462 518 500" stroke="#f2469d" stroke-opacity=".34"/>
+                <path d="M414 306 C490 306 553 340 662 366" stroke="#a78bfa" stroke-opacity=".38"/>
             </g>
             <g class="svg-gateway" transform="translate(360 306)" filter="url(#gatewayGlow)">
-                <circle r="101" fill="none" stroke="#9259ff" stroke-width="3" opacity=".92"/>
-                <circle r="84" fill="url(#gatewaySurface)" stroke="#6d69ff" stroke-width="2"/>
                 <g class="svg-atom" fill="none" stroke="url(#atomStroke)" stroke-width="8" stroke-linecap="round">
                     <ellipse rx="72" ry="31" transform="rotate(0)"/>
                     <ellipse rx="72" ry="31" transform="rotate(60)"/>
@@ -222,6 +316,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
         <a class="planet pe" href="app-store/"><span><i>🏫</i>EDUCATION</span></a>
             <a class="planet pf" href="beyond-id/dashboard/wallet.php"><span><i>👛</i>WALLET</span></a>
         <a class="planet px" href="beyond-tv/"><span class="label"><i>▶</i>ENTERTAIN<br>MENT</span></a>
+        <a class="planet ps" href="beyond-id/" aria-label="Protection: Beyond ID"><span><i>♢</i>PROTECTION</span></a>
     </div>
 </section>
 <section class="jaguar-banner wrap" id="jaguar" aria-labelledby="jaguar-title">
@@ -234,33 +329,33 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
             <span class="platform-kicker">One connected ecosystem</span>
             <h2 id="platform-title">Useful tools for every part of life.</h2>
         </div>
-        <p>Discover experiences for health, learning, entertainment, and creator commerce. Beyond brings them together through a shared identity and a connected path across the products you use.</p>
+        <p>Discover experiences for health, learning, entertainment, creator commerce and protection. Beyond brings them together through a shared identity and a connected path across the products you use.</p>
     </div>
-    <div class="product-grid" aria-label="Explore flagship Beyond Imagination Technology web products">
+    <div class="product-grid" aria-label="Explore the five Beyond Imagination Technology pillars">
         <a class="product-card health" href="/dailybreath/">
-            <span class="product-number">01 · LIVE</span><h3>DailyBreath</h3>
+            <span class="product-number">01 · LIVE</span><h3>Health</h3>
             <p>Daily readings, breathing practices, recovery support, private reflection, and a gentle Trivia mode in an installable web experience.</p>
             <span class="product-link">Open DailyBreath →</span>
         </a>
         <a class="product-card education" href="/academy/">
-            <span class="product-number">02 · LEARN</span><h3>Beyond Academy</h3>
+            <span class="product-number">02 · LEARN</span><h3>Education</h3>
             <p>A growing learning layer spanning French, mathematics, history, space and coding pathways. Beyond French now brings daily lessons, Academy, French Quest and trivia together in one learning path.</p>
             <span class="product-link">Enter the Academy →</span>
         </a>
-        <a class="product-card wallet" href="/beyond-market/">
-            <span class="product-number">03 · EARN</span><h3>Market + Wallet</h3>
-            <p>Creator listings, seller tools and a shared bit$ reward experience designed to connect participation across products.</p>
-            <span class="product-link">Explore the market →</span>
+        <a class="product-card wallet" href="/beyond-id/dashboard/wallet.php">
+            <span class="product-number">03 · EARN</span><h3>Wallet</h3>
+            <p>Review your bit$ rewards and wallet activity, with creator listings and seller tools connecting participation across products.</p>
+            <span class="product-link">Open Beyond Wallet →</span>
         </a>
         <a class="product-card entertainment" href="/beyond-tv/">
-            <span class="product-number">04 · EXPLORE</span><h3>Beyond TV</h3>
+            <span class="product-number">04 · EXPLORE</span><h3>Entertainment</h3>
             <p>Live thematic channels and on-demand discovery turn the ecosystem into an always-on destination.</p>
             <span class="product-link">Watch the live demo →</span>
         </a>
-        <a class="product-card kitchen" href="/beyond-kitchen/">
-            <span class="product-number">05 · COOK</span><h3>Beyond Kitchen</h3>
-            <p>A fresh daily recipe, practical cooking details, and a personal list of meals worth making again.</p>
-            <span class="product-link">Find today's recipe →</span>
+        <a class="product-card protection" href="/beyond-id/">
+            <span class="product-number">05 · PROTECT</span><h3>Protection</h3>
+            <p>Beyond ID connects account access, while BIT OS Cyber provides a defensive environment for authorized security work.</p>
+            <span class="product-link">Explore Beyond ID →</span>
         </a>
     </div>
     <div class="platform-loop">
@@ -319,6 +414,7 @@ $homeLiveControls = [
     <div class="home-live-player">
       <iframe id="homeBeyondTvPlayer" src="/beyond-tv/embed-player.php?slug=beyond-after-dark" title="Beyond After Dark live on Beyond TV" allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
       <video id="homeBeyondTvVideo" controls autoplay muted playsinline preload="metadata" hidden></video>
+      <div id="homeLivePlayerStatus" role="status" hidden style="position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;background:#090b16;color:#fff;font-weight:700">Connecting to the live program…</div>
     </div>
 
     <div class="home-live-meta">
@@ -364,7 +460,90 @@ $homeLiveControls = [
 @media(max-width:480px){.home-live-stage h2{font-size:34px}.home-live-stage__top p{font-size:13px}.home-live-actions{display:grid;grid-template-columns:1fr 1fr}.home-live-button{padding:0 10px}.home-live-player{aspect-ratio:16/10}.home-live-clock{display:none}}
 html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .home-shortcuts a{background:rgba(255,255,255,.82);border-color:rgba(26,31,54,.14)}html[data-theme="light"] .home-shortcuts small{color:#5e667a}
 .home-live-player video{display:block;width:100%;height:100%;border:0;background:#000}.home-live-player iframe[hidden],.home-live-player video[hidden]{display:none}
+.home-live-player{position:relative}
+#homeLivePlayerStatus[hidden]{display:none!important}
 </style>
+
+<script>
+(() => {
+ const form=document.getElementById('homeJaguarForm');
+ if(!form)return;
+ const prompt=form.querySelector('#homeJaguarPrompt');
+ const send=form.querySelector('#homeJaguarSend');
+ const responseOutput=document.getElementById('homeJaguarResponse');
+ const signedIn=<?=json_encode($signedIn)?>;
+ const csrf=<?=json_encode($homeJaguarCsrf)?>;
+
+ async function solveProof(challenge,difficulty){
+   const parsedDifficulty=Number(difficulty);
+   if(typeof challenge!=='string'||!/^[a-f0-9]{36}$/.test(challenge)||!Number.isInteger(parsedDifficulty)||parsedDifficulty<1||parsedDifficulty>20){
+     throw new Error('Jaguar’s security check returned invalid challenge data.');
+   }
+   const requiredNibbles=Math.ceil(parsedDifficulty/4);
+   for(let counter=0;counter<1000000000;counter++){
+     const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(`${challenge}:${counter}`));
+     const bytes=new Uint8Array(digest);
+     let valid=true;
+     for(let nibble=0;nibble<requiredNibbles;nibble++){
+       const value=nibble%2===0?bytes[Math.floor(nibble/2)]>>4:bytes[Math.floor(nibble/2)]&15;
+       if(value!==0){valid=false;break;}
+     }
+     if(valid)return{challenge,counter:String(counter)};
+     if(counter%500===0)await new Promise(resolve=>window.setTimeout(resolve,0));
+   }
+   throw new Error('The local security check could not complete.');
+ }
+
+ async function getGuestProof(){
+   const challengeResponse=await fetch('/ai/api/challenge.php?v=20260926-1',{credentials:'same-origin',cache:'no-store'});
+   const challengeText=await challengeResponse.text();
+   let challengeData;
+   try{challengeData=JSON.parse(challengeText)}catch(error){throw new Error('Jaguar’s security check returned an unexpected response. Please refresh and try again.')}
+   if(!challengeResponse.ok||!challengeData.challenge)throw new Error(challengeData.error||'Jaguar’s security check is unavailable.');
+   return solveProof(challengeData.challenge,challengeData.difficulty);
+ }
+
+ form.addEventListener('submit',async event=>{
+   event.preventDefault();
+   const text=prompt.value.trim();
+   if(!text||send.disabled)return;
+   send.disabled=true;
+   responseOutput.dataset.state='loading';
+   responseOutput.textContent='Jaguar is thinking…';
+   try{
+     const proof=signedIn?null:await getGuestProof();
+     const controller=new AbortController();
+     const timeout=window.setTimeout(()=>controller.abort(),115000);
+     let result;
+     try{
+       const apiResponse=await fetch('/ai/api/chat.php?v=20260927-1',{
+         method:'POST',
+         credentials:'same-origin',
+         cache:'no-store',
+         headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
+         body:JSON.stringify({mode:'core',language:'en',messages:[{role:'user',content:text}],proof}),
+         signal:controller.signal
+       });
+       const body=await apiResponse.text();
+       try{result=JSON.parse(body)}catch(error){throw new Error(`Jaguar returned an unexpected ${apiResponse.status} response. Please try again.`)}
+       if(!apiResponse.ok)throw new Error(result.error||'Jaguar is unavailable right now.');
+       if(typeof result.message!=='string'||result.message.trim()==='')throw new Error('Jaguar returned an empty response. Please try again.');
+     }finally{window.clearTimeout(timeout)}
+     responseOutput.dataset.state='answer';
+     responseOutput.textContent=result.message;
+     prompt.value='';
+   }catch(error){
+     responseOutput.dataset.state='error';
+     responseOutput.textContent=error instanceof DOMException&&error.name==='AbortError'
+       ?'Jaguar is taking longer than expected. Please try again.'
+       :error instanceof Error?error.message:'Jaguar is unavailable right now.';
+   }finally{send.disabled=false}
+ });
+ prompt.addEventListener('keydown',event=>{
+   if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();form.requestSubmit()}
+ });
+})();
+</script>
 
 <script>
 (function(){
@@ -380,7 +559,8 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
  const heading=document.getElementById('homeLiveHeading');
  const description=document.getElementById('homeLiveDescription');
  const clock=stage.querySelector('.home-live-clock');
- const tvVersion=stage.dataset.tvVersion||'1.0';
+ const playerStatus=document.getElementById('homeLivePlayerStatus');
+   const tvVersion=stage.dataset.tvVersion||'1.1.1';
  const EPISODE_SYNC_MS=30*60*1000;
  const LONG_FORM_SYNC_MS=2*60*60*1000;
  const longFormChannels=new Set(['space','ancient','cinema','health','comedy','family']);
@@ -420,6 +600,7 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
     if(directVideo){
       frame.hidden=true;
       video.hidden=false;
+      if(playerStatus)playerStatus.hidden=true;
       const nextSrc=new URL(directVideo,window.location.href).href;
       if(video.src!==nextSrc){
         video.src=nextSrc;
@@ -433,6 +614,7 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
       video.pause();
       video.hidden=true;
       frame.hidden=false;
+      if(playerStatus)playerStatus.hidden=true;
       const withApi=/youtube(?:-nocookie)?\.com/.test(embed)&&!embed.includes('enablejsapi=1')?embed+(embed.includes('?')?'&':'?')+'enablejsapi=1':embed;
       const nextSrc=new URL(withApi,window.location.href).href;
       if(frame.src!==nextSrc)frame.src=nextSrc;
@@ -465,6 +647,16 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
    updateClock(button);
  }
  async function tune(button,{refreshState=true}={}){
+   const previous=stage.querySelector('[data-home-channel].active');
+   if(previous!==button){
+     video.pause();
+     video.removeAttribute('src');
+     video.load();
+     video.hidden=true;
+     frame.src='about:blank';
+     frame.hidden=true;
+     if(playerStatus){playerStatus.textContent='Connecting to the live program…';playerStatus.hidden=false;}
+   }
    buttons.forEach(item=>{
      const isActive=item===button;
      item.classList.toggle('active',isActive);
@@ -475,14 +667,29 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
    if(!refreshState||playerOwnsSchedule||!button.dataset.endpoint){schedule(button);return;}
    const requestedEndpoint=button.dataset.endpoint;
    try{
-     const response=await fetch(requestedEndpoint,{cache:'default'});
+     const response=await fetch(requestedEndpoint,{cache:'no-store'});
      if(!response.ok)throw new Error('HTTP '+response.status);
      const data=await response.json();
      if(button.classList.contains('active'))render(button,data.state||data);
-   }catch(error){console.warn('Beyond TV channel refresh unavailable',error);}
+   }catch(error){
+     console.warn('Beyond TV channel refresh unavailable',error);
+     if(button.classList.contains('active')&&frame.hidden&&video.hidden&&playerStatus){
+       playerStatus.textContent='Preview unavailable. Open the full channel to watch.';
+       playerStatus.hidden=false;
+     }
+   }
    finally{if(button.classList.contains('active'))schedule(button);}
  }
  buttons.forEach(button=>button.addEventListener('click',()=>tune(button)));
+ video.addEventListener('ended',()=>{
+   const active=stage.querySelector('[data-home-channel].active');
+   if(!active)return;
+   if(syncTimer)window.clearTimeout(syncTimer);
+   const refresh=()=>{if(active.classList.contains('active'))tune(active)};
+   if(window.BeyondTVAds?.playBreak){
+     window.BeyondTVAds.playBreak({container:stage.querySelector('.home-live-player'),contentVideo:video,duration:300}).then(refresh);
+   }else refresh();
+ });
  window.addEventListener('message',event=>{
    if(event.origin!==window.location.origin||event.source!==frame.contentWindow)return;
    if(event.data?.type!=='beyond-tv:state'||typeof event.data.slug!=='string')return;
@@ -557,8 +764,8 @@ window.addEventListener('DOMContentLoaded',()=>{
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&drawer.classList.contains('is-open'))setOpen(false);});
 })();
 </script>
-<script src="/beyond-tv/assets/js/video-ads.js?v=1.0.0"></script>
-<script src="/beyond-tv/assets/js/app.js?v=3.0.4"></script>
+<script src="/beyond-tv/assets/js/video-ads.js?v=1.1.1"></script>
+<script src="/beyond-tv/assets/js/app.js?v=1.1.1"></script>
 </main>
 <footer class="footer wrap">
     <div><a class="brand" href="./">BEYOND <span>IMAGINATION</span></a><p>Technology for the connected imagination ecosystem.</p><p class="copyright">© 2026 Beyond Imagination Technology.</p></div>
@@ -573,15 +780,16 @@ const icons={
 health:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 42V15a4 4 0 0 1 4-4h20a4 4 0 0 1 4 4v27M7 42h34M18 42V31h12v11M20 20h8M24 16v8"/></svg>',
 education:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 42V18l17-10 17 10v24M4 42h40M14 24h5v5h-5zM29 24h5v5h-5zM20 42V33h8v9M13 16h22"/></svg>',
 wallet:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 14h31a4 4 0 0 1 4 4v22H7a4 4 0 0 1-4-4V12a4 4 0 0 1 4-4h27v6M31 25h11v9H31a4 4 0 0 1 0-9Z"/></svg>',
-entertainment:'<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="10" width="36" height="28" rx="5"/><path d="m20 18 11 6-11 6V18ZM16 43h16"/></svg>'
+entertainment:'<svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="10" width="36" height="28" rx="5"/><path d="m20 18 11 6-11 6V18ZM16 43h16"/></svg>',
+security:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5 40 11v11c0 10-6.6 17.2-16 21-9.4-3.8-16-11-16-21V11L24 5Z"/><path d="m17 23 5 5 10-11"/></svg>'
 };
-const names={health:'HEALTH',education:'EDUCATION',wallet:'WALLET',entertainment:'ENTERTAINMENT'},actions={health:'LIVE',education:'LEARN',wallet:'EARN',entertainment:'EXPLORE'},planetClasses={health:'.ph',education:'.pe',wallet:'.pf',entertainment:'.px'};
+const names={health:'HEALTH',education:'EDUCATION',wallet:'WALLET',entertainment:'ENTERTAINMENT',security:'PROTECTION'},actions={health:'LIVE',education:'LEARN',wallet:'EARN',entertainment:'EXPLORE',security:'PROTECT'},planetClasses={health:'.ph',education:'.pe',wallet:'.pf',entertainment:'.px',security:'.ps'};
 Object.keys(icons).forEach(function(id){
 const planet=document.querySelector(planetClasses[id]);
 if(planet)planet.innerHTML='<span><i class="division-icon">'+icons[id]+'</i>'+names[id]+'<em>'+actions[id]+'</em></span>';
 const panel=document.querySelector('.world.'+id+' .world-icon');if(panel)panel.innerHTML=icons[id];
 });
-const orbit=document.querySelector('.orbit');if(orbit){const copy=document.createElement('div');copy.className='orbit-copy';copy.innerHTML='<strong>Live &bull; Learn &bull; Earn &bull; Explore</strong><span>Every Possibility</span>';orbit.appendChild(copy);}
+const orbit=document.querySelector('.orbit');if(orbit){const copy=document.createElement('div');copy.className='orbit-copy';copy.innerHTML='<strong>Live &bull; Learn &bull; Earn &bull; Explore &bull; Protect</strong><span>Five pillars · one BIT ecosystem</span>';orbit.appendChild(copy);}
 })();
 </script>
 <script src="assets/js/pwa-install.js" defer></script><script src="/assets/js/visitor-analytics.js" defer></script></body>

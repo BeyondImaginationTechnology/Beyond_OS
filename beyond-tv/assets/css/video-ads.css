@@ -1,8 +1,11 @@
 .btv-ad-break{position:absolute;z-index:30;inset:0;display:grid;overflow:hidden;place-items:center;background:radial-gradient(circle at 50% 25%,#4b2879,#070916 68%);color:#fff;font-family:Inter,system-ui,sans-serif}
+.btv-ad-game{position:absolute;z-index:1;inset:0;width:100%;height:100%;border:0;background:#050817}
+.btv-ad-game[hidden]{display:none}
 .btv-ad-slot{position:absolute;z-index:2;inset:0;visibility:hidden}
-.btv-ad-filler{position:relative;z-index:1;text-align:center}
-.btv-ad-filler span{display:block;color:#b8e600;font-size:12px;font-weight:950;letter-spacing:.2em}
-.btv-ad-filler strong{display:block;margin:10px 0 5px;font-size:clamp(28px,5vw,58px);letter-spacing:-.05em}
-.btv-ad-filler p{margin:0;color:#d5d0e4}
+.btv-ad-filler{position:absolute;z-index:3;top:12px;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100% - 20px);padding:8px 16px;border:1px solid rgba(255,255,255,.2);border-radius:999px;background:rgba(5,8,23,.82);box-shadow:0 8px 24px rgba(0,0,0,.25);text-align:center;pointer-events:none}
+.btv-ad-filler[hidden]{display:none}
+.btv-ad-filler span{display:block;color:#b8e600;font-size:10px;font-weight:950;letter-spacing:.15em}
+.btv-ad-filler strong{display:block;margin:2px 0;font-size:clamp(12px,1.7vw,17px);letter-spacing:0}
+.btv-ad-filler p{margin:0;color:#d5d0e4;font-size:12px}
 .btv-ad-filler b{color:#fff;font-variant-numeric:tabular-nums}
 .btv-ad-break.is-serving-ad .btv-ad-slot{visibility:visible;background:#000}

@@ -16,6 +16,7 @@
 **/out/
 /dailybreath/assets/videos/breathing/
 /beyond-kitchen/assets/images/daily/
+/recipe/assets/images/daily/
 **/generated-*
 **/node_modules/
 **/vendor/

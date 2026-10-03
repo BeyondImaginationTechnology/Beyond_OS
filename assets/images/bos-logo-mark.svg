@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-labelledby="title desc">
   <title id="title">Beyond Imagination</title>
-  <desc id="desc">A restrained keyhole gateway surrounded by three luminous atomic orbits.</desc>
+  <desc id="desc">A restrained keyhole gateway surrounded by four luminous atomic orbits.</desc>
   <defs>
     <linearGradient id="orbit" x1="7" y1="9" x2="41" y2="39" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#62a5ff"/>
@@ -13,6 +13,7 @@
     <ellipse cx="24" cy="24" rx="16.5" ry="5.7"/>
     <ellipse cx="24" cy="24" rx="16.5" ry="5.7" transform="rotate(60 24 24)"/>
     <ellipse cx="24" cy="24" rx="16.5" ry="5.7" transform="rotate(120 24 24)"/>
+    <ellipse cx="24" cy="24" rx="21" ry="4.6" transform="rotate(30 24 24)" stroke-width=".85" opacity=".82"/>
   </g>
   <g fill="#f8f4ff" opacity=".92">
     <circle cx="39.8" cy="22.4" r=".72"/>

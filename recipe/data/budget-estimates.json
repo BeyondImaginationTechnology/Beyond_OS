@@ -1,0 +1,1890 @@
+{
+  "updated": "2026-09-30",
+  "referenceCanada": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810024502",
+  "referenceUnitedStates": "https://www.ers.usda.gov/data-products/food-price-outlook/",
+  "regions": [
+    {
+      "id": "ca-ab",
+      "name": "Alberta (AB)",
+      "country": "Canada",
+      "currency": "CAD",
+      "priceScale": 1,
+      "factor": 1.01,
+      "stores": [
+        {
+          "id": "walmart-ca",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.ca/en/grocery"
+        },
+        {
+          "id": "superstore",
+          "name": "Real Canadian Superstore",
+          "factor": 0.97,
+          "url": "https://www.realcanadiansuperstore.ca/"
+        },
+        {
+          "id": "save-on-foods",
+          "name": "Save-On-Foods",
+          "factor": 1.08,
+          "url": "https://www.saveonfoods.com/"
+        }
+      ]
+    },
+    {
+      "id": "ca-bc",
+      "name": "British Columbia (BC)",
+      "country": "Canada",
+      "currency": "CAD",
+      "priceScale": 1,
+      "factor": 1.06,
+      "stores": [
+        {
+          "id": "walmart-ca",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.ca/en/grocery"
+        },
+        {
+          "id": "no-frills",
+          "name": "No Frills",
+          "factor": 0.94,
+          "url": "https://www.nofrills.ca/"
+        },
+        {
+          "id": "save-on-foods",
+          "name": "Save-On-Foods",
+          "factor": 1.08,
+          "url": "https://www.saveonfoods.com/"
+        }
+      ]
+    },
+    {
+      "id": "ca-mb",
+      "name": "Manitoba (MB)",
+      "country": "Canada",
+      "currency": "CAD",
+      "priceScale": 1,
+      "factor": 0.99,
+      "stores": [
+        {
+          "id": "walmart-ca",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.ca/en/grocery"
+        },
+        {
+          "id": "superstore",
+          "name": "Real Canadian Superstore",
+          "factor": 0.97,
+          "url": "https://www.realcanadiansuperstore.ca/"
+        },
+        {
+          "id": "save-on-foods",
+          "name": "Save-On-Foods",
+          "factor": 1.08,
+          "url": "https://www.saveonfoods.com/"
+        }
+      ]
+    },
+    {
+      "id": "ca-nb",
+      "name": "New Brunswick (NB)",
+      "country": "Canada",
+      "currency": "CAD",
+      "priceScale": 1,
+      "factor": 1,
+      "stores": [
+        {
+          "id": "walmart-ca",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.ca/en/grocery"
+        },
+        {
+          "id": "atlantic-superstore",
+          "name": "Atlantic Superstore",
+          "factor": 0.97,
+          "url": "https://www.atlanticsuperstore.ca/"
+        },
+        {
+          "id": "sobeys",
+          "name": "Sobeys",
+          "factor": 1.08,
+          "url": "https://www.sobeys.com/"
+        }
+      ]
+    },
+    {
+      "id": "ca-nl",
+      "name": "Newfoundland and Labrador (NL)",
+      "country": "Canada",
+      "currency": "CAD",
+      "priceScale": 1,
+      "factor": 1.07,
+      "stores": [
+        {
+          "id": "walmart-ca",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.ca/en/grocery"
+        },
+        {
+          "id": "atlantic-superstore",
+          "name": "Atlantic Superstore",
+          "factor": 0.97,
+          "url": "https://www.atlanticsuperstore.ca/"
+        },
+        {
+          "id": "sobeys",
+          "name": "Sobeys",
+          "factor": 1.08,
+          "url": "https://www.sobeys.com/"
+        }
+      ]
+    },
+    {
+      "id": "ca-ns",
+      "name": "Nova Scotia (NS)",
+      "country": "Canada",
+      "currency": "CAD",
+      "priceScale": 1,
+      "factor": 1.02,
+      "stores": [
+        {
+          "id": "walmart-ca",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.ca/en/grocery"
+        },
+        {
+          "id": "atlantic-superstore",
+          "name": "Atlantic Superstore",
+          "factor": 0.97,
+          "url": "https://www.atlanticsuperstore.ca/"
+        },
+        {
+          "id": "sobeys",
+          "name": "Sobeys",
+          "factor": 1.08,
+          "url": "https://www.sobeys.com/"
+        }
+      ]
+    },
+    {
+      "id": "ca-nt",
+      "name": "Northwest Territories (NT)",
+      "country": "Canada",
+      "currency": "CAD",
+      "priceScale": 1,
+      "factor": 1.28,
+      "stores": [
+        {
+          "id": "local-value-ca",
+          "name": "Local value grocer",
+          "factor": 0.95,
+          "url": null
+        },
+        {
+          "id": "local-grocer-ca",
+          "name": "Local supermarket",
+          "factor": 1.02,
+          "url": null
+        },
+        {
+          "id": "local-specialty-ca",
+          "name": "Specialty or import market",
+          "factor": 1.12,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "ca-nu",
+      "name": "Nunavut (NU)",
+      "country": "Canada",
+      "currency": "CAD",
+      "priceScale": 1,
+      "factor": 1.42,
+      "stores": [
+        {
+          "id": "local-value-ca",
+          "name": "Local value grocer",
+          "factor": 0.95,
+          "url": null
+        },
+        {
+          "id": "local-grocer-ca",
+          "name": "Local supermarket",
+          "factor": 1.02,
+          "url": null
+        },
+        {
+          "id": "local-specialty-ca",
+          "name": "Specialty or import market",
+          "factor": 1.12,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "ca-on",
+      "name": "Ontario (ON)",
+      "country": "Canada",
+      "currency": "CAD",
+      "priceScale": 1,
+      "factor": 1.04,
+      "stores": [
+        {
+          "id": "walmart-ca",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.ca/en/grocery"
+        },
+        {
+          "id": "no-frills",
+          "name": "No Frills",
+          "factor": 0.94,
+          "url": "https://www.nofrills.ca/"
+        },
+        {
+          "id": "metro",
+          "name": "Metro",
+          "factor": 1.08,
+          "url": "https://www.metro.ca/en"
+        }
+      ]
+    },
+    {
+      "id": "ca-pe",
+      "name": "Prince Edward Island (PE)",
+      "country": "Canada",
+      "currency": "CAD",
+      "priceScale": 1,
+      "factor": 1.05,
+      "stores": [
+        {
+          "id": "walmart-ca",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.ca/en/grocery"
+        },
+        {
+          "id": "atlantic-superstore",
+          "name": "Atlantic Superstore",
+          "factor": 0.97,
+          "url": "https://www.atlanticsuperstore.ca/"
+        },
+        {
+          "id": "sobeys",
+          "name": "Sobeys",
+          "factor": 1.08,
+          "url": "https://www.sobeys.com/"
+        }
+      ]
+    },
+    {
+      "id": "ca-qc",
+      "name": "Québec (QC)",
+      "country": "Canada",
+      "currency": "CAD",
+      "priceScale": 1,
+      "factor": 1,
+      "stores": [
+        {
+          "id": "walmart-ca",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.ca/en/grocery"
+        },
+        {
+          "id": "maxi",
+          "name": "Maxi",
+          "factor": 0.95,
+          "url": "https://www.maxi.ca/"
+        },
+        {
+          "id": "metro",
+          "name": "Metro",
+          "factor": 1.08,
+          "url": "https://www.metro.ca/en"
+        }
+      ]
+    },
+    {
+      "id": "ca-sk",
+      "name": "Saskatchewan (SK)",
+      "country": "Canada",
+      "currency": "CAD",
+      "priceScale": 1,
+      "factor": 0.98,
+      "stores": [
+        {
+          "id": "walmart-ca",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.ca/en/grocery"
+        },
+        {
+          "id": "superstore",
+          "name": "Real Canadian Superstore",
+          "factor": 0.97,
+          "url": "https://www.realcanadiansuperstore.ca/"
+        },
+        {
+          "id": "save-on-foods",
+          "name": "Save-On-Foods",
+          "factor": 1.08,
+          "url": "https://www.saveonfoods.com/"
+        }
+      ]
+    },
+    {
+      "id": "ca-yt",
+      "name": "Yukon (YT)",
+      "country": "Canada",
+      "currency": "CAD",
+      "priceScale": 1,
+      "factor": 1.18,
+      "stores": [
+        {
+          "id": "local-value-ca",
+          "name": "Local value grocer",
+          "factor": 0.95,
+          "url": null
+        },
+        {
+          "id": "local-grocer-ca",
+          "name": "Local supermarket",
+          "factor": 1.02,
+          "url": null
+        },
+        {
+          "id": "local-specialty-ca",
+          "name": "Specialty or import market",
+          "factor": 1.12,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-al",
+      "name": "Alabama (AL)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.95,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-ak",
+      "name": "Alaska (AK)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.3,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-az",
+      "name": "Arizona (AZ)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.02,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-ar",
+      "name": "Arkansas (AR)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.94,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-ca",
+      "name": "California (CA)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.16,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-co",
+      "name": "Colorado (CO)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.07,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-ct",
+      "name": "Connecticut (CT)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.12,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-de",
+      "name": "Delaware (DE)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.06,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-fl",
+      "name": "Florida (FL)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.04,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "aldi",
+          "name": "ALDI",
+          "factor": 0.94,
+          "url": "https://www.aldi.us/"
+        },
+        {
+          "id": "publix",
+          "name": "Publix",
+          "factor": 1.1,
+          "url": "https://www.publix.com/"
+        }
+      ]
+    },
+    {
+      "id": "us-ga",
+      "name": "Georgia (GA)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.99,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-hi",
+      "name": "Hawaii (HI)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.35,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-id",
+      "name": "Idaho (ID)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.03,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-il",
+      "name": "Illinois (IL)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.04,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-in",
+      "name": "Indiana (IN)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.96,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-ia",
+      "name": "Iowa (IA)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.96,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-ks",
+      "name": "Kansas (KS)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.95,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-ky",
+      "name": "Kentucky (KY)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.95,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-la",
+      "name": "Louisiana (LA)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.98,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-me",
+      "name": "Maine (ME)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.1,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-md",
+      "name": "Maryland (MD)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.1,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-ma",
+      "name": "Massachusetts (MA)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.15,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-mi",
+      "name": "Michigan (MI)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.98,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-mn",
+      "name": "Minnesota (MN)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.02,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-ms",
+      "name": "Mississippi (MS)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.94,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-mo",
+      "name": "Missouri (MO)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.96,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-mt",
+      "name": "Montana (MT)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.05,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-ne",
+      "name": "Nebraska (NE)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.98,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-nv",
+      "name": "Nevada (NV)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.04,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-nh",
+      "name": "New Hampshire (NH)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.08,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-nj",
+      "name": "New Jersey (NJ)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.11,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-nm",
+      "name": "New Mexico (NM)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-ny",
+      "name": "New York (NY)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.16,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-nc",
+      "name": "North Carolina (NC)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.99,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-nd",
+      "name": "North Dakota (ND)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.01,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-oh",
+      "name": "Ohio (OH)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.97,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-ok",
+      "name": "Oklahoma (OK)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.94,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-or",
+      "name": "Oregon (OR)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.08,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-pa",
+      "name": "Pennsylvania (PA)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.02,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-ri",
+      "name": "Rhode Island (RI)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.09,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-sc",
+      "name": "South Carolina (SC)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.98,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-sd",
+      "name": "South Dakota (SD)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-tn",
+      "name": "Tennessee (TN)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.97,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-tx",
+      "name": "Texas (TX)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.98,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-ut",
+      "name": "Utah (UT)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.04,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-vt",
+      "name": "Vermont (VT)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.12,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-va",
+      "name": "Virginia (VA)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.03,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-wa",
+      "name": "Washington (WA)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.13,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-wv",
+      "name": "West Virginia (WV)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 0.96,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-wi",
+      "name": "Wisconsin (WI)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-wy",
+      "name": "Wyoming (WY)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.03,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-dc",
+      "name": "Washington, DC (DC)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.2,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    },
+    {
+      "id": "us-pr",
+      "name": "Puerto Rico (PR)",
+      "country": "United States",
+      "currency": "USD",
+      "priceScale": 0.76,
+      "factor": 1.09,
+      "stores": [
+        {
+          "id": "walmart-us",
+          "name": "Walmart",
+          "factor": 0.98,
+          "url": "https://www.walmart.com/cp/food/976759"
+        },
+        {
+          "id": "value-market-us",
+          "name": "Local value grocer",
+          "factor": 0.94,
+          "url": null
+        },
+        {
+          "id": "full-service-us",
+          "name": "Local supermarket",
+          "factor": 1.08,
+          "url": null
+        }
+      ]
+    }
+  ],
+  "ingredientUnitCosts": {
+    "All-purpose flour": 0.6,
+    "Baby spinach": 1.05,
+    "Beef chuck or stew meat, cubed": 8.2,
+    "Boneless chicken thighs": 3.1,
+    "Broccoli florets": 1.05,
+    "Brown sugar": 0.75,
+    "Butter beans, drained": 2.2,
+    "Cherry tomatoes": 2.5,
+    "Chicken thighs": 2.45,
+    "Chili flakes": 0.05,
+    "Cold butter, cubed": 0.18,
+    "Cooked brown rice": 0.55,
+    "Cooked chickpeas, drained": 1.7,
+    "Cooked jasmine rice": 0.48,
+    "Cottage cheese": 2.8,
+    "Couscous": 1.8,
+    "Crushed tomatoes": 2.1,
+    "Crusty bread": 0.55,
+    "Cucumber": 1.7,
+    "Dried djon djon mushrooms": 18,
+    "English cucumber": 1.8,
+    "Fresh chives": 0.3,
+    "Fresh dill, chopped": 0.25,
+    "Fresh ginger, grated": 0.35,
+    "Fresh parsley": 1.5,
+    "Fresh thyme": 0.3,
+    "Garlic cloves, crushed": 0.17,
+    "Garlic cloves, minced": 0.17,
+    "Green plantains": 1.4,
+    "Ground cinnamon": 0.12,
+    "Ground coriander": 0.15,
+    "Ground cumin": 0.15,
+    "Haitian epis seasoning": 5.5,
+    "Honey": 0.42,
+    "Lemon": 0.85,
+    "Lemon juice": 0.15,
+    "Lemon, juiced": 0.85,
+    "Lima beans, cooked": 1.9,
+    "Long-grain rice, rinsed": 0.7,
+    "Neutral oil": 0.2,
+    "Neutral oil for frying": 0.85,
+    "Olive oil": 0.38,
+    "Pikliz": 2.5,
+    "Pikliz, to serve": 2.5,
+    "Plain Greek yogurt": 2.8,
+    "Plain yogurt": 2.2,
+    "Pork shoulder, cut into chunks": 5.6,
+    "Pumpkin seeds": 0.28,
+    "Rice vinegar": 0.08,
+    "Ripe avocado": 2.05,
+    "Ripe peaches, sliced": 1.55,
+    "Rolled oats": 0.9,
+    "Salmon fillets": 7,
+    "Sesame seeds": 0.1,
+    "Smoked paprika": 0.17,
+    "Sour orange juice or orange-lime juice": 2.2,
+    "Sour orange or orange-lime juice": 2.2,
+    "Sourdough bread": 0.85,
+    "Soy sauce or tamari": 0.2,
+    "Vanilla yogurt, to serve": 2.8,
+    "Vegetable broth": 0.7
+  }
+}

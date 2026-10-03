@@ -2,6 +2,7 @@ package technology.co.beyondimagination.beyondkitchen;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Insets;
 import android.graphics.Color;
 import android.graphics.BitmapFactory;
@@ -9,7 +10,9 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.net.Uri;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
@@ -26,11 +29,15 @@ import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
@@ -43,6 +50,7 @@ import java.util.Locale;
 import java.util.Set;
 
 public final class MainActivity extends Activity {
+    private static final String DINNER_ENDPOINT = "https://recipe.beyondimagination.co.technology/api/dinner.php";
     private static final int PAPER = Color.rgb(246, 245, 239);
     private static final int CARD = Color.rgb(255, 254, 250);
     private static final int INK = Color.rgb(40, 49, 38);
@@ -136,6 +144,7 @@ public final class MainActivity extends Activity {
 
         Recipe featured = dailyRecipe();
         page.addView(featuredCard(featured), params(0, 0, 0, 23));
+        page.addView(dinnerPlanner(), params(0, 0, 0, 24));
         page.addView(text("TODAY'S CAROUSEL", 10, GREEN, true), params(0, 0, 0, 8));
         page.addView(text("From ingredients to the finished plate", 20, INK, false), params(0, 0, 0, 12));
         page.addView(dailyCarousel(featured), params(0, 0, 0, 24));
@@ -209,6 +218,146 @@ public final class MainActivity extends Activity {
         cook.setBackground(shape(0xfff4d989, 22, 0x00ffffff));
         cook.setOnClickListener(view -> showRecipe(recipe));
         card.addView(cook, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(43)));
+        return card;
+    }
+
+    private View dinnerPlanner() {
+        LinearLayout panel = column();
+        panel.setPadding(dp(18), dp(20), dp(18), dp(20));
+        panel.setBackground(shape(0xffeef2e9, 19, 0xffdce4d7));
+        panel.addView(text("DINNER GUIDE · BETA 0.0.1", 10, GREEN, true), params(0, 0, 0, 8));
+        panel.addView(text("What's for dinner?", 26, INK, false), params(0, 0, 0, 7));
+        panel.addView(text("Tell us your mood, time, budget, or what's in the fridge.", 12, MUTED, false), params(0, 0, 0, 12));
+        EditText prompt = new EditText(this);
+        prompt.setHint("I'm tired, want something spicy, and have about $25…");
+        prompt.setTextSize(13);
+        prompt.setTextColor(INK);
+        prompt.setHintTextColor(MUTED);
+        prompt.setMinLines(2);
+        prompt.setMaxLines(3);
+        prompt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(400)});
+        prompt.setPadding(dp(13), dp(10), dp(13), dp(10));
+        prompt.setBackground(shape(CARD, 13, 0xffcfd9ca));
+        panel.addView(prompt, params(0, 0, 0, 11));
+        HorizontalScrollView hintScroll = new HorizontalScrollView(this);
+        hintScroll.setHorizontalScrollBarEnabled(false);
+        LinearLayout hints = row();
+        String[][] choices = {{"20 min", "under 20 minutes"}, {"Under $25", "under $25"}, {"Low energy", "low energy"}, {"Spicy", "spicy"}, {"Vegetarian", "vegetarian"}};
+        for (String[] choice : choices) {
+            TextView hint = text(choice[0], 11, GREEN, true);
+            hint.setGravity(Gravity.CENTER);
+            hint.setPadding(dp(11), 0, dp(11), 0);
+            hint.setBackground(shape(CARD, 18, 0xffcbd7c5));
+            hint.setOnClickListener(view -> {
+                String current = prompt.getText().toString().trim();
+                prompt.setText(current + (current.isEmpty() ? "" : ", ") + choice[1]);
+                prompt.setSelection(prompt.length());
+            });
+            LinearLayout.LayoutParams hintParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(32));
+            hintParams.setMargins(0, 0, dp(7), 0);
+            hints.addView(hint, hintParams);
+        }
+        hintScroll.addView(hints);
+        panel.addView(hintScroll, params(0, 0, 0, 12));
+        Button submit = new Button(this);
+        submit.setText("Find dinner ideas  →");
+        submit.setTextAllCaps(false);
+        submit.setTextColor(Color.WHITE);
+        submit.setTextSize(12);
+        submit.setBackground(shape(GREEN, 22, 0x00000000));
+        panel.addView(submit, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(43)));
+        panel.addView(text("Pickup and delivery are dish ideas. Check nearby menus and availability.", 10, MUTED, false), params(0, 10, 0, 0));
+        LinearLayout results = column();
+        panel.addView(results, params(0, 15, 0, 0));
+        submit.setOnClickListener(view -> {
+            String requestPrompt = prompt.getText().toString().trim();
+            if (requestPrompt.isEmpty()) requestPrompt = "Surprise me with a good dinner tonight.";
+            submit.setEnabled(false);
+            submit.setText("Finding ideas…");
+            results.removeAllViews();
+            results.addView(text("Putting a few dinner ideas together…", 12, GREEN, false));
+            String finalPrompt = requestPrompt;
+            new Thread(() -> {
+                try {
+                    JSONObject answer = fetchDinnerIdeas(finalPrompt);
+                    runOnUiThread(() -> renderDinnerIdeas(results, answer));
+                } catch (Exception error) {
+                    Log.e("BeyondKitchen", "Dinner ideas unavailable.", error);
+                    runOnUiThread(() -> renderDinnerUnavailable(results));
+                } finally {
+                    runOnUiThread(() -> {
+                        submit.setEnabled(true);
+                        submit.setText("Find dinner ideas  →");
+                    });
+                }
+            }).start();
+        });
+        return panel;
+    }
+
+    private JSONObject fetchDinnerIdeas(String prompt) throws Exception {
+        HttpURLConnection connection = (HttpURLConnection) new URL(DINNER_ENDPOINT).openConnection();
+        try {
+            connection.setRequestMethod("POST");
+            connection.setConnectTimeout(8000);
+            connection.setReadTimeout(35000);
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            byte[] body = new JSONObject().put("prompt", prompt).toString().getBytes(StandardCharsets.UTF_8);
+            try (OutputStream output = connection.getOutputStream()) { output.write(body); }
+            InputStream stream = connection.getResponseCode() < 400 ? connection.getInputStream() : connection.getErrorStream();
+            if (stream == null) throw new IOException("Dinner service did not respond.");
+            StringBuilder response = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = reader.readLine()) != null) response.append(line);
+            }
+            JSONObject result = new JSONObject(response.toString());
+            if (connection.getResponseCode() >= 400 || !result.optBoolean("ok")) throw new IOException(result.optString("error", "AI dinner ideas are unavailable."));
+            return result;
+        } finally {
+            connection.disconnect();
+        }
+    }
+
+    private void renderDinnerIdeas(LinearLayout results, JSONObject answer) {
+        results.removeAllViews();
+        JSONObject cook = answer.optJSONObject("cook");
+        JSONObject pickup = answer.optJSONObject("pickup");
+        JSONObject delivery = answer.optJSONObject("delivery");
+        if (cook == null || pickup == null || delivery == null) {
+            renderDinnerUnavailable(results);
+            return;
+        }
+        Recipe chosen = dailyRecipe();
+        for (Recipe recipe : recipes) if (recipe.id.equals(cook.optString("recipeId"))) chosen = recipe;
+        Recipe cookRecipe = chosen;
+        results.addView(dinnerIdeaCard("COOK", chosen.name, cook.optString("why"), "Open recipe  →", () -> showRecipe(cookRecipe)), params(0, 0, 0, 9));
+        String pickupDish = pickup.optString("dish");
+        Uri pickupUrl = Uri.parse("https://www.google.com/maps/search/").buildUpon().appendQueryParameter("api", "1").appendQueryParameter("query", pickupDish + " pickup near me").build();
+        results.addView(dinnerIdeaCard("PICK UP", pickupDish, pickup.optString("why"), "Search nearby pickup  →", () -> startActivity(new Intent(Intent.ACTION_VIEW, pickupUrl))), params(0, 0, 0, 9));
+        String deliveryDish = delivery.optString("dish");
+        Uri deliveryUrl = Uri.parse("https://www.google.com/search").buildUpon().appendQueryParameter("q", deliveryDish + " delivery near me").build();
+        results.addView(dinnerIdeaCard("DELIVER", deliveryDish, delivery.optString("why"), "Search delivery  →", () -> startActivity(new Intent(Intent.ACTION_VIEW, deliveryUrl))));
+    }
+
+    private void renderDinnerUnavailable(LinearLayout results) {
+        results.removeAllViews();
+        results.addView(text("AI dinner ideas are unavailable right now. Here's today's recipe.", 12, MUTED, false), params(0, 0, 0, 10));
+        Recipe recipe = dailyRecipe();
+        results.addView(dinnerIdeaCard("A RECIPE FOR NOW", recipe.name, recipe.description, "Open recipe  →", () -> showRecipe(recipe)));
+    }
+
+    private View dinnerIdeaCard(String label, String title, String why, String action, Runnable onAction) {
+        LinearLayout card = column();
+        card.setPadding(dp(15), dp(15), dp(15), dp(15));
+        card.setBackground(shape(CARD, 15, 0xffe5e4da));
+        card.addView(text(label, 10, GREEN, true), params(0, 0, 0, 6));
+        card.addView(text(title, 20, INK, true), params(0, 0, 0, 7));
+        card.addView(text(why, 12, MUTED, false), params(0, 0, 0, 9));
+        TextView link = text(action, 12, GREEN, true);
+        card.addView(link);
+        card.setOnClickListener(view -> onAction.run());
         return card;
     }
 

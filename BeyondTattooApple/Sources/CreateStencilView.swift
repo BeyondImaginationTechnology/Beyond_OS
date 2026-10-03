@@ -15,13 +15,13 @@ struct CreateStencilView: View {
                 .frame(height: 220)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
 
-                SectionTitle(text: "Canvas ready")
-                Text("Today’s released stencil is loaded as your starting point. Import a reference only when you want to replace it.")
+                SectionTitle(text: "Tattoo imagination")
+                Text("Describe an idea with Needle Bot and build a six-piece direction: stencil, stylesheet, lore, reference, placement, and a printer-ready asset.")
                     .foregroundStyle(.secondary)
                 NavigationLink {
-                    LiveFeatureScreen(title: "Stencil editor", subtitle: "Jaguar render requests stay in this app while they process.", url: WebDestination.editor.url)
+                    LiveFeatureScreen(title: "Stencil generator", subtitle: "Needle Bot and Llama Jaguar · six-piece tattoo direction", url: WebDestination.generator.url)
                 } label: {
-                    Label("Edit today’s stencil", systemImage: "wand.and.stars")
+                    Label("Start a tattoo idea", systemImage: "wand.and.stars")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
@@ -30,16 +30,19 @@ struct CreateStencilView: View {
             .background(Color.tattooPanel, in: RoundedRectangle(cornerRadius: 8))
 
             VStack(alignment: .leading, spacing: 10) {
-                SectionTitle(text: "Jaguar Draw")
-                Text("Describe a new tattoo idea in the editor. Jaguar keeps the request in the app and returns the generation status there; Needle Bot remains available for stencil direction.")
+                SectionTitle(text: "Violet Trace")
+                Text("Photograph a drawing or choose an image, tune its outline, then save, share, or print a stencil PNG.")
                     .foregroundStyle(.secondary)
                 NavigationLink {
-                    NeedleBotView()
+                    LiveFeatureScreen(title: "Violet Trace", subtitle: "Picture to stencil · violet or black outline", url: WebDestination.camera.url)
                 } label: {
-                    Label("Plan with Needle Bot", systemImage: "sparkles")
+                    Label("Open stencil camera", systemImage: "camera.viewfinder")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
+                NavigationLink { NeedleBotView() } label: {
+                    Label("Plan with Needle Bot", systemImage: "sparkles").frame(maxWidth: .infinity)
+                }.buttonStyle(.bordered)
             }
             .padding()
             .background(Color.tattooPanel, in: RoundedRectangle(cornerRadius: 8))

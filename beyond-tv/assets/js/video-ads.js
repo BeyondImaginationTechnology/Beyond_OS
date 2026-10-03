@@ -38,28 +38,39 @@ function createOverlay(container,label){
   const overlay=document.createElement('section');
   overlay.className='btv-ad-break';
   overlay.setAttribute('aria-label',label);
-  overlay.innerHTML='<div class="btv-ad-slot" data-btv-ad-slot></div><div class="btv-ad-filler"><span>BEYOND TV</span><strong data-btv-ad-label></strong><p>Programming resumes in <b data-btv-ad-countdown>5:00</b></p></div>';
+  overlay.innerHTML='<iframe class="btv-ad-game" data-btv-ad-game src="/beyond-games/bit-runner.php?break=1" title="Play Bit Runner during the Beyond TV break" loading="eager" allow="autoplay"></iframe><div class="btv-ad-slot" data-btv-ad-slot></div><div class="btv-ad-filler"><span>BEYOND TV · MINI-GAME BREAK</span><strong data-btv-ad-label></strong><p>Programming resumes in <b data-btv-ad-countdown>5:00</b></p></div>';
   const style=getComputedStyle(container);
   if(style.position==='static')container.style.position='relative';
   container.appendChild(overlay);
   return overlay;
 }
 
-function startIma(config,overlay,contentVideo,onAdState){
-  if(!config.enabled||!config.ad_tag_url)return Promise.resolve(null);
+function startIma(config,overlay,contentVideo,onAdState,maxSeconds){
+  if(!config.enabled||!config.ad_tag_url)return Promise.resolve();
   return loadIma().then(ima=>new Promise((resolve,reject)=>{
     const slot=overlay.querySelector('[data-btv-ad-slot]');
     const displayContainer=new ima.AdDisplayContainer(slot,contentVideo||undefined);
     const loader=new ima.AdsLoader(displayContainer);
     let manager=null;
     let settled=false;
-    const requestTimer=window.setTimeout(()=>fail(new Error('Ad request timed out')),10000);
+    let requestTimer=window.setTimeout(()=>fail(new Error('Ad request timed out')),10000);
+    let playbackTimer=0;
+    const finish=()=>{
+      if(settled)return;
+      settled=true;
+      window.clearTimeout(requestTimer);
+      window.clearTimeout(playbackTimer);
+      onAdState(false);
+      try{manager?.destroy()}catch(_){}
+      resolve();
+    };
     const fail=error=>{
       onAdState(false);
       try{manager?.destroy()}catch(_){}
       if(settled)return;
       settled=true;
       window.clearTimeout(requestTimer);
+      window.clearTimeout(playbackTimer);
       reject(error instanceof Error?error:new Error('Ad playback failed'));
     };
     loader.addEventListener(ima.AdErrorEvent.Type.AD_ERROR,event=>fail(event.getError()),false);
@@ -68,15 +79,17 @@ function startIma(config,overlay,contentVideo,onAdState){
         manager=event.getAdsManager(contentVideo||document.createElement('video'));
         if(settled){manager.destroy();return}
         manager.addEventListener(ima.AdErrorEvent.Type.AD_ERROR,event=>fail(event.getError()));
-        manager.addEventListener(ima.AdEvent.Type.STARTED,()=>onAdState(true));
-        manager.addEventListener(ima.AdEvent.Type.ALL_ADS_COMPLETED,()=>onAdState(false));
+        manager.addEventListener(ima.AdEvent.Type.STARTED,()=>{
+          window.clearTimeout(requestTimer);
+          onAdState(true);
+          playbackTimer=window.setTimeout(finish,maxSeconds*1000);
+        });
+        manager.addEventListener(ima.AdEvent.Type.ALL_ADS_COMPLETED,finish);
+        manager.addEventListener(ima.AdEvent.Type.CONTENT_RESUME_REQUESTED,finish);
         const width=Math.max(320,overlay.clientWidth);
         const height=Math.max(180,overlay.clientHeight);
         manager.init(width,height,ima.ViewMode.NORMAL);
         manager.start();
-        settled=true;
-        window.clearTimeout(requestTimer);
-        resolve(manager);
       }catch(error){fail(error)}
     },false);
     try{
@@ -95,6 +108,42 @@ function startIma(config,overlay,contentVideo,onAdState){
   }));
 }
 
+function startNativeAd(onAdState){
+  const bridge=window.BeyondTVNativeAds;
+  if(!bridge?.postMessage)return Promise.resolve(false);
+  return new Promise(resolve=>{
+    const id=`break-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    let started=false;
+    let settled=false;
+    const prior=bridge.onmessage;
+    let timer=0;
+    const finish=()=>{
+      if(settled)return;
+      settled=true;
+      window.clearTimeout(timer);
+      onAdState(false);
+      bridge.onmessage=prior;
+      resolve(started);
+    };
+    bridge.onmessage=event=>{
+      let data;
+      try{data=JSON.parse(event.data)}catch(_){return}
+      if(data.id!==id)return;
+      if(data.type==='started'){
+        started=true;
+        onAdState(true);
+        window.clearTimeout(timer);
+        timer=window.setTimeout(finish,120000);
+      }else if(data.type==='complete'||data.type==='failed')finish();
+    };
+    timer=window.setTimeout(()=>{
+      try{bridge.postMessage(JSON.stringify({type:'cancel-break-ad',id}))}catch(_){}
+      finish();
+    },10000);
+    try{bridge.postMessage(JSON.stringify({type:'show-break-ad',id}))}catch(_){finish()}
+  });
+}
+
 function playBreak(options={}){
   if(activeBreak)return activeBreak;
   activeBreak=(async()=>{
@@ -108,26 +157,29 @@ function playBreak(options={}){
     const label=overlay.querySelector('[data-btv-ad-label]');
     const countdown=overlay.querySelector('[data-btv-ad-countdown]');
     const filler=overlay.querySelector('.btv-ad-filler');
-    label.textContent=config.enabled?'Commercial break':'Beyond TV intermission';
-    const started=Date.now();
-    const endsAt=started+duration*1000;
+    const game=overlay.querySelector('[data-btv-ad-game]');
+    const endsAt=Date.now()+duration*1000;
     const tick=()=>{countdown.textContent=formatTime((endsAt-Date.now())/1000)};
     tick();
     const countdownTimer=window.setInterval(tick,1000);
-    let manager=null;
+    const adState=playing=>{
+      filler.hidden=playing;
+      game.hidden=playing;
+      overlay.classList.toggle('is-serving-ad',playing);
+      try{game.contentWindow?.postMessage({type:'beyond-tv:break-ad-state',playing},location.origin)}catch(_){}
+    };
+    label.textContent='Play Bit Runner while you wait';
     try{
-      manager=await startIma(config,overlay,contentVideo,playing=>{
-        filler.hidden=playing;
-        overlay.classList.toggle('is-serving-ad',playing);
-      });
-    }catch(_){
-      label.textContent='Beyond TV intermission';
-      filler.hidden=false;
-    }
+      if(window.BeyondTVNativeAds?.postMessage){
+        const nativeStarted=await startNativeAd(adState);
+        if(!nativeStarted)await startIma(config,overlay,contentVideo,adState,duration);
+      }else{
+        await startIma(config,overlay,contentVideo,adState,duration);
+      }
+    }catch(error){console.warn('Beyond TV ad unavailable',error);}
     const remaining=endsAt-Date.now();
     if(remaining>0)await new Promise(resolve=>window.setTimeout(resolve,remaining));
     window.clearInterval(countdownTimer);
-    try{manager?.destroy()}catch(_){}
     overlay.remove();
   })().finally(()=>{activeBreak=null});
   return activeBreak;

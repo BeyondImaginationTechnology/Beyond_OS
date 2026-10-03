@@ -31,6 +31,10 @@ function bt_asset_library(): array
 {
     $assets = [];
     $sequence = 0;
+    $seasonOneNumbers = [];
+    foreach (bt_season_one_drops() as $drop) {
+        $seasonOneNumbers[$drop['collection_slug'] . ':' . $drop['collection_index']] = $drop['sequence'];
+    }
     $today = (new DateTimeImmutable('today', new DateTimeZone('America/Vancouver')))->format('Y-m-d');
     $styleDefaults = [
         'divine-realism' => 'Black-and-grey realism',
@@ -43,6 +47,7 @@ function bt_asset_library(): array
     foreach (bt_library_collections() as $collectionSlug => $collection) {
         foreach ($collection['stencils'] as $collectionIndex => [$title, $releaseDate]) {
             $sequence++;
+            $seasonDrop = $seasonOneNumbers[$collectionSlug . ':' . $collectionIndex] ?? null;
             $folderName = sprintf('%02d-%s', $collectionIndex + 1, bt_asset_library_slug($title));
             $uploadedFolder = 'uploads/stencil-library/' . $collectionSlug . '/' . $folderName;
             $bundledFolder = 'assets/stencils/' . $collectionSlug . '/' . $folderName;
@@ -76,8 +81,9 @@ function bt_asset_library(): array
                 'slug' => bt_asset_library_slug($title),
                 'title' => $title,
                 'sequence' => $sequence,
-                'season_drop' => max(1, (int)($metadata['season_drop'] ?? $sequence)),
-                'season_total' => 55,
+                'season_drop' => $seasonDrop,
+                'season_total' => $seasonDrop === null ? null : 55,
+                'program' => $seasonDrop !== null ? 'season-one' : ($collectionSlug === 'season-one-opening' ? 'bonus' : 'studio'),
                 'collection' => $collection['name'],
                 'collection_slug' => $collectionSlug,
                 'collection_description' => $collection['description'],

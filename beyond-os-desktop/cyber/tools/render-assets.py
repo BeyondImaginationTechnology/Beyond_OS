@@ -29,7 +29,7 @@ for angle in (0, math.pi / 3, 2 * math.pi / 3):
                          cy + ex * math.sin(angle) + ey * math.cos(angle)))
     for i in range(240):
         ratio = i / 240
-        color = (round(98 + 80 * ratio), round(165 - 56 * ratio), 255)
+        color = (round(132 + 75 * ratio), round(91 + 30 * ratio), 255)
         d.line([points[i], points[i + 1]], fill=color, width=3 * scale)
 d.ellipse([xy(cx - 12, cy - 18), xy(cx + 12, cy + 6)], outline=(215, 209, 255), width=3 * scale)
 d.polygon([xy(cx - 5, cy + 2), xy(cx - 13, cy + 24),
@@ -41,10 +41,10 @@ def text(value, y, size, color):
     font = ImageFont.truetype(str(args.font), size * scale)
     d.text(xy(320, y), value, font=font, fill=color, anchor="mt")
 text("Beyond OS", 193, 40, (245, 247, 255))
-text("HOME EDITION  0.1", 250, 12, (163, 175, 200))
+text("CYBER EDITION  0.1", 250, 12, (185, 166, 220))
 for index in range(3):
     x = 307 + index * 13
-    d.ellipse([xy(x - 2, 309), xy(x + 2, 313)], fill=(115 + index * 25, 142, 230))
+    d.ellipse([xy(x - 2, 309), xy(x + 2, 313)], fill=(139 + index * 24, 104, 230))
 im = im.resize((640, 360), Image.Resampling.LANCZOS)
 im.save(root / "assets/boot.ppm")
 preview = Image.new("RGB", (1440, 900), (9, 13, 22))

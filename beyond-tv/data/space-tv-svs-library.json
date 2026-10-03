@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "channel_slug": "space-tv",
+  "provider": "NASA Scientific Visualization Studio",
+  "provider_url": "https://svs.gsfc.nasa.gov/",
+  "refresh_policy": "Download at most one approved source per run. Publish only a silent local master with a complete rights record.",
+  "sources": [
+    {
+      "id": "iss-earth-observations",
+      "title": "Earth from the International Space Station",
+      "program": "Orbit View",
+      "blocks": ["earth-from-orbit", "nasa-morning"],
+      "svs_page": "https://svs.gsfc.nasa.gov/30771/",
+      "download_url": "https://svs.gsfc.nasa.gov/vis/a030000/a030700/a030771/ISS_Crew_Earth_Observations_720p.mp4",
+      "credit": "NASA's Scientific Visualization Studio",
+      "rights_status": "public_domain_unless_noted",
+      "audio_policy": "remove_and_replace",
+      "fallback_duration_seconds": 300,
+      "maximum_megabytes": 100,
+      "enabled": true
+    },
+    {
+      "id": "earthrise",
+      "title": "Earthrise",
+      "program": "Mission Archive",
+      "blocks": ["earth-from-orbit", "moon-missions", "space-exploration-prime-time"],
+      "svs_page": "https://svs.gsfc.nasa.gov/4593/",
+      "download_url": "https://svs.gsfc.nasa.gov/vis/a000000/a004500/a004593/TWITTER_720_G2018_Earthrise_Master_VX-300368_twitter_720.mp4",
+      "credit": "NASA's Scientific Visualization Studio",
+      "rights_status": "public_domain_unless_noted",
+      "audio_policy": "remove_and_replace",
+      "fallback_duration_seconds": 180,
+      "maximum_megabytes": 150,
+      "enabled": true
+    },
+    {
+      "id": "moon-tour",
+      "title": "Tour of the Moon",
+      "program": "Moon Window",
+      "blocks": ["moon-missions", "deep-space-night"],
+      "svs_page": "https://svs.gsfc.nasa.gov/4619/",
+      "download_url": "https://svs.gsfc.nasa.gov/vis/a000000/a004600/a004619/moontour_notitle_720p30.mp4",
+      "credit": "NASA's Scientific Visualization Studio",
+      "rights_status": "public_domain_unless_noted",
+      "audio_policy": "remove_and_replace",
+      "fallback_duration_seconds": 300,
+      "maximum_megabytes": 150,
+      "enabled": true
+    },
+    {
+      "id": "artemis-ii-lunar-flyby",
+      "title": "Artemis II Lunar Flyby",
+      "program": "Mission Archive",
+      "blocks": ["moon-missions", "space-exploration-prime-time"],
+      "svs_page": "https://svs.gsfc.nasa.gov/5633/",
+      "download_url": "https://svs.gsfc.nasa.gov/vis/a000000/a005600/a005633/mission_720p30.mp4",
+      "credit": "NASA's Scientific Visualization Studio",
+      "rights_status": "public_domain_unless_noted",
+      "audio_policy": "remove_and_replace",
+      "fallback_duration_seconds": 180,
+      "maximum_megabytes": 100,
+      "enabled": true
+    },
+    {
+      "id": "black-hole-magnetic-reconnection",
+      "title": "Magnetic Reconnection at a Black Hole",
+      "program": "Cosmic Visualization Lab",
+      "blocks": ["webb-and-the-universe", "deep-space-night"],
+      "svs_page": "https://svs.gsfc.nasa.gov/20310/",
+      "download_url": "https://svs.gsfc.nasa.gov/vis/a020000/a020300/a020310/Blackhole_Sequence_v04_2160p30.mp4",
+      "credit": "NASA's Scientific Visualization Studio",
+      "rights_status": "public_domain_unless_noted",
+      "audio_policy": "remove_and_replace",
+      "fallback_duration_seconds": 15,
+      "maximum_megabytes": 80,
+      "enabled": true
+    }
+  ]
+}

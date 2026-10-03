@@ -8,7 +8,7 @@ $csrf = Auth::csrf();
 <style>
   :root{--story-ink:#f4f5ef;--story-muted:#a6b0a4;--story-line:#ffffff20;--story-panel:#13271d;--story-accent:#c9dc9e;--story-warm:#f0c77c;--story-error:#ffaaa0}
   .story-builder{max-width:1320px;margin:-26px auto 0;padding:28px 24px 70px;color:var(--story-ink)}
-  .story-builder *{box-sizing:border-box}.story-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:25px}.story-eyebrow{margin:0 0 9px;color:var(--story-warm);font-size:11px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}.story-head h1{margin:0;font:500 clamp(34px,5vw,56px)/1 Georgia,serif}.story-head p:last-child{max-width:670px;margin:12px 0 0;color:var(--story-muted);line-height:1.6}.story-duration{flex:0 0 auto;padding:10px 14px;border:1px solid var(--story-line);border-radius:999px;color:var(--story-accent);font-size:12px;font-weight:850}
+  .story-builder *{box-sizing:border-box}.story-head{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:25px}.story-eyebrow{margin:0 0 9px;color:var(--story-warm);font-size:11px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}.story-head h1{margin:0;font:500 clamp(34px,5vw,56px)/1 Georgia,serif}.story-head p:last-child{max-width:670px;margin:12px 0 0;color:var(--story-muted);line-height:1.6}.story-duration{flex:0 0 auto;padding:10px 14px;border:1px solid var(--story-line);border-radius:999px;color:var(--story-accent);font-size:12px;font-weight:850}.story-field input[type=checkbox]{width:auto;vertical-align:middle}
   .story-columns{display:grid;grid-template-columns:minmax(290px,.72fr) minmax(0,1.28fr);gap:17px;align-items:start}.story-panel{border:1px solid var(--story-line);border-radius:20px;background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.018));overflow:hidden}.story-panel-head{padding:16px 18px;border-bottom:1px solid var(--story-line);font-size:14px;font-weight:850}.story-panel-body{padding:18px}.story-field{display:grid;gap:7px;margin-bottom:15px}.story-field label{color:#d8dfd4;font-size:12px;font-weight:850}.story-field small,.story-note{color:var(--story-muted);font-size:11px;line-height:1.55}.story-field textarea,.story-field input,.beat-field textarea{width:100%;padding:11px 12px;border:1px solid #ffffff25;border-radius:11px;background:#0b1b13;color:var(--story-ink);font:13px/1.5 Inter,system-ui,sans-serif}.story-field textarea{min-height:105px;resize:vertical}.story-field textarea.sources-input{min-height:215px}.story-field input:focus,.story-field textarea:focus,.beat-field textarea:focus{outline:2px solid var(--story-accent);outline-offset:1px}.story-action{display:flex;flex-wrap:wrap;gap:9px}.story-action button,.story-download{min-height:43px;padding:11px 14px;border:1px solid #ffffff28;border-radius:11px;background:#f0c77c;color:#182216;font:850 12px Inter,system-ui,sans-serif;text-decoration:none;cursor:pointer}.story-action button.secondary,.story-download{background:#1b3828;color:var(--story-ink)}.story-action button:disabled{opacity:.5;cursor:wait}.story-status{min-height:20px;margin:12px 0 0;color:var(--story-muted);font-size:12px}.story-status[aria-busy=true]{color:var(--story-accent)}.story-status.error{color:var(--story-error)}.story-topline{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:15px}.story-timeline{display:flex;flex-wrap:wrap;gap:5px}.story-timeline span{padding:6px 8px;border:1px solid var(--story-line);border-radius:7px;color:#d7decf;font-size:10px;font-weight:750}.story-meta-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}.story-meta-fields .story-field{margin-bottom:10px}.beat-list{display:grid;gap:10px}.beat{border:1px solid var(--story-line);border-radius:15px;background:#0b1b13a8;overflow:hidden}.beat summary{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;list-style:none}.beat summary::-webkit-details-marker{display:none}.beat-time{min-width:90px;color:var(--story-warm);font:800 11px ui-monospace,monospace}.beat summary strong{font-size:13px}.beat-body{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px 14px}.beat-field{display:grid;gap:6px}.beat-field.wide{grid-column:1/-1}.beat-field label{color:var(--story-muted);font-size:10px;font-weight:850;letter-spacing:.04em;text-transform:uppercase}.beat-field textarea{min-height:65px;font-size:12px}.beat-field.wide textarea{min-height:72px}.story-sources{margin-top:12px;border:1px solid var(--story-line);border-radius:13px}.story-sources summary{padding:12px 14px;color:var(--story-accent);font-size:12px;font-weight:850;cursor:pointer}.story-source-item{padding:12px 14px;border-top:1px solid var(--story-line);font-size:12px}.story-source-item p{margin:6px 0 0;color:var(--story-muted);line-height:1.5;white-space:pre-wrap}.story-source-item a{display:block;margin-top:5px;color:var(--story-warm);overflow-wrap:anywhere}.story-export{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.story-help{margin-top:20px;padding:14px;border-left:2px solid var(--story-warm);background:#ffffff08;color:var(--story-muted);font-size:11px;line-height:1.6}
   .story-rendered-video{display:block;width:min(360px,100%);margin:16px auto 0;border-radius:14px;background:#050b07}.story-rendered-video[hidden]{display:none}
   @media(max-width:900px){.story-columns{grid-template-columns:1fr}.story-head{align-items:start;flex-direction:column}.story-builder{padding:22px 14px 55px}.beat-body{grid-template-columns:1fr}.beat-field.wide{grid-column:auto}}
@@ -42,7 +42,8 @@ $csrf = Auth::csrf();
           <div class="beat-list" id="beatList"></div>
           <div class="story-field" style="margin-top:12px"><label for="storyOutro">Daily Breath outro</label><textarea id="storyOutro" maxlength="180" style="min-height:56px"></textarea></div>
           <details class="story-sources" id="sourceDetails"><summary>Sources · complete citations and notes</summary><div id="sourceList"></div></details>
-          <div class="story-export"><button class="story-download" type="button" id="downloadJson">Download story brief JSON</button><button type="button" id="renderStory">Render 60-second MP4</button><button class="story-download" type="button" id="downloadMp4" disabled>Download MP4</button></div>
+          <div class="story-field" style="margin-top:14px"><label><input id="recordVoiceover" type="checkbox" style="accent-color:#c9dc9e;margin-right:7px"> Generate ElevenLabs voiceover</label><small>Creates one voice clip per beat using the configured server voice and ElevenLabs account credits. Leave unchecked for a silent video.</small></div>
+          <div class="story-export"><button class="story-download" type="button" id="downloadJson">Download story brief JSON</button><button type="button" id="renderStory">Render MP4</button><button class="story-download" type="button" id="downloadMp4" disabled>Download MP4</button></div>
           <video id="renderedVideo" class="story-rendered-video" controls playsinline hidden aria-label="Rendered Daily Breath story video"></video>
         </div>
       </div>
@@ -204,11 +205,12 @@ $csrf = Auth::csrf();
     button.disabled = true;
     try {
       const data = currentStory();
-      status('Rendering the 60-second vertical MP4 with Remotion…', false, true);
+      const recordVoiceover = $('recordVoiceover').checked;
+      status(recordVoiceover ? 'Recording each beat with ElevenLabs, then rendering the vertical MP4…' : 'Rendering the vertical MP4 with Remotion…', false, true);
       const response = await fetch('api/render-dailybreath-story.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'X-CSRF-Token': root.dataset.csrf},
-        body: JSON.stringify(data),
+        body: JSON.stringify({...data, recordVoiceover}),
       });
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
@@ -221,7 +223,7 @@ $csrf = Auth::csrf();
       $('renderedVideo').src = renderedVideoUrl;
       $('renderedVideo').hidden = false;
       $('downloadMp4').disabled = false;
-      status('MP4 ready. Preview it below or download when approved.');
+      status(recordVoiceover ? 'ElevenLabs voiceover and MP4 ready. Preview it below or download when approved.' : 'MP4 ready. Preview it below or download when approved.');
     } catch (error) {
       status(error instanceof Error ? error.message : 'Remotion render failed.', true);
     } finally {

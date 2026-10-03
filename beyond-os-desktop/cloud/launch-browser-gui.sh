@@ -30,9 +30,10 @@ for _ in {1..30}; do
 done
 ss -ltn | grep -q ':5900 ' || { echo "QEMU VNC did not start; see $qemu_log" >&2; exit 1; }
 
-nohup env BEYOND_NOVNC_LISTEN=127.0.0.1:6080 BEYOND_VNC_TARGET=127.0.0.1:5900 \
+novnc_listen=${BEYOND_NOVNC_LISTEN:-127.0.0.1:6080}
+nohup env BEYOND_NOVNC_LISTEN="$novnc_listen" BEYOND_VNC_TARGET=127.0.0.1:5900 \
     "$cloud_dir/serve-novnc.sh" >"$novnc_log" 2>&1 &
 echo $! > /tmp/beyond-core-novnc.pid
-echo "noVNC loopback endpoint: http://127.0.0.1:6080/vnc.html?host=127.0.0.1&port=6080"
+echo "noVNC endpoint: http://$novnc_listen/vnc.html"
 echo "QEMU log: $qemu_log"
 echo "noVNC log: $novnc_log"

@@ -1,79 +1,79 @@
 {
   "brand": "Daily Breath",
   "series": "Bible devotional",
-  "title": "Enough for Today",
-  "subtitle": "A reflection on Matthew 6:25–34",
+  "title": "A Strong Tower",
+  "subtitle": "A reflection on Proverbs 18:10",
   "beats": [
     {
       "id": "intro",
       "label": "Begin",
       "startSeconds": 0,
       "durationSeconds": 12,
-      "narration": "Welcome to Daily Breath. Take a slow breath. Let your shoulders soften. For these few minutes, you don’t have to solve everything at once.",
-      "onScreenText": "Matthew 6:25–34",
+      "narration": "Welcome to Daily Breath. Take a slow breath and let your shoulders soften. Today, we’ll rest with one image of safety: a strong tower.",
+      "onScreenText": "Proverbs 18:10",
       "visualPrompt": "Quiet morning light across a simple room; soft greens and warm cream; slow camera drift."
     },
     {
       "id": "reading",
-      "label": "Today’s passage",
+      "label": "Verse of the Day",
       "startSeconds": 12,
-      "durationSeconds": 28,
-      "narration": "Today’s reading is Matthew 6:25–34. Jesus teaches his listeners not to be consumed by worry about food, clothing, or tomorrow. He points to the birds and the flowers as reminders of God’s care. Then he gives this instruction: “Therefore don’t be anxious for tomorrow, for tomorrow will be anxious for itself. Each day’s own evil is sufficient.”",
-      "onScreenText": "Matthew 6:25–34 · World English Bible",
-      "visualPrompt": "Birds moving through a sunlit garden; lilies and wildflowers in a breeze; scripture reference appears quietly."
+      "durationSeconds": 24,
+      "narration": "Our Verse of the Day is Proverbs 18:10: “The LORD’s name is a strong tower: the righteous run to him, and are safe.” This verse pictures God’s name—God’s character and faithfulness—as a place to turn when we need refuge.",
+      "onScreenText": "The LORD’s name is a strong tower.",
+      "visualPrompt": "A sturdy stone tower above a peaceful landscape at sunrise; scripture reference appears quietly."
     },
     {
       "id": "reflection",
       "label": "Reflect",
-      "startSeconds": 40,
-      "durationSeconds": 34,
-      "narration": "Jesus isn’t saying that life has no real needs, or that planning is wrong. He is turning our attention toward the day in front of us. Worry pulls us into a future we can’t control. This passage invites us to meet today with trust, and to seek God’s kingdom and righteousness first.",
-      "onScreenText": "Meet today with trust.",
-      "visualPrompt": "A winding path through a green landscape, with one clear step illuminated ahead and the distant horizon soft."
+      "startSeconds": 36,
+      "durationSeconds": 31,
+      "narration": "A tower does not make the storm imaginary. It offers shelter while the storm is real. Faith can be like that: not denial, but a trusted place to bring fear, grief, and uncertainty. The verse invites us to turn toward God rather than face every burden alone.",
+      "onScreenText": "Bring the real thing into prayer.",
+      "visualPrompt": "Rain passes beyond a sheltered stone arch; warm light rests inside while the landscape remains visible."
     },
     {
       "id": "question",
       "label": "Consider",
-      "startSeconds": 74,
-      "durationSeconds": 28,
-      "narration": "What is one thing you’re carrying from tomorrow into today? You don’t have to pretend it doesn’t matter. Name it honestly. Then ask: what is the next faithful step I can take today?",
-      "onScreenText": "What is your next faithful step?",
-      "visualPrompt": "A journal beside a window; a hand writes one small next step in morning light."
+      "startSeconds": 67,
+      "durationSeconds": 24,
+      "narration": "What feels heavy or uncertain today? You don’t need to solve it in this moment. Name it honestly. What would it mean to seek refuge before rushing to fix everything?",
+      "onScreenText": "What are you carrying today?",
+      "visualPrompt": "A journal beside a window; a hand writes one honest concern in morning light."
     },
     {
       "id": "practice",
       "label": "Practice",
-      "startSeconds": 102,
-      "durationSeconds": 31,
-      "narration": "Maybe it’s making a call, asking for help, finishing one small task, or resting when you need rest. The passage doesn’t promise that every difficulty disappears. It offers a way to face this day without letting tomorrow take all of today’s breath.",
-      "onScreenText": "One step. One day at a time.",
-      "visualPrompt": "A few ordinary acts of care: a phone placed beside a note, a task completed, a quiet cup of tea."
+      "startSeconds": 91,
+      "durationSeconds": 29,
+      "narration": "Take one quiet minute. Breathe in, and remember you are not required to carry everything alone. Breathe out, and offer God the concern you named. If support from another person would help, choose someone safe to contact today.",
+      "onScreenText": "Pause. Breathe. Reach for support.",
+      "visualPrompt": "A calm pause beside an open window, followed by a phone placed next to a handwritten note."
     },
     {
       "id": "pause",
       "label": "Pause",
-      "startSeconds": 133,
-      "durationSeconds": 18,
-      "narration": "For now, return to this moment. Breathe in. Breathe out. Take the next step you can take, and leave the rest with God.",
-      "onScreenText": "Breathe in. Breathe out.",
+      "startSeconds": 120,
+      "durationSeconds": 19,
+      "narration": "For a few breaths, be still. Breathe in: refuge. Breathe out: I can ask for help. Let the words settle without forcing yourself to feel a certain way.",
+      "onScreenText": "Refuge. One breath at a time.",
       "visualPrompt": "Still leaves moving gently in a light breeze; hold a spacious, quiet frame."
     },
     {
       "id": "prayer",
       "label": "Prayer",
-      "startSeconds": 151,
-      "durationSeconds": 32,
-      "narration": "God, thank you for meeting us in this day. Help us release the worries we cannot resolve right now. Give us wisdom for the next step, courage to ask for help, and trust in your care. Teach us to seek what is good and faithful today. Amen.",
-      "onScreenText": "A prayer for today",
+      "startSeconds": 139,
+      "durationSeconds": 31,
+      "narration": "Present God, help me receive your care and recognize the people you have placed beside me. Be my refuge in what feels uncertain. Give me courage for the next step, and humility to reach out when I need help. Amen.",
+      "onScreenText": "A prayer for refuge",
       "visualPrompt": "Warm light across an open Bible on a table; gentle stillness without depicting a specific religious figure."
     },
     {
       "id": "resolution",
       "label": "Carry this with you",
-      "startSeconds": 183,
-      "durationSeconds": 12,
-      "narration": "May you carry one day at a time. This has been Daily Breath.",
-      "onScreenText": "May you carry one day at a time.",
+      "startSeconds": 170,
+      "durationSeconds": 14,
+      "narration": "May you find refuge for this moment and courage for your next step. This has been Daily Breath.",
+      "onScreenText": "You can reach for refuge.",
       "visualPrompt": "A calm sunrise over a simple horizon; fade slowly to the Daily Breath mark."
     }
   ],
@@ -81,12 +81,12 @@
   "outroSeconds": 8,
   "sources": [
     {
-      "citation": "Matthew 6:25–34 · World English Bible (WEB)",
-      "url": "https://ebible.org/web/MAT06.htm",
-      "notes": "Scripture text and passage summary are taken from the public-domain WEB; devotional reflection and prayer are original."
+      "citation": "Proverbs 18:10 · World English Bible (WEB)",
+      "url": "https://ebible.org/web/PRO18.htm",
+      "notes": "Verse text is from the public-domain WEB. Reflection, practice, and prayer are original."
     }
   ],
-  "outroText": "Take today one step at a time.",
+  "outroText": "May you find refuge for this moment.",
   "fps": 30,
   "width": 1080,
   "height": 1920,

@@ -36,7 +36,8 @@ const status=document.getElementById('status');
 const label=status.querySelector('b');
 const countdown=document.getElementById('status-countdown');
 const unmute=document.getElementById('unmute');
-let sources=[],index=0,offset=0,failures=0,countdownTimer=0,hideTimer=0;
+let sources=[],index=0,offset=0,failures=0,countdownTimer=0,hideTimer=0,secondsSinceBreak=0;
+const breakEverySeconds=<?=json_encode($slug==='space-tv'?1800:1)?>;
 
 function clearStatusTimers(){
   if(countdownTimer)window.clearInterval(countdownTimer);
@@ -100,11 +101,20 @@ function playCurrent(){
     offset=0;
     playCurrent();
   };
-  video.onended=()=>window.BeyondTVAds.playBreak({container:document.querySelector('.player'),contentVideo:video,duration:300}).then(()=>{
-    index=(index+1)%sources.length;
-    offset=0;
-    playCurrent();
-  });
+  video.onended=()=>{
+    secondsSinceBreak+=Number.isFinite(video.duration)?video.duration:0;
+    const continuePlayback=()=>{
+      index=(index+1)%sources.length;
+      offset=0;
+      playCurrent();
+    };
+    if(breakEverySeconds>0&&secondsSinceBreak>=breakEverySeconds){
+      secondsSinceBreak=0;
+      window.BeyondTVAds.playBreak({container:document.querySelector('.player'),contentVideo:video,duration:300}).then(continuePlayback);
+      return;
+    }
+    continuePlayback();
+  };
 }
 
 fetch(endpoint,{cache:'default'})

@@ -636,6 +636,30 @@ nav a:focus-visible {
   line-height: 1.5;
 }
 
+.session-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 15px;
+}
+
+.session-controls p {
+  flex-basis: 100%;
+  margin: 0;
+  color: #61738b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.session-controls .button {
+  cursor: pointer;
+}
+
+.session-controls button:disabled {
+  opacity: .65;
+  cursor: progress;
+}
+
 .how {
   padding-block: 72px;
   background: #e9eef6;

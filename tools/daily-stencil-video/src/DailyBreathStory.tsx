@@ -1,9 +1,11 @@
 import React from 'react';
+import {Audio} from '@remotion/media';
 import {
   AbsoluteFill,
   Easing,
   Sequence,
   interpolate,
+  staticFile,
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
@@ -25,6 +27,11 @@ export type DailyBreathStorySource = {
   notes: string;
 };
 
+export type DailyBreathStoryAudioSegment = {
+  audioFile: string;
+  startSeconds: number;
+};
+
 export type DailyBreathStoryProps = {
   brand: string;
   series: string;
@@ -32,6 +39,7 @@ export type DailyBreathStoryProps = {
   subtitle: string;
   beats: DailyBreathStoryBeat[];
   sources: DailyBreathStorySource[];
+  audioSegments?: DailyBreathStoryAudioSegment[];
   outroText: string;
   sourceSeconds: number;
   outroSeconds: number;
@@ -271,6 +279,11 @@ export const DailyBreathStory: React.FC<DailyBreathStoryProps> = (props) => {
   );
   return (
     <AbsoluteFill style={{background: props.palette.background}}>
+      {(props.audioSegments ?? []).map((segment, index) => (
+        <Sequence key={`${segment.audioFile}-${index}`} from={Math.max(0, Math.round(segment.startSeconds * fps))}>
+          <Audio src={staticFile(segment.audioFile)} volume={0.96} />
+        </Sequence>
+      ))}
       {props.beats.map((beat) => (
         <Sequence
           key={beat.id}

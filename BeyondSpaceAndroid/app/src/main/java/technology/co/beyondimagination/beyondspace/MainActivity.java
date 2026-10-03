@@ -124,7 +124,7 @@ public class MainActivity extends Activity {
         add(page, watchHeading, 0, 9);
         LinearLayout watchRow = new LinearLayout(this);
         watchRow.setOrientation(LinearLayout.HORIZONTAL);
-        Button tvButton = actionButton("Space TV", false);
+        Button tvButton = actionButton("Beyond Space TV", false);
         tvButton.setOnClickListener(view -> open(spaceTVUrl));
         Button youtubeButton = actionButton("YouTube", false);
         youtubeButton.setOnClickListener(view -> open(youtubeUrl));

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require dirname(__DIR__) . '/bootstrap.php';
 require_once dirname(__DIR__, 4) . '/config/bootstrap.php';
+require_once dirname(__DIR__, 4) . '/includes/narration/StudioNarration.php';
 
 function dailyBreathStoryRenderError(int $status, string $message): never
 {
@@ -36,6 +37,7 @@ if (!function_exists('proc_open')) dailyBreathStoryRenderError(503, 'This server
 $title = trim((string)($input['title'] ?? ''));
 $subtitle = trim((string)($input['subtitle'] ?? ''));
 $outroText = trim((string)($input['outroText'] ?? ''));
+$recordVoiceover = ($input['recordVoiceover'] ?? false) === true;
 $beats = $input['beats'] ?? null;
 $sources = $input['sources'] ?? null;
 if ($title === '' || mb_strlen($title) > 100 || $subtitle === '' || mb_strlen($subtitle) > 140 || $outroText === '' || mb_strlen($outroText) > 180) {
@@ -108,6 +110,7 @@ $props = [
     'sourceSeconds' => max(1, min(60, (float)($default['sourceSeconds'] ?? 8))),
     'outroSeconds' => max(1, min(60, (float)($default['outroSeconds'] ?? 8))),
     'sources' => $cleanSources,
+    'audioSegments' => [],
     'fps' => 30,
     'width' => 1080,
     'height' => 1920,
@@ -117,7 +120,24 @@ $job = bin2hex(random_bytes(12));
 $propsFile = sys_get_temp_dir() . '/daily-breath-story-' . $job . '.json';
 $outputFile = sys_get_temp_dir() . '/daily-breath-story-' . $job . '.mp4';
 $logFile = sys_get_temp_dir() . '/daily-breath-story-' . $job . '.log';
+$audioFiles = [];
 try {
+    if ($recordVoiceover) {
+        @set_time_limit(900);
+        foreach ($orderedBeats as $index => $beat) {
+            $result = studio_narration_generate($beat['narration'], 'en-US', 'elevenlabs');
+            $audio = (string)($result['audio_content'] ?? '');
+            studio_assert_mp3($audio);
+            $audioFile = 'daily-breath-story-' . $job . '-' . $index . '.mp3';
+            $audioPath = $project . '/public/' . $audioFile;
+            if (file_put_contents($audioPath, $audio, LOCK_EX) === false) {
+                throw new RuntimeException('ElevenLabs audio could not be prepared for the video render.');
+            }
+            @chmod($audioPath, 0600);
+            $audioFiles[] = $audioPath;
+            $props['audioSegments'][] = ['audioFile' => $audioFile, 'startSeconds' => $beat['startSeconds']];
+        }
+    }
     $encoded = json_encode($props, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
     if (file_put_contents($propsFile, $encoded . PHP_EOL, LOCK_EX) === false) {
         throw new RuntimeException('The story configuration could not be prepared for Remotion.');
@@ -139,9 +159,9 @@ try {
             $exitCode = (int)$status['exitcode'];
             break;
         }
-        if (microtime(true) - $started > 180) {
+        if (microtime(true) - $started > 600) {
             proc_terminate($process);
-            throw new RuntimeException('The Remotion story render exceeded 180 seconds.');
+            throw new RuntimeException('The Remotion story render exceeded 600 seconds.');
         }
         usleep(250000);
     } while (true);
@@ -162,7 +182,7 @@ try {
     error_log('Daily Breath Remotion story export: ' . $error->getMessage());
     dailyBreathStoryRenderError(503, $error->getMessage());
 } finally {
-    foreach ([$propsFile, $outputFile, $logFile] as $file) {
+    foreach (array_merge([$propsFile, $outputFile, $logFile], $audioFiles) as $file) {
         if (is_file($file)) @unlink($file);
     }
 }

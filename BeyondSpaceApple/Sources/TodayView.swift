@@ -69,7 +69,7 @@ struct TodayView: View {
                     }
                     HStack(spacing: 12) {
                         Link(destination: spaceTVURL) {
-                            Label("Space TV", systemImage: "tv")
+                            Label("Beyond Space TV", systemImage: "tv")
                                 .frame(maxWidth: .infinity, minHeight: 44)
                         }
                         .buttonStyle(.bordered)

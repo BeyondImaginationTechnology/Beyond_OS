@@ -295,6 +295,7 @@ function jaguar_wallet_release(PDO $pdo, int $userId, string $idempotencyKey): b
 function jaguar_wallet_draw_receipt(PDO $pdo, int $userId, ?string $idempotencyKey = null): ?array
 {
     if ($userId < 1) return null;
+    if (function_exists('jaguar_draw_image_cleanup')) jaguar_draw_image_cleanup($pdo, 5);
     $sql = 'SELECT h.idempotency_key,h.amount,h.status,h.created_at,h.updated_at FROM jaguar_draw_holds h JOIN beyond_wallets w ON w.id=h.wallet_id WHERE w.user_id=?';
     $params = [$userId];
     if ($idempotencyKey !== null) { $sql .= ' AND h.idempotency_key=?'; $params[] = $idempotencyKey; }
@@ -303,12 +304,25 @@ function jaguar_wallet_draw_receipt(PDO $pdo, int $userId, ?string $idempotencyK
     $statement->execute($params);
     $hold = $statement->fetch(PDO::FETCH_ASSOC);
     if (!$hold || !in_array($hold['status'], ['held', 'charged', 'released'], true)) return null;
+    $receiptId = substr(hash('sha256', (string)$hold['idempotency_key']), 0, 16);
+    $imageAvailable = false;
+    $imageExpiresAt = null;
+    if ($hold['status'] === 'charged') {
+        try {
+            $image = $pdo->prepare('SELECT expires_at FROM jaguar_draw_images WHERE idempotency_key=? AND expires_at>? LIMIT 1');
+            $image->execute([(string)$hold['idempotency_key'], time()]);
+            $expiresAt = $image->fetchColumn();
+            if ($expiresAt !== false) { $imageAvailable = true; $imageExpiresAt = gmdate('c', (int)$expiresAt); }
+        } catch (Throwable $exception) { /* Keep receipts useful when the optional image migration is pending. */ }
+    }
     return [
-        'receipt_id' => substr(hash('sha256', (string)$hold['idempotency_key']), 0, 16),
+        'receipt_id' => $receiptId,
         'status' => $hold['status'],
         'amount_bit_dollars' => (float)$hold['amount'],
         'created_at' => gmdate('c', (int)$hold['created_at']),
         'updated_at' => gmdate('c', (int)$hold['updated_at']),
+        'image_available' => $imageAvailable,
+        'image_expires_at' => $imageExpiresAt,
     ];
 }
 

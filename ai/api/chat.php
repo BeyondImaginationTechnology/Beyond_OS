@@ -3,6 +3,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/modes.php';
 require_once __DIR__ . '/../includes/usage.php';
+require_once __DIR__ . '/../includes/draw-images.php';
 require_once __DIR__ . '/../../beyond-id/includes/mobile-auth.php';
 require_once __DIR__ . '/../../dailybreath/includes/chat-guide.php';
 
@@ -160,15 +161,19 @@ if (in_array($mode, ['draw', 'video'], true)) {
         $drawResponse = curl_exec($drawRequest); $drawStatus = (int)curl_getinfo($drawRequest, CURLINFO_RESPONSE_CODE); curl_close($drawRequest);
         $drawResult = is_string($drawResponse) && strlen($drawResponse) <= 15 * 1024 * 1024 ? json_decode($drawResponse, true) : null;
         $imageUrl = is_array($drawResult) && is_string($drawResult['image_url'] ?? null) ? trim($drawResult['image_url']) : '';
-        $isDataImage = preg_match('/^data:image\/(?:png|jpeg|webp);base64,[A-Za-z0-9+\/=]+$/', $imageUrl) === 1 && strlen($imageUrl) <= 12 * 1024 * 1024;
-        $isHttpsImage = filter_var($imageUrl, FILTER_VALIDATE_URL) !== false && strtolower((string)parse_url($imageUrl, PHP_URL_SCHEME)) === 'https';
-        if ($drawStatus < 200 || $drawStatus >= 300 || (!$isDataImage && !$isHttpsImage)) {
+        $decodedImage = $imageUrl !== '' ? jaguar_draw_image_decode($imageUrl) : null;
+        if ($drawStatus < 200 || $drawStatus >= 300 || $decodedImage === null) {
             $released = jaguar_wallet_release(beyond_db(), $drawUserId, $drawKey);
             http_response_code(503); echo json_encode(['error' => $released ? 'Jaguar Draw could not generate an image. Your 10 BIT$ hold was released.' : 'Jaguar Draw could not generate an image. The temporary BIT$ hold is pending recovery.', 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)]); exit;
         }
+        $savedImage = jaguar_draw_image_store(beyond_db(), $drawUserId, $drawKey, $decodedImage);
+        if ($savedImage === null) {
+            $released = jaguar_wallet_release(beyond_db(), $drawUserId, $drawKey);
+            http_response_code(503); echo json_encode(['error' => $released ? 'Jaguar generated an image but could not save it for recovery. Your 10 BIT$ hold was released.' : 'Jaguar generated an image but could not save it for recovery. The temporary BIT$ hold is pending recovery.', 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)]); exit;
+        }
         $capture = jaguar_wallet_capture(beyond_db(), $drawUserId, $drawKey, 'Jaguar Draw image generation');
         if (!$capture['ok']) { jaguar_wallet_release(beyond_db(), $drawUserId, $drawKey); http_response_code(503); echo json_encode(['error' => 'The image was generated, but the wallet charge could not be recorded. The image was not delivered.', 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)]); exit; }
-        echo json_encode(['model' => 'jaguar-draw-gpu', 'adapter' => $drawResult['adapter'] ?? null, 'mode' => 'draw', 'message' => 'Your Jaguar Draw image is ready.', 'image_url' => $imageUrl, 'wallet_bit_balance' => $capture['balance'], 'charged_bit_dollars' => $drawPrice, 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        echo json_encode(['model' => 'jaguar-draw-gpu', 'adapter' => $drawResult['adapter'] ?? null, 'mode' => 'draw', 'message' => 'Your Jaguar Draw image is ready.', 'image_url' => jaguar_draw_image_url((string)$savedImage['receipt_id']), 'wallet_bit_balance' => $capture['balance'], 'charged_bit_dollars' => $drawPrice, 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
     http_response_code(501);

@@ -110,6 +110,17 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
         const id = typeof receipt.receipt_id === 'string' ? ` · Receipt ${receipt.receipt_id}` : '';
         drawReceipt.className = `draw-receipt ${receipt.status}`;
         drawReceipt.textContent = `Last Draw: ${event}${when}${id}`;
+        if (receipt.status === 'charged' && receipt.image_available === true
+            && typeof receipt.receipt_id === 'string' && /^[a-f0-9]{16}$/.test(receipt.receipt_id)) {
+            drawReceipt.append(document.createTextNode(' · '));
+            const imageLink = document.createElement('a');
+            imageLink.href = `${appBasePath}/api/draw-image.php?receipt=${encodeURIComponent(receipt.receipt_id)}`;
+            imageLink.target = '_blank';
+            imageLink.rel = 'noopener';
+            imageLink.textContent = 'Open saved image (7 days)';
+            imageLink.setAttribute('aria-label', 'Open your saved Jaguar Draw image; available for seven days');
+            drawReceipt.append(imageLink);
+        }
         drawReceipt.hidden = false;
     }
 

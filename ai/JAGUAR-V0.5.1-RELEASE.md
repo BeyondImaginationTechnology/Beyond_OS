@@ -19,6 +19,11 @@ in their separate training scope and do not become a public Jaguar mode.
 - The web client waits longer than the Draw worker deadline and limits Draw
   prompts to the worker's 2,000-character maximum. The iOS model request waits
   120 seconds, beyond PHP's 105-second runtime deadline.
+- A valid worker image is size- and format-checked, then saved under private
+  server storage before the wallet captures its 10 BIT$ hold. A signed-in
+  account can retrieve its charged image for seven days using its receipt;
+  retrieval checks ownership, charged status, expiry, file size, and SHA-256.
+  Expired image files are cleaned up as Jaguar usage continues.
 
 ## Verification and release gates
 
@@ -28,13 +33,15 @@ project source, atomic wallet holds, charge, release, stale recovery, and
 cross-user receipt isolation. PHP lint, embedded JavaScript syntax, and
 `git diff --check` pass locally. This is not an authenticated end-to-end test.
 
-Before enabling paid Draw on the live site, apply the MySQL or SQLite
-`20260929_01_jaguar_draw_holds` migration and verify the production worker URL,
-token, PHP request timeout, wallet schema, and one signed-in transaction. A
-charged image currently has a receipt but no server-side image history; if a
-client disconnects after capture, the receipt remains visible but the image
-cannot be retrieved. That recovery gap should be closed before broad paid
-release. No paid GPU generation or production wallet debit was made here.
+Before enabling paid Draw image recovery on the live site, apply the MySQL or
+SQLite `20261003_01_jaguar_draw_images` migration (after
+`20260929_01_jaguar_draw_holds`) and verify the production worker URL, token,
+PHP request timeout, private storage permissions, wallet schema, and one
+signed-in transaction. SDXL-Turbo's published license is non-commercial
+and requires a separate Stability AI license for commercial/production or
+hosted API use; secure that authorization or select a suitably licensed model
+before offering Draw commercially. No paid GPU generation or production wallet
+debit was made here.
 
 Before promoting Code Thinking as a development lead, repeat the four
 representative BIT evaluations through the authenticated admin API. The last

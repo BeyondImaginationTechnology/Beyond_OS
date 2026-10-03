@@ -120,12 +120,12 @@ $signedIn = $mobileClaims !== null || !empty($_SESSION['user_id']);
 $payload = json_decode((string) file_get_contents('php://input'), true);
 if (!is_array($payload)) { http_response_code(400); echo json_encode(['error' => 'Invalid request.']); exit; }
 $mode = is_string($payload['mode'] ?? null) ? strtolower(trim($payload['mode'])) : 'core';
-// The public endpoint is deliberately a single fast-lane-first conversation.
-// Other Jaguar capabilities remain backend functions and must be exposed through
-// their own authenticated server-side workflow, never by a browser-supplied mode.
-if ($mode !== 'core') {
+// Public chat defaults to the fast-lane-first core conversation. Draw is the
+// one explicit public generation request: it requires sign-in, a wallet hold,
+// and a monthly GPU reservation before the image worker is contacted.
+if (!in_array($mode, ['core', 'draw'], true)) {
     http_response_code(403);
-    echo json_encode(['error' => 'Public Jaguar chat uses the core conversation workflow.']);
+    echo json_encode(['error' => 'This Jaguar capability is available only through its authenticated backend workflow.']);
     exit;
 }
 $modeDefinition = jaguar_mode($mode);
@@ -162,6 +162,24 @@ if (in_array($mode, ['draw', 'video'], true)) {
             echo json_encode(['error' => $drawHold['balance'] !== null ? 'You need 10 BIT$ to generate an image.' : 'Your BIT$ wallet could not reserve this image. No BIT$ was charged.', 'wallet_bit_balance' => $drawHold['balance'] ?? $drawBalance]);
             exit;
         }
+        try {
+            $drawUsageIdentity = jaguar_usage_identity(true);
+            $drawUsageReservation = jaguar_usage_reserve(beyond_db(), $drawUsageIdentity);
+        } catch (Throwable $exception) {
+            jaguar_wallet_release(beyond_db(), $drawUserId, $drawKey);
+            error_log('Jaguar Draw GPU reservation unavailable: ' . $exception->getMessage());
+            http_response_code(503); echo json_encode(['error' => 'Jaguar Draw usage protection is temporarily unavailable. No BIT$ was charged.', 'wallet_bit_balance' => $drawBalance]); exit;
+        }
+        if (!$drawUsageReservation['allowed']) {
+            jaguar_wallet_release(beyond_db(), $drawUserId, $drawKey);
+            http_response_code(429);
+            echo json_encode(['error' => 'You have reached this month’s Modal GPU request allowance. Your usage resets next month.', 'monthly_limit' => true, 'usage' => jaguar_usage_public($drawUsageReservation, $drawBalance)]);
+            exit;
+        }
+        $releaseDrawUsageReservation = static function () use ($drawUsageIdentity, $drawUsageReservation): void {
+            try { jaguar_usage_release(beyond_db(), $drawUsageIdentity, (string)$drawUsageReservation['period']); }
+            catch (Throwable $exception) { error_log('Jaguar Draw GPU reservation release failed: ' . $exception->getMessage()); }
+        };
         register_shutdown_function(static function () use ($drawKey, $drawUserId): void {
             try { jaguar_wallet_release(beyond_db(), $drawUserId, $drawKey); } catch (Throwable $exception) { error_log('Jaguar Draw shutdown release failed: ' . $exception->getMessage()); }
         });
@@ -171,18 +189,28 @@ if (in_array($mode, ['draw', 'video'], true)) {
         $drawResult = is_string($drawResponse) && strlen($drawResponse) <= 15 * 1024 * 1024 ? json_decode($drawResponse, true) : null;
         $imageUrl = is_array($drawResult) && is_string($drawResult['image_url'] ?? null) ? trim($drawResult['image_url']) : '';
         $decodedImage = $imageUrl !== '' ? jaguar_draw_image_decode($imageUrl) : null;
-        if ($drawStatus < 200 || $drawStatus >= 300 || $decodedImage === null) {
+        $drawGpuSeconds = is_array($drawResult) && is_numeric($drawResult['gpu_seconds'] ?? null) ? (float)$drawResult['gpu_seconds'] : -1.0;
+        if ($drawStatus < 200 || $drawStatus >= 300 || $decodedImage === null || !is_finite($drawGpuSeconds) || $drawGpuSeconds < 0 || $drawGpuSeconds > 180) {
             $released = jaguar_wallet_release(beyond_db(), $drawUserId, $drawKey);
+            $releaseDrawUsageReservation();
             http_response_code(503); echo json_encode(['error' => $released ? 'Jaguar Draw could not generate an image. Your 10 BIT$ hold was released.' : 'Jaguar Draw could not generate an image. The temporary BIT$ hold is pending recovery.', 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)]); exit;
         }
         $savedImage = jaguar_draw_image_store(beyond_db(), $drawUserId, $drawKey, $decodedImage);
         if ($savedImage === null) {
             $released = jaguar_wallet_release(beyond_db(), $drawUserId, $drawKey);
+            $releaseDrawUsageReservation();
             http_response_code(503); echo json_encode(['error' => $released ? 'Jaguar generated an image but could not save it for recovery. Your 10 BIT$ hold was released.' : 'Jaguar generated an image but could not save it for recovery. The temporary BIT$ hold is pending recovery.', 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)]); exit;
+        }
+        try {
+            $drawUsage = jaguar_usage_settle(beyond_db(), $drawUsageIdentity, (string)$drawUsageReservation['period'], 0, 0, $drawGpuSeconds);
+        } catch (Throwable $exception) {
+            $released = jaguar_wallet_release(beyond_db(), $drawUserId, $drawKey);
+            error_log('Jaguar Draw GPU settlement failed: ' . $exception->getMessage());
+            http_response_code(503); echo json_encode(['error' => $released ? 'Jaguar Draw could not record GPU usage. Your 10 BIT$ hold was released.' : 'Jaguar Draw could not record GPU usage. The temporary BIT$ hold is pending recovery.', 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)]); exit;
         }
         $capture = jaguar_wallet_capture(beyond_db(), $drawUserId, $drawKey, 'Jaguar Draw image generation');
         if (!$capture['ok']) { jaguar_wallet_release(beyond_db(), $drawUserId, $drawKey); http_response_code(503); echo json_encode(['error' => 'The image was generated, but the wallet charge could not be recorded. The image was not delivered.', 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)]); exit; }
-        echo json_encode(['model' => 'jaguar-draw-gpu', 'adapter' => $drawResult['adapter'] ?? null, 'mode' => 'draw', 'message' => 'Your Jaguar Draw image is ready.', 'image_url' => jaguar_draw_image_url((string)$savedImage['receipt_id']), 'wallet_bit_balance' => $capture['balance'], 'charged_bit_dollars' => $drawPrice, 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        echo json_encode(['model' => 'jaguar-draw-gpu', 'adapter' => $drawResult['adapter'] ?? null, 'mode' => 'draw', 'message' => 'Your Jaguar Draw image is ready.', 'image_url' => jaguar_draw_image_url((string)$savedImage['receipt_id']), 'wallet_bit_balance' => $capture['balance'], 'charged_bit_dollars' => $drawPrice, 'usage' => jaguar_usage_public($drawUsage, $capture['balance']), 'draw_receipt' => jaguar_wallet_draw_receipt_safe(beyond_db(), $drawUserId, $drawKey)], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
     http_response_code(501);

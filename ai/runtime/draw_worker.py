@@ -5,6 +5,7 @@ import base64
 import io
 import os
 import secrets
+import time
 from functools import lru_cache
 
 import torch
@@ -56,9 +57,10 @@ def health() -> dict[str, object]:
 
 
 @app.post("/v1/draw", dependencies=[Depends(require_runtime_token)])
-def draw(request: DrawRequest) -> dict[str, str]:
+def draw(request: DrawRequest) -> dict[str, object]:
     try:
         pipeline = load_pipeline()
+        started_at = time.perf_counter()
         with torch.inference_mode():
             result = pipeline(
                 request.prompt,
@@ -71,7 +73,11 @@ def draw(request: DrawRequest) -> dict[str, str]:
         output = io.BytesIO()
         image.save(output, format="PNG", optimize=True)
         encoded = base64.b64encode(output.getvalue()).decode("ascii")
-        return {"model": MODEL_ID, "image_url": "data:image/png;base64," + encoded}
+        return {
+            "model": MODEL_ID,
+            "image_url": "data:image/png;base64," + encoded,
+            "gpu_seconds": round(time.perf_counter() - started_at, 6),
+        }
     except RuntimeError as error:
         raise HTTPException(status_code=503, detail="Jaguar Draw is not ready") from error
 

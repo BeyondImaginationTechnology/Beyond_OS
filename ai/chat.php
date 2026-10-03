@@ -30,7 +30,7 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
 .side-links a:hover,.side-links a:focus-visible{color:#f5eaff;background:linear-gradient(90deg,rgba(179,92,255,.1),transparent);transform:translateX(3px)}
 .message.assistant .avatar{transition:box-shadow .3s ease,transform .3s ease}.message.assistant:hover .avatar{box-shadow:0 0 20px rgba(224,79,194,.28);transform:scale(1.04)}
 @media(prefers-reduced-motion:reduce){.suggestions button,.new-chat,.side-links a,.message.assistant .avatar{transition:none}.suggestions button::after{display:none}.composer:focus-within{animation:none}}
-</style><style>.usage-status{line-height:1.4}.draw-receipt{margin:0 0 9px;padding:9px 12px;border:1px solid rgba(131,239,168,.35);border-radius:11px;background:rgba(15,58,36,.32);color:#d7ffe4;font-size:11px;line-height:1.5}.draw-receipt[hidden]{display:none}.draw-receipt.held{border-color:rgba(255,209,122,.4);background:rgba(70,43,9,.3);color:#ffe6b2}.draw-receipt.released{border-color:var(--line);background:rgba(28,18,41,.7);color:#d8c8e4}</style>
+</style><style>.usage-status{line-height:1.4}.draw-notice{margin:0 0 9px;padding:9px 12px;border:1px solid rgba(255,211,125,.45);border-radius:11px;background:rgba(75,48,10,.38);color:#ffe2a1;font-size:11px;line-height:1.5}.draw-notice[hidden]{display:none}.draw-receipt{margin:0 0 9px;padding:9px 12px;border:1px solid rgba(131,239,168,.35);border-radius:11px;background:rgba(15,58,36,.32);color:#d7ffe4;font-size:11px;line-height:1.5}.draw-receipt[hidden]{display:none}.draw-receipt.held{border-color:rgba(255,209,122,.4);background:rgba(70,43,9,.3);color:#ffe6b2}.draw-receipt.released{border-color:var(--line);background:rgba(28,18,41,.7);color:#d8c8e4}.send{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.48);background:linear-gradient(135deg,#7828d5 0%,#b747ed 45%,#ff71c7 100%);background-size:180% 180%;box-shadow:inset 0 1px 1px rgba(255,255,255,.58),inset 0 -7px 12px rgba(70,9,107,.26),0 6px 0 #6920a3,0 13px 24px rgba(131,43,193,.34);text-shadow:0 1px 2px rgba(41,4,70,.45);transition:transform .2s ease,box-shadow .2s ease,filter .2s ease;animation:sendColor 5s ease-in-out infinite}.send::before{content:'';position:absolute;inset:1px 4px auto;height:42%;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,0));pointer-events:none}.send:hover:not(:disabled),.send:focus-visible:not(:disabled){transform:translateY(-2px);filter:saturate(1.15) brightness(1.06);box-shadow:inset 0 1px 1px rgba(255,255,255,.68),inset 0 -7px 12px rgba(70,9,107,.2),0 8px 0 #6920a3,0 18px 29px rgba(131,43,193,.42)}.send:active:not(:disabled){transform:translateY(4px);box-shadow:inset 0 2px 7px rgba(70,9,107,.28),0 2px 0 #6920a3,0 7px 14px rgba(131,43,193,.28)}.send:disabled{animation:none}@keyframes sendColor{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}@media(prefers-reduced-motion:reduce){.send{animation:none}}</style>
 </head><body>
 <div class="shell"><aside class="sidebar"><a class="brand" href="/"><img class="brand-mark-image" src="assets/jaguar-eye-v0.2.png" alt="Jaguar eye logo"><span><strong>JAGUAR</strong><small>V0.5.1 · BEYOND AI</small></span></a><button class="new-chat" id="newChat" type="button">＋ New conversation</button><div class="sidebar-note"><b>Guest chat</b>Conversation history is not saved in this preview. A quick security check protects guest requests.</div><nav class="side-links"><a href="https://beyondimagination.co.technology/ai/">About Jaguar</a><a href="https://beyondimagination.co.technology/release-notes.php#jaguar">Build progress</a><a href="https://beyondimagination.co.technology/">Beyond Imagination</a></nav></aside>
 <section class="workspace"><header class="topbar"><div class="model-name"><i class="status"></i> Llama Jaguar · v0.5.1 Preview</div><div class="account"><?php if ($signedIn): ?><?=e($displayName !== '' ? $displayName : 'Beyond ID')?> · signed in<?php if (in_array(strtolower((string)($_SESSION['role'] ?? '')), ['admin', 'super_admin'], true)): ?> · <a href="code.php">Code Thinking</a> · <a href="admin/training-feedback.php">Training review</a><?php endif; ?> · <a href="https://beyondimagination.co.technology/beyond-id/auth/logout.php">Sign out</a><?php else: ?><a href="https://beyondimagination.co.technology/beyond-id/auth/login.php?return=%2Fai%2Fchat.php">Sign in with Beyond ID</a><?php endif; ?></div></header>
@@ -68,6 +68,11 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
     drawReceipt.setAttribute('aria-live', 'polite');
     drawReceipt.hidden = true;
     form.parentNode.insertBefore(drawReceipt, usageStatus);
+    const drawNotice = document.createElement('div');
+    drawNotice.className = 'draw-notice';
+    drawNotice.setAttribute('role', 'status');
+    drawNotice.hidden = true;
+    form.parentNode.insertBefore(drawNotice, form);
     const feedbackGate = document.getElementById('feedbackGate');
     const feedbackForm = document.getElementById('feedbackForm');
     let feedbackExchange = null;
@@ -79,6 +84,19 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
     let language = 'en';
     let pendingText = '';
     let guestProof = null;
+
+    const isDrawPrompt = value => /^\s*(?:draw|dibuja|dessine)(?:\s|:)/iu.test(value)
+        || /^\s*(?:generate|create)\s+(?:an?\s+)?image(?:\s|:)/iu.test(value)
+        || /^\s*(?:génère|genere)\s+une?\s+image(?:\s|:)/iu.test(value)
+        || /^\s*genera\s+una?\s+imagen(?:\s|:)/iu.test(value);
+
+    function updateDrawNotice() {
+        if (!isDrawPrompt(input.value)) { drawNotice.hidden = true; return; }
+        drawNotice.textContent = signedIn
+            ? 'Image request: this uses 1 Modal GPU request. Jaguar places a temporary 10 BIT$ hold and charges it only when an image is delivered.'
+            : 'Image request: sign in to generate. A successful image uses 1 Modal GPU request and 10 BIT$ from your Beyond wallet.';
+        drawNotice.hidden = false;
+    }
 
     function updateUsageStatus(usage) {
         if (!usage || typeof usage !== 'object') return;
@@ -275,9 +293,11 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
         history.push({role: 'user', content: text});
         addMessage('user', text);
         input.value = '';
+        updateDrawNotice();
         input.style.height = 'auto';
         send.disabled = true;
-        const thinking = addMessage('assistant', copy[language].waking);
+        const requestMode = isDrawPrompt(text) ? 'draw' : publicMode;
+        const thinking = addMessage('assistant', requestMode === 'draw' ? 'Jaguar is creating your image…' : copy[language].waking);
         const startedAt = performance.now();
         let stage = 0;
         const updateThinking = () => {
@@ -287,9 +307,8 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
         };
         const thinkingTimer = window.setInterval(() => { stage = (stage + 1) % copy[language].thinkingStages.length; updateThinking(); }, 2200);
         updateThinking();
-        const requestMode = publicMode;
         const controller = new AbortController();
-        const timeout = window.setTimeout(() => controller.abort(), 115000);
+        const timeout = window.setTimeout(() => controller.abort(), requestMode === 'draw' ? 205000 : 115000);
         try {
             const requestBody = JSON.stringify({mode: requestMode, language, messages: history, proof: signedIn ? null : guestProof});
             const requestOptions = {
@@ -344,6 +363,15 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
             if (!response.ok) throw new Error(data.error || 'Jaguar is unavailable.');
             updateUsageStatus(data.usage);
             thinking.textContent = data.message;
+            if (requestMode === 'draw' && typeof data.image_url === 'string') {
+                const image = document.createElement('img');
+                image.src = data.image_url;
+                image.alt = 'Jaguar Draw result';
+                image.loading = 'lazy';
+                image.referrerPolicy = 'no-referrer';
+                image.style.cssText = 'display:block;max-width:100%;margin-top:14px;border-radius:16px;border:1px solid rgba(199,123,255,.38);box-shadow:0 18px 40px rgba(0,0,0,.3)';
+                thinking.appendChild(image);
+            }
             history.push({role: 'assistant', content: data.message});
             attachFeedback(thinking, text, data.message, requestMode);
         } catch (error) {
@@ -373,6 +401,7 @@ $appBasePath = $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim
     input.addEventListener('input', () => {
         input.style.height = 'auto';
         input.style.height = `${Math.min(input.scrollHeight, 170)}px`;
+        updateDrawNotice();
     });
     input.addEventListener('keydown', event => {
         if (event.key === 'Enter' && !event.shiftKey) {

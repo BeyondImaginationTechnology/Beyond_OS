@@ -35,6 +35,7 @@
 **/*.jks
 **/*.keystore
 Thumbs.db
+Documents - Shortcut.lnk
 *.zip
 /build/
 /dist/

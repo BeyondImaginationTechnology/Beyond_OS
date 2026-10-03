@@ -94,6 +94,13 @@ for asset in \
   chmod 0644 "${ASSET_PATH}"
 done
 
+# Original channel masters are committed for the initial launch, then served
+# directly by the live player. Git checkout honours the private deployment
+# umask, so make these public media files readable after every deployment.
+if [[ -d "${PUBLIC_ROOT}/beyond-tv/assets/media" ]]; then
+  find "${PUBLIC_ROOT}/beyond-tv/assets/media" -type f -name '*.mp4' -exec chmod 0644 {} +
+fi
+
 DEPLOY_COMMIT="$(git rev-parse HEAD)"
 DEPLOYED_AT="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 DEPLOY_STATE_DIR="${PRIVATE_ROOT}/deployments"

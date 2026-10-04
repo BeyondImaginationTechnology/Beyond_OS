@@ -63,3 +63,6 @@ Documents - Shortcut.lnk
 
 # Generated build caches stay out of the web root and repository.
 /.cache/
+
+/tools/dailybreath-tv-worker/worker-secret.xml
+/tools/dailybreath-tv-worker/server-token-pending.txt

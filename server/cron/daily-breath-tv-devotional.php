@@ -91,8 +91,8 @@ function dailybreath_render_tv_devotional(): string
         ]],
         'outroText' => 'Carry this reading with you.',
         'fps' => 30,
-        'width' => 1080,
-        'height' => 1920,
+        'width' => 1920,
+        'height' => 1080,
         'palette' => $config['palette'] ?? ['background'=>'#10271F','foreground'=>'#F5F1E8','accent'=>'#B9D6A1','muted'=>'#B9C5BB'],
     ];
 

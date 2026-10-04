@@ -95,8 +95,8 @@ function dailybreath_render_tv_verse(string $tradition = 'bible', string $locale
         ]],
         'outroText' => 'Carry this reading with you.',
         'fps' => 30,
-        'width' => 1080,
-        'height' => 1920,
+        'width' => 1920,
+        'height' => 1080,
         'direction' => $profile['direction'],
         'palette' => $profile['palette'],
     ];

@@ -202,7 +202,35 @@ workflows:
       xcode: 16.4
     scripts:
       - name: Configure signing profiles
-        script: xcode-project use-profiles --verbose
+        script: |
+          set -euo pipefail
+          xcode-project use-profiles --verbose
+      - name: Configure App Store export profiles
+        script: |
+          set -euo pipefail
+          cat > /Users/builder/export_options.plist <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store-connect</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>teamID</key>
+            <string>FK9QM3VUNH</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>technology.co.beyondimagination.thedailybreath</key>
+              <string>Daily Breath Codemagic 2026</string>
+              <key>technology.co.beyondimagination.thedailybreath.widget</key>
+              <string>Daily Breath Widget Codemagic 2026</string>
+              <key>technology.co.beyondimagination.thedailybreath.Clip</key>
+              <string>Daily Breath App Clip Codemagic 2026</string>
+            </dict>
+          </dict>
+          </plist>
+          PLIST
       - name: Set the next App Store build number
         script: |
           set -euo pipefail
@@ -214,7 +242,8 @@ workflows:
           set -euo pipefail
           xcode-project build-ipa \
             --project "$CM_BUILD_DIR/DailyBreathApple/TheDailyBreath.xcodeproj" \
-            --scheme "The Daily Breath"
+            --scheme "The Daily Breath" \
+            --export-options-plist /Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log

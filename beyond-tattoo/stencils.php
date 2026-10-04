@@ -7,6 +7,7 @@ require_once __DIR__ . '/includes/library-catalog.php';
 $disableBeyondShell = true;
 $stencilDay = bt_stencil_content();
 $downloadFile = $stencilDay['package_url'];
+$outlineFile = $stencilDay['outline_png_url'] ?? $downloadFile;
 $pageTitle = 'Stencils — Beyond Tattoo';
 $pageDescription = 'Browse Beyond Tattoo stencil collections, placement references, print-ready artwork and studio transfer resources.';
 $pageCanonical = 'https://beyondimagination.co.technology/beyond-tattoo/stencils.php';
@@ -172,14 +173,14 @@ foreach ($collections as $collectionSlug => $collection) {
 ?>
 <style>.bt-stencil-viewer-copy{max-height:calc(100dvh - 32px);overflow-y:auto}@media(max-width:760px){.bt-stencil-viewer-copy{max-height:38dvh}}</style>
 <main class="bt-storefront bt-library-page" id="top">
-  <div class="bt-announcement"><div class="bt-wrap bt-announcement-inner"><span>✦ Asset library</span><span>◆ Verified assets only</span><span>Artist focused</span><a href="<?= e($downloadFile) ?>" download>Current stencil pack →</a></div></div>
+  <div class="bt-announcement"><div class="bt-wrap bt-announcement-inner"><span>✦ Asset library</span><span>◆ Verified assets only</span><span>Artist focused</span><a href="<?= e($outlineFile) ?>" target="_blank" rel="noopener">Print current outline →</a></div></div>
   <header class="bt-site-header"><div class="bt-wrap bt-site-header-inner">
     <a class="bt-brand" href="index.php"><span class="bt-brand-mark"><svg viewBox="0 0 64 64"><ellipse cx="32" cy="32" rx="25" ry="10"/><ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(60 32 32)"/><ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(120 32 32)"/><circle cx="32" cy="32" r="4"/></svg></span><span><strong>BEYOND</strong><b>TATTOO</b></span></a>
     <nav class="bt-desktop-nav"><a href="index.php">Home</a><a href="stencils.php" class="is-active">Stencils</a><a href="stylesheets.php">Stylesheets</a><a href="collections.php">Collections</a><a href="studios.php">Studios</a><a href="about.php">About</a></nav>
-    <div class="bt-header-actions"><a class="bt-header-download" href="<?= e($downloadFile) ?>" download>↓ Free pack</a><a class="bt-login-link" href="login.php">Studio login</a><details class="bt-mobile-menu"><summary>☰</summary><div><a href="stencils.php">Stencils</a><a href="stylesheets.php">Stylesheets</a><a href="collections.php">Collections</a><a href="studios.php">Studios</a><a href="about.php">About</a><a href="login.php">Studio login</a></div></details></div>
+    <div class="bt-header-actions"><a class="bt-header-download" href="<?= e($outlineFile) ?>" target="_blank" rel="noopener">⌘ Print outline</a><a class="bt-login-link" href="login.php">Studio login</a><details class="bt-mobile-menu"><summary>☰</summary><div><a href="stencils.php">Stencils</a><a href="stylesheets.php">Stylesheets</a><a href="collections.php">Collections</a><a href="studios.php">Studios</a><a href="about.php">About</a><a href="login.php">Studio login</a></div></details></div>
   </div></header>
 
-<section class="bt-page-hero"><div class="bt-wrap"><p class="bt-gold-kicker">✦ ASSET-BACKED LIBRARY</p><h1><?= e((string)$availableCount) ?> VERIFIED<br><strong>STENCIL DROPS</strong></h1><p>Browse approved designs with real preview and print-master files. Season One has 55 numbered drops, plus two bonus opening designs; only populated assets appear in this library.</p><div class="bt-main-actions"><a class="bt-glow-button" href="<?= e($downloadFile) ?>" download>↓ Download current stencil</a><a class="bt-outline-button" href="collections.php">Browse collections</a></div></div></section>
+<section class="bt-page-hero"><div class="bt-wrap"><p class="bt-gold-kicker">✦ ASSET-BACKED LIBRARY</p><h1><?= e((string)$availableCount) ?> VERIFIED<br><strong>STENCIL DROPS</strong></h1><p>Browse approved designs with real preview and print-master files. Season One has 55 numbered drops, plus two bonus opening designs; only populated assets appear in this library.</p><div class="bt-main-actions"><a class="bt-glow-button" href="<?= e($outlineFile) ?>" target="_blank" rel="noopener">⌘ Print current outline</a><a class="bt-outline-button" href="collections.php">Browse collections</a></div></div></section>
 <section class="bt-page-section"><div class="bt-wrap">
   <form class="filter-row" method="get" role="search" style="margin-bottom:18px"><label class="sr-only" for="stencil-search">Search approved stencils</label><input class="input" id="stencil-search" name="q" value="<?= e($searchQuery) ?>" placeholder="Search subject, style, placement, or difficulty"><?php if ($activeCategory !== ''): ?><input type="hidden" name="category" value="<?= e($activeCategory) ?>"><?php endif; ?><select class="input" name="style" aria-label="Filter by style"><option value="">All styles</option><option value="black-and-grey" <?= $filterStyle === 'black-and-grey' ? 'selected' : '' ?>>Black &amp; grey</option><option value="realism" <?= $filterStyle === 'realism' ? 'selected' : '' ?>>Realism</option><option value="japanese" <?= $filterStyle === 'japanese' ? 'selected' : '' ?>>Japanese</option></select><select class="input" name="difficulty" aria-label="Filter by difficulty"><option value="">All difficulty</option><option value="intermediate" <?= $filterDifficulty === 'intermediate' ? 'selected' : '' ?>>Intermediate</option><option value="advanced" <?= $filterDifficulty === 'advanced' ? 'selected' : '' ?>>Advanced</option></select><input class="input" name="placement" value="<?= e($filterPlacement) ?>" placeholder="Placement"><input class="input" name="collection" value="<?= e($filterCollection) ?>" placeholder="Collection"><input class="input" type="date" name="from" value="<?= e($filterFrom) ?>" aria-label="Release date from"><input class="input" type="date" name="to" value="<?= e($filterTo) ?>" aria-label="Release date to"><button class="bt-outline-button" type="submit">Filter library</button></form>
   <?php if (($stencilDay['updated_at'] ?? '') !== '' && $searchQuery === '' && $activeCategory === ''): ?>
@@ -286,24 +287,24 @@ foreach ($collections as $collectionSlug => $collection) {
       <h2 id="bt-stencil-viewer-title" data-stencil-viewer-title>Stencil preview</h2>
       <p class="bt-stencil-viewer-note">Official outline first, followed by the other available stencil assets.</p>
       <div class="bt-stencil-viewer-actions">
-        <a class="bt-glow-button" href="#" download data-stencil-viewer-download hidden>↓ Download PNG</a>
-        <a class="bt-glow-button" href="#" download data-stencil-viewer-outline hidden>↓ Download outline stencil</a>
-        <a class="bt-glow-button" href="#" download data-stencil-viewer-current hidden>↓ Download current asset</a>
-        <a class="bt-glow-button" href="#" download data-stencil-viewer-zip hidden>↓ Download all assets (ZIP)</a>
-        <a class="bt-outline-button" href="#" download data-stencil-viewer-pdf hidden>↓ Download printable PDF</a>
-        <a class="bt-outline-button" href="#" download data-stencil-viewer-reference hidden>↓ Download reference artwork</a>
-        <a class="bt-outline-button" href="#" download data-stencil-viewer-detail hidden>↓ Download detail artwork</a>
-        <a class="bt-outline-button" href="#" download data-stencil-viewer-placement hidden>↓ Download placement mockup</a>
-        <a class="bt-outline-button" href="#" download data-stencil-viewer-pack hidden>↓ Download packaging</a>
-        <a class="bt-outline-button" href="#" download data-stencil-viewer-lore hidden>↓ Download lore card</a>
-        <a class="bt-outline-button" href="#" download data-stencil-viewer-style hidden>↓ Download style card</a>
+        <a class="bt-glow-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-download hidden>Open print-ready stencil</a>
+        <a class="bt-glow-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-outline hidden>⌘ Print outline stencil</a>
+        <a class="bt-glow-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-current hidden>Open current asset</a>
+        <a class="bt-glow-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-zip hidden>Open asset package</a>
+        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-pdf hidden>Open printable PDF</a>
+        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-reference hidden>View reference artwork</a>
+        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-detail hidden>View detail artwork</a>
+        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-placement hidden>View placement mockup</a>
+        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-pack hidden>View packaging</a>
+        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-lore hidden>View lore card</a>
+        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-style hidden>View style card</a>
       </div>
     </div>
   </section>
 </div>
 
   <footer class="bt-store-footer"><div class="bt-wrap bt-store-footer-grid"><div class="bt-footer-brand"><span class="bt-brand-mark"><svg viewBox="0 0 64 64"><ellipse cx="32" cy="32" rx="25" ry="10"/><ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(60 32 32)"/><ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(120 32 32)"/><circle cx="32" cy="32" r="4"/></svg></span><div><strong>Beyond Tattoo</strong><small>Beyond imagination. Beyond limits.</small></div></div><div class="bt-footer-links"><a href="../">Beyond OS</a><a href="login.php">Studio login</a><a href="../legal/terms.php">Terms</a><a href="../legal/privacy.php">Privacy</a></div></div></footer>
-  <a class="bt-mobile-sticky-download" href="<?= e($downloadFile) ?>" download>↓ Download today’s free stencil</a>
+  <a class="bt-mobile-sticky-download" href="<?= e($outlineFile) ?>" target="_blank" rel="noopener">⌘ Print today’s outline</a>
 </main>
 <script>
 (() => {

@@ -14,6 +14,7 @@ import {
   defaultDailyBreathStoryProps,
   dailyBreathStoryDurationSeconds,
 } from './DailyBreathStory';
+import {validateDailyBreathStoryProps} from './validate-story';
 
 const calculateMetadata: CalculateMetadataFunction<DailyStencilProps> = async ({props}) => {
   const qrDataUrl = props.showQrCode && props.downloadUrl
@@ -43,12 +44,15 @@ const calculateDailyBreathMetadata: CalculateMetadataFunction<
 
 const calculateDailyBreathStoryMetadata: CalculateMetadataFunction<
   DailyBreathStoryProps
-> = ({props}) => ({
-  durationInFrames: Math.round(dailyBreathStoryDurationSeconds(props) * props.fps),
-  fps: props.fps,
-  width: props.width,
-  height: props.height,
-});
+> = ({props}) => {
+  validateDailyBreathStoryProps(props);
+  return {
+    durationInFrames: Math.round(dailyBreathStoryDurationSeconds(props) * props.fps),
+    fps: props.fps,
+    width: props.width,
+    height: props.height,
+  };
+};
 
 const calculateSpaceHoroscopeMetadata: CalculateMetadataFunction<SpaceHoroscopeProps> = ({props}) => ({
   durationInFrames: Math.round((props.durationSeconds ?? 300) * 30),

@@ -240,10 +240,19 @@ workflows:
       - name: Build signed IPA
         script: |
           set -euo pipefail
-          xcode-project build-ipa \
-            --project "$CM_BUILD_DIR/DailyBreathApple/TheDailyBreath.xcodeproj" \
-            --scheme "The Daily Breath" \
-            --export-options-plist /Users/builder/export_options.plist
+          archive_path="$CM_BUILD_DIR/DailyBreathApple/build/ios/xcarchive/TheDailyBreath.xcarchive"
+          export_path="$CM_BUILD_DIR/DailyBreathApple/build/ios/ipa"
+          rm -rf "$archive_path" "$export_path"
+          xcodebuild archive \
+            -project "$CM_BUILD_DIR/DailyBreathApple/TheDailyBreath.xcodeproj" \
+            -scheme "The Daily Breath" \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$archive_path"
+          xcodebuild -exportArchive \
+            -archivePath "$archive_path" \
+            -exportPath "$export_path" \
+            -exportOptionsPlist /Users/builder/export_options.plist
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log

@@ -73,6 +73,14 @@ $studioStencilsJson = json_encode($studioStencils, JSON_UNESCAPED_SLASHES | JSON
 <script>
 (()=>{
   const studioStencils=<?= $studioStencilsJson ?: '[]' ?>;
+  const requestedStencilUrl = new URLSearchParams(window.location.search).get('stencil') || '';
+  const requestedStencilTitle = new URLSearchParams(window.location.search).get('title') || 'Selected Beyond Tattoo stencil';
+  try {
+    const requestedUrl = new URL(requestedStencilUrl, window.location.origin);
+    if (requestedStencilUrl && requestedUrl.origin === window.location.origin && requestedUrl.pathname.startsWith('/beyond-tattoo/')) {
+      studioStencils.unshift({title: requestedStencilTitle.slice(0, 120), collection: 'Beyond Tattoo library', style: 'Selected stencil', image: requestedUrl.href});
+    }
+  } catch (error) { console.warn('The requested stencil could not be loaded.', error); }
   const guide=document.querySelector('#guideCanvas'),ink=document.querySelector('#inkCanvas'),g=guide.getContext('2d'),ctx=ink.getContext('2d');
   const W=800, paths={
     rose:[[[400,128],[445,194],[514,187],[488,250],[546,291],[475,320],[478,390],[412,351],[354,392],[350,321],[280,292],[338,247],[313,184],[383,195],[400,128]],[[400,351],[420,456],[386,565],[420,680]],[[398,480],[315,438],[270,470],[333,510]],[[394,542],[474,502],[523,535],[457,575]]],

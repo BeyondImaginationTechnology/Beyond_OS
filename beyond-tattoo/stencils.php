@@ -289,6 +289,7 @@ foreach ($collections as $collectionSlug => $collection) {
       <div class="bt-stencil-viewer-actions">
         <button class="bt-glow-button" type="button" data-stencil-viewer-print hidden>⌘ Print stencil</button>
         <a class="bt-glow-button" href="#" download data-stencil-viewer-zip hidden>↓ Download all assets .ZIP</a>
+        <a class="bt-glow-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-play hidden>▶ Play in Tattoo Master</a>
         <a class="bt-outline-button" href="stencil-editor.php" data-stencil-viewer-edit>✎ Edit</a>
         <button class="bt-outline-button" type="button" data-stencil-viewer-share>↗ Share</button>
       </div>
@@ -313,6 +314,7 @@ foreach ($collections as $collectionSlug => $collection) {
   const next = viewer.querySelector('[data-stencil-carousel-next]');
   const print = viewer.querySelector('[data-stencil-viewer-print]');
   const zipDownload = viewer.querySelector('[data-stencil-viewer-zip]');
+  const play = viewer.querySelector('[data-stencil-viewer-play]');
   const edit = viewer.querySelector('[data-stencil-viewer-edit]');
   const share = viewer.querySelector('[data-stencil-viewer-share]');
   let currentCard = null;
@@ -366,6 +368,17 @@ foreach ($collections as $collectionSlug => $collection) {
     print.dataset.stencilUrl = card.dataset.stencilOutline || card.dataset.stencilDownload || card.dataset.stencilPdf || '';
     print.hidden = !print.dataset.stencilUrl;
     setLink(zipDownload, card.dataset.stencilZip || '');
+    const playAsset = card.dataset.stencilOutline || card.dataset.stencilDownload || card.dataset.stencilPreview || '';
+    if (playAsset) {
+      const masterUrl = new URL('../beyond-games/tattoo-master.php', window.location.href);
+      masterUrl.searchParams.set('stencil', new URL(playAsset, window.location.href).href);
+      masterUrl.searchParams.set('title', titleText);
+      play.href = masterUrl.href;
+      play.hidden = false;
+    } else {
+      play.removeAttribute('href');
+      play.hidden = true;
+    }
     edit.href = `stencil-editor.php?stencil=${encodeURIComponent(titleText)}`;
     dots.replaceChildren(...slides.map((slide, index) => {
       const dot = document.createElement('button');

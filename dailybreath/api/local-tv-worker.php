@@ -3,6 +3,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../../config/bootstrap.php';
 require_once __DIR__ . '/../includes/web-app.php';
 require_once __DIR__ . '/../includes/verse-of-day.php';
+require_once __DIR__ . '/../includes/sacred-text.php';
 header('Content-Type: application/json; charset=utf-8'); header('Cache-Control: no-store');
 $token=trim((string)beyond_config('dailybreath.local_worker_token',''));
 $given=preg_replace('/^Bearer\s+/i','',(string)($_SERVER['HTTP_AUTHORIZATION']??''));

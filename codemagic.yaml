@@ -199,7 +199,7 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: technology.co.beyondimagination.thedailybreath
-      xcode: latest
+      xcode: 16.4
     scripts:
       - name: Configure signing profiles
         script: |

@@ -811,7 +811,7 @@
 				PRODUCT_MODULE_NAME = DailyBreathClip;
 				PRODUCT_NAME = "The Daily Breath Clip";
 				SDKROOT = iphoneos;
-				SKIP_INSTALL = NO;
+				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -840,7 +840,7 @@
 				PRODUCT_MODULE_NAME = DailyBreathClip;
 				PRODUCT_NAME = "The Daily Breath Clip";
 				SDKROOT = iphoneos;
-				SKIP_INSTALL = NO;
+				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = NO;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

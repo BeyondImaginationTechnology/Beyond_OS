@@ -4,13 +4,13 @@
   "scope": "beyond-tattoo",
   "assistant": "needle-bot",
   "target_app": "beyond-tattoo",
-  "status": "review_required",
-  "base_revision": "202b7397b12c16421b0367b77afb54196fdf5e82",
+  "status": "approved_for_retrieval",
+  "base_revision": "5e974800ff80ccace2b4c8b61a89a38f6679877b",
   "dataset": "needle-bot-beyond-tattoo-stencil-editor-v0.1.jsonl",
   "sources": [
     {
       "path": "beyond-tattoo/stencil-editor.php",
-      "sha256": "C0B00A0797B8E94A4B7D6AE5604018862EC4F0821FBBB5A9FD6EF5E215B53BDF"
+      "sha256": "83F84EB1A6527B6CEB6702E9A72E9A86AC41574AE3C5F06880932427A20BFB74"
     },
     {
       "path": "JaguarApple/Sources/JaguarDrawStudioView.swift",
@@ -18,13 +18,14 @@
     },
     {
       "path": "JaguarApple/Sources/RootView.swift",
-      "sha256": "0EEEAA37AD9061BF7EC5BCF405920A688161B5A4DFD9DDFC343CC2103D518A8F"
+      "sha256": "AC52EF3481531629956A03683E56D38DC2B1F61C52AF2DD4B2B3861EDB6C365A"
     },
     {
       "path": "JaguarApple/project.yml",
-      "sha256": "E138F11BFBBEE7115E52915832BFCA5BABD8F790606005635911969B273E4218"
+      "sha256": "64516AF4D47649F130348F33A98595089E3F95F90EED1A74A55F21FD6819F2FE"
     }
   ],
   "created_at": "2026-09-26",
-  "training_status": "source changed after review; re-approval is required before Needle Bot retrieval; endpoint integration is pending, and this is not fine-tuning or a live weight update"
+  "reviewed_at": "2026-10-04",
+  "training_status": "approved by product owner against the pinned source revision; eligible for a separate Needle Bot retrieval or adapter experiment, but not connected to a live endpoint"
 }

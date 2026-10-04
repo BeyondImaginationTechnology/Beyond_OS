@@ -513,12 +513,7 @@ if ($mode === 'core' && $guide !== '') {
     }
 $gemini = $mode === 'core' ? jaguar_gemini_answer($originalPrompt, $language) : null;
 if ($gemini !== null) {
-    try {
-        jaguar_gemini_record_training(beyond_db(), $originalPrompt, $gemini['message'], $gemini['citations'], $gemini['model'], $language);
-    } catch (Throwable $exception) {
-        error_log('Jaguar Gemini training record failed: ' . $exception->getMessage());
-    }
-    echo json_encode(['model' => 'gemini-google-search', 'adapter' => $gemini['model'], 'mode' => $mode, 'message' => $gemini['message'], 'citations' => $gemini['citations'], 'training_recorded' => true], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    echo json_encode(['model' => 'gemini-google-search', 'adapter' => $gemini['model'], 'mode' => $mode, 'message' => $gemini['message'], 'citations' => $gemini['citations']], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
 $runtimeUrl = rtrim(jaguar_runtime_config('runtime_url'), '/');

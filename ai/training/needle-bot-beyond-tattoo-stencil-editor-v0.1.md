@@ -1,6 +1,6 @@
 # Needle Bot training pack: Beyond Tattoo Stencil Editor
 
-**Status:** The 13 examples target Needle Bot, Beyond Tattoo’s AI companion. Retrieval approval is paused because the current stencil-editor source no longer matches the hash reviewed for this pack. Re-review the examples against the current editor before connecting them. The live Needle Bot chat endpoint is not connected, and Jaguar does not retrieve them. This is not a fine-tuned adapter or live weight update.
+**Status:** The 13 examples target Needle Bot, Beyond Tattoo’s AI companion. The product owner reviewed and approved the pack for retrieval on 2026-10-04 against the source revision recorded in its manifest. Needle Bot retrieves matching examples only; Jaguar does not retrieve them. This is not a fine-tuned adapter or live weight update.
 
 **Scope:** Beyond Tattoo stencil-editor questions only. Keep these examples separate from Jaguar's shared/general knowledge, Daily Breath, and any other app’s training data.
 

@@ -1,33 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/** Store raw Gemini fallback pairs for the scheduled training-dataset review. */
-function jaguar_gemini_training_table(PDO $db): void
-{
-    if ($db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
-        $db->exec("CREATE TABLE IF NOT EXISTS jaguar_gemini_training_examples (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, prompt TEXT NOT NULL, answer TEXT NOT NULL,
-            citations_json TEXT NOT NULL, model TEXT NOT NULL, language TEXT NOT NULL,
-            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )");
-        $db->exec('CREATE INDEX IF NOT EXISTS idx_jaguar_gemini_training_created ON jaguar_gemini_training_examples(created_at)');
-        return;
-    }
-    $db->exec("CREATE TABLE IF NOT EXISTS jaguar_gemini_training_examples (
-        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, prompt LONGTEXT NOT NULL,
-        answer LONGTEXT NOT NULL, citations_json LONGTEXT NOT NULL, model VARCHAR(100) NOT NULL,
-        language VARCHAR(10) NOT NULL, created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        KEY idx_jaguar_gemini_training_created (created_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-}
-
-function jaguar_gemini_record_training(PDO $db, string $prompt, string $answer, array $citations, string $model, string $language): void
-{
-    jaguar_gemini_training_table($db);
-    $statement = $db->prepare('INSERT INTO jaguar_gemini_training_examples(prompt,answer,citations_json,model,language) VALUES(?,?,?,?,?)');
-    $statement->execute([$prompt, $answer, json_encode($citations, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), $model, $language]);
-}
-
 /** Returns a Gemini answer or null when fallback is unavailable or unsuccessful. */
 function jaguar_gemini_answer(string $prompt, string $language): ?array
 {

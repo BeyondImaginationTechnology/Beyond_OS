@@ -280,12 +280,12 @@ foreach ($collections as $collectionSlug => $collection) {
         <img src="" alt="" data-stencil-viewer-image>
         <button class="bt-stencil-carousel-nav bt-stencil-carousel-next" type="button" data-stencil-carousel-next aria-label="Next asset">›</button>
       </div>
-      <div class="bt-stencil-carousel-footer"><span data-stencil-carousel-label>Official outline stencil</span><span class="bt-stencil-carousel-count" data-stencil-carousel-count aria-live="polite"></span><div class="bt-stencil-carousel-dots" data-stencil-carousel-dots aria-label="Scroll assets and choose one"></div></div>
+      <div class="bt-stencil-carousel-footer"><span data-stencil-carousel-label>YouTube video</span><span class="bt-stencil-carousel-count" data-stencil-carousel-count aria-live="polite"></span><div class="bt-stencil-carousel-dots" data-stencil-carousel-dots aria-label="Choose a production carousel item"></div></div>
     </div>
     <div class="bt-stencil-viewer-copy">
       <p data-stencil-viewer-meta>Unlocked stencil</p>
       <h2 id="bt-stencil-viewer-title" data-stencil-viewer-title>Stencil preview</h2>
-      <p class="bt-stencil-viewer-note">Official outline first, followed by the other available stencil assets.</p>
+      <p class="bt-stencil-viewer-note">Eight locked production slots rotate automatically. Available assets appear in their assigned slot; the rest remain marked as placeholders.</p>
       <div class="bt-stencil-viewer-actions">
         <button class="bt-glow-button" type="button" data-stencil-viewer-print hidden>⌘ Print stencil</button>
         <a class="bt-glow-button" href="#" download data-stencil-viewer-zip hidden>↓ Download all assets .ZIP</a>
@@ -319,6 +319,16 @@ foreach ($collections as $collectionSlug => $collection) {
   let slides = [];
   let activeSlide = 0;
   let pointerStart = null;
+  let autoplayTimer = null;
+  const placeholderArtwork = (assetLabel) => `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200"><rect width="900" height="1200" fill="#171219"/><rect x="34" y="34" width="832" height="1132" rx="18" fill="none" stroke="#d3a452" stroke-width="3"/><path d="M122 230H778M122 970H778" stroke="#6d5266" stroke-width="2"/><circle cx="450" cy="510" r="132" fill="none" stroke="#d3a452" stroke-width="5"/><path d="M450 328v364M268 510h364" stroke="#d3a452" stroke-width="3"/><text x="450" y="210" text-anchor="middle" fill="#d3a452" font-family="Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="7">BEYOND TATTOO</text><text x="450" y="786" text-anchor="middle" fill="#f4eadc" font-family="Arial, sans-serif" font-size="40" font-weight="700">${assetLabel}</text><text x="450" y="836" text-anchor="middle" fill="#bbaeb6" font-family="Arial, sans-serif" font-size="22" letter-spacing="3">LOCKED PLACEHOLDER</text><text x="450" y="1030" text-anchor="middle" fill="#d3a452" font-family="Arial, sans-serif" font-size="18" letter-spacing="5">PRODUCTION SLOT</text></svg>`)}`;
+  const stopAutoplay = () => {
+    if (autoplayTimer !== null) window.clearInterval(autoplayTimer);
+    autoplayTimer = null;
+  };
+  const startAutoplay = () => {
+    stopAutoplay();
+    if (slides.length > 1 && !viewer.hidden) autoplayTimer = window.setInterval(() => showSlide(activeSlide + 1), 5600);
+  };
   const setLink = (link, url) => {
     if (!link) return;
     if (url) { link.href = url; link.hidden = false; }
@@ -329,7 +339,7 @@ foreach ($collections as $collectionSlug => $collection) {
     activeSlide = (index + slides.length) % slides.length;
     const slide = slides[activeSlide];
     image.src = slide.url;
-    image.alt = `${currentCard.dataset.stencilTitle || 'Stencil'} — ${slide.label}`;
+    image.alt = `${currentCard.dataset.stencilTitle || 'Stencil'} — ${slide.label}${slide.placeholder ? ' placeholder' : ''}`;
     label.textContent = slide.label;
     counter.textContent = `${activeSlide + 1} / ${slides.length}`;
     previous.disabled = slides.length < 2;
@@ -340,23 +350,17 @@ foreach ($collections as $collectionSlug => $collection) {
   const open = (card) => {
     currentCard = card;
     const titleText = card.dataset.stencilTitle || 'Stencil preview';
-    const urls = [
-      ['Official outline stencil', card.dataset.stencilOutline],
-      ['Print-ready stencil', card.dataset.stencilDownload],
-      ['Preview', card.dataset.stencilPreview],
-      ['Reference artwork', card.dataset.stencilReference],
-      ['Detail artwork', card.dataset.stencilDetail],
-      ['Placement mockup', card.dataset.stencilPlacement],
-      ['Premium packaging', card.dataset.stencilPack],
-      ['Lore card', card.dataset.stencilLore],
-      ['Style card', card.dataset.stencilStyle],
+    const productionSlots = [
+      ['YouTube video', card.dataset.stencilYoutube || ''],
+      ['Style card', card.dataset.stencilStyle || ''],
+      ['Lore card', card.dataset.stencilLore || ''],
+      ['Packaging preview', card.dataset.stencilPack || ''],
+      ['Mockup', card.dataset.stencilPlacement || ''],
+      ['Reference', card.dataset.stencilReference || ''],
+      ['Printer-ready stencil PNG', card.dataset.stencilDownload || ''],
+      ['Violet Trace', card.dataset.stencilVioletTrace || ''],
     ];
-    const seen = new Set();
-    slides = urls.filter(([assetLabel, url]) => {
-      if (!url || seen.has(url)) return false;
-      seen.add(url);
-      return true;
-    }).map(([assetLabel, url]) => ({label: assetLabel, url}));
+    slides = productionSlots.map(([assetLabel, url]) => ({label: assetLabel, url: url || placeholderArtwork(assetLabel), placeholder: !url}));
     title.textContent = titleText;
     meta.textContent = [card.dataset.stencilCollection, card.dataset.stencilDate, 'Unlocked'].filter(Boolean).join(' · ');
     print.dataset.stencilUrl = card.dataset.stencilOutline || card.dataset.stencilDownload || card.dataset.stencilPdf || '';
@@ -381,8 +385,10 @@ foreach ($collections as $collectionSlug => $collection) {
     viewer.setAttribute('aria-hidden', 'false');
     document.body.classList.add('bt-modal-open');
     viewer.querySelector('[data-stencil-close]')?.focus();
+    startAutoplay();
   };
   const close = () => {
+    stopAutoplay();
     viewer.hidden = true;
     viewer.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('bt-modal-open');
@@ -431,6 +437,10 @@ foreach ($collections as $collectionSlug => $collection) {
     event.preventDefault();
     showSlide(activeSlide + (event.deltaX > 0 ? 1 : -1));
   }, {passive: false});
+  viewer.querySelector('[data-stencil-carousel-stage]').addEventListener('mouseenter', stopAutoplay);
+  viewer.querySelector('[data-stencil-carousel-stage]').addEventListener('mouseleave', startAutoplay);
+  viewer.querySelector('[data-stencil-carousel-stage]').addEventListener('focusin', stopAutoplay);
+  viewer.querySelector('[data-stencil-carousel-stage]').addEventListener('focusout', startAutoplay);
   document.querySelectorAll('[data-stencil-preview]').forEach((card) => {
     card.addEventListener('click', (event) => { event.stopImmediatePropagation(); open(card); });
     card.addEventListener('keydown', (event) => {

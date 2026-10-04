@@ -287,17 +287,10 @@ foreach ($collections as $collectionSlug => $collection) {
       <h2 id="bt-stencil-viewer-title" data-stencil-viewer-title>Stencil preview</h2>
       <p class="bt-stencil-viewer-note">Official outline first, followed by the other available stencil assets.</p>
       <div class="bt-stencil-viewer-actions">
-        <a class="bt-glow-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-download hidden>Open print-ready stencil</a>
-        <a class="bt-glow-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-outline hidden>⌘ Print outline stencil</a>
-        <a class="bt-glow-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-current hidden>Open current asset</a>
-        <a class="bt-glow-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-zip hidden>Open asset package</a>
-        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-pdf hidden>Open printable PDF</a>
-        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-reference hidden>View reference artwork</a>
-        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-detail hidden>View detail artwork</a>
-        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-placement hidden>View placement mockup</a>
-        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-pack hidden>View packaging</a>
-        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-lore hidden>View lore card</a>
-        <a class="bt-outline-button" href="#" target="_blank" rel="noopener" data-stencil-viewer-style hidden>View style card</a>
+        <button class="bt-glow-button" type="button" data-stencil-viewer-print hidden>⌘ Print stencil</button>
+        <a class="bt-glow-button" href="#" download data-stencil-viewer-zip hidden>↓ Download all assets .ZIP</a>
+        <a class="bt-outline-button" href="stencil-editor.php" data-stencil-viewer-edit>✎ Edit</a>
+        <button class="bt-outline-button" type="button" data-stencil-viewer-share>↗ Share</button>
       </div>
     </div>
   </section>
@@ -318,12 +311,10 @@ foreach ($collections as $collectionSlug => $collection) {
   const dots = viewer.querySelector('[data-stencil-carousel-dots]');
   const previous = viewer.querySelector('[data-stencil-carousel-prev]');
   const next = viewer.querySelector('[data-stencil-carousel-next]');
-  const download = viewer.querySelector('[data-stencil-viewer-download]');
-  const outlineDownload = viewer.querySelector('[data-stencil-viewer-outline]');
-  const pdfDownload = viewer.querySelector('[data-stencil-viewer-pdf]');
-  const currentDownload = viewer.querySelector('[data-stencil-viewer-current]');
+  const print = viewer.querySelector('[data-stencil-viewer-print]');
   const zipDownload = viewer.querySelector('[data-stencil-viewer-zip]');
-  const links = ['outline', 'reference', 'detail', 'placement', 'pack', 'lore', 'style'];
+  const edit = viewer.querySelector('[data-stencil-viewer-edit]');
+  const share = viewer.querySelector('[data-stencil-viewer-share]');
   let currentCard = null;
   let slides = [];
   let activeSlide = 0;
@@ -333,11 +324,6 @@ foreach ($collections as $collectionSlug => $collection) {
     if (url) { link.href = url; link.hidden = false; }
     else { link.removeAttribute('href'); link.hidden = true; }
   };
-  const prepareAssetLinks = (card) => links.forEach((name) => {
-    const link = viewer.querySelector(`[data-stencil-viewer-${name}]`);
-    const url = card.dataset[`stencil${name[0].toUpperCase()}${name.slice(1)}`] || '';
-    setLink(link, url);
-  });
   const showSlide = (index) => {
     if (!slides.length) return;
     activeSlide = (index + slides.length) % slides.length;
@@ -345,7 +331,6 @@ foreach ($collections as $collectionSlug => $collection) {
     image.src = slide.url;
     image.alt = `${currentCard.dataset.stencilTitle || 'Stencil'} — ${slide.label}`;
     label.textContent = slide.label;
-    setLink(currentDownload, slide.url);
     counter.textContent = `${activeSlide + 1} / ${slides.length}`;
     previous.disabled = slides.length < 2;
     next.disabled = slides.length < 2;
@@ -374,11 +359,10 @@ foreach ($collections as $collectionSlug => $collection) {
     }).map(([assetLabel, url]) => ({label: assetLabel, url}));
     title.textContent = titleText;
     meta.textContent = [card.dataset.stencilCollection, card.dataset.stencilDate, 'Unlocked'].filter(Boolean).join(' · ');
-    setLink(download, card.dataset.stencilDownload || '');
-    setLink(outlineDownload, card.dataset.stencilOutline || '');
-    setLink(pdfDownload, card.dataset.stencilPdf || '');
+    print.dataset.stencilUrl = card.dataset.stencilOutline || card.dataset.stencilDownload || card.dataset.stencilPdf || '';
+    print.hidden = !print.dataset.stencilUrl;
     setLink(zipDownload, card.dataset.stencilZip || '');
-    prepareAssetLinks(card);
+    edit.href = `stencil-editor.php?stencil=${encodeURIComponent(titleText)}`;
     dots.replaceChildren(...slides.map((slide, index) => {
       const dot = document.createElement('button');
       dot.type = 'button';
@@ -408,6 +392,30 @@ foreach ($collections as $collectionSlug => $collection) {
   };
   previous.addEventListener('click', () => showSlide(activeSlide - 1));
   next.addEventListener('click', () => showSlide(activeSlide + 1));
+  print.addEventListener('click', () => {
+    const url = print.dataset.stencilUrl || '';
+    if (!url) return;
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    printWindow.opener = null;
+    printWindow.document.title = `${title.textContent || 'Beyond Tattoo'} stencil`;
+    const stylesheet = printWindow.document.createElement('style');
+    stylesheet.textContent = '@page{margin:0.35in}body{margin:0;text-align:center}img{display:block;max-width:100%;max-height:10in;margin:0 auto;object-fit:contain}';
+    const printable = printWindow.document.createElement('img');
+    printable.alt = title.textContent || 'Beyond Tattoo stencil';
+    printable.src = url;
+    printable.addEventListener('load', () => { printWindow.focus(); printWindow.print(); }, {once: true});
+    printWindow.document.head.append(stylesheet);
+    printWindow.document.body.append(printable);
+  });
+  share.addEventListener('click', async () => {
+    const shareUrl = window.location.href.split('#')[0];
+    const shareData = {title: title.textContent || 'Beyond Tattoo stencil', text: meta.textContent || 'Beyond Tattoo stencil', url: shareUrl};
+    try {
+      if (navigator.share) await navigator.share(shareData);
+      else if (navigator.clipboard) { await navigator.clipboard.writeText(shareUrl); share.textContent = '✓ Link copied'; setTimeout(() => { share.textContent = '↗ Share'; }, 1800); }
+    } catch (error) { if (error?.name !== 'AbortError') console.warn('Sharing is unavailable.', error); }
+  });
   viewer.querySelector('[data-stencil-carousel-stage]').addEventListener('pointerdown', (event) => {
     pointerStart = {x: event.clientX, y: event.clientY};
   });

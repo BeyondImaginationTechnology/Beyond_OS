@@ -1,6 +1,6 @@
 param([switch]$InstallTask)
 $ErrorActionPreference='Stop'
-$root=Split-Path -Parent $PSScriptRoot
+$root=Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $configPath=Join-Path $PSScriptRoot 'worker-secret.xml'
 if(!(Test-Path $configPath)){throw "Create worker-secret.xml with the setup script before running."}
 $config=Import-Clixml $configPath

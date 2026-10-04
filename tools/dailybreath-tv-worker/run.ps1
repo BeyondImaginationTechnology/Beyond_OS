@@ -15,20 +15,15 @@ function Send-WorkerVideo {
   Add-Type -AssemblyName System.Net.Http
   $client=[System.Net.Http.HttpClient]::new()
   $client.DefaultRequestHeaders.Authorization=[System.Net.Http.Headers.AuthenticationHeaderValue]::new('Bearer',$Token)
-  $form=[System.Net.Http.MultipartFormDataContent]::new()
-  $stream=$null
+  $content=[System.Net.Http.ByteArrayContent]::new([System.IO.File]::ReadAllBytes($VideoPath))
+  $content.Headers.ContentType=[System.Net.Http.Headers.MediaTypeHeaderValue]::Parse('application/octet-stream')
+  foreach($entry in $Fields.GetEnumerator()) { $content.Headers.Add(('X-DailyBreath-'+$entry.Key),[string]$entry.Value) }
   try {
-    foreach($entry in $Fields.GetEnumerator()) { $form.Add([System.Net.Http.StringContent]::new([string]$entry.Value),[string]$entry.Key) }
-    $stream=[System.IO.File]::OpenRead($VideoPath)
-    $video=[System.Net.Http.StreamContent]::new($stream)
-    $video.Headers.ContentType=[System.Net.Http.Headers.MediaTypeHeaderValue]::Parse('video/mp4')
-    $form.Add($video,'video',[System.IO.Path]::GetFileName($VideoPath))
-    $response=$client.PostAsync($Uri,$form).GetAwaiter().GetResult()
+    $response=$client.PostAsync($Uri,$content).GetAwaiter().GetResult()
     $body=$response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
     if(-not $response.IsSuccessStatusCode) { throw "Upload failed: $([int]$response.StatusCode) $body" }
   } finally {
-    if($stream){$stream.Dispose()}
-    $form.Dispose(); $client.Dispose()
+    $content.Dispose(); $client.Dispose()
   }
 }
 Push-Location $project

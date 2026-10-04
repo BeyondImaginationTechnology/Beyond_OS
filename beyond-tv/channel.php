@@ -132,6 +132,7 @@ html[data-tv-theme="sunset"]{color-scheme:dark}html[data-tv-theme="sunset"] .btv
 </div>
 </section>
 <?php if($slug==='mrbeast-tv' && !empty($channelSlate['weekly_specials'])): ?><section class="schedule-mini" aria-labelledby="daily-breath-specials"><h2 id="daily-breath-specials">Weekly services & observances</h2><?php foreach($channelSlate['weekly_specials'] as $special): ?><div style="padding:10px 12px;border:1px solid #303446;border-radius:10px;margin:8px 0"><strong><?=htmlspecialchars((string)($special['day']??''))?><?=!empty($special['time'])?' · '.htmlspecialchars((string)$special['time']):''?> · <?=htmlspecialchars((string)($special['show']??''))?></strong><br><small><?=htmlspecialchars((string)($special['focus']??''))?></small></div><?php endforeach; ?></section><?php endif; ?>
+<?php if($slug==='mrbeast-tv'): ?><section class="schedule-mini" aria-labelledby="daily-breath-live-services"><h2 id="daily-breath-live-services">Live Services</h2><p>Christian, Jewish, and Muslim public services from their official sources, with local time and a nearby-services finder.</p><a class="btn btn-secondary" href="/dailybreath/live-services.php">Open Live Services →</a></section><?php endif; ?>
 <?php if($isSlatePreview && $channelSlate): ?>
 <section class="slate-section" aria-labelledby="channel-slate-title">
 <span class="kicker">CHANNEL <?=$channelNumber?> · PROGRAMMING PLAN</span>

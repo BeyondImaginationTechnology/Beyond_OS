@@ -1,4 +1,5 @@
 import AVFoundation
+import AVKit
 import CryptoKit
 import SwiftUI
 import UIKit
@@ -20,6 +21,7 @@ struct TodayView: View {
     @State private var narrationMessage: String?
     @State private var narrationTask: Task<Void, Never>?
     @State private var narrationRequestID = UUID()
+    @State private var tvPlayer = AVPlayer(url: URL(string: "https://beyondimagination.co.technology/dailybreath/assets/videos/daily-breath-tv/daily-breath-story.mp4")!)
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -73,6 +75,7 @@ struct TodayView: View {
             VStack(alignment: .leading, spacing: 18) {
                 todayIntro
                 todayReading
+                dailyBreathTVPlayer
             }
             .padding()
         }
@@ -151,6 +154,32 @@ struct TodayView: View {
         verseCard
     }
 
+    private var dailyBreathTVPlayer: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Label("Daily Breath TV", systemImage: "play.tv.fill")
+                    .font(.headline.weight(.bold))
+                Spacer()
+                Link("Open channel", destination: Self.dailyBreathTVChannelURL)
+                    .font(.subheadline.weight(.semibold))
+            }
+            VideoPlayer(player: tvPlayer)
+                .frame(minHeight: 190)
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .accessibilityLabel("Muted Daily Breath TV preview")
+            Text("Playing muted · Daily Breath TV")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .padding(16)
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 24))
+        .onAppear {
+            tvPlayer.isMuted = true
+            tvPlayer.play()
+        }
+        .onDisappear { tvPlayer.pause() }
+    }
+
     private var traditionPicker: some View {
         Picker("Verse tradition", selection: $traditionID) {
             ForEach(FaithTradition.allCases) { tradition in
@@ -173,15 +202,15 @@ struct TodayView: View {
                 .foregroundStyle(selectedTheme.accent)
             Text(Date(), format: .dateTime.weekday(.wide).month(.wide).day().year())
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.78))
+                .foregroundStyle(.black.opacity(0.66))
             if let approved = store.approvedContent, approved.tradition == selectedTradition {
                 Text("Approved reading · updated \(String(approved.updatedAt.prefix(16)))")
                     .font(.caption)
-                    .foregroundStyle(.white.opacity(0.82))
+                    .foregroundStyle(.black.opacity(0.62))
             }
             Text(todayVerse.text)
                 .font(.system(.largeTitle, design: .serif, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(.black)
                 .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(passageIsRightToLeft ? .trailing : .leading)
                 .environment(\.layoutDirection, passageIsRightToLeft ? .rightToLeft : .leftToRight)
@@ -198,7 +227,7 @@ struct TodayView: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .foregroundStyle(.white)
+                .foregroundStyle(.black)
                 .accessibilityLabel("Open reading")
                 ShareLink(item: todayShareURL) {
                     Image(systemName: "square.and.arrow.up")
@@ -206,7 +235,7 @@ struct TodayView: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .foregroundStyle(.white)
+                .foregroundStyle(.black)
                 .accessibilityLabel("Share reading")
                 Button {
                     exportShareImage()
@@ -216,7 +245,7 @@ struct TodayView: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .foregroundStyle(.white)
+                .foregroundStyle(.black)
                 .accessibilityLabel("Share or save image")
                 .accessibilityHint("Opens options to share or save the reading image.")
             }
@@ -232,18 +261,19 @@ struct TodayView: View {
             }
             .buttonStyle(.borderedProminent)
             .tint(selectedTheme.accent)
+            .frame(maxWidth: .infinity, minHeight: 46)
             .disabled(narrationLoading)
             .accessibilityHint("Prepares and saves today’s narration on this device for offline replay.")
             if let narrationMessage {
                 Text(narrationMessage)
                     .font(.footnote.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.82))
+                    .foregroundStyle(.black.opacity(0.62))
             }
         }
         .padding(24)
         .background(
             RoundedRectangle(cornerRadius: 26)
-                .fill(.black.opacity(selectedTheme.artworkName == nil ? 0.18 : 0.30))
+                .fill(.white.opacity(selectedTheme.artworkName == nil ? 0.94 : 0.88))
         )
     }
 
@@ -406,6 +436,8 @@ struct TodayView: View {
         narrationURL = nil
         narrationPlaying = false
     }
+
+    private static let dailyBreathTVChannelURL = URL(string: "https://beyondimagination.co.technology/beyond-tv/channel.php?slug=mrbeast-tv")!
 
     private func exportShareImage() {
         let card = DailyBreathExportCard(

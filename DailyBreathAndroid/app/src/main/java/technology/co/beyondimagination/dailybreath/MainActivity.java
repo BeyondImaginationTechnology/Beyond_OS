@@ -38,6 +38,7 @@ import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 import androidx.core.content.FileProvider;
 import android.util.Base64;
 import com.android.billingclient.api.BillingClient;
@@ -117,6 +118,7 @@ public final class MainActivity extends Activity {
     private Button chatSend;
     private RemoteDailyContent remoteToday;
     private MediaPlayer narrationPlayer;
+    private VideoView dailyBreathTVPlayer;
     private boolean narrationRequestInFlight;
     private boolean activityResumed;
     private String lastContentFetchDate="";
@@ -144,9 +146,9 @@ public final class MainActivity extends Activity {
         else if (!prefs.getBoolean("onboarding_complete", false)) page.post(this::showAccountChoice);
     }
     @Override protected void onNewIntent(Intent intent) { super.onNewIntent(intent); setIntent(intent); if (!handleAuthCallback(intent)) openIntent(intent); }
-    @Override protected void onResume(){super.onResume();activityResumed=true;String date=LocalDate.now().toString();boolean dayChanged=!date.equals(lastContentFetchDate);if(dayChanged){loadCachedTodayContent();lastContentFetchDate=date;if(tab==0)showToday();}refreshTodayContent(dayChanged);int month=LocalDate.now().getMonthValue();if(themeId.equals("seasonal")&&month!=seasonalMonth){applyTheme(themeId);buildLayout();showTab(tab);}DailyBreathWidgetProvider.updateWidgets(this);}
-    @Override protected void onPause() { activityResumed=false;super.onPause(); if (breathing) { breathing = false; handler.removeCallbacks(ticker); refreshBreathControls(); } stopNarration(); }
-    @Override protected void onDestroy() { handler.removeCallbacks(ticker); stopNarration(); super.onDestroy(); }
+    @Override protected void onResume(){super.onResume();activityResumed=true;String date=LocalDate.now().toString();boolean dayChanged=!date.equals(lastContentFetchDate);if(dayChanged){loadCachedTodayContent();lastContentFetchDate=date;if(tab==0)showToday();}refreshTodayContent(dayChanged);int month=LocalDate.now().getMonthValue();if(themeId.equals("seasonal")&&month!=seasonalMonth){applyTheme(themeId);buildLayout();showTab(tab);}if(tab==0&&dailyBreathTVPlayer!=null)dailyBreathTVPlayer.start();DailyBreathWidgetProvider.updateWidgets(this);}
+    @Override protected void onPause() { activityResumed=false;super.onPause(); if (breathing) { breathing = false; handler.removeCallbacks(ticker); refreshBreathControls(); } stopNarration(); if (dailyBreathTVPlayer != null) dailyBreathTVPlayer.pause(); }
+    @Override protected void onDestroy() { handler.removeCallbacks(ticker); stopNarration(); stopDailyBreathTVPreview(); super.onDestroy(); }
 
     private void buildLayout() {
         root = new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL); root.setBackgroundColor(CREAM);
@@ -253,8 +255,25 @@ public final class MainActivity extends Activity {
     private void showToday() {
         title("TODAY","A steadier next step"); if(faith!=Faith.BIBLE)addReadingLanguagePicker(); addBody(todayIntro()); Reading reading=readingOfTheDay();
         LinearLayout card=card(faith==Faith.QURAN?FOREST_DARK:INK);applyReadingArtwork(card);card.addView(label(faith.dailyLabel.toUpperCase(Locale.US)+" OF THE DAY",12,GOLD,true)); TextView date=label(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy",Locale.getDefault())),14,Color.LTGRAY,true); date.setPadding(0,dp(7),0,0); card.addView(date); if(remoteToday!=null&&remoteToday.isToday(faith,todayLocale())&&!remoteToday.updatedAt.isEmpty())card.addView(label("Updated from Daily Breath · "+remoteToday.updatedAt,12,Color.LTGRAY,false)); TextView quote=label("“"+reading.text+"”",27,Color.WHITE,true); quote.setPadding(0,dp(14),0,dp(12)); quote.setTextIsSelectable(true); applyPassageDirection(quote,reading.text); card.addView(quote); card.addView(label(reading.reference,18,GOLD,true)); page.addView(card,spaced());
+        addDailyBreathTVPreview();
         LinearLayout sharing=new LinearLayout(this);sharing.setOrientation(LinearLayout.HORIZONTAL);Button share=action("Share reading");share.setOnClickListener(v->shareTodayReading(reading));sharing.addView(share,new LinearLayout.LayoutParams(0,-2,1));Button image=action("Share image");image.setOnClickListener(v->shareTodayImage(reading));LinearLayout.LayoutParams imageParams=new LinearLayout.LayoutParams(0,-2,1);imageParams.leftMargin=dp(8);sharing.addView(image,imageParams);page.addView(sharing,spaced());
         Button audio=action("Listen to today’s reading");audio.setOnClickListener(v->prepareNarration());page.addView(audio,spaced());
+    }
+
+    private void addDailyBreathTVPreview() {
+        LinearLayout preview=card(Color.WHITE);
+        LinearLayout heading=new LinearLayout(this);heading.setGravity(Gravity.CENTER_VERTICAL);
+        heading.addView(label("Daily Breath TV",18,INK,true),new LinearLayout.LayoutParams(0,-2,1));
+        TextView open=label("Open channel ›",13,FOREST,true);open.setPadding(dp(10),dp(10),0,dp(10));open.setOnClickListener(v->openUrl("https://beyondimagination.co.technology/beyond-tv/channel.php?slug=mrbeast-tv"));heading.addView(open);
+        preview.addView(heading);
+        dailyBreathTVPlayer=new VideoView(this);dailyBreathTVPlayer.setContentDescription("Muted Daily Breath TV preview");dailyBreathTVPlayer.setBackgroundColor(FOREST_DARK);dailyBreathTVPlayer.setVideoURI(Uri.parse("https://beyondimagination.co.technology/dailybreath/assets/videos/daily-breath-tv/daily-breath-story.mp4"));dailyBreathTVPlayer.setOnPreparedListener(player->{player.setVolume(0f,0f);player.setLooping(true);if(activityResumed)dailyBreathTVPlayer.start();});
+        preview.addView(dailyBreathTVPlayer,new LinearLayout.LayoutParams(-1,dp(190)));
+        preview.addView(label("Playing muted · original Daily Breath TV programming.",12,Color.DKGRAY,false),spaced());
+        page.addView(preview,spaced());
+    }
+
+    private void stopDailyBreathTVPreview() {
+        if (dailyBreathTVPlayer != null) { dailyBreathTVPlayer.stopPlayback(); dailyBreathTVPlayer = null; }
     }
     private void showScripture() {
         title(faith.title.toUpperCase(Locale.US),faith==Faith.TANAKH?"Complete local Tanakh":faith==Faith.QURAN?"Complete local Quran":"Complete local Bible"); addFaithPicker();

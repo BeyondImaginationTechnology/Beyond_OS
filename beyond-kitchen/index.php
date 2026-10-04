@@ -165,6 +165,7 @@ if (!is_array($recipes) || !array_is_list($recipes) || $recipes === []) {
     <footer class="site-footer">
       <a href="https://beyondimagination.co.technology/">← Beyond Imagination Technology</a>
       <span>Beyond Kitchen · 0.0.2</span>
+      <nav class="app-legal-links" aria-label="Beyond Kitchen legal information"><a href="/legal/privacy.php?app=Beyond%20Kitchen">Privacy</a><a href="/legal/terms.php?app=Beyond%20Kitchen">Terms</a></nav>
     </footer>
   </div>
 

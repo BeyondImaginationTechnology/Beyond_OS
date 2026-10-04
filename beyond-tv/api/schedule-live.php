@@ -19,7 +19,7 @@ if (!$channel) {
 
 $timezone = new DateTimeZone('America/Vancouver');
 $now = new DateTimeImmutable('now', $timezone);
-$hour = (int)$now->format('G');
+$minutesSinceMidnight = ((int)$now->format('G') * 60) + (int)$now->format('i');
 $schedule = is_array($schedules[$slug] ?? null) ? $schedules[$slug] : [];
 if (in_array($slug, ['beyond-after-dark', 'beyond-comedy', 'beyond-family'], true)) {
     require_once dirname(__DIR__) . '/includes/eight-channel-guide.php';
@@ -32,9 +32,9 @@ if (in_array($slug, ['beyond-after-dark', 'beyond-comedy', 'beyond-family'], tru
 }
 $currentIndex = 0;
 foreach ($schedule as $index => $block) {
-    $start = (int)($block['start'] ?? 0);
-    $end = (int)($block['end'] ?? 24);
-    $matches = $end > $start ? ($hour >= $start && $hour < $end) : ($hour >= $start || $hour < $end);
+    $start = (float)($block['start'] ?? 0) * 60;
+    $end = (float)($block['end'] ?? 24) * 60;
+    $matches = $end > $start ? ($minutesSinceMidnight >= $start && $minutesSinceMidnight < $end) : ($minutesSinceMidnight >= $start || $minutesSinceMidnight < $end);
     if ($matches) { $currentIndex = (int)$index; break; }
 }
 $fallbackCurrent = ['icon'=>$channel['icon'] ?? '▶', 'title'=>$channel['now'] ?? 'Live now', 'lineup'=>$channel['now'] ?? 'Live now'];

@@ -1,0 +1,22 @@
+{
+  "title": "Cosmic Compass",
+  "date": "October 3, 2026",
+  "theme": "A little wonder, one grounded step.",
+  "source": "Beyond Space original",
+  "disclaimer": "For entertainment and personal reflection. Not scientific or professional advice.",
+  "durationSeconds": 300,
+  "readings": [
+    {"sign":"Aries","symbol":"♈","mood":"Brave focus","paragraphs":["Make the next choice with patience, clarity, and a little wonder.","Trust the practical step in front of you before chasing the perfect one."]},
+    {"sign":"Taurus","symbol":"♉","mood":"Steady calm","paragraphs":["Choose one small direction and give it your full attention.","Share the encouragement, then stay grounded in your own judgment."]},
+    {"sign":"Gemini","symbol":"♊","mood":"Bright curiosity","paragraphs":["Leave room for a useful surprise before you lock in a plan.","Let today be about progress you can actually feel."]},
+    {"sign":"Cancer","symbol":"♋","mood":"Gentle renewal","paragraphs":["A calm conversation can reveal the detail you were missing.","A brief pause can be enough to reset the rest of your day."]},
+    {"sign":"Leo","symbol":"♌","mood":"Creative confidence","paragraphs":["Protect your energy and make space for one meaningful next step.","Keep it light: this is a prompt for reflection, not a prediction."]},
+    {"sign":"Virgo","symbol":"♍","mood":"Clear purpose","paragraphs":["Let curiosity lead, then turn the best idea into a simple action.","Trust the practical step in front of you before chasing the perfect one."]},
+    {"sign":"Libra","symbol":"♎","mood":"Balanced perspective","paragraphs":["Notice what is already working and build from there.","Share the encouragement, then stay grounded in your own judgment."]},
+    {"sign":"Scorpio","symbol":"♏","mood":"Quiet insight","paragraphs":["Make the next choice with patience, clarity, and a little wonder.","Let today be about progress you can actually feel."]},
+    {"sign":"Sagittarius","symbol":"♐","mood":"Open adventure","paragraphs":["Choose one small direction and give it your full attention.","A brief pause can be enough to reset the rest of your day."]},
+    {"sign":"Capricorn","symbol":"♑","mood":"Practical momentum","paragraphs":["Leave room for a useful surprise before you lock in a plan.","Keep it light: this is a prompt for reflection, not a prediction."]},
+    {"sign":"Aquarius","symbol":"♒","mood":"Fresh ideas","paragraphs":["A calm conversation can reveal the detail you were missing.","Trust the practical step in front of you before chasing the perfect one."]},
+    {"sign":"Pisces","symbol":"♓","mood":"Imaginative calm","paragraphs":["Protect your energy and make space for one meaningful next step.","Share the encouragement, then stay grounded in your own judgment."]}
+  ]
+}

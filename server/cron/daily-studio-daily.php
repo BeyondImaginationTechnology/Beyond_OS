@@ -2,7 +2,12 @@
 if (PHP_SAPI!=='cli') { $token=getenv('DAILY_STUDIO_CRON_TOKEN')?:''; if(!$token || !hash_equals($token,$_GET['token']??'')){http_response_code(403);exit('Forbidden');}}
 require_once dirname(__DIR__,2).'/config/bootstrap.php';
 require_once __DIR__ . '/daily-breath-video.php';
+require_once __DIR__ . '/daily-breath-tv-narration.php';
+require_once __DIR__ . '/daily-breath-tv-devotional.php';
+require_once __DIR__ . '/daily-breath-tv-verse.php';
 $breathVideoError = null;
+$tvDevotionalError = null;
+$tvVerseError = null;
 if (PHP_SAPI === 'cli') {
     try {
         echo dailybreath_render_daily_video() . PHP_EOL;
@@ -11,8 +16,24 @@ if (PHP_SAPI === 'cli') {
         fwrite(STDERR, 'Daily Breath video generation failed: ' . $error->getMessage() . PHP_EOL);
         $breathVideoError = $error;
     }
+    try {
+        echo dailybreath_render_tv_devotional() . PHP_EOL;
+    } catch (Throwable $error) {
+        error_log('Daily Breath TV devotional generation failed: ' . $error->getMessage());
+        fwrite(STDERR, 'Daily Breath TV devotional generation failed: ' . $error->getMessage() . PHP_EOL);
+        $tvDevotionalError = $error;
+    }
+    try {
+        foreach ([['bible', 'en'], ['torah', 'he'], ['quran', 'ar']] as [$tradition, $locale]) {
+            echo dailybreath_render_tv_verse($tradition, $locale) . PHP_EOL;
+        }
+    } catch (Throwable $error) {
+        error_log('Daily Breath TV verse generation failed: ' . $error->getMessage());
+        fwrite(STDERR, 'Daily Breath TV verse generation failed: ' . $error->getMessage() . PHP_EOL);
+        $tvVerseError = $error;
+    }
 }
-$dbPath=beyond_private_file('db/daily-studio.sqlite','daily-studio.sqlite');if(!file_exists($dbPath)){echo "Daily Studio database not initialized.\n";if($breathVideoError!==null)exit(1);exit;}$db=new PDO('sqlite:'.$dbPath,null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);$tomorrow=date('Y-m-d',strtotime('+1 day'));$channels=$db->query('SELECT channel_key,name FROM channels WHERE enabled=1')->fetchAll(PDO::FETCH_ASSOC);$missing=[];foreach($channels as $c){$s=$db->prepare('SELECT COUNT(*) FROM events WHERE channel_key=? AND date(scheduled_at)=?');$s->execute([$c['channel_key'],$tomorrow]);if(!(int)$s->fetchColumn())$missing[]=$c['name'];}$report=['date'=>$tomorrow,'missing_channels'=>$missing,'generated_at'=>date(DATE_ATOM)];$outDir=beyond_private_directory('data/daily-studio/published','daily-studio-published');if(!is_dir($outDir))mkdir($outDir,0755,true);file_put_contents($outDir.'/daily-check.json',json_encode($report,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));echo count($missing)." missing channel(s) for $tomorrow.\n";
-if ($breathVideoError !== null) {
+$dbPath=beyond_private_file('db/daily-studio.sqlite','daily-studio.sqlite');if(!file_exists($dbPath)){echo "Daily Studio database not initialized.\n";if($breathVideoError!==null || $tvDevotionalError!==null || $tvVerseError!==null)exit(1);exit;}$db=new PDO('sqlite:'.$dbPath,null,null,[PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);$tomorrow=date('Y-m-d',strtotime('+1 day'));$channels=$db->query('SELECT channel_key,name FROM channels WHERE enabled=1')->fetchAll(PDO::FETCH_ASSOC);$missing=[];foreach($channels as $c){$s=$db->prepare('SELECT COUNT(*) FROM events WHERE channel_key=? AND date(scheduled_at)=?');$s->execute([$c['channel_key'],$tomorrow]);if(!(int)$s->fetchColumn())$missing[]=$c['name'];}$report=['date'=>$tomorrow,'missing_channels'=>$missing,'generated_at'=>date(DATE_ATOM)];$outDir=beyond_private_directory('data/daily-studio/published','daily-studio-published');if(!is_dir($outDir))mkdir($outDir,0755,true);file_put_contents($outDir.'/daily-check.json',json_encode($report,JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));echo count($missing)." missing channel(s) for $tomorrow.\n";
+if ($breathVideoError !== null || $tvDevotionalError !== null || $tvVerseError !== null) {
     exit(1);
 }

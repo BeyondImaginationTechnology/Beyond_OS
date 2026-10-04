@@ -195,7 +195,7 @@ struct DailyBreathHomeBackground: View {
                         .clipped()
                         .overlay {
                             LinearGradient(
-                                colors: [.black.opacity(0.38), .black.opacity(0.20), .black.opacity(0.42)],
+                                colors: [.black.opacity(0.16), .black.opacity(0.08), .black.opacity(0.20)],
                                 startPoint: .top,
                                 endPoint: .bottom
                             )

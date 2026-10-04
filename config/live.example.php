@@ -86,6 +86,10 @@ return [
             'api_key' => '',
             'model' => 'eleven_multilingual_v2',
             'voices' => [
+                // Configure the selected ElevenLabs voice IDs privately per stream.
+                'en-US' => '',
+                'he-IL' => '',
+                'ar-SA' => '',
                 // Azure does not offer native ht-HT or en-JM voices.
                 'ht-HT' => '',
                 'en-JM' => '',
@@ -122,5 +126,8 @@ return [
             // converter itself must run on Python + FFmpeg hosting.
             'audio_api_base_url' => '',
         ],
+    ],
+    'dailybreath' => [
+        'local_worker_token' => '',
     ],
 ];

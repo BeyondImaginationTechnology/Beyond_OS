@@ -1,0 +1,11 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__ . '/../../config/bootstrap.php';
+header('Content-Type: application/json; charset=utf-8');
+$token=trim((string)beyond_config('dailybreath.local_worker_token',''));$given=preg_replace('/^Bearer\s+/i','',(string)($_SERVER['HTTP_AUTHORIZATION']??''));
+if($_SERVER['REQUEST_METHOD']!=='POST'||$token===''||$given===''||!hash_equals($token,$given)){http_response_code(401);echo json_encode(['ok'=>false]);exit;}
+$date=(string)($_POST['date']??'');$tradition=(string)($_POST['tradition']??'');$reference=trim((string)($_POST['reference']??''));$title=trim((string)($_POST['title']??''));
+if(!preg_match('/^\d{4}-\d{2}-\d{2}$/',$date)||!in_array($tradition,['bible','torah','quran'],true)||$reference===''||$title===''||empty($_FILES['video']['tmp_name'])){http_response_code(422);echo json_encode(['ok'=>false]);exit;}
+$root=dirname(__DIR__,2);$dir=$root.'/dailybreath/assets/videos/daily-breath-tv';if(!is_dir($dir))mkdir($dir,0755,true);$name="$date-$tradition-verse-of-the-day.mp4";$target="$dir/$name";
+if(!is_uploaded_file($_FILES['video']['tmp_name'])||$_FILES['video']['size']<1024||$_FILES['video']['size']>104857600||!move_uploaded_file($_FILES['video']['tmp_name'],$target)){http_response_code(500);echo json_encode(['ok'=>false]);exit;}@chmod($target,0644);
+$manifestFile="$dir/rotation.json";$manifest=json_decode((string)@file_get_contents($manifestFile),true)?:[];$id="daily-$tradition-verse-$date";$episodes=array_values(array_filter((array)($manifest['episodes']??[]),fn($e)=>is_array($e)&&($e['id']??'')!==$id));array_unshift($episodes,['id'=>$id,'title'=>$title,'subtitle'=>"Daily Breath · $date",'show'=>'Daily Breath','video_url'=>'/dailybreath/assets/videos/daily-breath-tv/'.$name,'duration_seconds'=>57,'published_at'=>gmdate(DATE_ATOM),'voiceover'=>'ElevenLabs narration']);file_put_contents($manifestFile,json_encode(['channel'=>'Daily Breath TV','updated_at'=>gmdate(DATE_ATOM),'episodes'=>array_slice($episodes,0,30)],JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT).PHP_EOL,LOCK_EX);echo json_encode(['ok'=>true]);

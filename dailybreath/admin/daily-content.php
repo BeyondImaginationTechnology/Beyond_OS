@@ -107,10 +107,12 @@ $shareUrl = '/dailybreath/daily.php?date='.rawurlencode($date).'&tradition='.raw
   const get=name=>form.elements[name]?.value||'';
   const localeOptions={bible:{en:'English',fr:'Français',es:'Español'},torah:{en:'English',he:'עברית · Hebrew'},quran:{en:'English',ar:'العربية · Arabic'}};
   function updateLocales(){const select=form.elements['locale'],allowed=localeOptions[get('tradition')]||localeOptions.bible,current=select.value;select.replaceChildren(...Object.entries(allowed).map(([value,label])=>new Option(label,value)));select.value=Object.hasOwn(allowed,current)?current:'en';}
-  form.elements['tradition'].addEventListener('change',updateLocales);updateLocales();
+  const loadSuggestion=()=>{const url=new URL(location.href);url.searchParams.set('date',get('publish_date'));url.searchParams.set('tradition',get('tradition'));url.searchParams.set('locale',get('locale'));location.href=url.toString()};
+  form.elements['tradition'].addEventListener('change',()=>{updateLocales();loadSuggestion();});
+  form.elements['locale'].addEventListener('change',loadSuggestion);updateLocales();
   const traditionName=()=>({bible:'Bible Verse',torah:'Tanakh Passage',quran:'Quran Ayah'}[get('tradition')]||'Scripture');
   const cards=[['preview-label','preview-passage','preview-reference','preview-reflection'],['mobile-label','mobile-passage','mobile-reference','mobile-reflection']];
-  const images={bible:'bible',torah:'tanakh',quran:'quran'};document.getElementById('load-suggestion').addEventListener('click',()=>{const url=new URL(location.href);url.searchParams.set('date',get('publish_date'));url.searchParams.set('tradition',get('tradition'));url.searchParams.set('locale',get('locale'));location.href=url.toString()});
+  const images={bible:'bible',torah:'tanakh',quran:'quran'};document.getElementById('load-suggestion').addEventListener('click',loadSuggestion);
   function update(){
     const date=get('publish_date')||new Date().toISOString().slice(0,10),ref=get('reference')||'Reference',passage=get('passage')||'Your passage preview',reflection=get('reflection'),tradition=get('tradition')||'bible',locale=get('locale')||'en',theme=get('theme')||'seasonal';
     const title=traditionName()+' — '+date,url='https://beyondimagination.co.technology/dailybreath/daily.php?date='+encodeURIComponent(date)+'&tradition='+tradition+'&lang='+locale;

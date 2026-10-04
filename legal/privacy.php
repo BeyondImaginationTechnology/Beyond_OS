@@ -1,12 +1,15 @@
 <?php
 require_once __DIR__.'/../includes/app-layout.php';
-$wallet = bos_page_start('Beyond OS', 'Privacy Policy', 'Privacy practices for Beyond OS, Beyond ID, connected apps, analytics, payments, rewards, and account controls.');
+$legalApp = trim((string) ($_GET['app'] ?? ''));
+$legalApp = preg_replace('/[^A-Za-z0-9 .&$’\'-]/u', '', $legalApp) ?: '';
+$pageTitle = $legalApp ? $legalApp . ' Privacy Policy' : 'Privacy Policy';
+$wallet = bos_page_start('Beyond OS', $pageTitle, 'Privacy practices for Beyond OS, Beyond ID, connected apps, analytics, payments, rewards, and account controls.');
 ?>
 <main class="bos-main">
     <section class="bos-hero">
         <span class="bos-kicker">Effective August 22, 2026</span>
-        <h1>Privacy Policy</h1>
-        <p>This Privacy Policy explains how Beyond Imagination Technology collects, uses, shares, protects, and lets you manage information connected to Beyond OS, Beyond ID, Beyond Wallet, and connected apps.</p>
+        <h1><?=e($pageTitle)?></h1>
+        <p>This Privacy Policy explains how Beyond Imagination Technology collects, uses, shares, protects, and lets you manage information connected to <?=e($legalApp ?: 'Beyond OS')?><?= $legalApp ? ' and the connected Beyond ecosystem' : ', Beyond ID, Beyond Wallet, and connected apps' ?>.</p>
         <div class="bos-actions">
             <a class="bos-btn" href="/legal/terms.php">Read Terms of Service</a>
             <a class="bos-btn secondary" href="/contact.php">Privacy request</a>

@@ -35,5 +35,28 @@
     {"time":"7:35 AM","show":"Breath of History"},
     {"time":"8:00 AM","show":"Big Questions"}
   ],
-  "production_pipeline": ["Show","Season","Episode","Script","Characters","Environments","Scenes","Shots","Animation","Voice / Audio","Edit","Master","Daily Breath TV Schedule"]
+  "daily_schedule": [
+    {"time":"12:00 AM–6:00 AM","show":"Night Breath","focus":"Calm readings, Isha reflection, nature, and replays"},
+    {"time":"6:00–7:00 AM","show":"Verse of the Day","focus":"Daily scripture, Fajr reflection, devotional, and prayer"},
+    {"time":"7:00–9:00 AM","show":"Christian Morning","focus":"Bible devotional, prayer, study, and faith stories"},
+    {"time":"9:00–10:00 AM","show":"Judaism · Shacharit & Study","focus":"Morning prayer window, Torah/Tanakh study, culture, and community"},
+    {"time":"10:00 AM–12:00 PM","show":"Muslim Morning","focus":"Quran reflection, Salah learning, and Muslim community stories"},
+    {"time":"12:00–1:00 PM","show":"Daily Breath Update","focus":"Newsletter, community highlights, and upcoming programming"},
+    {"time":"1:00–3:00 PM","show":"Christian Afternoon","focus":"Bible teaching, devotionals, service replays, and family programs"},
+    {"time":"3:00–6:00 PM","show":"Judaism · Mincha & Culture","focus":"Afternoon prayer window, Jewish history, food, culture, and learning"},
+    {"time":"6:00–9:00 PM","show":"Muslim Evening","focus":"Asr, Maghrib, and Isha reflection windows; Quran and Muslim community programming"},
+    {"time":"9:00 PM–12:00 AM","show":"Evening Devotional","focus":"Daily devotional replay, reflection, Night Breath, and tomorrow preview"}
+  ],
+  "weekly_specials": [
+    {"day":"Friday","time":"Local Dhuhr window","show":"Jumu’ah","focus":"Khutbah and congregational-prayer programming led by an Imam or approved community partner."},
+    {"day":"Friday sunset–Saturday night","show":"Shabbat","focus":"Shabbat welcome, Torah study, prayer, music, family programming, and Havdalah. Standard interruptions are paused."},
+    {"day":"Sunday","time":"9:00–10:30 AM","show":"Sunday Service","focus":"Live or prerecorded Christian service; Sunday Reflection follows at 10:30 AM."}
+  ],
+  "editorial_notes": [
+    "Prayer times change by date and location. On-air Salah windows are labeled as local prayer windows and must be seasonally adjusted for the service location.",
+    "A broadcast does not itself constitute a Minyan or congregational prayer. Community and rabbinic guidance determines religious participation.",
+    "Torah refers to the Five Books of Moses; Tanakh refers to the broader Hebrew Bible. Label Jewish programming by its own community or movement when relevant.",
+    "Use Quran, mosque or masjid, and Imam accurately. Islamic observances follow the Hijri calendar and require annually verified dates."
+  ],
+    "production_pipeline": ["Show","Season","Episode","Script","Characters","Environments","Scenes","Shots","Animation","Voice / Audio","Edit","Master","Daily Breath TV Schedule"]
 }

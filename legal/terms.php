@@ -1,12 +1,15 @@
 <?php
 require_once __DIR__.'/../includes/app-layout.php';
-$wallet = bos_page_start('Beyond OS', 'Terms of Service', 'Terms for using Beyond OS, Beyond ID, connected apps, rewards, payments, content, and marketplace features.');
+$legalApp = trim((string) ($_GET['app'] ?? ''));
+$legalApp = preg_replace('/[^A-Za-z0-9 .&$’\'-]/u', '', $legalApp) ?: '';
+$pageTitle = $legalApp ? $legalApp . ' Terms of Service' : 'Terms of Service';
+$wallet = bos_page_start('Beyond OS', $pageTitle, 'Terms for using Beyond OS, Beyond ID, connected apps, rewards, payments, content, and marketplace features.');
 ?>
 <main class="bos-main">
     <section class="bos-hero">
         <span class="bos-kicker">Effective August 1, 2026</span>
-        <h1>Terms of Service</h1>
-        <p>These Terms govern your use of Beyond OS, Beyond ID, Beyond Wallet, and connected Beyond Imagination Technology apps, websites, beta features, marketplaces, communities, and services.</p>
+        <h1><?=e($pageTitle)?></h1>
+        <p>These Terms govern your use of <?=e($legalApp ?: 'Beyond OS')?><?= $legalApp ? ' and connected Beyond services' : ', Beyond ID, connected apps, rewards, payments, content, and marketplace features' ?>.</p>
         <div class="bos-actions">
             <a class="bos-btn" href="/legal/privacy.php">Read Privacy Policy</a>
             <a class="bos-btn secondary" href="/contact.php">Contact support</a>

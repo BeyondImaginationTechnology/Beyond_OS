@@ -298,7 +298,7 @@ if (!empty($stencilDay['iso_date'])) {
         </span>
         <div><strong>Beyond Tattoo</strong><small>Beyond imagination. Beyond limits.</small></div>
       </div>
-      <div class="bt-footer-links"><a href="../">Beyond OS</a><a href="stencils.php">Browse release calendar</a><a href="login.php?workspace=studio">Studio login</a><a href="../legal/terms.php">Terms</a><a href="../legal/privacy.php">Privacy</a></div>
+      <div class="bt-footer-links"><a href="../">Beyond OS</a><a href="stencils.php">Browse release calendar</a><a href="login.php?workspace=studio">Studio login</a><a href="../legal/terms.php?app=Beyond%20Tattoo">Terms</a><a href="../legal/privacy.php?app=Beyond%20Tattoo">Privacy</a></div>
     </div>
   </footer>
 

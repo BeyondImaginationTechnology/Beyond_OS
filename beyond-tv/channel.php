@@ -26,7 +26,7 @@ $channelNumber = str_pad((string)($channel['display_number'] ?? $channel['number
 $isPreview = ($channel['source_type'] ?? '') === 'placeholder';
 $isSlatePreview = $isPreview && !empty($channel['slate_file']);
 $slateFile = basename((string)($channel['slate_file'] ?? ''));
-$channelSlate = $isSlatePreview && $slateFile !== '' ? (json_decode((string)@file_get_contents(__DIR__ . '/data/' . $slateFile), true) ?: []) : [];
+$channelSlate = $slateFile !== '' ? (json_decode((string)@file_get_contents(__DIR__ . '/data/' . $slateFile), true) ?: []) : [];
 $channelArt = [
     'beyond-after-dark' => ['channel-backgrounds-sprite.png', '0% 0%'],
     'beyond-cartoons' => ['channel-backgrounds-sprite-v2.png', '0% 0%'],
@@ -130,6 +130,7 @@ html[data-tv-theme="sunset"]{color-scheme:dark}html[data-tv-theme="sunset"] .btv
 <?php if($signedIn && $channel['name'] !== 'Channel not found'):?><button class="btn btn-secondary" type="button" data-my-list data-list-type="channel" data-list-slug="<?=htmlspecialchars($slug)?>" data-list-token="<?=htmlspecialchars(beyond_tv_my_list_token())?>" aria-pressed="<?=$inMyList?'true':'false'?>"><?=$inMyList?'✓ Added to My List':'＋ My List'?></button><?php elseif(!$signedIn):?><a class="btn btn-secondary" href="/beyond-id/auth/login.php?return=<?=urlencode($_SERVER['REQUEST_URI']??'/beyond-tv/')?>">Sign in to save</a><?php endif;?>
 </div>
 </section>
+<?php if($slug==='mrbeast-tv' && !empty($channelSlate['weekly_specials'])): ?><section class="schedule-mini" aria-labelledby="daily-breath-specials"><h2 id="daily-breath-specials">Weekly services & observances</h2><?php foreach($channelSlate['weekly_specials'] as $special): ?><div style="padding:10px 12px;border:1px solid #303446;border-radius:10px;margin:8px 0"><strong><?=htmlspecialchars((string)($special['day']??''))?><?=!empty($special['time'])?' · '.htmlspecialchars((string)$special['time']):''?> · <?=htmlspecialchars((string)($special['show']??''))?></strong><br><small><?=htmlspecialchars((string)($special['focus']??''))?></small></div><?php endforeach; ?></section><?php endif; ?>
 <?php if($isSlatePreview && $channelSlate): ?>
 <section class="slate-section" aria-labelledby="channel-slate-title">
 <span class="kicker">CHANNEL <?=$channelNumber?> · PROGRAMMING PLAN</span>

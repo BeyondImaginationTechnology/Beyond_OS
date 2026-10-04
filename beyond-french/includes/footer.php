@@ -14,6 +14,7 @@
 </nav>
 <footer class="site-footer">
     <p>© <?= date('Y') ?> Beyond French · French first. 12 language bridges. Every day.</p>
+    <nav class="app-legal-links" aria-label="Beyond French legal information"><a href="/legal/privacy.php?app=Beyond%20French">Privacy</a><a href="/legal/terms.php?app=Beyond%20French">Terms</a></nav>
 </footer>
 <script src="<?= h($frenchBase) ?>assets/js/app.js?v=<?= h((string)(@filemtime(__DIR__ . '/../assets/js/app.js') ?: time())) ?>"></script>
 <script>if('serviceWorker'in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register(<?= json_encode($frenchBase . 'service-worker.js', JSON_UNESCAPED_SLASHES) ?>,{scope:<?= json_encode($frenchBase, JSON_UNESCAPED_SLASHES) ?>}).catch(()=>{}))}</script>

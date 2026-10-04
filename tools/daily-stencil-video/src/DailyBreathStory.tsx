@@ -3,6 +3,7 @@ import {Audio} from '@remotion/media';
 import {
   AbsoluteFill,
   Easing,
+  Img,
   Sequence,
   interpolate,
   staticFile,
@@ -40,6 +41,8 @@ export type DailyBreathStoryProps = {
   beats: DailyBreathStoryBeat[];
   sources: DailyBreathStorySource[];
   audioSegments?: DailyBreathStoryAudioSegment[];
+  artworkFile?: string;
+  direction?: 'ltr' | 'rtl';
   outroText: string;
   sourceSeconds: number;
   outroSeconds: number;
@@ -95,12 +98,28 @@ const Scene: React.FC<{
         background: `radial-gradient(ellipse at 50% 34%, ${palette.accent}2b, transparent 58%), linear-gradient(155deg, ${palette.background}, #071c16)`,
         color: palette.foreground,
         display: 'flex',
+        direction: props.direction ?? 'ltr',
         justifyContent: 'center',
         overflow: 'hidden',
         padding: '96px 84px',
         textAlign: 'center',
       }}
     >
+      {props.artworkFile ? (
+        <Img
+          src={staticFile(props.artworkFile)}
+          style={{
+            height: '100%',
+            left: 0,
+            objectFit: 'cover',
+            opacity: 0.54,
+            position: 'absolute',
+            top: 0,
+            width: '100%',
+          }}
+        />
+      ) : null}
+      <AbsoluteFill style={{background: 'rgba(3, 12, 10, 0.28)', position: 'absolute'}} />
       <div
         style={{
           border: `1px solid ${palette.accent}48`,
@@ -135,7 +154,7 @@ const Scene: React.FC<{
           <>
             <div
               style={{
-                fontFamily: 'Georgia, Times New Roman, serif',
+                fontFamily: props.direction === 'rtl' ? 'Noto Naskh Arabic, Geeza Pro, Arial, sans-serif' : 'Georgia, Times New Roman, serif',
                 fontSize: props.title.length > 42 ? 62 : props.title.length > 28 ? 74 : 86,
                 fontWeight: 600,
                 lineHeight: 1.05,
@@ -157,7 +176,7 @@ const Scene: React.FC<{
         ) : (
           <div
             style={{
-              fontFamily: 'Georgia, Times New Roman, serif',
+              fontFamily: props.direction === 'rtl' ? 'Noto Naskh Arabic, Geeza Pro, Arial, sans-serif' : 'Georgia, Times New Roman, serif',
               fontSize: isPeak ? 70 : 56,
               fontWeight: 600,
               lineHeight: 1.14,

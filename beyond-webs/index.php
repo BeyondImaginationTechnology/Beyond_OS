@@ -114,7 +114,7 @@ $loginUrl = $identityOrigin . '/beyond-id/auth/login.php?app=beyond-webs&return=
 
     <section class="how" id="how"><div class="wrap"><p class="eyebrow">The VPS session flow</p><div class="how-grid"><h2>Choose. Request. Review.</h2><div><b>01</b><h3>Sign in</h3><p>Continue with Beyond ID to save your VPS request to your account.</p></div><div><b>02</b><h3>Configure</h3><p>Choose a BIT OS flavour and proposed session size.</p></div><div><b>03</b><h3>Save request</h3><p>Track your request in your account. No machine or hourly charges start yet.</p></div></div></div></section>
   </main>
-  <footer class="wrap"><span>© <?= date('Y') ?> Beyond Imagination Technology</span><span>Beyond Webs v0.0.1 · BIT OS VPS sessions</span></footer>
+  <footer class="wrap"><span>© <?= date('Y') ?> Beyond Imagination Technology</span><span>Beyond Webs v0.0.1 · BIT OS VPS sessions</span><nav class="app-legal-links" aria-label="Beyond Webs legal information"><a href="/legal/privacy.php?app=Beyond%20Webs">Privacy</a><a href="/legal/terms.php?app=Beyond%20Webs">Terms</a></nav></footer>
   <script src="assets/app.js?v=0.0.6"></script>
 </body>
 </html>

@@ -96,7 +96,7 @@ if ($isDedicatedOsHost) {
                 <div class="guide-grid"><a href="#downloads"><span>01</span><strong>Use the Windows setup wizard</strong><small>Recommended guided USB creation →</small></a><a href="#downloads"><span>02</span><strong>Install from ISO</strong><small>USB, dual-boot, and bare-metal setup →</small></a><a href="#downloads"><span>03</span><strong>Write the USB image</strong><small>Advanced direct USB installation →</small></a></div>
             </section>
         </main>
-        <footer><span>© <?= date('Y') ?> Beyond Imagination Technology</span><span>BIT OS Cyber 1.0 Candidate · Use only on systems you own or are authorized to test.</span></footer>
+  <footer><span>© <?= date('Y') ?> Beyond Imagination Technology</span><span>BIT OS Cyber 1.0 Candidate · Use only on systems you own or are authorized to test.</span><nav class="app-legal-links" aria-label="BIT OS legal information"><a href="/legal/privacy.php?app=BIT%20OS">Privacy</a><a href="/legal/terms.php?app=BIT%20OS">Terms</a></nav></footer>
     </body>
     </html>
     <?php

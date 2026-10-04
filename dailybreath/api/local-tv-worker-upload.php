@@ -10,10 +10,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' || $token === '' || $given === '' || !
 }
 
 $rawUpload = str_starts_with(strtolower((string)($_SERVER['CONTENT_TYPE'] ?? '')), 'application/octet-stream');
-$date = (string)($rawUpload ? ($_SERVER['HTTP_X_DAILYBREATH_DATE'] ?? '') : ($_POST['date'] ?? ''));
-$tradition = (string)($rawUpload ? ($_SERVER['HTTP_X_DAILYBREATH_TRADITION'] ?? '') : ($_POST['tradition'] ?? ''));
-$reference = trim((string)($rawUpload ? ($_SERVER['HTTP_X_DAILYBREATH_REFERENCE'] ?? '') : ($_POST['reference'] ?? '')));
-$title = trim((string)($rawUpload ? ($_SERVER['HTTP_X_DAILYBREATH_TITLE'] ?? '') : ($_POST['title'] ?? '')));
+$metadata = [];
+if ($rawUpload) {
+    $encoded = (string)($_SERVER['HTTP_X_DAILYBREATH_METADATA'] ?? '');
+    $decoded = base64_decode($encoded, true);
+    $metadata = is_string($decoded) ? (json_decode($decoded, true) ?: []) : [];
+}
+$date = (string)($rawUpload ? ($metadata['date'] ?? '') : ($_POST['date'] ?? ''));
+$tradition = (string)($rawUpload ? ($metadata['tradition'] ?? '') : ($_POST['tradition'] ?? ''));
+$reference = trim((string)($rawUpload ? ($metadata['reference'] ?? '') : ($_POST['reference'] ?? '')));
+$title = trim((string)($rawUpload ? ($metadata['title'] ?? '') : ($_POST['title'] ?? '')));
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !in_array($tradition, ['bible','torah','quran'], true) || $reference === '' || $title === '') {
     http_response_code(422); echo json_encode(['ok' => false, 'error' => 'Invalid episode metadata']); exit;
 }

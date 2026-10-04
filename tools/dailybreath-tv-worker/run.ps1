@@ -17,7 +17,8 @@ function Send-WorkerVideo {
   $client.DefaultRequestHeaders.Authorization=[System.Net.Http.Headers.AuthenticationHeaderValue]::new('Bearer',$Token)
   $content=[System.Net.Http.ByteArrayContent]::new([System.IO.File]::ReadAllBytes($VideoPath))
   $content.Headers.ContentType=[System.Net.Http.Headers.MediaTypeHeaderValue]::Parse('application/octet-stream')
-  foreach($entry in $Fields.GetEnumerator()) { $content.Headers.Add(('X-DailyBreath-'+$entry.Key),[string]$entry.Value) }
+  $metadata=[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes(($Fields | ConvertTo-Json -Compress)))
+  $content.Headers.Add('X-DailyBreath-Metadata',$metadata)
   try {
     $response=$client.PostAsync($Uri,$content).GetAwaiter().GetResult()
     $body=$response.Content.ReadAsStringAsync().GetAwaiter().GetResult()

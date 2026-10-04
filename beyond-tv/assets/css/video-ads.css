@@ -8,6 +8,7 @@
 .btv-ad-filler strong{display:block;margin:2px 0;font-size:clamp(12px,1.7vw,17px);letter-spacing:0}
 .btv-ad-filler p{margin:0;color:#d5d0e4;font-size:12px}
 .btv-ad-filler b{color:#fff;font-variant-numeric:tabular-nums}
+.btv-ad-reward{display:block;margin-top:6px;color:#b8e600;font-size:11px;font-weight:850}.btv-ad-change-channel{margin-top:8px;padding:7px 11px;border:1px solid rgba(255,255,255,.35);border-radius:999px;color:#fff;background:rgba(255,255,255,.1);font:800 11px/1 Inter,system-ui,sans-serif;cursor:pointer}.btv-ad-change-channel:hover,.btv-ad-change-channel:focus-visible{background:rgba(255,255,255,.2)}.btv-breath-break .btv-ad-reward{position:relative;z-index:2;color:#dfe990}.btv-breath-break .btv-ad-change-channel{position:relative;z-index:2}
 .btv-ad-break.is-serving-ad .btv-ad-slot{visibility:visible;background:#000}
 .btv-breath-break{position:absolute;z-index:1;inset:0;display:grid;grid-template-rows:auto minmax(150px,1fr) auto auto auto auto;place-items:center;align-content:center;gap:10px;padding:clamp(22px,5vw,54px);overflow:hidden;text-align:center;background:radial-gradient(circle at 50% 35%,rgba(200,190,116,.2),transparent 28%),linear-gradient(160deg,#08251f,#174739 58%,#816f3e);color:#fff8df}
 .btv-breath-break[hidden]{display:none}

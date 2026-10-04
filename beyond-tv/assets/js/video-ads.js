@@ -44,8 +44,8 @@ function createOverlay(container,label,experience){
   };
   const gameExperience=gameExperiences[experience]||gameExperiences['mini-game'];
   overlay.innerHTML=experience==='breath-hourglass'
-    ? '<div class="btv-breath-break" data-btv-breath-break><span class="btv-breath-eyebrow">DAILY BREATH TV · BREATH HOURGLASS</span><div class="btv-hourglass" aria-hidden="true"><span class="btv-hourglass-frame"></span><span class="btv-hourglass-top"></span><span class="btv-hourglass-stream"></span><span class="btv-hourglass-bottom"></span></div><strong class="btv-breath-cue" data-btv-breath-cue>Breathe in</strong><p class="btv-breath-copy" data-btv-breath-copy>Settle in. Programming returns shortly.</p><time class="btv-breath-time" data-btv-ad-countdown>5:00</time><small data-btv-ad-label></small><button class="btv-ad-change-channel" type="button" data-btv-change-channel>Change channel</button></div><div class="btv-ad-slot" data-btv-ad-slot></div>'
-    : `<iframe class="btv-ad-game" data-btv-ad-game src="${gameExperience.url}" title="${gameExperience.title}" loading="eager" allow="autoplay"></iframe><div class="btv-ad-slot" data-btv-ad-slot></div><div class="btv-ad-filler"><span>${gameExperience.eyebrow}</span><strong data-btv-ad-label></strong><p>Programming resumes in <b data-btv-ad-countdown>5:00</b></p><button class="btv-ad-change-channel" type="button" data-btv-change-channel>Change channel</button></div>`;
+    ? '<div class="btv-breath-break" data-btv-breath-break><span class="btv-breath-eyebrow">DAILY BREATH TV · BREATH HOURGLASS</span><div class="btv-hourglass" aria-hidden="true"><span class="btv-hourglass-frame"></span><span class="btv-hourglass-top"></span><span class="btv-hourglass-stream"></span><span class="btv-hourglass-bottom"></span></div><strong class="btv-breath-cue" data-btv-breath-cue>Breathe in</strong><p class="btv-breath-copy" data-btv-breath-copy>Settle in. Programming returns shortly.</p><time class="btv-breath-time" data-btv-ad-countdown>5:00</time><small data-btv-ad-label></small><small class="btv-ad-reward" data-btv-ad-reward>Watch all 5 minutes to earn 0.01 bit$</small><button class="btv-ad-change-channel" type="button" data-btv-change-channel>Change channel</button></div><div class="btv-ad-slot" data-btv-ad-slot></div>'
+    : `<iframe class="btv-ad-game" data-btv-ad-game src="${gameExperience.url}" title="${gameExperience.title}" loading="eager" allow="autoplay"></iframe><div class="btv-ad-slot" data-btv-ad-slot></div><div class="btv-ad-filler"><span>${gameExperience.eyebrow}</span><strong data-btv-ad-label></strong><p>Programming resumes in <b data-btv-ad-countdown>5:00</b></p><small class="btv-ad-reward" data-btv-ad-reward>Watch all 5 minutes to earn 0.01 bit$</small><button class="btv-ad-change-channel" type="button" data-btv-change-channel>Change channel</button></div>`;
   const style=getComputedStyle(container);
   if(style.position==='static')container.style.position='relative';
   container.appendChild(overlay);
@@ -151,6 +151,12 @@ function startNativeAd(onAdState){
   });
 }
 
+function adReward(action,token=''){
+  return fetch('/beyond-tv/api/ad-reward.php',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({action,token})})
+    .then(response=>response.json().catch(()=>({ok:false})))
+    .catch(()=>({ok:false}));
+}
+
 function playBreak(options={}){
   if(activeBreak)return activeBreak;
   activeBreak=(async()=>{
@@ -169,6 +175,9 @@ function playBreak(options={}){
     const breath=overlay.querySelector('[data-btv-breath-break]');
     const breathCue=overlay.querySelector('[data-btv-breath-cue]');
     const breathCopy=overlay.querySelector('[data-btv-breath-copy]');
+    const rewardLabel=overlay.querySelector('[data-btv-ad-reward]');
+    const rewardSession=await adReward('start');
+    if(!rewardSession?.ok&&rewardLabel)rewardLabel.textContent=rewardSession?.message||'Sign in to earn 0.01 bit$.';
     let endBreak;
     const endEarly=new Promise(resolve=>{endBreak=resolve});
     overlay.querySelector('[data-btv-change-channel]')?.addEventListener('click',()=>{
@@ -213,7 +222,11 @@ function playBreak(options={}){
       }
     }catch(error){console.warn('Beyond TV ad unavailable',error);}
     const remaining=endsAt-Date.now();
-    if(remaining>0)await Promise.race([new Promise(resolve=>window.setTimeout(resolve,remaining)),endEarly]);
+    const changedChannel=remaining>0?await Promise.race([new Promise(resolve=>window.setTimeout(()=>resolve(false),remaining)),endEarly.then(()=>true)]):false;
+    if(!changedChannel&&rewardSession?.ok&&rewardSession.token){
+      const reward=await adReward('complete',rewardSession.token);
+      if(rewardLabel)rewardLabel.textContent=reward.message||'0.01 bit$ earned.';
+    }
     window.clearInterval(countdownTimer);
     overlay.remove();
   })().finally(()=>{activeBreak=null});

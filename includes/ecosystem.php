@@ -135,9 +135,10 @@ function beyond_wallet(): array {
 }
 
 /** Credit a completion reward to the shared Beyond Wallet exactly once. */
-function beyond_award_reward(int $userId,string $appSlug,string $activityType,string $activityId,int $amount,string $description): array {
+function beyond_award_reward(int $userId,string $appSlug,string $activityType,string $activityId,float $amount,string $description): array {
+    $amount=round($amount,2);
     $result=['ok'=>false,'awarded'=>false,'amount'=>$amount,'balance'=>null,'message'=>''];
-    if($userId<1||$amount<1||trim($activityId)==='')return $result;
+    if($userId<1||$amount<0.01||trim($activityId)==='')return $result;
     $appSlug=strtolower(trim((string)preg_replace('/[^a-z0-9-]+/i','-',$appSlug),'-'))?:'beyond-os';
     $activityType=strtolower(trim((string)preg_replace('/[^a-z0-9-]+/i','-',$activityType),'-'))?:'completion';
     $idempotency=sprintf('reward:v1:u%d:%s:%s:%s',$userId,substr($appSlug,0,28),substr($activityType,0,20),substr(hash('sha256',$activityId),0,24));

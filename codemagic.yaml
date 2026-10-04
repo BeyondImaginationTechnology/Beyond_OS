@@ -202,11 +202,7 @@ workflows:
       xcode: 16.4
     scripts:
       - name: Configure signing profiles
-        script: |
-          set -euo pipefail
-          if ! xcode-project use-profiles --verbose; then
-            echo "Profiles were applied; using the release export configuration below."
-          fi
+        script: xcode-project use-profiles --verbose
       - name: Set the next App Store build number
         script: |
           set -euo pipefail

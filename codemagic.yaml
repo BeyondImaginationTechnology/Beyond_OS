@@ -207,32 +207,6 @@ workflows:
           if ! xcode-project use-profiles --verbose; then
             echo "Profiles were applied; using the release export configuration below."
           fi
-      - name: Create current App Store Connect export configuration
-        script: |
-          set -euo pipefail
-          cat > /Users/builder/export_options.plist <<'PLIST'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>app-store</string>
-            <key>signingStyle</key>
-            <string>manual</string>
-            <key>teamID</key>
-            <string>FK9QM3VUNH</string>
-            <key>provisioningProfiles</key>
-            <dict>
-              <key>technology.co.beyondimagination.thedailybreath</key>
-              <string>Daily Breath Codemagic 2026</string>
-              <key>technology.co.beyondimagination.thedailybreath.widget</key>
-              <string>Daily Breath Widget Codemagic 2026</string>
-              <key>technology.co.beyondimagination.thedailybreath.Clip</key>
-              <string>Daily Breath App Clip Codemagic 2026</string>
-            </dict>
-          </dict>
-          </plist>
-          PLIST
       - name: Set the next App Store build number
         script: |
           set -euo pipefail
@@ -242,19 +216,9 @@ workflows:
       - name: Build signed IPA
         script: |
           set -euo pipefail
-          archive_path="$CM_BUILD_DIR/DailyBreathApple/build/ios/xcarchive/TheDailyBreath.xcarchive"
-          export_path="$CM_BUILD_DIR/DailyBreathApple/build/ios/ipa"
-          rm -rf "$archive_path" "$export_path"
-          xcodebuild archive \
+          xcode-project build-ipa \
             -project "$CM_BUILD_DIR/DailyBreathApple/TheDailyBreath.xcodeproj" \
-            -scheme "The Daily Breath" \
-            -configuration Release \
-            -destination 'generic/platform=iOS' \
-            -archivePath "$archive_path"
-          xcodebuild -exportArchive \
-            -archivePath "$archive_path" \
-            -exportPath "$export_path" \
-            -exportOptionsPlist /Users/builder/export_options.plist
+            -scheme "The Daily Breath"
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log

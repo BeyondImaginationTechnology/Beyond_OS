@@ -65,7 +65,7 @@ function beyond_space_schedule_state(?DateTimeImmutable $now = null): array
             'id' => 'cosmic-compass-2026-10-03',
             'title' => 'Cosmic Compass: Daily Astrology',
             'program' => 'Cosmic Compass',
-            'url' => '/beyond-tv/assets/media/space-tv/cosmic-compass-2026-10-03.mp4',
+            'url' => '/beyond-tv/space-tv-media.php?episode=cosmic-compass-2026-10-03',
             'duration' => 300,
             'type' => 'video/mp4',
         ];

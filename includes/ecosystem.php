@@ -134,6 +134,12 @@ function beyond_wallet(): array {
     return $wallet;
 }
 
+/** Render whole or fractional BIT$ values without insignificant trailing zeroes. */
+function beyond_format_bits(float $amount): string {
+    $formatted = number_format($amount, 2, '.', '');
+    return rtrim(rtrim($formatted, '0'), '.');
+}
+
 /** Credit a completion reward to the shared Beyond Wallet exactly once. */
 function beyond_award_reward(int $userId,string $appSlug,string $activityType,string $activityId,float $amount,string $description): array {
     $amount=round($amount,2);
@@ -255,7 +261,7 @@ function beyond_shell_markup(string $appName, array $wallet): string {
         $avatarMarkup = $avatarUrl !== ''
             ? '<span class="bos-avatar"><img src="' . $avatarUrl . '" alt=""></span>'
             : '<span class="bos-avatar bos-avatar-default"><img src="' . e(beyond_url('assets/images/default-astronaut-avatar.webp?v=20260727-1')) . '" alt=""></span>';
-        $balance = number_format((float)($wallet['balance'] ?? 0), 0);
+        $balance = beyond_format_bits((float)($wallet['balance'] ?? 0));
         $unread = beyond_notification_count();
         $accountActions = '<span class="bos-account-cluster"><a class="bos-icon-action bos-notifications" href="' . e(beyond_url('beyond-id/dashboard/notifications.php')) . '" aria-label="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/></svg>' . ($unread ? '<span class="bos-badge">' . $unread . '</span>' : '') . '</a>'
             . '<a class="bos-action bos-bits" href="' . e(beyond_url('beyond-id/dashboard/wallet.php')) . '"><i aria-hidden="true">b</i><span>' . $balance . ' bit$</span></a>'

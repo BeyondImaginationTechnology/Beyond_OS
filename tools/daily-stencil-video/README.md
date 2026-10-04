@@ -60,13 +60,15 @@ visual direction, citation, and timing. Render a motion-graphics draft with:
 npm run render:story
 ```
 
-In Daily Studio, open DailyBreath → **Bible Devotional Builder**. Enter a
-Bible topic and up to four Bible source blocks in `citation | URL | excerpt or
-notes` format. Generation uses only the supplied excerpts and notes (URLs are
-credited but not fetched), returns the beat narration, concise screen text,
-and visual-production prompts, and requires an editor to review the draft
-before downloading the story brief or rendering an MP4. This production tool
-is Bible-only; Daily Breath’s Tanakh and Quran readings remain in the app.
+In Daily Studio, open DailyBreath → **Sacred Reading Builder**. Choose the
+Bible, Tanakh, or Quran template, then enter a topic and up to four source
+blocks in `citation | URL | excerpt or notes` format. Generation uses only the
+supplied excerpts and notes (URLs are credited but not fetched), returns the
+beat narration, concise screen text, and visual-production prompts, and
+requires an editor to review the draft before downloading the story brief or
+rendering an MP4. Tanakh renders use the Dovi profile, navy and gold palette,
+and Hebrew-aware RTL layout; Quran renders use Moe, emerald and gold, and
+Arabic-aware RTL layout.
 
 The existing `server/cron/daily-studio-daily.php` worker also renders one video
 for the current date in the configured timezone. It saves the public MP4 at

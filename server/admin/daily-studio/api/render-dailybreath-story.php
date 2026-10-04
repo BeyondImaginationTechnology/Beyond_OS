@@ -37,6 +37,14 @@ if (!function_exists('proc_open')) dailyBreathStoryRenderError(503, 'This server
 $title = trim((string)($input['title'] ?? ''));
 $subtitle = trim((string)($input['subtitle'] ?? ''));
 $outroText = trim((string)($input['outroText'] ?? ''));
+$tradition = trim((string)($input['tradition'] ?? 'bible'));
+$templates = [
+    'bible' => ['series' => 'Daily Christian Devotional', 'guide' => 'Chris', 'direction' => 'ltr', 'voiceLocale' => 'en-US', 'palette' => ['background' => '#10271F', 'foreground' => '#F5F1E8', 'accent' => '#B9D6A1', 'muted' => '#B9C5BB']],
+    'tanakh' => ['series' => 'Tanakh Passage of the Day', 'guide' => 'Dovi', 'direction' => 'rtl', 'voiceLocale' => 'he', 'palette' => ['background' => '#0A1832', 'foreground' => '#FFF9E9', 'accent' => '#D9B45A', 'muted' => '#D9D7CB']],
+    'quran' => ['series' => 'Quran Ayah of the Day', 'guide' => 'Moe', 'direction' => 'rtl', 'voiceLocale' => 'ar', 'palette' => ['background' => '#0C372E', 'foreground' => '#FFF9E9', 'accent' => '#DAB35A', 'muted' => '#D8E2D7']],
+];
+if (!isset($templates[$tradition])) dailyBreathStoryRenderError(422, 'Choose the Bible, Tanakh, or Quran template.');
+$template = $templates[$tradition];
 $recordVoiceover = ($input['recordVoiceover'] ?? false) === true;
 $publishToDailyBreathTv = ($input['publishToDailyBreathTv'] ?? false) === true;
 $beats = $input['beats'] ?? null;
@@ -103,7 +111,10 @@ $default = json_decode((string)file_get_contents($project . '/public/daily-breat
 if (!is_array($default)) dailyBreathStoryRenderError(500, 'The Daily Breath Remotion template configuration is unavailable.');
 $props = [
     'brand' => 'Daily Breath',
-    'series' => trim((string)($default['series'] ?? 'A story to carry with you')),
+    'series' => $template['series'],
+    'tradition' => $tradition,
+    'guideName' => $template['guide'],
+    'direction' => $template['direction'],
     'title' => $title,
     'subtitle' => $subtitle,
     'outroText' => $outroText,
@@ -115,7 +126,7 @@ $props = [
     'fps' => 30,
     'width' => 1080,
     'height' => 1920,
-    'palette' => (array)($default['palette'] ?? []),
+    'palette' => $template['palette'],
 ];
 $job = bin2hex(random_bytes(12));
 $propsFile = sys_get_temp_dir() . '/daily-breath-story-' . $job . '.json';
@@ -126,7 +137,7 @@ try {
     if ($recordVoiceover) {
         @set_time_limit(900);
         foreach ($orderedBeats as $index => $beat) {
-            $result = studio_narration_generate($beat['narration'], 'en-US', 'elevenlabs');
+            $result = studio_narration_generate($beat['narration'], $template['voiceLocale'], 'elevenlabs');
             $audio = (string)($result['audio_content'] ?? '');
             studio_assert_mp3($audio);
             $audioFile = 'daily-breath-story-' . $job . '-' . $index . '.mp3';
@@ -198,6 +209,7 @@ try {
             'title' => $title,
             'subtitle' => $subtitle,
             'show' => 'Daily Breath',
+            'tradition' => $tradition,
             'video_url' => '/dailybreath/assets/videos/daily-breath-tv/' . rawurlencode($episodeId) . '.mp4',
             'duration_seconds' => (int)ceil(max(array_map(static fn(array $beat): float => (float)$beat['startSeconds'] + (float)$beat['durationSeconds'], $orderedBeats)) + $props['sourceSeconds'] + $props['outroSeconds']),
             'published_at' => gmdate(DATE_ATOM),

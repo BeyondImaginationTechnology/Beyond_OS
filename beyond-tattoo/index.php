@@ -17,7 +17,6 @@ $stencilDay = bt_stencil_content();
 $downloadFile = $stencilDay['package_url'];
 $packImage = trim((string)($stencilDay['pack_image_url'] ?? '')) ?: $stencilDay['preview_url'];
 $libraryAssets = bt_asset_library();
-$seasonOneReleasedCount = count(array_filter($libraryAssets, static fn(array $asset): bool => $asset['season_drop'] !== null));
 $libraryCatalog = bt_library_collections();
 $homeCollectionSlugs = ['divine-realism', 'beyond-ancient', 'japanese-legends', 'dark-realism'];
 $libraryCounts = [];
@@ -152,7 +151,6 @@ if (!empty($stencilDay['iso_date'])) {
           <span><i>✦</i> Six connected assets</span>
           <span><i>◇</i> Stylesheet-led prompts</span>
           <span><i>▣</i> Needle Bot guided</span>
-          <span><i>◆</i> Season 1 · <?= (int)$seasonOneReleasedCount ?>/55 live</span>
         </div>
       </div>
 

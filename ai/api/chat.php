@@ -4,6 +4,7 @@ require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/modes.php';
 require_once __DIR__ . '/../includes/usage.php';
 require_once __DIR__ . '/../includes/draw-images.php';
+require_once __DIR__ . '/../includes/gemini.php';
 require_once __DIR__ . '/../../beyond-id/includes/mobile-auth.php';
 require_once __DIR__ . '/../../dailybreath/includes/chat-guide.php';
 
@@ -303,9 +304,9 @@ if ($isDailyBreathChat) {
 }
 $simpleReply = null;
 $simpleCopy = [
-    'en' => ['hello' => 'Hello! I’m Jaguar. What would you like to explore?', 'thanks' => 'You’re welcome. What should we explore next?', 'acknowledgement' => 'I’m here when you’re ready. What should we explore?', 'help' => 'I’m Jaguar, Beyond’s AI assistant. Explain teaches ideas; Build preview turns product ideas into scoped plans. Build cannot inspect repositories or change files. Draw is intended for Jaguar image generation; the stencil editor has separate canvas drawing tools.', 'version' => 'You’re using Jaguar v0.5.1 Preview.'],
-    'fr' => ['hello' => 'Bonjour ! Je suis Jaguar. Qu’aimeriez-vous explorer ?', 'thanks' => 'Avec plaisir. Qu’allons-nous explorer ensuite ?', 'acknowledgement' => 'Je suis là quand vous êtes prêt. Qu’allons-nous explorer ?', 'help' => 'Je suis Jaguar, l’assistant IA de Beyond. Explain enseigne des idées ; Build transforme les idées de produit en plans structurés. Build ne peut ni consulter des dépôts ni modifier des fichiers. Draw est prévu pour la génération d’images Jaguar ; l’éditeur de pochoirs possède ses propres outils de dessin.', 'version' => 'Vous utilisez Jaguar v0.5.1 Preview.'],
-    'es' => ['hello' => '¡Hola! Soy Jaguar. ¿Qué te gustaría explorar?', 'thanks' => 'De nada. ¿Qué exploramos ahora?', 'acknowledgement' => 'Estoy aquí cuando estés listo. ¿Qué exploramos?', 'help' => 'Soy Jaguar, el asistente de IA de Beyond. Explain enseña ideas; Build convierte ideas de producto en planes concretos. Build no puede consultar repositorios ni cambiar archivos. Draw está pensado para la generación de imágenes de Jaguar; el editor de plantillas tiene sus propias herramientas de dibujo.', 'version' => 'Estás usando Jaguar v0.5.1 Preview.'],
+    'en' => ['hello' => 'Hello! I’m Jaguar. What would you like to explore?', 'thanks' => 'You’re welcome. What should we explore next?', 'acknowledgement' => 'I’m here when you’re ready. What should we explore?', 'help' => 'I’m Jaguar, Beyond’s AI assistant. Explain teaches ideas; Build preview turns product ideas into scoped plans. Build cannot inspect repositories or change files. Draw is intended for Jaguar image generation; the stencil editor has separate canvas drawing tools.', 'jaguar_animal' => 'A jaguar is a large spotted wild cat native to the Americas. It is the largest cat in the Americas and is known for its powerful bite, climbing, and swimming.', 'version' => 'You’re using Jaguar v0.5.2 Preview.'],
+    'fr' => ['hello' => 'Bonjour ! Je suis Jaguar. Qu’aimeriez-vous explorer ?', 'thanks' => 'Avec plaisir. Qu’allons-nous explorer ensuite ?', 'acknowledgement' => 'Je suis là quand vous êtes prêt. Qu’allons-nous explorer ?', 'help' => 'Je suis Jaguar, l’assistant IA de Beyond. Explain enseigne des idées ; Build transforme les idées de produit en plans structurés. Build ne peut ni consulter des dépôts ni modifier des fichiers. Draw est prévu pour la génération d’images Jaguar ; l’éditeur de pochoirs possède ses propres outils de dessin.', 'jaguar_animal' => 'Un jaguar est un grand félin sauvage tacheté originaire des Amériques. C’est le plus grand félin des Amériques, connu pour sa morsure puissante, son agilité dans les arbres et sa capacité à nager.', 'version' => 'Vous utilisez Jaguar v0.5.2 Preview.'],
+    'es' => ['hello' => '¡Hola! Soy Jaguar. ¿Qué te gustaría explorar?', 'thanks' => 'De nada. ¿Qué exploramos ahora?', 'acknowledgement' => 'Estoy aquí cuando estés listo. ¿Qué exploramos?', 'help' => 'Soy Jaguar, el asistente de IA de Beyond. Explain enseña ideas; Build convierte ideas de producto en planes concretos. Build no puede consultar repositorios ni cambiar archivos. Draw está pensado para la generación de imágenes de Jaguar; el editor de plantillas tiene sus propias herramientas de dibujo.', 'jaguar_animal' => 'Un jaguar es un gran felino salvaje con manchas, nativo de las Américas. Es el felino más grande de América y se conoce por su poderosa mordida, su habilidad para trepar y nadar.', 'version' => 'Estás usando Jaguar v0.5.2 Preview.'],
 ];
 // Keep common greeting variations off the scale-to-zero runtime. In particular,
 // "Hello world" is a normal first message, not a request that needs a GPU cold start.
@@ -315,6 +316,8 @@ if (preg_match('/^(hi|hello|hey|bonjour|salut|allo|hola|buenas)(?:[\s,]+(?:there
     $simpleReply = $simpleCopy[$language]['thanks'];
 } elseif (preg_match('/^(ok|okay|alright|d[’\']accord|bien|vale|perfecto)[\s!.?¿¡]*$/u', $simplePrompt)) {
     $simpleReply = $simpleCopy[$language]['acknowledgement'];
+} elseif (preg_match('/^(?:(?:what(?:[’\']s|\s+is)?|whats)\s+(?:a\s+)?jaguar|(?:qu[’\']est-ce\s+que\s+c[’\']est|quel est)\s+(?:un\s+)?jaguar|(?:qué\s+es|que\s+es)\s+(?:un\s+)?jaguar)[\s!.?¿¡]*$/iu', $simplePrompt)) {
+    $simpleReply = $simpleCopy[$language]['jaguar_animal'];
 } elseif (preg_match('/^(what can you do|who are you|what[’\']?s your name|what is your name|help|que peux-tu faire|qui es-tu|comment tu t[’\']appelles|qué puedes hacer|quién eres|cómo te llamas)[\s!.?¿¡]*$/u', $simplePrompt)) {
     $simpleReply = $simpleCopy[$language]['help'];
 } elseif (preg_match('/^(what version is this|version|quelle version|qué versión)[\s!.?¿¡]*$/u', $simplePrompt)) {
@@ -391,9 +394,9 @@ if (preg_match('/^(hi|hello|hey|bonjour|salut|allo|hola|buenas)(?:[\s,]+(?:there
     }
 } elseif (preg_match('/^(how old are you|what(?:[’\']s| is) your age|when were you (?:made|created|born)|quel âge as-tu|cuántos años tienes)[\s!.?¿¡]*$/u', $simplePrompt)) {
     $simpleReply = [
-        'en' => 'I don’t have a human age. I’m Llama Jaguar v0.5.1 Preview, an AI system being built for the BIT ecosystem.',
-        'fr' => 'Je n’ai pas d’âge humain. Je suis Llama Jaguar v0.5.1 Preview, un système d’IA conçu pour l’écosystème BIT.',
-        'es' => 'No tengo una edad humana. Soy Llama Jaguar v0.5.1 Preview, un sistema de IA creado para el ecosistema BIT.',
+        'en' => 'I don’t have a human age. I’m Llama Jaguar v0.5.2 Preview, an AI system being built for the BIT ecosystem.',
+        'fr' => 'Je n’ai pas d’âge humain. Je suis Llama Jaguar v0.5.2 Preview, un système d’IA conçu pour l’écosystème BIT.',
+        'es' => 'No tengo una edad humana. Soy Llama Jaguar v0.5.2 Preview, un sistema de IA creado para el ecosistema BIT.',
     ][$language];
 } elseif (preg_match('/^(-?\d+(?:\.\d+)?)\s*([+\-*\/])\s*(-?\d+(?:\.\d+)?)\s*(?:=|\?)?$/', $simplePrompt, $math)) {
     $left = (float) $math[1];
@@ -508,6 +511,16 @@ if ($mode === 'core' && $guide !== '') {
         echo json_encode(['model' => 'jaguar-dailybreath-fast-lane', 'adapter' => 'local', 'mode' => $mode, 'message' => $guideName . ' is available here for Daily Breath and sacred-text questions only. This no-GPU chat can offer concise, best-effort guidance from Jaguar’s built-in knowledge; for a specific passage, include its book, chapter, and verse.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
+$gemini = $mode === 'core' ? jaguar_gemini_answer($originalPrompt, $language) : null;
+if ($gemini !== null) {
+    try {
+        jaguar_gemini_record_training(beyond_db(), $originalPrompt, $gemini['message'], $gemini['citations'], $gemini['model'], $language);
+    } catch (Throwable $exception) {
+        error_log('Jaguar Gemini training record failed: ' . $exception->getMessage());
+    }
+    echo json_encode(['model' => 'gemini-google-search', 'adapter' => $gemini['model'], 'mode' => $mode, 'message' => $gemini['message'], 'citations' => $gemini['citations'], 'training_recorded' => true], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
+}
 $runtimeUrl = rtrim(jaguar_runtime_config('runtime_url'), '/');
 if ($runtimeUrl === '' || !filter_var($runtimeUrl, FILTER_VALIDATE_URL) || !function_exists('curl_init')) { http_response_code(503); echo json_encode(['error' => 'Jaguar is not available yet.']); exit; }
 $runtimeToken = jaguar_runtime_config('runtime_token');

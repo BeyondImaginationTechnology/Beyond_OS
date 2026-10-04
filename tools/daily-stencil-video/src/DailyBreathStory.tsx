@@ -42,6 +42,8 @@ export type DailyBreathStoryProps = {
   sources: DailyBreathStorySource[];
   audioSegments?: DailyBreathStoryAudioSegment[];
   artworkFile?: string;
+  tradition?: 'bible' | 'tanakh' | 'quran';
+  guideName?: string;
   direction?: 'ltr' | 'rtl';
   outroText: string;
   sourceSeconds: number;
@@ -71,6 +73,12 @@ export const dailyBreathStoryDurationSeconds = (props: DailyBreathStoryProps) =>
 const clamp = {
   extrapolateLeft: 'clamp' as const,
   extrapolateRight: 'clamp' as const,
+};
+
+const sacredTextFont = (props: DailyBreathStoryProps) => {
+  if (props.tradition === 'tanakh') return 'Noto Sans Hebrew, Arial Hebrew, Arial, sans-serif';
+  if (props.direction === 'rtl') return 'Noto Naskh Arabic, Geeza Pro, Arial, sans-serif';
+  return 'Georgia, Times New Roman, serif';
 };
 
 const Scene: React.FC<{
@@ -154,7 +162,7 @@ const Scene: React.FC<{
           <>
             <div
               style={{
-                fontFamily: props.direction === 'rtl' ? 'Noto Naskh Arabic, Geeza Pro, Arial, sans-serif' : 'Georgia, Times New Roman, serif',
+                fontFamily: sacredTextFont(props),
                 fontSize: props.title.length > 42 ? 62 : props.title.length > 28 ? 74 : 86,
                 fontWeight: 600,
                 lineHeight: 1.05,
@@ -176,7 +184,7 @@ const Scene: React.FC<{
         ) : (
           <div
             style={{
-              fontFamily: props.direction === 'rtl' ? 'Noto Naskh Arabic, Geeza Pro, Arial, sans-serif' : 'Georgia, Times New Roman, serif',
+              fontFamily: sacredTextFont(props),
               fontSize: isPeak ? 70 : 56,
               fontWeight: 600,
               lineHeight: 1.14,
@@ -249,7 +257,7 @@ const SourcesCard: React.FC<{props: DailyBreathStoryProps}> = ({props}) => (
     }}
   >
     <div style={{color: props.palette.accent, fontSize: 25, fontWeight: 800, letterSpacing: 7}}>
-      SOURCES
+      {props.tradition === 'tanakh' ? 'SOURCES · מקורות' : props.tradition === 'quran' ? 'SOURCES · المصادر' : 'SOURCES'}
     </div>
     <div style={{display: 'grid', gap: 18, marginTop: 44, maxWidth: 860}}>
       {props.sources.slice(0, 4).map((source, index) => (
@@ -280,7 +288,7 @@ const OutroCard: React.FC<{props: DailyBreathStoryProps}> = ({props}) => (
     <div style={{color: props.palette.accent, fontSize: 28, fontWeight: 850, letterSpacing: 8}}>
       DAILY BREATH
     </div>
-    <div style={{fontFamily: 'Georgia, Times New Roman, serif', fontSize: 48, marginTop: 27}}>
+    <div style={{fontFamily: sacredTextFont(props), fontSize: 48, marginTop: 27}}>
       {props.outroText}
     </div>
     <div style={{color: props.palette.muted, fontSize: 22, marginTop: 18}}>{props.title}</div>

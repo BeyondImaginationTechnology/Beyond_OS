@@ -11,6 +11,8 @@ function jaguar_runtime_config(string $key): string
         'runtime_url' => 'JAGUAR_RUNTIME_URL',
         'draw_runtime_url' => 'JAGUAR_DRAW_RUNTIME_URL',
         'runtime_token' => 'JAGUAR_RUNTIME_TOKEN',
+        'gemini_api_key' => 'GEMINI_API_KEY',
+        'gemini_model' => 'JAGUAR_GEMINI_MODEL',
     ];
     $environmentName = $environmentNames[$key] ?? null;
     if ($environmentName !== null) {

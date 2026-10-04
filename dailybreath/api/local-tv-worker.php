@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__ . '/../../config/bootstrap.php';
+require_once __DIR__ . '/../../includes/ecosystem.php';
 require_once __DIR__ . '/../includes/web-app.php';
 require_once __DIR__ . '/../includes/verse-of-day.php';
 require_once __DIR__ . '/../includes/sacred-text.php';

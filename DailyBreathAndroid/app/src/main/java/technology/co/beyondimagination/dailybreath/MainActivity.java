@@ -33,6 +33,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
@@ -119,6 +121,8 @@ public final class MainActivity extends Activity {
     private RemoteDailyContent remoteToday;
     private MediaPlayer narrationPlayer;
     private VideoView dailyBreathTVPlayer;
+    private String tvProgramming="full";
+    private boolean tvMuted=true;
     private boolean narrationRequestInFlight;
     private boolean activityResumed;
     private String lastContentFetchDate="";
@@ -266,10 +270,30 @@ public final class MainActivity extends Activity {
         heading.addView(label("Daily Breath TV",18,INK,true),new LinearLayout.LayoutParams(0,-2,1));
         TextView open=label("Open channel ›",13,FOREST,true);open.setPadding(dp(10),dp(10),0,dp(10));open.setOnClickListener(v->openUrl("https://beyondimagination.co.technology/beyond-tv/channel.php?slug=mrbeast-tv"));heading.addView(open);
         preview.addView(heading);
-        dailyBreathTVPlayer=new VideoView(this);dailyBreathTVPlayer.setContentDescription("Muted Daily Breath TV preview");dailyBreathTVPlayer.setBackgroundColor(FOREST_DARK);dailyBreathTVPlayer.setVideoURI(Uri.parse("https://beyondimagination.co.technology/dailybreath/assets/videos/daily-breath-tv/daily-breath-story.mp4"));dailyBreathTVPlayer.setOnPreparedListener(player->{player.setVolume(0f,0f);player.setLooping(true);if(activityResumed)dailyBreathTVPlayer.start();});
+        dailyBreathTVPlayer=new VideoView(this);dailyBreathTVPlayer.setContentDescription("Daily Breath TV preview");dailyBreathTVPlayer.setBackgroundColor(FOREST_DARK);
         preview.addView(dailyBreathTVPlayer,new LinearLayout.LayoutParams(-1,dp(190)));
-        preview.addView(label("Playing muted · original Daily Breath TV programming.",12,Color.DKGRAY,false),spaced());
+        TextView status=label("Loading Daily Breath TV…",12,Color.DKGRAY,false);preview.addView(status,spaced());
+        RadioGroup programming=new RadioGroup(this);programming.setOrientation(RadioGroup.VERTICAL);programming.setContentDescription("Daily Breath TV programming");
+        String[][] options={{"full","Full programming"},{"christian","Christian programming"},{"muslim","Muslim programming"},{"judaism","Judaism programming"}};
+        for(String[] option:options){RadioButton button=new RadioButton(this);button.setId(View.generateViewId());button.setText(option[1]);button.setTextColor(INK);button.setTextSize(14);button.setTag(option[0]);button.setChecked(option[0].equals(tvProgramming));programming.addView(button);}
+        programming.setOnCheckedChangeListener((group,checkedId)->{View selected=group.findViewById(checkedId);if(selected!=null){tvProgramming=(String)selected.getTag();loadDailyBreathTVPreview(tvProgramming,status);}});
+        preview.addView(programming,spaced());
+        Button audio=action("Turn on channel audio");audio.setOnClickListener(v->{tvMuted=!tvMuted;audio.setText(tvMuted?"Turn on channel audio":"Mute channel audio");loadDailyBreathTVPreview(tvProgramming,status);});preview.addView(audio,spaced());
+        loadDailyBreathTVPreview(tvProgramming,status);
         page.addView(preview,spaced());
+    }
+
+    private void loadDailyBreathTVPreview(String selection, TextView status) {
+        final String requested=selection;
+        new Thread(()->{HttpURLConnection connection=null;try{
+            connection=(HttpURLConnection)new URL("https://beyondimagination.co.technology/dailybreath/assets/videos/daily-breath-tv/rotation.json").openConnection();connection.setConnectTimeout(12000);connection.setReadTimeout(12000);connection.setRequestProperty("Accept","application/json");
+            if(connection.getResponseCode()<200||connection.getResponseCode()>=300)throw new IllegalStateException("Rotation unavailable");
+            StringBuilder response=new StringBuilder();try(BufferedReader reader=new BufferedReader(new InputStreamReader(connection.getInputStream(),StandardCharsets.UTF_8))){String line;while((line=reader.readLine())!=null)response.append(line);}
+            JSONArray episodes=new JSONObject(response.toString()).optJSONArray("episodes");if(episodes==null)throw new IllegalStateException("No episodes");
+            String prefix=requested.equals("christian")?"daily-bible-":requested.equals("muslim")?"daily-quran-":requested.equals("judaism")?"daily-torah-":"";JSONObject chosen=null;for(int index=0;index<episodes.length();index++){JSONObject episode=episodes.optJSONObject(index);if(episode!=null&&(prefix.isEmpty()||episode.optString("id").startsWith(prefix))){chosen=episode;break;}}if(chosen==null)throw new IllegalStateException("No matching episode");
+            String videoUrl=chosen.getString("video_url"),title=chosen.optString("title","Daily Breath TV");
+            runOnUiThread(()->{if(dailyBreathTVPlayer==null||!requested.equals(tvProgramming))return;dailyBreathTVPlayer.setVideoURI(Uri.parse(videoUrl.startsWith("http")?videoUrl:"https://beyondimagination.co.technology"+videoUrl));dailyBreathTVPlayer.setOnPreparedListener(player->{player.setVolume(tvMuted?0f:1f,tvMuted?0f:1f);player.setLooping(true);if(activityResumed)dailyBreathTVPlayer.start();});status.setText(title);});
+        }catch(Exception error){runOnUiThread(()->{if(requested.equals(tvProgramming))status.setText("The selected channel preview is unavailable. Open the channel to try again.");});}finally{if(connection!=null)connection.disconnect();}}).start();
     }
 
     private void stopDailyBreathTVPreview() {

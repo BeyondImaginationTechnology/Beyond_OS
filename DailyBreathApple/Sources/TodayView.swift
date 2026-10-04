@@ -4,6 +4,48 @@ import CryptoKit
 import SwiftUI
 import UIKit
 
+private enum DailyBreathTVProgramming: String, CaseIterable, Identifiable {
+    case full
+    case christian
+    case muslim
+    case judaism
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .full: "Full programming"
+        case .christian: "Christian programming"
+        case .muslim: "Muslim programming"
+        case .judaism: "Judaism programming"
+        }
+    }
+
+    var episodePrefix: String? {
+        switch self {
+        case .full: nil
+        case .christian: "daily-bible-"
+        case .muslim: "daily-quran-"
+        case .judaism: "daily-torah-"
+        }
+    }
+}
+
+private struct DailyBreathTVRotation: Decodable {
+    let episodes: [DailyBreathTVEpisode]
+}
+
+private struct DailyBreathTVEpisode: Decodable {
+    let id: String
+    let title: String
+    let videoURL: String
+
+    enum CodingKeys: String, CodingKey {
+        case id, title
+        case videoURL = "video_url"
+    }
+}
+
 struct TodayView: View {
     var onNavigate: (DailyBreathTab) -> Void = { _ in }
     @EnvironmentObject private var store: DailyBreathStore
@@ -21,7 +63,11 @@ struct TodayView: View {
     @State private var narrationMessage: String?
     @State private var narrationTask: Task<Void, Never>?
     @State private var narrationRequestID = UUID()
-    @State private var tvPlayer = AVPlayer(url: URL(string: "https://beyondimagination.co.technology/dailybreath/assets/videos/daily-breath-tv/daily-breath-story.mp4")!)
+    @AppStorage("dailyBreathTVProgramming") private var tvProgrammingID = DailyBreathTVProgramming.full.id
+    @State private var tvPlayer = AVPlayer()
+    @State private var tvPreviewTitle = "Loading Daily Breath TV…"
+    @State private var tvPreviewError: String?
+    @State private var tvMuted = true
 
     private var selectedTheme: DailyBreathTheme {
         DailyBreathTheme(id: selectedThemeID)
@@ -36,7 +82,7 @@ struct TodayView: View {
     }
 
     private var todayDevotional: Devotional {
-        store.weeklyDevotional(for: selectedTradition)
+        store.dailyDevotional(for: selectedTradition)
     }
 
     private var todayContentLocale: String {
@@ -48,6 +94,10 @@ struct TodayView: View {
         case .quran:
             store.contentLocale(for: .quran, editionID: quranEditionID)
         }
+    }
+
+    private var tvProgramming: DailyBreathTVProgramming {
+        DailyBreathTVProgramming(rawValue: tvProgrammingID) ?? .full
     }
 
     private var todayShareURL: URL {
@@ -75,6 +125,7 @@ struct TodayView: View {
             VStack(alignment: .leading, spacing: 18) {
                 todayIntro
                 todayReading
+                devotionalCard
                 dailyBreathTVPlayer
             }
             .padding()
@@ -166,18 +217,70 @@ struct TodayView: View {
             VideoPlayer(player: tvPlayer)
                 .frame(minHeight: 190)
                 .clipShape(RoundedRectangle(cornerRadius: 18))
-                .accessibilityLabel("Muted Daily Breath TV preview")
-            Text("Playing muted · Daily Breath TV")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .accessibilityLabel("Daily Breath TV preview")
+            if let tvPreviewError {
+                Text(tvPreviewError)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text(tvPreviewTitle)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
+            }
+            Menu {
+                ForEach(DailyBreathTVProgramming.allCases) { programming in
+                    Button {
+                        tvProgrammingID = programming.id
+                    } label: {
+                        Label(programming.title, systemImage: programming == tvProgramming ? "checkmark" : "circle")
+                    }
+                }
+            } label: {
+                Label(tvProgramming.title, systemImage: "checklist")
+                    .font(.subheadline.weight(.semibold))
+            }
+            .accessibilityLabel("Daily Breath TV programming")
+            .accessibilityHint("Choose full, Christian, Muslim, or Judaism programming.")
+            Button {
+                tvMuted.toggle()
+                tvPlayer.isMuted = tvMuted
+            } label: {
+                Label(tvMuted ? "Turn on channel audio" : "Mute channel audio", systemImage: tvMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+            }
+            .buttonStyle(.bordered)
         }
         .padding(16)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 24))
-        .onAppear {
-            tvPlayer.isMuted = true
-            tvPlayer.play()
-        }
+        .task(id: tvProgrammingID) { await loadDailyBreathTVPreview() }
         .onDisappear { tvPlayer.pause() }
+    }
+
+    @MainActor
+    private func loadDailyBreathTVPreview() async {
+        tvPlayer.pause()
+        tvPreviewError = nil
+        tvPreviewTitle = "Loading \(tvProgramming.title)…"
+        do {
+            let (data, response) = try await URLSession.shared.data(from: Self.dailyBreathTVRotationURL)
+            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+                throw DailyBreathAPIError.badResponse
+            }
+            let episodes = try JSONDecoder().decode(DailyBreathTVRotation.self, from: data).episodes
+            let episode = episodes.first { episode in
+                guard let prefix = tvProgramming.episodePrefix else { return true }
+                return episode.id.hasPrefix(prefix)
+            }
+            guard let episode,
+                  let url = URL(string: episode.videoURL, relativeTo: Self.dailyBreathTVBaseURL) else {
+                throw DailyBreathAPIError.badResponse
+            }
+            tvPlayer.replaceCurrentItem(with: AVPlayerItem(url: url))
+            tvPlayer.isMuted = tvMuted
+            tvPlayer.play()
+            tvPreviewTitle = episode.title
+        } catch {
+            tvPreviewError = "The selected channel preview is unavailable. Open the channel to try again."
+        }
     }
 
     private var traditionPicker: some View {
@@ -438,6 +541,8 @@ struct TodayView: View {
     }
 
     private static let dailyBreathTVChannelURL = URL(string: "https://beyondimagination.co.technology/beyond-tv/channel.php?slug=mrbeast-tv")!
+    private static let dailyBreathTVBaseURL = URL(string: "https://beyondimagination.co.technology")!
+    private static let dailyBreathTVRotationURL = URL(string: "https://beyondimagination.co.technology/dailybreath/assets/videos/daily-breath-tv/rotation.json")!
 
     private func exportShareImage() {
         let card = DailyBreathExportCard(
@@ -460,7 +565,7 @@ struct TodayView: View {
         } label: {
             HStack(alignment: .top, spacing: 14) {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("WEEKLY \(selectedTradition.devotionalName.uppercased())")
+                    Text("DAILY \(selectedTradition.devotionalName.uppercased())")
                         .font(.caption.bold())
                         .tracking(1.6)
                         .foregroundStyle(selectedTheme.primary)

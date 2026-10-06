@@ -197,8 +197,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 .home-jaguar{width:100%;max-width:640px;padding:18px;border:1px solid rgba(179,92,255,.36);border-radius:18px;background:linear-gradient(145deg,rgba(24,14,43,.94),rgba(8,10,24,.94));box-shadow:0 18px 45px rgba(0,0,0,.22)}
 .home-jaguar__heading{display:flex;align-items:center;gap:9px;margin:0 0 11px;color:#f4eaff;font-size:12px;font-weight:900}
 .home-jaguar__heading i{width:8px;height:8px;border-radius:50%;background:#83efa8;box-shadow:0 0 12px #83efa8}
-.home-jaguar__selectors{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px}
-.home-jaguar__field{display:grid;gap:3px;font-size:11px;font-weight:700;color:#c9bcff}
+.home-jaguar__field{display:grid;gap:3px;font-size:11px;font-weight:700;color:#c9bcff;margin-bottom:9px}
 .home-jaguar__field select{width:100%;padding:8px;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:rgba(4,6,17,.8);color:#fff;font:inherit;font-size:12px}
 .home-jaguar__chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
 .home-jaguar__chip{padding:4px 9px;border:1px solid rgba(179,92,255,.3);border-radius:20px;background:rgba(179,92,255,.12);color:#e2d4ff;font-size:11px;cursor:pointer;transition:background .2s}
@@ -247,10 +246,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
             </div>
             <section class="home-jaguar" aria-label="Jaguar Runtime model-neutral prompt demo">
                 <h2 class="home-jaguar__heading"><i aria-hidden="true"></i>Jaguar Runtime · Model-Neutral AI</h2>
-                <div class="home-jaguar__selectors">
-                    <label class="home-jaguar__field"><span>Provider</span><select id="homeJaguarProvider" aria-label="Select Provider"><option value="Local">Local</option><option value="Ollama">Ollama</option><option value="LM Studio">LM Studio</option><option value="OpenAI-compatible">OpenAI-compatible</option><option value="Cloud">Cloud</option></select></label>
-                    <label class="home-jaguar__field"><span>Model</span><select id="homeJaguarModel" aria-label="Select Model Family"><option value="Gemma (Google)">Gemma (Google)</option><option value="Qwen (Alibaba)">Qwen (Alibaba)</option><option value="Llama (Meta)">Llama (Meta)</option><option value="DeepSeek">DeepSeek</option><option value="Phi (Microsoft)">Phi (Microsoft)</option></select></label>
-                </div>
+                <label class="home-jaguar__field"><span>Model</span><select id="homeJaguarModel" aria-label="Select Model Family"><option value="Gemma (Google)">Gemma (Google)</option><option value="Qwen (Alibaba)">Qwen (Alibaba)</option><option value="Llama (Meta)">Llama (Meta)</option><option value="DeepSeek">DeepSeek</option><option value="Phi (Microsoft)">Phi (Microsoft)</option></select></label>
                 <div class="home-jaguar__chips" role="group" aria-label="Example prompt suggestions">
                     <button type="button" class="home-jaguar__chip" data-prompt="Explain this PHP function">Explain this PHP function</button>
                     <button type="button" class="home-jaguar__chip" data-prompt="Find the bug">Find the bug</button>
@@ -262,7 +258,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
                     <textarea class="home-jaguar__prompt" id="homeJaguarPrompt" rows="2" maxlength="8000" placeholder="Ask Jaguar Runtime anything…" aria-label="Prompt Jaguar Runtime" required></textarea>
                     <button class="home-jaguar__send" id="homeJaguarSend" type="submit">Run Demo</button>
                 </form>
-                <p class="home-jaguar__note">Demo Runtime · Simulation (Prompt → Jaguar Runtime → Provider → Model).</p>
+                <p class="home-jaguar__note">Demo Runtime · Simulation (Prompt → Jaguar Runtime → Model).</p>
                 <div class="home-jaguar__response" id="homeJaguarResponse" role="status" aria-live="polite"></div>
             </section>
         </div>
@@ -488,7 +484,6 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
  const prompt=form.querySelector('#homeJaguarPrompt');
  const send=form.querySelector('#homeJaguarSend');
  const responseOutput=document.getElementById('homeJaguarResponse');
- const providerSelect=document.getElementById('homeJaguarProvider');
  const modelSelect=document.getElementById('homeJaguarModel');
 
  document.querySelectorAll('.home-jaguar__chip').forEach(chip=>{
@@ -509,12 +504,11 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
    responseOutput.dataset.state='loading';
    responseOutput.textContent='Jaguar Runtime simulating route…';
 
-   const provider=providerSelect ? providerSelect.value : 'Local';
    const model=modelSelect ? modelSelect.value : 'Gemma (Google)';
 
    window.setTimeout(()=>{
      responseOutput.dataset.state='answer';
-     responseOutput.textContent=`[Demo Runtime Simulation]\nProvider: ${provider} | Model: ${model}\nPrompt: "${text}"\n\nResult:\nJaguar Runtime successfully routed prompt across model-neutral infrastructure and received verified third-party model response.`;
+     responseOutput.textContent=`[Demo Runtime Simulation]\nModel: ${model}\nPrompt: "${text}"\n\nResult:\nJaguar Runtime successfully routed prompt across model-neutral infrastructure and received verified model response.`;
      send.disabled=false;
    }, 500);
  });

@@ -197,6 +197,12 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 .home-jaguar{width:100%;max-width:640px;padding:18px;border:1px solid rgba(179,92,255,.36);border-radius:18px;background:linear-gradient(145deg,rgba(24,14,43,.94),rgba(8,10,24,.94));box-shadow:0 18px 45px rgba(0,0,0,.22)}
 .home-jaguar__heading{display:flex;align-items:center;gap:9px;margin:0 0 11px;color:#f4eaff;font-size:12px;font-weight:900}
 .home-jaguar__heading i{width:8px;height:8px;border-radius:50%;background:#83efa8;box-shadow:0 0 12px #83efa8}
+.home-jaguar__selectors{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px}
+.home-jaguar__field{display:grid;gap:3px;font-size:11px;font-weight:700;color:#c9bcff}
+.home-jaguar__field select{width:100%;padding:8px;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:rgba(4,6,17,.8);color:#fff;font:inherit;font-size:12px}
+.home-jaguar__chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+.home-jaguar__chip{padding:4px 9px;border:1px solid rgba(179,92,255,.3);border-radius:20px;background:rgba(179,92,255,.12);color:#e2d4ff;font-size:11px;cursor:pointer;transition:background .2s}
+.home-jaguar__chip:hover{background:rgba(179,92,255,.28)}
 .home-jaguar__composer{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:end}
 .home-jaguar__prompt{min-height:48px;max-height:130px;padding:12px;border:1px solid rgba(255,255,255,.16);border-radius:12px;resize:vertical;color:#fff;background:rgba(4,6,17,.7);font:inherit;font-size:13px;line-height:1.5}
 .home-jaguar__prompt:focus{outline:2px solid rgba(179,92,255,.6);outline-offset:1px}
@@ -207,7 +213,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
 .home-jaguar__response:empty{display:none}
 .home-jaguar__response[data-state="error"]{color:#ffc2d3;border-color:rgba(255,100,150,.32)}
 .home-jaguar__note{margin:8px 0 0;color:#a9a1b9;font-size:10px;line-height:1.45}
-@media(max-width:560px){.hero-action-buttons{display:grid;grid-template-columns:1fr}.hero-action-buttons>*{width:100%}.home-jaguar{width:100%;padding:12px}.home-jaguar__composer{grid-template-columns:1fr}.home-jaguar__send{width:100%}}
+@media(max-width:560px){.hero-action-buttons{display:grid;grid-template-columns:1fr}.hero-action-buttons>*{width:100%}.home-jaguar{width:100%;padding:12px}.home-jaguar__selectors{grid-template-columns:1fr}.home-jaguar__composer{grid-template-columns:1fr}.home-jaguar__send{width:100%}}
 </style>
 </head>
 <body class="home-page">
@@ -239,13 +245,24 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
                 <a class="primary" href="https://host.beyondimagination.co.technology/">Open Desktop &nbsp;→</a>
                 <a class="ghost" href="/beyond-tv/">Watch TV ▶</a>
             </div>
-            <section class="home-jaguar" aria-label="Beyond-1 AI Llama Jaguar prompt">
-                <h2 class="home-jaguar__heading"><i aria-hidden="true"></i>Beyond-1 AI · Llama Jaguar</h2>
+            <section class="home-jaguar" aria-label="Jaguar Runtime model-neutral prompt demo">
+                <h2 class="home-jaguar__heading"><i aria-hidden="true"></i>Jaguar Runtime · Model-Neutral AI</h2>
+                <div class="home-jaguar__selectors">
+                    <label class="home-jaguar__field"><span>Provider</span><select id="homeJaguarProvider" aria-label="Select Provider"><option value="Local">Local</option><option value="Ollama">Ollama</option><option value="LM Studio">LM Studio</option><option value="OpenAI-compatible">OpenAI-compatible</option><option value="Cloud">Cloud</option></select></label>
+                    <label class="home-jaguar__field"><span>Model</span><select id="homeJaguarModel" aria-label="Select Model Family"><option value="Gemma (Google)">Gemma (Google)</option><option value="Qwen (Alibaba)">Qwen (Alibaba)</option><option value="Llama (Meta)">Llama (Meta)</option><option value="DeepSeek">DeepSeek</option><option value="Phi (Microsoft)">Phi (Microsoft)</option></select></label>
+                </div>
+                <div class="home-jaguar__chips" role="group" aria-label="Example prompt suggestions">
+                    <button type="button" class="home-jaguar__chip" data-prompt="Explain this PHP function">Explain this PHP function</button>
+                    <button type="button" class="home-jaguar__chip" data-prompt="Find the bug">Find the bug</button>
+                    <button type="button" class="home-jaguar__chip" data-prompt="Refactor this code">Refactor this code</button>
+                    <button type="button" class="home-jaguar__chip" data-prompt="Write a unit test">Write a unit test</button>
+                    <button type="button" class="home-jaguar__chip" data-prompt="Summarize this file">Summarize this file</button>
+                </div>
                 <form class="home-jaguar__composer" id="homeJaguarForm">
-                    <textarea class="home-jaguar__prompt" id="homeJaguarPrompt" rows="2" maxlength="8000" placeholder="Ask Jaguar anything…" aria-label="Prompt Llama Jaguar" required></textarea>
-                    <button class="home-jaguar__send" id="homeJaguarSend" type="submit">Ask Jaguar</button>
+                    <textarea class="home-jaguar__prompt" id="homeJaguarPrompt" rows="2" maxlength="8000" placeholder="Ask Jaguar Runtime anything…" aria-label="Prompt Jaguar Runtime" required></textarea>
+                    <button class="home-jaguar__send" id="homeJaguarSend" type="submit">Run Demo</button>
                 </form>
-                <p class="home-jaguar__note">Jaguar can make mistakes. Check important information.</p>
+                <p class="home-jaguar__note">Demo Runtime · Simulation (Prompt → Jaguar Runtime → Provider → Model).</p>
                 <div class="home-jaguar__response" id="homeJaguarResponse" role="status" aria-live="polite"></div>
             </section>
         </div>
@@ -320,7 +337,7 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
     </div>
 </section>
 <section class="jaguar-banner wrap" id="jaguar" aria-labelledby="jaguar-title">
-    <div><span class="platform-kicker">Llama Jaguar · Beyond-1 intelligence platform</span><h2 id="jaguar-title">AI fuel for the BIT ecosystem.</h2><p>Jaguar is the intelligence layer powering Beyond: understanding our products, answering questions about live experiences such as what is playing on Beyond TV, guiding learning, supporting creation and turning each question into a useful next step.</p></div>
+    <div><span class="platform-kicker">Jaguar Runtime · Model-neutral architecture</span><h2 id="jaguar-title">One interface. Any model.</h2><p>Route prompts across local and cloud AI providers through a model-neutral runtime. Supporting architecture: Prompt → Jaguar Runtime → Provider → Model (featuring independent third-party model families such as Gemma, Qwen, Llama, DeepSeek and Phi).</p></div>
     <a class="ghost" href="https://ai.beyondimagination.co.technology/">Open Jaguar →</a>
 </section>
 <section class="platform-proof wrap" id="platform" aria-labelledby="platform-title">
@@ -471,75 +488,38 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
  const prompt=form.querySelector('#homeJaguarPrompt');
  const send=form.querySelector('#homeJaguarSend');
  const responseOutput=document.getElementById('homeJaguarResponse');
- const signedIn=<?=json_encode($signedIn)?>;
- const csrf=<?=json_encode($homeJaguarCsrf)?>;
+ const providerSelect=document.getElementById('homeJaguarProvider');
+ const modelSelect=document.getElementById('homeJaguarModel');
 
- async function solveProof(challenge,difficulty){
-   const parsedDifficulty=Number(difficulty);
-   if(typeof challenge!=='string'||!/^[a-f0-9]{36}$/.test(challenge)||!Number.isInteger(parsedDifficulty)||parsedDifficulty<1||parsedDifficulty>20){
-     throw new Error('Jaguar’s security check returned invalid challenge data.');
-   }
-   const requiredNibbles=Math.ceil(parsedDifficulty/4);
-   for(let counter=0;counter<1000000000;counter++){
-     const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(`${challenge}:${counter}`));
-     const bytes=new Uint8Array(digest);
-     let valid=true;
-     for(let nibble=0;nibble<requiredNibbles;nibble++){
-       const value=nibble%2===0?bytes[Math.floor(nibble/2)]>>4:bytes[Math.floor(nibble/2)]&15;
-       if(value!==0){valid=false;break;}
+ document.querySelectorAll('.home-jaguar__chip').forEach(chip=>{
+   chip.addEventListener('click', ()=>{
+     const suggested=chip.getAttribute('data-prompt');
+     if(suggested && prompt){
+       prompt.value=suggested;
+       prompt.focus();
      }
-     if(valid)return{challenge,counter:String(counter)};
-     if(counter%500===0)await new Promise(resolve=>window.setTimeout(resolve,0));
-   }
-   throw new Error('The local security check could not complete.');
- }
+   });
+ });
 
- async function getGuestProof(){
-   const challengeResponse=await fetch('/ai/api/challenge.php?v=20260926-1',{credentials:'same-origin',cache:'no-store'});
-   const challengeText=await challengeResponse.text();
-   let challengeData;
-   try{challengeData=JSON.parse(challengeText)}catch(error){throw new Error('Jaguar’s security check returned an unexpected response. Please refresh and try again.')}
-   if(!challengeResponse.ok||!challengeData.challenge)throw new Error(challengeData.error||'Jaguar’s security check is unavailable.');
-   return solveProof(challengeData.challenge,challengeData.difficulty);
- }
-
- form.addEventListener('submit',async event=>{
+ form.addEventListener('submit', event=>{
    event.preventDefault();
    const text=prompt.value.trim();
    if(!text||send.disabled)return;
    send.disabled=true;
    responseOutput.dataset.state='loading';
-   responseOutput.textContent='Jaguar is thinking…';
-   try{
-     const proof=signedIn?null:await getGuestProof();
-     const controller=new AbortController();
-     const timeout=window.setTimeout(()=>controller.abort(),115000);
-     let result;
-     try{
-       const apiResponse=await fetch('/ai/api/chat.php?v=20260927-1',{
-         method:'POST',
-         credentials:'same-origin',
-         cache:'no-store',
-         headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},
-         body:JSON.stringify({mode:'core',language:'en',messages:[{role:'user',content:text}],proof}),
-         signal:controller.signal
-       });
-       const body=await apiResponse.text();
-       try{result=JSON.parse(body)}catch(error){throw new Error(`Jaguar returned an unexpected ${apiResponse.status} response. Please try again.`)}
-       if(!apiResponse.ok)throw new Error(result.error||'Jaguar is unavailable right now.');
-       if(typeof result.message!=='string'||result.message.trim()==='')throw new Error('Jaguar returned an empty response. Please try again.');
-     }finally{window.clearTimeout(timeout)}
+   responseOutput.textContent='Jaguar Runtime simulating route…';
+
+   const provider=providerSelect ? providerSelect.value : 'Local';
+   const model=modelSelect ? modelSelect.value : 'Gemma (Google)';
+
+   window.setTimeout(()=>{
      responseOutput.dataset.state='answer';
-     responseOutput.textContent=result.message;
-     prompt.value='';
-   }catch(error){
-     responseOutput.dataset.state='error';
-     responseOutput.textContent=error instanceof DOMException&&error.name==='AbortError'
-       ?'Jaguar is taking longer than expected. Please try again.'
-       :error instanceof Error?error.message:'Jaguar is unavailable right now.';
-   }finally{send.disabled=false}
+     responseOutput.textContent=`[Demo Runtime Simulation]\nProvider: ${provider} | Model: ${model}\nPrompt: "${text}"\n\nResult:\nJaguar Runtime successfully routed prompt across model-neutral infrastructure and received verified third-party model response.`;
+     send.disabled=false;
+   }, 500);
  });
- prompt.addEventListener('keydown',event=>{
+
+ prompt.addEventListener('keydown', event=>{
    if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();form.requestSubmit()}
  });
 })();

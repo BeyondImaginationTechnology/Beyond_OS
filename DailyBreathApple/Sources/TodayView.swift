@@ -197,7 +197,6 @@ struct TodayView: View {
     @ViewBuilder
     private var todayIntro: some View {
         BrandHeader()
-        traditionPicker
     }
 
     @ViewBuilder
@@ -283,19 +282,6 @@ struct TodayView: View {
         }
     }
 
-    private var traditionPicker: some View {
-        Picker("Verse tradition", selection: $traditionID) {
-            ForEach(FaithTradition.allCases) { tradition in
-                Label(tradition.name, systemImage: tradition.symbolName).tag(tradition.id)
-            }
-        }
-        .pickerStyle(.segmented)
-        .onChange(of: traditionID) { _, _ in
-            store.publishSelectedFaithContent()
-            stopNarration()
-            Task { await store.refreshToday() }
-        }
-    }
 
     private var verseCard: some View {
         VStack(alignment: .leading, spacing: 18) {

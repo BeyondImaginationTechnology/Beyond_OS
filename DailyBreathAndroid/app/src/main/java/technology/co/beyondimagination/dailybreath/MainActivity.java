@@ -241,7 +241,7 @@ public final class MainActivity extends Activity {
 
     private void showHome(){
         title("DAILY BREATH","A steady beginning");
-        addFaithPicker();addThemePicker();
+        addThemePicker();
         Button language=action("Language / Langue / Idioma");language.setOnClickListener(v->showLanguageDialog());page.addView(language,spaced());
         addBody("Choose a small faithful step for today.");
         addBody("Offline-ready · your reading is saved on this device.");
@@ -358,7 +358,6 @@ public final class MainActivity extends Activity {
     private void showChat() {
         String guide=guideName();
         title("CHAT",guide+" · "+faith.title);
-        addFaithPicker();
 
         LinearLayout guideCard=card(Color.WHITE);
         guideCard.setGravity(Gravity.CENTER_HORIZONTAL);
@@ -433,7 +432,7 @@ public final class MainActivity extends Activity {
     private String guideKey(){return guideName().toLowerCase(Locale.US);}
     private int guideDrawable(){return faith==Faith.BIBLE?R.drawable.chat_guide_chris:faith==Faith.TANAKH?R.drawable.chat_guide_dovi:R.drawable.chat_guide_moe;}
     private void showAcademy() {
-        title("ACADEMY","Learn one faithful step"); addFaithPicker();
+        title("ACADEMY","Learn one faithful step");
         if (!academyUnlocked) { showAcademyPaywall(); return; }
         if(faith==Faith.TANAKH){addLesson("Learning with care","A Jewish pathway for reflection and practice.","Begin with Shema: listen before reacting. Jewish life is lived in community; a rabbi and a welcoming congregation are the right guides for deeper study or conversion.");addLesson("Teshuvah and return","Recovery can include honest repair.","Teshuvah is a movement of return. Name what happened truthfully, repair what you safely can, and reconnect with trusted support.");}
         else if(faith==Faith.QURAN){addLesson("Intention and guidance","A Muslim pathway for reflection and practice.","Begin with sincere intention, remember Allah, and seek guidance through steady, practical action and trusted community.");addLesson("Mercy and patience","A recovery practice grounded in sabr.","Pause before reacting, ask Allah for help, and take the next right step with a trusted person or professional support when needed.");}

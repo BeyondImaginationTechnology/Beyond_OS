@@ -12,7 +12,9 @@
   {"number":11,"slug":"beyond-ancient","name":"Beyond History","icon":"📜","description":"History, civilizations, archaeology, and the stories that shaped the world.","category":"History"},
   {"number":12,"slug":"beyond-french","name":"French","icon":"🇫🇷","description":"French-language learning and culture, with Beyond French as the flagship series.","category":"Language & Culture"},
   {"number":13,"slug":"beyond-health","name":"Beyond Health","icon":"💚","description":"Fitness, nutrition, meditation, and wellness.","category":"Wellness"},
-  {"number":14,"slug":"mrbeast-tv","name":"Daily Breath TV","icon":"🌿","description":"Faith, reflection, family animation, culture, nature, and wellbeing across 12 recurring shows.","category":"Faith & Wellness"},
+  {"number":14,"slug":"mrbeast-tv","name":"Daily Breath Bible TV","icon":"🌿","description":"Original Bible readings and Christian programming.","category":"Faith & Wellness"},
   {"number":15,"slug":"redbull-tv","name":"Tattoo Channel","icon":"✒️","description":"Tattoo artistry, artist spotlights, and creative ink culture.","category":"Culture"},
-  {"number":16,"slug":"beyond-mystery","name":"Beyond Technology","icon":"💻","description":"Technology, innovation, digital culture, and the ideas shaping tomorrow.","category":"Technology"}
+  {"number":16,"slug":"beyond-mystery","name":"Beyond Technology","icon":"💻","description":"Technology, innovation, digital culture, and the ideas shaping tomorrow.","category":"Technology"},
+  {"number":17,"slug":"daily-breath-torah","name":"Daily Breath Torah TV","icon":"📜","description":"Original Torah and Tanakh readings.","category":"Faith & Wellness"},
+  {"number":18,"slug":"daily-breath-quran","name":"Daily Breath Quran TV","icon":"☪️","description":"Original Quran readings.","category":"Faith & Wellness"}
 ]

@@ -24,7 +24,7 @@ $channelDay = (int)$channelNow->format('z');
 $animeState = $isAnimeChannel ? beyond_anime_schedule_state($channelNow) : null;
 $channelNumber = str_pad((string)($channel['display_number'] ?? $channel['number'] ?? '1'), 2, '0', STR_PAD_LEFT);
 $isPreview = ($channel['source_type'] ?? '') === 'placeholder';
-$isDailyBreathChannel = $slug === 'mrbeast-tv';
+$isDailyBreathChannel = in_array($slug, ['mrbeast-tv', 'daily-breath-torah', 'daily-breath-quran'], true);
 $isSlatePreview = $isPreview && !empty($channel['slate_file']);
 $slateFile = basename((string)($channel['slate_file'] ?? ''));
 $channelSlate = $slateFile !== '' ? (json_decode((string)@file_get_contents(__DIR__ . '/data/' . $slateFile), true) ?: []) : [];
@@ -43,6 +43,8 @@ $channelArt = [
     'beyond-french' => ['channel-backgrounds-sprite.png', '66.666% 100%'],
     'beyond-health' => ['channel-backgrounds-sprite.png', '100% 100%'],
     'mrbeast-tv' => ['channel-backgrounds-sprite-v2.png', '33.333% 100%'],
+    'daily-breath-torah' => ['channel-backgrounds-sprite-v2.png', '33.333% 100%'],
+    'daily-breath-quran' => ['channel-backgrounds-sprite-v2.png', '33.333% 100%'],
     'redbull-tv' => ['channel-backgrounds-sprite-v2.png', '66.666% 100%'],
     'beyond-mystery' => ['channel-backgrounds-sprite-v2.png', '0% 100%'],
 ];
@@ -132,7 +134,7 @@ html[data-tv-theme="sunset"]{color-scheme:dark}html[data-tv-theme="sunset"] .btv
 </div>
 </section>
 <?php if($slug==='mrbeast-tv' && !empty($channelSlate['weekly_specials'])): ?><section class="schedule-mini" aria-labelledby="daily-breath-specials"><h2 id="daily-breath-specials">Weekly services & observances</h2><?php foreach($channelSlate['weekly_specials'] as $special): ?><div style="padding:10px 12px;border:1px solid #303446;border-radius:10px;margin:8px 0"><strong><?=htmlspecialchars((string)($special['day']??''))?><?=!empty($special['time'])?' · '.htmlspecialchars((string)$special['time']):''?> · <?=htmlspecialchars((string)($special['show']??''))?></strong><br><small><?=htmlspecialchars((string)($special['focus']??''))?></small></div><?php endforeach; ?></section><?php endif; ?>
-<?php if($slug==='mrbeast-tv'): ?><section class="schedule-mini" aria-labelledby="daily-breath-live-services"><h2 id="daily-breath-live-services">Live Services</h2><p>Christian, Jewish, and Muslim public services from their official sources, with local time and a nearby-services finder.</p><a class="btn btn-secondary" href="/dailybreath/live-services.php">Open Live Services →</a></section><?php endif; ?>
+<?php if($isDailyBreathChannel): ?><section class="schedule-mini" aria-labelledby="daily-breath-live-services"><h2 id="daily-breath-live-services">Live Services</h2><p>Christian, Jewish, and Muslim public services from their official sources, with local time and a nearby-services finder.</p><a class="btn btn-secondary" href="/dailybreath/live-services.php">Open Live Services →</a></section><?php endif; ?>
 <?php if($isSlatePreview && $channelSlate): ?>
 <section class="slate-section" aria-labelledby="channel-slate-title">
 <span class="kicker">CHANNEL <?=$channelNumber?> · PROGRAMMING PLAN</span>
@@ -159,4 +161,4 @@ html[data-tv-theme="sunset"]{color-scheme:dark}html[data-tv-theme="sunset"] .btv
 <?php if($slug==='beyond-french'): ?><p><a href="/beyond-tv/channel.php?slug=preschool-francais">Looking for French shows for young children? Visit Préscolaire Français →</a></p><?php endif; ?>
 </section>
 <?php endif; ?>
-</main><?php if($slug==='mrbeast-tv'): ?><script>window.BeyondTVAdBreakExperience='breath-hourglass';</script><?php elseif($slug==='redbull-tv'): ?><script>window.BeyondTVAdBreakExperience='tattoo-stencil';</script><?php endif; ?><script src="/beyond-tv/assets/js/video-ads.js?v=1.3.0"></script><script src="/beyond-tv/assets/js/app.js?v=1.1.1"></script><script src="/assets/js/visitor-analytics.js" defer></script></body></html>
+</main><?php if($isDailyBreathChannel): ?><script>window.BeyondTVAdBreakExperience='breath-hourglass';</script><?php elseif($slug==='redbull-tv'): ?><script>window.BeyondTVAdBreakExperience='tattoo-stencil';</script><?php endif; ?><script src="/beyond-tv/assets/js/video-ads.js?v=1.3.0"></script><script src="/beyond-tv/assets/js/app.js?v=1.1.1"></script><script src="/assets/js/visitor-analytics.js" defer></script></body></html>

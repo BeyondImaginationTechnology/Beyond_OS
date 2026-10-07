@@ -125,6 +125,7 @@ if (is_file($frenchLessonsPath)) {
 <link rel="stylesheet" href="/assets/css/beyond-splash.css?v=20260828-1">
 <link rel="stylesheet" href="/assets/css/stylesheet-1-31.css?v=20261001-4">
 <link rel="stylesheet" href="/beyond-tv/assets/css/video-ads.css?v=1.0.0">
+<link rel="stylesheet" href="/beyond-tv/assets/css/home-primetime.css?v=1">
 <script src="/assets/js/beyond-splash.js?v=20260904-1" defer></script>
 <style>
 :root{--bg:#030611;--panel:#09101f;--line:rgba(255,255,255,.13);--text:#f7f8ff;--muted:#b8bed2;--pink:#f2469d;--violet:#7057ff;--green:#51db78;--gold:#ffbf32;--blue:#448cff}
@@ -478,10 +479,27 @@ $homeLiveControls = [
     'space-tv' => ['theme'=>'space','endpoint'=>'/beyond-tv/api/space-live.php','icon'=>'satellite','now'=>'NASA space programming','next'=>'See the daily schedule'],
     'beyond-health' => ['theme'=>'health','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=beyond-health','icon'=>'heart-pulse'],
     'mrbeast-tv' => ['theme'=>'daily-breath','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=mrbeast-tv','icon'=>'leaf'],
+    'daily-breath-torah' => ['theme'=>'daily-breath','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=daily-breath-torah','icon'=>'book-open'],
+    'daily-breath-quran' => ['theme'=>'daily-breath','endpoint'=>'/beyond-tv/api/channel-stream.php?slug=daily-breath-quran','icon'=>'book-open'],
     'redbull-tv' => ['theme'=>'tattoo','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=redbull-tv','icon'=>'pen-tool'],
     'beyond-mystery' => ['theme'=>'technology','endpoint'=>'/beyond-tv/api/schedule-live.php?slug=beyond-mystery','icon'=>'cpu'],
 ];
+$homePrimetime = json_decode((string)@file_get_contents(__DIR__ . '/beyond-tv/data/home-primetime.json'), true) ?: [];
 ?>
+<section class="home-primetime" aria-labelledby="homePrimetimeHeading">
+  <div class="home-primetime__head"><div><span class="home-live-kicker">Movies &amp; TV · YouTube</span><h2 id="homePrimetimeHeading">Free Primetime movies</h2><p>Selected from YouTube Movies · Free with ads where available</p></div><a href="https://www.youtube.com/movies" target="_blank" rel="noopener noreferrer">Browse YouTube Movies ↗</a></div>
+  <div class="home-primetime__rail" aria-label="Free Primetime movie posters">
+  <?php foreach ($homePrimetime as $homeMovie):
+    $homeMovieId = (string)($homeMovie['youtube_id'] ?? '');
+    if (!preg_match('/^[A-Za-z0-9_-]{11}$/', $homeMovieId)) continue;
+    $homeMovieTitle = (string)($homeMovie['title'] ?? 'Movie');
+  ?>
+    <article class="home-primetime__card"><img class="home-primetime__art" src="https://i.ytimg.com/vi/<?=htmlspecialchars($homeMovieId)?>/hqdefault.jpg" alt="<?=htmlspecialchars($homeMovieTitle)?> on YouTube" loading="lazy"><div class="home-primetime__body"><span class="home-primetime__source">YouTube Movies · Free with ads</span><h3><?=htmlspecialchars($homeMovieTitle)?></h3><p class="home-primetime__meta"><?=htmlspecialchars((string)($homeMovie['genre'] ?? 'Movie'))?> · <?=htmlspecialchars((string)($homeMovie['year'] ?? ''))?> · <?=htmlspecialchars((string)($homeMovie['duration'] ?? ''))?></p><div class="home-primetime__actions"><button type="button" data-primetime-id="<?=htmlspecialchars($homeMovieId)?>" data-primetime-title="<?=htmlspecialchars($homeMovieTitle)?>">Play here</button><a href="https://www.youtube.com/watch?v=<?=htmlspecialchars($homeMovieId)?>" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></div></div></article>
+  <?php endforeach; ?>
+  </div>
+  <div class="home-primetime__viewer" role="dialog" aria-modal="true" aria-label="YouTube movie player" hidden><div class="home-primetime__panel"><div class="home-primetime__viewer-head"><h3>YouTube movie</h3><button class="home-primetime__close" type="button">Close ✕</button></div><iframe title="YouTube movie player" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><p>Playback and ads are provided by YouTube. If this movie cannot play here, <a data-official-video href="https://www.youtube.com/movies" target="_blank" rel="noopener noreferrer">watch on YouTube ↗</a>.</p></div></div>
+</section>
+<script src="/beyond-tv/assets/js/home-primetime.js?v=1" defer></script>
 <section class="home-live-stage" data-channel-theme="after-dark" data-sync-owner="page" data-tv-version="<?=htmlspecialchars($homeTvVersion)?>" data-tv-build="<?=$homeTvBuild?>" aria-labelledby="homeLiveHeading">
   <div class="home-live-stage__background" aria-hidden="true"></div>
   <div class="home-live-stage__inner">

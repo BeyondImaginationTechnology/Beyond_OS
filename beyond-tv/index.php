@@ -32,6 +32,8 @@ $channelPanelArt = [
     'beyond-french' => ['channel-backgrounds-sprite.png', '66.666% 100%'],
     'beyond-health' => ['channel-backgrounds-sprite.png', '100% 100%'],
     'mrbeast-tv' => ['channel-backgrounds-sprite-v2.png', '33.333% 100%'],
+    'daily-breath-torah' => ['channel-backgrounds-sprite-v2.png', '33.333% 100%'],
+    'daily-breath-quran' => ['channel-backgrounds-sprite-v2.png', '33.333% 100%'],
     'redbull-tv' => ['channel-backgrounds-sprite-v2.png', '66.666% 100%'],
     'beyond-mystery' => ['channel-backgrounds-sprite-v2.png', '0% 100%'],
 ];

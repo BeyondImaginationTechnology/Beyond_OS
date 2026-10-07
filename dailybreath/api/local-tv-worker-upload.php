@@ -58,5 +58,5 @@ $airings = match ($tradition) {
     'quran' => [['start' => '06:00', 'end' => '06:15'], ['start' => '12:00', 'end' => '13:00']],
 };
 array_unshift($episodes, ['id'=>$id,'title'=>$title,'subtitle'=>"Daily Breath · $date",'show'=>'Daily Breath','tradition'=>$tradition,'programming'=>$programming,'airings'=>$airings,'timezone'=>'America/Vancouver','video_url'=>'/dailybreath/assets/videos/daily-breath-tv/'.$name,'duration_seconds'=>57,'published_at'=>gmdate(DATE_ATOM),'voiceover'=>$voiceover!==''?$voiceover:'ElevenLabs narration']);
-file_put_contents($manifestFile, json_encode(['channel'=>'Daily Breath TV','updated_at'=>gmdate(DATE_ATOM),'episodes'=>array_slice($episodes,0,30)], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL, LOCK_EX);
+file_put_contents($manifestFile, json_encode(['channel'=>'Daily Breath originals','updated_at'=>gmdate(DATE_ATOM),'episodes'=>array_slice($episodes,0,30)], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL, LOCK_EX);
 echo json_encode(['ok' => true]);

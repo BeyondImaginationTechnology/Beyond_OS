@@ -58,6 +58,7 @@ function bt_stencil_preview_assets(string $collectionSlug, int $collectionIndex,
         'pack' => $asset('premium-packaging.webp'),
         'lore' => $asset('lore-card.webp'),
         'style' => $asset('style-card.webp'),
+        'violet_trace' => $asset('stencil-violet-trace.png'),
     ];
     if (!is_file(__DIR__ . '/' . $assets['print_png']) && is_file(__DIR__ . '/' . $assets['outline_png'])) {
         $assets['print_png'] = $assets['outline_png'];
@@ -197,7 +198,7 @@ foreach ($collections as $collectionSlug => $collection) {
     </div></details>
     <label class="bt-library-sort" title="Sort library"><span aria-hidden="true">↕</span><span class="sr-only">Sort library</span><select name="sort" onchange="this.form.submit()"><option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?>>Newest</option><option value="oldest" <?= $sort === 'oldest' ? 'selected' : '' ?>>Oldest</option><option value="title" <?= $sort === 'title' ? 'selected' : '' ?>>A–Z</option></select></label>
   </form>
-  <div class="bt-category-results"><strong><?= e((string)$visibleCount) ?> approved stencil<?= $visibleCount === 1 ? '' : 's' ?></strong><span>Pure-black outlines · Violet Trace compatible</span></div>
+  <div class="bt-category-results"><strong><?= e((string)$availableCount) ?> / <?= e((string)$seasonTotal) ?> verified Season One stencils</strong><span><?= e((string)$visibleCount) ?> matching this view · Pure-black outlines · Violet Trace compatible</span></div>
 
   <?php $number=1; foreach($collections as $slug=>$collection):
     $matchingItems = [];
@@ -257,6 +258,7 @@ foreach ($collections as $collectionSlug => $collection) {
       data-stencil-pack="<?= is_file(__DIR__ . '/' . $assets['pack']) ? e($assets['pack']) : '' ?>"
       data-stencil-lore="<?= is_file(__DIR__ . '/' . $assets['lore']) ? e($assets['lore']) : '' ?>"
       data-stencil-style="<?= is_file(__DIR__ . '/' . $assets['style']) ? e($assets['style']) : '' ?>"
+      data-stencil-violet-trace="<?= is_file(__DIR__ . '/' . $assets['violet_trace']) ? e($assets['violet_trace']) : '' ?>"
       data-stencil-zip="api/stencil-download.php?type=package&amp;id=<?= e(bt_stencil_asset_slug($item[0]) . '-' . $item[1]) ?>"
     <?php endif; ?>
   >
@@ -275,7 +277,7 @@ foreach ($collections as $collectionSlug => $collection) {
 .bt-stencil-carousel-nav:disabled{opacity:.42;cursor:default}.bt-stencil-carousel-prev{left:10px}.bt-stencil-carousel-next{right:10px}
 .bt-stencil-carousel-footer{display:grid;grid-template-columns:1fr auto;gap:5px 12px;align-items:center;color:#fff;font-size:.78rem;font-weight:800}
 .bt-stencil-carousel-count{color:#c9b9cf;font-size:.7rem;font-weight:700}.bt-stencil-carousel-dots{grid-column:1/-1;display:flex;justify-content:center;gap:7px;padding:4px}
-.bt-stencil-carousel-dots{overflow-x:auto;justify-content:flex-start;scrollbar-width:thin;scrollbar-color:#d3a452 #25102f}.bt-stencil-carousel-dot{flex:none;width:74px;min-height:78px;padding:4px;border:2px solid transparent;border-radius:8px;background:#241b29;color:#fff;cursor:pointer;font-size:.61rem;line-height:1.1}.bt-stencil-carousel-dot img{width:100%;height:48px;object-fit:cover;border-radius:4px}.bt-stencil-carousel-dot[aria-current=true]{border-color:#d3a452;background:#46304f}
+.bt-stencil-carousel-dots{overflow-x:auto;justify-content:flex-start;scrollbar-width:thin;scrollbar-color:#d3a452 #25102f}.bt-stencil-carousel-dot{flex:none;width:92px;min-height:92px;padding:6px;border:2px solid transparent;border-radius:8px;background:#241b29;color:#fffdfa;cursor:pointer;font-size:.68rem;font-weight:800;line-height:1.2;text-align:left}.bt-stencil-carousel-dot img{display:block;width:100%;height:52px;object-fit:contain;border-radius:4px;background:#fff;margin-bottom:4px}.bt-stencil-carousel-dot[aria-current=true]{border-color:#d3a452;background:#46304f}
 .bt-stencil-viewer-actions [hidden]{display:none!important}
 @media(max-width:760px){.bt-stencil-carousel-stage img{max-height:48dvh}.bt-stencil-carousel-nav{width:38px;height:38px}.bt-stencil-viewer-art{height:54dvh!important;padding:14px!important}}
 </style>
@@ -289,12 +291,12 @@ foreach ($collections as $collectionSlug => $collection) {
         <img src="" alt="" data-stencil-viewer-image>
         <button class="bt-stencil-carousel-nav bt-stencil-carousel-next" type="button" data-stencil-carousel-next aria-label="Next asset">›</button>
       </div>
-      <div class="bt-stencil-carousel-footer"><span data-stencil-carousel-label>YouTube video</span><span class="bt-stencil-carousel-count" data-stencil-carousel-count aria-live="polite"></span><div class="bt-stencil-carousel-dots" data-stencil-carousel-dots aria-label="Choose a production carousel item"></div></div>
+      <div class="bt-stencil-carousel-footer"><span data-stencil-carousel-label>Stencil preview</span><span class="bt-stencil-carousel-count" data-stencil-carousel-count aria-live="polite"></span><div class="bt-stencil-carousel-dots" data-stencil-carousel-dots aria-label="Choose a stencil asset"></div></div>
     </div>
     <div class="bt-stencil-viewer-copy">
       <p data-stencil-viewer-meta>Unlocked stencil</p>
       <h2 id="bt-stencil-viewer-title" data-stencil-viewer-title>Stencil preview</h2>
-      <p class="bt-stencil-viewer-note">Eight locked production slots rotate automatically. Available assets appear in their assigned slot; the rest remain marked as placeholders.</p>
+      <p class="bt-stencil-viewer-note">Available production assets rotate automatically. When a supporting card has not been created yet, its slot uses the approved stencil artwork instead of a placeholder. YouTube links are being added separately.</p>
       <div class="bt-stencil-viewer-actions">
         <button class="bt-glow-button" type="button" data-stencil-viewer-print hidden>⌘ Print stencil</button>
         <a class="bt-glow-button" href="#" download data-stencil-viewer-zip hidden>↓ Download all assets .ZIP</a>
@@ -331,7 +333,6 @@ foreach ($collections as $collectionSlug => $collection) {
   let activeSlide = 0;
   let pointerStart = null;
   let autoplayTimer = null;
-  const placeholderArtwork = (assetLabel) => `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200"><rect width="900" height="1200" fill="#171219"/><rect x="34" y="34" width="832" height="1132" rx="18" fill="none" stroke="#d3a452" stroke-width="3"/><path d="M122 230H778M122 970H778" stroke="#6d5266" stroke-width="2"/><circle cx="450" cy="510" r="132" fill="none" stroke="#d3a452" stroke-width="5"/><path d="M450 328v364M268 510h364" stroke="#d3a452" stroke-width="3"/><text x="450" y="210" text-anchor="middle" fill="#d3a452" font-family="Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="7">BEYOND TATTOO</text><text x="450" y="786" text-anchor="middle" fill="#f4eadc" font-family="Arial, sans-serif" font-size="40" font-weight="700">${assetLabel}</text><text x="450" y="836" text-anchor="middle" fill="#bbaeb6" font-family="Arial, sans-serif" font-size="22" letter-spacing="3">LOCKED PLACEHOLDER</text><text x="450" y="1030" text-anchor="middle" fill="#d3a452" font-family="Arial, sans-serif" font-size="18" letter-spacing="5">PRODUCTION SLOT</text></svg>`)}`;
   const stopAutoplay = () => {
     if (autoplayTimer !== null) window.clearInterval(autoplayTimer);
     autoplayTimer = null;
@@ -361,17 +362,19 @@ foreach ($collections as $collectionSlug => $collection) {
   const open = (card) => {
     currentCard = card;
     const titleText = card.dataset.stencilTitle || 'Stencil preview';
+    const fallbackArtwork = card.dataset.stencilPreview || card.dataset.stencilOutline || card.dataset.stencilDownload || '';
+    const productionSlot = (label, url, fallbackLabel = 'stencil preview') => [url ? label : `${label} · ${fallbackLabel}`, url || fallbackArtwork];
     const productionSlots = [
-      ['YouTube video', card.dataset.stencilYoutube || ''],
-      ['Style card', card.dataset.stencilStyle || ''],
-      ['Lore card', card.dataset.stencilLore || ''],
-      ['Packaging preview', card.dataset.stencilPack || ''],
-      ['Mockup', card.dataset.stencilPlacement || ''],
-      ['Reference', card.dataset.stencilReference || ''],
-      ['Printer-ready stencil PNG', card.dataset.stencilDownload || ''],
-      ['Violet Trace', card.dataset.stencilVioletTrace || ''],
+      ['Stencil preview', card.dataset.stencilPreview || fallbackArtwork],
+      productionSlot('Style card', card.dataset.stencilStyle || ''),
+      productionSlot('Lore card', card.dataset.stencilLore || ''),
+      productionSlot('Packaging preview', card.dataset.stencilPack || ''),
+      productionSlot('Mockup', card.dataset.stencilPlacement || ''),
+      productionSlot('Reference', card.dataset.stencilReference || ''),
+      ['Printer-ready stencil PNG', card.dataset.stencilDownload || card.dataset.stencilOutline || fallbackArtwork],
+      productionSlot('Violet Trace', card.dataset.stencilVioletTrace || '', 'pure-black outline'),
     ];
-    slides = productionSlots.map(([assetLabel, url]) => ({label: assetLabel, url: url || placeholderArtwork(assetLabel), placeholder: !url}));
+    slides = productionSlots.filter(([, url]) => Boolean(url)).map(([assetLabel, url]) => ({label: assetLabel, url, placeholder: false}));
     title.textContent = titleText;
     meta.textContent = [card.dataset.stencilCollection, card.dataset.stencilDate, 'Unlocked'].filter(Boolean).join(' · ');
     print.dataset.stencilUrl = card.dataset.stencilOutline || card.dataset.stencilDownload || card.dataset.stencilPdf || '';

@@ -14,7 +14,8 @@ const ticketSecret = process.env.BEYOND_WEBS_GATEWAY_TICKET_SECRET || '';
 const cookieSecret = process.env.BEYOND_WEBS_GATEWAY_COOKIE_SECRET || '';
 const project = process.env.GCP_PROJECT_ID || '';
 const zone = process.env.GCP_ZONE || '';
-const image = process.env.BIT_OS_IMAGE || '';
+const flavourImages = parseJsonEnv('GCP_FLAVOUR_IMAGES_JSON');
+const legacyImage = process.env.BIT_OS_IMAGE || '';
 const network = process.env.GCP_NETWORK || 'global/networks/default';
 const subnetwork = process.env.GCP_SUBNETWORK || '';
 const diskType = process.env.GCP_BOOT_DISK_TYPE || 'pd-balanced';
@@ -24,6 +25,10 @@ const maxRunSeconds = Math.max(1800, Math.min(43200, Number.parseInt(process.env
 const port = Number.parseInt(process.env.PORT || '8080', 10);
 const serviceMode = process.env.SERVICE_MODE || 'combined';
 const computeAuth = new GoogleAuth({ scopes: ['https://www.googleapis.com/auth/cloud-platform'] });
+const flavourCatalog = JSON.parse(await readFile(new URL('../flavours.json', import.meta.url), 'utf8')).flavours;
+const releasedFlavours = new Set((Array.isArray(flavourCatalog) ? flavourCatalog : [])
+  .filter((flavour) => flavour && flavour.released === true && typeof flavour.id === 'string')
+  .map((flavour) => flavour.id));
 
 if (!['gateway', 'provisioner', 'combined'].includes(serviceMode)) throw new Error('SERVICE_MODE must be gateway, provisioner, or combined.');
 if (serviceMode !== 'gateway' && provisionerSecret.length < 32) throw new Error('Provisioner signing secret must be at least 32 characters.');
@@ -34,6 +39,15 @@ if (serviceMode !== 'provisioner' && (!lookupUrl.startsWith('https://') || !appO
 function parseJsonEnv(name) {
   try { const value = JSON.parse(process.env[name] || '{}'); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
   catch { return {}; }
+}
+
+function imageForFlavour(flavour) {
+  if (!releasedFlavours.has(flavour)) throw new Error('This BIT OS flavour is not released for VPS sessions.');
+  const image = flavourImages[flavour] || (Object.keys(flavourImages).length === 0 ? legacyImage : '');
+  if (!/^projects\/[a-z0-9-]+\/global\/images\/[a-z0-9-]+$/.test(image)) {
+    throw new Error(`No verified Compute Engine image is configured for ${flavour}.`);
+  }
+  return image;
 }
 
 function b64url(value) { return Buffer.from(value).toString('base64url'); }
@@ -137,7 +151,8 @@ async function createInstance(input) {
   requireRequest(input);
   const profile = profileById.get(input.profile);
   const machineType = machineTypes[input.profile];
-  if (!profile || !machineType || !project || !zone || !/^projects\/[a-z0-9-]+\/global\/images\/[a-z0-9-]+$/.test(image)) {
+  const image = imageForFlavour(String(input.flavour || ''));
+  if (!profile || !machineType || !project || !zone) {
     throw new Error('This BIT OS profile is not configured for provisioning.');
   }
   const accelerator = accelerators[input.profile];

@@ -21,6 +21,19 @@ function webs_profile_catalog(): array
     return is_array($catalog['profiles'] ?? null) ? $catalog['profiles'] : [];
 }
 
+function webs_released_flavours(): array
+{
+    $catalog = json_decode((string)file_get_contents(__DIR__ . '/../flavours.json'), true);
+    if (!is_array($catalog['flavours'] ?? null)) return [];
+    $flavours = [];
+    foreach ($catalog['flavours'] as $flavour) {
+        if (!is_array($flavour) || ($flavour['released'] ?? false) !== true) continue;
+        $id = (string)($flavour['id'] ?? '');
+        if (preg_match('/^[A-Za-z][A-Za-z0-9]{1,31}$/', $id)) $flavours[] = $id;
+    }
+    return $flavours;
+}
+
 function webs_hourly_rates(): array
 {
     $rates = json_decode((string)(getenv('BEYOND_WEBS_PROFILE_RATES_JSON') ?: '{}'), true);
@@ -181,7 +194,7 @@ try {
         $plan = $input['plan'] ?? null;
         $workMode = $input['work_mode'] ?? null;
         $allowedProfiles = array_values(array_filter(array_map(static fn(array $profile): string => (string)($profile['id'] ?? ''), webs_profile_catalog())));
-        if (!is_string($flavour) || !in_array($flavour, ['Home', 'Core', 'Creator', 'Academy', 'Cyber', 'Sentinel', 'Gaming'], true)
+        if (!is_string($flavour) || !in_array($flavour, webs_released_flavours(), true)
             || !is_string($plan) || !in_array($plan, $allowedProfiles, true)
             || !is_string($workMode) || !in_array($workMode, ['developer', 'creative', 'gaming'], true)) {
             webs_reply(422, ['error' => 'Choose a listed BIT OS flavour, machine profile, and work mode.']);

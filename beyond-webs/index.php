@@ -5,6 +5,10 @@ require_once __DIR__ . '/../beyond-id/includes/session.php';
 header('Cache-Control: no-store');
 $profileCatalog = json_decode((string)file_get_contents(__DIR__ . '/machine-profiles.json'), true);
 $machineProfiles = is_array($profileCatalog['profiles'] ?? null) ? $profileCatalog['profiles'] : [];
+$flavourCatalog = json_decode((string)file_get_contents(__DIR__ . '/flavours.json'), true);
+$releasedFlavours = is_array($flavourCatalog['flavours'] ?? null)
+    ? array_values(array_filter($flavourCatalog['flavours'], static fn($flavour): bool => is_array($flavour) && ($flavour['released'] ?? false) === true))
+    : [];
 
 $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
 $configuredOrigin = rtrim((string)getenv('BEYOND_WEBS_ORIGIN'), '/');
@@ -54,7 +58,7 @@ $loginUrl = $identityOrigin . '/beyond-id/auth/login.php?app=beyond-webs&return=
             <div class="checks"><p><b>01</b> Choose a BIT OS flavour</p><p><b>02</b> Select a session size</p><p><b>03</b> Save your request</p><p><b>04</b> Check its status</p></div>
             <article class="session-card">
               <small>CONFIGURATION PREVIEW · NOT A LIVE VPS</small>
-              <strong><span id="previewFlavour">Gaming</span> <i>·</i> <span id="previewPlan">Build</span></strong>
+              <strong><span id="previewFlavour">Home</span> <i>·</i> <span id="previewPlan">Build</span></strong>
               <div class="resource"><span>RAM</span><b id="previewRam">32 GB</b></div>
               <div class="resource"><span>CPU</span><b id="previewCpu">8 vCPUs</b></div>
               <div class="resource"><span>GPU</span><b id="previewGpu">GPU optional by capacity</b></div>
@@ -67,18 +71,16 @@ $loginUrl = $identityOrigin . '/beyond-id/auth/login.php?app=beyond-webs&return=
       </div>
     </section>
 
-    <section class="proof wrap"><div><b>07</b><span>BIT OS flavours</span></div><div><b>BY HOUR</b><span>Planned VPS billing</span></div><div><b>ID</b><span>Beyond ID sign-in</span></div></section>
+    <section class="proof wrap"><div><b><?= sprintf('%02d', count($releasedFlavours)) ?></b><span>released BIT OS editions</span></div><div><b>BY HOUR</b><span>Planned VPS billing</span></div><div><b>ID</b><span>Beyond ID sign-in</span></div></section>
 
     <section class="section wrap" id="flavours">
       <div class="section-head"><div><p class="eyebrow">BIT OS installed machines</p><h2>Choose your BIT OS flavour.</h2></div><p>Every offered session uses a machine with BIT OS installed. Your flavour is saved with your request.</p></div>
       <div class="flavour-grid">
-        <button class="flavour" data-flavour="Home" data-desc="A comfortable personal desktop for everyday life."><b>01</b><span class="flavour-icon">⌂</span><strong>Home</strong><small>Private · Familiar</small></button>
-        <button class="flavour" data-flavour="Core" data-desc="A lean foundation for custom systems and virtual machines."><b>02</b><span class="flavour-icon">◌</span><strong>Core</strong><small>Small · Stable</small></button>
-        <button class="flavour" data-flavour="Creator" data-desc="A production workspace for design, code, music, and media."><b>03</b><span class="flavour-icon">✦</span><strong>Creator</strong><small>Make · Ship</small></button>
-        <button class="flavour" data-flavour="Academy" data-desc="A focused environment for learning and teaching."><b>04</b><span class="flavour-icon">▤</span><strong>Academy</strong><small>Learn · Grow</small></button>
-        <button class="flavour" data-flavour="Cyber" data-desc="A controlled workspace for authorized defensive security work."><b>05</b><span class="flavour-icon">◇</span><strong>Cyber</strong><small>Assess · Report</small></button>
-        <button class="flavour" data-flavour="Sentinel" data-desc="A long term, fleet aware environment for organizations."><b>06</b><span class="flavour-icon">◉</span><strong>Sentinel</strong><small>See · Coordinate</small></button>
-        <button class="flavour selected" data-flavour="Gaming" data-desc="A performance focused desktop for your games and play."><b>07</b><span class="flavour-icon">⌁</span><strong>Gaming</strong><small>Play · Perform</small></button>
+        <?php foreach ($releasedFlavours as $index => $flavour):
+          $flavourId = (string)($flavour['id'] ?? '');
+        ?>
+          <button class="flavour<?= $flavourId === 'Home' ? ' selected' : '' ?>" data-flavour="<?= htmlspecialchars($flavourId, ENT_QUOTES, 'UTF-8') ?>" data-desc="<?= htmlspecialchars((string)($flavour['description'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"><b><?= sprintf('%02d', $index + 1) ?></b><span class="flavour-icon"><?= htmlspecialchars((string)($flavour['icon'] ?? ''), ENT_QUOTES, 'UTF-8') ?></span><strong><?= htmlspecialchars($flavourId, ENT_QUOTES, 'UTF-8') ?></strong><small><?= htmlspecialchars((string)($flavour['tagline'] ?? ''), ENT_QUOTES, 'UTF-8') ?></small></button>
+        <?php endforeach; ?>
       </div>
     </section>
 
@@ -108,7 +110,7 @@ $loginUrl = $identityOrigin . '/beyond-id/auth/login.php?app=beyond-webs&return=
       <p class="mode-note">These are requested Linux work modes. The app and its license notices will be included in the session image; game add-ons and user content may have separate terms.</p>
     </section>
 
-    <section class="launch wrap" id="launch"><div class="launch-copy"><p class="eyebrow">VPS session request</p><h2>Review your configuration.</h2><p id="flavourDescription">A performance focused desktop for your games and play.</p><div class="chosen"><span id="chosenFlavour">Gaming</span><i></i><span id="chosenPlan">Build</span></div><div class="chosen"><span id="chosenMode">Developer workstation</span></div></div><div class="seat-summary"><div class="summary-top"><span>PROPOSED SESSION</span><b id="seatState">READY TO REQUEST</b></div><div class="resource"><span>RAM</span><strong id="ram">32 GB</strong></div><div class="resource"><span>CPU</span><strong id="cpu">8 vCPUs</strong></div><div class="resource"><span>GPU</span><strong id="gpu">GPU optional by capacity</strong></div><div class="resource"><span>STORAGE</span><strong id="storage">512 GB SSD</strong></div><div class="resource"><span>ACCESS</span><strong>Browser desktop · noVNC</strong></div><div class="resource"><span>USAGE</span><strong>Not started</strong></div><?php if ($signedIn): ?><button class="start-seat" id="startSeat">Save session request <span>→</span></button><?php else: ?><a class="start-seat" id="signInSeat" href="<?= htmlspecialchars($loginUrl, ENT_QUOTES, 'UTF-8') ?>">Continue with Beyond ID <span>→</span></a><?php endif; ?><p class="request-note" id="requestMessage" role="status" aria-live="polite">No charge or machine starts when you save a request.</p></div></section>
+    <section class="launch wrap" id="launch"><div class="launch-copy"><p class="eyebrow">VPS session request</p><h2>Review your configuration.</h2><p id="flavourDescription">A comfortable personal desktop for everyday life.</p><div class="chosen"><span id="chosenFlavour">Home</span><i></i><span id="chosenPlan">Build</span></div><div class="chosen"><span id="chosenMode">Developer workstation</span></div></div><div class="seat-summary"><div class="summary-top"><span>PROPOSED SESSION</span><b id="seatState">READY TO REQUEST</b></div><div class="resource"><span>RAM</span><strong id="ram">32 GB</strong></div><div class="resource"><span>CPU</span><strong id="cpu">8 vCPUs</strong></div><div class="resource"><span>GPU</span><strong id="gpu">GPU optional by capacity</strong></div><div class="resource"><span>STORAGE</span><strong id="storage">512 GB SSD</strong></div><div class="resource"><span>ACCESS</span><strong>Browser desktop · noVNC</strong></div><div class="resource"><span>USAGE</span><strong>Not started</strong></div><?php if ($signedIn): ?><button class="start-seat" id="startSeat">Save session request <span>→</span></button><?php else: ?><a class="start-seat" id="signInSeat" href="<?= htmlspecialchars($loginUrl, ENT_QUOTES, 'UTF-8') ?>">Continue with Beyond ID <span>→</span></a><?php endif; ?><p class="request-note" id="requestMessage" role="status" aria-live="polite">No charge or machine starts when you save a request.</p></div></section>
 
     <section class="requests-section" id="requests"><div class="wrap requests-grid"><div><p class="eyebrow">Beyond ID account</p><h2>My VPS request</h2><p>View your machine profile, metered usage, and protected browser desktop access here.</p></div><div class="request-card" id="requestCard"><?php if ($signedIn): ?><span class="request-kicker">CURRENT STATUS</span><strong id="accountStatus">Loading request…</strong><p id="accountDetails">Checking your Beyond ID account.</p><dl><div><dt>Request ID</dt><dd id="accountId">—</dd></div><div><dt>Requested</dt><dd id="accountDate">—</dd></div><div><dt>Browser desktop</dt><dd id="accountAccess">noVNC · pending provisioning</dd></div><div><dt>Hourly rate</dt><dd id="accountRate">Not configured</dd></div><div><dt>Metered use</dt><dd id="accountUsage">Not started</dd></div><div><dt>Usage estimate</dt><dd id="accountEstimate">—</dd></div></dl><p class="access-note">Compute time is metered by the hour. The session automatically stops at its runtime limit; its SSD stays attached and may continue to incur storage charges.</p><div class="session-controls" id="sessionControls" hidden><p id="sessionMessage" role="status" aria-live="polite"></p><button class="button primary" id="startVps" type="button" hidden>Start VPS session <span>→</span></button><button class="button primary" id="resumeVps" type="button" hidden>Resume VPS session <span>→</span></button><button class="button primary" id="openDesktop" type="button" hidden>Open BIT OS desktop <span>↗</span></button><button class="button" id="stopVps" type="button" hidden>Stop VPS session</button></div><?php else: ?><strong>Sign in to view your request</strong><p>Your saved VPS configuration will be linked to your Beyond ID.</p><a class="button primary" href="<?= htmlspecialchars($loginUrl, ENT_QUOTES, 'UTF-8') ?>">Continue with Beyond ID <span>→</span></a><?php endif; ?></div></div></section>
 

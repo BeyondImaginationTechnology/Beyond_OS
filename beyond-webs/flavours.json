@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "flavours": [
+    {
+      "id": "Home",
+      "version": "0.2",
+      "icon": "⌂",
+      "tagline": "Private · Familiar",
+      "description": "A comfortable personal desktop for everyday life.",
+      "released": true
+    },
+    {
+      "id": "Core",
+      "version": "0.2",
+      "icon": "◌",
+      "tagline": "Small · Stable",
+      "description": "A lean foundation for custom systems and virtual machines.",
+      "released": true
+    },
+    {
+      "id": "Creator",
+      "version": "0.1",
+      "icon": "✦",
+      "tagline": "Make · Ship",
+      "description": "A production workspace for design, code, music, and media.",
+      "released": true
+    },
+    {
+      "id": "Academy",
+      "version": "0.1",
+      "icon": "▤",
+      "tagline": "Learn · Grow",
+      "description": "A focused environment for learning and teaching.",
+      "released": true
+    },
+    {
+      "id": "Cyber",
+      "version": "0.1",
+      "icon": "◇",
+      "tagline": "Assess · Report",
+      "description": "A controlled workspace for authorized defensive security work.",
+      "released": true
+    }
+  ]
+}

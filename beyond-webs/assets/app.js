@@ -5,7 +5,7 @@
   const modeButtons = [...document.querySelectorAll('.mode')];
   const requestButton = $('#startSeat');
   const csrf = document.body.dataset.requestToken;
-  const state = { flavour: 'Gaming', plan: 'Build', work_mode: 'developer' };
+  const state = { flavour: 'Home', plan: 'Build', work_mode: 'developer' };
   const modeNames = { developer: 'Linux developer workstation', creative: 'Linux creator workstation', gaming: 'Linux game launcher' };
   let savedRequest = null;
 

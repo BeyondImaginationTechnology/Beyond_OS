@@ -59,7 +59,7 @@
       "purpose": "Controller-ready performance profiles and play.",
       "base": "core",
       "profile": "gaming",
-      "status": "profile-defined"
+      "status": "source-implemented"
     }
   ]
 }

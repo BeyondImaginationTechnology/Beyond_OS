@@ -1,0 +1,8 @@
+config BR2_PACKAGE_BEYOND_GAMING
+	bool "Beyond Imagination OS Gaming Hub"
+	depends on BR2_PACKAGE_SDL2
+	depends on BR2_PACKAGE_SDL2_TTF
+	depends on BR2_PACKAGE_SDL2_X11
+	help
+	  Native Gaming Hub with controller detection, saved play preferences,
+	  and a bundled local arcade game.

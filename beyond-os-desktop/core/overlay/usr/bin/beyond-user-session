@@ -12,6 +12,7 @@ case "$flavour" in
     creator) desktop=beyond-creator ;;
     academy) desktop=beyond-academy ;;
     sentinel) desktop=beyond-sentinel ;;
+    gaming) desktop=beyond-gaming ;;
     *) desktop=beyond-core ;;
 esac
 exec openbox --startup "/bin/sh -c '$desktop; openbox --exit'"

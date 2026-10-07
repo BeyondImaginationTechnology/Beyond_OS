@@ -9,6 +9,7 @@ rm -f "$target/etc/init.d/S40xorg"
 chmod 0755 "$target/etc/init.d/S00beyond-live-runtime" "$target/etc/init.d/S01beyond-splash" "$target/etc/init.d/S99beyond-core"
 chmod 0755 "$target/usr/bin/beyond-session" "$target/usr/bin/beyond-user-session" "$target/usr/bin/bit-install-core"
 [ ! -e "$target/usr/bin/beyond-sentinel" ] || chmod 0755 "$target/usr/bin/beyond-sentinel"
+[ ! -e "$target/usr/bin/beyond-gaming" ] || chmod 0755 "$target/usr/bin/beyond-gaming"
 # The selected profile metadata is installed before this hook runs.
 flavour=core
 [ ! -r "$target/usr/share/beyond-imagination-os/flavour" ] || flavour=$(cat "$target/usr/share/beyond-imagination-os/flavour")
@@ -44,6 +45,16 @@ VERSION_ID="0.1"
 BUILD_ID="sentinel-0.1-dev.1"
 HOME_URL="https://beyondimagination.co.technology/"
 EOF
+elif [ "$flavour" = gaming ]; then
+cat > "$target/etc/os-release" <<'EOF'
+NAME="Beyond Imagination OS Gaming Edition"
+PRETTY_NAME="BIT OS Gaming v0.1 (Development Preview)"
+ID=beyond-os
+VERSION="0.1 (Development Preview)"
+VERSION_ID="0.1"
+BUILD_ID="gaming-0.1-dev.1"
+HOME_URL="https://beyondimagination.co.technology/"
+EOF
 else
 cat > "$target/etc/os-release" <<'EOF'
 NAME="Beyond Imagination OS Core Edition"
@@ -72,6 +83,11 @@ if [ "$flavour" = sentinel ]; then
         "$target/home/home/Incidents" "$target/home/home/Reports"
     chown -R 1000:1000 "$target/home/home"
 fi
+if [ "$flavour" = gaming ]; then
+    install -d -m 0755 "$target/home/home/Games" "$target/home/home/Saves" \
+        "$target/home/home/Screenshots"
+    chown -R 1000:1000 "$target/home/home"
+fi
 rm -f "$target/usr/lib/os-release"
 cp "$target/etc/os-release" "$target/usr/lib/os-release"
 if [ "$flavour" = creator ]; then
@@ -86,6 +102,10 @@ elif [ "$flavour" = sentinel ]; then
     printf '%s\n' 'Welcome to BIT OS Sentinel v0.1.' 'Open Sentinel Console to review this device, policy choices and local reports.' > "$target/home/home/Documents/Welcome.txt"
     printf '%s\n' 'BIT OS Sentinel v0.1 (Development Preview)' > "$target/etc/issue"
     printf '%s\n' 'BIT OS Sentinel v0.1 (Development Preview)' > "$target/etc/motd"
+elif [ "$flavour" = gaming ]; then
+    printf '%s\n' 'Welcome to BIT OS Gaming v0.1.' 'Open Game Hub to play Rally and check your controller.' > "$target/home/home/Documents/Welcome.txt"
+    printf '%s\n' 'BIT OS Gaming v0.1 (Development Preview)' > "$target/etc/issue"
+    printf '%s\n' 'BIT OS Gaming v0.1 (Development Preview)' > "$target/etc/motd"
 else
     printf '%s\n' 'Welcome to BIT OS Core v0.2.' 'This independent image is built from upstream Linux components.' > "$target/home/home/Documents/Welcome.txt"
     printf '%s\n' 'BIT OS Core v0.2' > "$target/etc/issue"

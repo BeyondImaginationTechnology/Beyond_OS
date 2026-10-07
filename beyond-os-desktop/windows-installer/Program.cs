@@ -54,9 +54,10 @@ namespace BITOSInstaller
                 CompressedImage = true
             },
             new ReleaseDefinition {
-                Edition = "BIT OS Academy", Version = "1.0", Available = false,
-                ImageUrl = "https://os.beyondimagination.co.technology/releases/academy/1.0/bit-os-academy-1.0-installer.img",
-                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/academy/1.0/SHA256SUMS"
+                Edition = "BIT OS Academy", Version = "v0.1 Preview", Available = true,
+                ImageUrl = "https://os.beyondimagination.co.technology/releases/academy/0.1/bit-os-academy-0.1-installer.img.gz",
+                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/academy/0.1/SHA256SUMS",
+                CompressedImage = true
             },
             new ReleaseDefinition {
                 Edition = "BIT OS Cyber", Version = "v0.1 Candidate", Available = true,

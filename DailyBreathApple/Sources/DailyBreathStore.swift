@@ -7,6 +7,7 @@ enum DailyBreathAPIError: Error, Equatable {
     case invalidURL
     case badResponse
     case staleDate(expected: String, received: String)
+    case traditionMismatch(expected: FaithTradition, received: FaithTradition?)
 }
 
 enum DailyContentAvailability: Equatable {
@@ -36,13 +37,14 @@ enum DailyContentAvailability: Equatable {
 
 struct DailyBreathTodayResponse: Decodable, Equatable, Sendable {
     let date: String
+    let tradition: FaithTradition?
     let verse: Verse
     let devotional: Devotional
     let challenge: RecoveryChallenge?
     let approvedContent: ApprovedDailyContent?
 
     enum CodingKeys: String, CodingKey {
-        case date, verse, devotional, challenge
+        case date, tradition, verse, devotional, challenge
         case approvedContent = "approved_content"
     }
 }
@@ -108,6 +110,9 @@ struct DailyBreathAPIClient: Sendable {
         let today = try JSONDecoder().decode(DailyBreathTodayResponse.self, from: data)
         guard today.date == dateKey else {
             throw DailyBreathAPIError.staleDate(expected: dateKey, received: today.date)
+        }
+        guard today.tradition == tradition else {
+            throw DailyBreathAPIError.traditionMismatch(expected: tradition, received: today.tradition)
         }
         return today
     }

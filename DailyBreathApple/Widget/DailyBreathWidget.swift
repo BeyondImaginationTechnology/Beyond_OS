@@ -147,9 +147,6 @@ private struct VerseWidgetView: View {
     private var themeBackground: some View {
         let colors: [Color]
         switch entry.themeID {
-        case "bibleForest": colors = [Color(red: 0.03, green: 0.16, blue: 0.12), Color(red: 0.12, green: 0.34, blue: 0.25)]
-        case "tanakhNavy": colors = [Color(red: 0.03, green: 0.08, blue: 0.19), Color(red: 0.10, green: 0.20, blue: 0.36)]
-        case "quranEmerald": colors = [Color(red: 0.02, green: 0.18, blue: 0.15), Color(red: 0.11, green: 0.38, blue: 0.29)]
         case "fall": colors = [Color(red: 0.34, green: 0.21, blue: 0.13), Color(red: 0.68, green: 0.40, blue: 0.18)]
         case "forest": colors = [Color(red: 0.12, green: 0.30, blue: 0.21), Color(red: 0.17, green: 0.41, blue: 0.29)]
         case "botanical": colors = [Color(red: 0.20, green: 0.31, blue: 0.23), Color(red: 0.56, green: 0.68, blue: 0.50)]

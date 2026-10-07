@@ -42,13 +42,6 @@ struct ScriptureLibraryView: View {
     var body: some View {
         List {
             Section {
-                Picker("Faith tradition", selection: $traditionID) {
-                    ForEach(FaithTradition.allCases) { item in
-                        Label(item.name, systemImage: item.symbolName).tag(item.id)
-                    }
-                }
-                .pickerStyle(.segmented)
-
                 Picker("Language & edition", selection: editionBinding) {
                     ForEach(ScriptureEdition.options(for: tradition)) { item in
                         Text(item.displayName).tag(item.id)

@@ -50,7 +50,6 @@ struct AcademyView: View {
                 if purchaseManager.hasAccess {
                     VStack(alignment: .leading, spacing: 18) {
                         hero
-                        traditionPicker
                         metricGrid
                         continueCard
                         ForEach(Array(selectedPaths.enumerated()), id: \.element.id) { index, path in
@@ -170,15 +169,6 @@ struct AcademyView: View {
         }
         .padding(22)
         .background(.background.opacity(0.94), in: RoundedRectangle(cornerRadius: 16))
-    }
-
-    private var traditionPicker: some View {
-        Picker("Academy path", selection: $traditionID) {
-            ForEach(FaithTradition.allCases) { tradition in
-                Label(tradition.name, systemImage: tradition.symbolName).tag(tradition.id)
-            }
-        }
-        .pickerStyle(.segmented)
     }
 
     private var hero: some View {

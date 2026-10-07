@@ -4,6 +4,7 @@ struct SettingsAboutView: View {
     @EnvironmentObject private var store: DailyBreathStore
     @EnvironmentObject private var auth: BeyondIDAuthManager
     @AppStorage("dailyBreathTheme") private var selectedThemeID = DailyBreathTheme.seasonal.id
+    @AppStorage("selectedFaithTradition") private var traditionID = FaithTradition.bible.id
     @AppStorage("dailyBreathLanguage") private var languageID = DailyBreathLanguage.english.rawValue
     @AppStorage("encryptedICloudSyncEnabled") private var encryptedICloudSyncEnabled = false
     @State private var showingDeleteConfirmation = false
@@ -29,6 +30,17 @@ struct SettingsAboutView: View {
                 }
             }
 
+            Section("Faith") {
+                Picker("Faith selection", selection: $traditionID) {
+                    ForEach(FaithTradition.allCases) { tradition in
+                        Label(tradition.name, systemImage: tradition.symbolName).tag(tradition.id)
+                    }
+                }
+                Text("This choice sets Today, Scripture, Chat, Academy, Daily Breath TV, and your widget reading.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Section("Appearance") {
                 Picker("Language", selection: $languageID) {
                     ForEach(DailyBreathLanguage.allCases) { language in
@@ -41,35 +53,6 @@ struct SettingsAboutView: View {
                     }
                 }
                 Text("Seasonal changes with the calendar. A theme you choose stays selected until you change it.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Section("Scripture artwork") {
-                ForEach([DailyBreathTheme.bibleForest, .tanakhNavy, .quranEmerald]) { theme in
-                    Button {
-                        selectedThemeID = theme.id
-                    } label: {
-                        HStack(spacing: 12) {
-                            if let artwork = theme.artworkName {
-                                Image(artwork)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 58, height: 72)
-                                    .clipped()
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                            }
-                            Text(theme.name)
-                            Spacer()
-                            if selectedThemeID == theme.id {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .accessibilityLabel("Selected")
-                            }
-                        }
-                    }
-                    .buttonStyle(.plain)
-                }
-                Text("Artwork themes appear on Home. Today keeps a clean reading background for clearer text and controls.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -156,6 +139,9 @@ struct SettingsAboutView: View {
             }
         }
         .navigationTitle("Settings & About")
+        .onChange(of: traditionID) { _, _ in
+            store.publishSelectedFaithContent()
+        }
         .confirmationDialog(
             "Delete your Beyond-ID account?",
             isPresented: $showingDeleteConfirmation,
@@ -192,16 +178,6 @@ struct DailyHistoryView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 18) {
-                Picker("History tradition", selection: $traditionID) {
-                    ForEach(FaithTradition.allCases) { tradition in
-                        Text(tradition.name).tag(tradition.id)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .controlSize(.small)
-                .font(.caption.weight(.semibold))
-                .accessibilityHint("Selects the faith tradition used for readings in Daily History")
-
                 HStack {
                     Button { changeMonth(by: -1) } label: { Image(systemName: "chevron.left") }
                     Spacer()

@@ -453,7 +453,7 @@ struct TodayView: View {
         .padding(24)
         .background(
             RoundedRectangle(cornerRadius: 26)
-                .fill(.white.opacity(selectedTheme.artworkName == nil ? 0.94 : 0.88))
+                .fill(.white.opacity(0.94))
         )
     }
 
@@ -810,13 +810,6 @@ private struct DailyBreathExportCard: View {
     var body: some View {
         ZStack {
             LinearGradient(colors: [theme.primary, theme.secondary], startPoint: .topLeading, endPoint: .bottomTrailing)
-            if let artwork = theme.shareArtworkName {
-                Image(artwork)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 1200, height: 675)
-                    .clipped()
-            }
             LinearGradient(colors: [.black.opacity(0.46), .black.opacity(0.62)], startPoint: .top, endPoint: .bottom)
             VStack(spacing: 20) {
                 Text("\(tradition.dailyReadingName) of the Day · \(date.formatted(date: .long, time: .omitted))")

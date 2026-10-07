@@ -165,18 +165,17 @@ private struct DailyBreathHomeView: View {
     }
     private var tradition: FaithTradition { FaithTradition(rawValue: traditionID) ?? .bible }
     private var selectedTheme: DailyBreathTheme { DailyBreathTheme(id: selectedThemeID) }
-    private var usesArtworkBackground: Bool { selectedTheme.artworkName != nil }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                BrandHeader(onArtwork: usesArtworkBackground)
+                BrandHeader()
                 Text("A steady beginning")
                     .font(.largeTitle.bold())
-                    .foregroundStyle(usesArtworkBackground ? Color.white : Color.primary)
+                    .foregroundStyle(Color.primary)
                 Text("Make room for a small faithful step today.")
                     .font(.title3)
-                    .foregroundStyle(usesArtworkBackground ? Color.white.opacity(0.82) : Color.secondary)
+                    .foregroundStyle(Color.secondary)
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {
                         Label("Today’s rhythm", systemImage: "checklist.checked").font(.headline)
@@ -196,8 +195,8 @@ private struct DailyBreathHomeView: View {
                     Label("Open Today · \(store.dailyVerse(for: tradition).reference)", systemImage: "sun.max.fill")
                         .font(.headline).frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
-                        .foregroundStyle(usesArtworkBackground ? Color.white : selectedTheme.primary)
-                        .background(usesArtworkBackground ? Color.black.opacity(0.42) : selectedTheme.primary.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
+                        .foregroundStyle(selectedTheme.primary)
+                        .background(selectedTheme.primary.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
                 }
                 .buttonStyle(.plain)
                 ScriptureContinueReadingLink()
@@ -214,7 +213,7 @@ private struct DailyBreathHomeView: View {
             }
             .padding()
         }
-        .background(DailyBreathHomeBackground(theme: selectedTheme))
+        .background(DailyBreathThemeBackground(theme: selectedTheme))
         .navigationTitle("Home")
         .navigationBarTitleDisplayMode(.inline)
     }

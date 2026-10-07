@@ -9,9 +9,6 @@ enum DailyBreathTheme: String, CaseIterable, Identifiable {
     case rose
     case torahLight
     case quranMoon
-    case bibleForest
-    case tanakhNavy
-    case quranEmerald
 
     var id: String { rawValue }
 
@@ -24,24 +21,6 @@ enum DailyBreathTheme: String, CaseIterable, Identifiable {
         case 9...11: .fall
         case 12, 1, 2: .forest
         default: .botanical
-        }
-    }
-
-    var artworkName: String? {
-        switch self {
-        case .bibleForest: "BibleForestPortrait"
-        case .tanakhNavy: "TanakhNavyPortrait"
-        case .quranEmerald: "QuranEmeraldPortrait"
-        default: nil
-        }
-    }
-
-    var shareArtworkName: String? {
-        switch self {
-        case .bibleForest: "BibleForestLandscape"
-        case .tanakhNavy: "TanakhNavyLandscape"
-        case .quranEmerald: "QuranEmeraldLandscape"
-        default: nil
         }
     }
 
@@ -63,9 +42,6 @@ enum DailyBreathTheme: String, CaseIterable, Identifiable {
         case .rose: return "Rose"
         case .torahLight: return "Torah Light"
         case .quranMoon: return "Quran Moon"
-        case .bibleForest: return "Bible Forest"
-        case .tanakhNavy: return "Tanakh Navy & Gold"
-        case .quranEmerald: return "Quran Emerald & Gold"
         }
     }
 
@@ -79,9 +55,6 @@ enum DailyBreathTheme: String, CaseIterable, Identifiable {
         case .rose: return "heart.fill"
         case .torahLight: return "star.circle.fill"
         case .quranMoon: return "moon.stars.fill"
-        case .bibleForest: return "cross.fill"
-        case .tanakhNavy: return "star.circle.fill"
-        case .quranEmerald: return "moon.stars.fill"
         }
     }
 
@@ -98,9 +71,6 @@ enum DailyBreathTheme: String, CaseIterable, Identifiable {
         // ink for titles, controls, and labels so it remains legible on that
         // surface everywhere the shared theme primary color is used.
         case .quranMoon: return Color(red: 0.52, green: 0.78, blue: 1.0)
-        case .bibleForest: return Color(red: 0.03, green: 0.16, blue: 0.12)
-        case .tanakhNavy: return Color(red: 0.03, green: 0.08, blue: 0.19)
-        case .quranEmerald: return Color(red: 0.02, green: 0.18, blue: 0.15)
         }
     }
 
@@ -114,9 +84,6 @@ enum DailyBreathTheme: String, CaseIterable, Identifiable {
         case .rose: return Color(red: 0.91, green: 0.45, blue: 0.62)
         case .torahLight: return Color(red: 0.68, green: 0.82, blue: 0.96)
         case .quranMoon: return Color(red: 0.08, green: 0.31, blue: 0.34)
-        case .bibleForest: return Color(red: 0.12, green: 0.34, blue: 0.25)
-        case .tanakhNavy: return Color(red: 0.10, green: 0.20, blue: 0.36)
-        case .quranEmerald: return Color(red: 0.11, green: 0.38, blue: 0.29)
         }
     }
 
@@ -129,7 +96,6 @@ enum DailyBreathTheme: String, CaseIterable, Identifiable {
         case .rose: return Color(red: 0.98, green: 0.72, blue: 0.82)
         case .torahLight: return Color(red: 0.86, green: 0.69, blue: 0.24)
         case .quranMoon: return Color(red: 0.93, green: 0.72, blue: 0.25)
-        case .bibleForest, .tanakhNavy, .quranEmerald: return Color(red: 0.96, green: 0.82, blue: 0.54)
         }
     }
 
@@ -143,9 +109,6 @@ enum DailyBreathTheme: String, CaseIterable, Identifiable {
         case .rose: return Color(red: 0.99, green: 0.92, blue: 0.95)
         case .torahLight: return Color(red: 0.965, green: 0.98, blue: 1.0)
         case .quranMoon: return Color(red: 0.025, green: 0.045, blue: 0.10)
-        case .bibleForest: return Color(red: 0.91, green: 0.94, blue: 0.88)
-        case .tanakhNavy: return Color(red: 0.91, green: 0.93, blue: 0.97)
-        case .quranEmerald: return Color(red: 0.90, green: 0.95, blue: 0.91)
         }
     }
 }
@@ -177,34 +140,5 @@ struct DailyBreathThemeBackground: View {
             )
             .ignoresSafeArea()
         }
-    }
-}
-
-struct DailyBreathHomeBackground: View {
-    let theme: DailyBreathTheme
-
-    var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                DailyBreathThemeBackground(theme: theme)
-                if let artwork = theme.artworkName {
-                    Image(artwork)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: geometry.size.width, height: geometry.size.height)
-                        .clipped()
-                        .overlay {
-                            LinearGradient(
-                                colors: [.black.opacity(0.16), .black.opacity(0.08), .black.opacity(0.20)],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        }
-                }
-            }
-            .frame(width: geometry.size.width, height: geometry.size.height)
-        }
-        .ignoresSafeArea()
-        .accessibilityHidden(true)
     }
 }

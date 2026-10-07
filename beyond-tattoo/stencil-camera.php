@@ -15,7 +15,7 @@ declare(strict_types=1);
 <body>
 <main class="wrap">
 <header><a href="index.php">← Beyond Tattoo</a><a href="tattoo-generator.php">Tattoo imagination generator →</a></header>
-<div class="eyebrow">Violet Trace · v1.2.1</div>
+<div class="eyebrow">Violet Trace · v1.2.2</div>
 <h1>Picture to stencil</h1>
 <p class="intro">Photograph a drawing or choose an image. Tune its outline, save the PNG, or print a clean transfer reference. Review every line with your tattoo artist before skin application.</p>
 <div class="layout">

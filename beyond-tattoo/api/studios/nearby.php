@@ -24,4 +24,4 @@ $studios = array_map(static function(array $studio): array {
         'booking_url' => $studio['booking_url'] ?? $studio['instagram_url'],
     ];
 }, bt_list_studios($query));
-echo json_encode(['version'=>'1.2','provider'=>'beyond-tattoo-directory','query'=>$query,'count'=>count($studios),'studios'=>$studios], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+echo json_encode(['version' => '1.2.2','provider'=>'beyond-tattoo-directory','query'=>$query,'count'=>count($studios),'studios'=>$studios], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

@@ -103,7 +103,7 @@ if (!empty($stencilDay['iso_date'])) {
       <nav class="bt-desktop-nav" aria-label="Beyond Tattoo navigation">
         <a class="is-active" href="#top">Home</a>
         <a href="tattoo-generator.php">Idea generator</a>
-        <a href="stencil-camera.php">Violet Trace</a>
+        <a href="ar-preview.php">AR Preview</a>
         <a href="stencils.php">Stencils</a>
         <a href="stylesheets.php">Stylesheets</a>
         <a href="collections.php">Collections</a>
@@ -122,7 +122,7 @@ if (!empty($stencilDay['iso_date'])) {
           <div>
             <a href="stencils.php">Stencils</a>
             <a href="tattoo-generator.php">Idea generator</a>
-            <a href="stencil-camera.php">Violet Trace</a>
+            <a href="ar-preview.php">AR Preview</a>
             <a href="stylesheets.php">Stylesheets</a>
             <a href="collections.php">Collections</a>
             <a href="store.php">Store</a>
@@ -145,7 +145,7 @@ if (!empty($stencilDay['iso_date'])) {
         <p class="bt-main-lead">Turn a tattoo idea into a six-piece creative direction: stencil, stylesheet, lore, reference artwork, placement mockup and printer-ready studio asset.</p>
         <div class="bt-main-actions">
           <a class="bt-glow-button" href="tattoo-generator.php">✦ Start the stencil generator</a>
-          <a class="bt-outline-button" href="<?= e(bt_app_url('downloads/tattoo-procedure-consent-bc.pdf')) ?>" download>↓ Download consent waiver form</a>
+          <a class="bt-outline-button" href="ar-preview.php">◌ Preview placement in AR</a>
         </div>
         <div class="bt-trust-row" aria-label="Idea generator features">
           <span><i>✦</i> Six connected assets</span>
@@ -189,15 +189,16 @@ if (!empty($stencilDay['iso_date'])) {
       <h2 id="imagination-title">One prompt. A complete tattoo direction.</h2>
       <p class="bt-main-lead">Describe the feeling, subject or story you want to wear. Needle Bot and Llama Jaguar shape the idea into a practical studio brief while you keep control of the final design.</p>
       <div class="bt-pack-grid" style="margin-top:24px">
-        <div><b>01</b><strong>Stencil</strong><small>Clean transfer hierarchy with open negative space.</small></div>
-        <div><b>02</b><strong>Stylesheet</strong><small>Original variations grouped for fast artist review.</small></div>
-        <div><b>03</b><strong>Studio pack</strong><small>Lore, reference, placement and printer-ready delivery.</small></div>
-        <div><b>04</b><strong>Shop workflow</strong><small>Move from a saved concept to a studio conversation.</small></div>
+        <div><b>01</b><strong>Create</strong><small>Shape a tattoo direction from a clear imagination prompt.</small></div>
+        <div><b>02</b><strong>Preview</strong><small>Test scale and placement with AR Preview or Violet Trace.</small></div>
+        <div><b>03</b><strong>Prepare</strong><small>Print a clean outline and gather the studio-ready asset pack.</small></div>
+        <div><b>04</b><strong>Play</strong><small>Open the design in Tattoo Master and start a studio conversation.</small></div>
       </div>
       <div class="bt-main-actions" style="max-width:420px;margin-top:24px">
         <a class="bt-glow-button" href="tattoo-generator.php">Write a tattoo imagination prompt</a>
         <a class="bt-outline-button" href="needle-bot.php">Ask Needle Bot for a direction</a>
         <a class="bt-outline-button" href="stencil-camera.php">Picture to stencil · Violet Trace</a>
+        <a class="bt-outline-button" href="ar-preview.php">Preview tattoo placement in AR</a>
       </div>
     </div>
   </section>

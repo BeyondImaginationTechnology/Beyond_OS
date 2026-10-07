@@ -55,7 +55,7 @@ $released = array_values(array_filter($items, static fn(array $asset): bool => $
 $daily = $released ? end($released) : ($items[0] ?? null);
 
 echo json_encode([
-    'version' => '1.2',
+    'version' => '1.2.2',
     'season_total' => 55,
     'asset_count' => count($items),
     'season_one_released_count' => count(array_filter($items, static fn(array $asset): bool => $asset['season_drop'] !== null && $asset['is_released'])),

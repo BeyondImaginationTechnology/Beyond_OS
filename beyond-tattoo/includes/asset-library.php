@@ -127,7 +127,7 @@ function bt_asset_library_daily(): array
     $packageFiles = [];
     foreach ($asset['files'] as $file) $packageFiles[$file['url']] = $asset['slug'] . '/' . $file['file'];
     return [
-        'library_version' => '1.2',
+        'library_version' => '1.2.2',
         'slug' => $asset['id'],
         'title' => $asset['title'],
         'collection' => $asset['collection'] . ' Collection',

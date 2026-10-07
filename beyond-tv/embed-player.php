@@ -129,7 +129,9 @@ fetch(endpoint,{cache:'default'})
   })
   .catch(error=>showStatus(error.message||'Channel unavailable',{error:true}));
 
-unmute.onclick=()=>{video.muted=false;video.volume=1;video.play().catch(()=>{});unmute.hidden=true};
+function setSound(enabled){video.muted=!enabled;if(enabled){video.volume=1;video.play().catch(()=>{});}unmute.hidden=enabled;}
+unmute.onclick=()=>setSound(true);
+window.addEventListener('message',event=>{if(event.origin!==window.location.origin||event.data?.type!=='beyond-tv:sound')return;setSound(Boolean(event.data.enabled));});
 })();
 </script>
 </body>

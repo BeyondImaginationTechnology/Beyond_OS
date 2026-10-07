@@ -532,7 +532,7 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
 
    window.setTimeout(()=>{
      responseOutput.dataset.state='answer';
-     responseOutput.textContent=`[Demo Runtime Simulation]\nModel: ${model}\nPrompt: "${text}"\n\nResult:\nJaguar Runtime successfully routed prompt across model-neutral infrastructure and received verified model response.`;
+     responseOutput.textContent=`[Demo Runtime Simulation]\nModel: ${model}\nPrompt: "${text}"\n\nThis is a routing concept preview. It does not send your prompt to a provider or return a verified model response.`;
      send.disabled=false;
    }, 500);
  });

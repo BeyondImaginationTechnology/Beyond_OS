@@ -28,6 +28,7 @@ $studioGroups = [
     'Beyond Tattoo' => [
         ['/server/admin/daily-studio/stencil-library.php', 'Generate & publish', '📤'],
         ['/server/admin/daily-studio/tattoo-asset-import.php', 'Asset inbox', '🖼️'],
+        ['/server/admin/daily-studio/stylesheet-publisher.php', 'Stylesheet publisher', '🍂'],
     ],
     'Video' => [
         ['/server/admin/daily-studio/video-templates.php', 'Creation templates', '✦'],

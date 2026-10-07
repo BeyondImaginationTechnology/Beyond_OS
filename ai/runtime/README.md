@@ -93,14 +93,19 @@ The public prompt interface is served from `ai/chat.php`. Configure the subdomai
 ```text
 BEYOND_AI_ORIGIN=https://ai.beyondimagination.co.technology
 BEYOND_SESSION_COOKIE_DOMAIN=.beyondimagination.co.technology
-JAGUAR_RUNTIME_URL=https://your-private-jaguar-runtime.example
-JAGUAR_RUNTIME_TOKEN=a-long-random-secret-shared-only-with-the-runtime
+JAGUAR_PRIVATE_RUNTIME_URL=https://your-private-jaguar-runtime.example
+JAGUAR_PRIVATE_RUNTIME_TOKEN=a-long-random-secret-shared-only-with-the-runtime
 JAGUAR_DRAW_RUNTIME_URL=https://your-private-draw-worker.example
+JAGUAR_TEXT_PROVIDER_ORDER=google,private-runtime
+JAGUAR_GOOGLE_API_KEY=your-grounded-text-provider-key
+JAGUAR_GOOGLE_MODEL=gemini-2.5-flash
 ```
 
-The shared hosting account serves the PHP interface and authenticated proxy. The model runtime must run separately on GPU-capable infrastructure. Set the same non-empty `JAGUAR_RUNTIME_TOKEN` on both hosts: the PHP proxy sends it as a bearer token and the runtime rejects unauthenticated chat requests.
+The shared hosting account serves the PHP interface and authenticated proxy. The model runtime must run separately on GPU-capable infrastructure. Use the same secret value as `JAGUAR_PRIVATE_RUNTIME_TOKEN` on the PHP host and `JAGUAR_RUNTIME_TOKEN` on the private runtime; the PHP proxy sends it as a bearer token and the runtime rejects unauthenticated chat requests.
 
-On the PHP host, the protected `var/config/live.php` may hold the endpoint settings under `jaguar.runtime_url`, `jaguar.draw_runtime_url`, and `jaguar.runtime_token`. Environment variables `JAGUAR_RUNTIME_URL`, `JAGUAR_DRAW_RUNTIME_URL`, and `JAGUAR_RUNTIME_TOKEN` take precedence when present; never commit live credentials.
+On the PHP host, the protected `var/config/live.php` may hold provider settings as `jaguar.providers.private_runtime.url`, `jaguar.providers.private_runtime.token`, `jaguar.providers.google.api_key`, and `jaguar.providers.google.model`. Provider-specific environment variables take precedence. `jaguar.runtime_url`, `jaguar.runtime_token`, `jaguar.gemini_api_key`, and `jaguar.gemini_model` remain supported as migration aliases, so existing production configuration does not break. Never commit live credentials.
+
+Jaguar routes by capability rather than a vendor name. The current public `core` route may use a grounded-text provider first, then falls back to the private metered runtime. The private runtime call always stays in the PHP request-metering path; it is never invoked by the provider fallback helper. Add another provider by returning the normalized fields `provider`, `model`, `message`, and optional `citations` from `ai/includes/providers.php`.
 
 Draw uses a separate private GPU worker configured as `JAGUAR_DRAW_RUNTIME_URL`. Deploy `draw_modal_app.py` with the existing Hugging Face and runtime secrets. It accepts `POST /v1/draw` with `{ "prompt": "...", "language": "en" }` and returns a bounded PNG data URL plus measured `gpu_seconds`. The PHP proxy requires a signed-in user with at least 10 BIT$ and a prompt of at most 2,000 characters. Apply the `20260929_01_jaguar_draw_holds` database migration before enabling this path. PHP reserves one of the five monthly Modal GPU requests and 10 BIT$ atomically before the GPU call, records measured GPU usage and an idempotent debit only after a valid image, and releases both holds on failure. An abandoned hold is recovered after ten minutes on the next Jaguar balance read for that user.
 
@@ -140,4 +145,4 @@ Deploy the Draw worker separately when the Hugging Face account has accepted the
 python -m modal deploy draw_modal_app.py
 ```
 
-Deployment builds the container and publishes the endpoint but does not load Llama onto a GPU. Copy the resulting Modal URL into `JAGUAR_RUNTIME_URL` on the PHP host, and configure the matching `JAGUAR_RUNTIME_TOKEN` there. The first authenticated `/v1/chat` request is the first GPU-backed model invocation.
+Deployment builds the container and publishes the endpoint but does not load a model onto a GPU. Copy the resulting Modal URL into `JAGUAR_PRIVATE_RUNTIME_URL` on the PHP host, and configure the matching `JAGUAR_PRIVATE_RUNTIME_TOKEN` there. The runtime defaults to Llama 3.1 8B, but its `JAGUAR_MODEL_ID` is deployment configuration rather than a PHP routing assumption. The first authenticated `/v1/chat` request is the first GPU-backed model invocation.

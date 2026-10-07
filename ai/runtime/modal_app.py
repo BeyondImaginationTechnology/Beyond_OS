@@ -34,7 +34,8 @@ image = (
             "HF_HOME": HF_CACHE_DIR,
             "HF_HUB_CACHE": f"{HF_CACHE_DIR}/hub",
             "HF_XET_HIGH_PERFORMANCE": "1",
-            "JAGUAR_MODEL_ID": "meta-llama/Llama-3.1-8B-Instruct",
+            # The runtime defaults to Llama in app.py, but the deployment may
+            # override JAGUAR_MODEL_ID without changing Jaguar's PHP router.
             "JAGUAR_DEVICE_MAP": "auto",
             "JAGUAR_LOAD_IN_4BIT": "1",
             "JAGUAR_MAX_INPUT_TOKENS": "4096",

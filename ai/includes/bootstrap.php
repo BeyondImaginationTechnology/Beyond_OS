@@ -22,6 +22,25 @@ function jaguar_runtime_config(string $key): string
     return trim((string)beyond_optional_config('jaguar.' . $key, ''));
 }
 
+/**
+ * Read one provider setting. Provider-specific names are preferred, while the
+ * earlier Jaguar keys remain supported so an existing live.php keeps working
+ * during the migration to the provider registry.
+ */
+function jaguar_provider_config(string $provider, string $key, string $legacyKey = ''): string
+{
+    $provider = strtolower(trim($provider));
+    $key = strtolower(trim($key));
+    if (!preg_match('/^[a-z0-9_-]{1,40}$/', $provider) || !preg_match('/^[a-z0-9_-]{1,40}$/', $key)) return '';
+    $environmentName = 'JAGUAR_' . strtoupper(str_replace('-', '_', $provider)) . '_' . strtoupper(str_replace('-', '_', $key));
+    $environmentValue = getenv($environmentName);
+    if (is_string($environmentValue) && trim($environmentValue) !== '') return trim($environmentValue);
+    $configProvider = str_replace('-', '_', $provider);
+    $configured = trim((string)beyond_optional_config('jaguar.providers.' . $configProvider . '.' . $key, ''));
+    if ($configured !== '') return $configured;
+    return $legacyKey === '' ? '' : jaguar_runtime_config($legacyKey);
+}
+
 try {
     beyond_live_config();
 } catch (Throwable $error) {

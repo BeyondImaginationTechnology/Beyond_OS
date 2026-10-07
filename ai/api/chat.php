@@ -4,7 +4,7 @@ require_once __DIR__ . '/../includes/bootstrap.php';
 require_once __DIR__ . '/../includes/modes.php';
 require_once __DIR__ . '/../includes/usage.php';
 require_once __DIR__ . '/../includes/draw-images.php';
-require_once __DIR__ . '/../includes/gemini.php';
+require_once __DIR__ . '/../includes/providers.php';
 require_once __DIR__ . '/../../beyond-id/includes/mobile-auth.php';
 require_once __DIR__ . '/../../dailybreath/includes/chat-guide.php';
 
@@ -394,9 +394,9 @@ if (preg_match('/^(hi|hello|hey|bonjour|salut|allo|hola|buenas)(?:[\s,]+(?:there
     }
 } elseif (preg_match('/^(how old are you|what(?:[’\']s| is) your age|when were you (?:made|created|born)|quel âge as-tu|cuántos años tienes)[\s!.?¿¡]*$/u', $simplePrompt)) {
     $simpleReply = [
-        'en' => 'I don’t have a human age. I’m Llama Jaguar v0.5.2 Preview, an AI system being built for the BIT ecosystem.',
-        'fr' => 'Je n’ai pas d’âge humain. Je suis Llama Jaguar v0.5.2 Preview, un système d’IA conçu pour l’écosystème BIT.',
-        'es' => 'No tengo una edad humana. Soy Llama Jaguar v0.5.2 Preview, un sistema de IA creado para el ecosistema BIT.',
+        'en' => 'I don’t have a human age. I’m Jaguar v0.5.2 Preview, an AI system being built for the BIT ecosystem.',
+        'fr' => 'Je n’ai pas d’âge humain. Je suis Jaguar v0.5.2 Preview, un système d’IA conçu pour l’écosystème BIT.',
+        'es' => 'No tengo una edad humana. Soy Jaguar v0.5.2 Preview, un sistema de IA creado para el ecosistema BIT.',
     ][$language];
 } elseif (preg_match('/^(-?\d+(?:\.\d+)?)\s*([+\-*\/])\s*(-?\d+(?:\.\d+)?)\s*(?:=|\?)?$/', $simplePrompt, $math)) {
     $left = (float) $math[1];
@@ -511,14 +511,15 @@ if ($mode === 'core' && $guide !== '') {
         echo json_encode(['model' => 'jaguar-dailybreath-fast-lane', 'adapter' => 'local', 'mode' => $mode, 'message' => $guideName . ' is available here for Daily Breath and sacred-text questions only. This no-GPU chat can offer concise, best-effort guidance from Jaguar’s built-in knowledge; for a specific passage, include its book, chapter, and verse.'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
-$gemini = $mode === 'core' ? jaguar_gemini_answer($originalPrompt, $language) : null;
-if ($gemini !== null) {
-    echo json_encode(['model' => 'gemini-google-search', 'adapter' => $gemini['model'], 'mode' => $mode, 'message' => $gemini['message'], 'citations' => $gemini['citations']], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+$providerAnswer = $mode === 'core' ? jaguar_provider_answer('grounded-text', $originalPrompt, $language) : null;
+if ($providerAnswer !== null) {
+    echo json_encode(['provider' => $providerAnswer['provider'], 'model' => $providerAnswer['model'], 'adapter' => null, 'mode' => $mode, 'message' => $providerAnswer['message'], 'citations' => $providerAnswer['citations']], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
 }
-$runtimeUrl = rtrim(jaguar_runtime_config('runtime_url'), '/');
+$runtimeEndpoint = jaguar_private_runtime_endpoint();
+$runtimeUrl = rtrim($runtimeEndpoint['url'], '/');
 if ($runtimeUrl === '' || !filter_var($runtimeUrl, FILTER_VALIDATE_URL) || !function_exists('curl_init')) { http_response_code(503); echo json_encode(['error' => 'Jaguar is not available yet.']); exit; }
-$runtimeToken = jaguar_runtime_config('runtime_token');
+$runtimeToken = $runtimeEndpoint['token'];
 if ($runtimeToken === '') { http_response_code(503); echo json_encode(['error' => 'Jaguar runtime authentication is not configured.']); exit; }
 $headers = ['Content-Type: application/json'];
 $headers[] = 'Authorization: Bearer ' . $runtimeToken;
@@ -596,4 +597,5 @@ if ($signedIn) {
     catch (Throwable $exception) { error_log('Jaguar BIT$ wallet lookup failed: ' . $exception->getMessage()); }
 }
 $runtimeResult['usage'] = jaguar_usage_public($usage, $walletBalance);
+$runtimeResult['provider'] = $runtimeEndpoint['provider'];
 echo json_encode($runtimeResult, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

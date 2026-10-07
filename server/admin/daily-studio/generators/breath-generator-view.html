@@ -29,7 +29,7 @@
   <aside class="controls">
     <a class="back" href="/server/admin/daily-studio/">&larr; Studio Home</a>
     <h1>DailyBreath Verse Studio</h1>
-    <p class="lede">Preview and export scheduled Scripture artwork, narration, and multilingual editions.</p>
+    <p class="lede">Preview and export the Bible, Tanakh, or Quran reading selected for each date.</p>
     <div class="mode-switch"><button id="scheduledMode" class="btn primary" type="button">Scheduled</button><button id="createDraft" class="btn secondary" type="button">Create Draft</button></div>
     <div id="modePill" class="mode-pill"><span>SCHEDULED · READ ONLY</span><button id="editScheduled" class="btn secondary" type="button">Edit scheduled</button></div>
     <div id="scheduleNav" class="schedule-nav"><button id="previousVerse" class="btn secondary" type="button" aria-label="Previous scheduled verse">←</button><button id="todayVerse" class="btn secondary" type="button">Today</button><button id="nextVerse" class="btn secondary" type="button" aria-label="Next scheduled verse">→</button><button id="reloadVerse" class="btn secondary" type="button" aria-label="Reload scheduled verse">↻</button></div>
@@ -37,13 +37,13 @@
     <div id="draftTools" class="draft-tools" hidden><button id="generateTodayVerse" class="btn primary" type="button">✨ Suggest an available verse</button><span class="hint">Suggestions use verses not already in the dated schedule.</span></div>
 
     <section class="group">
-      <label>Template style</label>
+      <label>Daily reading tradition</label>
       <div class="styles">
-        <label class="style-card"><input type="radio" name="style" value="chris" checked><strong>Chris · Christian</strong><small>Sunrise over the hills with Chris</small></label>
-        <label class="style-card"><input type="radio" name="style" value="dovi"><strong>Dovi · Jewish</strong><small>Synagogue sanctuary with Dovi</small></label>
-        <label class="style-card"><input type="radio" name="style" value="moe"><strong>Moe · Islamic</strong><small>Geometric mosque courtyard with Moe</small></label>
+        <label class="style-card"><input type="radio" name="style" value="chris" checked><strong>Bible · Chris</strong><small>Daily Bible verse with Christian artwork</small></label>
+        <label class="style-card"><input type="radio" name="style" value="dovi"><strong>Tanakh · Dovi</strong><small>Daily Tanakh passage in Hebrew</small></label>
+        <label class="style-card"><input type="radio" name="style" value="moe"><strong>Quran · Moe</strong><small>Daily Quran ayah in Arabic</small></label>
       </div>
-      <div class="hint">These choices change the character artwork and setting. The verse still follows the DailyBreath Bible schedule or draft text.</div>
+      <div class="hint">Each choice changes the reading source, language, guide, and artwork together.</div>
     </section>
 
     <section class="group">
@@ -54,8 +54,10 @@
         <label class="language-option"><input type="radio" name="verseLanguage" value="es"><span>🇪🇸 Spanish</span></label>
         <label class="language-option"><input type="radio" name="verseLanguage" value="jm"><span>🇯🇲 Patois</span></label>
         <label class="language-option"><input type="radio" name="verseLanguage" value="ht"><span>🇭🇹 Kreyòl</span></label>
+        <label class="language-option"><input type="radio" name="verseLanguage" value="he"><span>🇮🇱 Hebrew</span></label>
+        <label class="language-option"><input type="radio" name="verseLanguage" value="ar"><span>🇸🇦 Arabic</span></label>
       </div>
-      <div class="hint" style="margin:0 0 16px">English follows the DailyBreath WEB Scripture schedule. Other languages use their matching verse libraries.</div>
+      <div class="hint" style="margin:0 0 16px">Scheduled readings use English for Bible, Hebrew for Tanakh, and Arabic for Quran. Bible drafts still support the multilingual Bible library.</div>
       <label>Select a specific Bible verse</label>
       <div class="verse-picker">
         <div class="field"><label for="verseBook">Book</label><select id="verseBook"></select></div>
@@ -70,7 +72,7 @@
       <div class="field"><label for="translation">Translation</label><input id="translation" type="text" value=""></div>
       <div class="field"><label for="footer">Footer message</label><input id="footer" type="text" value="WALK IN FAITH TODAY."></div>
       <div class="field"><label for="publishDate">Publish date</label><input id="publishDate" type="date"></div>
-      <div class="field"><label for="locale">Locale</label><select id="locale"><option value="en-US">English (US)</option><option value="en-JM">English (Jamaica)</option><option value="fr-FR">French</option><option value="ht-HT">Haitian Kreyòl</option><option value="es-ES">Spanish</option></select></div>
+      <div class="field"><label for="locale">Locale</label><select id="locale"><option value="en-US">English (US)</option><option value="en-JM">English (Jamaica)</option><option value="fr-FR">French</option><option value="ht-HT">Haitian Kreyòl</option><option value="es-ES">Spanish</option><option value="he-IL">Hebrew</option><option value="ar-SA">Arabic</option></select></div>
     </section>
 
     <section class="group">
@@ -90,6 +92,8 @@
           <label class="language-option"><input type="radio" name="narrationLanguage" value="es-ES"><span>🇪🇸 Spanish</span></label>
           <label class="language-option"><input type="radio" name="narrationLanguage" value="en-JM"><span>🇯🇲 Patois</span></label>
           <label class="language-option"><input type="radio" name="narrationLanguage" value="ht-HT"><span>🇭🇹 Kreyòl</span></label>
+          <label class="language-option"><input type="radio" name="narrationLanguage" value="he-IL"><span>🇮🇱 Hebrew</span></label>
+          <label class="language-option"><input type="radio" name="narrationLanguage" value="ar-SA"><span>🇸🇦 Arabic</span></label>
         </div>
       </div>
       <div class="field"><label for="browserVoice">Narrator voice</label><select id="browserVoice"><option value="">Automatic matching voice</option></select><div class="hint">Preview uses a matching voice installed on this device. Narrated export uses the configured server voice for the selected language or an uploaded file.</div></div>
@@ -158,8 +162,27 @@
     fr:{narration:'fr-FR',locale:'fr-FR',headings:{morning:'VERSET DU MATIN',day:'VERSET DU JOUR',night:'VERSET DE LA NUIT'}},
     es:{narration:'es-ES',locale:'es-ES',headings:{morning:'VERSÍCULO DE LA MAÑANA',day:'VERSÍCULO DEL DÍA',night:'VERSÍCULO DE LA NOCHE'}},
     jm:{narration:'en-JM',locale:'en-JM',headings:{morning:'VERSE FI DI MAWNIN',day:'VERSE FI DI DAY',night:'VERSE FI DI NIGHT'}},
-    ht:{narration:'ht-HT',locale:'ht-HT',headings:{morning:'VÈSÈ MATEN AN',day:'VÈSÈ JODI A',night:'VÈSÈ LANNWIT LA'}}
+    ht:{narration:'ht-HT',locale:'ht-HT',headings:{morning:'VÈSÈ MATEN AN',day:'VÈSÈ JODI A',night:'VÈSÈ LANNWIT LA'}},
+    he:{narration:'he-IL',locale:'he-IL',headings:{morning:'קטע התנ״ך של הבוקר',day:'קטע התנ״ך של היום',night:'קטע התנ״ך של הלילה'}},
+    ar:{narration:'ar-SA',locale:'ar-SA',headings:{morning:'آية الصباح',day:'آية اليوم',night:'آية المساء'}}
   };
+  const traditionProfiles = {
+    chris:{tradition:'bible',language:'en',narration:'en-US',locale:'en',heading:'BIBLE VERSE OF THE DAY',footer:'WALK IN FAITH TODAY.',translation:'WEB',label:'Bible verse'},
+    dovi:{tradition:'torah',language:'he',narration:'he-IL',locale:'he',heading:'TANAKH PASSAGE OF THE DAY',footer:'CARRY THIS WISDOM WITH YOU TODAY.',translation:'Tanakh',label:'Tanakh passage'},
+    moe:{tradition:'quran',language:'ar',narration:'ar-SA',locale:'ar',heading:'QURAN AYAH OF THE DAY',footer:'CARRY THIS AYAH WITH YOU TODAY.',translation:'Quran',label:'Quran ayah'}
+  };
+  const traditionProfile = () => traditionProfiles[style()] || traditionProfiles.chris;
+  const shiftDate = (date, days) => { const d=new Date(date+'T12:00:00'); d.setDate(d.getDate()+days); return d.toISOString().slice(0,10); };
+  function applyTraditionSelection(){
+    const profile=traditionProfile();
+    const textRadio=document.querySelector('input[name="verseLanguage"][value="'+profile.language+'"]');
+    const narrationRadio=document.querySelector('input[name="narrationLanguage"][value="'+profile.narration+'"]');
+    if(textRadio) textRadio.checked=true;
+    if(narrationRadio) narrationRadio.checked=true;
+    $('locale').value=languageSettings[profile.language].locale;
+    $('heading').value=profile.heading;
+    $('footer').value=profile.footer;
+  }
   const resolvedDaypart=()=>{const selected=value('daypart');if(selected!=='auto')return selected;const hour=new Date().getHours();return hour<11?'morning':(hour>=18?'night':'day')};
   const localizedHeading=(language=verseLanguage())=>languageSettings[language].headings[resolvedDaypart()];
   const syncHeading=()=>{$('heading').value=localizedHeading()};
@@ -307,26 +330,44 @@
     if(!preserveDate){const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000);$('publishDate').value=local.toISOString().slice(0,10)}draw();
   }
   const localDate=()=>{const now=new Date(),local=new Date(now.getTime()-now.getTimezoneOffset()*60000);return local.toISOString().slice(0,10)};
-  function setContentLocked(locked){contentIds.forEach(id=>{$(id).readOnly=locked});$('publishDate').disabled=contentMode==='edit';['verseBook','verseChapter','verseNumber','loadSelectedVerse','daypart'].forEach(id=>{$(id).disabled=locked});document.querySelectorAll('input[name="verseLanguage"]').forEach(input=>{input.disabled=locked||input.value!=='en'})}
+  function setContentLocked(locked){
+    const profile=traditionProfile();
+    contentIds.forEach(id=>{$(id).readOnly=locked});$('publishDate').disabled=contentMode==='edit';
+    ['verseBook','verseChapter','verseNumber','loadSelectedVerse','daypart'].forEach(id=>{$(id).disabled=locked});
+    document.querySelectorAll('input[name="verseLanguage"]').forEach(input=>{input.disabled=locked ? input.value!==profile.language : (profile.tradition!=='bible' || input.value!=='en')});
+    document.querySelectorAll('input[name="narrationLanguage"]').forEach(input=>{input.disabled=locked ? input.value!==profile.narration : false});
+  }
   function updateModeUi(){
     const scheduled=contentMode==='scheduled',editing=contentMode==='edit',draft=contentMode==='draft',empty=contentMode==='empty',pill=$('modePill');
     pill.classList.toggle('editing',editing);pill.classList.toggle('draft',draft);pill.querySelector('span').textContent=scheduled?'SCHEDULED · READ ONLY':editing?'SCHEDULED · EDITING':draft?'NEW DRAFT':`NO VERSE ON ${value('publishDate')}`;
     $('scheduledMode').className=`btn ${scheduled||empty?'primary':'secondary'}`;$('createDraft').className=`btn ${draft||editing?'primary':'secondary'}`;$('editScheduled').hidden=!scheduled;$('draftTools').hidden=!draft;$('saveDraft').hidden=scheduled||empty;$('saveDraft').textContent=editing?'Replace scheduled verse + audio':'Publish draft + generate audio';
     ['downloadPng','exportMp3','previewAudio','exportVideo','exportAllVideo'].forEach(id=>{$(id).disabled=empty});$('previousVerse').disabled=!scheduleNavigation.previous;$('nextVerse').disabled=!scheduleNavigation.next;setContentLocked(scheduled||empty);
   }
-  function clearContent(date=''){currentVerseId='';$('heading').value='VERSE OF THE DAY';$('verse').value='';$('reference').value='';$('translation').value='WEB';$('footer').value='WALK IN FAITH TODAY.';$('publishDate').value=date;draw()}
-  function scheduledAudioMatches(){return !!scheduledAudioUrl&&narrationLocale()==='en-US'&&value('publishDate')===scheduledDate&&value('verse')===scheduledVerseText&&value('reference')===scheduledReference}
+  function clearContent(date=''){const profile=traditionProfile();currentVerseId='';$('heading').value=profile.heading;$('verse').value='';$('reference').value='';$('translation').value=profile.translation;$('footer').value=profile.footer;$('publishDate').value=date;draw()}
+  function scheduledAudioMatches(){return !!scheduledAudioUrl&&narrationLocale()===traditionProfile().narration&&value('publishDate')===scheduledDate&&value('verse')===scheduledVerseText&&value('reference')===scheduledReference}
   async function loadScheduleDate(date=localDate()){
-    status(`Loading the ${date} verse schedule…`);
+    const profile=traditionProfile();
+    status('Loading the '+date+' '+profile.label+'…');
     try{
-      const response=await fetch(`/server/admin/daily-studio/api/dailybreath-schedule.php?date=${encodeURIComponent(date)}`,{cache:'no-store'}),data=await response.json();
-      if(!response.ok||!data.ok)throw new Error(data.error||'The Daily Breath schedule is unavailable.');
-      scheduleNavigation=data.navigation||{};nextAvailableDate=scheduleNavigation.next_available||'';$('scheduleSummary').textContent=`${data.counts?.scheduled||0} dated verses · ${data.counts?.with_audio||0} prerecorded MP3s · ${data.counts?.library||0} library verses`;
-      if(!data.item){contentMode='empty';scheduledAudioUrl='';scheduledDate='';scheduledVerseText='';scheduledReference='';clearContent(date);updateModeUi();status(`No verse is scheduled for ${date}. Choose Create Draft to use this date.`);return false}
-      const item=data.item;contentMode='scheduled';$('publishDate').value=data.date;document.querySelector('input[name="verseLanguage"][value="en"]').checked=true;document.querySelector('input[name="narrationLanguage"][value="en-US"]').checked=true;$('locale').value='en-US';applyVerseItem({id:item.id,verse:item.verse||item.text,reference:item.reference,translation:item.translation||'WEB',footer:'WALK IN FAITH TODAY.',template_style:item.template_style||'chris'},true);scheduledAudioUrl=item.audio_url?new URL(item.audio_url,location.origin).href:'';scheduledDate=data.date;scheduledVerseText=value('verse');scheduledReference=value('reference');$('includeNarration').checked=!!scheduledAudioUrl;updateModeUi();draw();status(scheduledAudioUrl?`${data.date} is ready with prerecorded audio.`:`${data.date} is scheduled. MP3 export will use the selected provider.`);return true;
-    }catch(error){status(error.message||'The verse schedule could not be loaded.',true);return false}
+      const params=new URLSearchParams({date,tradition:profile.tradition,locale:profile.locale});
+      const response=await fetch('/dailybreath/api/today.php?'+params,{cache:'no-store'}),data=await response.json();
+      if(!response.ok||!data.ok||!data.verse)throw new Error(data.error||'The Daily Breath reading is unavailable.');
+      scheduleNavigation={previous:shiftDate(date,-1),next:shiftDate(date,1)};nextAvailableDate=shiftDate(date,1);
+      $('scheduleSummary').textContent=profile.label+' · '+(data.verse.audio_url?'prerecorded MP3 available':'text ready for narration');
+      contentMode='scheduled';$('publishDate').value=data.date||date;applyTraditionSelection();
+      applyVerseItem({id:data.verse.id,verse:data.verse.text,reference:data.verse.reference,translation:profile.translation,footer:profile.footer,template_style:style()},true);
+      $('heading').value=profile.heading;
+      scheduledAudioUrl=data.verse.audio_url?new URL(data.verse.audio_url,location.origin).href:'';scheduledDate=value('publishDate');scheduledVerseText=value('verse');scheduledReference=value('reference');$('includeNarration').checked=!!scheduledAudioUrl;
+      updateModeUi();draw();status(scheduledAudioUrl?scheduledDate+' is ready with prerecorded audio.':scheduledDate+' is ready for '+profile.label+' narration.');return true;
+    }catch(error){status(error.message||'The Daily Breath reading could not be loaded.',true);return false}
   }
-  async function enterDraftMode(){const draftDate=contentMode==='empty'&&value('publishDate')?value('publishDate'):(nextAvailableDate||localDate());contentMode='draft';scheduledAudioUrl='';scheduledDate='';scheduledVerseText='';scheduledReference='';document.querySelector('input[name="verseLanguage"][value="en"]').checked=true;clearContent(draftDate);updateModeUi();draw();status('Draft mode is separate from the schedule. Loading the Bible picker…');await loadVerseCatalog();setContentLocked(false);status('Choose a date, select a verse, or request an available verse suggestion.')}
+  async function enterDraftMode(){
+    if(traditionProfile().tradition!=='bible'){
+      document.querySelector('input[name="style"][value="chris"]').checked=true;applyTraditionSelection();
+      status('Draft publishing currently supports Bible readings. Tanakh and Quran are managed through Daily Content.',true);
+    }
+    const draftDate=contentMode==='empty'&&value('publishDate')?value('publishDate'):(nextAvailableDate||localDate());contentMode='draft';scheduledAudioUrl='';scheduledDate='';scheduledVerseText='';scheduledReference='';document.querySelector('input[name="verseLanguage"][value="en"]').checked=true;clearContent(draftDate);updateModeUi();draw();status('Draft mode is separate from the schedule. Loading the Bible picker…');await loadVerseCatalog();setContentLocked(false);status('Choose a date, select a verse, or request an available verse suggestion.')
+  }
   function editScheduledVerse(){if(contentMode!=='scheduled')return;if(!confirm(`Edit the scheduled verse for ${scheduledDate}? Publishing will overwrite that date and regenerate its prerecorded audio.`))return;contentMode='edit';updateModeUi();status('Scheduled editing is enabled. Publishing will use the overwrite permission you just confirmed.')}
   function populateBooks(){
     const books=[...new Set(verseCatalog.map(item=>item.book))];$('verseBook').innerHTML=books.map(book=>`<option value="${book}">${book}</option>`).join('');populateChapters();
@@ -470,7 +511,8 @@
   }
   if('speechSynthesis' in window){window.speechSynthesis.onvoiceschanged=populateVoices;populateVoices()}
   document.querySelectorAll('input[name="narrationLanguage"]').forEach(input=>input.addEventListener('change',()=>{populateVoices();status(`${input.nextElementSibling.textContent.trim()} narrator selected.`);draw()}));
-  document.querySelectorAll('input[name="verseLanguage"]').forEach(input=>input.addEventListener('change',()=>{if(input.value!=='en'){document.querySelector('input[name="verseLanguage"][value="en"]').checked=true;status('The dated schedule publishes English WEB verses. Use the multilingual Bible generator for localized editions.',true);return}syncHeading();draw()}));
+  document.querySelectorAll('input[name="verseLanguage"]').forEach(input=>input.addEventListener('change',()=>{if(contentMode==='scheduled'&&input.value!==traditionProfile().language){applyTraditionSelection();status('Scheduled readings use the language assigned to their tradition.',true);return}syncHeading();draw()}));
+  document.querySelectorAll('input[name="style"]').forEach(input=>input.addEventListener('change',()=>{if((contentMode==='draft'||contentMode==='edit')&&traditionProfile().tradition!=='bible'){document.querySelector('input[name="style"][value="chris"]').checked=true;status('Draft publishing currently supports Bible readings. Use Daily Content to publish Tanakh or Quran readings.',true);return}applyTraditionSelection();if(contentMode==='scheduled'||contentMode==='empty')loadScheduleDate(value('publishDate')||localDate());else draw()}));
   $('daypart').addEventListener('change',()=>{syncHeading();draw()});
   $('verseBook').addEventListener('change',populateChapters);$('verseChapter').addEventListener('change',populateVerseNumbers);$('loadSelectedVerse').addEventListener('click',()=>{if(contentMode==='draft'||contentMode==='edit')loadSelectedVerse()});$('publishDate').addEventListener('change',()=>{if(contentMode==='scheduled'||contentMode==='empty')loadScheduleDate(value('publishDate'));else draw()});
 

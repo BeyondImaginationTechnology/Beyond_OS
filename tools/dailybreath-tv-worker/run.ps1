@@ -1,10 +1,16 @@
-param([switch]$InstallTask)
+param([switch]$InstallTask,[switch]$UploadYouTube)
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $configPath=Join-Path $PSScriptRoot 'worker-secret.xml'
 if(!(Test-Path $configPath)){throw "Create worker-secret.xml with the setup script before running."}
 $config=Import-Clixml $configPath
 $token=[System.Net.NetworkCredential]::new('', $config.Token).Password
+$youtubeConfigPath=Join-Path $PSScriptRoot 'youtube-oauth.xml'
+$youtubeConfig=$null
+if($UploadYouTube){
+  if(!(Test-Path $youtubeConfigPath)){throw 'Run authorize-youtube.ps1 before enabling YouTube uploads.'}
+  $youtubeConfig=Import-Clixml $youtubeConfigPath
+}
 $headers=@{Authorization="Bearer $token"}
 $base=$config.BaseUrl.TrimEnd('/')
 $project=Join-Path $root 'tools\daily-stencil-video'
@@ -27,6 +33,40 @@ function Send-WorkerVideo {
     $content.Dispose(); $client.Dispose()
   }
 }
+function Get-YouTubeAccessToken {
+  param($Config)
+  $clientSecret=[System.Net.NetworkCredential]::new('', $Config.ClientSecret).Password
+  $refreshToken=[System.Net.NetworkCredential]::new('', $Config.RefreshToken).Password
+  $response=Invoke-RestMethod -Method Post -Uri 'https://oauth2.googleapis.com/token' -ContentType 'application/x-www-form-urlencoded' -Body @{
+    client_id=[string]$Config.ClientId
+    client_secret=$clientSecret
+    refresh_token=$refreshToken
+    grant_type='refresh_token'
+  }
+  if([string]::IsNullOrWhiteSpace([string]$response.access_token)){throw 'Google did not return a YouTube access token.'}
+  return [string]$response.access_token
+}
+function Publish-YouTubeVideo {
+  param($Config,[string]$VideoPath,[string]$Title,[string]$Description)
+  $accessToken=Get-YouTubeAccessToken -Config $Config
+  $metadata=@{
+    snippet=@{title=$Title;description=$Description;categoryId='22';tags=@('Daily Breath','Verse of the Day','Faith')}
+    status=@{privacyStatus='private';selfDeclaredMadeForKids=$false}
+  } | ConvertTo-Json -Depth 5 -Compress
+  $fileSize=(Get-Item -LiteralPath $VideoPath).Length
+  $headers=@{
+    Authorization="Bearer $accessToken"
+    'X-Upload-Content-Type'='video/mp4'
+    'X-Upload-Content-Length'=[string]$fileSize
+  }
+  $session=Invoke-WebRequest -Method Post -Uri 'https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status' -Headers $headers -ContentType 'application/json; charset=UTF-8' -Body $metadata
+  $uploadUri=[string]$session.Headers.Location
+  if([string]::IsNullOrWhiteSpace($uploadUri)){throw 'YouTube did not provide an upload session.'}
+  $bytes=[System.IO.File]::ReadAllBytes($VideoPath)
+  $upload=Invoke-RestMethod -Method Put -Uri $uploadUri -Headers @{Authorization="Bearer $accessToken"} -ContentType 'video/mp4' -Body $bytes
+  if([string]::IsNullOrWhiteSpace([string]$upload.id)){throw 'YouTube did not return a video ID.'}
+  Write-Host "Uploaded private YouTube video: $($upload.id)"
+}
 Push-Location $project
 try {
 foreach($tradition in 'bible','torah','quran'){
@@ -39,6 +79,11 @@ foreach($tradition in 'bible','torah','quran'){
   if($LASTEXITCODE -ne 0){throw "Render failed for $tradition"}
   # Upload endpoint is enabled with the production deploy; do not expose token in URLs.
   Send-WorkerVideo -Uri "$base/dailybreath/api/local-tv-worker-upload.php" -Token $token -VideoPath $output -Fields @{tradition=$tradition;date=$payload.date;reference=$payload.reference;title=($payload.kind+' of the Day · '+$payload.reference)}
+  if($UploadYouTube){
+    $title=("Daily Breath · {0} · {1}" -f $payload.kind,$payload.reference)
+    $description=("{0}`n`n{1}`n`nDaily Breath · Faith-centered wellness" -f $payload.reference,$payload.passage)
+    Publish-YouTubeVideo -Config $youtubeConfig -VideoPath $output -Title $title -Description $description
+  }
 }
 }
 finally {

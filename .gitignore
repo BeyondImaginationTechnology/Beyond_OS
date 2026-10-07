@@ -65,4 +65,5 @@ Documents - Shortcut.lnk
 /.cache/
 
 /tools/dailybreath-tv-worker/worker-secret.xml
+/tools/dailybreath-tv-worker/youtube-oauth.xml
 /tools/dailybreath-tv-worker/server-token-pending.txt

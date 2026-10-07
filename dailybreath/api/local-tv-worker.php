@@ -11,6 +11,13 @@ $token=trim((string)beyond_config('dailybreath.local_worker_token',''));
 $given=preg_replace('/^Bearer\s+/i','',(string)($_SERVER['HTTP_AUTHORIZATION']??''));
 if($token===''||$given===''||!hash_equals($token,$given)){http_response_code(401);echo json_encode(['ok'=>false,'error'=>'Unauthorized']);exit;}
 $tz=new DateTimeZone('America/Vancouver');$now=new DateTimeImmutable('now',$tz);$date=$now->format('Y-m-d');
+$requestedDate=trim((string)($_GET['date']??''));
+if($requestedDate!==''){
+  $requested=DateTimeImmutable::createFromFormat('!Y-m-d',$requestedDate,$tz);
+  $errors=DateTimeImmutable::getLastErrors();
+  if(!$requested||($errors!==false&&($errors['warning_count']>0||$errors['error_count']>0))||$requested->format('Y-m-d')!==$requestedDate){http_response_code(422);echo json_encode(['ok'=>false,'error'=>'date must use YYYY-MM-DD']);exit;}
+  $date=$requestedDate;
+}
 $tradition=(string)($_GET['tradition']??'bible');$tradition=$tradition==='tanakh'?'torah':$tradition;
 $profiles=['bible'=>['locale'=>'en','kind'=>'Verse','series'=>'Bible Verse of the Day','direction'=>'ltr'],'torah'=>['locale'=>'he','kind'=>'Tanakh Passage','series'=>'Tanakh Passage of the Day','direction'=>'rtl'],'quran'=>['locale'=>'ar','kind'=>'Quran Ayah','series'=>'Quran Ayah of the Day','direction'=>'rtl']];
 if(!isset($profiles[$tradition])){http_response_code(422);echo json_encode(['ok'=>false,'error'=>'Unsupported tradition']);exit;}

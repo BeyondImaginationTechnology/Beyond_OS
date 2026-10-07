@@ -9,6 +9,17 @@ schtasks /Create /TN "Beyond Daily Breath TV" /SC DAILY /ST 05:40 /TR "powershel
 
 `worker-secret.xml` is encrypted with Windows DPAPI for the current Windows account. The server endpoint and upload endpoint require the same value from private `dailybreath.local_worker_token`.
 
+## Daily Windows task
+
+The installed **Daily Breath — Daily Readings Production** task runs each day at **8:00 PM Pacific** while Greg is signed in. It writes one timestamped log for every run in `logs/`, can run on battery, wakes the PC when Windows permits it, and starts when the next interactive session is available after a missed schedule. Each run prepares the following calendar day so the files exist before early prayer-based programming slots.
+
+It produces three faith-specific videos:
+
+- **Bible:** the Daily Bible Verse, narrated by Chris's configured ElevenLabs voice (Ryan), rendered with the Chris study presenter scene in Blender.
+- **Tanakh and Quran:** their own language-matched ElevenLabs narration and current Daily Breath TV render.
+
+Chris's present rig has a timed seated body-performance loop but no facial bones or mouth shape keys. The narration and performance render together; adding phoneme-accurate lipsync requires a later facial-rig pass.
+
 ## YouTube upload authorization
 
 Google Cloud must have the `youtube.upload` scope and the channel owner must be a test user while the OAuth app is in Testing. Run this once in PowerShell, using the OAuth client ID and client secret stored in the private production configuration:

@@ -295,7 +295,6 @@ html[data-theme="light"] .menu-toggle,html[data-theme="light"] .drawer-close{bor
           <a href="/academy/">Academy</a><a href="/beyond-tv/">TV</a><a href="/beyond-games/">Games</a><a href="https://host.beyondimagination.co.technology/">VPS</a><a href="/ai/">AI</a><a href="https://os.beyondimagination.co.technology/">OS</a><a href="/release-notes.php">What’s New</a><a href="/investors.php">Investors</a>
           <a href="/beyond-market/">Store</a>
           <label class="currency-picker"><span aria-hidden="true">BIT$</span><span class="visually-hidden">Display currency</span><select id="homeCurrency" aria-label="Display currency"><option value="BITS">BIT$</option><option value="USD">USD</option><option value="CAD">CAD</option></select></label>
-          <div class="nav-quick-actions" aria-label="Quick actions"><a class="nav-3d-button" href="/app-store/">App Store</a><label class="nav-language">Language <select aria-label="Language"><option>EN</option><option>FR</option></select></label><button class="theme-toggle nav-3d-button" type="button" aria-label="Change theme">🌅</button><a class="nav-3d-button nav-id" href="/beyond-id/auth/login.php">Beyond ID</a></div>
     </nav>
     <button class="menu-toggle" type="button" aria-label="Open navigation menu" aria-controls="mobileNavigation" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 </header>

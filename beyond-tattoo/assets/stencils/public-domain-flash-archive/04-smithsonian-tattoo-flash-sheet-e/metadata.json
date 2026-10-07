@@ -1,0 +1,24 @@
+{
+  "title": "Smithsonian Tattoo Flash Sheet E",
+  "status": "approved",
+  "release_date": "2026-09-23",
+  "display_date": "Smithsonian Open Access import",
+  "description": "Historic American tattoo flash sheet E, reproduced from a CC0 Smithsonian source as a cleaned black-outline flash sheet.",
+  "style": "Traditional flash · Blackwork",
+  "placement": "Individual motif placement selected by artist",
+  "difficulty": "Intermediate",
+  "license": "CC0 source · professional use",
+  "rights_confirmed": true,
+  "source": {
+    "institution": "Smithsonian American Art Museum",
+    "record_id": "saam_1998.84.50E",
+    "url": "https://www.si.edu/object/tattoo-flash%3Asaam_1998.84.50E",
+    "rights": "CC0",
+    "original_file": "source-original.jpg"
+  },
+  "asset_formats": [
+    "pure_black_outline",
+    "violet_trace_compatible"
+  ],
+  "outline_standard": "Cleaned black contours on pure white; historical source recorded in metadata."
+}

@@ -1,23 +1,32 @@
 {
   "collection": "Public-domain tattoo reference candidates",
-  "purpose": "Curator queue only. Do not publish any image until its specific rights statement, source URL, and derivative treatment are recorded in the artwork metadata.",
+  "purpose": "Curator queue. A source clearance permits use as reference or for a new derivative outline; a library record still requires its own source URL, rights record, preview, print PNG, and outline PNG before publication.",
   "sources": [
     {
       "name": "Smithsonian Open Access tattoo flash collection",
       "rights": "CC0 public-domain dedication",
-      "url": "https://americanart.si.edu/collections/search/artwork/?id=78741",
-      "catalog_url": "https://commons.wikimedia.org/wiki/Category:Flash_(tattoo)",
+      "commercial_status": "approved_source_use",
+      "approval_scope": "Commercial use and derivative outlines are approved only for the Smithsonian records listed below, each of which is marked CC0 on its item page.",
+      "attribution": "Optional but retained in artwork metadata: Smithsonian American Art Museum, Tattoo Flash, unidentified artist, CC0.",
+      "approved_records": [
+        {"record_id": "saam_1998.84.50A", "url": "https://www.si.edu/object/tattoo-flash%3Asaam_1998.84.50A", "rights": "CC0"},
+        {"record_id": "saam_1998.84.50B", "url": "https://www.si.edu/object/tattoo-flash%3Asaam_1998.84.50B", "rights": "CC0"},
+        {"record_id": "saam_1998.84.50D", "url": "https://www.si.edu/object/tattoo-flash%3Asaam_1998.84.50D", "rights": "CC0"},
+        {"record_id": "saam_1998.84.50E", "url": "https://www.si.edu/object/tattoo-flash%3Asaam_1998.84.50E", "rights": "CC0"},
+        {"record_id": "saam_1998.84.50F", "url": "https://www.si.edu/object/tattoo-flash%3Asaam_1998.84.50F", "rights": "CC0"}
+      ],
       "suggested_collection": "Public Domain Flash Archive",
       "suggested_categories": ["traditional", "flash", "blackwork"],
-      "workflow": "Create a new outline derivative, preserve source attribution and record the source identifier before approval."
+      "workflow": "Create a new clean outline derivative, preserve the record ID and source URL in metadata, then approve the finished asset for publication."
     },
     {
       "name": "Library of Congress Free to Use and Reuse: Autumn and Halloween",
-      "rights": "Collection-level free-to-use-and-reuse selection; verify the individual item’s rights advisory before publication.",
+      "rights": "Collection-level free-to-use-and-reuse selection; individual rights advisory still governs each item.",
+      "commercial_status": "pending_item_review",
       "url": "https://www.loc.gov/free-to-use/autumn-and-halloween/",
       "suggested_collection": "Public Domain Autumn Archive",
       "suggested_categories": ["illustrative", "autumn", "halloween"],
-      "workflow": "Use only entries with a compatible individual rights advisory; record the item URL and a new clean outline derivative."
+      "workflow": "Use only entries with a compatible individual rights advisory; record the item URL and create a new clean outline derivative."
     }
   ]
 }

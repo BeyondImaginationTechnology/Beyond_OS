@@ -22,12 +22,12 @@ run_tree() {
   local output="$build_root/$flavour"
   echo "==> $flavour ($tree): $action"
   BEYOND_BUILD_DIR="$output" BEYOND_FLAVOUR="$flavour" bash "$source/build.sh" "$action"
-  if [[ "$action" == installer && "$tree" == core && "$flavour" != core ]]; then
+  if [[ "$action" == installer && "$tree" == core && "$flavour" != core && "$flavour" != creator && "$flavour" != academy ]]; then
     local images="$output/installer-output/images"
-    # The shared Core builder deliberately keeps its stable internal names;
-    # release bundles get the selected flavour name at the orchestration edge.
+    # Sentinel and Gaming still use Core's installer packaging. Creator and
+    # Academy create profile-specific release names in the shared builder.
     local profile_version=1.0
-    [[ "$flavour" == creator ]] && profile_version=0.1
+    [[ "$flavour" == creator || "$flavour" == academy ]] && profile_version=0.1
     cp "$images/bit-os-core-0.2-installer.img" "$images/bit-os-$flavour-$profile_version-installer.img"
     cp "$images/bitCoreos.iso" "$images/bit${flavour^}os.iso"
     sha256sum "$images/bit-os-$flavour-$profile_version-installer.img" "$images/bit${flavour^}os.iso" > "$images/SHA256SUMS"
@@ -40,6 +40,7 @@ run_tree() {
       home) iso="$images/bitHomeos.iso"; image="$images/bit-os-home-0.2-installer.img" ;;
       cyber) iso="$images/bitCyberos.iso"; image="$images/bit-os-cyber-0.1-installer.img" ;;
       creator) iso="$images/bitCreatoros.iso"; image="$images/bit-os-creator-0.1-installer.img" ;;
+      academy) iso="$images/bitAcademyos.iso"; image="$images/bit-os-academy-0.1-installer.img" ;;
       *) iso="$images/bit${flavour^}os.iso"; image="$images/bit-os-$flavour-1.0-installer.img" ;;
     esac
     sums="$images/SHA256SUMS"

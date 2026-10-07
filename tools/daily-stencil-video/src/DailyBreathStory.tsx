@@ -31,6 +31,7 @@ export type DailyBreathStorySource = {
 export type DailyBreathStoryAudioSegment = {
   audioFile: string;
   startSeconds: number;
+  volume?: number;
 };
 
 export type DailyBreathStoryProps = {
@@ -308,7 +309,7 @@ export const DailyBreathStory: React.FC<DailyBreathStoryProps> = (props) => {
     <AbsoluteFill style={{background: props.palette.background}}>
       {(props.audioSegments ?? []).map((segment, index) => (
         <Sequence key={`${segment.audioFile}-${index}`} from={Math.max(0, Math.round(segment.startSeconds * fps))}>
-          <Audio src={staticFile(segment.audioFile)} volume={0.96} />
+          <Audio src={staticFile(segment.audioFile)} volume={segment.volume ?? 0.96} />
         </Sequence>
       ))}
       {props.beats.map((beat) => (

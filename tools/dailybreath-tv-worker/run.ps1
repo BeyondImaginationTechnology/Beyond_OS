@@ -51,6 +51,22 @@ function Get-WorkerNarration {
   Invoke-WebRequest -Headers $Headers -Uri $downloadUri.AbsoluteUri -OutFile $Destination
   if(!(Test-Path $Destination) -or (Get-Item -LiteralPath $Destination).Length -lt 128){throw 'Worker narration download was invalid.'}
 }
+function New-AmbientDevotionalBed {
+  param([string]$Destination,[int]$DurationSeconds=58)
+  if(Test-Path $Destination){return}
+  $folder=Split-Path -Parent $Destination
+  if(!(Test-Path $folder)){New-Item -ItemType Directory -Path $folder -Force | Out-Null}
+  $sampleRate=11025;$sampleCount=$sampleRate*$DurationSeconds;$dataBytes=$sampleCount*2
+  $stream=[System.IO.File]::Open($Destination,[System.IO.FileMode]::Create,[System.IO.FileAccess]::Write)
+  $writer=[System.IO.BinaryWriter]::new($stream)
+  try{
+    $writer.Write([Text.Encoding]::ASCII.GetBytes('RIFF'));$writer.Write([int](36+$dataBytes));$writer.Write([Text.Encoding]::ASCII.GetBytes('WAVEfmt '));$writer.Write([int]16);$writer.Write([int16]1);$writer.Write([int16]1);$writer.Write([int]$sampleRate);$writer.Write([int]($sampleRate*2));$writer.Write([int16]2);$writer.Write([int16]16);$writer.Write([Text.Encoding]::ASCII.GetBytes('data'));$writer.Write([int]$dataBytes)
+    $roots=@(73.416,65.406,87.307,73.416)
+    for($i=0;$i -lt $sampleCount;$i++){
+      $time=$i/$sampleRate;$chord=[int]([math]::Floor($time/14)%$roots.Count);$root=$roots[$chord];$fade=[math]::Min(1,[math]::Min($time/3,($DurationSeconds-$time)/4));$pad=0.55*[math]::Sin(2*[math]::PI*$root*$time)+0.27*[math]::Sin(2*[math]::PI*($root*1.4983)*$time)+0.18*[math]::Sin(2*[math]::PI*($root*2)*$time);$pulse=[math]::Pow([math]::Max(0,[math]::Sin(2*[math]::PI*$time/8)),6);$bell=0.10*$pulse*[math]::Sin(2*[math]::PI*($root*4)*$time);$value=[math]::Max(-0.78,[math]::Min(0.78,($pad+$bell)*0.17*$fade));$writer.Write([int16]([math]::Round($value*32767)))
+    }
+  }finally{$writer.Dispose();$stream.Dispose()}
+}
 function Get-YouTubeAccessToken {
   param($Config)
   $clientSecret=[System.Net.NetworkCredential]::new('', $Config.ClientSecret).Password
@@ -90,16 +106,25 @@ try {
 foreach($tradition in 'bible','torah','quran'){
   $payload=Invoke-RestMethod -Headers $headers -Uri "$base/dailybreath/api/local-tv-worker.php?tradition=$tradition"
   if(!$payload.ok){throw "Payload failed for $tradition"}
-  $audioRelative=('generated/dailybreath/{0}-{1}-{2}.mp3' -f $payload.date,$tradition,$payload.voice_id)
-  $audioPath=Join-Path $project ('public\'+$audioRelative.Replace('/','\'))
-  Get-WorkerNarration -Base $base -AudioUrl ([string]$payload.audio_url) -Headers $headers -Destination $audioPath
-  $props=@{brand='Daily Breath';series=$payload.series;title=($payload.kind+' of the Day');subtitle=($payload.reference+' · '+$payload.label);direction=$payload.direction;guideName=$payload.guide_name;audioSegments=@(@{audioFile=$audioRelative;startSeconds=0});beats=@(@{id='intro';label='Daily Breath';startSeconds=0;durationSeconds=7;narration=('Here is today''s '+$payload.kind+'.');onScreenText=$payload.reference;visualPrompt='Opening'},@{id='reading';label=($payload.kind+' of the Day');startSeconds=7;durationSeconds=20;narration=$payload.passage;onScreenText=$payload.passage;visualPrompt='Reading'},@{id='reflection';label='Reflect';startSeconds=27;durationSeconds=12;narration='Carry these words with you today.';onScreenText='One reading. One breath.';visualPrompt='Reflection'},@{id='outro';label='Daily Breath';startSeconds=39;durationSeconds=7;narration='This has been Daily Breath.';onScreenText='Return whenever you need a breath.';visualPrompt='Close'});sourceSeconds=5;outroSeconds=6;sources=@(@{citation=$payload.reference;url='https://beyondimagination.co.technology/dailybreath/';notes='Daily Breath approved reading.'});outroText='Carry this reading with you.';fps=30;width=1920;height=1080;palette=@{background='#10271F';foreground='#FFFDF7';accent='#E2BC63';muted='#DDE4D7'}}
+  $audioSegments=@();$hasNarration=$false
+  if(-not [string]::IsNullOrWhiteSpace([string]$payload.audio_url)){
+    $audioRelative=('generated/dailybreath/{0}-{1}-{2}.mp3' -f $payload.date,$tradition,$payload.voice_id)
+    $audioPath=Join-Path $project ('public\'+$audioRelative.Replace('/','\'))
+    Get-WorkerNarration -Base $base -AudioUrl ([string]$payload.audio_url) -Headers $headers -Destination $audioPath
+    $audioSegments=@(@{audioFile=$audioRelative;startSeconds=0});$hasNarration=$true
+  }else{
+    $ambientRelative='generated/dailybreath/daily-breath-ambient-devotional.wav'
+    New-AmbientDevotionalBed -Destination (Join-Path $project ('public\'+$ambientRelative.Replace('/','\')))
+    $audioSegments=@(@{audioFile=$ambientRelative;startSeconds=0;volume=0.34})
+    Write-Host "Using original ambient devotional music for $tradition."
+  }
+  $props=@{brand='Daily Breath';series=$payload.series;title=($payload.kind+' of the Day');subtitle=($payload.reference+' · '+$payload.label);direction=$payload.direction;guideName=$payload.guide_name;audioSegments=$audioSegments;beats=@(@{id='intro';label='Daily Breath';startSeconds=0;durationSeconds=7;narration=('Here is today''s '+$payload.kind+'.');onScreenText=$payload.reference;visualPrompt='Opening'},@{id='reading';label=($payload.kind+' of the Day');startSeconds=7;durationSeconds=20;narration=$payload.passage;onScreenText=$payload.passage;visualPrompt='Reading'},@{id='reflection';label='Reflect';startSeconds=27;durationSeconds=12;narration='Carry these words with you today.';onScreenText='One reading. One breath.';visualPrompt='Reflection'},@{id='outro';label='Daily Breath';startSeconds=39;durationSeconds=7;narration='This has been Daily Breath.';onScreenText='Return whenever you need a breath.';visualPrompt='Close'});sourceSeconds=5;outroSeconds=6;sources=@(@{citation=$payload.reference;url='https://beyondimagination.co.technology/dailybreath/';notes='Daily Breath approved reading.'});outroText='Carry this reading with you.';fps=30;width=1920;height=1080;palette=@{background='#10271F';foreground='#FFFDF7';accent='#E2BC63';muted='#DDE4D7'}}
   $propsFile=Join-Path $env:TEMP ("dailybreath-$tradition.json");$output=Join-Path $env:TEMP ("$($payload.date)-$tradition-verse-of-the-day.mp4")
   [System.IO.File]::WriteAllText($propsFile, ($props | ConvertTo-Json -Depth 8), [System.Text.UTF8Encoding]::new($false))
   & $remotion render src/index.ts DailyBreathStory $output "--props=$propsFile" --codec=h264 --concurrency=2
   if($LASTEXITCODE -ne 0){throw "Render failed for $tradition"}
   # Upload endpoint is enabled with the production deploy; do not expose token in URLs.
-  $voiceover=if($payload.guide_name){"$($payload.guide_name) · ElevenLabs narration"}else{'ElevenLabs narration'}
+  $voiceover=if($hasNarration){if($payload.guide_name){"$($payload.guide_name) · ElevenLabs narration"}else{'ElevenLabs narration'}}else{'Original ambient devotional music · captioned reading'}
   Send-WorkerVideo -Uri "$base/dailybreath/api/local-tv-worker-upload.php" -Token $token -VideoPath $output -Fields @{tradition=$tradition;date=$payload.date;reference=$payload.reference;title=($payload.kind+' of the Day · '+$payload.reference);voiceover=$voiceover}
   if($UploadYouTube){
     $title=("Daily Breath · {0} · {1}" -f $payload.kind,$payload.reference)

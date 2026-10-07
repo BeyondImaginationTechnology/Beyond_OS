@@ -1,0 +1,8 @@
+config BR2_PACKAGE_BEYOND_ACADEMY
+	bool "Beyond Imagination OS Academy Learning Hub"
+	depends on BR2_PACKAGE_SDL2
+	depends on BR2_PACKAGE_SDL2_TTF
+	depends on BR2_PACKAGE_SDL2_X11
+	help
+	  Native Academy learning workspace with local course folders, a focus
+	  session and visible student/teacher boundaries.

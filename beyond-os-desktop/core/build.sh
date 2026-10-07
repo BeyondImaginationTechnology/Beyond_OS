@@ -8,7 +8,7 @@ case "$action" in configure|build|installer|legal-info) ;; *) echo "Usage: bash 
 profile=${BEYOND_FLAVOUR:-core}
 case "$profile" in core|creator|academy|sentinel|gaming) ;; *) echo "This Core builder supports core, creator, academy, sentinel, and gaming; use the Home or Cyber builder for those editions." >&2; exit 2 ;; esac
 profile_version=1.0
-case "$profile" in core) profile_version=0.2 ;; creator) profile_version=0.1 ;; esac
+case "$profile" in core) profile_version=0.2 ;; creator|academy) profile_version=0.1 ;; esac
 [[ $(uname -s) == Linux ]] || { echo "Build on a Linux host or Linux VM (not a Windows filesystem)." >&2; exit 1; }
 [[ $EUID -ne 0 ]] || { echo "Run Buildroot as a normal user." >&2; exit 1; }
 for command in make gcc g++ curl tar sha256sum python3 rsync cpio unzip patch; do
@@ -36,19 +36,25 @@ fi
 chmod +x "$core_source/board/x86_64/post-build.sh"
 chmod +x "$core_source/board/x86_64/post-image-uefi.sh"
 make -C "$source_dir" O="$output" BR2_EXTERNAL="$core_source" "$defconfig" BR2_BEYOND_PROFILE_ID="$profile"
-if [[ "$profile" == creator ]]; then
-    sed -i 's/^BR2_BEYOND_PROFILE_ID=.*/BR2_BEYOND_PROFILE_ID="creator"/' "$output/.config"
-    if grep -q '^# BR2_PACKAGE_BEYOND_CREATOR is not set$' "$output/.config"; then
-        sed -i 's/^# BR2_PACKAGE_BEYOND_CREATOR is not set$/BR2_PACKAGE_BEYOND_CREATOR=y/' "$output/.config"
-    elif ! grep -q '^BR2_PACKAGE_BEYOND_CREATOR=y$' "$output/.config"; then
-        printf '%s\n' 'BR2_PACKAGE_BEYOND_CREATOR=y' >> "$output/.config"
+if [[ "$profile" == creator || "$profile" == academy ]]; then
+    package=BEYOND_CREATOR
+    [[ "$profile" == academy ]] && package=BEYOND_ACADEMY
+    sed -i "s/^BR2_BEYOND_PROFILE_ID=.*/BR2_BEYOND_PROFILE_ID=\"$profile\"/" "$output/.config"
+    sed -i "s/^BR2_TARGET_GENERIC_HOSTNAME=.*/BR2_TARGET_GENERIC_HOSTNAME=\"beyond-$profile\"/" "$output/.config"
+    sed -i "s/^BR2_TARGET_ROOTFS_EXT2_LABEL=.*/BR2_TARGET_ROOTFS_EXT2_LABEL=\"BEYOND_${profile^^}\"/" "$output/.config"
+    if grep -q "^# BR2_PACKAGE_$package is not set$" "$output/.config"; then
+        sed -i "s/^# BR2_PACKAGE_$package is not set$/BR2_PACKAGE_$package=y/" "$output/.config"
+    elif ! grep -q "^BR2_PACKAGE_$package=y$" "$output/.config"; then
+        printf '%s\n' "BR2_PACKAGE_$package=y" >> "$output/.config"
     fi
     make -C "$source_dir" O="$output" BR2_EXTERNAL="$core_source" olddefconfig
-    creator_requested="$output/creator-requested.config"
-    cp "$core_source/configs/$defconfig" "$creator_requested"
-    sed -i 's/^BR2_BEYOND_PROFILE_ID=.*/BR2_BEYOND_PROFILE_ID="creator"/' "$creator_requested"
-    printf '%s\n' 'BR2_PACKAGE_BEYOND_CREATOR=y' >> "$creator_requested"
-    python3 "$core_source/tools/verify-config.py" "$creator_requested" "$output/.config"
+    profile_requested="$output/$profile-requested.config"
+    cp "$core_source/configs/$defconfig" "$profile_requested"
+    sed -i "s/^BR2_BEYOND_PROFILE_ID=.*/BR2_BEYOND_PROFILE_ID=\"$profile\"/" "$profile_requested"
+    sed -i "s/^BR2_TARGET_GENERIC_HOSTNAME=.*/BR2_TARGET_GENERIC_HOSTNAME=\"beyond-$profile\"/" "$profile_requested"
+    sed -i "s/^BR2_TARGET_ROOTFS_EXT2_LABEL=.*/BR2_TARGET_ROOTFS_EXT2_LABEL=\"BEYOND_${profile^^}\"/" "$profile_requested"
+    printf '%s\n' "BR2_PACKAGE_$package=y" >> "$profile_requested"
+    python3 "$core_source/tools/verify-config.py" "$profile_requested" "$output/.config"
 else
     python3 "$core_source/tools/verify-config.py" "$core_source/configs/$defconfig" "$output/.config"
 fi
@@ -70,8 +76,12 @@ if [[ "$action" == build ]]; then
     cp "$output/.config" "$output/images/beyond-core.config"
     printf 'BIT OS %s v%s images: %s/images\n' "$profile" "$profile_version" "$output"
 elif [[ "$action" == installer ]]; then
-    test -s "$output/images/bit-os-core-0.2-installer.img"
-    test -s "$output/images/bitCoreos.iso"
+    image_name=bit-os-core-0.2-installer.img
+    iso_name=bitCoreos.iso
+    if [[ "$profile" == creator ]]; then image_name=bit-os-creator-0.1-installer.img; iso_name=bitCreatoros.iso; fi
+    if [[ "$profile" == academy ]]; then image_name=bit-os-academy-0.1-installer.img; iso_name=bitAcademyos.iso; fi
+    test -s "$output/images/$image_name"
+    test -s "$output/images/$iso_name"
     test -s "$output/images/SHA256SUMS"
     cp "$output/.config" "$output/images/beyond-core-installer.config"
     printf 'BIT OS %s v%s UEFI installer candidate: %s/images\n' "$profile" "$profile_version" "$output"

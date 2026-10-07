@@ -13,6 +13,11 @@ if [ -r /usr/share/beyond-imagination-os/flavour ] &&
   edition=Creator
   release=v0.1
   filesystem_label=BEYOND_CREATOR
+elif [ -r /usr/share/beyond-imagination-os/flavour ] &&
+     [ "$(cat /usr/share/beyond-imagination-os/flavour)" = academy ]; then
+  edition=Academy
+  release=v0.1
+  filesystem_label=BEYOND_ACADEMY
 fi
 product="BIT OS $edition"
 

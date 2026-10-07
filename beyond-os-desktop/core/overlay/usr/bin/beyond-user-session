@@ -10,6 +10,7 @@ flavour=core
 [ ! -r /usr/share/beyond-imagination-os/flavour ] || flavour=$(cat /usr/share/beyond-imagination-os/flavour)
 case "$flavour" in
     creator) desktop=beyond-creator ;;
+    academy) desktop=beyond-academy ;;
     *) desktop=beyond-core ;;
 esac
 exec openbox --startup "/bin/sh -c '$desktop; openbox --exit'"

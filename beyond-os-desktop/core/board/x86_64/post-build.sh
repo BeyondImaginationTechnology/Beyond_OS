@@ -23,6 +23,16 @@ VERSION_ID="0.1"
 BUILD_ID="creator-0.1-dev.1"
 HOME_URL="https://beyondimagination.co.technology/"
 EOF
+elif [ "$flavour" = academy ]; then
+cat > "$target/etc/os-release" <<'EOF'
+NAME="Beyond Imagination OS Academy Edition"
+PRETTY_NAME="BIT OS Academy v0.1 (Development Preview)"
+ID=beyond-os
+VERSION="0.1 (Development Preview)"
+VERSION_ID="0.1"
+BUILD_ID="academy-0.1-dev.1"
+HOME_URL="https://beyondimagination.co.technology/"
+EOF
 else
 cat > "$target/etc/os-release" <<'EOF'
 NAME="Beyond Imagination OS Core Edition"
@@ -41,12 +51,21 @@ if [ "$flavour" = creator ]; then
         "$target/home/home/Exports" "$target/home/home/Fonts"
     chown -R 1000:1000 "$target/home/home"
 fi
+if [ "$flavour" = academy ]; then
+    install -d -m 0755 "$target/home/home/Courses/Offline" "$target/home/home/Assignments" \
+        "$target/home/home/Notes" "$target/home/home/Reading"
+    chown -R 1000:1000 "$target/home/home"
+fi
 rm -f "$target/usr/lib/os-release"
 cp "$target/etc/os-release" "$target/usr/lib/os-release"
 if [ "$flavour" = creator ]; then
     printf '%s\n' 'Welcome to BIT OS Creator v0.1.' 'Open Creator Hub to choose your apps, workspace, wallpaper and background playlist.' > "$target/home/home/Documents/Welcome.txt"
     printf '%s\n' 'BIT OS Creator v0.1 (Development Preview)' > "$target/etc/issue"
     printf '%s\n' 'BIT OS Creator v0.1 (Development Preview)' > "$target/etc/motd"
+elif [ "$flavour" = academy ]; then
+    printf '%s\n' 'Welcome to BIT OS Academy v0.1.' 'Open Learning Hub to find your course, assignment, reading and focus folders.' > "$target/home/home/Documents/Welcome.txt"
+    printf '%s\n' 'BIT OS Academy v0.1 (Development Preview)' > "$target/etc/issue"
+    printf '%s\n' 'BIT OS Academy v0.1 (Development Preview)' > "$target/etc/motd"
 else
     printf '%s\n' 'Welcome to BIT OS Core v0.2.' 'This independent image is built from upstream Linux components.' > "$target/home/home/Documents/Welcome.txt"
     printf '%s\n' 'BIT OS Core v0.2' > "$target/etc/issue"

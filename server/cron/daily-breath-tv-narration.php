@@ -21,7 +21,9 @@ function dailybreath_tv_narration_audio(PDO $pdo, string $date, string $traditio
     $audio = $isDailyReading ? dailybreath_audio_for_script($pdo, $date, $tradition, $locale, $script) : null;
     if (!$audio) {
         $voiceLocale = ['en' => 'en-US', 'he' => 'he-IL', 'ar' => 'ar-SA'][$locale] ?? '';
-        $voice = $voiceLocale === '' ? '' : studio_narration_voice('elevenlabs', $voiceLocale);
+        $voice = $voiceLocale === '' ? '' : ($tradition === 'bible'
+            ? studio_character_voice('chris', $voiceLocale, 'elevenlabs')
+            : studio_narration_voice('elevenlabs', $voiceLocale));
         if ($voice === '') {
             throw new RuntimeException('No ElevenLabs voice is configured for the ' . $locale . ' Daily Breath stream.');
         }

@@ -149,11 +149,21 @@ function dailybreath_render_tv_verse(string $tradition = 'bible', string $locale
         $episodes = is_array($manifest['episodes'] ?? null) ? $manifest['episodes'] : [];
         $episodeId = 'daily-' . $tradition . '-verse-' . $date;
         $episodes = array_values(array_filter($episodes, static fn($episode): bool => is_array($episode) && ($episode['id'] ?? '') !== $episodeId));
+        $programming = ['bible' => 'christian', 'torah' => 'judaism', 'quran' => 'muslim'][$tradition];
+        $airings = match ($tradition) {
+            'bible' => [['start' => '06:00', 'end' => '06:15'], ['start' => '07:00', 'end' => '08:00']],
+            'torah' => [['start' => '06:00', 'end' => '06:15'], ['start' => '08:00', 'end' => '09:00']],
+            'quran' => [['start' => '06:00', 'end' => '06:15'], ['start' => '12:00', 'end' => '13:00']],
+        };
         array_unshift($episodes, [
             'id' => $episodeId,
             'title' => $profile['kind'] . ' of the Day · ' . $reference,
             'subtitle' => $profile['series'] . ' · ' . $label,
             'show' => 'Daily Breath',
+            'tradition' => $tradition,
+            'programming' => $programming,
+            'airings' => $airings,
+            'timezone' => 'America/Vancouver',
             'video_url' => $outputUrl,
             'duration_seconds' => 57,
             'published_at' => $now->format(DATE_ATOM),

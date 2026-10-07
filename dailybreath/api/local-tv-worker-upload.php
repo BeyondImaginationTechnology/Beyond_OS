@@ -20,6 +20,7 @@ $date = (string)($rawUpload ? ($metadata['date'] ?? '') : ($_POST['date'] ?? '')
 $tradition = (string)($rawUpload ? ($metadata['tradition'] ?? '') : ($_POST['tradition'] ?? ''));
 $reference = trim((string)($rawUpload ? ($metadata['reference'] ?? '') : ($_POST['reference'] ?? '')));
 $title = trim((string)($rawUpload ? ($metadata['title'] ?? '') : ($_POST['title'] ?? '')));
+$voiceover = trim((string)($rawUpload ? ($metadata['voiceover'] ?? '') : ($_POST['voiceover'] ?? '')));
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || !in_array($tradition, ['bible','torah','quran'], true) || $reference === '' || $title === '') {
     http_response_code(422); echo json_encode(['ok' => false, 'error' => 'Invalid episode metadata']); exit;
 }
@@ -49,6 +50,13 @@ $manifestFile = "$directory/rotation.json";
 $manifest = json_decode((string)@file_get_contents($manifestFile), true) ?: [];
 $id = "daily-$tradition-verse-$date";
 $episodes = array_values(array_filter((array)($manifest['episodes'] ?? []), fn($episode) => is_array($episode) && ($episode['id'] ?? '') !== $id));
-array_unshift($episodes, ['id'=>$id,'title'=>$title,'subtitle'=>"Daily Breath · $date",'show'=>'Daily Breath','video_url'=>'/dailybreath/assets/videos/daily-breath-tv/'.$name,'duration_seconds'=>57,'published_at'=>gmdate(DATE_ATOM),'voiceover'=>'ElevenLabs narration']);
+$programming = ['bible' => 'christian', 'torah' => 'judaism', 'quran' => 'muslim'][$tradition];
+$airings = match ($tradition) {
+    // The shared morning reading is followed by a separate tradition-specific block.
+    'bible' => [['start' => '06:00', 'end' => '06:15'], ['start' => '07:00', 'end' => '08:00']],
+    'torah' => [['start' => '06:00', 'end' => '06:15'], ['start' => '08:00', 'end' => '09:00']],
+    'quran' => [['start' => '06:00', 'end' => '06:15'], ['start' => '12:00', 'end' => '13:00']],
+};
+array_unshift($episodes, ['id'=>$id,'title'=>$title,'subtitle'=>"Daily Breath · $date",'show'=>'Daily Breath','tradition'=>$tradition,'programming'=>$programming,'airings'=>$airings,'timezone'=>'America/Vancouver','video_url'=>'/dailybreath/assets/videos/daily-breath-tv/'.$name,'duration_seconds'=>57,'published_at'=>gmdate(DATE_ATOM),'voiceover'=>$voiceover!==''?$voiceover:'ElevenLabs narration']);
 file_put_contents($manifestFile, json_encode(['channel'=>'Daily Breath TV','updated_at'=>gmdate(DATE_ATOM),'episodes'=>array_slice($episodes,0,30)], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . PHP_EOL, LOCK_EX);
 echo json_encode(['ok' => true]);

@@ -37,6 +37,11 @@ function studio_elevenlabs_first_voice(array $providerConfig, string $language =
   return '';
 }
 function studio_narration_provider(): string { return strtolower((string)beyond_config('voice.provider','openai')); }
+function studio_character_voice(string $character, string $locale, string $provider = 'elevenlabs'): string {
+  $character = strtolower(trim($character));
+  $configured = trim((string)beyond_config('narration.'.strtolower($provider).'.character_voices.'.$character, ''));
+  return $configured !== '' ? $configured : studio_narration_voice($provider, $locale);
+}
 function studio_narration_voice(string $provider,string $locale): string {
   if($provider==='openai') return (string)beyond_config('narration.openai.voices.'.$locale,beyond_config('voice.openai_voice','coral'));
   $azureDefaults=['en-US'=>'en-US-JennyNeural','fr-FR'=>'fr-FR-DeniseNeural','fr-CA'=>'fr-CA-SylvieNeural','es-ES'=>'es-ES-ElviraNeural','it-IT'=>'it-IT-IsabellaNeural','de-DE'=>'de-DE-KatjaNeural','ru-RU'=>'ru-RU-SvetlanaNeural','pt-PT'=>'pt-PT-RaquelNeural','ar-MA'=>'ar-MA-MounaNeural','ar-EG'=>'ar-EG-SalmaNeural','sw-KE'=>'sw-KE-ZuriNeural'];

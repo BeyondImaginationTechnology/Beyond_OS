@@ -17,6 +17,11 @@
 /dailybreath/assets/videos/breathing/
 /dailybreath/assets/videos/daily-breath-tv/*
 !/dailybreath/assets/videos/daily-breath-tv/rotation.json
+# Blender source, exports, and backup files stay local because they are too large for GitHub.
+/dailybreath/assets/blender/
+/tools/blender/
+/dailybreath/assets/videos/*.blend
+/dailybreath/assets/videos/*.blend1
 /beyond-kitchen/assets/images/daily/
 /recipe/assets/images/daily/
 **/generated-*

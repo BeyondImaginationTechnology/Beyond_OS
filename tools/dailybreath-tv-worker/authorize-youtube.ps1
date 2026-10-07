@@ -1,7 +1,8 @@
 param(
   [Parameter(Mandatory = $true)][string]$ClientId,
   [Parameter(Mandatory = $true)][string]$ClientSecret,
-  [string]$RedirectUri = 'http://localhost:8765/oauth2/callback'
+  [string]$RedirectUri = 'http://localhost:8765/oauth2/callback',
+  [switch]$NoBrowser
 )
 
 $ErrorActionPreference = 'Stop'
@@ -28,8 +29,13 @@ $listener = [System.Net.HttpListener]::new()
 $listener.Prefixes.Add('http://localhost:8765/oauth2/')
 $listener.Start()
 try {
-  Write-Host 'Opening Google sign-in for the Daily Breath YouTube upload permission…'
-  Start-Process $authorizeUrl
+  if ($NoBrowser) {
+    Write-Host 'Open this URL in a browser to authorize Daily Breath YouTube uploads:'
+    Write-Output $authorizeUrl
+  } else {
+    Write-Host 'Opening Google sign-in for the Daily Breath YouTube upload permission…'
+    Start-Process $authorizeUrl
+  }
   $pending = $listener.BeginGetContext($null, $null)
   if (-not $pending.AsyncWaitHandle.WaitOne([TimeSpan]::FromMinutes(5))) {
     throw 'Timed out waiting for the Google authorization callback.'

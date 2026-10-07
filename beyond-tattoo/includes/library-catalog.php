@@ -84,7 +84,7 @@ function bt_library_collections(): array
         ],
         'public-domain-flash-archive' => [
             'name' => 'Public Domain Flash Archive', 'count' => 5, 'dates' => 'Sep 20–24, 2026',
-            'image' => 'assets/stencils/public-domain-flash-archive/01-smithsonian-flash-sheet-a/preview-watermarked.png',
+            'image' => 'assets/stencils/public-domain-flash-archive/01-smithsonian-tattoo-flash-sheet-a/preview-watermarked.png',
             'description' => 'Historic American tattoo flash from Smithsonian American Art Museum records released under CC0, prepared as clean black-outline flash sheets with the source record retained in each asset metadata file.',
             'stencils' => [
                 ['Smithsonian Tattoo Flash Sheet A', '2026-09-20'], ['Smithsonian Tattoo Flash Sheet B', '2026-09-21'],

@@ -1,0 +1,8 @@
+config BR2_PACKAGE_BEYOND_SENTINEL
+	bool "Beyond Imagination OS Sentinel Console"
+	depends on BR2_PACKAGE_SDL2
+	depends on BR2_PACKAGE_SDL2_TTF
+	depends on BR2_PACKAGE_SDL2_X11
+	help
+	  Native Sentinel console for local device posture, policy choices,
+	  audit-report folders and future opt-in fleet enrollment.

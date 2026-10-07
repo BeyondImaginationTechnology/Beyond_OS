@@ -18,6 +18,11 @@ elif [ -r "$TARGET_DIR/usr/share/beyond-imagination-os/flavour" ] &&
     product="BIT OS Academy v0.1"
     image="bit-os-academy-0.1-installer.img"
     iso="bitAcademyos.iso"
+elif [ -r "$TARGET_DIR/usr/share/beyond-imagination-os/flavour" ] &&
+     [ "$(cat "$TARGET_DIR/usr/share/beyond-imagination-os/flavour")" = sentinel ]; then
+    product="BIT OS Sentinel v0.1"
+    image="bit-os-sentinel-0.1-installer.img"
+    iso="bitSentinelos.iso"
 fi
 
 install -d "$BINARIES_DIR/efi-part/EFI/BOOT"

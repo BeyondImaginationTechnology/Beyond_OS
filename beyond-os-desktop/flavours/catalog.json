@@ -36,7 +36,7 @@
       "purpose": "Managed learning environments for students and teachers.",
       "base": "core",
       "profile": "academy",
-      "status": "profile-defined"
+      "status": "source-implemented"
     },
     {
       "id": "cyber",
@@ -51,7 +51,7 @@
       "purpose": "Long-term stability, policy, and fleet visibility.",
       "base": "core",
       "profile": "sentinel",
-      "status": "profile-defined"
+      "status": "source-implemented"
     },
     {
       "id": "gaming",

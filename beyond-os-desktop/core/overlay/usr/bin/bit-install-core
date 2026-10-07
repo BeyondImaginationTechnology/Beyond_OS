@@ -18,6 +18,11 @@ elif [ -r /usr/share/beyond-imagination-os/flavour ] &&
   edition=Academy
   release=v0.1
   filesystem_label=BEYOND_ACADEMY
+elif [ -r /usr/share/beyond-imagination-os/flavour ] &&
+     [ "$(cat /usr/share/beyond-imagination-os/flavour)" = sentinel ]; then
+  edition=Sentinel
+  release=v0.1
+  filesystem_label=BEYOND_SENTINEL
 fi
 product="BIT OS $edition"
 

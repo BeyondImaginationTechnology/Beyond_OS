@@ -2,5 +2,6 @@ menu "Beyond Imagination OS Core"
 source "$BR2_EXTERNAL_BEYOND_CORE_PATH/package/beyond-core/Config.in"
 source "$BR2_EXTERNAL_BEYOND_CORE_PATH/package/beyond-creator/Config.in"
 source "$BR2_EXTERNAL_BEYOND_CORE_PATH/package/beyond-academy/Config.in"
+source "$BR2_EXTERNAL_BEYOND_CORE_PATH/package/beyond-sentinel/Config.in"
 source "$BR2_EXTERNAL_BEYOND_CORE_PATH/package/beyond-profile/Config.in"
 endmenu

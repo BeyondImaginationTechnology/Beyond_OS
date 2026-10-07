@@ -8,7 +8,7 @@ case "$action" in configure|build|installer|legal-info) ;; *) echo "Usage: bash 
 profile=${BEYOND_FLAVOUR:-core}
 case "$profile" in core|creator|academy|sentinel|gaming) ;; *) echo "This Core builder supports core, creator, academy, sentinel, and gaming; use the Home or Cyber builder for those editions." >&2; exit 2 ;; esac
 profile_version=1.0
-case "$profile" in core) profile_version=0.2 ;; creator|academy) profile_version=0.1 ;; esac
+case "$profile" in core) profile_version=0.2 ;; creator|academy|sentinel) profile_version=0.1 ;; esac
 [[ $(uname -s) == Linux ]] || { echo "Build on a Linux host or Linux VM (not a Windows filesystem)." >&2; exit 1; }
 [[ $EUID -ne 0 ]] || { echo "Run Buildroot as a normal user." >&2; exit 1; }
 for command in make gcc g++ curl tar sha256sum python3 rsync cpio unzip patch; do
@@ -36,9 +36,10 @@ fi
 chmod +x "$core_source/board/x86_64/post-build.sh"
 chmod +x "$core_source/board/x86_64/post-image-uefi.sh"
 make -C "$source_dir" O="$output" BR2_EXTERNAL="$core_source" "$defconfig" BR2_BEYOND_PROFILE_ID="$profile"
-if [[ "$profile" == creator || "$profile" == academy ]]; then
+if [[ "$profile" == creator || "$profile" == academy || "$profile" == sentinel ]]; then
     package=BEYOND_CREATOR
     [[ "$profile" == academy ]] && package=BEYOND_ACADEMY
+    [[ "$profile" == sentinel ]] && package=BEYOND_SENTINEL
     sed -i "s/^BR2_BEYOND_PROFILE_ID=.*/BR2_BEYOND_PROFILE_ID=\"$profile\"/" "$output/.config"
     sed -i "s/^BR2_TARGET_GENERIC_HOSTNAME=.*/BR2_TARGET_GENERIC_HOSTNAME=\"beyond-$profile\"/" "$output/.config"
     sed -i "s/^BR2_TARGET_ROOTFS_EXT2_LABEL=.*/BR2_TARGET_ROOTFS_EXT2_LABEL=\"BEYOND_${profile^^}\"/" "$output/.config"
@@ -80,6 +81,7 @@ elif [[ "$action" == installer ]]; then
     iso_name=bitCoreos.iso
     if [[ "$profile" == creator ]]; then image_name=bit-os-creator-0.1-installer.img; iso_name=bitCreatoros.iso; fi
     if [[ "$profile" == academy ]]; then image_name=bit-os-academy-0.1-installer.img; iso_name=bitAcademyos.iso; fi
+    if [[ "$profile" == sentinel ]]; then image_name=bit-os-sentinel-0.1-installer.img; iso_name=bitSentinelos.iso; fi
     test -s "$output/images/$image_name"
     test -s "$output/images/$iso_name"
     test -s "$output/images/SHA256SUMS"

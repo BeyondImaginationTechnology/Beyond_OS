@@ -1,0 +1,15 @@
+{
+  "title": "Plague Doctor",
+  "status": "approved",
+  "release_date": "2026-09-01",
+  "display_date": "Tuesday, September 1, 2026",
+  "description": "A hooded plague doctor with lantern, raven, moon and thorned branches in a transfer-ready dark realism composition.",
+  "style": "Dark realism · Gothic blackwork",
+  "placement": "Forearm, calf, thigh or upper arm",
+  "difficulty": "Advanced",
+  "rights_confirmed": true,
+  "outline_stencil": "stencil-outline.png",
+  "print_ready_stencil": "stencil-print-ready.png",
+  "asset_formats": ["pure_black_outline", "violet_trace_compatible"],
+  "outline_standard": "Clean black contours on pure white; no color, gray wash, or background texture."
+}

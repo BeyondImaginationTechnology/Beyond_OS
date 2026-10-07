@@ -1,0 +1,23 @@
+{
+  "collection": "Public-domain tattoo reference candidates",
+  "purpose": "Curator queue only. Do not publish any image until its specific rights statement, source URL, and derivative treatment are recorded in the artwork metadata.",
+  "sources": [
+    {
+      "name": "Smithsonian Open Access tattoo flash collection",
+      "rights": "CC0 public-domain dedication",
+      "url": "https://americanart.si.edu/collections/search/artwork/?id=78741",
+      "catalog_url": "https://commons.wikimedia.org/wiki/Category:Flash_(tattoo)",
+      "suggested_collection": "Public Domain Flash Archive",
+      "suggested_categories": ["traditional", "flash", "blackwork"],
+      "workflow": "Create a new outline derivative, preserve source attribution and record the source identifier before approval."
+    },
+    {
+      "name": "Library of Congress Free to Use and Reuse: Autumn and Halloween",
+      "rights": "Collection-level free-to-use-and-reuse selection; verify the individual item’s rights advisory before publication.",
+      "url": "https://www.loc.gov/free-to-use/autumn-and-halloween/",
+      "suggested_collection": "Public Domain Autumn Archive",
+      "suggested_categories": ["illustrative", "autumn", "halloween"],
+      "workflow": "Use only entries with a compatible individual rights advisory; record the item URL and a new clean outline derivative."
+    }
+  ]
+}

@@ -81,6 +81,8 @@ $filterDifficulty = mb_substr(strtolower(trim((string)($_GET['difficulty'] ?? ''
 $filterCollection = mb_substr(strtolower(trim((string)($_GET['collection'] ?? ''))), 0, 80);
 $filterFrom = trim((string)($_GET['from'] ?? ''));
 $filterTo = trim((string)($_GET['to'] ?? ''));
+$sort = strtolower(trim((string)($_GET['sort'] ?? 'newest')));
+if (!in_array($sort, ['newest', 'oldest', 'title'], true)) $sort = 'newest';
 if (!isset($categoryOptions[$activeCategory])) {
     $activeCategory = '';
 }
@@ -100,7 +102,7 @@ function bt_stencil_category_slugs(string $title, string $collection): array
         $categories[] = 'black-grey';
     }
 
-    if ($collection === 'Japanese Legends') {
+    if (in_array($collection, ['Japanese Legends', 'Beyond Originals · Japanese'], true)) {
         $categories[] = 'japanese';
     }
 
@@ -171,28 +173,31 @@ foreach ($collections as $collectionSlug => $collection) {
     }
 }
 ?>
-<style>.bt-stencil-viewer-copy{max-height:calc(100dvh - 32px);overflow-y:auto}@media(max-width:760px){.bt-stencil-viewer-copy{max-height:38dvh}}</style>
+<style>
+.bt-library-toolbar{display:flex;align-items:center;gap:10px;margin:0 0 20px;padding:10px;border:1px solid #e3d9cc;border-radius:18px;background:#fff}.bt-library-search{display:flex;align-items:center;gap:9px;flex:1;min-width:0;padding:0 12px}.bt-library-search input{width:100%;min-width:0;border:0;outline:0;padding:10px 0;font:inherit;background:transparent}.bt-library-menu{position:relative}.bt-library-menu summary,.bt-library-sort{display:flex;align-items:center;gap:7px;min-height:42px;padding:0 13px;border:1px solid #e3d9cc;border-radius:11px;background:#fff;color:#211b17;font-weight:800;cursor:pointer;list-style:none}.bt-library-menu summary::-webkit-details-marker{display:none}.bt-library-menu-panel{position:absolute;z-index:6;right:0;top:50px;width:min(360px,calc(100vw - 42px));display:grid;gap:11px;padding:16px;border:1px solid #e3d9cc;border-radius:15px;background:#fffdf9;box-shadow:0 18px 42px rgba(31,20,11,.16)}.bt-library-menu-panel label{display:grid;gap:5px;font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.05em}.bt-library-menu-panel input,.bt-library-menu-panel select,.bt-library-sort select{padding:9px;border:1px solid #d8cfc3;border-radius:8px;background:#fff;font:inherit}.bt-library-menu-panel a{font-weight:800;color:#6645d7}.bt-library-sort{margin-left:auto}.bt-library-sort select{padding:0;border:0;outline:0;font-weight:800}.bt-stencil-schedule-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important}.bt-schedule-card{display:flex!important;flex-direction:column;align-items:stretch!important;padding:0!important;overflow:hidden}.bt-stencil-card-art{display:grid;place-items:center;min-height:210px;padding:14px;background:#fff}.bt-stencil-card-art img{width:100%;height:230px;object-fit:contain;mix-blend-mode:multiply}.bt-schedule-card>div:not(.bt-stencil-card-art){padding:0 16px}.bt-schedule-card>span{padding:10px 16px 14px}.bt-stencil-card-format{display:block;margin-top:8px;color:#7256d4;font-weight:800;font-size:.73rem;text-transform:uppercase;letter-spacing:.04em}.bt-schedule-number{display:none!important}@media(max-width:640px){.bt-library-toolbar{gap:7px}.bt-library-menu summary span{display:none}.bt-library-search{padding-left:8px}.bt-library-sort{margin-left:0}.bt-library-sort select{max-width:90px}.bt-stencil-card-art{min-height:180px}}
+.bt-stencil-viewer-copy{max-height:calc(100dvh - 32px);overflow-y:auto}@media(max-width:760px){.bt-stencil-viewer-copy{max-height:38dvh}}</style>
 <main class="bt-storefront bt-library-page" id="top">
-  <div class="bt-announcement"><div class="bt-wrap bt-announcement-inner"><span>✦ Asset library</span><span>◆ Verified assets only</span><span>Artist focused</span><a href="<?= e($outlineFile) ?>" target="_blank" rel="noopener">Print current outline →</a></div></div>
+  <div class="bt-announcement"><div class="bt-wrap bt-announcement-inner"><span>✦ Asset-backed stencil library</span><span>◆ Pure black outlines</span><span>Violet Trace ready</span><a href="collections.php">Browse collections →</a></div></div>
   <header class="bt-site-header"><div class="bt-wrap bt-site-header-inner">
     <a class="bt-brand" href="index.php"><span class="bt-brand-mark"><svg viewBox="0 0 64 64"><ellipse cx="32" cy="32" rx="25" ry="10"/><ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(60 32 32)"/><ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(120 32 32)"/><circle cx="32" cy="32" r="4"/></svg></span><span><strong>BEYOND</strong><b>TATTOO</b></span></a>
     <nav class="bt-desktop-nav"><a href="index.php">Home</a><a href="stencils.php" class="is-active">Stencils</a><a href="stylesheets.php">Stylesheets</a><a href="collections.php">Collections</a><a href="studios.php">Studios</a><a href="about.php">About</a></nav>
-    <div class="bt-header-actions"><a class="bt-header-download" href="<?= e($outlineFile) ?>" target="_blank" rel="noopener">⌘ Print outline</a><a class="bt-login-link" href="login.php">Studio login</a><details class="bt-mobile-menu"><summary>☰</summary><div><a href="stencils.php">Stencils</a><a href="stylesheets.php">Stylesheets</a><a href="collections.php">Collections</a><a href="studios.php">Studios</a><a href="about.php">About</a><a href="login.php">Studio login</a></div></details></div>
+    <div class="bt-header-actions"><a class="bt-header-download" href="collections.php">Browse collections</a><a class="bt-login-link" href="login.php">Studio login</a><details class="bt-mobile-menu"><summary>☰</summary><div><a href="stencils.php">Stencils</a><a href="stylesheets.php">Stylesheets</a><a href="collections.php">Collections</a><a href="studios.php">Studios</a><a href="about.php">About</a><a href="login.php">Studio login</a></div></details></div>
   </div></header>
 
-<section class="bt-page-hero"><div class="bt-wrap"><p class="bt-gold-kicker">✦ ASSET-BACKED LIBRARY</p><h1><?= e((string)$availableCount) ?> VERIFIED<br><strong>STENCIL DROPS</strong></h1><p>Browse approved designs with real preview and print-master files. Season One has 55 numbered drops, plus two bonus opening designs; only populated assets appear in this library.</p><div class="bt-main-actions"><a class="bt-glow-button" href="<?= e($outlineFile) ?>" target="_blank" rel="noopener">⌘ Print current outline</a><a class="bt-outline-button" href="collections.php">Browse collections</a></div></div></section>
+<section class="bt-page-hero"><div class="bt-wrap"><p class="bt-gold-kicker">✦ ASSET-BACKED LIBRARY</p><h1>EXPLORE<br><strong>STENCILS</strong></h1><p>Every card contains its actual pure-black stencil outline. Browse by collection, then filter and sort the approved library.</p><div class="bt-main-actions"><a class="bt-glow-button" href="collections.php">Browse collections</a></div></div></section>
 <section class="bt-page-section"><div class="bt-wrap">
-  <form class="filter-row" method="get" role="search" style="margin-bottom:18px"><label class="sr-only" for="stencil-search">Search approved stencils</label><input class="input" id="stencil-search" name="q" value="<?= e($searchQuery) ?>" placeholder="Search subject, style, placement, or difficulty"><?php if ($activeCategory !== ''): ?><input type="hidden" name="category" value="<?= e($activeCategory) ?>"><?php endif; ?><select class="input" name="style" aria-label="Filter by style"><option value="">All styles</option><option value="black-and-grey" <?= $filterStyle === 'black-and-grey' ? 'selected' : '' ?>>Black &amp; grey</option><option value="realism" <?= $filterStyle === 'realism' ? 'selected' : '' ?>>Realism</option><option value="japanese" <?= $filterStyle === 'japanese' ? 'selected' : '' ?>>Japanese</option></select><select class="input" name="difficulty" aria-label="Filter by difficulty"><option value="">All difficulty</option><option value="intermediate" <?= $filterDifficulty === 'intermediate' ? 'selected' : '' ?>>Intermediate</option><option value="advanced" <?= $filterDifficulty === 'advanced' ? 'selected' : '' ?>>Advanced</option></select><input class="input" name="placement" value="<?= e($filterPlacement) ?>" placeholder="Placement"><input class="input" name="collection" value="<?= e($filterCollection) ?>" placeholder="Collection"><input class="input" type="date" name="from" value="<?= e($filterFrom) ?>" aria-label="Release date from"><input class="input" type="date" name="to" value="<?= e($filterTo) ?>" aria-label="Release date to"><button class="bt-outline-button" type="submit">Filter library</button></form>
-  <?php if (($stencilDay['updated_at'] ?? '') !== '' && $searchQuery === '' && $activeCategory === ''): ?>
-  <section class="bt-library-group" id="studio-release"><div class="bt-library-heading"><div><p>BEYOND STUDIO RELEASE</p><h2>Latest published stencil</h2></div><span>Live now</span></div><div class="bt-stencil-schedule-grid"><article class="bt-schedule-card is-current is-unlocked" role="button" tabindex="0" aria-haspopup="dialog" aria-label="View <?= e($stencilDay['title']) ?> stencil" data-stencil-preview="<?= e($stencilDay['preview_url']) ?>" data-stencil-title="<?= e($stencilDay['title']) ?>" data-stencil-collection="<?= e($stencilDay['collection']) ?>" data-stencil-date="<?= e($stencilDay['display_date']) ?>" data-stencil-download="<?= e($stencilDay['transfer_png_url']) ?>" data-stencil-outline="<?= e($stencilDay['outline_png_url'] ?? '') ?>" data-stencil-pdf="<?= e($stencilDay['transfer_pdf_url'] ?? '') ?>" data-stencil-reference="<?= e($stencilDay['reference_image_url'] ?? '') ?>" data-stencil-placement="<?= e($stencilDay['placement_image_url'] ?? '') ?>" data-stencil-pack="<?= ($stencilDay['pack_image_url'] ?? '') !== ($stencilDay['preview_url'] ?? '') ? e($stencilDay['pack_image_url'] ?? '') : '' ?>" data-stencil-lore="<?= e($stencilDay['lore_card_url'] ?? '') ?>" data-stencil-style="<?= e($stencilDay['style_card_url'] ?? '') ?>" data-stencil-zip="<?= e($stencilDay['package_url'] ?? '') ?>"><div class="bt-schedule-number">AI</div><div><time datetime="<?= e($stencilDay['iso_date']) ?>"><?= e($stencilDay['display_date']) ?></time><h3><?= e($stencilDay['title']) ?></h3><p><?= e($stencilDay['description']) ?></p></div><span>View stencil</span></article></div></section>
-  <?php endif; ?>
-  <div class="bt-category-browser" aria-label="Browse stencils by category">
-    <a class="<?= $activeCategory === '' ? 'is-active' : '' ?>" href="stencils.php"><b>▦</b><span>All</span><small><?= e((string)$availableCount) ?></small></a>
-    <?php foreach ($categoryOptions as $slug => $option): ?>
-      <a class="<?= $activeCategory === $slug ? 'is-active' : '' ?>" href="stencils.php?category=<?= e($slug) ?>"><b><?= e($option['icon']) ?></b><span><?= e($option['label']) ?></span></a>
-    <?php endforeach; ?>
-  </div>
-  <div class="bt-category-results"><strong><?= e((string)$visibleCount) ?> available stencil<?= $visibleCount === 1 ? '' : 's' ?></strong><?php if ($activeCategory !== ''): ?><span>in <?= e($categoryOptions[$activeCategory]['label']) ?></span><a href="stencils.php">Clear filter ×</a><?php else: ?><span>released through <?= e($today->format('M j')) ?></span><?php endif; ?></div>
+  <form class="bt-library-toolbar" method="get" role="search">
+    <label class="bt-library-search" for="stencil-search"><span class="sr-only">Search stencil library</span><span aria-hidden="true">⌕</span><input id="stencil-search" name="q" value="<?= e($searchQuery) ?>" placeholder="Search stencil library"></label>
+    <details class="bt-library-menu"><summary aria-label="Open library filters" title="Filter library">⚲ <span>Filter</span></summary><div class="bt-library-menu-panel">
+      <label>Style<select name="style"><option value="">All styles</option><option value="black" <?= str_contains($filterStyle, 'black') ? 'selected' : '' ?>>Blackwork</option><option value="realism" <?= $filterStyle === 'realism' ? 'selected' : '' ?>>Realism</option><option value="japanese" <?= $filterStyle === 'japanese' ? 'selected' : '' ?>>Japanese</option></select></label>
+      <label>Difficulty<select name="difficulty"><option value="">Any difficulty</option><option value="intermediate" <?= $filterDifficulty === 'intermediate' ? 'selected' : '' ?>>Intermediate</option><option value="advanced" <?= $filterDifficulty === 'advanced' ? 'selected' : '' ?>>Advanced</option></select></label>
+      <label>Placement<input name="placement" value="<?= e($filterPlacement) ?>" placeholder="Forearm, calf…"></label>
+      <label>Collection<select name="collection"><option value="">All collections</option><?php foreach ($collections as $collectionOption): ?><option value="<?= e(strtolower($collectionOption['name'])) ?>" <?= $filterCollection === strtolower($collectionOption['name']) ? 'selected' : '' ?>><?= e($collectionOption['name']) ?></option><?php endforeach; ?></select></label>
+      <button class="bt-outline-button" type="submit">Apply filters</button><a href="stencils.php">Clear</a>
+    </div></details>
+    <label class="bt-library-sort" title="Sort library"><span aria-hidden="true">↕</span><span class="sr-only">Sort library</span><select name="sort" onchange="this.form.submit()"><option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?>>Newest</option><option value="oldest" <?= $sort === 'oldest' ? 'selected' : '' ?>>Oldest</option><option value="title" <?= $sort === 'title' ? 'selected' : '' ?>>A–Z</option></select></label>
+  </form>
+  <div class="bt-category-results"><strong><?= e((string)$visibleCount) ?> approved stencil<?= $visibleCount === 1 ? '' : 's' ?></strong><span>Pure-black outlines · Violet Trace compatible</span></div>
 
   <?php $number=1; foreach($collections as $slug=>$collection):
     $matchingItems = [];
@@ -207,7 +212,7 @@ foreach ($collections as $collectionSlug => $collection) {
       $scheduledDate = new DateTimeImmutable($item[1], new DateTimeZone('America/Vancouver'));
       $scheduledAssets = bt_stencil_preview_assets($slug, $index, $item[0]);
       $hasScheduledAssets = $scheduledAssets['approved'] && is_file(__DIR__ . '/' . $scheduledAssets['preview']) && is_file(__DIR__ . '/' . $scheduledAssets['print_png']);
-      if ($scheduledDate <= $today
+      if ($hasScheduledAssets && $scheduledDate <= $today
           && ($activeCategory === '' || in_array($activeCategory, bt_stencil_category_slugs($item[0], $collection['name']), true))
           && bt_stencil_matches_search($item[0], $collection['name'], $scheduledAssets['metadata'], $searchQuery)
           && bt_stencil_matches_filters($item[0], $collection['name'], $scheduledAssets['metadata'], $filterStyle, $filterPlacement, $filterDifficulty, $filterCollection, $filterFrom, $filterTo, $item[1])) {
@@ -215,6 +220,10 @@ foreach ($collections as $collectionSlug => $collection) {
       }
     }
     if (!$matchingItems) { if ($number > $seasonTotal) break; continue; }
+    usort($matchingItems, static function (array $left, array $right) use ($sort): int {
+      if ($sort === 'title') return strcasecmp($left[0][0], $right[0][0]);
+      return $sort === 'oldest' ? strcmp($left[0][1], $right[0][1]) : strcmp($right[0][1], $left[0][1]);
+    });
   ?>
   <section class="bt-library-group" id="<?= e($slug) ?>"><div class="bt-library-heading"><div><p><?= e($collection['dates']) ?></p><h2><?= e($collection['name']) ?></h2></div><span><?= e((string)count($matchingItems)) ?> shown</span></div><div class="bt-stencil-schedule-grid">
   <?php foreach($matchingItems as $matching):
@@ -251,8 +260,8 @@ foreach ($collections as $collectionSlug => $collection) {
       data-stencil-zip="api/stencil-download.php?type=package&amp;id=<?= e(bt_stencil_asset_slug($item[0]) . '-' . $item[1]) ?>"
     <?php endif; ?>
   >
-    <div class="bt-schedule-number"><?= $itemNumber > 0 ? str_pad((string)max(1,(int)($assets['metadata']['season_drop'] ?? $itemNumber)),2,'0',STR_PAD_LEFT) : 'OPENING BONUS' ?></div>
-    <div><time datetime="<?= e($item[1]) ?>"><?= e(bt_pretty_date($item[1])) ?></time><h3><?= e($item[0]) ?></h3><p><?= e((string)($assets['metadata']['style'] ?? $collection['name'])) ?> · <?= e((string)($assets['metadata']['placement'] ?? implode(' · ', array_map(static fn($cat) => $categoryOptions[$cat]['label'] ?? $cat, $itemCategories)))) ?> · <?= e((string)($assets['metadata']['license'] ?? 'Professional use')) ?></p></div>
+    <?php $cardArt = is_file(__DIR__ . '/' . $assets['outline_png']) ? $assets['outline_png'] : $assets['print_png']; ?><div class="bt-stencil-card-art"><img src="<?= e($cardArt) ?>" alt="<?= e($item[0]) ?> pure black outline" loading="lazy"></div>
+    <div><time datetime="<?= e($item[1]) ?>"><?= e(bt_pretty_date($item[1])) ?></time><h3><?= e($item[0]) ?></h3><p><?= e((string)($assets['metadata']['style'] ?? $collection['name'])) ?> · <?= e((string)($assets['metadata']['placement'] ?? implode(' · ', array_map(static fn($cat) => $categoryOptions[$cat]['label'] ?? $cat, $itemCategories)))) ?></p><small class="bt-stencil-card-format">Pure black outline · Violet Trace ready</small></div>
     <span><?= $isUnlocked?'View stencil':($releaseDate > $today ? 'Upcoming' : 'Available') ?></span><?php if ($isUnlocked): ?><button class="bt-save-stencil" type="button" data-save-stencil="<?= e($item[0]) ?>" aria-label="Save <?= e($item[0]) ?>">☆ Save</button><?php endif; ?>
   </article><?php endforeach; ?>
   </div></section><?php endforeach; ?>
@@ -298,7 +307,7 @@ foreach ($collections as $collectionSlug => $collection) {
 </div>
 
   <footer class="bt-store-footer"><div class="bt-wrap bt-store-footer-grid"><div class="bt-footer-brand"><span class="bt-brand-mark"><svg viewBox="0 0 64 64"><ellipse cx="32" cy="32" rx="25" ry="10"/><ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(60 32 32)"/><ellipse cx="32" cy="32" rx="25" ry="10" transform="rotate(120 32 32)"/><circle cx="32" cy="32" r="4"/></svg></span><div><strong>Beyond Tattoo</strong><small>Beyond imagination. Beyond limits.</small></div></div><div class="bt-footer-links"><a href="../">Beyond OS</a><a href="login.php">Studio login</a><a href="../legal/terms.php">Terms</a><a href="../legal/privacy.php">Privacy</a></div></div></footer>
-  <a class="bt-mobile-sticky-download" href="<?= e($outlineFile) ?>" target="_blank" rel="noopener">⌘ Print today’s outline</a>
+  <a class="bt-mobile-sticky-download" href="collections.php">Browse collections</a>
 </main>
 <script>
 (() => {

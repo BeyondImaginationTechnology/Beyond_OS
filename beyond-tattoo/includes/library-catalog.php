@@ -62,9 +62,9 @@ function bt_library_collections(): array
             ],
         ],
         'beyond-studio-originals' => [
-            'name' => 'Beyond Studio Originals', 'count' => 10, 'dates' => 'Aug 30–Sep 8, 2026',
+            'name' => 'Beyond Originals', 'count' => 10, 'dates' => 'Aug 30–Sep 8, 2026',
             'image' => 'assets/img/storefront/collection-dark.webp',
-            'description' => 'The first Beyond Studio artist set: gothic architecture, chains, roses, ravens and mythic guardians.',
+            'description' => 'Original Beyond Tattoo artist set: gothic architecture, chains, roses, ravens and mythic guardians.',
             'stencils' => [
                 ['Chain Lantern Cathedral', '2026-08-30'], ['Skull Cathedral Smoke', '2026-08-31'], ['Crow Ruins', '2026-09-01'],
                 ['Demon Cathedral', '2026-09-02'], ['Fallen Angel', '2026-09-03'], ['Reaper and Ravens', '2026-09-04'],
@@ -72,9 +72,9 @@ function bt_library_collections(): array
             ],
         ],
         'beyond-studio-japanese' => [
-            'name' => 'Beyond Studio Japanese Originals', 'count' => 10, 'dates' => 'Sep 9–18, 2026',
+            'name' => 'Beyond Originals · Japanese', 'count' => 10, 'dates' => 'Sep 9–18, 2026',
             'image' => 'assets/img/storefront/collection-japanese.webp',
-            'description' => 'Japanese-inspired guardians, dragons, flowers and flowing ornamental compositions from the Beyond Studio artist set.',
+            'description' => 'Original Beyond Tattoo Japanese-inspired set: guardians, dragons, flowers and flowing ornamental compositions.',
             'stencils' => [
                 ['Raijin Drummer', '2026-09-09'], ['Raijin Thunder', '2026-09-10'], ['Phoenix Chrysanthemum', '2026-09-11'],
                 ['Kitsune Koi', '2026-09-12'], ['Shishi Lion', '2026-09-13'], ['Yin Yang Waves', '2026-09-14'],

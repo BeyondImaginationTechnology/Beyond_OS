@@ -22,6 +22,20 @@
       "transfer": "Select one design from the sheet for the stencil. Preserve its silhouette and facial or foliage details, and confirm minimum line spacing at final print size."
     },
     {
+      "sequence": 2,
+      "date": "2026-10-02",
+      "title": "Midnight Harvest Flash",
+      "asset": "assets/stylesheets/autumn-ink-02-midnight-harvest.png",
+      "style": "Gothic autumn blackwork flash",
+      "palette": "Pure black linework on a clean white field.",
+      "linework": "Use bold outer contours, crisp interior feathering and open line spacing around every independent flash motif.",
+      "contrast": "Let the raven, haunted house, skull and thorned heart carry the strongest black fields; preserve readable open skin in clouds, web strands and leaves.",
+      "texture": "Use restrained stippling on moon craters, feathers and bone. Keep tiny stars, thorns and leaf veins clean at transfer scale.",
+      "composition": "A balanced 12-piece gothic autumn flash sheet with a raven, haunted house, moon, black cat, lantern, leaf-crowned skull, witch hand, coffin, web, ghost, acorn and thorned heart.",
+      "placement": "Individual motifs suit wrist, ankle, forearm, calf or shoulder. Scale the haunted house, raven and heart up for more detailed placements.",
+      "transfer": "Choose one motif for transfer. Preserve the silhouette and simplify the smallest stars, web strands and thorn tips at final tattoo size."
+    },
+    {
       "sequence": 3,
       "date": "2026-10-03",
       "title": "Thorned Harvest Flash",
@@ -48,6 +62,34 @@
       "composition": "A balanced 12-piece autumn flash sheet: raven, pumpkin, stacked pumpkins, maple leaf, acorn, feather, moon, ghost, witch hat, mushrooms, wheat and spider web.",
       "placement": "Individual motifs suit wrist, ankle, forearm, calf or shoulder placements; scale the raven, ghost and mushroom grouping up for larger placements.",
       "transfer": "Select one flash motif at a time for transfer. Preserve the outer silhouette, leave breathing room between close lines, and simplify tiny accents for the final tattoo size."
+    },
+    {
+      "sequence": 5,
+      "date": "2026-10-05",
+      "title": "Witching Harvest Flash",
+      "asset": "assets/stylesheets/autumn-ink-05-witching-harvest.png",
+      "style": "Mystic harvest blackwork flash",
+      "palette": "Pure black linework on a clean white field.",
+      "linework": "Use a sturdy outer contour with open internal hatching so cottage stone, potion glass, fur, petals and smoke remain legible after transfer.",
+      "contrast": "Hold the strongest black fields in the cottage roof, bat wings, cauldron and cat skull. Let the moon, eye rays and potion highlights stay open.",
+      "texture": "Use controlled stipple for smoke, glass reflections and moon texture. Keep leaf clusters, wheat and thorn details clear rather than densely filled.",
+      "composition": "A balanced 12-piece witching flash sheet with a cottage, potion bottle, bat, moon, moth, mystical eye, spellbook, cauldron, lantern tree, cat skull, wheat and thorned rose.",
+      "placement": "Small motifs work on wrist, ankle or collarbone; the cottage, cauldron, moth and lantern tree reward larger forearm, calf or upper-arm placements.",
+      "transfer": "Choose a single flash design per transfer. Preserve open negative space inside the potion, eye, cauldron steam and cottage windows."
+    },
+    {
+      "sequence": 6,
+      "date": "2026-10-06",
+      "title": "Midnight Reliquary Flash",
+      "asset": "assets/stylesheets/autumn-ink-06-midnight-reliquary.png",
+      "style": "Victorian autumn blackwork flash",
+      "palette": "Pure black linework on a clean white field.",
+      "linework": "Use confident exterior lines and controlled hatching in stone, feathers, metal keys, wax and botanical details; protect negative space around small accents.",
+      "contrast": "Keep the grave marker, owl, black rose, raven skull and spider as the darkest focal points. Preserve the candle flame, moonlight and hourglass stars as clean openings.",
+      "texture": "Use stipple on aged stone, moon texture and water reflection. Simplify intricate web strands and key teeth at smaller tattoo sizes.",
+      "composition": "A balanced 12-piece Victorian autumn flash sheet with a grave marker, owl, pumpkin carriage, black rose, skeletal hand and lantern, raven skull, hourglass, feather, spider web, keys, candle and harvest moon.",
+      "placement": "Individual motifs suit wrist, ankle, forearm, calf or shoulder. The owl, grave marker, carriage and moon scene are best scaled for medium-to-large placements.",
+      "transfer": "Choose one motif per transfer. Preserve the outer silhouette and leave adequate breathing room in webs, keys, lantern filigree and the candle wax."
     }
   ]
 }

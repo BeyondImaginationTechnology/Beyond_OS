@@ -29,6 +29,27 @@ private enum DailyBreathTVProgramming: String, CaseIterable, Identifiable {
         case .judaism: "daily-torah-"
         }
     }
+
+    var tradition: FaithTradition? {
+        switch self {
+        case .full: nil
+        case .christian: .bible
+        case .muslim: .quran
+        case .judaism: .torah
+        }
+    }
+
+    static func options(for tradition: FaithTradition) -> [DailyBreathTVProgramming] {
+        [.full, program(for: tradition)]
+    }
+
+    static func program(for tradition: FaithTradition) -> DailyBreathTVProgramming {
+        switch tradition {
+        case .bible: .christian
+        case .torah: .judaism
+        case .quran: .muslim
+        }
+    }
 }
 
 private struct DailyBreathTVRotation: Decodable {
@@ -39,11 +60,19 @@ private struct DailyBreathTVEpisode: Decodable {
     let id: String
     let title: String
     let videoURL: String
+    let tradition: String?
+    let programming: String?
+    let airings: [DailyBreathTVAiring]?
 
     enum CodingKeys: String, CodingKey {
-        case id, title
+        case id, title, tradition, programming, airings
         case videoURL = "video_url"
     }
+}
+
+private struct DailyBreathTVAiring: Decodable {
+    let start: String
+    let end: String
 }
 
 struct TodayView: View {
@@ -97,7 +126,10 @@ struct TodayView: View {
     }
 
     private var tvProgramming: DailyBreathTVProgramming {
-        DailyBreathTVProgramming(rawValue: tvProgrammingID) ?? .full
+        let saved = DailyBreathTVProgramming(rawValue: tvProgrammingID) ?? .full
+        return DailyBreathTVProgramming.options(for: selectedTradition).contains(saved)
+            ? saved
+            : DailyBreathTVProgramming.program(for: selectedTradition)
     }
 
     private var todayShareURL: URL {
@@ -183,6 +215,11 @@ struct TodayView: View {
             stopNarration()
             Task { await store.refreshToday() }
         }
+        .onChange(of: traditionID) { _, _ in
+            stopNarration()
+            tvProgrammingID = DailyBreathTVProgramming.program(for: selectedTradition).id
+            Task { await store.refreshToday() }
+        }
         .onChange(of: store.approvedContent?.audioURL) { _, _ in stopNarration() }
         .onReceive(NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime)) { notification in
             if (notification.object as? AVPlayerItem) === narrationPlayer?.currentItem {
@@ -213,10 +250,12 @@ struct TodayView: View {
                 Link("Open channel", destination: Self.dailyBreathTVChannelURL)
                     .font(.subheadline.weight(.semibold))
             }
-            VideoPlayer(player: tvPlayer)
-                .frame(minHeight: 190)
-                .clipShape(RoundedRectangle(cornerRadius: 18))
-                .accessibilityLabel("Daily Breath TV preview")
+            if tvPreviewError == nil {
+                VideoPlayer(player: tvPlayer)
+                    .frame(minHeight: 190)
+                    .clipShape(RoundedRectangle(cornerRadius: 18))
+                    .accessibilityLabel("Daily Breath TV preview")
+            }
             if let tvPreviewError {
                 Text(tvPreviewError)
                     .font(.caption)
@@ -227,7 +266,7 @@ struct TodayView: View {
                     .foregroundStyle(.secondary)
             }
             Menu {
-                ForEach(DailyBreathTVProgramming.allCases) { programming in
+                ForEach(DailyBreathTVProgramming.options(for: selectedTradition)) { programming in
                     Button {
                         tvProgrammingID = programming.id
                     } label: {
@@ -239,14 +278,16 @@ struct TodayView: View {
                     .font(.subheadline.weight(.semibold))
             }
             .accessibilityLabel("Daily Breath TV programming")
-            .accessibilityHint("Choose full, Christian, Muslim, or Judaism programming.")
-            Button {
-                tvMuted.toggle()
-                tvPlayer.isMuted = tvMuted
-            } label: {
-                Label(tvMuted ? "Turn on channel audio" : "Mute channel audio", systemImage: tvMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+            .accessibilityHint("Choose full programming or programming for your selected sacred-text tradition.")
+            if tvPreviewError == nil {
+                Button {
+                    tvMuted.toggle()
+                    tvPlayer.isMuted = tvMuted
+                } label: {
+                    Label(tvMuted ? "Turn on channel audio" : "Mute channel audio", systemImage: tvMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                }
+                .buttonStyle(.bordered)
             }
-            .buttonStyle(.bordered)
         }
         .padding(16)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 24))
@@ -265,13 +306,12 @@ struct TodayView: View {
                 throw DailyBreathAPIError.badResponse
             }
             let episodes = try JSONDecoder().decode(DailyBreathTVRotation.self, from: data).episodes
-            let episode = episodes.first { episode in
-                guard let prefix = tvProgramming.episodePrefix else { return true }
-                return episode.id.hasPrefix(prefix)
-            }
+            let episode = activeEpisode(from: episodes, at: Date())
             guard let episode,
                   let url = URL(string: episode.videoURL, relativeTo: Self.dailyBreathTVBaseURL) else {
-                throw DailyBreathAPIError.badResponse
+                tvPreviewTitle = "No \(tvProgramming.title.lowercased()) is live right now. All times are Pacific."
+                tvPreviewError = "The next scheduled \(selectedTradition.name) Daily Breath TV block will appear here."
+                return
             }
             tvPlayer.replaceCurrentItem(with: AVPlayerItem(url: url))
             tvPlayer.isMuted = tvMuted
@@ -280,6 +320,57 @@ struct TodayView: View {
         } catch {
             tvPreviewError = "The selected channel preview is unavailable. Open the channel to try again."
         }
+    }
+
+    private func activeEpisode(from episodes: [DailyBreathTVEpisode], at date: Date) -> DailyBreathTVEpisode? {
+        let matching = episodes.filter { episode in
+            let episodeTradition = episode.tradition ?? inferredTradition(for: episode)
+            guard let episodeTradition else { return false }
+            if let programTradition = tvProgramming.tradition {
+                guard episodeTradition == programTradition.id,
+                      episode.programming == tvProgramming.id else { return false }
+            }
+            return episodeIsForCurrentDay(episode, at: date) && isAiring(episode, at: date)
+        }
+        guard !matching.isEmpty else { return nil }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "America/Vancouver") ?? .current
+        let minute = (calendar.component(.hour, from: date) * 60) + calendar.component(.minute, from: date)
+        return matching[minute % matching.count]
+    }
+
+    private func inferredTradition(for episode: DailyBreathTVEpisode) -> String? {
+        if episode.id.hasPrefix("daily-bible-") { return FaithTradition.bible.id }
+        if episode.id.hasPrefix("daily-torah-") { return FaithTradition.torah.id }
+        if episode.id.hasPrefix("daily-quran-") { return FaithTradition.quran.id }
+        return nil
+    }
+
+    private func episodeIsForCurrentDay(_ episode: DailyBreathTVEpisode, at date: Date) -> Bool {
+        let datePattern = #"\d{4}-\d{2}-\d{2}"#
+        guard let range = episode.id.range(of: datePattern, options: .regularExpression) else { return false }
+        var formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.timeZone = TimeZone(identifier: "America/Vancouver") ?? .current
+        formatter.dateFormat = "yyyy-MM-dd"
+        return String(episode.id[range]) == formatter.string(from: date)
+    }
+
+    private func isAiring(_ episode: DailyBreathTVEpisode, at date: Date) -> Bool {
+        guard let airings = episode.airings, !airings.isEmpty else { return false }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "America/Vancouver") ?? .current
+        let current = (calendar.component(.hour, from: date) * 60) + calendar.component(.minute, from: date)
+        return airings.contains { airing in
+            guard let start = Self.minutes(for: airing.start), let end = Self.minutes(for: airing.end) else { return false }
+            return start <= end ? (current >= start && current < end) : (current >= start || current < end)
+        }
+    }
+
+    private static func minutes(for time: String) -> Int? {
+        let parts = time.split(separator: ":").compactMap { Int($0) }
+        guard parts.count == 2, (0..<24).contains(parts[0]), (0..<60).contains(parts[1]) else { return nil }
+        return (parts[0] * 60) + parts[1]
     }
 
 

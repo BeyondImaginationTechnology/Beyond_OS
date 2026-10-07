@@ -22,7 +22,7 @@ The script opens Google consent, listens only on `http://localhost:8765/oauth2/c
 To publish the three rendered daily readings to YouTube as **private** videos, run the worker explicitly with:
 
 ```powershell
-.\run.ps1 -UploadYouTube
+.\run.ps1
 ```
 
-The normal scheduled task does not publish to YouTube. Add `-UploadYouTube` to its task command only after reviewing a successful private upload.
+Each normal run uploads the completed video to Beyond TV and then to YouTube as a private video. Run `authorize-youtube.ps1` once before starting the worker. Use `-SkipYouTube` only when you need to produce a Beyond TV-only run.

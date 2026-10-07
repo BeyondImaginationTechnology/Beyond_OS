@@ -1,4 +1,4 @@
-param([switch]$InstallTask,[switch]$UploadYouTube)
+param([switch]$InstallTask,[switch]$SkipYouTube)
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $configPath=Join-Path $PSScriptRoot 'worker-secret.xml'
@@ -7,8 +7,9 @@ $config=Import-Clixml $configPath
 $token=[System.Net.NetworkCredential]::new('', $config.Token).Password
 $youtubeConfigPath=Join-Path $PSScriptRoot 'youtube-oauth.xml'
 $youtubeConfig=$null
-if($UploadYouTube){
-  if(!(Test-Path $youtubeConfigPath)){throw 'Run authorize-youtube.ps1 before enabling YouTube uploads.'}
+$publishYouTube=-not $SkipYouTube
+if($publishYouTube){
+  if(!(Test-Path $youtubeConfigPath)){throw 'Run authorize-youtube.ps1 before running the worker. Daily Breath now uploads each completed Beyond TV video to YouTube in the same run.'}
   $youtubeConfig=Import-Clixml $youtubeConfigPath
 }
 $headers=@{Authorization="Bearer $token"}
@@ -126,7 +127,7 @@ foreach($tradition in 'bible','torah','quran'){
   # Upload endpoint is enabled with the production deploy; do not expose token in URLs.
   $voiceover=if($hasNarration){if($payload.guide_name){"$($payload.guide_name) · ElevenLabs narration"}else{'ElevenLabs narration'}}else{'Original ambient devotional music · captioned reading'}
   Send-WorkerVideo -Uri "$base/dailybreath/api/local-tv-worker-upload.php" -Token $token -VideoPath $output -Fields @{tradition=$tradition;date=$payload.date;reference=$payload.reference;title=($payload.kind+' of the Day · '+$payload.reference);voiceover=$voiceover}
-  if($UploadYouTube){
+  if($publishYouTube){
     $title=("Daily Breath · {0} · {1}" -f $payload.kind,$payload.reference)
     $description=("{0}`n`n{1}`n`nDaily Breath · Faith-centered wellness" -f $payload.reference,$payload.passage)
     Publish-YouTubeVideo -Config $youtubeConfig -VideoPath $output -Title $title -Description $description

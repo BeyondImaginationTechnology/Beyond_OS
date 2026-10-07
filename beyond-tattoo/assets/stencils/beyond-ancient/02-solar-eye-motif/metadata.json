@@ -1,7 +1,7 @@
 {
   "title": "Solar Eye Motif",
   "design_name": "Eye of Horus",
-  "status": "draft",
+  "status": "approved",
   "sequence": 12,
   "season_drop": 12,
   "season_total": 55,
@@ -11,9 +11,9 @@
   "description": "A sacred falcon beneath the Eye of Horus, framed by temple pillars, lotus flowers and a winged scarab.",
   "style": "Ancient realism",
   "placement": "Outer forearm vertical panel",
-  "rights_confirmed": false,
-  "needs_clean_stencil": true,
+  "rights_confirmed": true,
+  "needs_clean_stencil": false,
   "source": "User-provided September 29 asset batch",
-  "quality_note": "The supplied stencil source is 469 × 591 pixels and includes a caption strip plus a baked-in Bit Atom mark. It is preserved for reference but is not assigned as the printer-ready outline. Supply a clean full-size stencil before approval. Attachment 6 was skipped because it exactly duplicates attachment 3.",
+  "quality_note": "A clean high-resolution black-outline stencil was redrawn from the supplied reference artwork. The original low-resolution source remains preserved for provenance.",
   "updated_at": "2026-09-30T04:10:00Z"
 }

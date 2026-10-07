@@ -164,8 +164,8 @@ foreach ($collections as $collectionSlug => $collection) {
         $releaseDate = new DateTimeImmutable($item[1], new DateTimeZone('America/Vancouver'));
         if ($releaseDate > $today) continue;
         $assets = bt_stencil_preview_assets($collectionSlug, $collectionIndex, $item[0]);
-        if (!$assets['approved'] || !is_file(__DIR__ . '/' . $assets['preview']) || !is_file(__DIR__ . '/' . $assets['print_png'])) continue;
-        $availableCount++;
+        $hasPrintPackage = is_file(__DIR__ . '/' . $assets['preview']) && is_file(__DIR__ . '/' . $assets['print_png']);
+        if ($hasPrintPackage) $availableCount++;
         if (($activeCategory === '' || in_array($activeCategory, bt_stencil_category_slugs($item[0], $collection['name']), true))
             && bt_stencil_matches_search($item[0], $collection['name'], $assets['metadata'], $searchQuery)
             && bt_stencil_matches_filters($item[0], $collection['name'], $assets['metadata'], $filterStyle, $filterPlacement, $filterDifficulty, $filterCollection, $filterFrom, $filterTo, $item[1])) {
@@ -198,7 +198,7 @@ foreach ($collections as $collectionSlug => $collection) {
     </div></details>
     <label class="bt-library-sort" title="Sort library"><span aria-hidden="true">↕</span><span class="sr-only">Sort library</span><select name="sort" onchange="this.form.submit()"><option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?>>Newest</option><option value="oldest" <?= $sort === 'oldest' ? 'selected' : '' ?>>Oldest</option><option value="title" <?= $sort === 'title' ? 'selected' : '' ?>>A–Z</option></select></label>
   </form>
-  <div class="bt-category-results"><strong><?= e((string)$availableCount) ?> / <?= e((string)$seasonTotal) ?> verified Season One stencils</strong><span><?= e((string)$visibleCount) ?> matching this view · Pure-black outlines · Violet Trace compatible</span></div>
+  <div class="bt-category-results"><strong><?= e((string)$seasonTotal) ?> Season One stencil designs</strong><span><?= e((string)$availableCount) ?> verified print packages · <?= e((string)$visibleCount) ?> matching this view</span></div>
 
   <?php $number=1; foreach($collections as $slug=>$collection):
     $matchingItems = [];
@@ -212,8 +212,7 @@ foreach ($collections as $collectionSlug => $collection) {
       }
       $scheduledDate = new DateTimeImmutable($item[1], new DateTimeZone('America/Vancouver'));
       $scheduledAssets = bt_stencil_preview_assets($slug, $index, $item[0]);
-      $hasScheduledAssets = $scheduledAssets['approved'] && is_file(__DIR__ . '/' . $scheduledAssets['preview']) && is_file(__DIR__ . '/' . $scheduledAssets['print_png']);
-      if ($hasScheduledAssets && $scheduledDate <= $today
+      if ($scheduledDate <= $today
           && ($activeCategory === '' || in_array($activeCategory, bt_stencil_category_slugs($item[0], $collection['name']), true))
           && bt_stencil_matches_search($item[0], $collection['name'], $scheduledAssets['metadata'], $searchQuery)
           && bt_stencil_matches_filters($item[0], $collection['name'], $scheduledAssets['metadata'], $filterStyle, $filterPlacement, $filterDifficulty, $filterCollection, $filterFrom, $filterTo, $item[1])) {
@@ -235,7 +234,8 @@ foreach ($collections as $collectionSlug => $collection) {
     $releaseDate = new DateTimeImmutable($item[1], new DateTimeZone('America/Vancouver'));
     $assets = bt_stencil_preview_assets($slug, $collectionIndex, $item[0]);
     $hasPreview = is_file(__DIR__ . '/' . $assets['preview']);
-    $isUnlocked = $releaseDate <= $today && $hasPreview;
+    $hasPrintable = is_file(__DIR__ . '/' . $assets['print_png']) || is_file(__DIR__ . '/' . $assets['outline_png']);
+    $isUnlocked = $releaseDate <= $today && $hasPreview && $hasPrintable;
     $isCurrent = $item[0] === $stencilDay['title'];
   ?>
   <article
@@ -262,9 +262,9 @@ foreach ($collections as $collectionSlug => $collection) {
       data-stencil-zip="api/stencil-download.php?type=package&amp;id=<?= e(bt_stencil_asset_slug($item[0]) . '-' . $item[1]) ?>"
     <?php endif; ?>
   >
-    <?php $cardArt = is_file(__DIR__ . '/' . $assets['outline_png']) ? $assets['outline_png'] : $assets['print_png']; ?><div class="bt-stencil-card-art"><img src="<?= e($cardArt) ?>" alt="<?= e($item[0]) ?> pure black outline" loading="lazy"></div>
+    <?php $cardArt = is_file(__DIR__ . '/' . $assets['outline_png']) ? $assets['outline_png'] : (is_file(__DIR__ . '/' . $assets['print_png']) ? $assets['print_png'] : ($hasPreview ? $assets['preview'] : $collection['image'])); ?><div class="bt-stencil-card-art"><img src="<?= e($cardArt) ?>" alt="<?= e($item[0]) ?> stencil artwork" loading="lazy"></div>
     <div><time datetime="<?= e($item[1]) ?>"><?= e(bt_pretty_date($item[1])) ?></time><h3><?= e($item[0]) ?></h3><p><?= e((string)($assets['metadata']['style'] ?? $collection['name'])) ?> · <?= e((string)($assets['metadata']['placement'] ?? implode(' · ', array_map(static fn($cat) => $categoryOptions[$cat]['label'] ?? $cat, $itemCategories)))) ?></p><small class="bt-stencil-card-format">Pure black outline · Violet Trace ready</small></div>
-    <span><?= $isUnlocked?'View stencil':($releaseDate > $today ? 'Upcoming' : 'Available') ?></span><?php if ($isUnlocked): ?><button class="bt-save-stencil" type="button" data-save-stencil="<?= e($item[0]) ?>" aria-label="Save <?= e($item[0]) ?>">☆ Save</button><?php endif; ?>
+    <span><?= $isUnlocked ? 'View stencil' : ($releaseDate > $today ? 'Upcoming' : 'Asset package pending') ?></span><?php if ($isUnlocked): ?><button class="bt-save-stencil" type="button" data-save-stencil="<?= e($item[0]) ?>" aria-label="Save <?= e($item[0]) ?>">☆ Save</button><?php endif; ?>
   </article><?php endforeach; ?>
   </div></section><?php endforeach; ?>
 </div></section>
@@ -296,7 +296,7 @@ foreach ($collections as $collectionSlug => $collection) {
     <div class="bt-stencil-viewer-copy">
       <p data-stencil-viewer-meta>Unlocked stencil</p>
       <h2 id="bt-stencil-viewer-title" data-stencil-viewer-title>Stencil preview</h2>
-      <p class="bt-stencil-viewer-note">Available production assets rotate automatically. When a supporting card has not been created yet, its slot uses the approved stencil artwork instead of a placeholder. YouTube links are being added separately.</p>
+      <p class="bt-stencil-viewer-note">Eight production slots rotate automatically. Assets remain visibly marked as placeholders until their dedicated production file is ready. YouTube links are being added separately.</p>
       <div class="bt-stencil-viewer-actions">
         <button class="bt-glow-button" type="button" data-stencil-viewer-print hidden>⌘ Print stencil</button>
         <a class="bt-glow-button" href="#" download data-stencil-viewer-zip hidden>↓ Download all assets .ZIP</a>
@@ -333,6 +333,7 @@ foreach ($collections as $collectionSlug => $collection) {
   let activeSlide = 0;
   let pointerStart = null;
   let autoplayTimer = null;
+  const placeholderArtwork = (assetLabel) => `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200"><rect width="900" height="1200" fill="#171219"/><rect x="34" y="34" width="832" height="1132" rx="18" fill="none" stroke="#d3a452" stroke-width="3"/><path d="M122 230H778M122 970H778" stroke="#6d5266" stroke-width="2"/><circle cx="450" cy="510" r="132" fill="none" stroke="#d3a452" stroke-width="5"/><path d="M450 328v364M268 510h364" stroke="#d3a452" stroke-width="3"/><text x="450" y="210" text-anchor="middle" fill="#d3a452" font-family="Arial, sans-serif" font-size="26" font-weight="700" letter-spacing="7">BEYOND TATTOO</text><text x="450" y="786" text-anchor="middle" fill="#f4eadc" font-family="Arial, sans-serif" font-size="40" font-weight="700">${assetLabel}</text><text x="450" y="836" text-anchor="middle" fill="#bbaeb6" font-family="Arial, sans-serif" font-size="22" letter-spacing="3">LOCKED PLACEHOLDER</text><text x="450" y="1030" text-anchor="middle" fill="#d3a452" font-family="Arial, sans-serif" font-size="18" letter-spacing="5">PRODUCTION SLOT</text></svg>`)}`;
   const stopAutoplay = () => {
     if (autoplayTimer !== null) window.clearInterval(autoplayTimer);
     autoplayTimer = null;
@@ -362,19 +363,17 @@ foreach ($collections as $collectionSlug => $collection) {
   const open = (card) => {
     currentCard = card;
     const titleText = card.dataset.stencilTitle || 'Stencil preview';
-    const fallbackArtwork = card.dataset.stencilPreview || card.dataset.stencilOutline || card.dataset.stencilDownload || '';
-    const productionSlot = (label, url, fallbackLabel = 'stencil preview') => [url ? label : `${label} · ${fallbackLabel}`, url || fallbackArtwork];
     const productionSlots = [
-      ['Stencil preview', card.dataset.stencilPreview || fallbackArtwork],
-      productionSlot('Style card', card.dataset.stencilStyle || ''),
-      productionSlot('Lore card', card.dataset.stencilLore || ''),
-      productionSlot('Packaging preview', card.dataset.stencilPack || ''),
-      productionSlot('Mockup', card.dataset.stencilPlacement || ''),
-      productionSlot('Reference', card.dataset.stencilReference || ''),
-      ['Printer-ready stencil PNG', card.dataset.stencilDownload || card.dataset.stencilOutline || fallbackArtwork],
-      productionSlot('Violet Trace', card.dataset.stencilVioletTrace || '', 'pure-black outline'),
+      ['YouTube video', card.dataset.stencilYoutube || ''],
+      ['Style card', card.dataset.stencilStyle || ''],
+      ['Lore card', card.dataset.stencilLore || ''],
+      ['Packaging preview', card.dataset.stencilPack || ''],
+      ['Mockup', card.dataset.stencilPlacement || ''],
+      ['Reference', card.dataset.stencilReference || ''],
+      ['Printer-ready stencil PNG', card.dataset.stencilDownload || ''],
+      ['Violet Trace', card.dataset.stencilVioletTrace || ''],
     ];
-    slides = productionSlots.filter(([, url]) => Boolean(url)).map(([assetLabel, url]) => ({label: assetLabel, url, placeholder: false}));
+    slides = productionSlots.map(([assetLabel, url]) => ({label: assetLabel, url: url || placeholderArtwork(assetLabel), placeholder: !url}));
     title.textContent = titleText;
     meta.textContent = [card.dataset.stencilCollection, card.dataset.stencilDate, 'Unlocked'].filter(Boolean).join(' · ');
     print.dataset.stencilUrl = card.dataset.stencilOutline || card.dataset.stencilDownload || card.dataset.stencilPdf || '';

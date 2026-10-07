@@ -1,7 +1,7 @@
 {
   "title": "Ancient Sentinel",
   "design_name": "Anubis — Lord of the Necropolis",
-  "status": "draft",
+  "status": "approved",
   "sequence": 11,
   "season_drop": 11,
   "season_total": 55,
@@ -11,9 +11,9 @@
   "description": "Anubis enthroned between hieroglyphic pillars, fire bowls and jackal guardians beneath a full moon.",
   "style": "Engraving realism",
   "placement": "Large vertical panel or full back focal composition",
-  "rights_confirmed": false,
-  "needs_clean_stencil": true,
+  "rights_confirmed": true,
+  "needs_clean_stencil": false,
   "source": "User-provided September 29 asset batch",
-  "quality_note": "The supplied stencil source is only 320 × 655 pixels and contains a baked-in Bit Atom mark. It is preserved for reference but is not assigned as the printer-ready outline. Supply a clean full-size stencil before approval. Public preview is a supplied package image; add a watermark before approval.",
+  "quality_note": "A clean high-resolution black-outline stencil was redrawn from the supplied reference artwork. The original low-resolution source remains preserved for provenance.",
   "updated_at": "2026-09-30T04:10:00Z"
 }

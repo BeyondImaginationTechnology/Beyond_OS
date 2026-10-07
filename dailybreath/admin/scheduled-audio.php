@@ -74,7 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 require_once __DIR__ . '/../../includes/narration/StudioNarration.php';
                 $voiceLocale = ['en'=>'en-US','fr'=>'fr-FR','es'=>'es-ES','he'=>'he-IL','ar'=>'ar-SA'][$locale] ?? '';
-                $voice = studio_narration_voice('elevenlabs', $voiceLocale);
+                $voice = $tradition === 'bible' && $voiceLocale === 'en-US'
+                    ? studio_character_voice('chris', $voiceLocale)
+                    : studio_narration_voice('elevenlabs', $voiceLocale);
                 if ($voice === '') throw new RuntimeException('No verified voice is available for ' . $voiceLocale . '.');
                 $generated = studio_narration_generate($script, $voiceLocale, 'elevenlabs', $voice);
                 $stored = studio_store_mp3(

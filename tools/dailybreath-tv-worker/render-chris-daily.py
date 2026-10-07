@@ -22,11 +22,17 @@ def set_text(name, value):
         obj.data.body = value
 
 
+INTRO_FRAMES = 96  # Four seconds at 24 fps.
+OUTRO_HOLD_FRAMES = 36
+
+
 def setup_audio(scene, audio_path):
     if scene.sequence_editor:
         scene.sequence_editor_clear()
     editor = scene.sequence_editor_create()
-    sound = editor.strips.new_sound('Chris_Ryan_Narration', audio_path, channel=1, frame_start=1)
+    # The first four seconds are the visual title/reference opener. Prayan begins
+    # when the edit cuts to Chris's close presenter shot.
+    sound = editor.strips.new_sound('Chris_Prayan_Narration', audio_path, channel=1, frame_start=INTRO_FRAMES + 1)
     return max(1, int(math.ceil(sound.frame_final_duration)))
 
 
@@ -48,13 +54,28 @@ def loop_body_performance(scene, end_frame):
     rig.animation_data.action = None
 
 
+def set_episode_cameras(scene, closing_frame):
+    wide = bpy.data.objects.get('Chris_Morning_Wide_Camera') or bpy.data.objects.get('Chris_Presenter_Camera')
+    close = bpy.data.objects.get('Chris_Morning_Close_Camera') or wide
+    if not wide:
+        return
+    scene.timeline_markers.clear()
+    opening = scene.timeline_markers.new('Morning Verse opening', frame=1)
+    opening.camera = wide
+    reading = scene.timeline_markers.new('Chris reads today\'s verse', frame=INTRO_FRAMES + 1)
+    reading.camera = close
+    closing = scene.timeline_markers.new('Carry this verse with you', frame=closing_frame)
+    closing.camera = wide
+    scene.camera = wide
+
+
 def main():
     args = arguments()
     if not os.path.isfile(args.audio):
         raise RuntimeError('Narration MP3 was not found: ' + args.audio)
 
     scene = bpy.context.scene
-    scene.render.engine = 'BLENDER_EEVEE_NEXT'
+    scene.render.engine = 'BLENDER_EEVEE'
     scene.render.resolution_x = 1920
     scene.render.resolution_y = 1080
     scene.render.resolution_percentage = 100
@@ -66,7 +87,7 @@ def main():
     scene.render.ffmpeg.constant_rate_factor = 'MEDIUM'
     scene.render.filepath = args.output
 
-    camera = bpy.data.objects.get('Chris_Presenter_Camera')
+    camera = bpy.data.objects.get('Chris_Morning_Wide_Camera') or bpy.data.objects.get('Chris_Presenter_Camera')
     if camera:
         scene.camera = camera
 
@@ -74,14 +95,20 @@ def main():
     set_text('DB_Study_Verse_Reference', args.reference.upper())
     scene['daily_breath_reference'] = args.reference
     scene['daily_breath_passage'] = args.passage
-    scene['narrator'] = 'Chris · Ryan (ElevenLabs)'
+    scene['narrator'] = 'Chris · Prayan (ElevenLabs)'
     scene['facial_sync_note'] = 'Body performance is timed to narration; this rig has no mouth shape keys or facial bones.'
 
-    end_frame = setup_audio(scene, args.audio)
+    narration_frames = setup_audio(scene, args.audio)
     # Give the final spoken word a short visual hold.
     scene.frame_start = 1
-    scene.frame_end = max(48, end_frame + int(scene.render.fps * 1.5))
+    scene.frame_end = max(INTRO_FRAMES + OUTRO_HOLD_FRAMES, INTRO_FRAMES + narration_frames + OUTRO_HOLD_FRAMES)
+    set_episode_cameras(scene, scene.frame_end - OUTRO_HOLD_FRAMES + 1)
     loop_body_performance(scene, scene.frame_end)
+    scene['episode_timeline'] = {
+        'opening': 'Frames 1-96 · four-second Morning Verse opener',
+        'reading': 'Frame 97 · Prayan narration and Chris close presenter shot',
+        'outro': '36-frame visual hold after Prayan finishes',
+    }
     scene.frame_set(1)
     bpy.ops.render.render(animation=True)
 

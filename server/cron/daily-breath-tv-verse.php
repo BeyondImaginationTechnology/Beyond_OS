@@ -120,7 +120,9 @@ function dailybreath_render_tv_verse(string $tradition = 'bible', string $locale
     $process = null;
     try {
         $contentUpdatedAt = strtotime((string)($content['updated_at'] ?? '')) ?: 0;
-        if (!is_file($outputFile) || filesize($outputFile) < 1024 || filemtime($outputFile) < $contentUpdatedAt) {
+        $narrationUpdatedAt = filemtime($project . '/public/' . $narration['audioFile']) ?: 0;
+        if (!is_file($outputFile) || filesize($outputFile) < 1024
+            || filemtime($outputFile) < max($contentUpdatedAt, $narrationUpdatedAt)) {
             $encoded = json_encode($config, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
             if (!is_string($encoded) || file_put_contents($propsFile, $encoded, LOCK_EX) === false) {
                 throw new RuntimeException('The Daily Breath TV render props could not be written.');

@@ -147,7 +147,9 @@ try {
         $eleven = (array)($config['providers']['elevenlabs'] ?? []);
         // Respect the voice selected in Premium Voices. If none is saved,
         // the shared resolver discovers a voice verified for this language.
-        $voice = studio_narration_voice('elevenlabs', $voiceLocale);
+        $voice = $tradition === 'bible' && $voiceLocale === 'en-US'
+            ? studio_character_voice('chris', $voiceLocale)
+            : studio_narration_voice('elevenlabs', $voiceLocale);
         if (trim((string)($eleven['api_key'] ?? '')) === '' || $voice === '') {
             dailybreath_narration_reply(['ok'=>false,'error'=>'A server-side ElevenLabs key and voice are required for this language.'], 503);
         }

@@ -39,6 +39,9 @@ function studio_elevenlabs_first_voice(array $providerConfig, string $language =
 function studio_narration_provider(): string { return strtolower((string)beyond_config('voice.provider','openai')); }
 function studio_character_voice(string $character, string $locale, string $provider = 'elevenlabs'): string {
   $character = strtolower(trim($character));
+  // Chris is the English Daily Breath Bible presenter. Keep his selected
+  // voice independent of the general English narrator used by other shows.
+  if(strtolower($provider)==='elevenlabs' && $character==='chris' && $locale==='en-US') return 'Z6T21S2OyYi1iLYXumk4'; // Prayan - Fun & Friendly Tutor
   $configured = trim((string)beyond_config('narration.'.strtolower($provider).'.character_voices.'.$character, ''));
   return $configured !== '' ? $configured : studio_narration_voice($provider, $locale);
 }

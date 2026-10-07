@@ -129,7 +129,7 @@ foreach($tradition in 'bible','torah','quran'){
   $propsFile=Join-Path $env:TEMP ("dailybreath-$tradition.json");$output=Join-Path $env:TEMP ("$($payload.date)-$tradition-verse-of-the-day.mp4")
   [System.IO.File]::WriteAllText($propsFile, ($props | ConvertTo-Json -Depth 8), [System.Text.UTF8Encoding]::new($false))
   if($tradition -eq 'bible' -and $hasNarration -and (Test-Path -LiteralPath $chrisRenderer)){
-    Write-Host "Rendering Chris with Ryan's Daily Breath narration."
+    Write-Host "Rendering Chris with Prayan's Daily Breath narration."
     & $chrisRenderer -AudioPath $audioPath -OutputPath $output -Reference $payload.reference -Passage $payload.passage
   }else{
     & $remotion render src/index.ts DailyBreathStory $output "--props=$propsFile" --codec=h264 --concurrency=2

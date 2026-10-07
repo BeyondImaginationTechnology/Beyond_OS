@@ -1,0 +1,10 @@
+{
+  "character": "Chris",
+  "show": "Daily Verse of the Day",
+  "provider": "ElevenLabs",
+  "voice_name": "Prayan - Fun & Friendly Tutor",
+  "voice_id": "Z6T21S2OyYi1iLYXumk4",
+  "voice_library_url": "https://elevenlabs.io/voice-library?voiceId=Z6T21S2OyYi1iLYXumk4",
+  "test_script": "chris-isaiah26-script.txt",
+  "status": "selected_for_production"
+}

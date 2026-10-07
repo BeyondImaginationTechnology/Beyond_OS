@@ -33,7 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $voiceLocale = preg_match('/[\x{0590}-\x{05FF}]/u', $script) ? 'he-IL'
                     : (preg_match('/[\x{0600}-\x{06FF}]/u', $script) ? 'ar-SA'
                     : (['fr'=>'fr-FR','es'=>'es-ES'][$locale] ?? 'en-US'));
-                $voice = studio_narration_voice('elevenlabs', $voiceLocale);
+                $voice = $tradition === 'bible' && $voiceLocale === 'en-US'
+                    ? studio_character_voice('chris', $voiceLocale)
+                    : studio_narration_voice('elevenlabs', $voiceLocale);
                 if ($voice === '') throw new RuntimeException('No verified ElevenLabs voice is available for ' . $voiceLocale . '. Configure a matching voice in Premium Voices.');
                 $generated = studio_narration_generate($script, $voiceLocale, 'elevenlabs', $voice);
                 $stored = studio_store_mp3((string)$generated['audio_content'], 'daily-breath', $date, $voiceLocale, $script . "\n" . $voice);

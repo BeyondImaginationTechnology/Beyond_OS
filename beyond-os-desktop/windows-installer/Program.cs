@@ -78,14 +78,16 @@ namespace BITOSInstaller
                 CompressedImage = true
             },
             new ReleaseDefinition {
-                Edition = "BIT OS Gaming", Version = "1.0", Available = false,
-                ImageUrl = "https://os.beyondimagination.co.technology/releases/gaming/1.0/bit-os-gaming-1.0-installer.img",
-                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/gaming/1.0/SHA256SUMS"
+                Edition = "BIT OS Gaming", Version = "v0.1 Preview", Available = true,
+                ImageUrl = "https://os.beyondimagination.co.technology/releases/gaming/0.1/bit-os-gaming-0.1-installer.img.gz",
+                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/gaming/0.1/SHA256SUMS",
+                CompressedImage = true
             },
             new ReleaseDefinition {
-                Edition = "BIT OS Sentinel", Version = "1.0", Available = false,
-                ImageUrl = "https://os.beyondimagination.co.technology/releases/sentinel/1.0/bit-os-sentinel-1.0-installer.img",
-                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/sentinel/1.0/SHA256SUMS"
+                Edition = "BIT OS Sentinel", Version = "v0.1 Preview", Available = true,
+                ImageUrl = "https://os.beyondimagination.co.technology/releases/sentinel/0.1/bit-os-sentinel-0.1-installer.img.gz",
+                ChecksumsUrl = "https://os.beyondimagination.co.technology/releases/sentinel/0.1/SHA256SUMS",
+                CompressedImage = true
             }
         };
         private bool verified;

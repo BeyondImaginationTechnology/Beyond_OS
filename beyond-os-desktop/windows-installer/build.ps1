@@ -17,4 +17,8 @@ $academyExe = Join-Path $out 'academyOS.exe'
 Copy-Item -LiteralPath (Join-Path $out 'BITOSInstaller.exe') -Destination $academyExe -Force
 $cyberExe = Join-Path $out 'cyberOS.exe'
 Copy-Item -LiteralPath (Join-Path $out 'BITOSInstaller.exe') -Destination $cyberExe -Force
-Get-Item (Join-Path $out 'BITOSInstaller.exe'), $coreExe, $homeExe, $creatorExe, $academyExe, $cyberExe | Select-Object FullName,Length,LastWriteTime
+$sentinelExe = Join-Path $out 'sentinelOS.exe'
+Copy-Item -LiteralPath (Join-Path $out 'BITOSInstaller.exe') -Destination $sentinelExe -Force
+$gamingExe = Join-Path $out 'gamingOS.exe'
+Copy-Item -LiteralPath (Join-Path $out 'BITOSInstaller.exe') -Destination $gamingExe -Force
+Get-Item (Join-Path $out 'BITOSInstaller.exe'), $coreExe, $homeExe, $creatorExe, $academyExe, $cyberExe, $sentinelExe, $gamingExe | Select-Object FullName,Length,LastWriteTime

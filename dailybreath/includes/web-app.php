@@ -123,7 +123,13 @@ function dailybreath_audio_for_script(PDO $pdo, string $date, string $tradition,
     $query = $pdo->prepare('SELECT audio_url,voice_id,provider,generated_at,script_hash FROM dailybreath_daily_audio WHERE publish_date=? AND tradition=? AND locale=? LIMIT 1');
     $query->execute([$date, $tradition, $locale]);
     $audio = $query->fetch(PDO::FETCH_ASSOC);
-    return is_array($audio) && hash_equals(hash('sha256', $script), (string)$audio['script_hash']) ? $audio : null;
+    if (!is_array($audio) || !hash_equals(hash('sha256', $script), (string)$audio['script_hash'])) return null;
+    // A matching passage recorded with Ryan is not a valid Chris recording.
+    if ($tradition === 'bible' && $locale === 'en') {
+        require_once __DIR__ . '/../../includes/narration/StudioNarration.php';
+        if ((string)$audio['voice_id'] !== studio_character_voice('chris', 'en-US')) return null;
+    }
+    return $audio;
 }
 
 function dailybreath_scheduled_verse_audio(PDO $pdo, string $date, string $tradition, string $locale, array $verse): ?array

@@ -15,7 +15,7 @@ The installed **Daily Breath — Daily Readings Production** task runs each day 
 
 It produces three faith-specific videos:
 
-- **Bible:** the Daily Bible Verse, narrated by Chris's configured ElevenLabs voice (Ryan), rendered with the Chris study presenter scene in Blender.
+- **Bible:** the Daily Bible Verse, narrated by Chris's selected ElevenLabs voice (Prayan), rendered with the Chris study presenter scene in Blender.
 - **Tanakh and Quran:** their own language-matched ElevenLabs narration and current Daily Breath TV render.
 
 Chris's present rig has a timed seated body-performance loop but no facial bones or mouth shape keys. The narration and performance render together; adding phoneme-accurate lipsync requires a later facial-rig pass.

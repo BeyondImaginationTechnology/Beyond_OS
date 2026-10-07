@@ -7,7 +7,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $blender = 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe'
-$template = Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) 'dailybreath\assets\videos\DB_Christian_StudyV11_Chris_Facial_Keys.blend'
+$template = Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) 'dailybreath\assets\videos\DB_Christian_StudyV14_Morning_Verse_Timeline.blend'
 $script = Join-Path $PSScriptRoot 'render-chris-daily.py'
 
 if (!(Test-Path -LiteralPath $blender)) { throw 'Blender 5.2 is not installed at the configured path.' }

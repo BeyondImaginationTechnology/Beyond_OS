@@ -39,6 +39,9 @@ if(!is_array($audio)||trim((string)($audio['voice_id']??''))!==$voice){
     else{$query=$pdo->prepare('INSERT INTO dailybreath_daily_audio (publish_date,tradition,locale,script_hash,audio_url,voice_id,provider) VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE script_hash=VALUES(script_hash),audio_url=VALUES(audio_url),voice_id=VALUES(voice_id),provider=VALUES(provider),generated_at=CURRENT_TIMESTAMP');}
     $query->execute($values);
     $audio=['audio_url'=>(string)$stored['url'],'voice_id'=>$voice,'provider'=>'elevenlabs'];
-  }catch(Throwable $error){http_response_code(502);echo json_encode(['ok'=>false,'error'=>'Narration generation failed. '.$error->getMessage()]);exit;}
+  }catch(Throwable $error){
+    error_log('Narration generation failed, falling back to ambient music: ' . $error->getMessage());
+    $audio=['audio_url'=>'','voice_id'=>'','provider'=>'ambient'];
+  }
 }
 echo json_encode(['ok'=>true,'date'=>$date,'label'=>$now->format('l, F j, Y'),'tradition'=>$tradition,'locale'=>$profile['locale'],'kind'=>$profile['kind'],'series'=>$profile['series'],'direction'=>$profile['direction'],'passage'=>$passage,'reference'=>$reference,'audio_url'=>(string)$audio['audio_url'],'voice_id'=>$voice,'guide_name'=>$tradition==='bible'?'Chris':null,'content_hash'=>hash('sha256',$passage."\n\n".$reference)],JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES);

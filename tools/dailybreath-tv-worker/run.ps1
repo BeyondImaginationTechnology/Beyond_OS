@@ -111,7 +111,22 @@ function Publish-YouTubeVideo {
 Push-Location $project
 try {
 foreach($tradition in 'bible','torah','quran'){
-  $payload=Invoke-RestMethod -Headers $headers -Uri "$base/dailybreath/api/local-tv-worker.php?tradition=$tradition&date=$ContentDate"
+  $payloadUri="$base/dailybreath/api/local-tv-worker.php?tradition=$tradition&date=$ContentDate"
+  try {
+    $payload=Invoke-RestMethod -Headers $headers -Uri $payloadUri
+  } catch {
+    $detail='No response body was returned.'
+    $response=$_.Exception.Response
+    if($response){
+      try {
+        $reader=[System.IO.StreamReader]::new($response.GetResponseStream())
+        $body=$reader.ReadToEnd();$reader.Dispose()
+        if(-not [string]::IsNullOrWhiteSpace($body)){$detail=$body}
+      } catch { $detail=$_.Exception.Message }
+      throw "Daily Breath worker request failed for $tradition (HTTP $([int]$response.StatusCode)): $detail"
+    }
+    throw "Daily Breath worker request failed for ${tradition}: $($_.Exception.Message)"
+  }
   if(!$payload.ok){throw "Payload failed for $tradition"}
   $audioSegments=@();$hasNarration=$false
   if(-not [string]::IsNullOrWhiteSpace([string]$payload.audio_url)){

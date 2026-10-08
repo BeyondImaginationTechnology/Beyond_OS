@@ -20,7 +20,7 @@ console.log(`Current Entries in JSON: ${releases.length}`);
 let missingAssets = [];
 let missingMetaData = [];
 
-for (let seq = 1; seq <= (campaign.total_releases || 31); seq++) {
+for (let seq = 1; seq <= (campaign.total_releases || 10); seq++) {
   const rel = releases.find(r => r.sequence === seq);
   if (!rel) {
     missingMetaData.push(seq);

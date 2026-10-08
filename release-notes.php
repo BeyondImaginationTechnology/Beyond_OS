@@ -23,42 +23,42 @@ function whats_new_card(string $title, string $copy, string $href, string $actio
 <body class="bos-page">
 <main class="bos-main whats-new-main">
   <section class="bos-hero whats-new-hero">
-    <span class="bos-kicker">Weekly update · <time datetime="2026-10-01">Thursday, October 1, 2026</time></span>
-    <h1>What’s new.</h1>
-    <p>This week across Beyond: app updates, creative tools, and OS milestones. Preview and development work are clearly marked.</p>
+    <span class="bos-kicker">BIT 3.0 Platform Release · <time datetime="2026-10-06">Tuesday, October 6, 2026</time></span>
+    <h1>BIT 3.0 Release Notes.</h1>
+    <p>Introducing BIT 3.0 across Beyond Imagination Technology: Jaguar Runtime model-neutral AI architecture, Daily Breath 1.2 with Settings-driven faith traditions, auto-filtered TV streams, and 3D glassmorphism button design.</p>
     <div class="bos-actions">
-      <a class="bos-btn" href="#apps">Latest app updates</a>
-      <a class="bos-btn secondary" href="#jaguar">Jaguar preview</a>
+      <a class="bos-btn" href="#jaguar">Jaguar Runtime 3.0</a>
+      <a class="bos-btn secondary" href="#dailybreath">Daily Breath 1.2</a>
       <a class="bos-btn secondary" href="#core-v02">BIT OS Core v0.2</a>
-      <a class="bos-btn secondary" href="#projects">See creator projects</a>
+      <a class="bos-btn secondary" href="#projects">Creator tools</a>
     </div>
   </section>
 
   <section class="bos-section jaguar-release" id="jaguar">
     <div class="jaguar-release-copy">
-      <span class="bos-kicker">Jaguar AI · v0.4 web preview</span>
-      <h2>Meet the Jaguar chat preview.</h2>
-      <p>Jaguar now has a web chat experience with English, French, and Spanish interfaces. Explain offers quick utility answers and built-in guidance; Build introduces a preview for software ideas, planning, and coding questions.</p>
+      <span class="bos-kicker">Jaguar Runtime · Model-Neutral AI</span>
+      <h2>One interface. Any model.</h2>
+      <p>Jaguar Runtime routes prompts across local and cloud AI providers through a model-neutral architecture. Users can select third-party model families such as Gemma (Google), Qwen (Alibaba), Llama (Meta), DeepSeek, and Phi (Microsoft) with prompt suggestions and simulation routing.</p>
       <div class="bos-actions">
-        <a class="bos-btn" href="<?=e(beyond_url('ai/chat.php'))?>">Open Jaguar chat</a>
-        <a class="bos-btn secondary" href="#jaguar-progress-title">See build progress</a>
+        <a class="bos-btn" href="<?=e(beyond_url('index.php#homeJaguarForm'))?>">Try Jaguar Runtime demo</a>
+        <a class="bos-btn secondary" href="<?=e(beyond_url('ai/chat.php'))?>">Open Jaguar chat</a>
       </div>
     </div>
     <div class="jaguar-release-art"><img src="<?=e(beyond_url('ai/assets/jaguar-runner.jpg'))?>" alt="The cybernetic Jaguar visual identity moving through a digital landscape"></div>
   </section>
 
   <section class="bos-section jaguar-progress" aria-labelledby="jaguar-progress-title">
-    <span class="bos-kicker">Build status</span>
-    <h2 id="jaguar-progress-title">What you can use—and what’s next</h2>
+    <span class="bos-kicker">BIT 3.0 Architecture</span>
+    <h2 id="jaguar-progress-title">What’s new in BIT 3.0</h2>
     <div class="progress-grid">
-      <article class="progress-card complete"><span>AVAILABLE</span><h3>Explain</h3><p>Quick utility answers, lookups, and concise built-in guidance. Explain uses a fast response path without GPU inference.</p></article>
-      <article class="progress-card active"><span>PREVIEW</span><h3>Build</h3><p>Explore software ideas, plan an experience, and ask for coding guidance. This text preview does not edit your repository or generate images or video.</p></article>
-      <article class="progress-card active"><span>APPLE APP PREVIEW</span><h3>Beyond-1 Draw Studio</h3><p>The native v0.5 preview adds touch and Apple Pencil sketching, undo and redo, and transparent PNG exports for the tattoo editor. Drawing stays on your device.</p></article>
-      <article class="progress-card active"><span>ADMIN PREVIEW</span><h3>Code Thinking</h3><p>A separate workspace for authorized administrators supports development work with project context. It is separate from the public Build chat.</p></article>
-      <article class="progress-card next"><span>PLANNED</span><h3>AI Draw and Video</h3><p>Image and video generation remain planned modes. The native Draw Studio preview is a manual sketching tool.</p></article>
-      <article class="progress-card active"><span>IN DEVELOPMENT</span><h3>Beyond-1 model work</h3><p>Training and evaluation work continues around a Llama-based adapter. The small starter dataset exercises the training pipeline; it does not establish a production-ready model.</p></article>
+      <article class="progress-card complete"><span>AVAILABLE</span><h3>Model-Neutral Runtime</h3><p>Prompt routing across independent model families including Gemma, Qwen, Llama, DeepSeek, and Phi with provider abstraction.</p></article>
+      <article class="progress-card complete"><span>AVAILABLE</span><h3>3D Glassmorphism UI</h3><p>Glossy squircle CTAs with top highlight sheen and extruded depth shadow across BIT homepage, navigation docks, and app actions.</p></article>
+      <article class="progress-card complete"><span>AVAILABLE</span><h3>Daily Breath 1.2</h3><p>Settings-driven faith tradition selection (Bible, Tanakh, Quran) and auto-filtered TV programming matching user faith preferences.</p></article>
+      <article class="progress-card active"><span>PREVIEW</span><h3>Build Mode</h3><p>Explore software ideas, plan an experience, and ask coding guidance via Jaguar Runtime.</p></article>
+      <article class="progress-card active"><span>APPLE APP PREVIEW</span><h3>Beyond-1 Draw Studio</h3><p>Native v0.5 preview with Apple Pencil sketching, undo/redo, and transparent PNG exports for the tattoo editor.</p></article>
+      <article class="progress-card complete"><span>VALIDATED</span><h3>BIT OS Core v0.2</h3><p>Published UEFI ISO and USB downloads, Windows USB setup wizard, and SHA-256 verification manifest.</p></article>
     </div>
-    <aside class="jaguar-note"><strong>Preview availability</strong><p>The chat shows which modes are enabled for your account. Preview features may change; the native app preview and model development milestones do not imply App Store availability or a completed Beyond foundation model.</p></aside>
+    <aside class="jaguar-note"><strong>BIT 3.0 Milestone</strong><p>BIT 3.0 brings model-neutral AI, 3D UI styling, and Settings-driven sacred text preferences across Web, Android, and iOS.</p></aside>
   </section>
 
   <section class="bos-section core-release" id="core-v02" aria-labelledby="core-v02-title">

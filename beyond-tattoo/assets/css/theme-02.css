@@ -89,13 +89,37 @@ a { color: inherit; }
 .bt-studio-product-grid article p { color: var(--bt20-muted); }
 .bt-values-grid>div { border-color: var(--bt20-border); }
 
-/* Needle Bot suit sketch backdrop: a quiet line-art layer for the public home page. */
+/* Needle Bot suit sketch backdrop: prominent full-page backdrop layer for the public home page. */
 :root { --bt-needle-sketch-bg: url('../img/backgrounds/needle-bot-suit-sketch-bg.png'); }
 .bt-storefront .bt-main-hero {
+  position: relative;
   background:
-    linear-gradient(90deg, rgba(247,244,239,.96) 0%, rgba(247,244,239,.9) 48%, rgba(247,244,239,.76) 100%),
-    var(--bt-needle-sketch-bg) center / cover no-repeat;
+    linear-gradient(180deg, rgba(7,6,12,.62) 0%, rgba(7,6,12,.88) 100%),
+    var(--bt-needle-sketch-bg) center / cover no-repeat fixed !important;
+  color: #f7f4ff !important;
+  padding-block: clamp(54px, 8vw, 110px) !important;
 }
+.bt-main-hero-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 0 !important;
+}
+.bt-main-copy {
+  max-width: 680px !important;
+  padding: clamp(28px, 4vw, 48px) !important;
+  border-radius: 28px !important;
+  background: rgba(10, 8, 16, 0.76) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(162, 119, 255, 0.22) !important;
+  box-shadow: 0 24px 70px rgba(0,0,0,0.48) !important;
+}
+.bt-main-copy h1 span { color: #9b65ff !important; }
+.bt-main-copy h1 strong { color: #ffffff !important; }
+.bt-gold-kicker { color: #a37200 !important; font-weight: 900 !important; }
+.bt-stencil-drop { color: #1e1b24 !important; font-weight: 900 !important; }
+.bt-main-lead { color: #332f3b !important; font-weight: 700 !important; }
+.bt-trust-row span { color: #3e3a47 !important; font-weight: 800 !important; }
 .bt-storefront .bt-needle-feature {
   background:
     radial-gradient(ellipse at 22% 50%, rgba(121,61,188,.22), transparent 52%),

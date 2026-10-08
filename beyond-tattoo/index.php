@@ -153,15 +153,6 @@ if (!empty($stencilDay['iso_date'])) {
           <span><i>▣</i> Needle Bot guided</span>
         </div>
       </div>
-
-      <a class="bt-package-stage" href="<?= e($dailyStylesheet !== null ? 'stylesheets.php#stylesheet-' . sprintf('%02d', $dailyStylesheet['sequence']) : 'stylesheets.php') ?>" aria-label="<?= e($dailyStylesheet !== null ? 'View today’s Autumn Ink stylesheet' : 'View the Autumn Ink stylesheet calendar') ?>">
-        <span class="bt-package-glow" aria-hidden="true"></span>
-        <img
-          src="<?= e($dailyStylesheet['asset_url'] ?? $stylesheetPosterUrl ?: $packImage) ?>?v=<?= e((string)($stencilDay['updated_at'] ?: '1')) ?>"
-          alt="<?= e($dailyStylesheet !== null ? 'Today’s Autumn Ink stylesheet: ' . $dailyStylesheet['title'] : 'Autumn Ink daily stylesheet ' . sprintf('%02d', $currentStylesheetSequence ?? 1) . ' of 31 is in preparation') ?>"
-        >
-        <span class="bt-package-cta"><?= e($currentStylesheetSequence !== null ? 'Today’s stylesheet · ' . sprintf('%02d', $currentStylesheetSequence) . '/31' : 'Browse stylesheets') ?></span>
-      </a>
     </div>
   </section>
 

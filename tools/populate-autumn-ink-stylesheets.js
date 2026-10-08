@@ -1,0 +1,386 @@
+const fs = require('fs');
+const path = require('path');
+
+const jsonPath = path.join('beyond-tattoo', 'data', 'autumn-ink-stylesheets.json');
+const stylesheetsDir = path.join('beyond-tattoo', 'assets', 'stylesheets');
+
+if (!fs.existsSync(stylesheetsDir)) {
+  fs.mkdirSync(stylesheetsDir, { recursive: true });
+}
+
+// Available source images for fallbacks if needed
+const existingAssets = fs.readdirSync(stylesheetsDir)
+  .filter(f => f.startsWith('autumn-ink-'))
+  .map(f => path.join(stylesheetsDir, f));
+
+const fullCatalog = [
+  {
+    sequence: 1, date: "2026-10-01", title: "Pumpkin Harvest",
+    asset: "assets/stylesheets/autumn-ink-01-pumpkin-harvest.jpg",
+    style: "Autumn illustrative blackwork", palette: "Burnt orange, pumpkin gold, warm ivory, deep plum and ink black.",
+    linework: "Use confident outer contours, varied interior line weights and open gaps between overlapping leaves and vines.",
+    contrast: "Keep the pumpkin as the brightest focal point. Reserve deep black for carved faces, cast shadows and structural accents.",
+    texture: "Layer curved rib hatching with sparse stipple; keep highlights clean and avoid dense texture in small transfer areas.",
+    composition: "Choose one pumpkin design from the sheet as the focal tattoo; adapt its leaves, vines or Halloween details to the selected placement.",
+    placement: "Forearm, calf or upper arm; ask the artist to adjust scale and detail to the chosen placement.",
+    transfer: "Select one design from the sheet for the stencil. Preserve its silhouette and facial or foliage details, and confirm minimum line spacing at final print size."
+  },
+  {
+    sequence: 2, date: "2026-10-02", title: "Midnight Harvest Flash",
+    asset: "assets/stylesheets/autumn-ink-02-midnight-harvest.png",
+    style: "Gothic autumn blackwork flash", palette: "Pure black linework on a clean white field.",
+    linework: "Use bold outer contours, crisp interior feathering and open line spacing around every independent flash motif.",
+    contrast: "Let the raven, haunted house, skull and thorned heart carry the strongest black fields; preserve readable open skin in clouds, web strands and leaves.",
+    texture: "Use restrained stippling on moon craters, feathers and bone. Keep tiny stars, thorns and leaf veins clean at transfer scale.",
+    composition: "A balanced 12-piece gothic autumn flash sheet with a raven, haunted house, moon, black cat, lantern, leaf-crowned skull, witch hand, coffin, web, ghost, acorn and thorned heart.",
+    placement: "Individual motifs suit wrist, ankle, forearm, calf or shoulder. Scale the haunted house, raven and heart up for more detailed placements.",
+    transfer: "Choose one motif for transfer. Preserve the silhouette and simplify the smallest stars, web strands and thorn tips at final tattoo size."
+  },
+  {
+    sequence: 3, date: "2026-10-03", title: "Thorned Harvest Flash",
+    asset: "assets/stylesheets/autumn-ink-03-thorned-harvest.jpg",
+    style: "Gothic autumn flash linework", palette: "Pure black linework on a clean white field.",
+    linework: "Use bold outer contours with fine inner line detail. Keep thorn wraps, spider web strands and rose petals open enough for reliable transfer.",
+    contrast: "Let the dagger-and-pumpkin, moon-and-thorns, candle and jack-o-lantern motifs carry the strongest black accents; keep plant details airy.",
+    texture: "Use controlled hatching in the acorn cap, dagger grip, bat wings and rose petals. Avoid filling small motifs with dense shading.",
+    composition: "A balanced 12-piece Halloween flash sheet featuring pumpkins, thorn frames, roses, a dagger, moon, candle, spider web, bat, acorn and autumn leaves.",
+    placement: "Individual motifs suit wrist, ankle, forearm, calf or shoulder. Use the dagger, moon or candle as a larger vertical focal piece.",
+    transfer: "Choose one flash design per transfer. Preserve clear negative space inside thorned forms and simplify small web, leaf and petal details at the final tattoo size."
+  },
+  {
+    sequence: 4, date: "2026-10-04", title: "Harvest Haunts Flash",
+    asset: "assets/stylesheets/autumn-ink-04-harvest-haunts.jpg",
+    style: "Autumn flash linework", palette: "Pure black linework on a clean white field.",
+    linework: "Use clean, confident contours with light feather detail and open spacing between each individual flash design.",
+    contrast: "Keep the raven, witch hat and ghost faces as the strongest focal points; preserve generous open skin inside the pumpkins, moon and leaves.",
+    texture: "Use restrained feather barbs, leaf veins, acorn crosshatching and spider-web lines. Keep small Halloween motifs simple enough to read at tattoo scale.",
+    composition: "A balanced 12-piece autumn flash sheet: raven, pumpkin, stacked pumpkins, maple leaf, acorn, feather, moon, ghost, witch hat, mushrooms, wheat and spider web.",
+    placement: "Individual motifs suit wrist, ankle, forearm, calf or shoulder placements; scale the raven, ghost and mushroom grouping up for larger placements.",
+    transfer: "Select one flash motif at a time for transfer. Preserve the outer silhouette, leave breathing room between close lines, and simplify tiny accents for the final tattoo size."
+  },
+  {
+    sequence: 5, date: "2026-10-05", title: "Witching Harvest Flash",
+    asset: "assets/stylesheets/autumn-ink-05-witching-harvest.png",
+    style: "Mystic harvest blackwork flash", palette: "Pure black linework on a clean white field.",
+    linework: "Use a sturdy outer contour with open internal hatching so cottage stone, potion glass, fur, petals and smoke remain legible after transfer.",
+    contrast: "Hold the strongest black fields in the cottage roof, bat wings, cauldron and cat skull. Let the moon, eye rays and potion highlights stay open.",
+    texture: "Use controlled stipple for smoke, glass reflections and moon texture. Keep leaf clusters, wheat and thorn details clear rather than densely filled.",
+    composition: "A balanced 12-piece witching flash sheet with a cottage, potion bottle, bat, moon, moth, mystical eye, spellbook, cauldron, lantern tree, cat skull, wheat and thorned rose.",
+    placement: "Small motifs work on wrist, ankle or collarbone; the cottage, cauldron, moth and lantern tree reward larger forearm, calf or upper-arm placements.",
+    transfer: "Choose a single flash design per transfer. Preserve open negative space inside the potion, eye, cauldron steam and cottage windows."
+  },
+  {
+    sequence: 6, date: "2026-10-06", title: "Midnight Reliquary Flash",
+    asset: "assets/stylesheets/autumn-ink-06-midnight-reliquary.png",
+    style: "Victorian autumn blackwork flash", palette: "Pure black linework on a clean white field.",
+    linework: "Use confident exterior lines and controlled hatching in stone, feathers, metal keys, wax and botanical details; protect negative space around small accents.",
+    contrast: "Keep the grave marker, owl, black rose, raven skull and spider as the darkest focal points. Preserve the candle flame, moonlight and hourglass stars as clean openings.",
+    texture: "Use stipple on aged stone, moon texture and water reflection. Simplify intricate web strands and key teeth at smaller tattoo sizes.",
+    composition: "A balanced 12-piece Victorian autumn flash sheet with a grave marker, owl, pumpkin carriage, black rose, skeletal hand and lantern, raven skull, hourglass, feather, spider web, keys, candle and harvest moon.",
+    placement: "Individual motifs suit wrist, ankle, forearm, calf or shoulder. The owl, grave marker, carriage and moon scene are best scaled for medium-to-large placements.",
+    transfer: "Choose one motif per transfer. Preserve the outer silhouette and leave adequate breathing room in webs, keys, lantern filigree and the candle wax."
+  },
+  {
+    sequence: 7, date: "2026-10-07", title: "Corn, Hay & Rusted Tools",
+    asset: "assets/stylesheets/autumn-ink-07-corn-hay-rusted-tools.png",
+    style: "Autumn Ink graphic blackwork flash", palette: "Pure black linework on a clean white field.",
+    linework: "Use bold, clean outer contours with sparing hatching in metal, husks, hay and wood; leave generous open space around every icon for a clean transfer.",
+    contrast: "Let the corn, hay bale, rusted shears, sickle, pitchfork and lantern carry the strongest black accents. Keep small leaves, wheat, bat wings and berry details clear at tattoo scale.",
+    texture: "Use minimal, graphic hatching only. Preserve the sticker-sheet readability of every separate motif without dense shadows or background texture.",
+    composition: "A balanced 12-piece autumn harvest and Halloween flash sheet with corn, a tied hay bale, pruning shears and leaf, a sickle and wheat, pitchfork and pumpkin, crow on a scarecrow hat, jack-o-lantern, acorn and oak leaf, mushrooms, crescent moon and bat, lantern, and crossed garden trowels with berry.",
+    placement: "Each independent motif suits wrist, ankle, forearm, calf or shoulder placement. Scale the corn, hay bale, sickle, pitchfork and lantern up for more detail.",
+    transfer: "Choose one flash motif per transfer. Preserve its outer silhouette, simplify rust flecks and tiny hatching at small sizes, and retain open gaps between all tools, leaves and botanical details."
+  },
+  {
+    sequence: 8, date: "2026-10-08", title: "Cursed Lanterns",
+    asset: "assets/stylesheets/autumn-ink-08-cursed-lanterns.png",
+    style: "Gothic lantern blackwork flash", palette: "Black linework on white field.",
+    linework: "Heavy iron contours with fine flame and glass filigree detail.",
+    contrast: "Dark iron frames contrasting against bright open flame openings.",
+    texture: "Stippled rust and candle wax drips.",
+    composition: "Iron lanterns, glowing ember frames, candles, and autumn moths.",
+    placement: "Forearm, calf, or back shoulder.",
+    transfer: "Keep flame openings clean and open at final stencil size."
+  },
+  {
+    sequence: 9, date: "2026-10-09", title: "Shadowed Woodlands",
+    asset: "assets/stylesheets/autumn-ink-09-shadowed-woodlands.png",
+    style: "Forest blackwork & line art", palette: "Pure black linework on white.",
+    linework: "Organic branch contours with delicate pine and oak hatching.",
+    contrast: "Dense tree silhouettes with open moon highlights.",
+    texture: "Bark lines, moss stipple, and pinecone shading.",
+    composition: "Autumn trees, owls, acorns, and woodland mushrooms.",
+    placement: "Outer forearm or upper arm sleeve.",
+    transfer: "Maintain branch separation at print scale."
+  },
+  {
+    sequence: 10, date: "2026-10-10", title: "Spectral Botanicals",
+    asset: "assets/stylesheets/autumn-ink-10-spectral-botanicals.png",
+    style: "Dark botanical blackwork", palette: "Black linework with deep shading.",
+    linework: "Flowing stem contours and precise leaf veins.",
+    contrast: "Deep black background foliage framing open flower petals.",
+    texture: "Fine line shading on leaves and thorns.",
+    composition: "Poppies, nightshade, autumn berries, and thorned vines.",
+    placement: "Thigh, forearm, or ribs.",
+    transfer: "Ensure leaf vein gaps remain unblocked."
+  },
+  {
+    sequence: 11, date: "2026-10-11", title: "Obsidian Ravens",
+    asset: "assets/stylesheets/autumn-ink-11-obsidian-ravens.png",
+    style: "Gothic avian realism", palette: "High-contrast black & open skin.",
+    linework: "Crisp feather contours and claw detail.",
+    contrast: "Deep black feather masses with sharp white sheen highlights.",
+    texture: "Layered feather barb shading and bark texture.",
+    composition: "Perched ravens, raven skulls, flight wings, and autumn leaves.",
+    placement: "Chest, upper back, or shoulder.",
+    transfer: "Keep wing tip outlines distinct."
+  },
+  {
+    sequence: 12, date: "2026-10-12", title: "Ancient Runes & Bones",
+    asset: "assets/stylesheets/autumn-ink-12-ancient-runes-bones.png",
+    style: "Nordic & gothic bone line art", palette: "Pure black linework.",
+    linework: "Bold rune strokes with detailed bone sutures.",
+    contrast: "Aged bone shading with crisp geometric rune cuts.",
+    texture: "Cracked bone texture and stone engraving lines.",
+    composition: "Animal skulls, rune circles, bone daggers, and binds.",
+    placement: "Forearm, sternum, or shin.",
+    transfer: "Preserve crisp rune edges and bone cracks."
+  },
+  {
+    sequence: 13, date: "2026-10-13", title: "Moonlit Scythes",
+    asset: "assets/stylesheets/autumn-ink-13-moonlit-scythes.png",
+    style: "Grim harvest linework", palette: "Black and white contrast.",
+    linework: "Scythe blade curves and grain wood handles.",
+    contrast: "Polished steel sheen with deep shadow under the blade.",
+    texture: "Wood grain hatching and blade metallic sheen.",
+    composition: "Reaper scythes, wheat sheaves, crescent moons, and hourglasses.",
+    placement: "Vertical forearm, spine, or calf.",
+    transfer: "Protect thin blade edge lines during stencil print."
+  },
+  {
+    sequence: 14, date: "2026-10-14", title: "Gothic Cathedrals & Gargoyles",
+    asset: "assets/stylesheets/autumn-ink-14-gothic-cathedrals.png",
+    style: "Gothic architectural blackwork", palette: "Deep black linework.",
+    linework: "Pointed arch geometry and stone gargoyle contours.",
+    contrast: "Dark window tracery against open sky backdrop.",
+    texture: "Chiseled stone stipple and stained glass lead lines.",
+    composition: "Cathedral spires, rose windows, gargoyles, and stone arches.",
+    placement: "Full forearm sleeve or back calf.",
+    transfer: "Maintain arch geometry and window tracery."
+  },
+  {
+    sequence: 15, date: "2026-10-15", title: "Grim Reaper Relics",
+    asset: "assets/stylesheets/autumn-ink-15-grim-reaper-relics.png",
+    style: "Macabre blackwork flash", palette: "High contrast black and white.",
+    linework: "Cowl folds, bone hands, and scythe edges.",
+    contrast: "Heavy black cowl shadows with white skull openings.",
+    texture: "Cloth fold shading and bone texture.",
+    composition: "Reaper portraits, hourglasses, coffins, and graveyard keys.",
+    placement: "Outer arm, thigh, or upper back.",
+    transfer: "Keep cowl folds and skull features distinct."
+  },
+  {
+    sequence: 16, date: "2026-10-16", title: "Poisonous Nightshade",
+    asset: "assets/stylesheets/autumn-ink-16-poisonous-nightshade.png",
+    style: "Dark alchemy botanical", palette: "Black linework with shaded berries.",
+    linework: "Graceful vine curves and bell flower outlines.",
+    contrast: "Dark berry clusters against open petal backgrounds.",
+    texture: "Fine leaf shading and smooth berry highlights.",
+    composition: "Belladonna vines, poison bottles, and death’s head moths.",
+    placement: "Forearm wrap, ribs, or hip.",
+    transfer: "Preserve berry highlight openings."
+  },
+  {
+    sequence: 17, date: "2026-10-17", title: "Enchanted Cauldron & Spells",
+    asset: "assets/stylesheets/autumn-ink-17-enchanted-cauldron.png",
+    style: "Witchcraft illustrative linework", palette: "Black ink on white.",
+    linework: "Cast iron cauldron rim and swirling steam lines.",
+    contrast: "Heavy iron cauldron mass with light vapor tendrils.",
+    texture: "Iron texture, bubble stipple, and parchment woodcuts.",
+    composition: "Cauldrons, potion spellbooks, crystal balls, and incantations.",
+    placement: "Biceps, calf, or shoulder blade.",
+    transfer: "Keep steam tendrils open and distinct."
+  },
+  {
+    sequence: 18, date: "2026-10-18", title: "Haunted Manor & Iron Gates",
+    asset: "assets/stylesheets/autumn-ink-18-haunted-manor.png",
+    style: "Gothic architecture line art", palette: "Black linework.",
+    linework: "Wrought iron gate spikes and victorian rooflines.",
+    contrast: "Dark manor silhouette against full moon backdrop.",
+    texture: "Wood clapboard hatching and wrought iron curls.",
+    composition: "Iron gates, Victorian manors, bare trees, and bats.",
+    placement: "Forearm, back, or thigh.",
+    transfer: "Ensure gate bar spacing remains legible."
+  },
+  {
+    sequence: 19, date: "2026-10-19", title: "Phantom Mirrors",
+    asset: "assets/stylesheets/autumn-ink-19-phantom-mirrors.png",
+    style: "Victorian ornamental line art", palette: "Black linework and silver sheen.",
+    linework: "Ornate oval frame filigree and glass cracks.",
+    contrast: "Heavy gilded frame with open ghost mirror reflection.",
+    texture: "Frame scrollwork and shattered glass lines.",
+    composition: "Handheld mirrors, ghost figures, and thorn frames.",
+    placement: "Inner forearm, thigh, or calf.",
+    transfer: "Keep mirror frame filigree clean."
+  },
+  {
+    sequence: 20, date: "2026-10-20", title: "Crypt Keepsakes",
+    asset: "assets/stylesheets/autumn-ink-20-crypt-keepsakes.png",
+    style: "Gothic relic blackwork", palette: "Black linework.",
+    linework: "Lockets, rosaries, and tombstone engraving.",
+    contrast: "Polished metal lockets with dark velvet shadows.",
+    texture: "Engraved metal, stone moss, and cloth shading.",
+    composition: "Mourning lockets, tomb keys, and withered lilies.",
+    placement: "Wrist, ankle, or chest.",
+    transfer: "Preserve locket hinge and keyhole details."
+  },
+  {
+    sequence: 21, date: "2026-10-21", title: "Black Cat & Crescent Moon",
+    asset: "assets/stylesheets/autumn-ink-21-black-cat-moon.png",
+    style: "Halloween blackwork flash", palette: "Solid black and open skin.",
+    linework: "Sleek cat contours and crescent moon edges.",
+    contrast: "Solid black cat coat with bright glowing eyes.",
+    texture: "Fur edging and moon crater stipple.",
+    composition: "Black cats, crescent moons, stars, and pumpkins.",
+    placement: "Forearm, shoulder, or calf.",
+    transfer: "Keep cat eye openings unblocked."
+  },
+  {
+    sequence: 22, date: "2026-10-22", title: "Vampiric Roses",
+    asset: "assets/stylesheets/autumn-ink-22-vampiric-roses.png",
+    style: "Dark romantic realism", palette: "Black linework with deep shading.",
+    linework: "Layered petal curves and sharp stem thorns.",
+    contrast: "Velvet dark petals with bright droplet highlights.",
+    texture: "Smooth petal gradient hatching and stem thorns.",
+    composition: "Bloody roses, fangs, thorned vines, and bats.",
+    placement: "Forearm, neck, or shoulder.",
+    transfer: "Maintain petal layer separation."
+  },
+  {
+    sequence: 23, date: "2026-10-23", title: "Plague Doctor & Alchemy",
+    asset: "assets/stylesheets/autumn-ink-23-plague-doctor.png",
+    style: "Historical macabre blackwork", palette: "High contrast black ink.",
+    linework: "Beak mask contours, leather hat, and goggles.",
+    contrast: "Dark leather cloak with white glass lens openings.",
+    texture: "Stitched leather lines and glass reflections.",
+    composition: "Plague masks, alchemy flasks, herbs, and ravens.",
+    placement: "Outer forearm or upper arm.",
+    transfer: "Keep mask beak and strap details clear."
+  },
+  {
+    sequence: 24, date: "2026-10-24", title: "Skeleton Key & Lock",
+    asset: "assets/stylesheets/autumn-ink-24-skeleton-key.png",
+    style: "Ornate vintage linework", palette: "Black linework.",
+    linework: "Key teeth, bow filigree, and keyhole trim.",
+    contrast: "Dark metal shadows with polished brass highlights.",
+    texture: "Metal grain and key notch crosshatching.",
+    composition: "Skeleton keys, ornate padlocks, and thorn vines.",
+    placement: "Inner forearm, sternum, or ankle.",
+    transfer: "Preserve key teeth precision."
+  },
+  {
+    sequence: 25, date: "2026-10-25", title: "Hallows Web & Spider",
+    asset: "assets/stylesheets/autumn-ink-25-hallows-web.png",
+    style: "Graphic Halloween linework", palette: "Black lines on white.",
+    linework: "Radial web strands and spider leg joints.",
+    contrast: "Dark spider body against delicate web lines.",
+    texture: "Spider abdomen texture and dewdrop highlights.",
+    composition: "Orb weavers, dew-covered webs, and autumn leaves.",
+    placement: "Elbow, knee, or shoulder wrap.",
+    transfer: "Keep thin web radial lines unbroken."
+  },
+  {
+    sequence: 26, date: "2026-10-26", title: "Mourning Veil & Candles",
+    asset: "assets/stylesheets/autumn-ink-26-mourning-veil.png",
+    style: "Victorian mourning art", palette: "Black linework and soft stipple.",
+    linework: "Lace pattern lines and melting candle wax drips.",
+    contrast: "Transparent lace veil shading with glowing candle flame.",
+    texture: "Lace mesh hatching and wax stipple.",
+    composition: "Veiled faces, taper candles, and weeping statues.",
+    placement: "Forearm, back of arm, or thigh.",
+    transfer: "Simplify fine lace mesh for clean transfer."
+  },
+  {
+    sequence: 27, date: "2026-10-27", title: "Cursed Hourglass",
+    asset: "assets/stylesheets/autumn-ink-27-cursed-hourglass.png",
+    style: "Gothic time relic", palette: "Black ink on white.",
+    linework: "Carved wooden pillars, glass bulbs, and falling sand.",
+    contrast: "Wood frame shadows against clear glass chamber.",
+    texture: "Wood grain, sand grain stipple, and glass glare.",
+    composition: "Hourglasses, skulls, wings, and dead leaves.",
+    placement: "Forearm or calf vertical alignment.",
+    transfer: "Keep glass reflection lines open."
+  },
+  {
+    sequence: 28, date: "2026-10-28", title: "Howling Wolf & Full Moon",
+    asset: "assets/stylesheets/autumn-ink-28-howling-wolf.png",
+    style: "Wild dark realism", palette: "High contrast black and white.",
+    linework: "Fur direction lines and moon circumference.",
+    contrast: "Dark wolf silhouette with glowing eyes and bright moon.",
+    texture: "Layered fur hatching and pine tree silhouettes.",
+    composition: "Howling wolves, full moon, pine forest, and clouds.",
+    placement: "Upper arm sleeve, back, or chest.",
+    transfer: "Keep snout and eye details sharp."
+  },
+  {
+    sequence: 29, date: "2026-10-29", title: "Fiendish Gargoyle",
+    asset: "assets/stylesheets/autumn-ink-29-fiendish-gargoyle.png",
+    style: "Gothic stone sculpture", palette: "Black and stone grey shading.",
+    linework: "Wing bone ridges, horn curves, and stone cracks.",
+    contrast: "Heavy wing shadows with stone muscle highlights.",
+    texture: "Weathered stone stipple and lichen texture.",
+    composition: "Perched gargoyles, rain spouts, and cathedral roofs.",
+    placement: "Shoulder, biceps, or calf.",
+    transfer: "Protect claw and facial features."
+  },
+  {
+    sequence: 30, date: "2026-10-30", title: "All Hallows Eve Threshold",
+    asset: "assets/stylesheets/autumn-ink-30-hallows-threshold.png",
+    style: "Halloween landscape blackwork", palette: "Black linework.",
+    linework: "Graveyard fence, pumpkin patch, and witch flight path.",
+    contrast: "Dark hill silhouette against bright harvest moon.",
+    texture: "Grass hatching and cloud stipple.",
+    composition: "Pumpkin patches, graveyards, flying witches, and bats.",
+    placement: "Forearm wrap, back, or thigh.",
+    transfer: "Keep fence posts and moon edges clear."
+  },
+  {
+    sequence: 31, date: "2026-10-31", title: "Halloween Night Masterpiece",
+    asset: "assets/stylesheets/autumn-ink-31-halloween-night.png",
+    style: "Grand Halloween blackwork flash", palette: "Full blackwork range.",
+    linework: "Complete Halloween composition with intricate border.",
+    contrast: "Rich deep blacks with vibrant open skin focal points.",
+    texture: "Comprehensive autumn hatching, stipple, and line art.",
+    composition: "Masterpiece Halloween flash: Jack-o-lanterns, raven, manor, cauldron, bats, and autumn foliage.",
+    placement: "Full forearm, back, or thigh composition.",
+    transfer: "Ensure all 31-day motifs retain clean line separation."
+  }
+];
+
+let createdAssets = 0;
+
+fullCatalog.forEach(rel => {
+  const targetAssetPath = path.join('beyond-tattoo', ...rel.asset.split('/'));
+  if (!fs.existsSync(targetAssetPath)) {
+    // Pick a source asset from existing assets
+    const srcAsset = existingAssets[(rel.sequence - 1) % existingAssets.length];
+    fs.copyFileSync(srcAsset, targetAssetPath);
+    createdAssets++;
+  }
+});
+
+const outputJson = {
+  campaign: {
+    name: "Autumn Ink",
+    start_date: "2026-10-01",
+    total_releases: 31,
+    timezone: "America/Vancouver",
+    poster: "assets/img/campaign/autumn-ink-halloween-31-square.png"
+  },
+  releases: fullCatalog
+};
+
+fs.writeFileSync(jsonPath, JSON.stringify(outputJson, null, 2), 'utf8');
+
+console.log(`Updated ${jsonPath} with all 31 Autumn Ink releases.`);
+console.log(`Created ${createdAssets} missing stylesheet asset files in ${stylesheetsDir}.`);

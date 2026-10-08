@@ -181,12 +181,28 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
       else $('assetBrowserStatus').textContent = 'No private upload batches yet.';
     } catch (error) { $('assetBrowserStatus').textContent = error.message || 'Could not load private batches.'; }
   };
+  const cleanDisplayName = (item) => {
+    let name = (item.name || '').trim();
+    name = name.replace(/^[0-9]{3}-[a-f0-9]{10}-/, '');
+    if (/^[0-9a-f-]{20,}\.(png|jpe?g|webp|gif)$/i.test(name)) {
+      const ext = name.split('.').pop().toUpperCase();
+      return `Asset #${String(item.position).padStart(3, '0')} (${ext})`;
+    }
+    return name;
+  };
   const renderStoredItems = () => {
     const term = $('assetSearch').value.trim().toLowerCase();
-    const filtered = storedItems.filter((item) => item.name.toLowerCase().includes(term));
-    $('assetGrid').innerHTML = filtered.map((item) => `<article class="asset-card"><label class="check"><input class="asset-select" type="checkbox" value="${item.position}" ${selectedInboxPositions.has(item.position) ? 'checked' : ''}> Remove after review</label>${item.preview ? `<img loading="lazy" src="${escapeHtml(item.preview)}" alt="Private upload ${item.position}">` : '<div class="asset-card" style="height:190px;display:grid;place-items:center;color:#888">No image preview</div>'}<b>${String(item.position).padStart(3,'0')} · ${escapeHtml(item.name)}</b><small>${escapeHtml(item.mime)} · ${item.width && item.height ? `${item.width} × ${item.height} · ` : ''}${(item.bytes/1048576).toFixed(2)} MB</small></article>`).join('');
+    const filtered = storedItems.filter((item) => item.name.toLowerCase().includes(term) || cleanDisplayName(item).toLowerCase().includes(term));
+    $('assetGrid').innerHTML = filtered.map((item) => `<article class="asset-card"><label class="check"><input class="asset-select" type="checkbox" value="${item.position}" ${selectedInboxPositions.has(item.position) ? 'checked' : ''}> Remove after review</label>${item.preview ? `<img loading="lazy" src="${escapeHtml(item.preview)}" alt="Private upload ${item.position}">` : '<div class="asset-card" style="height:190px;display:grid;place-items:center;color:#888">No image preview</div>'}<b>${String(item.position).padStart(3,'0')} · ${escapeHtml(cleanDisplayName(item))}</b><small>${escapeHtml(item.mime)} · ${item.width && item.height ? `${item.width} × ${item.height} · ` : ''}${(item.bytes/1048576).toFixed(2)} MB</small>${item.image && item.width >= 600 && item.height >= 600 ? `<button class="btn secondary promote-card-btn" type="button" data-position="${item.position}" style="margin-top:8px;padding:6px 12px;font-size:11px">Promote to Drop →</button>` : ''}</article>`).join('');
     $('assetBrowserStatus').textContent = `${filtered.length} of ${storedItems.length} files shown. Originals remain private; select only reviewed assets for removal.`;
     document.querySelectorAll('.asset-select').forEach((input) => input.addEventListener('change', () => { const position = Number(input.value); input.checked ? selectedInboxPositions.add(position) : selectedInboxPositions.delete(position); syncDeleteSelection(); }));
+    document.querySelectorAll('.promote-card-btn').forEach((button) => button.addEventListener('click', () => {
+      const pos = button.getAttribute('data-position');
+      $('promoteItem').value = pos;
+      $('promoteItem').dispatchEvent(new Event('change'));
+      $('promoteItem').focus();
+      $('promoteItem').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }));
     syncDeleteSelection();
   };
   const loadStoredBatch = async (batchId) => {
@@ -198,7 +214,7 @@ foreach (bt_season_one_drops() as $scheduledDrop) {
     storedItems = data.items || [];
     selectedInboxPositions = new Set();
     const promotable = storedItems.filter((item) => item.image && item.width >= 600 && item.height >= 600);
-    $('promoteItem').innerHTML = '<option value="">Choose a reviewed image</option>' + promotable.map((item) => `<option value="${item.position}">${String(item.position).padStart(3,'0')} · ${escapeHtml(item.name)} · ${item.width} × ${item.height}</option>`).join('');
+    $('promoteItem').innerHTML = '<option value="">Choose a reviewed image</option>' + promotable.map((item) => `<option value="${item.position}">#${String(item.position).padStart(3,'0')} · ${escapeHtml(cleanDisplayName(item))} · ${item.width} × ${item.height}</option>`).join('');
     $('promoteItem').disabled = promotable.length === 0;
     $('promote').disabled = true;
     $('promoteStatus').textContent = promotable.length ? `${promotable.length} eligible images in this private batch. Promotion keeps the source original private.` : 'No library-sized images are available in this batch.';

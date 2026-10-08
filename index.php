@@ -125,7 +125,14 @@ if (is_file($frenchLessonsPath)) {
 <link rel="stylesheet" href="/assets/css/beyond-splash.css?v=20260828-1">
 <link rel="stylesheet" href="/assets/css/stylesheet-1-31.css?v=20261001-4">
 <link rel="stylesheet" href="/beyond-tv/assets/css/video-ads.css?v=1.0.0">
-<link rel="stylesheet" href="/beyond-tv/assets/css/home-primetime.css?v=1">
+<link rel="stylesheet" href="/beyond-tv/assets/css/home-primetime.css?v=2">
+<style>
+html[data-theme="light"] .home-primetime{color:#1b2034}
+html[data-theme="light"] .home-primetime__head p{color:#4f5870}
+html[data-theme="light"] .home-primetime__head a{color:#4a37b3}
+html[data-theme="light"] .home-primetime__rail{scrollbar-color:#7062bd #e1e5f1}
+html[data-theme="light"] .home-primetime__actions .home-primetime__signin{background:#6246d7}
+</style>
 <script src="/assets/js/beyond-splash.js?v=20260904-1" defer></script>
 <style>
 :root{--bg:#030611;--panel:#09101f;--line:rgba(255,255,255,.13);--text:#f7f8ff;--muted:#b8bed2;--pink:#f2469d;--violet:#7057ff;--green:#51db78;--gold:#ffbf32;--blue:#448cff}
@@ -494,12 +501,10 @@ $homePrimetime = json_decode((string)@file_get_contents(__DIR__ . '/beyond-tv/da
     if (!preg_match('/^[A-Za-z0-9_-]{11}$/', $homeMovieId)) continue;
     $homeMovieTitle = (string)($homeMovie['title'] ?? 'Movie');
   ?>
-    <article class="home-primetime__card"><img class="home-primetime__art" src="https://i.ytimg.com/vi/<?=htmlspecialchars($homeMovieId)?>/hqdefault.jpg" alt="<?=htmlspecialchars($homeMovieTitle)?> on YouTube" loading="lazy"><div class="home-primetime__body"><span class="home-primetime__source">YouTube Movies · Free with ads</span><h3><?=htmlspecialchars($homeMovieTitle)?></h3><p class="home-primetime__meta"><?=htmlspecialchars((string)($homeMovie['genre'] ?? 'Movie'))?> · <?=htmlspecialchars((string)($homeMovie['year'] ?? ''))?> · <?=htmlspecialchars((string)($homeMovie['duration'] ?? ''))?></p><div class="home-primetime__actions"><button type="button" data-primetime-id="<?=htmlspecialchars($homeMovieId)?>" data-primetime-title="<?=htmlspecialchars($homeMovieTitle)?>">Play here</button><a href="https://www.youtube.com/watch?v=<?=htmlspecialchars($homeMovieId)?>" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></div></div></article>
+    <article class="home-primetime__card"><img class="home-primetime__art" src="https://i.ytimg.com/vi/<?=htmlspecialchars($homeMovieId)?>/hqdefault.jpg" alt="<?=htmlspecialchars($homeMovieTitle)?> on YouTube" loading="lazy"><div class="home-primetime__body"><span class="home-primetime__source">YouTube Movies · Free with ads</span><h3><?=htmlspecialchars($homeMovieTitle)?></h3><p class="home-primetime__meta"><?=htmlspecialchars((string)($homeMovie['genre'] ?? 'Movie'))?> · <?=htmlspecialchars((string)($homeMovie['year'] ?? ''))?> · <?=htmlspecialchars((string)($homeMovie['duration'] ?? ''))?></p><div class="home-primetime__actions"><a class="home-primetime__signin" href="https://accounts.google.com/ServiceLogin?service=youtube&amp;continue=<?=htmlspecialchars(urlencode('https://www.youtube.com/watch?v=' . $homeMovieId))?>" target="_blank" rel="noopener noreferrer">Sign in to YouTube</a><a href="https://www.youtube.com/watch?v=<?=htmlspecialchars($homeMovieId)?>" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></div></div></article>
   <?php endforeach; ?>
   </div>
-  <div class="home-primetime__viewer" role="dialog" aria-modal="true" aria-label="YouTube movie player" hidden><div class="home-primetime__panel"><div class="home-primetime__viewer-head"><h3>YouTube movie</h3><button class="home-primetime__close" type="button">Close ✕</button></div><iframe title="YouTube movie player" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><p>Playback and ads are provided by YouTube. If this movie cannot play here, <a data-official-video href="https://www.youtube.com/movies" target="_blank" rel="noopener noreferrer">watch on YouTube ↗</a>.</p></div></div>
 </section>
-<script src="/beyond-tv/assets/js/home-primetime.js?v=1" defer></script>
 <section class="home-live-stage" data-channel-theme="after-dark" data-sync-owner="page" data-tv-version="<?=htmlspecialchars($homeTvVersion)?>" data-tv-build="<?=$homeTvBuild?>" aria-labelledby="homeLiveHeading">
   <div class="home-live-stage__background" aria-hidden="true"></div>
   <div class="home-live-stage__inner">

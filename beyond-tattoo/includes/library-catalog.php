@@ -4,28 +4,23 @@ declare(strict_types=1);
 function bt_library_collections(): array
 {
     return [
-        'season-one-opening' => [
-            'name' => 'Season One Opening Releases', 'count' => 6, 'dates' => 'Jul 14–21, 2026',
-            'image' => 'assets/stencils/season-one-opening/01-celestial-rose/preview-watermarked.jpg',
-            'description' => 'The original opening drops that established the Beyond Tattoo daily stencil season.',
+        'divine-realism' => [
+            'name' => 'Divine Realism',
+            'count' => 10,
+            'dates' => 'Jul 14–26, 2026',
+            'image' => 'assets/img/storefront/collection-divine.webp',
+            'description' => 'Biblical portraiture, angels and sacred iconography composed for black-and-grey realism.',
             'stencils' => [
                 ['Celestial Rose', '2026-07-14'],
                 ['Eye of Horus Anubis', '2026-07-16'],
                 ['Sacred Heart', '2026-07-18'],
                 ['Archangel Michael', '2026-07-19'],
-                ['Praying Hands & Rosary', '2026-07-20'],
-                ['Guardian Angel', '2026-07-21'],
-            ],
-        ],
-        'divine-realism' => [
-            'name' => 'Divine Realism',
-            'count' => 10,
-            'dates' => 'Jul 17–26, 2026',
-            'image' => 'assets/img/storefront/collection-divine.webp',
-            'description' => 'Biblical portraiture, angels and sacred iconography composed for black-and-grey realism.',
-            'stencils' => [
-                ['Biblical Realism', '2026-07-17'], ['Dove & Radiant Cross', '2026-07-22'],
-                ['Cherub & Clouds', '2026-07-23'], ['Gates of Heaven', '2026-07-24'], ['Crown & Cross', '2026-07-25'], ['Angel of Light', '2026-07-26'],
+                ['Biblical Realism', '2026-07-17'],
+                ['Dove & Radiant Cross', '2026-07-22'],
+                ['Cherub & Clouds', '2026-07-23'],
+                ['Gates of Heaven', '2026-07-24'],
+                ['Crown & Cross', '2026-07-25'],
+                ['Angel of Light', '2026-07-26'],
             ],
         ],
         'beyond-ancient' => [
@@ -100,9 +95,8 @@ function bt_season_one_drops(): array
 {
     $drops = [];
     foreach (bt_library_collections() as $collectionSlug => $collection) {
-        if (in_array($collectionSlug, ['beyond-studio-originals', 'beyond-studio-japanese'], true)) break;
+        if (in_array($collectionSlug, ['beyond-studio-originals', 'beyond-studio-japanese', 'public-domain-flash-archive'], true)) break;
         foreach ($collection['stencils'] as $collectionIndex => [$title, $releaseDate]) {
-            if ($collectionSlug === 'season-one-opening' && $collectionIndex >= 4) continue;
             $drops[] = [
                 'sequence' => count($drops) + 1,
                 'title' => $title,

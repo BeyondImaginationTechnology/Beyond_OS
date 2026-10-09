@@ -97,7 +97,7 @@ function beyond_tv_episode_code(array $episode): string
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#401532">
 <title><?= htmlspecialchars((string) $title['title']) ?><?= $currentEpisodeIsPlayable && $currentEpisodeTitle !== '' ? ' · ' . htmlspecialchars(beyond_tv_episode_code($currentEpisode ?? []) . ' ' . $currentEpisodeTitle) : '' ?> | Beyond TV</title>
-<link rel="stylesheet" href="/beyond-tv/assets/css/app.css?v=3.0.1">
+<link rel="stylesheet" href="/beyond-tv/assets/css/app.css?v=3.0.5">
 </head>
 <body class="tv-app">
 <?php include __DIR__ . '/partials/header.php'; ?>

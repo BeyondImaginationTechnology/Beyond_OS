@@ -25,7 +25,7 @@ $isSafety = str_ends_with($currentTvPath, '/source-safety.php');
       <button class="menu-btn" type="button" aria-label="Toggle menu" aria-expanded="false">☰</button>
     </div>
   </div>
-  <nav class="mobile-nav" aria-label="Mobile" hidden><a href="/">Home</a><a href="/beyond-tv/">Watch</a><a href="/beyond-tv/live-tv.php">Guide</a><a href="/beyond-tv/browse.php">Browse</a><a href="/beyond-tv/source-safety.php">Source Safety</a><?php if ($signedIn): ?><a href="/beyond-tv/browse.php?list=mine">My List</a><?php else: ?><a href="/beyond-id/auth/login.php?return=/beyond-tv/">Sign in</a><?php endif; ?></nav>
+  <nav class="mobile-nav" aria-label="Mobile" hidden style="display:none!important"><a href="/">Home</a><a href="/beyond-tv/">Watch</a><a href="/beyond-tv/live-tv.php">Guide</a><a href="/beyond-tv/browse.php">Browse</a><a href="/beyond-tv/source-safety.php">Source Safety</a><?php if ($signedIn): ?><a href="/beyond-tv/browse.php?list=mine">My List</a><?php else: ?><a href="/beyond-id/auth/login.php?return=/beyond-tv/">Sign in</a><?php endif; ?></nav>
 </header>
 <script>
 (function() {
@@ -40,8 +40,10 @@ $isSafety = str_ends_with($currentTvPath, '/source-safety.php');
         const open = nav.classList.toggle('is-open');
         if (open) {
           nav.removeAttribute('hidden');
+          nav.style.setProperty('display', 'grid', 'important');
         } else {
           nav.setAttribute('hidden', '');
+          nav.style.setProperty('display', 'none', 'important');
         }
         btn.setAttribute('aria-expanded', String(open));
       });
@@ -49,6 +51,7 @@ $isSafety = str_ends_with($currentTvPath, '/source-safety.php');
         if (nav.classList.contains('is-open') && !btn.contains(e.target) && !nav.contains(e.target)) {
           nav.classList.remove('is-open');
           nav.setAttribute('hidden', '');
+          nav.style.setProperty('display', 'none', 'important');
           btn.setAttribute('aria-expanded', 'false');
         }
       });

@@ -8,8 +8,34 @@ window.BeyondTVClassicFallback=async function(frame,payload){
  play(pos);
 };
 })();
-const menuBtn=document.querySelector('.menu-btn');
-const mobileNav=document.querySelector('.mobile-nav');
+(function() {
+  const menuBtn = document.querySelector('.tv-header .menu-btn') || document.querySelector('.menu-btn');
+  const mobileNav = document.querySelector('.tv-header .mobile-nav') || document.querySelector('.mobile-nav');
+  if (menuBtn && mobileNav && !menuBtn.dataset.tvMenuBound) {
+    menuBtn.dataset.tvMenuBound = 'true';
+    menuBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const open = mobileNav.classList.toggle('is-open');
+      if (open) {
+        mobileNav.removeAttribute('hidden');
+        mobileNav.style.setProperty('display', 'grid', 'important');
+      } else {
+        mobileNav.setAttribute('hidden', '');
+        mobileNav.style.setProperty('display', 'none', 'important');
+      }
+      menuBtn.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', (e) => {
+      if (mobileNav.classList.contains('is-open') && !menuBtn.contains(e.target) && !mobileNav.contains(e.target)) {
+        mobileNav.classList.remove('is-open');
+        mobileNav.setAttribute('hidden', '');
+        mobileNav.style.setProperty('display', 'none', 'important');
+        menuBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+})();
 
 function initProviderPlayer(container){
   if(!container||container.dataset.ready==='1')return;

@@ -48,7 +48,7 @@ require __DIR__ . '/../includes/admin-header.php';
 require __DIR__ . '/../includes/admin-sidebar.php';
 ?>
 <style>
-.deployments-layout{max-width:1080px}.deployment-summary{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap}.deployment-summary p{margin:7px 0 0}.deployment-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:22px 0}.deployment-stat{padding:16px;border:1px solid var(--border);border-radius:16px;background:var(--panel2)}.deployment-stat span{display:block;margin-bottom:6px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.deployment-stat strong{display:block;overflow-wrap:anywhere}.deployment-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.deployment-actions form{margin:0}.deployment-actions button:disabled{cursor:not-allowed;opacity:.55}.deployment-note{margin-top:20px;padding-top:17px;border-top:1px solid var(--border);font-size:12px}.deployment-note code{color:var(--text)}@media(max-width:600px){.deployment-grid{grid-template-columns:1fr}}
+.deployments-layout{max-width:1080px}.deployment-summary{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap}.deployment-summary p{margin:7px 0 0}.deployment-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:22px 0}.deployment-stat{padding:16px;border:1px solid var(--border);border-radius:16px;background:var(--panel2)}.deployment-stat span{display:block;margin-bottom:6px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.deployment-stat strong{display:block;overflow-wrap:anywhere}.deployment-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.deployment-actions form{margin:0}.deployment-actions button:disabled{cursor:not-allowed;opacity:.55}.deployment-note{margin-top:20px;padding-top:17px;border-top:1px solid var(--border);font-size:12px}.deployment-note code{color:var(--text)}.deploy-log-output{margin:12px 0 0;padding:18px;border:1px solid var(--border);border-radius:14px;background:#080a14;color:#a3f7bf;font:13px/1.5 "Space Mono",Monaco,Consolas,monospace;white-space:pre-wrap;word-break:break-word;max-height:480px;overflow:auto}@media(max-width:600px){.deployment-grid{grid-template-columns:1fr}}
 </style>
 <section class="content deployments-layout">
   <div class="page-heading deployment-summary">
@@ -80,6 +80,13 @@ require __DIR__ . '/../includes/admin-sidebar.php';
     </div>
     <p class="muted deployment-note">This page queues a protected deployment request. The scheduled worker runs it within a minute; this status refreshes automatically while it is queued or running. The worker preserves <code>var/</code>, live configuration, and repository metadata.</p>
   </section>
+
+  <?php if (!empty($deployment['stdout']) || !empty($deployment['stderr'])): ?>
+  <section class="card" style="margin-top:22px;" aria-labelledby="deployment-log-title">
+    <div class="card-heading"><h2 id="deployment-log-title">Detailed Deployed Files Log</h2></div>
+    <pre class="deploy-log-output"><?= e($deployment['stdout'] ?: $deployment['stderr']) ?></pre>
+  </section>
+  <?php endif; ?>
 </section>
 <?php if (in_array($result, ['queued', 'running'], true)): ?>
 <script>window.setTimeout(() => window.location.replace('deployments.php'), 10000);</script>

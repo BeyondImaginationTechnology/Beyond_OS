@@ -129,6 +129,6 @@ function beyond_queue_deployment(array $requester): array
 function beyond_deployment_public_status(array $status): array
 {
     $public = [];
-    foreach (['result', 'message', 'branch', 'commit', 'requested_at', 'started_at', 'finished_at'] as $key) $public[$key] = (string)($status[$key] ?? '');
+    foreach (['result', 'message', 'branch', 'commit', 'requested_at', 'started_at', 'finished_at', 'stdout', 'stderr'] as $key) $public[$key] = (string)($status[$key] ?? '');
     return $public;
 }

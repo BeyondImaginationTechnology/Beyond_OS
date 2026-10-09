@@ -28,15 +28,36 @@ $isSafety = str_ends_with($currentTvPath, '/source-safety.php');
   <nav class="mobile-nav" aria-label="Mobile" hidden><a href="/">Home</a><a href="/beyond-tv/">Watch</a><a href="/beyond-tv/live-tv.php">Guide</a><a href="/beyond-tv/browse.php">Browse</a><a href="/beyond-tv/source-safety.php">Source Safety</a><?php if ($signedIn): ?><a href="/beyond-tv/browse.php?list=mine">My List</a><?php else: ?><a href="/beyond-id/auth/login.php?return=/beyond-tv/">Sign in</a><?php endif; ?></nav>
 </header>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const btn = document.querySelector('.tv-header .menu-btn');
-  const nav = document.querySelector('.tv-header .mobile-nav');
-  if (btn && nav) {
-    btn.addEventListener('click', function() {
-      const open = nav.classList.toggle('is-open');
-      if (open) nav.removeAttribute('hidden'); else nav.setAttribute('hidden', '');
-      btn.setAttribute('aria-expanded', String(open));
-    });
+(function() {
+  function initTvMenu() {
+    const btn = document.querySelector('.tv-header .menu-btn');
+    const nav = document.querySelector('.tv-header .mobile-nav');
+    if (btn && nav && !btn.dataset.tvMenuBound) {
+      btn.dataset.tvMenuBound = 'true';
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const open = nav.classList.toggle('is-open');
+        if (open) {
+          nav.removeAttribute('hidden');
+        } else {
+          nav.setAttribute('hidden', '');
+        }
+        btn.setAttribute('aria-expanded', String(open));
+      });
+      document.addEventListener('click', function(e) {
+        if (nav.classList.contains('is-open') && !btn.contains(e.target) && !nav.contains(e.target)) {
+          nav.classList.remove('is-open');
+          nav.setAttribute('hidden', '');
+          btn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
   }
-});
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTvMenu);
+  } else {
+    initTvMenu();
+  }
+})();
 </script>

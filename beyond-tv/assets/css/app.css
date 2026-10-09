@@ -379,3 +379,41 @@ html[data-tv-theme="light"] .channel-ambient-art{opacity:.22;filter:blur(14px) s
 
 /* Daily Breath TV renders in landscape for full player coverage. */
 .daily-breath-channel .provider-player,.daily-breath-channel .youtube-player-wrap{aspect-ratio:16/9;min-height:0}.daily-breath-channel .beyond-video{object-fit:cover}
+
+/* Strictly enforce mobile menu hiding on desktop & visibility when toggled */
+.site-header .menu-btn,
+.tv-header .menu-btn,
+.menu-btn {
+  display: none !important;
+}
+
+.site-header .mobile-nav,
+.tv-header .mobile-nav,
+.mobile-nav,
+.mobile-nav[hidden],
+.mobile-nav:not(.is-open) {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .site-header .desktop-nav,
+  .tv-header .desktop-nav,
+  .desktop-nav {
+    display: none !important;
+  }
+  .site-header .menu-btn,
+  .tv-header .menu-btn,
+  .menu-btn {
+    display: grid !important;
+  }
+  .site-header .mobile-nav.is-open,
+  .tv-header .mobile-nav.is-open,
+  .mobile-nav.is-open {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 12px 16px 18px;
+    background: var(--tv-panel);
+    border-top: 1px solid var(--tv-line);
+  }
+}

@@ -535,14 +535,25 @@ $homeLiveControls = [
 $homePrimetime = json_decode((string)@file_get_contents(__DIR__ . '/beyond-tv/data/home-primetime.json'), true) ?: [];
 ?>
 <section class="home-primetime" aria-labelledby="homePrimetimeHeading">
-  <div class="home-primetime__head"><div><span class="home-live-kicker">Movies &amp; TV · YouTube</span><h2 id="homePrimetimeHeading">Free Primetime movies</h2><p>Selected from YouTube Movies · Free with ads where available</p></div><a href="https://www.youtube.com/movies" target="_blank" rel="noopener noreferrer">Browse YouTube Movies ↗</a></div>
-  <div class="home-primetime__rail" aria-label="Free Primetime movie posters">
+  <div class="home-primetime__head">
+    <div>
+      <span class="home-live-kicker">Movies &amp; TV · YouTube</span>
+      <h2 id="homePrimetimeHeading">Free Primetime movies</h2>
+      <p>Selected from YouTube Movies · Free with ads where available</p>
+    </div>
+    <div class="home-primetime__controls">
+      <button type="button" class="home-primetime__arrow prev" id="homePrimetimePrev" aria-label="Scroll movies left" title="Scroll left">‹</button>
+      <button type="button" class="home-primetime__arrow next" id="homePrimetimeNext" aria-label="Scroll movies right" title="Scroll right">›</button>
+      <a href="https://www.youtube.com/movies" target="_blank" rel="noopener noreferrer">Browse YouTube Movies ↗</a>
+    </div>
+  </div>
+  <div class="home-primetime__rail" id="homePrimetimeRail" aria-label="Free Primetime movie posters">
   <?php foreach ($homePrimetime as $homeMovie):
     $homeMovieId = (string)($homeMovie['youtube_id'] ?? '');
     if (!preg_match('/^[A-Za-z0-9_-]{11}$/', $homeMovieId)) continue;
     $homeMovieTitle = (string)($homeMovie['title'] ?? 'Movie');
   ?>
-    <article class="home-primetime__card"><img class="home-primetime__art" src="https://i.ytimg.com/vi/<?=htmlspecialchars($homeMovieId)?>/hqdefault.jpg" alt="<?=htmlspecialchars($homeMovieTitle)?> on YouTube" loading="lazy"><div class="home-primetime__body"><span class="home-primetime__source">YouTube Movies · Free with ads</span><h3><?=htmlspecialchars($homeMovieTitle)?></h3><p class="home-primetime__meta"><?=htmlspecialchars((string)($homeMovie['genre'] ?? 'Movie'))?> · <?=htmlspecialchars((string)($homeMovie['year'] ?? ''))?> · <?=htmlspecialchars((string)($homeMovie['duration'] ?? ''))?></p><div class="home-primetime__actions"><a class="home-primetime__signin" href="https://accounts.google.com/ServiceLogin?service=youtube&amp;continue=<?=htmlspecialchars(urlencode('https://www.youtube.com/watch?v=' . $homeMovieId))?>" target="_blank" rel="noopener noreferrer">Sign in to YouTube</a><a href="https://www.youtube.com/watch?v=<?=htmlspecialchars($homeMovieId)?>" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></div></div></article>
+    <article class="home-primetime__card"><img class="home-primetime__art" src="https://i.ytimg.com/vi/<?=htmlspecialchars($homeMovieId)?>/hqdefault.jpg" alt="<?=htmlspecialchars($homeMovieTitle)?> on YouTube" loading="lazy"><div class="home-primetime__body"><span class="home-primetime__source">YouTube Movies · Free with ads</span><h3><?=htmlspecialchars($homeMovieTitle)?></h3><p class="home-primetime__meta"><?=htmlspecialchars((string)($homeMovie['genre'] ?? 'Movie'))?> · <?=htmlspecialchars((string)($homeMovie['year'] ?? ''))?> · <?=htmlspecialchars((string)($homeMovie['duration'] ?? ''))?></p><div class="home-primetime__actions"><a class="home-primetime__signin" href="https://accounts.google.com/ServiceLogin?service=youtube&amp;continue=<?=htmlspecialchars(urlencode('https://www.youtube.com/watch?v=' . $homeMovieId))?>" target="_blank" rel="noopener noreferrer" title="Sign in with Google to watch with ads">Sign in</a><a href="https://www.youtube.com/watch?v=<?=htmlspecialchars($homeMovieId)?>" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a></div></div></article>
   <?php endforeach; ?>
   </div>
 </section>
@@ -619,6 +630,14 @@ html[data-theme="light"] .home-live-stage{color:#fff}html[data-theme="light"] .h
 
 <script>
 (() => {
+ const primetimeRail=document.getElementById('homePrimetimeRail');
+ const primetimePrev=document.getElementById('homePrimetimePrev');
+ const primetimeNext=document.getElementById('homePrimetimeNext');
+ if(primetimeRail && primetimePrev && primetimeNext){
+   primetimePrev.addEventListener('click',()=>primetimeRail.scrollBy({left:-340,behavior:'smooth'}));
+   primetimeNext.addEventListener('click',()=>primetimeRail.scrollBy({left:340,behavior:'smooth'}));
+ }
+
  const form=document.getElementById('homeJaguarForm');
  if(!form)return;
  const prompt=form.querySelector('#homeJaguarPrompt');

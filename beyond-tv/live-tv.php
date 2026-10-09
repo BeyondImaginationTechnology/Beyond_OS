@@ -28,7 +28,7 @@ $currentHour = (int)(new DateTimeImmutable('now', $timezone))->format('G');
 <meta name="theme-color" content="#401532">
 <title>Full <?=count($channels)?>-Channel Guide | Beyond TV</title>
 <meta name="description" content="Browse Beyond TV live schedules and upcoming channel programming previews.">
-<link rel="stylesheet" href="/beyond-tv/assets/css/app.css?v=3.0.5">
+<link rel="stylesheet" href="/beyond-tv/assets/css/app.css?v=3.0.6">
 </head>
 <body class="tv-app">
 <div class="ambient-orb ambient-orb-one"></div><div class="ambient-orb ambient-orb-two"></div>

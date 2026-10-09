@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?><!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Source Safety | Beyond TV</title><link rel="stylesheet" href="/beyond-tv/assets/css/app.css?v=3.0.5">
+<title>Source Safety | Beyond TV</title><link rel="stylesheet" href="/beyond-tv/assets/css/app.css?v=3.0.6">
 <style>body{background:#090a16;color:#f7f7fb}.safety{width:min(760px,calc(100% - 32px));margin:40px auto 80px}.safety h1{font-size:clamp(2.2rem,6vw,4rem);margin:.3em 0}.safety p{line-height:1.65;color:#c2c5d4}.safety-card{border:1px solid #34384f;border-radius:20px;background:#151726;padding:24px;margin:20px 0}.safety-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.safety-grid div{padding:15px;border:1px solid #34384f;border-radius:14px}.safety-grid strong{display:block;color:#d6b6ff}.safety-grid small{display:block;margin-top:6px;line-height:1.45;color:#c2c5d4}.safety label{display:grid;gap:7px;margin:14px 0;font-weight:700}.safety input,.safety select,.safety textarea{width:100%;padding:12px;border:1px solid #4a4e68;border-radius:10px;background:#090a16;color:#fff;font:inherit}.safety textarea{min-height:120px}.safety button{padding:12px 20px;border:0;border-radius:10px;background:#a765ff;color:#fff;font-weight:800;cursor:pointer}.safety .quiet{font-size:.9rem}.safety .message{padding:14px;border-radius:10px;background:#23334c;color:#fff}.safety .trap{position:absolute;left:-9999px}@media(max-width:650px){.safety-grid{grid-template-columns:1fr}}</style>
 </head><body>
 <?php require __DIR__ . '/partials/header.php'; ?>

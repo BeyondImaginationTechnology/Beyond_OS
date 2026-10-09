@@ -317,7 +317,12 @@ body.tv-app:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:n
 .site-header,.tv-header{position:sticky;top:52px;z-index:40;height:60px;min-height:60px;background:color-mix(in srgb,var(--tv-bg-deep) 78%,transparent);border-color:var(--tv-line);box-shadow:0 12px 40px rgba(8,4,15,.16)}
 .nav-wrap{height:60px;min-height:60px}.brand img{width:40px;height:40px;border-radius:12px;box-shadow:0 8px 24px rgba(8,4,15,.28)}.brand b{letter-spacing:-.03em}.brand em,.site-footer em{color:var(--tv-accent);font-style:normal}.brand small{color:var(--tv-muted)}
 .desktop-nav{gap:5px}.desktop-nav a{padding:8px 13px;border-radius:999px;color:var(--tv-muted);font-weight:780}.desktop-nav a:hover,.desktop-nav a[aria-current="page"]{background:color-mix(in srgb,var(--tv-text) 9%,transparent);color:var(--tv-text)}
-.icon-btn,.menu-btn{display:grid;min-width:38px;min-height:38px;place-items:center;border:1px solid var(--tv-line);border-radius:999px;color:var(--tv-text);background:color-mix(in srgb,var(--tv-panel) 75%,transparent);font-size:18px}.tv-signin{padding:9px 15px;border-radius:999px;background:linear-gradient(120deg,#ef7077,var(--tv-accent-2) 58%,#7259d8);box-shadow:0 10px 30px rgba(174,53,126,.23)}
+.icon-btn{display:grid;min-width:38px;min-height:38px;place-items:center;border:1px solid var(--tv-line);border-radius:999px;color:var(--tv-text);background:color-mix(in srgb,var(--tv-panel) 75%,transparent);font-size:18px}
+.menu-btn{display:none !important;min-width:38px;min-height:38px;place-items:center;border:1px solid var(--tv-line);border-radius:999px;color:var(--tv-text);background:color-mix(in srgb,var(--tv-panel) 75%,transparent);font-size:18px}
+@media(max-width:900px){
+  .desktop-nav{display:none !important}
+  .menu-btn{display:grid !important}
+}.tv-signin{padding:9px 15px;border-radius:999px;background:linear-gradient(120deg,#ef7077,var(--tv-accent-2) 58%,#7259d8);box-shadow:0 10px 30px rgba(174,53,126,.23)}
 
 /* Browse Toolbar & Controls */
 .library-toolbar{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;margin-bottom:20px}

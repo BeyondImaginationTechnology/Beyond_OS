@@ -19,22 +19,24 @@ echo '<h1>✦ BIT Monorepo Server Deployment ✦</h1>';
 
 $targetDirEsc = escapeshellarg($targetDir);
 $authUrlEsc = escapeshellarg($authUrl);
-$output = [];
 
-if (!is_dir($targetDir . '/.git')) {
-    echo "<p>Initializing fresh git repository at <code>$targetDir</code>…</p>";
-    if (!is_dir($targetDir)) {
-        @mkdir($targetDir, 0755, true);
-    }
-    exec("cd $targetDirEsc && git init -b main 2>&1", $output);
-} else {
-    echo "<p>Updating existing repository at <code>$targetDir</code>…</p>";
+if (isset($_GET['fresh']) || !is_file($targetDir . '/.git/config')) {
+    echo "<p>Wiping broken target directory <code>$targetDir</code> for a fresh clone…</p>";
+    exec("rm -rf " . $targetDirEsc . " 2>&1");
 }
 
-exec("cd $targetDirEsc && (git remote set-url origin $authUrlEsc 2>&1 || git remote add origin $authUrlEsc 2>&1)", $output);
-exec("cd $targetDirEsc && git fetch --prune origin main 2>&1 && git reset --hard origin/main 2>&1", $output, $returnCode);
+if (!is_dir($targetDir . '/.git')) {
+    echo "<p>Cloning fresh <strong>BIT</strong> repository to <code>$targetDir</code>…</p>";
+    $cmd = 'git clone ' . $authUrlEsc . ' ' . $targetDirEsc . ' 2>&1';
+} else {
+    echo "<p>Updating existing repository at <code>$targetDir</code>…</p>";
+    $cmd = 'cd ' . $targetDirEsc . ' && git remote set-url origin ' . $authUrlEsc . ' 2>&1 && git fetch origin main 2>&1 && git reset --hard origin/main 2>&1';
+}
 
 echo '<pre>';
+$output = [];
+$returnCode = 0;
+exec($cmd, $output, $returnCode);
 echo htmlspecialchars(implode("\n", $output));
 echo "\n\nExit Code: " . $returnCode . "\n";
 if ($returnCode === 0) {

@@ -25,8 +25,12 @@ $user = 'BeyondImaginationTechnology';
 $authUrl = $token !== '' ? "https://{$user}:{$token}@github.com/{$user}/BIT.git" : "https://github.com/{$user}/BIT.git";
 
 if (is_dir($targetDir . '/.git')) {
-    echo "<p>Repository already exists at <code>$targetDir</code>. Updating from origin/main…</p>";
-    $cmd = 'cd ' . escapeshellarg($targetDir) . ' && git fetch origin main 2>&1 && git reset --hard origin/main 2>&1';
+    echo "<p>Repository already exists at <code>$targetDir</code>. Configuring origin and updating from main…</p>";
+    if ($token !== '') {
+        $cmd = 'cd ' . escapeshellarg($targetDir) . ' && git remote set-url origin ' . escapeshellarg($authUrl) . ' 2>&1 && git fetch origin main 2>&1 && git reset --hard origin/main 2>&1';
+    } else {
+        $cmd = 'cd ' . escapeshellarg($targetDir) . ' && git fetch origin main 2>&1 && git reset --hard origin/main 2>&1';
+    }
 } else {
     echo "<p>Cloning fresh <strong>BIT</strong> repository to <code>$targetDir</code>…</p>";
     if (is_dir($targetDir)) {

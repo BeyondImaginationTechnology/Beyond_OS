@@ -21,6 +21,14 @@ if [[ "$(cd -- "${PUBLIC_ROOT}" && pwd)" != "${REPOSITORY_ROOT}" ]]; then
 fi
 
 cd "${REPOSITORY_ROOT}"
+
+# Switch remote origin to new BIT monorepo repository
+TARGET_REPO_URL="https://github.com/BeyondImaginationTechnology/BIT.git"
+CURRENT_ORIGIN="$(git remote get-url origin 2>/dev/null || true)"
+if [[ "${CURRENT_ORIGIN}" != *"BIT.git"* ]]; then
+  git remote set-url origin "${TARGET_REPO_URL}" 2>/dev/null || git remote add origin "${TARGET_REPO_URL}"
+fi
+
 CURRENT_BRANCH="$(git symbolic-ref --quiet --short HEAD || true)"
 if [[ -n "${CURRENT_BRANCH}" && "${CURRENT_BRANCH}" != "main" ]]; then
   git checkout -f main || true
@@ -35,7 +43,7 @@ fi
 
 PREV_COMMIT="$(git rev-parse HEAD 2>/dev/null || echo "000000000000")"
 
-# Fetch latest main branch from GitHub
+# Fetch latest main branch from GitHub BIT repository
 git fetch --prune origin main
 git reset --hard origin/main
 
@@ -101,6 +109,7 @@ echo "✦ BEYOND OS STARTCP DEPLOYMENT REPORT ✦"
 echo "============================================================"
 echo "Timestamp:     ${DEPLOYED_AT}"
 echo "Public Root:   ${PUBLIC_ROOT}"
+echo "Repository:    ${TARGET_REPO_URL}"
 echo "Branch:        main"
 echo "Previous HEAD: ${PREV_COMMIT:0:12}"
 echo "Deployed HEAD: ${NEW_COMMIT:0:12}"

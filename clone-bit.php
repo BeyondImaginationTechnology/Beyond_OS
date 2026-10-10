@@ -6,10 +6,23 @@ header('Cache-Control: no-cache, no-store, must-revalidate');
 
 $accountRoot = '/home/sites/42b/a/a9823859bb/beyondimagination.co.technology';
 $targetDir = $accountRoot . '/BIT';
-$repoUrl = 'https://github.com/BeyondImaginationTechnology/BIT.git';
 
-echo '<!doctype html><html><head><title>Deploy BIT Monorepo</title><style>body{background:#0b0813;color:#f1e8ff;font-family:monospace;padding:24px;}pre{background:#130e20;padding:18px;border-radius:12px;border:1px solid #3d2459;overflow:auto;line-height:1.5;}</style></head><body>';
+$token = trim((string)($_GET['token'] ?? ''));
+
+echo '<!doctype html><html><head><title>Deploy BIT Monorepo</title><style>body{background:#0b0813;color:#f1e8ff;font-family:monospace;padding:24px;}pre{background:#130e20;padding:18px;border-radius:12px;border:1px solid #3d2459;overflow:auto;line-height:1.5;}input,button{padding:10px 14px;border-radius:8px;border:1px solid #7d35d0;background:#1b122b;color:#fff;font-family:inherit;}</style></head><body>';
 echo '<h1>✦ BIT Monorepo Server Deployment ✦</h1>';
+
+if ($token === '' && !is_dir($targetDir . '/.git')) {
+    echo '<form method="GET" style="margin:20px 0">';
+    echo '<label style="display:block;margin-bottom:8px">Enter GitHub Personal Access Token (PAT):</label>';
+    echo '<input type="password" name="token" placeholder="ghp_..." style="width:380px" required> ';
+    echo '<button type="submit">Clone BIT Repository to /BIT</button>';
+    echo '</form></body></html>';
+    exit;
+}
+
+$user = 'BeyondImaginationTechnology';
+$authUrl = $token !== '' ? "https://{$user}:{$token}@github.com/{$user}/BIT.git" : "https://github.com/{$user}/BIT.git";
 
 if (is_dir($targetDir . '/.git')) {
     echo "<p>Repository already exists at <code>$targetDir</code>. Updating from origin/main…</p>";
@@ -20,7 +33,7 @@ if (is_dir($targetDir . '/.git')) {
         echo "<p>Cleaning existing empty directory <code>$targetDir</code>…</p>";
         @rmdir($targetDir);
     }
-    $cmd = 'git clone ' . escapeshellarg($repoUrl) . ' ' . escapeshellarg($targetDir) . ' 2>&1';
+    $cmd = 'git clone ' . escapeshellarg($authUrl) . ' ' . escapeshellarg($targetDir) . ' 2>&1';
 }
 
 echo '<pre>';
@@ -32,6 +45,6 @@ echo "\n\nExit Code: " . $returnCode . "\n";
 if ($returnCode === 0) {
     echo "✅ SUCCESS: BIT monorepo deployed at $targetDir\n";
 } else {
-    echo "❌ ERROR: Check git permissions or folder locks.\n";
+    echo "❌ ERROR: Check git permissions or token.\n";
 }
 echo '</pre></body></html>';

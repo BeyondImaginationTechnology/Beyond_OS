@@ -36,9 +36,9 @@
     {"time":"8:00 AM","show":"Big Questions"}
   ],
   "daily_schedule": [
-    {"time":"12:00 AM–6:00 AM","show":"Night Breath","focus":"Calm readings, Isha reflection, nature, and replays"},
-    {"time":"6:00–7:00 AM","show":"Verse of the Day","focus":"Daily scripture, Fajr reflection, devotional, and prayer"},
-    {"time":"7:00–9:00 AM","show":"Christian Morning","focus":"Bible devotional, prayer, study, and faith stories"},
+    {"time":"12:00 AM–6:00 AM","show":"Night Breath · Ambient Devotional","focus":"Calm ambient readings & devotional music bed (no voice narration or animation overnight)"},
+    {"time":"6:00–7:00 AM","show":"Verse of the Day · Ambient Stream","focus":"Early morning scripture, ambient music, and quiet reflection"},
+    {"time":"7:00–9:00 AM","show":"Christian Morning · Chris Animated Devotional","focus":"Animated Chris Verse of the Day & Devotional rendered in Blender (DB_Christian_StudyV20_Chris_Speaking_Test.blend) with Chris narration"},
     {"time":"9:00–10:00 AM","show":"Judaism · Shacharit & Study","focus":"Morning prayer window, Torah/Tanakh study, culture, and community"},
     {"time":"10:00 AM–12:00 PM","show":"Muslim Morning","focus":"Quran reflection, Salah learning, and Muslim community stories"},
     {"time":"12:00–1:00 PM","show":"Daily Breath Update","focus":"Newsletter, community highlights, and upcoming programming"},

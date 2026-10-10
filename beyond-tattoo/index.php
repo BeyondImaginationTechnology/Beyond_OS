@@ -231,6 +231,28 @@ if (!empty($stencilDay['iso_date'])) {
     </div>
   </section>
 
+  <section class="bt-daily-section" id="stylesheet-of-day" style="padding-top:0">
+    <div class="bt-wrap bt-daily-card">
+      <div class="bt-daily-art" style="background:#faf8f5">
+        <img src="<?= e($dailyStylesheet['asset_url'] ?? bt_app_url('assets/stylesheets/autumn-ink-01-pumpkin-harvest.png')) ?>?v=3.0.5" alt="Today’s Autumn Ink Stylesheet: <?= e($dailyStylesheet['title'] ?? 'Pumpkin Harvest') ?>" style="object-fit:contain;background:#faf8f5">
+        <span class="bt-stencil-day-orb">Stylesheet<br>of the<br>day</span>
+        <span class="bt-image-date">OCTOBER 1 · AUTUMN INK</span>
+      </div>
+      <div class="bt-daily-copy">
+        <p class="bt-purple-kicker">Today’s Autumn Ink Stylesheet</p>
+        <h2><?= e($dailyStylesheet['title'] ?? 'Pumpkin Harvest') ?></h2>
+        <p class="bt-collection-tag">12-Piece Coordinated Flash Sheet</p>
+        <div class="bt-daily-features">
+          <span>✦ 12 original autumn harvest &amp; Halloween motifs</span>
+          <span>◇ Sticker-sheet separation for clean tattoo transfer</span>
+          <span>▣ High-resolution 1200×1600 master flash sheet</span>
+        </div>
+        <a class="bt-glow-button bt-full-button" href="stylesheets.php#stylesheet-01">Open 12-piece stylesheet &amp; download</a>
+        <small>Approved Autumn Ink daily flash sheet · Print-ready asset</small>
+      </div>
+    </div>
+  </section>
+
   <section class="bt-collections-section" id="collections">
     <div class="bt-wrap bt-section-frame">
       <div class="bt-section-heading-row">

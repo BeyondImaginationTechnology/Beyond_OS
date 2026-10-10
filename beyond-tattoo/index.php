@@ -6,6 +6,7 @@ header('Pragma: no-cache');
 header('Expires: 0');
 
 require_once __DIR__ . '/../includes/ecosystem.php';
+require_once __DIR__ . '/../ai/includes/bootstrap.php';
 require_once __DIR__ . '/includes/stencil-content.php';
 
 // The public storefront uses its own compact navigation instead of the full OS shell.
@@ -13,6 +14,7 @@ $disableBeyondShell = true;
 $pageTitle = 'Beyond Tattoo — Stencils, Stylesheets and Studio Tools';
 require __DIR__ . '/includes/header.php';
 
+$csrf = csrf_token();
 $stencilDay = bt_stencil_content();
 $downloadFile = $stencilDay['package_url'];
 $packImage = trim((string)($stencilDay['pack_image_url'] ?? '')) ?: $stencilDay['preview_url'];
@@ -115,7 +117,6 @@ if (!empty($stencilDay['iso_date'])) {
 
       <div class="bt-header-actions">
         <a class="bt-header-download" href="stencils.php">View release calendar</a>
-        <a class="bt-login-link" href="stencils.php">Browse release calendar</a>
         <a class="bt-login-link" href="login.php?workspace=studio">Studio login</a>
         <details class="bt-mobile-menu">
           <summary aria-label="Open menu">☰</summary>
@@ -136,44 +137,45 @@ if (!empty($stencilDay['iso_date'])) {
     </div>
   </header>
 
-  <section class="bt-main-hero">
-    <div class="bt-wrap bt-main-hero-grid">
-      <div class="bt-main-copy">
-        <p class="bt-gold-kicker">✦ STENCILS · STYLESHEETS · STUDIO WORKSPACE</p>
-        <h1><span>BEYOND</span><strong>TATTOO</strong></h1>
-        <p class="bt-stencil-drop">TATTOO IMAGINATION PROMPT</p>
-        <p class="bt-main-lead">Turn a tattoo idea into a six-piece creative direction: stencil, stylesheet, lore, reference artwork, placement mockup and printer-ready studio asset.</p>
-        <div class="bt-main-actions">
-          <a class="bt-glow-button" href="tattoo-generator.php">✦ Start the stencil generator</a>
-          <a class="bt-outline-button" href="ar-preview.php">◌ Preview placement in AR</a>
+  <!-- Interactive Needle Bot Prompt Workspace Hero -->
+  <section class="bt-needle-app-hero" id="app">
+    <div class="bt-wrap bt-needle-app-container">
+      <div class="bt-needle-app-intro">
+        <img class="bt-needle-app-avatar" src="<?= e(bt_app_url('assets/img/needle-bot-v2.png')) ?>" alt="Needle Bot, the violet-eyed armored tattoo robot">
+        <h1>Your tattoo AI companion</h1>
+        <p>Talk through tattoo ideas and stencil prep, or ask Needle Bot for help with Beyond Tattoo.</p>
+        <div class="bt-needle-app-pills">
+          <span>Design ideas</span>
+          <span>Stencil prep</span>
+          <span>Editor help</span>
         </div>
-        <div class="bt-trust-row" aria-label="Idea generator features">
-          <span><i>✦</i> Six connected assets</span>
-          <span><i>◇</i> Stylesheet-led prompts</span>
-          <span><i>▣</i> Needle Bot guided</span>
+      </div>
+
+      <div class="bt-needle-app-welcome" id="welcome">
+        <b>What are we creating?</b>
+        <p>Needle Bot answers tattoo and stencil questions. Image creation belongs to Jaguar Draw; it is not connected to this chat yet. Your editor images stay on your device.</p>
+        <div class="bt-needle-app-suggestions">
+          <button type="button" class="bt-suggestion-btn">Help me plan a tattoo concept</button>
+          <button type="button" class="bt-suggestion-btn">How can I get cleaner lines from my image?</button>
+          <button type="button" class="bt-suggestion-btn">Generate a 6-piece tattoo direction</button>
+          <button type="button" class="bt-suggestion-btn">Create an Autumn Ink flash concept</button>
         </div>
+      </div>
+
+      <div class="bt-needle-app-feed" id="messages" aria-live="polite"></div>
+
+      <div class="bt-needle-app-composer-wrap">
+        <div class="bt-needle-app-error" id="error" role="status"></div>
+        <form class="bt-needle-app-composer" id="form">
+          <textarea id="prompt" rows="2" maxlength="8000" placeholder="Ask Needle Bot…" aria-label="Message Needle Bot" required></textarea>
+          <button class="bt-needle-app-send" id="send" aria-label="Send message">↑</button>
+        </form>
+        <p class="bt-needle-app-fine">Jaguar Draw image generation is not connected to this web chat yet. Uploaded art stays on your device.</p>
       </div>
     </div>
   </section>
 
-  <section class="bt-needle-feature" aria-labelledby="needle-feature-title">
-    <div class="bt-wrap bt-needle-feature-card">
-      <div class="bt-needle-feature-art">
-        <img src="<?= e(bt_app_url('assets/img/needle-bot-v2.png')) ?>" alt="Needle Bot, a petite armored tattoo robot with a pale feminine face, ornate dark metal helmet, and glowing violet eyes" width="1024" height="1536" loading="lazy">
-      </div>
-      <div class="bt-needle-feature-copy">
-        <p class="bt-purple-kicker">Your tattoo AI companion</p>
-        <h2 id="needle-feature-title">Meet Needle Bot</h2>
-        <p>Turn a rough idea into six connected tattoo directions with Needle Bot and Llama Jaguar, then carry the strongest brief into your stencil workflow.</p>
-        <div class="bt-needle-feature-actions">
-          <a class="bt-glow-button" href="<?= e(bt_app_url('tattoo-generator.php')) ?>">Generate six ideas</a>
-          <a class="bt-outline-button" href="<?= e(bt_app_url('needle-bot.php')) ?>">Chat with Needle Bot</a>
-        </div>
-        <small>Llama Jaguar shapes the concepts. Needle Bot keeps the tattoo direction practical and studio-ready.</small>
-      </div>
-    </div>
-  </section>
-
+  <!-- Storefront Catalog Sections Below -->
   <section class="bt-category-section" aria-labelledby="imagination-title">
     <div class="bt-wrap bt-section-frame">
       <p class="bt-purple-kicker">From imagination to skin-ready planning</p>
@@ -316,4 +318,16 @@ if (!empty($stencilDay['iso_date'])) {
 
   <a class="bt-mobile-sticky-download" href="stencils.php">Browse release calendar</a>
 </main>
+
+<script>
+'use strict';
+const csrf=<?=json_encode($csrf)?>,messagesEl=document.getElementById('messages'),form=document.getElementById('form'),input=document.getElementById('prompt'),send=document.getElementById('send'),errorEl=document.getElementById('error');let history=[],proof=null,language='en';
+function add(role,text){document.getElementById('welcome')?.remove();const row=document.createElement('div');row.className='message '+role;const avatar=document.createElement('div');avatar.className='avatar';if(role==='assistant'){const portrait=document.createElement('img');portrait.src=<?=json_encode(bt_app_url('assets/img/needle-bot-v2.png'))?>;portrait.alt='';avatar.append(portrait)}else{avatar.textContent='You'}const bubble=document.createElement('div');bubble.className='bubble';bubble.textContent=text;row.append(avatar,bubble);messagesEl.append(row);const feed=document.querySelector('.bt-needle-app-feed');if(feed)feed.scrollTop=feed.scrollHeight;return bubble}
+async function challenge(){const res=await fetch('api/needle-bot-challenge.php',{cache:'no-store',credentials:'same-origin'});const data=await res.json();if(!res.ok||!data.challenge)throw Error(data.error||'Security check unavailable.');for(let i=0;i<3000000;i++){if(String(i).length>12)break;if(new RegExp('^0{'+Math.ceil(data.difficulty/4)+'}').test(await digest(data.challenge+':'+i)))return{challenge:data.challenge,counter:String(i)};if(i%400===0)await new Promise(resolve=>setTimeout(resolve,0))}throw Error('Security check could not finish. Try again.')}
+async function digest(value){const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));return Array.from(new Uint8Array(hash),b=>b.toString(16).padStart(2,'0')).join('')}
+if(form){
+  form.addEventListener('submit',async event=>{event.preventDefault();const text=input.value.trim();if(!text||send.disabled)return;input.value='';errorEl.textContent='';const bubble=add('user',text);history.push({role:'user',content:text});send.disabled=true;const thinking=add('assistant','Needle Bot is thinking…');try{proof=<?=!empty($_SESSION['user_id']) ? 'null' : 'await challenge()'?>;const response=await fetch('api/needle-bot-chat.php',{method:'POST',credentials:'same-origin',cache:'no-store',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({language,messages:history,proof})});const data=await response.json();if(!response.ok)throw Error(data.error||'Needle Bot is unavailable.');thinking.textContent=data.message;history.push({role:'assistant',content:data.message})}catch(err){thinking.textContent='';thinking.closest('.message')?.remove();history.pop();errorEl.textContent=err instanceof Error?err.message:'Needle Bot could not reply.';input.value=text}finally{proof=null;send.disabled=false;input.focus()}});
+  document.querySelectorAll('.bt-suggestion-btn').forEach(button=>button.addEventListener('click',()=>{input.value=button.textContent;input.focus()}));
+}
+</script>
 <?php require __DIR__ . '/includes/footer.php'; ?>

@@ -20,19 +20,18 @@ echo '<h1>✦ BIT Monorepo Server Deployment ✦</h1>';
 $targetDirEsc = escapeshellarg($targetDir);
 $authUrlEsc = escapeshellarg($authUrl);
 $output = [];
-$returnCode = 0;
 
 if (!is_dir($targetDir . '/.git')) {
     echo "<p>Initializing fresh git repository at <code>$targetDir</code>…</p>";
     if (!is_dir($targetDir)) {
         @mkdir($targetDir, 0755, true);
     }
-    exec("cd $targetDirEsc && git init -b main 2>&1", $output, $returnCode);
+    exec("cd $targetDirEsc && git init -b main 2>&1", $output);
 } else {
     echo "<p>Updating existing repository at <code>$targetDir</code>…</p>";
 }
 
-exec("cd $targetDirEsc && (git remote set-url origin $authUrlEsc 2>&1 || git remote add origin $authUrlEsc 2>&1)", $output, $returnCode);
+exec("cd $targetDirEsc && (git remote set-url origin $authUrlEsc 2>&1 || git remote add origin $authUrlEsc 2>&1)", $output);
 exec("cd $targetDirEsc && git fetch --prune origin main 2>&1 && git reset --hard origin/main 2>&1", $output, $returnCode);
 
 echo '<pre>';
